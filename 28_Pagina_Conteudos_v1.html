@@ -1,0 +1,2775 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Conteúdos institucionais do Grupo NTC — biblioteca editorial dedicada à administração pública brasileira. Artigos, estudos, notas técnicas, webinars e materiais didáticos produzidos pela curadoria científica das três verticais NTC: Educação, Gestão Pública e Saúde." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://www.grupontc.com.br/conteudos" />
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:site_name" content="Grupo NTC" />
+<meta property="og:title" content="Conteúdos institucionais · Grupo NTC" />
+<meta property="og:description" content="Biblioteca editorial do Grupo NTC — artigos, estudos, notas técnicas, webinars e materiais didáticos para a administração pública brasileira." />
+<meta property="og:url" content="https://www.grupontc.com.br/conteudos" />
+<meta property="og:image" content="https://www.grupontc.com.br/img/og/og-conteudos.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Conteúdos institucionais · Grupo NTC" />
+<meta name="twitter:description" content="Biblioteca editorial do Grupo NTC · artigos · estudos · notas técnicas · webinars · materiais para a administração pública brasileira." />
+<meta name="twitter:image" content="https://www.grupontc.com.br/img/og/og-conteudos.jpg" />
+
+<title>Conteúdos institucionais · Grupo NTC</title>
+
+<!--
+  ===========================================================================
+  GRUPO NTC · PORTAL · PÁGINA CONTEÚDOS · v2.0 · 14/05/2026
+  ---------------------------------------------------------------------------
+  Sprint D · 5ª entrega · Página-mãe editorial · refino sênior aplicado
+  para adequação editorial e segurança institucional · destrava o nav-item
+  "Conteúdos" do menu institucional das 8+ páginas-mãe canônicas.
+
+  CHANGELOG v1.0 → v2.0 (14/05/2026 · refino sênior para publicação):
+    MÉTRICAS:
+      — 5 métricas substituídas por formulações conservadoras (sem números
+        sem lastro documental): Produção editorial · Acervo em expansão ·
+        Webinars e replays · 3 verticais editoriais · Acesso progressivo.
+    MANIFESTO EDITORIAL:
+      — "A NTC não publica conteúdo para vender curso, gerar lead ou engajar
+        algoritmo" substituído por formulação institucional não-reativa
+        ("A NTC publica conteúdos não como ação promocional isolada, mas
+        como extensão de sua curadoria científica...").
+      — "Cada texto é assinado por uma frente editorial" → "Cada conteúdo
+        é atribuído a uma frente editorial do Instituto...".
+    TESE EDITORIAL:
+      — "É a doutrina viva da NTC, traduzida em texto, áudio e vídeo" →
+        "É a inteligência técnica da NTC traduzida em texto, áudio e vídeo".
+    BIBLIOTECA · CARDS:
+      — Reduzida de 16 para 9 cards prototipais (3 EDU + 2 GP + 2 SAU
+        + 2 TRANS) para coerência com a fase atual do projeto (CMS sendo
+        alimentado pela curadoria).
+      — Todos os 9 cards e os 3 destaques featured marcados visualmente
+        como "Em preparação editorial" (selo `.cont-card-prep`).
+      — CTAs convertidos de "Ler/Assistir/Baixar →" (com href ativo) para
+        rótulo neutro "Em breve" sem comportamento clicável — preserva
+        `data-cms-link` para CMS flip futuro.
+      — Datas específicas ("Mai 2026", "Abr 2026") substituídas por
+        "Previsto · 2026" para reforçar caráter prospectivo.
+      — Microcopy do header da biblioteca ajustada: "Acervo em construção
+        · conteúdos sendo finalizados pela curadoria editorial".
+    FAQ · LICENCIAMENTO:
+      — Removida menção a "Creative Commons CC BY-NC 4.0" (licença não
+        formalmente aprovada). Substituída por redação segura: citação
+        livre com atribuição à frente editorial + título + ano + URL;
+        reprodução integral, adaptação, uso comercial ou institucional
+        em larga escala dependem de autorização prévia do Instituto.
+    NEWSLETTER:
+      — Label "Nome institucional" trocada por "Nome completo".
+    DESTAQUES EDITORIAIS:
+      — Título da seção: "Três publicações em circulação ativa" →
+        "Próximas publicações editoriais em preparação".
+      — Selos visuais "Em preparação editorial" em cada destaque.
+      — CTAs trocados de link-arrow ativo para rótulo neutro "Em breve".
+    PRESERVAÇÃO INTEGRAL:
+      — Paleta Soberana, tipografia, header/footer canônicos, subnav
+        sticky, faixas premium parallax, biblioteca filtravel, curadoria
+        por vertical, newsletter, FAQ, CTA final, mobile drawer, fade-in,
+        JSON-LD, SEO, OG, Twitter Card.
+  ===========================================================================
+-->
+<!--
+  ESCOPO ORIGINAL v1.0 · 14/05/2026
+  ---------------------------------------------------------------------------
+  Sprint D · 5ª entrega · Página-mãe editorial · destrava o nav-item
+  "Conteúdos" do menu institucional das 8+ páginas-mãe canônicas.
+
+  ESCOPO EDITORIAL:
+    1)  Hero institucional slim com 5 quicklinks (Destaques · Biblioteca ·
+        Tipos · Verticais · Newsletter).
+    2)  Faixa de 5 métricas editoriais (anos de publicação · acervo total ·
+        áreas formativas · webinars com replay · materiais didáticos).
+    3)  Subnav institucional sticky (paridade canon com Capacitação v2.0).
+    4)  Manifesto editorial curto: por que a NTC publica conteúdos.
+    5)  Faixa premium parallax "Inteligência institucional em circulação"
+        com 3 pilares editoriais (Pesquisa aplicada · Posição técnica ·
+        Formação continuada).
+    6)  3 destaques editoriais em formato editorial premium horizontal
+        (1 estudo · 1 artigo · 1 webinar).
+    7)  Biblioteca filtravel com 16 cards prototipais · busca + filtros
+        funcionais por tipo + vertical client-side · pipeline com URL sync.
+    8)  5 tipos editoriais institucionais (Artigos · Estudos · Notas
+        técnicas · Webinars · Materiais didáticos).
+    9)  Curadoria temática por vertical (NTC Educação · NTC Gestão Pública
+        · NTC Saúde) com 3 trilhas editoriais.
+   10)  Bloco Newsletter premium "Boletim NTC" com microcopy editorial
+        e LGPD inline.
+   11)  FAQ Conteúdos (8 perguntas · acesso · licenciamento · citação ·
+        certificação · replay · LGPD · contribuições externas · idiomas).
+   12)  CTA final cromático com 3 pontes (Agenda · Soluções · Corpo Docente).
+   13)  Footer canon Soberana idêntico às demais páginas-mãe.
+
+  HERANÇA DE MATRIZ (paridade integral com Capacitação v2.0):
+    — Tokens Soberana · tipografia · .container · .btn · .link-arrow
+    — Header sticky + 3 mega menus (Programas · Capacitação · Soluções)
+    — Mobile drawer · Skip-link · fade-in · scroll suave
+    — Subnav institucional sticky com highlight do anchor ativo
+    — Footer institucional idêntico · Sticky CTA mobile
+    — JSON-LD com CollectionPage + EducationalOrganization + ItemList
+
+  CONVENÇÃO CMS FUTURA:
+    Cada card carrega data-cms-link (conteudo-XXX) e data-track. Os 16
+    cards são prototipais — em produção CMS renderizam do mesmo dataset
+    com paginação, ordenação e infinite scroll. As atribuições editoriais
+    são institucionais (Curadoria Editorial NTC, Direção Científica NTC,
+    Equipe Técnica das verticais) — não inventamos autorias reais sem
+    consentimento das pessoas envolvidas.
+
+  ===========================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+
+<style>
+/* =============================================================
+   SISTEMA SOBERANA 2026 · TOKENS
+   ============================================================= */
+:root {
+  --oxford:        #11365E;
+  --oxford-90:     rgba(17, 54, 94, 0.92);
+  --oxford-70:     rgba(17, 54, 94, 0.72);
+  --oxford-10:     rgba(17, 54, 94, 0.10);
+  --cardeal:       #8E2A1C;
+  --cardeal-10:    rgba(142, 42, 28, 0.10);
+  --oliva:         #4A6A1F;
+  --oliva-10:      rgba(74, 106, 31, 0.10);
+  --dourado:       #B8952E;
+  --dourado-soft:  #d6b350;
+  --noite:         #0B1726;
+  --pergaminho:    #F4F1E8;
+  --pergaminho-80: rgba(244, 241, 232, 0.80);
+  --pergaminho-50: rgba(244, 241, 232, 0.50);
+  --ivory:         #ECE7D8;
+  --tinta:         #14202E;
+  --grafite:       #3A4050;
+  --prata:         #A8ACB6;
+  --prata-30:      rgba(168, 172, 182, 0.32);
+  --prata-15:      rgba(168, 172, 182, 0.15);
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans:  'Barlow', system-ui, -apple-system, sans-serif;
+  --font-cond:  'Barlow Condensed', 'Barlow', sans-serif;
+
+  --space-1: 8px;  --space-2: 16px; --space-3: 24px; --space-4: 32px;
+  --space-5: 48px; --space-6: 64px; --space-7: 96px; --space-8: 128px;
+
+  --shadow-soft:   0 1px 2px rgba(20, 32, 46, 0.04), 0 2px 8px rgba(20, 32, 46, 0.04);
+  --shadow-medium: 0 2px 4px rgba(20, 32, 46, 0.06), 0 8px 24px rgba(20, 32, 46, 0.10);
+  --shadow-strong: 0 4px 12px rgba(20, 32, 46, 0.12), 0 16px 48px rgba(20, 32, 46, 0.14);
+
+  --container-max: 1280px;
+  --header-h: 88px;
+  --t-fast:   160ms ease-out;
+  --t-medium: 240ms ease-out;
+  --t-slow:   600ms ease-out;
+}
+
+/* =============================================================
+   RESET
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-padding-top: var(--header-h); }
+body {
+  margin: 0; font-family: var(--font-sans); font-weight: 400;
+  font-size: 17px; line-height: 1.65; color: var(--grafite);
+  background: var(--pergaminho); text-rendering: optimizeLegibility;
+}
+body.no-scroll { overflow: hidden; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; transition: color var(--t-fast); }
+button { font-family: inherit; cursor: pointer; }
+ul { list-style: none; padding: 0; margin: 0; }
+:focus-visible { outline: 2px solid var(--dourado); outline-offset: 2px; border-radius: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; padding: 12px 20px;
+  background: var(--tinta); color: var(--pergaminho);
+  font-family: var(--font-cond); font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; font-size: 13px; z-index: 9999;
+}
+.skip-link:focus { left: 0; }
+
+/* =============================================================
+   TIPOGRAFIA GLOBAL
+   ============================================================= */
+h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0; line-height: 1.12; letter-spacing: -0.3px; }
+.eyebrow {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12.5px;
+  text-transform: uppercase; letter-spacing: 1.8px; color: var(--oxford);
+  margin: 0 0 var(--space-2);
+}
+.eyebrow.gold  { color: var(--dourado); }
+.eyebrow.light { color: var(--pergaminho-80); }
+.eyebrow.crimson { color: var(--cardeal); }
+.eyebrow.olive { color: var(--oliva); }
+
+.lede {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 24px; line-height: 1.4; color: var(--tinta);
+}
+
+.container { width: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 32px; }
+@media (max-width: 1199px) { .container { padding: 0 24px; } }
+@media (max-width: 767px)  { .container { padding: 0 16px; } }
+
+.section { padding: var(--space-7) 0; }
+.section--cream { background: var(--ivory); }
+.section--pergaminho { background: var(--pergaminho); }
+.section--noite { background: var(--noite); color: var(--pergaminho); }
+.section-head { max-width: 880px; margin: 0 auto var(--space-5); text-align: center; }
+.section-head h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(30px, 3.4vw, 44px); line-height: 1.1; color: var(--tinta);
+  margin: 0 0 var(--space-2);
+}
+.section-head h2 em { font-style: italic; color: var(--dourado); font-weight: 500; }
+.section-head .intro { font-size: 17px; line-height: 1.6; color: var(--grafite); margin: 0 auto; }
+.section--noite .section-head h2 { color: var(--pergaminho); }
+.section--noite .section-head h2 em { color: var(--dourado-soft); }
+.section--noite .section-head .intro { color: var(--pergaminho-80); }
+
+/* =============================================================
+   BOTÕES E LINKS
+   ============================================================= */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 26px; font-family: var(--font-sans); font-weight: 600;
+  font-size: 13.5px; letter-spacing: 0.8px; text-transform: uppercase;
+  border-radius: 4px; border: 1.5px solid transparent;
+  transition: all var(--t-medium); cursor: pointer; white-space: nowrap;
+}
+.btn--primary    { background: var(--oxford); color: var(--pergaminho); border-color: var(--oxford); }
+.btn--primary:hover { background: var(--noite); border-color: var(--noite); transform: translateY(-1px); box-shadow: var(--shadow-soft); }
+.btn--gold       { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+.btn--gold:hover { background: var(--noite); color: var(--dourado-soft); border-color: var(--dourado); }
+.btn--secondary  { background: transparent; color: var(--oxford); border-color: var(--oxford); }
+.btn--secondary:hover { background: var(--oxford); color: var(--pergaminho); }
+.btn--ghost-light{ background: transparent; color: var(--pergaminho); border-color: var(--pergaminho-80); }
+.btn--ghost-light:hover { background: var(--pergaminho); color: var(--noite); border-color: var(--pergaminho); }
+.btn--participant { background: var(--noite); color: var(--dourado); border-color: var(--noite); }
+.btn--participant:hover { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+.btn--mini { padding: 10px 16px; font-size: 12px; }
+.btn-arrow { display: inline-block; transition: transform var(--t-medium); }
+.btn:hover .btn-arrow { transform: translateX(3px); }
+
+.link-arrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-cond); font-weight: 600; font-size: 13px;
+  text-transform: uppercase; letter-spacing: 1.4px; color: var(--oxford);
+  border-bottom: 1px solid transparent; padding-bottom: 3px;
+  transition: all var(--t-medium); cursor: pointer; background: none; border-top: 0; border-left: 0; border-right: 0;
+}
+.link-arrow::after { content: '→'; transition: transform var(--t-medium); }
+.link-arrow:hover { border-bottom-color: var(--dourado); color: var(--dourado); }
+.link-arrow:hover::after { transform: translateX(3px); }
+.link-arrow.light { color: var(--pergaminho); }
+.link-arrow.light:hover { color: var(--dourado-soft); border-bottom-color: var(--dourado-soft); }
+
+/* =============================================================
+   HEADER · STICKY + MEGA MENU (canon)
+   ============================================================= */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(244, 241, 232, 0.94);
+  backdrop-filter: saturate(140%) blur(14px);
+  -webkit-backdrop-filter: saturate(140%) blur(14px);
+  border-bottom: 1px solid var(--prata-30);
+  height: var(--header-h);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; gap: var(--space-3); }
+.brand { display: flex; align-items: center; }
+.brand img { height: 56px; width: auto; }
+@media (max-width: 599px) { .brand img { height: 44px; } }
+
+.nav-primary { display: flex; align-items: center; gap: 0; }
+.nav-item {
+  position: relative; padding: 30px 14px;
+  font-family: var(--font-cond); font-weight: 500; font-size: 13.5px;
+  color: var(--tinta); text-transform: uppercase; letter-spacing: 1.1px;
+  cursor: pointer; transition: color var(--t-fast);
+  background: transparent; border: 0;
+}
+.nav-item:hover { color: var(--oxford); }
+.nav-item.is-current { color: var(--oxford); }
+.nav-item.is-current::after {
+  content: ''; position: absolute; left: 14px; right: 14px; bottom: 22px;
+  height: 2px; background: var(--dourado);
+}
+.nav-item.has-mega::after {
+  content: ''; display: inline-block; width: 6px; height: 6px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  margin-left: 7px; opacity: 0.55;
+}
+.header-cta { display: flex; align-items: center; gap: 10px; }
+
+.mega {
+  position: absolute; top: calc(var(--header-h) - 1px); left: 0; right: 0;
+  background: var(--pergaminho);
+  border-top: 1px solid var(--prata-30);
+  border-bottom: 3px solid var(--oxford);
+  box-shadow: var(--shadow-medium);
+  opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity var(--t-medium), transform var(--t-medium), visibility var(--t-medium);
+  z-index: 99;
+}
+.mega.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+.mega-inner { display: grid; gap: var(--space-5); padding: var(--space-5) 0 var(--space-6); }
+.mega-col h4 {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--dourado);
+  margin: 0 0 var(--space-3); padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--prata-30);
+}
+.mega-list { display: grid; gap: 12px; }
+.mega-list a {
+  display: block; padding: 6px 0; color: var(--tinta);
+  border-left: 0 solid var(--oxford); padding-left: 0;
+  transition: padding-left var(--t-medium), border-left-width var(--t-medium), color var(--t-fast);
+}
+.mega-list a strong {
+  font-family: var(--font-serif); font-weight: 600; font-size: 18px;
+  color: var(--tinta); display: block;
+}
+.mega-list a span {
+  font-family: var(--font-sans); font-size: 12.5px; color: var(--grafite);
+  display: block; line-height: 1.4; margin-top: 2px;
+}
+.mega-list a:hover { border-left-width: 3px; padding-left: 12px; color: var(--oxford); }
+.mega-list a:hover strong { color: var(--oxford); }
+#mega-programas .mega-inner { grid-template-columns: 1.1fr 1fr 1fr; }
+
+.mobile-toggle {
+  display: none; background: none; border: 0; padding: 12px;
+  color: var(--tinta); cursor: pointer; align-self: center;
+}
+.mobile-toggle span { display: block; width: 22px; height: 2px; background: currentColor; margin: 5px 0; transition: var(--t-medium); }
+
+@media (max-width: 1199px) {
+  .nav-primary { display: none; }
+  .header-cta .btn:not(.btn--participant) { display: none; }
+  .mobile-toggle { display: block; }
+}
+@media (max-width: 599px) {
+  .header-cta .btn--participant { display: none; }
+}
+
+/* =============================================================
+   MOBILE DRAWER (canon)
+   ============================================================= */
+.mobile-drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: 100%;
+  max-width: 420px; background: var(--pergaminho); z-index: 200;
+  transform: translateX(100%); transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex; flex-direction: column;
+  box-shadow: -8px 0 32px rgba(20, 32, 46, 0.18); overflow-y: auto;
+}
+.mobile-drawer.is-open { transform: translateX(0); }
+.mobile-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(11, 23, 38, 0.6);
+  opacity: 0; visibility: hidden; transition: opacity 320ms, visibility 320ms; z-index: 199;
+}
+.mobile-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+
+.drawer-head { display: flex; justify-content: space-between; align-items: center; padding: 22px 24px; border-bottom: 1px solid var(--prata-30); }
+.drawer-head img { height: 44px; width: auto; }
+.drawer-close {
+  background: none; border: 0; padding: 8px; cursor: pointer;
+  font-family: var(--font-sans); font-size: 28px; color: var(--tinta);
+  line-height: 1; width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-nav { padding: var(--space-3) 0; flex: 1; }
+.drawer-item {
+  display: block; width: 100%; text-align: left;
+  padding: 18px 24px; border: 0; background: transparent;
+  font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  color: var(--tinta); cursor: pointer;
+  border-bottom: 1px solid var(--prata-15); transition: background var(--t-fast);
+}
+.drawer-item:hover, .drawer-item:focus { background: rgba(184, 149, 46, 0.08); }
+.drawer-item.is-current { color: var(--oxford); }
+.drawer-item.has-sub::after {
+  content: '+'; float: right; color: var(--dourado); font-weight: 400;
+  transition: transform var(--t-medium);
+}
+.drawer-item.has-sub.is-expanded::after { content: '−'; }
+.drawer-sub { display: none; background: rgba(168, 172, 182, 0.08); padding: 8px 0; }
+.drawer-sub.is-open { display: block; }
+.drawer-sub a {
+  display: block; padding: 12px 24px 12px 36px;
+  font-family: var(--font-sans); font-size: 15px; color: var(--grafite);
+  border-bottom: 1px solid var(--prata-15);
+}
+.drawer-sub a:hover { color: var(--oxford); background: rgba(184, 149, 46, 0.05); }
+.drawer-sub a strong { font-family: var(--font-serif); font-weight: 600; font-size: 16px; color: var(--tinta); display: block; }
+.drawer-sub a span { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--prata); }
+.drawer-cta { padding: var(--space-3) 24px var(--space-4); display: grid; gap: 10px; border-top: 1px solid var(--prata-30); }
+.drawer-cta .btn { width: 100%; justify-content: center; padding: 14px; }
+
+/* =============================================================
+   HERO INSTITUCIONAL SLIM
+   ============================================================= */
+.hero-page {
+  position: relative;
+  min-height: 480px;
+  display: flex; align-items: center;
+  background: var(--noite); color: var(--pergaminho);
+  overflow: hidden;
+  padding: var(--space-6) 0;
+}
+.hero-page-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(125deg, rgba(11, 23, 38, 0.92) 0%, rgba(17, 54, 94, 0.80) 55%, rgba(11, 23, 38, 0.74) 100%),
+    url('./img/fotos/_optimized/credibilidade-bastidor-transmissao.1920.webp');
+  background-size: cover;
+  background-position: center 42%;
+  filter: saturate(88%) contrast(1.06);
+}
+.hero-page::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background:
+    radial-gradient(ellipse at top right, rgba(184, 149, 46, 0.20) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom left, rgba(17, 54, 94, 0.30) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-page::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: linear-gradient(90deg, rgba(168, 172, 182, 0.05) 1px, transparent 1px);
+  background-size: 80px 100%;
+}
+.hero-page-content { position: relative; z-index: 2; max-width: 940px; }
+.hero-page h1 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(36px, 5vw, 62px); line-height: 1.06;
+  letter-spacing: -0.4px; color: var(--pergaminho);
+  margin: var(--space-3) 0 var(--space-3);
+}
+.hero-page h1 .accent { color: var(--dourado-soft); font-style: italic; font-weight: 500; }
+.hero-page-sub {
+  font-family: var(--font-sans); font-weight: 400;
+  font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6;
+  color: var(--pergaminho-80); max-width: 740px; margin: 0 0 var(--space-4);
+}
+.hero-quicklinks {
+  display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3);
+  font-family: var(--font-cond); font-size: 12.5px; letter-spacing: 1.4px; text-transform: uppercase;
+}
+.hero-quicklinks a {
+  color: var(--pergaminho-80); border-bottom: 1px solid rgba(244, 241, 232, 0.18);
+  padding-bottom: 4px; transition: all var(--t-medium);
+}
+.hero-quicklinks a:hover { color: var(--dourado-soft); border-bottom-color: var(--dourado-soft); }
+
+.crumb {
+  font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--pergaminho-80); display: flex; gap: 8px; align-items: center;
+}
+.crumb a { color: var(--pergaminho-80); transition: color var(--t-fast); }
+.crumb a:hover { color: var(--dourado-soft); }
+.crumb span.sep::before { content: '/'; opacity: 0.5; }
+.crumb span.current { color: var(--dourado-soft); }
+
+/* =============================================================
+   FAIXA DE MÉTRICAS EDITORIAIS
+   ============================================================= */
+.cont-metrics {
+  background: var(--ivory);
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--prata-30);
+  border-bottom: 1px solid var(--prata-30);
+}
+.cont-metrics-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-3);
+  align-items: start;
+}
+@media (max-width: 1199px) { .cont-metrics-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 767px)  { .cont-metrics-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px)  { .cont-metrics-grid { grid-template-columns: 1fr; } }
+.cont-metric {
+  display: flex; flex-direction: column; gap: 6px;
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--dourado);
+}
+.cont-metric .cm-num {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(34px, 3.6vw, 46px); line-height: 1;
+  color: var(--oxford); letter-spacing: -0.5px;
+}
+.cont-metric .cm-num--word { font-style: italic; font-weight: 500; color: var(--dourado); }
+.cont-metric .cm-lbl {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12px;
+  letter-spacing: 1.6px; text-transform: uppercase; color: var(--grafite);
+}
+.cont-metric .cm-detail {
+  font-family: var(--font-sans); font-size: 12.5px; color: var(--grafite);
+  line-height: 1.5; margin-top: 2px;
+}
+
+/* =============================================================
+   SUBNAV INSTITUCIONAL · STICKY OPCIONAL
+   ============================================================= */
+.cont-subnav {
+  background: var(--ivory);
+  border-top: 1px solid var(--dourado);
+  border-bottom: 1px solid var(--prata-30);
+  position: relative;
+  z-index: 60;
+}
+.cont-subnav.is-sticky {
+  position: sticky;
+  top: var(--header-h);
+  box-shadow: 0 1px 0 rgba(20,32,46,0.04), 0 6px 14px rgba(20,32,46,0.05);
+}
+.cont-subnav-inner {
+  display: flex; align-items: center; gap: var(--space-4);
+  padding: 14px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.cont-subnav-inner::-webkit-scrollbar { height: 2px; }
+.cont-subnav-inner::-webkit-scrollbar-thumb { background: var(--prata-30); }
+.cont-subnav-label {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--dourado); padding-right: var(--space-3);
+  border-right: 1px solid var(--prata-30); flex-shrink: 0;
+}
+.cont-subnav a {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-cond); font-weight: 500; font-size: 12.5px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--grafite); white-space: nowrap;
+  padding: 4px 0;
+  border-bottom: 1px solid transparent;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.cont-subnav a:hover, .cont-subnav a.is-active {
+  color: var(--oxford); border-bottom-color: var(--dourado);
+}
+@media (max-width: 767px) {
+  .cont-subnav.is-sticky { position: relative; top: auto; }
+  .cont-subnav-inner { gap: var(--space-3); padding: 12px 0; }
+  .cont-subnav-label { font-size: 10.5px; padding-right: var(--space-2); }
+  .cont-subnav a { font-size: 11.5px; letter-spacing: 1.2px; }
+}
+
+/* =============================================================
+   MANIFESTO EDITORIAL
+   ============================================================= */
+.cont-manifesto { background: var(--pergaminho); padding: var(--space-7) 0; }
+.cont-manifesto-inner { max-width: 920px; margin: 0 auto; text-align: center; }
+.cont-manifesto h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(28px, 3.2vw, 40px); line-height: 1.12;
+  color: var(--tinta); margin: var(--space-2) 0 var(--space-3);
+  letter-spacing: -0.3px;
+}
+.cont-manifesto h2 em { font-style: italic; color: var(--dourado); font-weight: 500; }
+.cont-manifesto .lede { margin: 0 auto var(--space-3); max-width: 760px; color: var(--tinta); }
+.cont-manifesto p {
+  font-size: 16px; line-height: 1.7; color: var(--grafite);
+  max-width: 760px; margin: 0 auto var(--space-2);
+}
+.cont-manifesto-marker {
+  display: inline-flex; align-items: center; gap: 14px;
+  margin: var(--space-3) auto var(--space-2);
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.8px;
+  font-weight: 600; text-transform: uppercase; color: var(--dourado);
+}
+.cont-manifesto-marker::before, .cont-manifesto-marker::after {
+  content: ''; width: 40px; height: 1px; background: var(--dourado-soft); opacity: 0.55;
+}
+
+/* =============================================================
+   FAIXA PREMIUM · TESE EDITORIAL (parallax)
+   ============================================================= */
+.cont-thesis {
+  position: relative;
+  background-color: var(--noite); color: var(--pergaminho);
+  background-image:
+    linear-gradient(135deg, rgba(11, 23, 38, 0.93) 0%, rgba(17, 54, 94, 0.74) 60%, rgba(11, 23, 38, 0.84) 100%),
+    url('./img/fotos/_optimized/detalhe-still-01.1920.webp');
+  background-size: cover;
+  background-position: center 40%;
+  background-attachment: fixed;
+  padding: var(--space-7) 0;
+  overflow: hidden;
+}
+@media (max-width: 899px) {
+  .cont-thesis { background-attachment: scroll; padding: var(--space-6) 0; }
+}
+.cont-thesis::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at top right, rgba(184, 149, 46, 0.20) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom left, rgba(17, 54, 94, 0.32) 0%, transparent 60%);
+}
+.cont-thesis::after {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(90deg, rgba(168, 172, 182, 0.05) 1px, transparent 1px);
+  background-size: 96px 100%;
+}
+.cont-thesis-inner { position: relative; z-index: 1; }
+.cont-thesis-head { text-align: center; max-width: 880px; margin: 0 auto var(--space-5); }
+.cont-thesis-head .eyebrow { color: var(--dourado-soft); }
+.cont-thesis-head h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(28px, 3.2vw, 42px); line-height: 1.1;
+  color: var(--pergaminho); margin: var(--space-2) 0 var(--space-3);
+  letter-spacing: -0.3px;
+}
+.cont-thesis-head h2 em { font-style: italic; color: var(--dourado-soft); font-weight: 500; }
+.cont-thesis-head p {
+  font-size: 16px; line-height: 1.7; color: var(--pergaminho-80);
+  max-width: 720px; margin: 0 auto;
+}
+.cont-thesis-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+@media (max-width: 899px) { .cont-thesis-grid { grid-template-columns: 1fr; } }
+.cont-thesis-pilar {
+  background: rgba(244, 241, 232, 0.04);
+  border: 1px solid rgba(244, 241, 232, 0.10);
+  border-top: 3px solid var(--dourado);
+  padding: var(--space-4) var(--space-3) var(--space-3);
+  display: flex; flex-direction: column;
+}
+.cont-thesis-num {
+  font-family: var(--font-serif); font-weight: 600; font-style: italic;
+  font-size: 34px;
+  color: var(--dourado-soft); line-height: 1; letter-spacing: -0.5px;
+  margin-bottom: var(--space-2);
+}
+.cont-thesis-pilar h3 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  color: var(--pergaminho); margin: 0 0 8px; line-height: 1.25;
+  letter-spacing: -0.2px;
+}
+.cont-thesis-pilar p {
+  font-size: 14px; line-height: 1.6; color: var(--pergaminho-80); margin: 0;
+}
+.cont-thesis-rule {
+  margin-top: var(--space-3); padding-top: var(--space-2);
+  border-top: 1px dashed rgba(214, 179, 80, 0.32);
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--dourado-soft);
+}
+
+/* =============================================================
+   3 DESTAQUES EDITORIAIS · FORMATO HORIZONTAL PREMIUM
+   ============================================================= */
+.cont-featured { background: var(--ivory); padding: var(--space-7) 0; }
+.cont-featured-list { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+.cont-featured-card {
+  display: grid; grid-template-columns: 1.05fr 1.4fr;
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  overflow: hidden; min-height: 280px;
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+}
+.cont-featured-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-medium); }
+@media (max-width: 899px) {
+  .cont-featured-card { grid-template-columns: 1fr; min-height: 0; }
+}
+.cont-featured-figura {
+  position: relative;
+  background-size: cover; background-position: center;
+  min-height: 240px;
+  filter: saturate(92%) contrast(1.02);
+}
+.cont-featured-figura::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(11, 23, 38, 0.10) 0%, transparent 55%);
+}
+.cont-featured-figura-tag {
+  position: absolute; left: var(--space-3); top: var(--space-3);
+  padding: 6px 12px;
+  background: rgba(244, 241, 232, 0.92);
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--accent, var(--oxford));
+  border-left: 2px solid var(--accent, var(--oxford));
+}
+.cont-featured-body {
+  padding: var(--space-4) var(--space-4);
+  display: flex; flex-direction: column; gap: 10px;
+  justify-content: center;
+  border-left: 1px solid var(--prata-15);
+}
+@media (max-width: 899px) {
+  .cont-featured-body { border-left: 0; border-top: 1px solid var(--prata-15); }
+}
+.cont-featured-card[data-vert="edu"] { --accent: #173F68; }
+.cont-featured-card[data-vert="gov"] { --accent: #6F3826; }
+.cont-featured-card[data-vert="sau"] { --accent: #4A6A1F; }
+.cont-featured-card[data-vert="trans"] { --accent: var(--oxford); }
+.cont-featured-eyebrow {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.8px; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 10px;
+  color: var(--accent, var(--oxford));
+}
+.cont-featured-eyebrow::before {
+  content: ''; display: inline-block; width: 22px; height: 1px;
+  background: currentColor;
+}
+.cont-featured-card h3 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(22px, 2.2vw, 28px); line-height: 1.18;
+  color: var(--tinta); margin: 0; letter-spacing: -0.3px;
+}
+.cont-featured-card p {
+  font-size: 15px; line-height: 1.65; color: var(--grafite); margin: 0;
+}
+.cont-featured-meta {
+  display: flex; flex-wrap: wrap; gap: 6px 14px;
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--grafite);
+  margin-top: 6px;
+}
+.cont-featured-meta span::before { content: '·'; margin-right: 8px; color: var(--prata); }
+.cont-featured-meta span:first-child::before { content: none; margin-right: 0; }
+.cont-featured-card .link-arrow { margin-top: var(--space-2); align-self: flex-start; color: var(--accent, var(--oxford)); }
+.cont-featured-card .link-arrow:hover { color: var(--dourado); border-bottom-color: var(--dourado); }
+
+/* =============================================================
+   BIBLIOTECA FILTRAVEL · BUSCA + FILTROS + GRADE
+   ============================================================= */
+.cont-biblioteca { background: var(--pergaminho); padding: var(--space-7) 0; }
+
+.cont-filterbar {
+  background: var(--ivory);
+  border: 1px solid var(--prata-30);
+  padding: var(--space-3);
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-3); align-items: center;
+  margin: var(--space-4) 0 var(--space-3);
+}
+@media (max-width: 899px) {
+  .cont-filterbar { grid-template-columns: 1fr; }
+}
+.cont-search {
+  position: relative;
+}
+.cont-search input {
+  width: 100%;
+  font-family: var(--font-sans); font-size: 14px;
+  padding: 12px 14px 12px 40px;
+  background: var(--pergaminho);
+  border: 1px solid var(--prata-30);
+  color: var(--tinta);
+  outline: none;
+  transition: border-color var(--t-medium);
+}
+.cont-search input:focus { border-color: var(--dourado); }
+.cont-search::before {
+  content: ''; position: absolute; left: 14px; top: 50%;
+  width: 14px; height: 14px;
+  border: 1.5px solid var(--grafite); border-radius: 50%;
+  transform: translateY(-60%);
+  box-shadow: 4px 4px 0 -2px var(--grafite);
+}
+.cont-filterbar-stats {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--grafite);
+}
+.cont-filterbar-stats strong { color: var(--oxford); }
+
+.cont-tabs {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.cont-tab {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--grafite);
+  padding: 8px 16px;
+  background: var(--pergaminho);
+  border: 1px solid var(--prata-30);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all var(--t-medium);
+}
+.cont-tab:hover { border-color: var(--dourado); color: var(--oxford); }
+.cont-tab.is-active {
+  background: var(--oxford); color: var(--pergaminho); border-color: var(--oxford);
+}
+.cont-tab[data-vert="edu"].is-active { background: #173F68; border-color: #173F68; }
+.cont-tab[data-vert="gov"].is-active { background: #6F3826; border-color: #6F3826; }
+.cont-tab[data-vert="sau"].is-active { background: #4A6A1F; border-color: #4A6A1F; }
+.cont-tab[data-vert="trans"].is-active { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+
+.cont-typefilter {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.cont-typefilter button {
+  font-family: var(--font-cond); font-weight: 500; font-size: 11.5px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--grafite);
+  padding: 6px 10px;
+  background: var(--pergaminho);
+  border: 1px solid var(--prata-30);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all var(--t-medium);
+}
+.cont-typefilter button:hover { border-color: var(--dourado); color: var(--oxford); }
+.cont-typefilter button.is-active {
+  background: var(--dourado); color: var(--noite);
+  border-color: var(--dourado);
+}
+
+.cont-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+@media (max-width: 1099px) { .cont-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .cont-grid { grid-template-columns: 1fr; } }
+
+.cont-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  display: flex; flex-direction: column;
+  transition: transform var(--t-medium), box-shadow var(--t-medium), border-color var(--t-medium);
+  overflow: hidden;
+}
+.cont-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); border-color: var(--dourado); }
+.cont-card.is-hidden { display: none; }
+.cont-card-band { height: 6px; background: var(--accent, var(--oxford)); }
+.cont-card[data-vert="edu"]   { --accent: #173F68; }
+.cont-card[data-vert="gov"]   { --accent: #6F3826; }
+.cont-card[data-vert="sau"]   { --accent: #4A6A1F; }
+.cont-card[data-vert="trans"] { --accent: var(--oxford); }
+
+.cont-card-body {
+  padding: var(--space-3); display: flex; flex-direction: column; gap: 10px; flex: 1;
+}
+.cont-card-tags {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.cont-card-tag {
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  padding: 4px 8px;
+  background: rgba(17, 54, 94, 0.08);
+  color: var(--accent, var(--oxford));
+}
+.cont-card-tag.type {
+  background: rgba(184, 149, 46, 0.12);
+  color: var(--dourado);
+}
+.cont-card h3 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: 21px; color: var(--tinta);
+  line-height: 1.22; margin: 0; letter-spacing: -0.2px;
+}
+.cont-card p {
+  font-size: 14px; line-height: 1.6; color: var(--grafite); margin: 0;
+  flex: 1;
+}
+.cont-card-meta {
+  display: flex; flex-wrap: wrap; gap: 4px 12px;
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--grafite);
+}
+.cont-card-meta span::before { content: '·'; margin-right: 8px; color: var(--prata); }
+.cont-card-meta span:first-child::before { content: none; margin-right: 0; }
+.cont-card-foot {
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--prata-15);
+}
+.cont-card-foot .author {
+  font-family: var(--font-cond); font-size: 11px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--grafite);
+}
+.cont-card-foot .author strong {
+  font-family: var(--font-serif); font-style: italic; font-weight: 500;
+  font-size: 14px; color: var(--oxford); display: block;
+  text-transform: none; letter-spacing: 0;
+}
+.cont-card-link {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--accent, var(--oxford));
+  border-bottom: 1px solid transparent; padding-bottom: 2px;
+  transition: border-color var(--t-fast);
+}
+.cont-card-link:hover { border-bottom-color: var(--accent, var(--oxford)); }
+
+/* Selo "Em preparação editorial" · cards e destaques */
+.cont-card-prep, .cont-featured-prep {
+  display: inline-flex; align-items: center; gap: 8px;
+  align-self: flex-start;
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  letter-spacing: 1.8px; text-transform: uppercase;
+  padding: 4px 10px;
+  background: rgba(184, 149, 46, 0.12);
+  border: 1px solid rgba(184, 149, 46, 0.32);
+  color: var(--dourado);
+  border-radius: 2px;
+}
+.cont-card-prep::before, .cont-featured-prep::before {
+  content: ''; display: block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--dourado-soft);
+}
+
+/* CTA neutralizado · "Em breve" · sem comportamento clicável */
+.cont-card-link.is-soon, .cont-featured-soon {
+  color: var(--grafite);
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  padding: 4px 0;
+  cursor: default;
+  border-bottom: 0;
+  opacity: 0.78;
+}
+.cont-card-link.is-soon:hover, .cont-featured-soon:hover {
+  border-bottom-color: transparent;
+  opacity: 0.78;
+}
+
+/* Versão do "em breve" no destaque · link-arrow neutralizado */
+.cont-featured-soon {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: var(--space-2);
+  padding: 6px 12px;
+  background: rgba(184, 149, 46, 0.08);
+  border: 1px solid rgba(184, 149, 46, 0.32);
+  color: var(--dourado);
+  align-self: flex-start;
+}
+
+/* Microcopy "Acervo em construção" do header da biblioteca */
+.cont-biblioteca-note {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin: var(--space-3) auto 0;
+  padding: 8px 16px;
+  background: rgba(184, 149, 46, 0.10);
+  border: 1px solid rgba(184, 149, 46, 0.32);
+  border-radius: 2px;
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--dourado);
+}
+.cont-biblioteca-note::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--dourado-soft);
+  box-shadow: 0 0 0 3px rgba(214, 179, 80, 0.25);
+}
+
+.cont-empty {
+  text-align: center; padding: var(--space-6) var(--space-3);
+  font-family: var(--font-serif); font-style: italic; font-weight: 500;
+  font-size: 18px; color: var(--grafite);
+  background: var(--ivory); border: 1px dashed var(--prata-30);
+  margin-top: var(--space-4);
+  display: none;
+}
+.cont-empty.is-visible { display: block; }
+
+.cont-biblioteca-foot { text-align: center; margin-top: var(--space-5); }
+
+/* =============================================================
+   5 TIPOS EDITORIAIS · ICONOGRAFIA INSTITUCIONAL
+   ============================================================= */
+.cont-tipos { background: var(--ivory); padding: var(--space-7) 0; }
+.cont-tipos-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+@media (max-width: 1199px) { .cont-tipos-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 767px)  { .cont-tipos-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px)  { .cont-tipos-grid { grid-template-columns: 1fr; } }
+.cont-tipo {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  padding: var(--space-4) var(--space-3);
+  display: flex; flex-direction: column; gap: 8px;
+  border-top: 3px solid var(--dourado);
+  position: relative;
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+}
+.cont-tipo:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.cont-tipo-num {
+  font-family: var(--font-serif); font-weight: 600; font-style: italic;
+  font-size: 30px;
+  color: var(--dourado); line-height: 1; letter-spacing: -0.5px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--prata-15);
+  margin-bottom: 6px;
+}
+.cont-tipo h3 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: 20px; color: var(--tinta);
+  margin: 0; line-height: 1.2; letter-spacing: -0.2px;
+}
+.cont-tipo p {
+  font-size: 13.5px; line-height: 1.55; color: var(--grafite); margin: 0;
+}
+.cont-tipo-tag {
+  margin-top: auto; padding-top: var(--space-2);
+  font-family: var(--font-cond); font-size: 10.5px;
+  font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--dourado);
+}
+
+/* =============================================================
+   CURADORIA POR VERTICAL · 3 TRILHAS EDITORIAIS
+   ============================================================= */
+.cont-verticais { background: var(--pergaminho); padding: var(--space-7) 0; }
+.cont-verticais-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+@media (max-width: 899px) { .cont-verticais-grid { grid-template-columns: 1fr; } }
+.cont-vert-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  padding: 0;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+}
+.cont-vert-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); }
+.cont-vert-card[data-vert="edu"] { --accent: #173F68; --accent-deep: #0E2A48; }
+.cont-vert-card[data-vert="gov"] { --accent: #6F3826; --accent-deep: #4A2418; }
+.cont-vert-card[data-vert="sau"] { --accent: #4A6A1F; --accent-deep: #2E4514; }
+.cont-vert-band {
+  position: relative;
+  height: 90px;
+  background:
+    linear-gradient(135deg, var(--accent-deep) 0%, var(--accent) 55%, var(--accent-deep) 100%);
+  overflow: hidden;
+}
+.cont-vert-band::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at top right, rgba(184, 149, 46, 0.22) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom left, rgba(244, 241, 232, 0.06) 0%, transparent 60%);
+}
+.cont-vert-band::after {
+  content: ''; position: absolute; inset: 0;
+  background-image:
+    linear-gradient(90deg, rgba(244, 241, 232, 0.06) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(244, 241, 232, 0.04) 1px, transparent 1px);
+  background-size: 56px 100%, 100% 28px;
+  opacity: 0.7;
+}
+.cont-vert-band-mark {
+  position: absolute; left: var(--space-3); bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--dourado-soft);
+}
+.cont-vert-band-mark::before {
+  content: ''; display: block; width: 22px; height: 1px; background: var(--dourado-soft);
+}
+.cont-vert-band-num {
+  position: absolute; right: var(--space-3); top: 14px;
+  font-family: var(--font-serif); font-weight: 600; font-style: italic;
+  font-size: 26px; color: rgba(244, 241, 232, 0.55); line-height: 1;
+}
+.cont-vert-body {
+  padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2);
+  flex: 1; border-top: 1px solid var(--accent);
+}
+.cont-vert-body h3 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: 22px; color: var(--tinta); margin: 0;
+  line-height: 1.2; letter-spacing: -0.2px;
+}
+.cont-vert-body p {
+  font-size: 14.5px; line-height: 1.6; color: var(--grafite); margin: 0;
+}
+.cont-vert-list { display: grid; gap: 6px; margin-top: 4px; }
+.cont-vert-list li {
+  font-family: var(--font-cond); font-weight: 500; font-size: 12.5px;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--grafite);
+  padding: 6px 0; border-bottom: 1px dashed var(--prata-15);
+}
+.cont-vert-list li:last-child { border-bottom: 0; }
+.cont-vert-list li strong {
+  font-family: var(--font-serif); font-weight: 600; font-style: italic;
+  font-size: 14.5px; color: var(--accent, var(--oxford)); display: inline-block;
+  text-transform: none; letter-spacing: 0; margin-right: 6px;
+}
+.cont-vert-body .link-arrow { margin-top: auto; align-self: flex-start; color: var(--accent, var(--oxford)); }
+.cont-vert-body .link-arrow:hover { color: var(--dourado); border-bottom-color: var(--dourado); }
+
+/* =============================================================
+   NEWSLETTER PREMIUM · BOLETIM NTC
+   ============================================================= */
+.cont-newsletter {
+  background: var(--noite); color: var(--pergaminho);
+  padding: var(--space-7) 0;
+  position: relative; overflow: hidden;
+}
+.cont-newsletter::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(135deg, rgba(11, 23, 38, 0.93) 0%, rgba(17, 54, 94, 0.78) 60%, rgba(11, 23, 38, 0.84) 100%),
+    url('./img/fotos/_optimized/detalhe-still-02.1920.webp');
+  background-size: cover; background-position: center 42%;
+  filter: saturate(85%) contrast(1.06);
+}
+.cont-newsletter::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse at top right, rgba(184, 149, 46, 0.20) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom left, rgba(17, 54, 94, 0.32) 0%, transparent 60%);
+}
+.cont-newsletter-inner {
+  position: relative; z-index: 2;
+  display: grid; grid-template-columns: 1fr 1.05fr; gap: var(--space-5); align-items: center;
+}
+@media (max-width: 899px) { .cont-newsletter-inner { grid-template-columns: 1fr; } }
+.cont-newsletter-text .eyebrow { color: var(--dourado-soft); }
+.cont-newsletter-text h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(28px, 3.2vw, 42px); line-height: 1.1;
+  color: var(--pergaminho); margin: var(--space-2) 0 var(--space-3); letter-spacing: -0.3px;
+}
+.cont-newsletter-text h2 em { font-style: italic; color: var(--dourado-soft); font-weight: 500; }
+.cont-newsletter-text p { font-size: 16px; line-height: 1.7; color: var(--pergaminho-80); margin: 0 0 var(--space-2); }
+.cont-newsletter-pillars {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--space-2);
+}
+.cont-newsletter-pill {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--dourado-soft);
+  padding: 6px 12px;
+  background: rgba(214, 179, 80, 0.10);
+  border: 1px solid rgba(214, 179, 80, 0.32);
+  border-radius: 2px;
+}
+.cont-newsletter-form {
+  background: rgba(244, 241, 232, 0.05);
+  border: 1px solid rgba(244, 241, 232, 0.10);
+  padding: var(--space-4);
+  display: grid; gap: var(--space-3);
+}
+.cont-newsletter-form label {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--dourado-soft); margin-bottom: 4px; display: block;
+}
+.cont-newsletter-form input, .cont-newsletter-form select {
+  width: 100%;
+  background: rgba(244, 241, 232, 0.04);
+  border: 1px solid rgba(244, 241, 232, 0.18);
+  color: var(--pergaminho);
+  padding: 12px 14px;
+  font-family: var(--font-sans); font-size: 14px;
+  outline: none; border-radius: 0;
+  transition: border-color var(--t-medium);
+}
+.cont-newsletter-form input:focus, .cont-newsletter-form select:focus {
+  border-color: var(--dourado-soft);
+}
+.cont-newsletter-form input::placeholder { color: rgba(244, 241, 232, 0.40); }
+.cont-newsletter-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 599px) { .cont-newsletter-form-row { grid-template-columns: 1fr; } }
+.cont-newsletter-form select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--dourado-soft) 50%), linear-gradient(135deg, var(--dourado-soft) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+}
+.cont-newsletter-form select option { background: var(--noite); color: var(--pergaminho); }
+.cont-newsletter-consent {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 12px; line-height: 1.5; color: var(--pergaminho-80);
+}
+.cont-newsletter-consent input[type="checkbox"] {
+  width: 16px; height: 16px; margin: 3px 0 0;
+  appearance: none;
+  border: 1px solid rgba(244, 241, 232, 0.40);
+  background: transparent;
+  position: relative; cursor: pointer; flex-shrink: 0;
+}
+.cont-newsletter-consent input[type="checkbox"]:checked {
+  background: var(--dourado); border-color: var(--dourado);
+}
+.cont-newsletter-consent input[type="checkbox"]:checked::after {
+  content: '✓'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--noite); font-size: 11px; font-weight: bold;
+}
+.cont-newsletter-consent a { color: var(--dourado-soft); border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+.cont-newsletter-msg {
+  display: none;
+  margin-top: 8px; padding: 12px 14px;
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+}
+.cont-newsletter-msg.is-visible { display: block; }
+.cont-newsletter-msg.success {
+  background: rgba(74, 106, 31, 0.18);
+  border-left: 3px solid var(--oliva);
+  color: #C0D8A0;
+}
+.cont-newsletter-msg.error {
+  background: rgba(142, 42, 28, 0.22);
+  border-left: 3px solid var(--cardeal);
+  color: #E8B4AB;
+}
+
+/* =============================================================
+   FAQ
+   ============================================================= */
+.cont-faq { background: var(--pergaminho); padding: var(--space-7) 0; }
+.cont-faq-list { max-width: 880px; margin: var(--space-5) auto 0; display: grid; gap: 10px; }
+.cont-faq-item {
+  background: var(--ivory); border: 1px solid var(--prata-30);
+  transition: border-color var(--t-medium), box-shadow var(--t-medium);
+}
+.cont-faq-item.is-open { border-color: var(--dourado); box-shadow: var(--shadow-soft); }
+.cont-faq-toggle {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; padding: var(--space-3); border: 0; background: transparent;
+  text-align: left; cursor: pointer; gap: var(--space-2);
+}
+.cont-faq-toggle h3 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 18px;
+  color: var(--tinta); margin: 0; line-height: 1.3; flex: 1;
+}
+.cont-faq-icon {
+  width: 28px; height: 28px; border: 1.5px solid var(--prata-30);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-family: var(--font-sans); color: var(--oxford);
+  font-weight: 600; font-size: 18px;
+  transition: transform var(--t-medium), color var(--t-medium), border-color var(--t-medium);
+}
+.cont-faq-item.is-open .cont-faq-icon { transform: rotate(45deg); color: var(--dourado); border-color: var(--dourado); }
+.cont-faq-body {
+  max-height: 0; overflow: hidden; transition: max-height 320ms ease-out;
+}
+.cont-faq-item.is-open .cont-faq-body { max-height: 640px; }
+.cont-faq-body-inner {
+  padding: 0 var(--space-3) var(--space-3);
+  font-size: 14.5px; line-height: 1.65; color: var(--grafite);
+}
+.cont-faq-body-inner p { margin: 0 0 var(--space-2); }
+.cont-faq-body-inner p:last-child { margin: 0; }
+.cont-faq-body-inner a { color: var(--oxford); border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+.cont-faq-body-inner a:hover { color: var(--dourado); }
+
+/* =============================================================
+   CTA FINAL · 3 PONTES CROMÁTICAS
+   ============================================================= */
+.cont-cta-final { background: var(--noite); color: var(--pergaminho); padding: var(--space-7) 0; position: relative; overflow: hidden; }
+.cont-cta-final::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(135deg, rgba(11, 23, 38, 0.94) 0%, rgba(17, 54, 94, 0.80) 60%, rgba(11, 23, 38, 0.88) 100%),
+    url('./img/fotos/_optimized/cta-institucional-premium2.1920.webp');
+  background-size: cover; background-position: center 42%;
+  filter: saturate(86%) contrast(1.04);
+}
+.cont-cta-final::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse at top right, rgba(184, 149, 46, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom left, rgba(17, 54, 94, 0.30) 0%, transparent 60%);
+}
+.cont-cta-final-inner { position: relative; z-index: 2; max-width: 1120px; margin: 0 auto; text-align: center; }
+.cont-cta-final h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(30px, 3.6vw, 46px); line-height: 1.1;
+  color: var(--pergaminho); margin: var(--space-2) 0 var(--space-3); letter-spacing: -0.3px;
+}
+.cont-cta-final h2 em { font-style: italic; color: var(--dourado-soft); font-weight: 500; }
+.cont-cta-final p {
+  font-size: 16px; line-height: 1.7; color: var(--pergaminho-80);
+  max-width: 760px; margin: 0 auto var(--space-4);
+}
+.cont-cta-final-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+@media (max-width: 767px) { .cont-cta-final-grid { grid-template-columns: 1fr; } }
+.cont-cta-final-card {
+  background: rgba(244, 241, 232, 0.05);
+  border: 1px solid rgba(244, 241, 232, 0.12);
+  border-top: 3px solid var(--cta-accent, var(--dourado-soft));
+  padding: var(--space-3);
+  display: flex; flex-direction: column; gap: 6px;
+  transition: background var(--t-medium);
+}
+.cont-cta-final-card:hover { background: rgba(244, 241, 232, 0.08); }
+.cont-cta-final-card[data-ponte="agenda"]   { --cta-accent: #6E92BC; }
+.cont-cta-final-card[data-ponte="solucoes"] { --cta-accent: var(--dourado-soft); }
+.cont-cta-final-card[data-ponte="docentes"] { --cta-accent: #8FB256; }
+.cont-cta-final-card .eyebrow {
+  font-size: 11px; letter-spacing: 1.6px; margin: 0 0 4px;
+  color: var(--cta-accent, var(--dourado-soft));
+}
+.cont-cta-final-card h4 { font-family: var(--font-serif); font-weight: 600; font-size: 19px; color: var(--pergaminho); margin: 0; }
+.cont-cta-final-card p { font-size: 13px; color: var(--pergaminho-80); margin: 0 0 8px; max-width: none; line-height: 1.5; }
+.cont-cta-final-card .link-arrow.light { font-size: 12px; color: var(--pergaminho); }
+.cont-cta-final-card .link-arrow.light:hover { color: var(--cta-accent, var(--dourado-soft)); border-bottom-color: var(--cta-accent, var(--dourado-soft)); }
+
+/* =============================================================
+   STICKY CTA MOBILE
+   ============================================================= */
+.sticky-cta-mobile {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+  display: none; padding: 12px 16px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  background: var(--noite);
+  border-top: 1px solid rgba(244, 241, 232, 0.15);
+  transform: translateY(100%);
+  transition: transform var(--t-medium);
+}
+.sticky-cta-mobile.is-visible { transform: translateY(0); }
+.sticky-cta-mobile .btn { width: 100%; justify-content: center; }
+.sticky-cta-mobile-dismiss {
+  position: absolute; top: 6px; right: 10px;
+  background: transparent; border: 0; color: var(--pergaminho-80);
+  font-size: 14px; padding: 4px 8px; cursor: pointer; line-height: 1;
+}
+@media (max-width: 767px) { .sticky-cta-mobile { display: block; } }
+
+/* =============================================================
+   FOOTER · CANON SOBERANA
+   ============================================================= */
+.site-footer { background: var(--noite); color: var(--pergaminho-80); padding: var(--space-6) 0 var(--space-4); border-top: 1px solid rgba(244, 241, 232, 0.10); }
+.footer-top { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: var(--space-5); padding-bottom: var(--space-5); border-bottom: 1px solid rgba(244, 241, 232, 0.10); }
+@media (max-width: 899px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px) { .footer-top { grid-template-columns: 1fr; } }
+.footer-brand img { height: 60px; width: auto; }
+.footer-tagline { font-family: var(--font-serif); font-style: italic; font-weight: 500; color: var(--dourado); font-size: 17px; margin: var(--space-3) 0 var(--space-2); display: block; }
+.footer-address { font-size: 13px; line-height: 1.55; color: var(--pergaminho-80); margin: 0; }
+.footer-address strong { color: var(--pergaminho); font-weight: 600; }
+.footer-col h5 { font-family: var(--font-cond); font-weight: 600; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--dourado); margin: 0 0 var(--space-2); }
+.footer-col ul { display: grid; gap: 10px; }
+.footer-col a { font-size: 14px; color: var(--pergaminho-80); transition: color var(--t-fast); }
+.footer-col a:hover { color: var(--dourado); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); flex-wrap: wrap; gap: var(--space-2); }
+.footer-badge { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--prata); }
+.footer-legal { display: flex; gap: var(--space-3); flex-wrap: wrap; font-family: var(--font-cond); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+.footer-legal a { color: var(--prata); }
+.footer-legal a:hover { color: var(--pergaminho); }
+
+/* =============================================================
+   ANIMAÇÕES E FADE-IN
+   ============================================================= */
+.fade-in { opacity: 0; transform: translateY(12px); transition: opacity 800ms ease-out, transform 800ms ease-out; }
+.fade-in.is-visible { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .fade-in { opacity: 1; transform: none; }
+}
+</style>
+<!-- NTC_COOKIE_CONSENT_CSS_BEGIN -->
+<link rel="stylesheet" href="./assets/cookie_consent.css" />
+<!-- NTC_COOKIE_CONSENT_CSS_END -->
+</head>
+<body>
+<a class="skip-link" href="#main">Pular para o conteúdo principal</a>
+
+<header class="site-header" id="topo">
+  <div class="container header-inner">
+    <a class="brand" href="./02_Prototipo_Home_GrupoNTC_v2_6.html" aria-label="Grupo NTC — Página inicial">
+      <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    </a>
+
+    <nav class="nav-primary" aria-label="Navegação principal">
+      <a class="nav-item" href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a>
+      <button class="nav-item has-mega" data-mega="programas" aria-haspopup="true" aria-expanded="false">Programas</button>
+      <button class="nav-item has-mega" data-mega="capacitacao" aria-haspopup="true" aria-expanded="false">Capacitação</button>
+      <button class="nav-item has-mega" data-mega="solucoes" aria-haspopup="true" aria-expanded="false">Soluções</button>
+      <a class="nav-item is-current" href="#main" aria-current="page">Conteúdos</a>
+      <a class="nav-item" href="./12_Pagina_Contato_v1.html">Contato</a>
+    </nav>
+
+    <div class="header-cta">
+      <a class="btn btn--secondary btn--mini" href="./12_Pagina_Contato_v1.html#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a>
+      <a class="btn btn--participant btn--mini" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="area-participante">Área do Participante</a>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobileDrawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mega menu: Programas -->
+  <div class="mega" id="mega-programas" data-mega-id="programas">
+    <div class="container">
+      <div class="mega-inner">
+        <div class="mega-col">
+          <h4>NTC Educação · 9 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./16_Pagina_Programa_EDUTEC_v1.html" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>Educação Digital, Inovação e Tecnologias para Redes Públicas</span></a></li>
+            <li><a href="./15_Pagina_Programa_PEAR_v1.html" data-cms-link="programa-PEAR"><strong>PEAR</strong><span>Alfabetização de Alta Performance e Recomposição da Aprendizagem</span></a></li>
+            <li><a href="./19_Pagina_Programa_PEI_v1.html" data-cms-link="programa-PEI"><strong>PEI</strong><span>Educação Integral — Gestão, Currículo e Resultados</span></a></li>
+            <li><a href="./21_Pagina_Programa_PROGIR_v1.html" data-cms-link="programa-PROGIR"><strong>PROGIR</strong><span>Gestão da Inclusão com Resultado</span></a></li>
+            <li><a href="./20_Pagina_Programa_PROGE_v1.html" data-cms-link="programa-PROGE"><strong>PROGE</strong><span>Gestão Escolar, Coordenação Pedagógica e Resultados</span></a></li>
+            <li><a href="./13_Pagina_Programa_EGIDE_v1.html" data-cms-link="programa-EGIDE"><strong>EGIDE</strong><span>IA, Dados e Governança da Transformação Digital</span></a></li>
+            <li><a href="./23_Pagina_Programa_VIVAESCOLA_v1.html" data-cms-link="programa-VIVAESCOLA"><strong>VIVAESCOLA</strong><span>Convivência, Permanência, Bem-Estar e Proteção Integral</span></a></li>
+            <li><a href="./22_Pagina_Programa_PINEI_v1.html" data-cms-link="programa-PINEI"><strong>PINEI</strong><span>Primeira Infância e Educação Infantil</span></a></li>
+            <li><a href="./24_Pagina_Programa_FUTURA_v1.html" data-cms-link="programa-FUTURA"><strong>FUTURA</strong><span>Ensino Médio, Itinerários de Futuro, Empregabilidade</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Gestão Pública · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./10_Pagina_Programa_LIDERA_v1.html" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>Liderança, Direção Estratégica e Resultados na Administração</span></a></li>
+            <li><a href="./06_Pagina_Programa_AGIP_v1.html" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>Governança, Integridade e Performance nas Contratações Públicas</span></a></li>
+            <li><a href="./11_Pagina_Programa_SIGA_v1.html" data-cms-link="programa-SIGA"><strong>SIGA</strong><span>Soluções Inteligentes de Governança e Administração</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Saúde · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./14_Pagina_Programa_SIGS_v1.html" data-cms-link="programa-SIGS"><strong>SIGS</strong><span>Sistema Integrado de Gestão em Saúde</span></a></li>
+            <li><a href="./17_Pagina_Programa_PROAPS_v1.html" data-cms-link="programa-PROAPS"><strong>PROAPS+</strong><span>Alta Performance na Atenção Primária e Redes de Cuidado</span></a></li>
+            <li><a href="./18_Pagina_Programa_PROSUS_v1.html" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>Direção Institucional em Saúde Pública</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Capacitação -->
+  <div class="mega" id="mega-capacitacao" data-mega-id="capacitacao">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Agenda e formatos</h4>
+          <ul class="mega-list">
+            <li><a href="./27_Pagina_Capacitacao_v1.html" data-cms-link="pagina-capacitacao"><strong>Página de Capacitação →</strong><span>Portal-mãe · ecossistema formativo NTC</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos no calendário</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-online"><strong>Eventos online</strong><span>Transmissão ao vivo, replay e certificado</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-presenciais"><strong>Eventos presenciais</strong><span>Encontros executivos em capitais estratégicas</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-hibridos"><strong>Eventos híbridos</strong><span>Combinação de presença e plataforma digital</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Plataforma e curadoria</h4>
+          <ul class="mega-list">
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="eventon-home"><strong>EventOn</strong><span>Plataforma de acesso, replay e certificado do Grupo NTC</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="area-participante"><strong>Área do Participante</strong><span>Histórico de eventos, materiais e certificados</span></a></li>
+            <li><a href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica e especialistas das 3 áreas</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Soluções -->
+  <div class="mega" id="mega-solucoes" data-mega-id="solucoes">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Verticais</h4>
+          <ul class="mega-list">
+            <li><a href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>Soluções estruturadas para redes públicas de ensino</span></a></li>
+            <li><a href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>Governança, integridade e performance na Administração</span></a></li>
+            <li><a href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>Inteligência institucional aplicada ao SUS</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Modelos de contratação</h4>
+          <ul class="mega-list">
+            <li><a href="./26_Pagina_Solucoes_v1.html" data-cms-link="pagina-solucoes"><strong>Página de Soluções →</strong><span>Modelos institucionais e contratação direta</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#in-company" data-cms-link="modelo-incompany"><strong>Soluções in company</strong><span>Programa entregue exclusivamente à instituição</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#turmas-fechadas" data-cms-link="modelo-fechada"><strong>Turmas fechadas</strong><span>Edição operacional dedicada à equipe contratante</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#sob-medida" data-cms-link="modelo-sobmedida"><strong>Soluções sob medida</strong><span>Customização profunda de ementas, módulos e formato</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#trilhas" data-cms-link="modelo-trilha"><strong>Trilhas e jornadas</strong><span>Sequências formativas curadas para necessidades específicas</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========================== MOBILE DRAWER ========================== -->
+<div class="mobile-drawer-backdrop" id="mobileBackdrop"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-label="Menu principal" aria-hidden="true">
+  <div class="drawer-head">
+    <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    <button class="drawer-close" id="drawerClose" aria-label="Fechar menu">×</button>
+  </div>
+  <nav class="drawer-nav" aria-label="Navegação móvel">
+    <a class="drawer-item" href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a>
+
+    <button class="drawer-item has-sub" data-sub="programas-mobile" aria-expanded="false">Programas</button>
+    <div class="drawer-sub" id="sub-programas-mobile">
+      <a href="./06_Pagina_Programa_AGIP_v1.html" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></a>
+      <a href="./10_Pagina_Programa_LIDERA_v1.html" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></a>
+      <a href="./16_Pagina_Programa_EDUTEC_v1.html" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>NTC Educação · Educação digital</span></a>
+      <a href="./15_Pagina_Programa_PEAR_v1.html" data-cms-link="programa-PEAR"><strong>PEAR</strong><span>NTC Educação · Alfabetização</span></a>
+      <a href="./18_Pagina_Programa_PROSUS_v1.html" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="ver-todos-programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></a>
+    </div>
+
+    <button class="drawer-item has-sub" data-sub="capacitacao-mobile" aria-expanded="false">Capacitação</button>
+    <div class="drawer-sub" id="sub-capacitacao-mobile">
+      <a href="./27_Pagina_Capacitacao_v1.html" data-cms-link="pagina-capacitacao"><strong>Página de Capacitação →</strong><span>Portal-mãe formativo</span></a>
+      <a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="eventon-home"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></a>
+      <a href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica das 3 áreas</span></a>
+    </div>
+
+    <button class="drawer-item has-sub" data-sub="solucoes-mobile" aria-expanded="false">Soluções</button>
+    <div class="drawer-sub" id="sub-solucoes-mobile">
+      <a href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>9 programas estratégicos</span></a>
+      <a href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>3 programas estratégicos</span></a>
+      <a href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>3 programas estratégicos</span></a>
+      <a href="./26_Pagina_Solucoes_v1.html" data-cms-link="pagina-solucoes"><strong>Soluções institucionais →</strong><span>In company · fechada · sob medida</span></a>
+    </div>
+
+    <a class="drawer-item is-current" href="#main" aria-current="page">Conteúdos</a>
+    <a class="drawer-item" href="./12_Pagina_Contato_v1.html">Contato</a>
+  </nav>
+  <div class="drawer-cta">
+    <a class="btn btn--gold" href="./12_Pagina_Contato_v1.html#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a>
+    <a class="btn btn--participant" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="area-participante">Área do Participante</a>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ========================== HERO INSTITUCIONAL · SLIM ========================== -->
+<section class="hero-page" aria-label="Cabeçalho institucional · Conteúdos">
+  <div class="hero-page-bg" aria-hidden="true"></div>
+  <div class="container hero-page-content fade-in">
+    <nav class="crumb" aria-label="Trilha de navegação">
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html">Grupo NTC</a>
+      <span class="sep"></span>
+      <span class="current">Conteúdos institucionais</span>
+    </nav>
+    <p class="eyebrow light">Biblioteca editorial · 2026</p>
+    <h1>A inteligência <span class="accent">institucional</span><br>do Grupo NTC, em circulação.</h1>
+    <p class="hero-page-sub">
+      Artigos, estudos, notas técnicas, webinars e materiais didáticos produzidos pela curadoria científica das três verticais NTC — para servidores, dirigentes, juristas, pesquisadores e equipes técnicas da administração pública brasileira.
+    </p>
+    <div class="hero-quicklinks" aria-label="Atalhos rápidos">
+      <a href="#destaques" data-track="hero_quicklink" data-cms-link="quicklink-destaques">Destaques</a>
+      <a href="#biblioteca" data-track="hero_quicklink" data-cms-link="quicklink-biblioteca">Biblioteca</a>
+      <a href="#tipos" data-track="hero_quicklink" data-cms-link="quicklink-tipos">Tipos</a>
+      <a href="#verticais" data-track="hero_quicklink" data-cms-link="quicklink-verticais">Verticais</a>
+      <a href="#newsletter" data-track="hero_quicklink" data-cms-link="quicklink-newsletter">Newsletter</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== FAIXA DE MÉTRICAS EDITORIAIS ========================== -->
+<section class="cont-metrics" aria-label="Métricas editoriais do Grupo NTC">
+  <div class="container">
+    <div class="cont-metrics-grid fade-in">
+      <div class="cont-metric">
+        <span class="cm-num cm-num--word">Editorial</span>
+        <span class="cm-lbl">Produção editorial</span>
+        <span class="cm-detail">Acervo institucional acumulado pelo Instituto NTC do Brasil</span>
+      </div>
+      <div class="cont-metric">
+        <span class="cm-num cm-num--word">Em expansão</span>
+        <span class="cm-lbl">Acervo em expansão</span>
+        <span class="cm-detail">Artigos, estudos, notas técnicas, webinars e materiais editoriais</span>
+      </div>
+      <div class="cont-metric">
+        <span class="cm-num cm-num--word">Replays</span>
+        <span class="cm-lbl">Webinars e replays</span>
+        <span class="cm-detail">Conteúdos audiovisuais disponíveis conforme política editorial</span>
+      </div>
+      <div class="cont-metric">
+        <span class="cm-num">3</span>
+        <span class="cm-lbl">Verticais editoriais</span>
+        <span class="cm-detail">Educação · Gestão Pública · Saúde · temas transversais</span>
+      </div>
+      <div class="cont-metric">
+        <span class="cm-num cm-num--word">Progressivo</span>
+        <span class="cm-lbl">Acesso progressivo</span>
+        <span class="cm-detail">Parte do acervo aberta ao público, com materiais exclusivos via EventOn</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== SUBNAV INSTITUCIONAL ========================== -->
+<nav class="cont-subnav" id="contSubnav" aria-label="Navegação interna de Conteúdos">
+  <div class="container">
+    <div class="cont-subnav-inner">
+      <span class="cont-subnav-label">Nesta página</span>
+      <a href="#destaques" data-cms-link="subnav-destaques">Destaques</a>
+      <a href="#biblioteca" data-cms-link="subnav-biblioteca">Biblioteca</a>
+      <a href="#tipos" data-cms-link="subnav-tipos">Tipos editoriais</a>
+      <a href="#verticais" data-cms-link="subnav-verticais">Verticais</a>
+      <a href="#newsletter" data-cms-link="subnav-newsletter">Newsletter</a>
+      <a href="#faq" data-cms-link="subnav-faq">FAQ</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ========================== MANIFESTO EDITORIAL ========================== -->
+<section class="cont-manifesto" aria-label="Manifesto editorial dos Conteúdos NTC">
+  <div class="container">
+    <div class="cont-manifesto-inner fade-in">
+      <p class="eyebrow gold">Por que publicamos</p>
+      <h2>Não é blog. É <em>publicação institucional</em>.</h2>
+      <p class="lede">
+        A NTC publica conteúdos não como ação promocional isolada, mas como extensão de sua curadoria científica: leituras técnicas confiáveis, produzidas com rigor editorial e orientadas aos desafios concretos da administração pública brasileira.
+      </p>
+      <p>
+        Cada conteúdo é atribuído a uma frente editorial do Instituto — Curadoria, Direção Científica ou Equipes Técnicas das verticais — e passa por revisão técnica antes da publicação. Webinars geram materiais derivados. Estudos viram notas técnicas. Notas técnicas viram artigos. É um ecossistema editorial vivo, atravessado pelos mesmos critérios que orientam os programas formativos.
+      </p>
+      <div class="cont-manifesto-marker">Biblioteca editorial NTC · 2026</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== FAIXA TESE EDITORIAL · PARALLAX ========================== -->
+<section class="cont-thesis" aria-label="Pilares editoriais do Grupo NTC">
+  <div class="container cont-thesis-inner">
+    <div class="cont-thesis-head fade-in">
+      <p class="eyebrow gold">Como produzimos</p>
+      <h2>Inteligência institucional <em>em circulação</em>.</h2>
+      <p>O conteúdo NTC nasce do mesmo lugar dos programas: pesquisa aplicada, posição técnica fundamentada e formação continuada. É a inteligência técnica da NTC traduzida em texto, áudio e vídeo.</p>
+    </div>
+    <div class="cont-thesis-grid fade-in">
+      <article class="cont-thesis-pilar">
+        <span class="cont-thesis-num">I</span>
+        <h3>Pesquisa aplicada</h3>
+        <p>Estudos com leitura empírica da administração pública brasileira — políticas, redes, sistemas e indicadores — não exercícios acadêmicos desconectados do real.</p>
+        <span class="cont-thesis-rule">Estudos · notas técnicas · diagnósticos</span>
+      </article>
+      <article class="cont-thesis-pilar">
+        <span class="cont-thesis-num">II</span>
+        <h3>Posição técnica</h3>
+        <p>Artigos e notas autorais que tomam posição sobre temas em discussão — Lei 14.133/2021, financiamento da APS, alfabetização baseada em evidências, IA e setor público — com fundamentação jurídica e técnica clara.</p>
+        <span class="cont-thesis-rule">Artigos · notas autorais · pareceres editoriais</span>
+      </article>
+      <article class="cont-thesis-pilar">
+        <span class="cont-thesis-num">III</span>
+        <h3>Formação continuada</h3>
+        <p>Webinars abertos, materiais didáticos e guias práticos — derivados dos programas estratégicos — para servidores e equipes que precisam aplicar a teoria ao cotidiano da gestão pública.</p>
+        <span class="cont-thesis-rule">Webinars · guias · kits didáticos</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== 3 DESTAQUES EDITORIAIS ========================== -->
+<section class="cont-featured" id="destaques" aria-label="Destaques editoriais">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow">Destaques editoriais</p>
+      <h2>Próximas publicações editoriais <em>em preparação</em>.</h2>
+      <p class="intro">Uma prévia da linha editorial que está sendo finalizada pela curadoria NTC para os próximos meses — um estudo, um artigo e um webinar, escolhidos pela aderência ao momento institucional brasileiro. Avisaremos pelo Boletim NTC quando cada publicação estiver disponível.</p>
+    </div>
+
+    <div class="cont-featured-list fade-in">
+
+      <article class="cont-featured-card" data-vert="gov">
+        <div class="cont-featured-figura" style="background-image:url('./img/fotos/_optimized/conteudo-01.1920.webp');">
+          <span class="cont-featured-figura-tag">Estudo</span>
+        </div>
+        <div class="cont-featured-body">
+          <span class="cont-featured-prep">Em preparação editorial</span>
+          <p class="cont-featured-eyebrow">NTC Gestão Pública · Contratações</p>
+          <h3>Cinco anos de Lei 14.133: o que mudou, o que não mudou e o que segue em disputa nas redes.</h3>
+          <p>Leitura técnica longa sobre a aplicação da nova Lei de Licitações no cotidiano dos órgãos públicos, com diagnóstico do que efetivamente se transformou na prática administrativa, dos riscos que persistem e das frentes em disputa interpretativa entre TCU, AGU e tribunais.</p>
+          <div class="cont-featured-meta">
+            <span>Previsto · 2026</span>
+            <span>Estudo · formato longo</span>
+            <span>Curadoria NTC Gestão Pública</span>
+          </div>
+          <span class="cont-featured-soon" data-cms-link="destaque-estudo-14133">Em breve · curadoria em andamento</span>
+        </div>
+      </article>
+
+      <article class="cont-featured-card" data-vert="edu">
+        <div class="cont-featured-figura" style="background-image:url('./img/fotos/_optimized/conteudo-02.1920.webp');">
+          <span class="cont-featured-figura-tag">Artigo</span>
+        </div>
+        <div class="cont-featured-body">
+          <span class="cont-featured-prep">Em preparação editorial</span>
+          <p class="cont-featured-eyebrow">NTC Educação · Alfabetização</p>
+          <h3>Recomposição da aprendizagem nos anos iniciais: o que os dados da rede pública estão dizendo.</h3>
+          <p>Artigo editorial sobre o estado atual da alfabetização na idade certa no Brasil pós-pandemia, com leitura crítica dos resultados das principais avaliações e proposições técnicas para gestores municipais e estaduais que estão organizando seus planos de recomposição.</p>
+          <div class="cont-featured-meta">
+            <span>Previsto · 2026</span>
+            <span>Artigo editorial</span>
+            <span>Direção Científica NTC</span>
+          </div>
+          <span class="cont-featured-soon" data-cms-link="destaque-artigo-alfabetizacao">Em breve · curadoria em andamento</span>
+        </div>
+      </article>
+
+      <article class="cont-featured-card" data-vert="sau">
+        <div class="cont-featured-figura" style="background-image:url('./img/fotos/_optimized/conteudo-03.1920.webp');">
+          <span class="cont-featured-figura-tag">Webinar</span>
+        </div>
+        <div class="cont-featured-body">
+          <span class="cont-featured-prep">Em preparação editorial</span>
+          <p class="cont-featured-eyebrow">NTC Saúde · Atenção Primária</p>
+          <h3>Previne Brasil 2026: o financiamento da APS e o que muda para os municípios.</h3>
+          <p>Webinar executivo sobre a arquitetura atual do financiamento da Atenção Primária à Saúde no Brasil, os efeitos das mudanças recentes do programa Previne Brasil sobre a operação das equipes de Saúde da Família e os caminhos de planejamento para a gestão municipal.</p>
+          <div class="cont-featured-meta">
+            <span>Previsto · 2026</span>
+            <span>Webinar executivo</span>
+            <span>Equipe Técnica NTC Saúde</span>
+          </div>
+          <span class="cont-featured-soon" data-cms-link="destaque-webinar-previne">Em breve · curadoria em andamento</span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================== BIBLIOTECA FILTRAVEL ========================== -->
+<section class="cont-biblioteca" id="biblioteca" aria-label="Biblioteca filtravel do Grupo NTC">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow">Biblioteca editorial</p>
+      <h2>O acervo editorial <em>filtrável</em> do Grupo NTC.</h2>
+      <p class="intro">Use a busca e os filtros para encontrar conteúdos por palavra-chave, vertical formativa ou tipo editorial. A biblioteca apresenta a linha editorial em construção pela curadoria — cada conteúdo será disponibilizado a partir do momento em que estiver finalizado.</p>
+      <span class="cont-biblioteca-note">Acervo em construção · conteúdos sendo finalizados pela curadoria editorial</span>
+    </div>
+
+    <div class="cont-tabs fade-in" role="tablist" aria-label="Filtrar por vertical">
+      <button class="cont-tab is-active" data-vert="all" role="tab" aria-selected="true">Todos</button>
+      <button class="cont-tab" data-vert="edu" role="tab" aria-selected="false">Educação</button>
+      <button class="cont-tab" data-vert="gov" role="tab" aria-selected="false">Gestão Pública</button>
+      <button class="cont-tab" data-vert="sau" role="tab" aria-selected="false">Saúde</button>
+      <button class="cont-tab" data-vert="trans" role="tab" aria-selected="false">Transversais</button>
+    </div>
+
+    <div class="cont-filterbar fade-in">
+      <div class="cont-search">
+        <input id="contSearch" type="search" placeholder="Buscar por título, tema ou palavra-chave..." aria-label="Buscar conteúdos" />
+      </div>
+      <div class="cont-typefilter" role="group" aria-label="Filtrar por tipo">
+        <button class="is-active" data-type="all">Todos os tipos</button>
+        <button data-type="estudo">Estudos</button>
+        <button data-type="artigo">Artigos</button>
+        <button data-type="nota">Notas técnicas</button>
+        <button data-type="webinar">Webinars</button>
+        <button data-type="material">Materiais</button>
+      </div>
+      <div class="cont-filterbar-stats" id="contStats">
+        <strong id="contCount">9</strong> conteúdos em preparação
+      </div>
+    </div>
+
+    <div class="cont-grid" id="contGrid">
+
+      <article class="cont-card" data-vert="gov" data-type="estudo" data-search="14133 contratacoes lei licitacoes governo">
+        <div class="cont-card-band" aria-hidden="true"></div>
+        <div class="cont-card-body">
+          <div class="cont-card-tags">
+            <span class="cont-card-tag">NTC Gestão Pública</span>
+            <span class="cont-card-tag type">Estudo</span>
+          </div>
+          <span class="cont-card-prep">Em preparação editorial</span>
+          <h3>Cinco anos de Lei 14.133: o que mudou nas redes.</h3>
+          <p>Leitura técnica longa sobre a aplicação da nova Lei de Licitações nos órgãos públicos brasileiros, com diagnóstico, riscos e frentes em disputa.</p>
+          <div class="cont-card-meta">
+            <span>Previsto · 2026</span>
+            <span>Formato longo</span>
+          </div>
+        </div>
+        <div class="cont-card-foot">
+          <div class="author">Curadoria<strong>NTC Gestão Pública</strong></div>
+          <span class="cont-card-link is-soon" data-cms-link="conteudo-estudo-14133">Em breve</span>
+        </div>
+      </article>
+
+      <article class="cont-card" data-vert="edu" data-type="artigo" data-search="alfabetizacao educacao recomposicao pear">
+        <div class="cont-card-band" aria-hidden="true"></div>
+        <div class="cont-card-body">
+          <div class="cont-card-tags">
+            <span class="cont-card-tag">NTC Educação</span>
+            <span class="cont-card-tag type">Artigo</span>
+          </div>
+          <span class="cont-card-prep">Em preparação editorial</span>
+          <h3>Recomposição da aprendizagem: o que os dados estão dizendo.</h3>
+          <p>Leitura crítica dos resultados de avaliações nacionais e proposições técnicas para redes que estão organizando seus planos de recomposição.</p>
+          <div class="cont-card-meta">
+            <span>Previsto · 2026</span>
+            <span>Artigo editorial</span>
+          </div>
+        </div>
+        <div class="cont-card-foot">
+          <div class="author">Direção<strong>Científica NTC</strong></div>
+          <span class="cont-card-link is-soon" data-cms-link="conteudo-artigo-alfabetizacao">Em breve</span>
+        </div>
+      </article>
+
+      <article class="cont-card" data-vert="sau" data-type="webinar" data-search="previne brasil aps atencao primaria financiamento sus">
+        <div class="cont-card-band" aria-hidden="true"></div>
+        <div class="cont-card-body">
+          <div class="cont-card-tags">
+            <span class="cont-card-tag">NTC Saúde</span>
+            <span class="cont-card-tag type">Webinar</span>
+          </div>
+          <span class="cont-card-prep">Em preparação editorial</span>
+          <h3>Previne Brasil 2026: financiamento da APS e o que muda.</h3>
+          <p>Webinar executivo sobre a arquitetura atual do financiamento da APS e os caminhos de planejamento municipal.</p>
+          <div class="cont-card-meta">
+            <span>Previsto · 2026</span>
+            <span>Webinar executivo</span>
+          </div>
+        </div>
+        <div class="cont-card-foot">
+          <div class="author">Equipe<strong>NTC Saúde</strong></div>
+          <span class="cont-card-link is-soon" data-cms-link="conteudo-webinar-previne">Em breve</span>
+        </div>
+      </article>
+
+      <article class="cont-card" data-vert="trans" data-type="nota" data-search="ia inteligencia artificial dados governanca digital">
+        <div class="cont-card-band" aria-hidden="true"></div>
+        <div class="cont-card-body">
+          <div class="cont-card-tags">
+            <span class="cont-card-tag">Transversal</span>
+            <span class="cont-card-tag type">Nota técnica</span>
+          </div>
+          <span class="cont-card-prep">Em preparação editorial</span>
+          <h3>IA generativa no setor público: limites e oportunidades.</h3>
+          <p>Nota técnica sobre o estado atual da incorporação de inteligência artificial generativa pelos órgãos da administração pública brasileira, com leitura crítica de riscos.</p>
+          <div class="cont-card-meta">
+            <span>Previsto · 2026</span>
+            <span>Nota técnica</span>
+          </div>
+        </div>
+        <div class="cont-card-foot">
+          <div class="author">Direção<strong>Científica NTC</strong></div>
+          <span class="cont-card-link is-soon" data-cms-link="conteudo-nota-ia">Em breve</span>
+        </div>
+      </article>
+
+      <article class="cont-card" data-vert="edu" data-type="estudo" data-search="educacao integral pei tempo integral">
+        <div class="cont-card-band" aria-hidden="true"></div>
+        <div class="cont-card-body">
+          <div class="cont-card-tags">
+            <span class="cont-card-tag">NTC Educação</span>
+            <span class="cont-card-tag type">Estudo</span>
+          </div>
+          <span class="cont-card-prep">Em preparação editorial</span>
+          <h3>Educação integral em escala: leitura institucional da Lei 14.640/2023.</h3>
+          <p>Estudo sobre a implementação da política de educação em tempo integral nas redes públicas brasileiras após a sanção da Lei 14.640/2023.</p>
+          <div class="cont-card-meta">
+            <span>Previsto · 2026</span>
+            <span>Estudo longo</span>
+          </div>
+        </div>
+        <div class="cont-card-foot">
+          <div class="author">Equipe<strong>NTC Educação</strong></div>
+          <span class="cont-card-link is-soon" data-cms-link="conteudo-estudo-pei">Em breve</span>
+        </div>
+      </article>
+
+      <article class="cont-card" data-vert="gov" data-type="webinar" data-search="lidera direcao estrategica governo gestao publica">
+        <div class="cont-card-band" aria-hidden="true"></div>
+        <div class="cont-card-body">
+          <div class="cont-card-tags">
+            <span class="cont-card-tag">NTC Gestão Pública</span>
+            <span class="cont-card-tag type">Webinar</span>
+          </div>
+          <span class="cont-card-prep">Em preparação editorial</span>
+          <h3>A direção estratégica na administração pública contemporânea.</h3>
+          <p>Webinar executivo sobre direção institucional, articulação federativa e leitura de cenário para dirigentes da administração pública brasileira.</p>
+          <div class="cont-card-meta">
+            <span>Previsto · 2026</span>
+            <span>Webinar executivo</span>
+          </div>
+        </div>
+        <div class="cont-card-foot">
+          <div class="author">Curadoria<strong>NTC Gestão Pública</strong></div>
+          <span class="cont-card-link is-soon" data-cms-link="conteudo-webinar-lidera">Em breve</span>
+        </div>
+      </article>
+
+      <article class="cont-card" data-vert="sau" data-type="estudo" data-search="prosus alta gestao sus diretor estadual municipal">
+        <div class="cont-card-band" aria-hidden="true"></div>
+        <div class="cont-card-body">
+          <div class="cont-card-tags">
+            <span class="cont-card-tag">NTC Saúde</span>
+            <span class="cont-card-tag type">Estudo</span>
+          </div>
+          <span class="cont-card-prep">Em preparação editorial</span>
+          <h3>Direção institucional em saúde pública: o estado da arte.</h3>
+          <p>Estudo sobre o desenho da direção institucional do SUS no Brasil — competências, governança, articulação federativa e gargalos de capacidade técnica.</p>
+          <div class="cont-card-meta">
+            <span>Previsto · 2026</span>
+            <span>Estudo longo</span>
+          </div>
+        </div>
+        <div class="cont-card-foot">
+          <div class="author">Curadoria<strong>NTC Saúde</strong></div>
+          <span class="cont-card-link is-soon" data-cms-link="conteudo-estudo-prosus">Em breve</span>
+        </div>
+      </article>
+
+      <article class="cont-card" data-vert="trans" data-type="webinar" data-search="dados governanca lgpd transversal politicas publicas">
+        <div class="cont-card-band" aria-hidden="true"></div>
+        <div class="cont-card-body">
+          <div class="cont-card-tags">
+            <span class="cont-card-tag">Transversal</span>
+            <span class="cont-card-tag type">Webinar</span>
+          </div>
+          <span class="cont-card-prep">Em preparação editorial</span>
+          <h3>Governança de dados no setor público: LGPD e a operação cotidiana.</h3>
+          <p>Webinar transversal sobre a aplicação da LGPD na rotina das três áreas — Educação, Gestão Pública e Saúde — com foco em dilemas concretos da operação.</p>
+          <div class="cont-card-meta">
+            <span>Previsto · 2026</span>
+            <span>Webinar transversal</span>
+          </div>
+        </div>
+        <div class="cont-card-foot">
+          <div class="author">Direção<strong>Científica NTC</strong></div>
+          <span class="cont-card-link is-soon" data-cms-link="conteudo-webinar-lgpd">Em breve</span>
+        </div>
+      </article>
+
+      <article class="cont-card" data-vert="edu" data-type="material" data-search="primeira infancia pinei educacao infantil creche bncc">
+        <div class="cont-card-band" aria-hidden="true"></div>
+        <div class="cont-card-body">
+          <div class="cont-card-tags">
+            <span class="cont-card-tag">NTC Educação</span>
+            <span class="cont-card-tag type">Material didático</span>
+          </div>
+          <span class="cont-card-prep">Em preparação editorial</span>
+          <h3>Primeira infância e educação infantil: kit de planejamento de rede.</h3>
+          <p>Material didático para gestores municipais — fluxos, indicadores, modelos e referências para o planejamento da política de creches e pré-escolas.</p>
+          <div class="cont-card-meta">
+            <span>Previsto · 2026</span>
+            <span>Kit institucional</span>
+          </div>
+        </div>
+        <div class="cont-card-foot">
+          <div class="author">Equipe<strong>NTC Educação</strong></div>
+          <span class="cont-card-link is-soon" data-cms-link="conteudo-material-pinei">Em breve</span>
+        </div>
+      </article>
+
+    </div>
+
+    <p class="cont-empty" id="contEmpty">Nenhum conteúdo encontrado com os filtros atuais. Limpe a busca ou troque a aba para ampliar a seleção.</p>
+
+    <div class="cont-biblioteca-foot fade-in">
+      <p style="font-family:var(--font-cond);font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--grafite);margin:0 0 var(--space-3);">Cadastre-se no Boletim NTC para ser avisado quando cada conteúdo for publicado</p>
+      <a class="btn btn--primary" href="#newsletter" data-cms-link="cta-newsletter" data-track="cont_cta_newsletter">Receber por e-mail quando publicarmos <span class="btn-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== 5 TIPOS EDITORIAIS ========================== -->
+<section class="cont-tipos" id="tipos" aria-label="Tipos editoriais do Grupo NTC">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow">Tipos editoriais institucionais</p>
+      <h2>Cinco formatos para <em>cada momento</em> da operação pública.</h2>
+      <p class="intro">A biblioteca NTC se organiza em cinco formatos editoriais complementares. Cada um responde a um tipo distinto de pergunta institucional — do diagnóstico estruturado ao apoio operacional cotidiano.</p>
+    </div>
+
+    <div class="cont-tipos-grid fade-in">
+      <article class="cont-tipo">
+        <span class="cont-tipo-num">01</span>
+        <h3>Artigos</h3>
+        <p>Posições técnicas autorais sobre temas em discussão. Texto editorial fundamentado, leitura média de 12 a 25 minutos, autoria institucional.</p>
+        <span class="cont-tipo-tag">Posição · análise · leitura</span>
+      </article>
+      <article class="cont-tipo">
+        <span class="cont-tipo-num">02</span>
+        <h3>Estudos</h3>
+        <p>Pesquisas longas com leitura empírica da administração pública — diagnósticos de campo, séries históricas, leitura de indicadores. PDF de 30 a 80 páginas.</p>
+        <span class="cont-tipo-tag">Diagnóstico · pesquisa · profundidade</span>
+      </article>
+      <article class="cont-tipo">
+        <span class="cont-tipo-num">03</span>
+        <h3>Notas técnicas</h3>
+        <p>Pareceres editoriais curtos sobre temas pontuais — uma decisão de tribunal, uma alteração legal, um novo programa federal. Foco em utilidade decisória.</p>
+        <span class="cont-tipo-tag">Parecer · decisório · objetividade</span>
+      </article>
+      <article class="cont-tipo">
+        <span class="cont-tipo-num">04</span>
+        <h3>Webinars</h3>
+        <p>Encontros formativos abertos, com transmissão pelo EventOn, materiais editoriais sincronizados e replay disponível para os inscritos pelos prazos previstos.</p>
+        <span class="cont-tipo-tag">Ao vivo · replay · formação</span>
+      </article>
+      <article class="cont-tipo">
+        <span class="cont-tipo-num">05</span>
+        <h3>Materiais didáticos</h3>
+        <p>Kits operacionais — checklists, fluxos, modelos e roteiros — para apoiar a aplicação cotidiana de políticas, normas e procedimentos pela equipe técnica.</p>
+        <span class="cont-tipo-tag">Operacional · prático · download</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== CURADORIA POR VERTICAL ========================== -->
+<section class="cont-verticais" id="verticais" aria-label="Curadoria editorial por vertical">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow">Curadoria editorial por vertical</p>
+      <h2>Três trilhas editoriais, <em>uma só doutrina</em>.</h2>
+      <p class="intro">Cada vertical formativa do Grupo NTC opera também como linha editorial — com equipe técnica dedicada à produção de conteúdo, calendário próprio de publicação e diálogo direto com os programas estratégicos.</p>
+    </div>
+
+    <div class="cont-verticais-grid fade-in">
+      <article class="cont-vert-card" data-vert="edu">
+        <div class="cont-vert-band" aria-hidden="true">
+          <span class="cont-vert-band-mark">NTC Educação</span>
+          <span class="cont-vert-band-num">01</span>
+        </div>
+        <div class="cont-vert-body">
+          <h3>Educação pública em circulação</h3>
+          <p>Acervo dedicado à formação institucional de redes de ensino — alfabetização, gestão escolar, inclusão, educação integral, educação digital e primeira infância.</p>
+          <ul class="cont-vert-list">
+            <li><strong>3</strong> conteúdos em preparação editorial</li>
+            <li><strong>9</strong> programas estratégicos relacionados</li>
+            <li><strong>Equipe Técnica NTC Educação</strong></li>
+          </ul>
+          <a class="link-arrow" href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu" data-track="cont_vert_click">Conhecer a vertical</a>
+        </div>
+      </article>
+
+      <article class="cont-vert-card" data-vert="gov">
+        <div class="cont-vert-band" aria-hidden="true">
+          <span class="cont-vert-band-mark">NTC Gestão Pública</span>
+          <span class="cont-vert-band-num">02</span>
+        </div>
+        <div class="cont-vert-body">
+          <h3>Direção e governança em pauta</h3>
+          <p>Acervo dedicado à alta gestão da administração pública brasileira — Lei 14.133/2021, direção estratégica, governança institucional e sistemas administrativos.</p>
+          <ul class="cont-vert-list">
+            <li><strong>2</strong> conteúdos em preparação editorial</li>
+            <li><strong>3</strong> programas estratégicos relacionados</li>
+            <li><strong>Curadoria NTC Gestão Pública</strong></li>
+          </ul>
+          <a class="link-arrow" href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov" data-track="cont_vert_click">Conhecer a vertical</a>
+        </div>
+      </article>
+
+      <article class="cont-vert-card" data-vert="sau">
+        <div class="cont-vert-band" aria-hidden="true">
+          <span class="cont-vert-band-mark">NTC Saúde</span>
+          <span class="cont-vert-band-num">03</span>
+        </div>
+        <div class="cont-vert-body">
+          <h3>Inteligência institucional para o SUS</h3>
+          <p>Acervo dedicado ao Sistema Único de Saúde — atenção primária resolutiva, redes territoriais, gestão integrada e direção institucional da saúde pública.</p>
+          <ul class="cont-vert-list">
+            <li><strong>2</strong> conteúdos em preparação editorial</li>
+            <li><strong>3</strong> programas estratégicos relacionados</li>
+            <li><strong>Equipe Técnica NTC Saúde</strong></li>
+          </ul>
+          <a class="link-arrow" href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau" data-track="cont_vert_click">Conhecer a vertical</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== NEWSLETTER PREMIUM ========================== -->
+<section class="cont-newsletter" id="newsletter" aria-label="Newsletter institucional Boletim NTC">
+  <div class="container">
+    <div class="cont-newsletter-inner fade-in">
+      <div class="cont-newsletter-text">
+        <p class="eyebrow gold">Boletim NTC</p>
+        <h2>Receba a inteligência <em>editorial</em> da NTC<br>direto na sua caixa.</h2>
+        <p>
+          O <strong>Boletim NTC</strong> é a curadoria mensal da Direção Científica do Instituto — uma seleção comentada dos conteúdos mais relevantes do período, organizada por vertical formativa. Sem rastreio de comportamento, sem ofertas comerciais, sem ruído.
+        </p>
+        <p>
+          Você escolhe se quer receber tudo ou apenas a vertical que interessa ao seu cenário institucional — e pode descadastrar a qualquer momento pelo link no rodapé de cada edição.
+        </p>
+        <div class="cont-newsletter-pillars">
+          <span class="cont-newsletter-pill">Curadoria mensal</span>
+          <span class="cont-newsletter-pill">Sem rastreio</span>
+          <span class="cont-newsletter-pill">Por vertical</span>
+          <span class="cont-newsletter-pill">Descadastro livre</span>
+        </div>
+      </div>
+
+      <form class="cont-newsletter-form" id="contNewsletterForm" novalidate>
+        <div>
+          <label for="newsletter-nome">Nome completo</label>
+          <input id="newsletter-nome" name="nome" type="text" placeholder="Como prefere ser chamado(a)" autocomplete="name" required />
+        </div>
+        <div>
+          <label for="newsletter-email">E-mail institucional</label>
+          <input id="newsletter-email" name="email" type="email" placeholder="nome@orgao.gov.br" autocomplete="email" required />
+        </div>
+        <div class="cont-newsletter-form-row">
+          <div>
+            <label for="newsletter-vertical">Vertical de interesse</label>
+            <select id="newsletter-vertical" name="vertical">
+              <option value="todas">Todas as verticais</option>
+              <option value="educacao">NTC Educação</option>
+              <option value="gestao">NTC Gestão Pública</option>
+              <option value="saude">NTC Saúde</option>
+              <option value="transversal">Apenas transversais</option>
+            </select>
+          </div>
+          <div>
+            <label for="newsletter-org">Órgão ou instituição</label>
+            <input id="newsletter-org" name="orgao" type="text" placeholder="Município, estado, autarquia..." />
+          </div>
+        </div>
+        <label class="cont-newsletter-consent">
+          <input type="checkbox" name="consent" required />
+          <span>Concordo em receber o Boletim NTC e autorizo o tratamento dos meus dados para essa finalidade, nos termos da <a href="./33_Pagina_LGPD_v1.html" data-cms-link="legal-lgpd">Política de Privacidade · LGPD</a> do Instituto NTC do Brasil. Posso descadastrar a qualquer momento.</span>
+        </label>
+        <button type="submit" class="btn btn--gold">Assinar o Boletim NTC <span class="btn-arrow">→</span></button>
+        <div class="cont-newsletter-msg success" id="contNewsletterMsgOk">Inscrição realizada. Confirme no e-mail que enviaremos a seguir.</div>
+        <div class="cont-newsletter-msg error" id="contNewsletterMsgErr">Verifique os campos obrigatórios.</div>
+      </form>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================== FAQ ========================== -->
+<section class="cont-faq" id="faq" aria-label="Perguntas frequentes sobre os Conteúdos NTC">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow">Perguntas frequentes</p>
+      <h2>O que <em>perguntam</em> sobre os Conteúdos NTC.</h2>
+      <p class="intro">Reunimos oito perguntas frequentes sobre o acervo editorial — política de acesso, licenciamento, certificação, replays, contribuições externas e privacidade.</p>
+    </div>
+
+    <div class="cont-faq-list fade-in">
+
+      <article class="cont-faq-item">
+        <button class="cont-faq-toggle" aria-expanded="false">
+          <h3>Os conteúdos são abertos ao público?</h3>
+          <span class="cont-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="cont-faq-body">
+          <div class="cont-faq-body-inner">
+            <p>Sim. Parte do acervo editorial do Grupo NTC — artigos, notas técnicas, estudos e materiais didáticos — será disponibilizada ao público sem login obrigatório, conforme a política editorial de publicação.</p>
+            <p>Webinars com replay e alguns materiais didáticos exclusivos podem exigir cadastro no <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="eventon-home">EventOn</a> — sem cobrança e apenas para identificação do servidor, em coerência com a Área do Participante.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="cont-faq-item">
+        <button class="cont-faq-toggle" aria-expanded="false">
+          <h3>Posso citar os conteúdos NTC em meus trabalhos?</h3>
+          <span class="cont-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="cont-faq-body">
+          <div class="cont-faq-body-inner">
+            <p>Sim, e ficamos honrados quando isso acontece. Os conteúdos podem ser citados com atribuição à frente editorial responsável (Curadoria, Direção Científica ou Equipe Técnica da vertical correspondente), título completo, ano de publicação e URL.</p>
+            <p>A reprodução integral, adaptação, incorporação em materiais comerciais ou uso institucional em larga escala depende de autorização prévia do Instituto NTC do Brasil. Para esses casos, entre em contato pelo <a href="./12_Pagina_Contato_v1.html#tab-atendimento" data-cms-link="atendimento-licenciamento">canal de atendimento institucional</a>.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="cont-faq-item">
+        <button class="cont-faq-toggle" aria-expanded="false">
+          <h3>Webinars geram certificado?</h3>
+          <span class="cont-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="cont-faq-body">
+          <div class="cont-faq-body-inner">
+            <p>Webinars abertos publicados na biblioteca, em formato editorial, não geram certificado de horas — são publicação institucional de acesso livre.</p>
+            <p>Já os <strong>eventos abertos da Agenda</strong> (turmas regulares com data, ementa e inscrição) geram certificado oficial NTC pela plataforma EventOn. Veja a <a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa">Agenda Geral</a> para os eventos certificáveis.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="cont-faq-item">
+        <button class="cont-faq-toggle" aria-expanded="false">
+          <h3>Os replays ficam disponíveis para sempre?</h3>
+          <span class="cont-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="cont-faq-body">
+          <div class="cont-faq-body-inner">
+            <p>Os replays de webinars abertos publicados na biblioteca ficam disponíveis pelo período declarado em cada card — geralmente entre 6 e 24 meses após a transmissão original.</p>
+            <p>Conteúdos retirados de circulação por desatualização técnica ou jurídica permanecem catalogados internamente, mas deixam de estar acessíveis publicamente para evitar a circulação de informação obsoleta na administração pública.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="cont-faq-item">
+        <button class="cont-faq-toggle" aria-expanded="false">
+          <h3>Quem escreve os conteúdos? Por que autoria institucional?</h3>
+          <span class="cont-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="cont-faq-body">
+          <div class="cont-faq-body-inner">
+            <p>Os conteúdos são produzidos por três frentes editoriais do Instituto NTC do Brasil: a <strong>Curadoria</strong> (linha editorial geral e Gestão Pública), a <strong>Direção Científica</strong> (transversal e temas estratégicos) e as <strong>Equipes Técnicas</strong> das três verticais (Educação, Gestão Pública e Saúde).</p>
+            <p>A autoria institucional é uma escolha editorial: cada conteúdo passa por revisão técnica coletiva antes de ser publicado e expressa a posição da frente editorial, não a opinião individual de quem o redigiu. Quando há contribuição autoral de um especialista externo, a co-autoria é declarada no início do texto.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="cont-faq-item">
+        <button class="cont-faq-toggle" aria-expanded="false">
+          <h3>É possível propor um tema para a biblioteca?</h3>
+          <span class="cont-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="cont-faq-body">
+          <div class="cont-faq-body-inner">
+            <p>Sim. Servidores, dirigentes, pesquisadores e equipes técnicas das três áreas podem propor temas pelo <a href="./12_Pagina_Contato_v1.html#tab-atendimento" data-cms-link="atendimento-editorial">canal de atendimento institucional</a>, indicando o tipo desejado (artigo, estudo, nota técnica ou webinar) e o problema institucional concreto que motiva a sugestão.</p>
+            <p>A curadoria editorial avalia a proposta e responde se entra ou não no planejamento editorial — sempre com explicação técnica, mesmo nos casos negativos.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="cont-faq-item">
+        <button class="cont-faq-toggle" aria-expanded="false">
+          <h3>Os conteúdos têm versão em outros idiomas?</h3>
+          <span class="cont-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="cont-faq-body">
+          <div class="cont-faq-body-inner">
+            <p>A biblioteca NTC publica em português brasileiro. Alguns estudos transversais relevantes ao debate latino-americano podem ser publicados também em espanhol — sempre indicado no card do conteúdo.</p>
+            <p>Não traduzimos por demanda automática para outras línguas. Em contratações institucionais dedicadas, pode haver versão localizada conforme o público da formação.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="cont-faq-item">
+        <button class="cont-faq-toggle" aria-expanded="false">
+          <h3>A NTC respeita a LGPD nos cadastros da biblioteca?</h3>
+          <span class="cont-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="cont-faq-body">
+          <div class="cont-faq-body-inner">
+            <p>Sim. O Instituto NTC do Brasil é controlador dos dados pessoais coletados pelo Boletim NTC e pelos cadastros do EventOn, sob a Lei 13.709/2018 (LGPD). Os dados são tratados exclusivamente para a finalidade da comunicação editorial e do acesso aos conteúdos, e não são compartilhados com terceiros para fins comerciais.</p>
+            <p>Você pode solicitar acesso, retificação ou exclusão dos seus dados a qualquer momento pelo encarregado de dados (DPO) indicado na <a href="./33_Pagina_LGPD_v1.html" data-cms-link="legal-lgpd">Política de Privacidade · LGPD</a>.</p>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================== CTA FINAL · 3 PONTES ========================== -->
+<section class="cont-cta-final" id="cta-final" aria-label="CTA institucional final">
+  <div class="container cont-cta-final-inner fade-in">
+    <p class="eyebrow gold">Próximo passo</p>
+    <h2>Depois da leitura, vem o <em>encontro</em>.</h2>
+    <p>Os Conteúdos são a entrada editorial do Grupo NTC — a partir deles, você pode aprofundar pela Agenda formativa, contratar uma formação institucional dedicada ou conhecer quem efetivamente assina a curadoria.</p>
+
+    <div class="cont-cta-final-grid">
+      <div class="cont-cta-final-card" data-ponte="agenda">
+        <p class="eyebrow">Agenda formativa</p>
+        <h4>Ir para os eventos abertos</h4>
+        <p>Inscrição em turmas regulares — online, híbridas e presenciais — com certificado oficial NTC e replay no EventOn.</p>
+        <a class="link-arrow light" href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa" data-track="cont_cta_agenda">Ver Agenda Geral</a>
+      </div>
+      <div class="cont-cta-final-card" data-ponte="solucoes">
+        <p class="eyebrow">Contratação institucional</p>
+        <h4>Conhecer Soluções dedicadas</h4>
+        <p>In company, turmas fechadas, sob medida e trilhas — para órgãos que precisam de formação institucional dedicada.</p>
+        <a class="link-arrow light" href="./26_Pagina_Solucoes_v1.html" data-cms-link="pagina-solucoes" data-track="cont_cta_solucoes">Ir para Soluções</a>
+      </div>
+      <div class="cont-cta-final-card" data-ponte="docentes">
+        <p class="eyebrow">Curadoria científica</p>
+        <h4>Conhecer o corpo docente</h4>
+        <p>Especialistas, autoridades públicas, juristas, gestores, pesquisadores e docentes de referência nacional articulados pela curadoria NTC.</p>
+        <a class="link-arrow light" href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente" data-track="cont_cta_docentes">Conhecer o corpo docente</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ========================== STICKY CTA MOBILE ========================== -->
+<aside class="sticky-cta-mobile" id="stickyCta" aria-label="Ação rápida">
+  <button class="sticky-cta-mobile-dismiss" id="stickyCtaDismiss" aria-label="Fechar">×</button>
+  <a class="btn btn--gold" href="#newsletter" data-cms-link="cta-newsletter-sticky" data-track="cont_sticky_cta">Assinar Boletim NTC <span class="btn-arrow">→</span></a>
+</aside>
+
+<!-- ========================== FOOTER CANON ========================== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="./img/logos/logo-dark.svg" alt="Grupo NTC" />
+        <span class="footer-tagline">O novo padrão da formação institucional.</span>
+        <p class="footer-address">
+          <strong>Instituto NTC do Brasil</strong><br>
+          SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001<br>
+          Asa Sul · CEP 70308-200 · Brasília – DF<br>
+          (63) 3212-1199 · contato@institutontc.com.br
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h5>Navegação</h5>
+        <ul>
+          <li><a href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas">Programas</a></li>
+          <li><a href="./27_Pagina_Capacitacao_v1.html">Capacitação</a></li>
+          <li><a href="./26_Pagina_Solucoes_v1.html">Soluções</a></li>
+          <li><a href="#main" aria-current="page">Conteúdos</a></li>
+          <li><a href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente">Corpo Docente</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon">EventOn</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html">Contato</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Biblioteca</h5>
+        <ul>
+          <li><a href="#destaques" data-cms-link="cont-destaques">Destaques editoriais</a></li>
+          <li><a href="#biblioteca" data-cms-link="cont-biblioteca">Acervo completo</a></li>
+          <li><a href="#tipos" data-cms-link="cont-tipos">Tipos editoriais</a></li>
+          <li><a href="#verticais" data-cms-link="cont-verticais">Curadoria por vertical</a></li>
+          <li><a href="#newsletter" data-cms-link="cont-newsletter">Boletim NTC</a></li>
+          <li><a href="#faq" data-cms-link="cont-faq">FAQ Conteúdos</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Atendimento</h5>
+        <ul>
+          <li><a href="./09_Pagina_Agenda_v2.html">Eventos com inscrições abertas</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html#tab-atendimento" data-cms-link="atendimento-editorial">Propor um tema editorial</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html#tab-atendimento" data-cms-link="atendimento-licenciamento">Licenciamento e citação</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="eventon-suporte">Suporte ao participante</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="area-participante">Área do Participante</a></li>
+          <li><a href="https://wa.me/5563984444040" data-cms-link="whatsapp">WhatsApp · (63) 98444-4040</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-badge">Grupo NTC — Núcleo de Tecnologia e Conhecimento · 2026</p>
+      <ul class="footer-legal">
+        <li><a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a></li>
+        <li><a href="./31_Pagina_Termos_v1.html" data-cms-link="legal-termos">Termos de Uso</a></li>
+        <li><a href="./32_Pagina_Cookies_v1.html" data-cms-link="legal-cookies">Política de Cookies</a></li>
+        <li><a href="./33_Pagina_LGPD_v1.html" data-cms-link="legal-lgpd">LGPD</a></li>
+        <li><a href="./34_Pagina_MapaDoSite_v1.html" data-cms-link="legal-mapa-do-site">Mapa do site</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* =============================================================
+   PIPELINE INTERATIVO · CONTEÚDOS v1.0
+   Canon: mega-menu + drawer + FAQ accordion + sticky CTA + fade-in
+        + biblioteca filtravel + subnav sticky + newsletter mock
+   ============================================================= */
+
+/* analytics centralizado · push para window.dataLayer (GA4/GTM/Mixpanel) */
+function track(name, payload) {
+  try {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(Object.assign({ event: name }, payload || {}));
+  } catch (e) { /* noop */ }
+}
+
+/* ============================================================
+   1) MEGA MENU (DESKTOP)
+   ============================================================ */
+(function () {
+  const triggers = document.querySelectorAll('.nav-item.has-mega');
+  const megas = document.querySelectorAll('.mega');
+  let openTimer = null;
+  function openMega(id) {
+    closeAllMegas();
+    const m = document.getElementById('mega-' + id);
+    if (m) m.classList.add('is-open');
+    triggers.forEach(t => t.setAttribute('aria-expanded', t.dataset.mega === id ? 'true' : 'false'));
+  }
+  function closeAllMegas() {
+    megas.forEach(m => m.classList.remove('is-open'));
+    triggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
+  }
+  triggers.forEach(trigger => {
+    trigger.addEventListener('mouseenter', () => { clearTimeout(openTimer); openMega(trigger.dataset.mega); });
+    trigger.addEventListener('click', e => {
+      e.preventDefault();
+      const id = trigger.dataset.mega;
+      const isOpen = document.getElementById('mega-' + id).classList.contains('is-open');
+      if (isOpen) closeAllMegas(); else openMega(id);
+    });
+    trigger.addEventListener('focus', () => openMega(trigger.dataset.mega));
+  });
+  megas.forEach(mega => {
+    mega.addEventListener('mouseenter', () => clearTimeout(openTimer));
+    mega.addEventListener('mouseleave', () => { openTimer = setTimeout(closeAllMegas, 200); });
+  });
+  document.querySelector('.site-header').addEventListener('mouseleave', () => { openTimer = setTimeout(closeAllMegas, 240); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllMegas(); });
+  document.addEventListener('click', e => { if (!e.target.closest('.site-header')) closeAllMegas(); });
+})();
+
+/* ============================================================
+   2) MOBILE DRAWER
+   ============================================================ */
+(function () {
+  const toggle = document.getElementById('mobileToggle');
+  const drawer = document.getElementById('mobileDrawer');
+  const backdrop = document.getElementById('mobileBackdrop');
+  const closeBtn = document.getElementById('drawerClose');
+  if (!toggle || !drawer || !backdrop) return;
+  function openDrawer() {
+    drawer.classList.add('is-open'); backdrop.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true'); drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
+    setTimeout(() => closeBtn.focus(), 320);
+  }
+  function closeDrawer() {
+    drawer.classList.remove('is-open'); backdrop.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false'); drawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll'); toggle.focus();
+  }
+  toggle.addEventListener('click', () => {
+    if (drawer.classList.contains('is-open')) closeDrawer(); else openDrawer();
+  });
+  closeBtn.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer(); });
+  drawer.querySelectorAll('.drawer-item.has-sub').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById('sub-' + btn.dataset.sub);
+      if (!target) return;
+      const isOpen = target.classList.toggle('is-open');
+      btn.classList.toggle('is-expanded', isOpen);
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+  drawer.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', () => setTimeout(closeDrawer, 80));
+  });
+})();
+
+/* ============================================================
+   3) FAQ ACCORDION
+   ============================================================ */
+(function () {
+  const items = document.querySelectorAll('.cont-faq-item');
+  items.forEach(item => {
+    const toggle = item.querySelector('.cont-faq-toggle');
+    if (!toggle) return;
+    toggle.addEventListener('click', () => {
+      const isOpen = item.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      track('cont_faq_toggle', { open: isOpen, q: toggle.querySelector('h3')?.textContent?.slice(0, 60) });
+    });
+  });
+})();
+
+/* ============================================================
+   4) STICKY CTA MOBILE (show on scroll)
+   ============================================================ */
+(function () {
+  const sticky = document.getElementById('stickyCta');
+  const dismiss = document.getElementById('stickyCtaDismiss');
+  if (!sticky || !dismiss) return;
+  let dismissed = false;
+  function onScroll() {
+    if (dismissed) return;
+    const y = window.scrollY || window.pageYOffset;
+    if (y > 800) sticky.classList.add('is-visible');
+    else sticky.classList.remove('is-visible');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  dismiss.addEventListener('click', () => {
+    dismissed = true; sticky.classList.remove('is-visible');
+    track('sticky_cta_dismissed', { page: 'conteudos' });
+  });
+})();
+
+/* ============================================================
+   5) FADE-IN OBSERVER
+   ============================================================ */
+(function () {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('is-visible'));
+    return;
+  }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('is-visible');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+})();
+
+/* ============================================================
+   6) BIBLIOTECA · BUSCA + FILTROS (VERTICAL + TIPO) CLIENT-SIDE
+   ============================================================ */
+(function () {
+  const grid = document.getElementById('contGrid');
+  const cards = grid ? grid.querySelectorAll('.cont-card') : [];
+  const tabs = document.querySelectorAll('.cont-tab');
+  const typeButtons = document.querySelectorAll('.cont-typefilter button');
+  const search = document.getElementById('contSearch');
+  const countEl = document.getElementById('contCount');
+  const emptyEl = document.getElementById('contEmpty');
+  if (!grid || !cards.length) return;
+
+  let state = {
+    vert: 'all',
+    type: 'all',
+    q: ''
+  };
+
+  function norm(s) {
+    return (s || '').toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  function apply() {
+    const q = norm(state.q.trim());
+    let shown = 0;
+    cards.forEach(c => {
+      const vOk = state.vert === 'all' || c.dataset.vert === state.vert;
+      const tOk = state.type === 'all' || c.dataset.type === state.type;
+      const haystack = norm(
+        (c.dataset.search || '') + ' ' +
+        (c.querySelector('h3')?.textContent || '') + ' ' +
+        (c.querySelector('p')?.textContent || '')
+      );
+      const qOk = q.length < 2 || haystack.includes(q);
+      const ok = vOk && tOk && qOk;
+      c.classList.toggle('is-hidden', !ok);
+      if (ok) shown++;
+    });
+    if (countEl) countEl.textContent = String(shown);
+    if (emptyEl) emptyEl.classList.toggle('is-visible', shown === 0);
+    // URL sync (sem poluir histórico)
+    const params = new URLSearchParams();
+    if (state.vert !== 'all') params.set('vertical', state.vert);
+    if (state.type !== 'all') params.set('tipo', state.type);
+    if (state.q.trim().length >= 2) params.set('q', state.q.trim());
+    const qs = params.toString();
+    const hash = location.hash || '';
+    const newUrl = location.pathname + (qs ? ('?' + qs) : '') + hash;
+    history.replaceState(null, '', newUrl);
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => {
+    state.vert = t.dataset.vert;
+    tabs.forEach(b => {
+      b.classList.toggle('is-active', b === t);
+      b.setAttribute('aria-selected', b === t ? 'true' : 'false');
+    });
+    apply();
+    track('cont_tab_change', { vert: state.vert });
+  }));
+
+  typeButtons.forEach(b => b.addEventListener('click', () => {
+    state.type = b.dataset.type;
+    typeButtons.forEach(x => x.classList.toggle('is-active', x === b));
+    apply();
+    track('cont_typefilter_change', { type: state.type });
+  }));
+
+  if (search) {
+    let t = null;
+    search.addEventListener('input', () => {
+      state.q = search.value;
+      clearTimeout(t);
+      t = setTimeout(() => {
+        apply();
+        track('cont_search', { q: state.q.slice(0, 60) });
+      }, 180);
+    });
+  }
+
+  // Read URL params on load
+  (function initFromUrl() {
+    const p = new URLSearchParams(location.search);
+    const v = p.get('vertical');
+    const tp = p.get('tipo');
+    const q = p.get('q');
+    if (v) {
+      const t = document.querySelector(`.cont-tab[data-vert="${v}"]`);
+      if (t) { state.vert = v; tabs.forEach(b => { b.classList.toggle('is-active', b === t); b.setAttribute('aria-selected', b === t ? 'true' : 'false'); }); }
+    }
+    if (tp) {
+      const b = document.querySelector(`.cont-typefilter button[data-type="${tp}"]`);
+      if (b) { state.type = tp; typeButtons.forEach(x => x.classList.toggle('is-active', x === b)); }
+    }
+    if (q) { state.q = q; if (search) search.value = q; }
+    apply();
+  })();
+})();
+
+/* ============================================================
+   7) SUBNAV STICKY + ACTIVE ANCHOR HIGHLIGHT
+   ============================================================ */
+(function () {
+  const subnav = document.getElementById('contSubnav');
+  if (!subnav) return;
+  const links = subnav.querySelectorAll('a[href^="#"]');
+  const sections = Array.from(links)
+    .map(a => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+  if (!sections.length) return;
+  const subnavTop = subnav.offsetTop;
+  function onScroll() {
+    const y = window.scrollY || window.pageYOffset;
+    subnav.classList.toggle('is-sticky', y >= subnavTop - 1);
+    const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 88;
+    const subnavH = subnav.offsetHeight;
+    const margin = headerH + subnavH + 24;
+    let activeId = null;
+    for (const s of sections) {
+      const top = s.getBoundingClientRect().top;
+      if (top - margin <= 0) activeId = s.id;
+    }
+    links.forEach(a => {
+      const isActive = a.getAttribute('href') === '#' + activeId;
+      a.classList.toggle('is-active', isActive);
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+})();
+
+/* ============================================================
+   8) NEWSLETTER · VALIDAÇÃO E FEEDBACK INLINE (mock)
+   ============================================================ */
+(function () {
+  const form = document.getElementById('contNewsletterForm');
+  const ok = document.getElementById('contNewsletterMsgOk');
+  const err = document.getElementById('contNewsletterMsgErr');
+  if (!form) return;
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    ok.classList.remove('is-visible');
+    err.classList.remove('is-visible');
+    const nome = form.elements['nome'].value.trim();
+    const email = form.elements['email'].value.trim();
+    const consent = form.elements['consent'].checked;
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!nome || !validEmail || !consent) {
+      err.classList.add('is-visible');
+      track('cont_newsletter_error', { hasName: !!nome, validEmail, consent });
+      return;
+    }
+    ok.classList.add('is-visible');
+    track('cont_newsletter_subscribe', {
+      vertical: form.elements['vertical'].value,
+      hasOrg: !!form.elements['orgao'].value.trim()
+    });
+    // CMS futuro: aqui POSTa para endpoint da newsletter
+    form.reset();
+  });
+})();
+
+/* ============================================================
+   9) SCROLL SUAVE PARA ÂNCORAS + TRACKING
+   ============================================================ */
+(function () {
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const href = a.getAttribute('href');
+      if (href.length < 2 || href === '#main') return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 88;
+      const top = target.getBoundingClientRect().top + window.pageYOffset - headerH - 8;
+      window.scrollTo({ top, behavior: 'smooth' });
+      history.replaceState(null, '', href);
+      const trackName = a.getAttribute('data-track');
+      if (trackName) track(trackName, { target: href });
+    });
+  });
+})();
+
+/* page_view */
+track('page_view', { page: 'conteudos' });
+</script>
+
+<!-- ========================== JSON-LD · CollectionPage + EducationalOrganization + ItemList ========================== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://www.grupontc.com.br/conteudos#webpage",
+      "url": "https://www.grupontc.com.br/conteudos",
+      "name": "Conteúdos institucionais · Grupo NTC",
+      "description": "Biblioteca editorial do Grupo NTC para a administração pública brasileira — artigos, estudos, notas técnicas, webinars e materiais didáticos das três verticais formativas: Educação, Gestão Pública e Saúde.",
+      "inLanguage": "pt-BR",
+      "isPartOf": { "@type": "WebSite", "name": "Grupo NTC", "url": "https://www.grupontc.com.br" },
+      "publisher": { "@id": "https://www.grupontc.com.br/#instituto-ntc-do-brasil" },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Grupo NTC", "item": "https://www.grupontc.com.br/" },
+          { "@type": "ListItem", "position": 2, "name": "Conteúdos institucionais", "item": "https://www.grupontc.com.br/conteudos" }
+        ]
+      }
+    },
+    {
+      "@type": "EducationalOrganization",
+      "@id": "https://www.grupontc.com.br/#instituto-ntc-do-brasil",
+      "name": "Instituto NTC do Brasil",
+      "alternateName": ["INTC", "Grupo NTC"],
+      "url": "https://www.grupontc.com.br",
+      "email": "contato@institutontc.com.br",
+      "telephone": "+556332121199",
+      "logo": "https://www.grupontc.com.br/img/logos/logo-dark.svg",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001",
+        "addressLocality": "Brasília", "addressRegion": "DF",
+        "postalCode": "70308-200", "addressCountry": "BR"
+      },
+      "areaServed": { "@type": "Country", "name": "Brasil" }
+    },
+    {
+      "@type": "ItemList",
+      "name": "Tipos editoriais da biblioteca NTC",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Artigos", "description": "Posições técnicas autorais sobre temas em discussão na administração pública brasileira, com leitura média de 12 a 25 minutos." },
+        { "@type": "ListItem", "position": 2, "name": "Estudos", "description": "Pesquisas longas com leitura empírica da administração pública — diagnósticos de campo, séries históricas e leitura de indicadores." },
+        { "@type": "ListItem", "position": 3, "name": "Notas técnicas", "description": "Pareceres editoriais curtos sobre temas pontuais — decisões de tribunal, alterações legais, novos programas federais." },
+        { "@type": "ListItem", "position": 4, "name": "Webinars", "description": "Encontros formativos abertos, com transmissão pelo EventOn, materiais sincronizados e replay disponível." },
+        { "@type": "ListItem", "position": 5, "name": "Materiais didáticos", "description": "Kits operacionais — checklists, fluxos, modelos e roteiros — para a aplicação cotidiana de políticas e procedimentos." }
+      ]
+    },
+    {
+      "@type": "ItemList",
+      "name": "Verticais editoriais do Grupo NTC",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "NTC Educação", "url": "https://www.grupontc.com.br/educacao", "description": "Acervo editorial dedicado à formação institucional de redes públicas de ensino — alfabetização, gestão escolar, inclusão, educação integral, educação digital, primeira infância." },
+        { "@type": "ListItem", "position": 2, "name": "NTC Gestão Pública", "url": "https://www.grupontc.com.br/gestao-publica", "description": "Acervo editorial dedicado à alta gestão da administração pública brasileira — Lei 14.133/2021, direção estratégica, governança e contratações públicas." },
+        { "@type": "ListItem", "position": 3, "name": "NTC Saúde", "url": "https://www.grupontc.com.br/saude", "description": "Acervo editorial dedicado ao Sistema Único de Saúde — atenção primária, redes territoriais, gestão integrada e direção institucional." }
+      ]
+    }
+  ]
+}
+</script>
+<!-- NTC_COOKIE_CONSENT_JS_BEGIN -->
+<script defer src="./assets/cookie_consent.js"></script>
+<!-- NTC_COOKIE_CONSENT_JS_END -->
+
+</body>
+</html>

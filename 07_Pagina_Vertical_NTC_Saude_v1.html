@@ -1,0 +1,3224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="NTC Saúde · Vertical estratégica do Grupo NTC dedicada à modernização do Sistema Único de Saúde e à profissionalização da gestão da saúde pública brasileira. Três programas estratégicos · SUS, atenção primária e gestão das redes assistenciais." />
+<title>NTC Saúde · Vertical Estratégica · Programas para o SUS e Gestão da Saúde Pública · Grupo NTC</title>
+
+<!--
+  ===========================================================================
+  GRUPO NTC · PORTAL · HOME · RODADA 2.6 · 05/05/2026 · VERSÃO APROVADA
+  ---------------------------------------------------------------------------
+  Sistema flexível de datas nos cards de eventos: o bloco de data agora
+  suporta três variantes — data única, range consecutivo e múltiplos
+  encontros — refletindo a flexibilidade real da agenda do Grupo NTC.
+
+  PRINCIPAIS MUDANÇAS R2.5 → R2.6:
+    — Bloco de data dos cards de eventos com 3 variantes:
+        SINGLE  : data única (ex: "05 Jun 2026") · evento de 1 dia
+        RANGE   : datas consecutivas (ex: "05–07 Jun") · evento de 2-5 dias seguidos
+        MULTI   : múltiplos encontros (ex: "4 encontros · Jun – Jul") · datas distribuídas
+    — Meta-essentials atualizada com formulações flexíveis:
+        "8h · 1 dia"  ·  "16h · 2 dias"  ·  "20h · 3 dias"
+        "8h · 2 tardes" (período parcial)
+        "24h · 4 encontros" (não consecutivos)
+        "32h · 4 encontros · Jun – Jul" (cruza meses)
+    — Os 6 cards atuais demonstram diferentes cenários:
+        PROSUS+ Brasília    : 20h · range 05–07 Jun (intensivo presencial)
+        PEAR Online         : 16h · range 22–23 Mai (online intensivo)
+        AGIP Híbrido        : 24h · multi 18 Jun · 25 Jun · 02 Jul · 09 Jul (4 quintas)
+        LIDERA Online       : 12h · range 28–29 Mai (2 tardes seguidas)
+        EDUTEC Híbrido      : 18h · multi 12, 19, 26 Jun (3 encontros)
+        PROAPS+ Online      : 16h · range 02–03 Jul (2 dias)
+    — Estrutura de dados no CMS para suportar essa flexibilidade
+      (documentada em comentário interno na seção de eventos)
+
+  PRINCIPAIS MUDANÇAS R2.4 → R2.5:
+    — Menu desktop reduzido de 7 para 6 itens, todos uniformes em 1 palavra
+      (exceto "Grupo NTC" que é a identidade institucional):
+        Grupo NTC · Programas · Capacitação · Soluções · Conteúdos · Contato
+    — "Soluções Estratégicas" → "Soluções" (mais leve)
+    — "Capacitação e Desenvolvimento" → "Capacitação" (28 → 11 chars)
+    — EventOn removido do nível principal — passa a viver dentro do mega
+      menu de Capacitação (junto com Agenda Geral, Eventos Online,
+      Eventos Presenciais, Próximas Turmas, Eventos Passados)
+    — Nova ordem narrativa: identidade → portfólio → oferta ativa →
+      modelo comercial → autoridade → relacionamento
+    — Mega menu de Capacitação adicionado (antes era link direto)
+    — Drawer mobile atualizado com a mesma estrutura
+    — Total de caracteres do menu reduzido de 90 → 56 (mais respiro)
+
+  PRINCIPAIS MUDANÇAS R2.3 → R2.4:
+    — Eyebrow do card mostra agora FORMATO + VERTICAL
+      (ex: "Seminário · NTC Saúde", "Oficina · NTC Gestão Pública").
+    — Adicionado SELO discreto de programa vinculado dentro do card
+      ("Integra o programa AGIP", "Integra o PEAR" etc).
+    — Modalidade preservada como selo próprio sobre a imagem
+      (Online ao vivo + replay / Presencial / Híbrido) — sem repetição
+      no eyebrow ou no título.
+    — Título da seção: "Eventos e módulos com inscrições abertas"
+      → "Eventos com inscrições abertas" (linguagem mais comercial).
+    — Variedade de formatos nos 6 cards: Seminário · Seminário · Oficina
+      · Curso Executivo · Jornada · Simpósio (comunica diversidade real
+      da agenda do Grupo NTC).
+    — Documentação CMS atualizada com os campos: Formato do evento
+      (público) + Tipo interno (módulo/turma/edição/avulso, gestão
+      interna) + Programa vinculado (público).
+
+  PRINCIPAIS MUDANÇAS R2.2 → R2.3:
+    — Cards principais com imagem cover ampliada (210px → 240px)
+    — Removidos selos extras: Replay disponível, Certificado NTC, Material de
+      apoio, Networking executivo (informações migram para a página interna)
+    — REMOVIDO bloco de Palestrante Principal (foto circular + nome).
+      Substituído por LINHA TEXTUAL "Coordenação científica · Especialistas
+      convidados" — evita criar hierarquia indevida entre palestrantes em
+      eventos com múltiplos nomes de notoriedade
+    — Replay agora aparece DISCRETAMENTE dentro da modalidade
+      (ex: "Online ao vivo + replay") — não como selo destacado
+    — Cards principais carregam apenas: status · data · modalidade · cidade
+      (se presencial) · programa vinculado · título · CH · valor individual
+      · condição para equipes/órgãos · 3 CTAs hierarquizados
+    — Adicionada SEGUNDA LINHA com 3 cards secundários compactos
+      (imagem 110px à esquerda + dados à direita + 1 CTA)
+    — Total de 6 eventos visíveis na Home, mantendo padrão premium e
+      atendendo a oferta volumosa do Grupo NTC
+
+  CONVENÇÃO DE IMAGEM (CMS):
+    Cada evento cadastra UMA imagem-mãe em alta resolução (recomendado:
+    2400×1600px ou 1800×1200px) com tratamento institucional. O CMS gera
+    recortes automáticos por contexto:
+      — Card principal:    1200×600px (proporção ~2:1, cover 240px)
+      — Card secundário:   400×400px (proporção 1:1, área lateral 110px)
+      — Página interna:    2400×900px (hero do evento)
+      — Miniatura agenda:  300×200px
+      — Mobile:            800×400px
+    Todos os recortes usam object-fit: cover + ponto focal configurável
+    no CMS para controle do enquadramento.
+
+  ORDENAÇÃO DOS EVENTOS (CMS):
+    Por padrão: ORDEM CRONOLÓGICA (próximas datas primeiro).
+    Flags disponíveis no CMS para sobrescrever:
+      — destaque-editorial : aparece como card principal mesmo fora da ordem
+      — prioridade-comercial : aparece nos secundários se não couber nos principais
+      — fixado-na-home : permanece visível independente da data
+      — evento-em-destaque : recebe selo Dourado + borda Dourada (1 por vez)
+
+  PRESERVADO DA R2.2:
+    — 3 cards principais com palestrante linha-textual + selo "Evento em destaque"
+    — Especialistas e Coordenação Científica logo após Programas
+    — Programas em duas camadas (3 áreas + 6 evidências + ver todos)
+    — Apresentação institucional enxuta com 3 highlights
+    — Menu mobile drawer funcional
+    — Prova institucional como categorias editoriais
+    — Conteúdos marcados como demonstrativos
+    — "Duas décadas" no lugar de "≈ 20"
+    — Atributos data-cms-link em todos os CTAs
+
+  CAMINHOS DE ATIVOS (relativos):
+    ./img/logos/*.svg     — logos oficiais Grupo NTC (Soberana 2026)
+    ./img/fotos/*.jpg|png — banco de imagens institucionais NTC
+
+  ⚠ DADOS PROVISÓRIOS:
+    — Datas, valores e títulos dos 6 eventos em destaque
+    — Indicadores numéricos institucionais
+    — Nomes/fotos dos especialistas
+    — Conteúdos editoriais (marcados como demonstrativos)
+  ===========================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+
+<style>
+/* =============================================================
+   SISTEMA SOBERANA 2026 · TOKENS
+   ============================================================= */
+:root {
+  --oxford:        #11365E;
+  --oxford-90:     rgba(17, 54, 94, 0.92);
+  --oxford-70:     rgba(17, 54, 94, 0.72);
+  --cardeal:       #8E2A1C;
+  --oliva:         #4A6A1F;
+  --dourado:       #B8952E;
+  --dourado-soft:  #d6b350;
+  --noite:         #0B1726;
+  --pergaminho:    #F4F1E8;
+  --pergaminho-80: rgba(244, 241, 232, 0.80);
+  --pergaminho-50: rgba(244, 241, 232, 0.50);
+  --tinta:         #14202E;
+  --grafite:       #3A4050;
+  --prata:         #A8ACB6;
+  --prata-30:      rgba(168, 172, 182, 0.32);
+  --prata-15:      rgba(168, 172, 182, 0.15);
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans:  'Barlow', system-ui, -apple-system, sans-serif;
+  --font-cond:  'Barlow Condensed', 'Barlow', sans-serif;
+
+  --space-1: 8px;  --space-2: 16px; --space-3: 24px; --space-4: 32px;
+  --space-5: 48px; --space-6: 64px; --space-7: 96px; --space-8: 128px;
+
+  --shadow-soft:   0 1px 2px rgba(20, 32, 46, 0.04), 0 2px 8px rgba(20, 32, 46, 0.04);
+  --shadow-medium: 0 2px 4px rgba(20, 32, 46, 0.06), 0 8px 24px rgba(20, 32, 46, 0.10);
+  --shadow-strong: 0 4px 12px rgba(20, 32, 46, 0.12), 0 16px 48px rgba(20, 32, 46, 0.14);
+
+  --container-max: 1280px;
+  --header-h: 88px;
+  --t-fast:   160ms ease-out;
+  --t-medium: 240ms ease-out;
+  --t-slow:   600ms ease-out;
+}
+
+/* =============================================================
+   RESET
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-padding-top: var(--header-h); }
+body {
+  margin: 0; font-family: var(--font-sans); font-weight: 400;
+  font-size: 17px; line-height: 1.65; color: var(--grafite);
+  background: var(--pergaminho); text-rendering: optimizeLegibility;
+}
+body.no-scroll { overflow: hidden; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; transition: color var(--t-fast); }
+button { font-family: inherit; cursor: pointer; }
+ul { list-style: none; padding: 0; margin: 0; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; padding: 12px 20px;
+  background: var(--tinta); color: var(--pergaminho);
+  font-family: var(--font-cond); font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; font-size: 13px; z-index: 9999;
+}
+.skip-link:focus { left: 0; }
+
+/* =============================================================
+   TIPOGRAFIA GLOBAL
+   ============================================================= */
+h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0; line-height: 1.12; letter-spacing: -0.3px; }
+.eyebrow {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12.5px;
+  text-transform: uppercase; letter-spacing: 1.8px; color: var(--oxford);
+  margin: 0 0 var(--space-2);
+}
+.eyebrow.gold  { color: var(--dourado); }
+.eyebrow.light { color: var(--pergaminho-80); }
+
+.lede {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 24px; line-height: 1.4; color: var(--tinta);
+}
+
+/* Container */
+.container { width: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 32px; }
+@media (max-width: 1199px) { .container { padding: 0 24px; } }
+@media (max-width: 767px)  { .container { padding: 0 16px; } }
+
+/* =============================================================
+   BOTÕES E LINKS
+   ============================================================= */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 26px; font-family: var(--font-sans); font-weight: 600;
+  font-size: 13.5px; letter-spacing: 0.8px; text-transform: uppercase;
+  border-radius: 4px; border: 1.5px solid transparent;
+  transition: all var(--t-medium); cursor: pointer; white-space: nowrap;
+}
+.btn--primary    { background: var(--oxford); color: var(--pergaminho); border-color: var(--oxford); }
+.btn--primary:hover { background: var(--noite); border-color: var(--noite); transform: translateY(-1px); box-shadow: var(--shadow-soft); }
+.btn--gold       { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+.btn--gold:hover { background: var(--noite); color: var(--dourado-soft); border-color: var(--dourado); }
+.btn--secondary  { background: transparent; color: var(--oxford); border-color: var(--oxford); }
+.btn--secondary:hover { background: var(--oxford); color: var(--pergaminho); }
+.btn--ghost-light{ background: transparent; color: var(--pergaminho); border-color: var(--pergaminho-80); }
+.btn--ghost-light:hover { background: var(--pergaminho); color: var(--noite); border-color: var(--pergaminho); }
+.btn--mini { padding: 10px 16px; font-size: 12px; }
+.btn-arrow { display: inline-block; transition: transform var(--t-medium); }
+.btn:hover .btn-arrow { transform: translateX(3px); }
+
+.link-arrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-cond); font-weight: 600; font-size: 13px;
+  text-transform: uppercase; letter-spacing: 1.4px; color: var(--oxford);
+  border-bottom: 1px solid transparent; padding-bottom: 3px;
+  transition: all var(--t-medium); cursor: pointer; background: none; border-top: 0; border-left: 0; border-right: 0;
+}
+.link-arrow::after { content: '→'; transition: transform var(--t-medium); }
+.link-arrow:hover { border-bottom-color: var(--dourado); color: var(--dourado); }
+.link-arrow:hover::after { transform: translateX(3px); }
+.link-arrow.light { color: var(--pergaminho); }
+.link-arrow.light:hover { color: var(--dourado-soft); border-bottom-color: var(--dourado-soft); }
+.link-arrow.crimson { color: var(--cardeal); }
+.link-arrow.crimson:hover { color: var(--cardeal); border-bottom-color: var(--cardeal); }
+.link-arrow.olive { color: var(--oliva); }
+.link-arrow.olive:hover { color: var(--oliva); border-bottom-color: var(--oliva); }
+
+/* =============================================================
+   HEADER · STICKY + MEGA MENU
+   ============================================================= */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(244, 241, 232, 0.94);
+  backdrop-filter: saturate(140%) blur(14px);
+  -webkit-backdrop-filter: saturate(140%) blur(14px);
+  border-bottom: 1px solid var(--prata-30);
+  height: var(--header-h);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; gap: var(--space-3); }
+.brand { display: flex; align-items: center; }
+.brand img { height: 56px; width: auto; }
+@media (max-width: 599px) { .brand img { height: 44px; } }
+
+.nav-primary { display: flex; align-items: center; gap: 0; }
+.nav-item {
+  position: relative; padding: 30px 14px;
+  font-family: var(--font-cond); font-weight: 500; font-size: 13.5px;
+  color: var(--tinta); text-transform: uppercase; letter-spacing: 1.1px;
+  cursor: pointer; transition: color var(--t-fast);
+  background: transparent; border: 0;
+}
+.nav-item:hover { color: var(--oxford); }
+.nav-item.has-mega::after {
+  content: ''; display: inline-block; width: 6px; height: 6px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  margin-left: 7px; opacity: 0.55;
+}
+
+.header-cta { display: flex; align-items: center; gap: 10px; }
+.btn--participant { background: var(--noite); color: var(--dourado); border-color: var(--noite); }
+.btn--participant:hover { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+
+.mega {
+  position: absolute; top: calc(var(--header-h) - 1px); left: 0; right: 0;
+  background: var(--pergaminho);
+  border-top: 1px solid var(--prata-30);
+  border-bottom: 3px solid var(--oxford);
+  box-shadow: var(--shadow-medium);
+  opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity var(--t-medium), transform var(--t-medium), visibility var(--t-medium);
+  z-index: 99;
+}
+.mega.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+.mega-inner {
+  display: grid; gap: var(--space-5); padding: var(--space-5) 0 var(--space-6);
+}
+.mega-col h4 {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--dourado);
+  margin: 0 0 var(--space-3); padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--prata-30);
+}
+.mega-list { display: grid; gap: 12px; }
+.mega-list a {
+  display: block; padding: 6px 0; color: var(--tinta);
+  border-left: 0 solid var(--oxford); padding-left: 0;
+  transition: padding-left var(--t-medium), border-left-width var(--t-medium), color var(--t-fast);
+}
+.mega-list a strong {
+  font-family: var(--font-serif); font-weight: 600; font-size: 18px;
+  color: var(--tinta); display: block;
+}
+.mega-list a span {
+  font-family: var(--font-sans); font-size: 12.5px; color: var(--grafite);
+  display: block; line-height: 1.4; margin-top: 2px;
+}
+.mega-list a:hover { border-left-width: 3px; padding-left: 12px; color: var(--oxford); }
+.mega-list a:hover strong { color: var(--oxford); }
+#mega-programas .mega-inner { grid-template-columns: 1.1fr 1fr 1fr; }
+
+.mobile-toggle {
+  display: none; background: none; border: 0; padding: 12px;
+  color: var(--tinta); cursor: pointer; align-self: center;
+}
+.mobile-toggle span { display: block; width: 22px; height: 2px; background: currentColor; margin: 5px 0; transition: var(--t-medium); }
+
+@media (max-width: 1199px) {
+  .nav-primary { display: none; }
+  .header-cta .btn:not(.btn--participant) { display: none; }
+  .mobile-toggle { display: block; }
+}
+@media (max-width: 599px) {
+  .header-cta .btn--participant { display: none; }
+}
+
+/* =============================================================
+   MOBILE DRAWER · FUNCIONAL
+   ============================================================= */
+.mobile-drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: 100%;
+  max-width: 420px; background: var(--pergaminho); z-index: 200;
+  transform: translateX(100%); transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex; flex-direction: column;
+  box-shadow: -8px 0 32px rgba(20, 32, 46, 0.18);
+  overflow-y: auto;
+}
+.mobile-drawer.is-open { transform: translateX(0); }
+.mobile-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(11, 23, 38, 0.6);
+  opacity: 0; visibility: hidden; transition: opacity 320ms, visibility 320ms;
+  z-index: 199;
+}
+.mobile-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+
+.drawer-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 24px; border-bottom: 1px solid var(--prata-30);
+}
+.drawer-head img { height: 44px; width: auto; }
+.drawer-close {
+  background: none; border: 0; padding: 8px; cursor: pointer;
+  font-family: var(--font-sans); font-size: 28px; color: var(--tinta);
+  line-height: 1; width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-nav { padding: var(--space-3) 0; flex: 1; }
+.drawer-item {
+  display: block; width: 100%; text-align: left;
+  padding: 18px 24px; border: 0; background: transparent;
+  font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  color: var(--tinta); cursor: pointer;
+  border-bottom: 1px solid var(--prata-15);
+  transition: background var(--t-fast);
+}
+.drawer-item:hover, .drawer-item:focus { background: rgba(184, 149, 46, 0.08); }
+.drawer-item.has-sub::after {
+  content: '+'; float: right; color: var(--dourado); font-weight: 400;
+  transition: transform var(--t-medium);
+}
+.drawer-item.has-sub.is-expanded::after { content: '−'; }
+.drawer-sub {
+  display: none; background: rgba(168, 172, 182, 0.08);
+  padding: 8px 0;
+}
+.drawer-sub.is-open { display: block; }
+.drawer-sub a {
+  display: block; padding: 12px 24px 12px 36px;
+  font-family: var(--font-sans); font-size: 15px; color: var(--grafite);
+  border-bottom: 1px solid var(--prata-15);
+}
+.drawer-sub a:hover { color: var(--oxford); background: rgba(184, 149, 46, 0.05); }
+.drawer-sub a strong { font-family: var(--font-serif); font-weight: 600; font-size: 16px; color: var(--tinta); display: block; }
+.drawer-sub a span { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--prata); }
+
+.drawer-cta {
+  padding: var(--space-3) 24px var(--space-4);
+  display: grid; gap: 10px;
+  border-top: 1px solid var(--prata-30);
+}
+.drawer-cta .btn { width: 100%; justify-content: center; padding: 14px; }
+
+/* =============================================================
+   HERO
+   ============================================================= */
+.hero {
+  position: relative;
+  min-height: calc(94vh - var(--header-h));
+  display: flex; align-items: center;
+  background: var(--noite); color: var(--pergaminho);
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-image: url('./img/fotos/_optimized/hero-principal.1920.webp');
+  background-size: cover; background-position: center 30%;
+  filter: saturate(85%) contrast(1.05);
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(125deg, rgba(11, 23, 38, 0.92) 0%, rgba(17, 54, 94, 0.78) 55%, rgba(11, 23, 38, 0.55) 100%);
+}
+.hero::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: linear-gradient(90deg, rgba(168, 172, 182, 0.05) 1px, transparent 1px);
+  background-size: 80px 100%;
+}
+.hero-content { position: relative; z-index: 2; padding: var(--space-7) 0 var(--space-6); max-width: 920px; }
+.hero h1 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(40px, 6.4vw, 82px); line-height: 1.04;
+  letter-spacing: -0.5px; color: var(--pergaminho);
+  margin: var(--space-3) 0 var(--space-4);
+}
+.hero h1 .accent { color: var(--dourado-soft); font-style: italic; font-weight: 500; }
+.hero-sub {
+  font-family: var(--font-sans); font-weight: 400;
+  font-size: clamp(16px, 1.4vw, 19px); line-height: 1.55;
+  color: var(--pergaminho-80); max-width: 720px; margin: 0 0 var(--space-5);
+}
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 14px; }
+.hero-trust {
+  position: absolute; bottom: 28px; left: 32px; right: 32px; z-index: 2;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: var(--space-4); font-family: var(--font-cond); font-size: 11px;
+  text-transform: uppercase; letter-spacing: 1.6px; color: var(--pergaminho-80);
+  border-top: 1px solid rgba(244, 241, 232, 0.12); padding-top: 18px;
+}
+.hero-trust .verticals { display: flex; gap: var(--space-3); }
+.hero-trust .verticals span::before { content: '— '; color: var(--dourado); }
+.hero-trust .scroll-hint::after { content: '↓'; margin-left: 8px; color: var(--dourado); }
+@media (max-width: 767px) { .hero-trust { position: static; padding: 0 0 24px; flex-direction: column; align-items: flex-start; } }
+
+/* =============================================================
+   SEÇÃO BASE
+   ============================================================= */
+.section { padding: var(--space-7) 0; }
+.section--tight { padding: var(--space-6) 0; }
+.section--cream { background: var(--pergaminho); }
+.section--ivory { background: #ECE7D8; }
+.section--dark { background: var(--noite); color: var(--pergaminho); }
+.section--dark h2, .section--dark h3 { color: var(--pergaminho); }
+.section--oxford { background: var(--oxford); color: var(--pergaminho); }
+.section--oxford h2, .section--oxford h3 { color: var(--pergaminho); }
+
+.section-head { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-5); max-width: 880px; }
+.section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+.section-head h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(30px, 3.8vw, 46px); line-height: 1.1;
+  color: var(--tinta); letter-spacing: -0.3px;
+}
+.section--dark .section-head h2, .section--oxford .section-head h2 { color: var(--pergaminho); }
+.section-intro {
+  font-family: var(--font-sans); font-size: 17px; line-height: 1.6;
+  color: var(--grafite); margin: 0; max-width: 720px;
+}
+.section--dark .section-intro, .section--oxford .section-intro { color: var(--pergaminho-80); }
+
+.section-head-row {
+  display: flex; align-items: end; justify-content: space-between;
+  gap: var(--space-4); margin-bottom: var(--space-5); flex-wrap: wrap;
+}
+.section-head-row > .section-head { margin-bottom: 0; }
+
+/* =============================================================
+   BLOCO NOBRE: EVENTOS — COMPOSIÇÃO EDITORIAL PREMIUM
+   ============================================================= */
+.events-prime {
+  background: var(--pergaminho);
+  padding: var(--space-7) 0 var(--space-6);
+  border-top: 6px solid var(--oxford);
+}
+.events-status-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: var(--space-4); padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--prata-30);
+  font-family: var(--font-cond); font-size: 12px;
+  text-transform: uppercase; letter-spacing: 1.8px;
+  color: var(--grafite);
+}
+.events-status-bar .live-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(184, 149, 46, 0.12); color: var(--dourado);
+  padding: 6px 12px; border-radius: 20px; font-weight: 600;
+}
+.events-status-bar .live-pill::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--dourado); box-shadow: 0 0 8px rgba(184, 149, 46, 0.5);
+  animation: pulse 1.6s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* GRADE DE 3 CARDS VERTICAIS EQUIVALENTES (R2.2) */
+.events-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+}
+@media (max-width: 1099px) { .events-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 767px)  { .events-grid { grid-template-columns: 1fr; } }
+
+.event-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  transition: transform var(--t-medium), box-shadow var(--t-medium), border-color var(--t-medium);
+}
+.event-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-medium); border-color: var(--oxford); }
+.event-card[data-area="gov"]:hover { border-color: var(--cardeal); }
+.event-card[data-area="sau"]:hover { border-color: var(--oliva); }
+
+/* Card destacado: borda Dourada + selo "Evento em destaque" */
+.event-card.is-featured {
+  border-color: var(--dourado); border-width: 2px;
+  box-shadow: 0 4px 20px rgba(184, 149, 46, 0.16);
+}
+.event-card.is-featured:hover {
+  border-color: var(--dourado);
+  box-shadow: 0 8px 32px rgba(184, 149, 46, 0.24);
+}
+.event-featured-badge {
+  position: absolute; top: 0; left: 0; z-index: 4;
+  background: var(--dourado); color: var(--noite);
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  letter-spacing: 1.6px; text-transform: uppercase;
+  padding: 6px 22px 6px 14px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
+/* Status flutuante */
+.event-status-tag {
+  position: absolute; top: 14px; right: 14px; z-index: 3;
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  text-transform: uppercase; letter-spacing: 1.4px;
+  padding: 5px 10px; border-radius: 2px;
+}
+.status-open { background: var(--dourado); color: var(--noite); }
+.status-last { background: var(--cardeal); color: var(--pergaminho); }
+.status-soon { background: var(--prata-15); color: var(--grafite); }
+.event-card.is-featured .event-status-tag { top: 38px; }
+
+/* Cover ampliado para 240px (R2.3) — área maior para presença visual editorial */
+.event-cover {
+  height: 240px; position: relative; overflow: hidden;
+  background: var(--noite);
+}
+.event-cover-img {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  filter: saturate(82%); transition: transform var(--t-slow);
+}
+.event-card:hover .event-cover-img { transform: scale(1.04); }
+.event-cover-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 35%, rgba(11, 23, 38, 0.78) 100%);
+}
+.event-cover-meta {
+  position: absolute; bottom: 14px; left: 16px; right: 16px;
+  display: flex; justify-content: space-between; align-items: end;
+  color: var(--pergaminho); z-index: 1; gap: 10px;
+}
+/* =============================================================
+   BLOCO DE DATA · 3 VARIANTES (R2.6)
+     .event-date-block          → wrapper (todas as variantes)
+     .event-date-block.single   → 1 data (ex: "05 Jun 2026")
+     .event-date-block.range    → datas consecutivas (ex: "05–07 Jun")
+     .event-date-block.multi    → múltiplos encontros não consecutivos
+                                   (ex: "4 encontros · Jun – Jul")
+   ============================================================= */
+.event-date-block {
+  display: flex; flex-direction: column; line-height: 1;
+  background: rgba(11, 23, 38, 0.74); backdrop-filter: blur(4px);
+  padding: 8px 12px; border-left: 3px solid var(--dourado);
+  min-width: 0;
+}
+
+/* Variante padrão (single) — preserva visual original */
+.event-date-block .day {
+  font-family: var(--font-serif); font-weight: 700; font-size: 32px;
+  color: var(--pergaminho);
+}
+.event-date-block .mon-yr {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.6px;
+  text-transform: uppercase; color: var(--pergaminho-80); margin-top: 4px;
+}
+
+/* Variante RANGE — datas consecutivas */
+.event-date-block.range .days {
+  font-family: var(--font-serif); font-weight: 700; font-size: 26px;
+  color: var(--pergaminho); letter-spacing: -0.5px; white-space: nowrap;
+}
+.event-date-block.range .days .dash {
+  color: var(--dourado); font-weight: 500; padding: 0 1px;
+}
+.event-date-block.range .mon-yr {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.6px;
+  text-transform: uppercase; color: var(--pergaminho-80); margin-top: 4px;
+}
+
+/* Variante MULTI — múltiplos encontros */
+.event-date-block.multi .count {
+  font-family: var(--font-serif); font-weight: 700; font-size: 22px;
+  color: var(--pergaminho); line-height: 1;
+}
+.event-date-block.multi .count .number { color: var(--dourado); }
+.event-date-block.multi .period {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.6px;
+  text-transform: uppercase; color: var(--pergaminho-80); margin-top: 4px;
+}
+
+/* Bloco de data nos cards SECUNDÁRIOS (.es-date) — versão compacta */
+.es-date.range .days {
+  font-family: var(--font-serif); font-weight: 700; font-size: 18px;
+  color: var(--pergaminho); white-space: nowrap;
+}
+.es-date.range .days .dash { color: var(--dourado); padding: 0 1px; }
+.es-date.range .mon-yr {
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--pergaminho-80); margin-top: 3px;
+}
+.es-date.multi .count {
+  font-family: var(--font-serif); font-weight: 700; font-size: 16px;
+  color: var(--pergaminho); line-height: 1;
+}
+.es-date.multi .count .number { color: var(--dourado); }
+.es-date.multi .period {
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--pergaminho-80); margin-top: 3px;
+}
+.event-modality {
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  background: rgba(244, 241, 232, 0.94); color: var(--oxford);
+  padding: 5px 10px;
+}
+.event-modality.presencial { color: #6f5817; }
+.event-modality.hibrido    { color: var(--oliva); }
+
+/* Body */
+.event-body {
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  flex: 1; display: flex; flex-direction: column; gap: 12px;
+}
+.event-program-link {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--oxford);
+}
+.event-card[data-area="gov"] .event-program-link { color: var(--cardeal); }
+.event-card[data-area="sau"] .event-program-link { color: var(--oliva); }
+.event-program-link a { border-bottom: 1px dotted currentColor; padding-bottom: 1px; }
+.event-program-link span.dot { color: var(--prata); margin: 0 4px; }
+
+.event-body h3 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: 22px; line-height: 1.2; color: var(--tinta); margin: 0;
+}
+
+/* Linha textual de palestrantes (R2.3) — substitui o bloco com foto circular.
+   Evita criar hierarquia indevida em eventos com múltiplos nomes fortes. */
+.event-speakers-line {
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--prata-15);
+  border-bottom: 1px solid var(--prata-15);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.event-speakers-line .label {
+  font-family: var(--font-cond); font-weight: 600; font-size: 10px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--prata);
+}
+.event-speakers-line .names {
+  font-family: var(--font-serif); font-style: italic; font-weight: 500;
+  font-size: 14.5px; color: var(--tinta); line-height: 1.4;
+}
+
+/* Linha CH + cidade — meta essencial enxuta (R2.3) */
+.event-meta-essentials {
+  display: flex; gap: var(--space-3); flex-wrap: wrap;
+  font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--grafite);
+}
+.event-meta-essentials span { display: inline-flex; align-items: center; gap: 6px; }
+.event-meta-essentials span + span::before {
+  content: '·'; color: var(--dourado); margin-right: 4px; font-weight: 700;
+}
+
+/* Selo discreto de programa vinculado (R2.4) — segundo nível editorial.
+   Aparece no rodapé do body do card, antes do pricing.
+   Ex: "Integra o programa AGIP — Governança nas Contratações Públicas" */
+.event-program-binding {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; align-self: start;
+  background: rgba(17, 54, 94, 0.06);
+  border-left: 2px solid var(--oxford);
+  font-family: var(--font-sans); font-size: 12px;
+  color: var(--grafite); line-height: 1.3;
+}
+.event-card[data-area="gov"] .event-program-binding {
+  background: rgba(142, 42, 28, 0.06);
+  border-left-color: var(--cardeal);
+}
+.event-card[data-area="sau"] .event-program-binding {
+  background: rgba(74, 106, 31, 0.06);
+  border-left-color: var(--oliva);
+}
+.event-program-binding .epb-label {
+  font-family: var(--font-cond); font-weight: 600; font-size: 10px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--prata);
+}
+.event-program-binding .epb-program {
+  font-family: var(--font-serif); font-weight: 600; font-size: 13.5px;
+  color: var(--oxford);
+}
+.event-card[data-area="gov"] .event-program-binding .epb-program { color: var(--cardeal); }
+.event-card[data-area="sau"] .event-program-binding .epb-program { color: var(--oliva); }
+.event-program-binding a { border-bottom: 1px dotted currentColor; padding-bottom: 1px; }
+
+/* Versão compacta para os cards secundários */
+.es-program-binding {
+  font-family: var(--font-sans); font-size: 11px; color: var(--grafite);
+  margin-top: 2px; line-height: 1.3;
+}
+.es-program-binding strong {
+  font-family: var(--font-serif); font-weight: 600; font-size: 12px;
+  color: var(--oxford);
+}
+.event-secondary-card[data-area="gov"] .es-program-binding strong { color: var(--cardeal); }
+.event-secondary-card[data-area="sau"] .es-program-binding strong { color: var(--oliva); }
+
+/* Pricing */
+.event-pricing {
+  display: flex; justify-content: space-between; align-items: end; gap: var(--space-2);
+  padding-top: var(--space-2); border-top: 1px solid var(--prata-30);
+  margin-top: var(--space-1);
+}
+.event-price {
+  font-family: var(--font-cond); font-size: 10.5px; letter-spacing: 1.3px;
+  text-transform: uppercase; color: var(--grafite);
+  display: flex; flex-direction: column; line-height: 1.2;
+}
+.event-price strong {
+  font-family: var(--font-sans); font-weight: 700; font-size: 19px;
+  color: var(--oxford); margin-top: 4px; letter-spacing: 0;
+}
+.event-price.institutional strong { color: var(--cardeal); font-size: 13px; }
+
+/* Actions: 1 botão Dourado + 2 link-arrows */
+.event-actions {
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  background: var(--pergaminho);
+  display: flex; flex-direction: column; gap: 10px;
+  border-top: 1px solid var(--prata-15);
+  margin-top: auto;
+}
+.event-actions .btn { width: 100%; justify-content: center; padding: 12px; font-size: 13px; }
+.event-actions-row {
+  display: flex; justify-content: space-between; gap: 8px;
+  flex-wrap: wrap; padding-top: 4px;
+}
+.event-actions-row .link-arrow { font-size: 11.5px; }
+
+.events-prime-foot {
+  display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-5); flex-wrap: wrap;
+}
+
+/* =============================================================
+   VARIANTE C · GRADE 3+3 (CARDS PRIMÁRIOS + SECUNDÁRIOS)
+   Segunda linha: cards horizontais compactos (imagem pequena + dados)
+   ============================================================= */
+.events-secondary {
+  margin-top: var(--space-5); padding-top: var(--space-4);
+  border-top: 1px solid var(--prata-30);
+}
+.events-secondary-head {
+  display: flex; justify-content: space-between; align-items: end;
+  margin-bottom: var(--space-3); flex-wrap: wrap; gap: var(--space-2);
+}
+.events-secondary-head h3 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  color: var(--tinta); margin: 0;
+}
+.events-secondary-head .eyebrow { margin: 0 0 4px; }
+
+.events-secondary-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+}
+@media (max-width: 1099px) { .events-secondary-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .events-secondary-grid { grid-template-columns: 1fr; } }
+
+.event-secondary-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  display: grid; grid-template-columns: 110px 1fr;
+  gap: 0; overflow: hidden;
+  transition: transform var(--t-medium), box-shadow var(--t-medium), border-color var(--t-medium);
+}
+.event-secondary-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); border-color: var(--oxford); }
+.event-secondary-card[data-area="gov"]:hover { border-color: var(--cardeal); }
+.event-secondary-card[data-area="sau"]:hover { border-color: var(--oliva); }
+
+.es-cover {
+  position: relative; overflow: hidden; background: var(--noite);
+  min-height: 100%;
+}
+.es-cover-img {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  filter: saturate(82%) brightness(0.7);
+  transition: transform var(--t-slow);
+}
+.event-secondary-card:hover .es-cover-img { transform: scale(1.05); }
+.es-cover-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(11,23,38,0.20) 0%, rgba(11,23,38,0.60) 100%);
+}
+.es-date {
+  position: absolute; bottom: 8px; left: 8px; right: 8px; z-index: 1;
+  display: flex; flex-direction: column; line-height: 1;
+  border-left: 2px solid var(--dourado); padding-left: 8px;
+  color: var(--pergaminho);
+}
+.es-date .day {
+  font-family: var(--font-serif); font-weight: 700; font-size: 22px;
+}
+.es-date .mon-yr {
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--pergaminho-80); margin-top: 3px;
+}
+
+.es-body {
+  padding: var(--space-2) var(--space-3);
+  display: flex; flex-direction: column; gap: 6px;
+  justify-content: space-between;
+}
+.es-program {
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--oxford);
+}
+.event-secondary-card[data-area="gov"] .es-program { color: var(--cardeal); }
+.event-secondary-card[data-area="sau"] .es-program { color: var(--oliva); }
+
+.es-title {
+  font-family: var(--font-serif); font-weight: 600; font-size: 16px;
+  color: var(--tinta); margin: 0; line-height: 1.25;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.es-meta {
+  font-family: var(--font-cond); font-size: 10.5px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--grafite);
+  display: flex; gap: var(--space-2);
+}
+.es-meta strong { color: var(--oxford); font-weight: 700; }
+.es-meta-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+.es-cta {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--dourado);
+  display: inline-flex; align-items: center; gap: 6px;
+  border-bottom: 1px solid transparent; padding-bottom: 2px;
+  transition: border-color var(--t-fast);
+  align-self: start;
+}
+.es-cta:hover { border-bottom-color: var(--dourado); }
+.es-cta::after { content: '→'; transition: transform var(--t-medium); }
+.es-cta:hover::after { transform: translateX(3px); }
+
+/* =============================================================
+   AGENDA · FAIXA COMPACTA
+   ============================================================= */
+.agenda-band {
+  background: var(--noite); color: var(--pergaminho);
+  padding: var(--space-5) 0;
+  border-top: 1px solid rgba(168, 172, 182, 0.15);
+  border-bottom: 1px solid rgba(168, 172, 182, 0.15);
+}
+.agenda-band-inner {
+  display: grid; grid-template-columns: 1.2fr 2fr auto; gap: var(--space-4); align-items: center;
+}
+@media (max-width: 1099px) { .agenda-band-inner { grid-template-columns: 1fr; } }
+.agenda-band h3 { font-family: var(--font-serif); font-weight: 600; font-size: 28px; color: var(--pergaminho); margin: 0; }
+.agenda-band p { font-family: var(--font-sans); color: var(--pergaminho-80); font-size: 14px; line-height: 1.5; margin: 6px 0 0; }
+.agenda-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.agenda-chip {
+  background: rgba(244, 241, 232, 0.08); border: 1px solid rgba(244, 241, 232, 0.18);
+  padding: 7px 14px; border-radius: 18px;
+  font-family: var(--font-cond); font-size: 12px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--pergaminho); cursor: pointer;
+  transition: all var(--t-fast);
+}
+.agenda-chip:hover { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+
+/* =============================================================
+   APRESENTAÇÃO INSTITUCIONAL CURTA · ENXUTA
+   ============================================================= */
+.intro-short { padding: var(--space-7) 0; }
+.intro-short-inner {
+  display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--space-6);
+  align-items: center;
+}
+@media (max-width: 899px) { .intro-short-inner { grid-template-columns: 1fr; gap: var(--space-3); } }
+
+.intro-short-headline {
+  font-family: var(--font-serif); font-weight: 500; font-style: italic;
+  font-size: clamp(24px, 2.6vw, 32px); line-height: 1.3;
+  color: var(--oxford);
+  border-left: 2px solid var(--dourado); padding-left: var(--space-3);
+}
+.intro-short-body p {
+  font-size: 17px; line-height: 1.6; color: var(--grafite); margin: 0 0 var(--space-3);
+}
+.intro-short-highlights {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin: var(--space-3) 0 var(--space-4);
+}
+@media (max-width: 599px) { .intro-short-highlights { grid-template-columns: 1fr; } }
+
+.intro-highlight {
+  border-top: 2px solid var(--dourado); padding-top: 12px;
+}
+.intro-highlight .num {
+  font-family: var(--font-serif); font-weight: 700; font-size: 28px;
+  color: var(--oxford); line-height: 1;
+}
+.intro-highlight .num.text { font-style: italic; font-weight: 500; font-size: 22px; }
+.intro-highlight .lbl {
+  font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.3px;
+  text-transform: uppercase; color: var(--grafite); margin-top: 6px; line-height: 1.3;
+}
+
+/* =============================================================
+   PROGRAMAS · ARQUITETURA EM DUAS CAMADAS
+   ============================================================= */
+.programs-section {
+  padding: var(--space-7) 0;
+  background: linear-gradient(180deg, var(--pergaminho) 0%, #ECE7D8 100%);
+}
+.programs-section .section-head { margin-bottom: var(--space-3); }
+
+.programs-intro-line {
+  font-family: var(--font-cond); font-size: 12px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--prata);
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: var(--space-5);
+}
+.programs-intro-line::before, .programs-intro-line::after {
+  content: ''; flex: 1; height: 1px; background: var(--prata-30);
+}
+
+/* === CAMADA 1: 3 cards premium de áreas === */
+.area-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+@media (max-width: 1099px) { .area-cards { grid-template-columns: 1fr; } }
+
+.area-card {
+  position: relative; min-height: 460px; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: end;
+  background: var(--noite); color: var(--pergaminho);
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+}
+.area-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-strong); }
+.area-card-img {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center;
+  filter: saturate(80%); transition: transform var(--t-slow);
+}
+.area-card:hover .area-card-img { transform: scale(1.04); }
+.area-card-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  /* Educação · predominância Oxford */
+  background: linear-gradient(180deg, rgba(17, 54, 94, 0.55) 0%, rgba(11, 23, 38, 0.92) 100%);
+}
+.area-card[data-vert="gov"] .area-card-overlay {
+  /* Gestão Pública · acento Cardeal */
+  background: linear-gradient(180deg, rgba(142, 42, 28, 0.55) 0%, rgba(11, 23, 38, 0.92) 100%);
+}
+.area-card[data-vert="sau"] .area-card-overlay {
+  /* Saúde · acento Oliva */
+  background: linear-gradient(180deg, rgba(74, 106, 31, 0.55) 0%, rgba(11, 23, 38, 0.92) 100%);
+}
+
+.area-card-num {
+  position: absolute; top: var(--space-4); right: var(--space-4); z-index: 2;
+  font-family: var(--font-serif); font-weight: 700; font-style: italic;
+  font-size: 56px; color: rgba(184, 149, 46, 0.5); line-height: 1;
+}
+.area-card-content { position: relative; z-index: 2; }
+.area-vertical-tag {
+  font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.6px;
+  text-transform: uppercase; color: var(--dourado);
+}
+.area-card h3 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: 38px; line-height: 1.05; color: var(--pergaminho);
+  margin: 6px 0 var(--space-2);
+}
+.area-card .area-tagline {
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 17px; line-height: 1.4; color: var(--pergaminho-80);
+  margin: 0 0 var(--space-3); max-width: 320px;
+}
+.area-card-divider {
+  height: 1px; background: rgba(244, 241, 232, 0.2);
+  margin: var(--space-3) 0;
+}
+.area-card-meta {
+  font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--pergaminho); margin-bottom: var(--space-3);
+}
+.area-card-meta strong { font-family: var(--font-serif); color: var(--dourado); font-size: 22px; font-weight: 700; margin-right: 8px; }
+.area-card-actions {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.area-card-actions .link-arrow.light { font-size: 12px; }
+
+/* === CAMADA 2: 6 programas em evidência (curadoria, não catálogo) === */
+.programs-curated-head {
+  display: flex; justify-content: space-between; align-items: end;
+  gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-4);
+  padding-top: var(--space-4); border-top: 1px solid var(--prata-30);
+}
+.programs-curated-head h3 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 28px;
+  color: var(--tinta); margin: 0;
+}
+.programs-curated-head p {
+  font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--prata); margin: 4px 0 0;
+}
+
+.programs-curated {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+}
+@media (max-width: 1099px) { .programs-curated { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .programs-curated { grid-template-columns: 1fr; } }
+
+.program-card-evidence {
+  position: relative; background: var(--pergaminho);
+  border-top: 3px solid var(--oxford);
+  padding: var(--space-3) var(--space-3) var(--space-3);
+  display: flex; flex-direction: column; gap: 12px;
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+  min-height: 280px;
+}
+.program-card-evidence[data-area="gov"] { border-top-color: var(--cardeal); }
+.program-card-evidence[data-area="sau"] { border-top-color: var(--oliva); }
+.program-card-evidence:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); }
+
+.program-evidence-head {
+  display: flex; justify-content: space-between; align-items: start; gap: var(--space-2);
+}
+.program-evidence-sigla {
+  font-family: var(--font-serif); font-weight: 700; font-size: 38px;
+  line-height: 1; color: var(--tinta); letter-spacing: -1px; margin: 0;
+}
+.program-evidence-area {
+  font-family: var(--font-cond); font-size: 10.5px; letter-spacing: 1.6px;
+  text-transform: uppercase; color: var(--oxford); font-weight: 600;
+  margin-top: 6px; text-align: right;
+}
+.program-card-evidence[data-area="gov"] .program-evidence-area { color: var(--cardeal); }
+.program-card-evidence[data-area="sau"] .program-evidence-area { color: var(--oliva); }
+
+.program-evidence-name {
+  font-family: var(--font-sans); font-weight: 600; font-size: 15px;
+  color: var(--tinta); margin: 0; line-height: 1.3;
+  /* O nome curto comercial; o oficial fica no tooltip e na página interna */
+}
+.program-evidence-value {
+  font-family: var(--font-serif); font-style: italic; font-size: 15px;
+  color: var(--grafite); line-height: 1.45; margin: 0;
+}
+.program-evidence-flag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--dourado);
+  align-self: start;
+}
+.program-evidence-flag::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--dourado); box-shadow: 0 0 6px rgba(184, 149, 46, 0.55);
+}
+.program-evidence-meta {
+  font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--grafite);
+  display: flex; gap: var(--space-2); margin-top: auto;
+  padding-top: var(--space-2); border-top: 1px solid var(--prata-30);
+}
+.program-evidence-meta span + span::before { content: '·'; color: var(--prata); margin-right: var(--space-1); }
+.program-evidence-actions {
+  display: flex; gap: var(--space-3); flex-wrap: wrap; padding-top: 8px;
+}
+
+.programs-cta-foot {
+  display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-6); flex-wrap: wrap;
+}
+
+/* =============================================================
+   SOLUÇÕES ESTRATÉGICAS
+   ============================================================= */
+.solutions { padding: var(--space-7) 0; background: var(--pergaminho); }
+.solutions-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6);
+  align-items: center;
+}
+@media (max-width: 899px) { .solutions-grid { grid-template-columns: 1fr; } }
+
+.solutions-content h2 { font-size: clamp(30px, 3.8vw, 44px); margin-bottom: var(--space-3); }
+.solutions-list {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin: var(--space-3) 0 var(--space-4);
+}
+.solutions-list li {
+  font-family: var(--font-cond); font-weight: 500; font-size: 14px;
+  letter-spacing: 0.6px; text-transform: uppercase; color: var(--tinta);
+  border-left: 2px solid var(--dourado); padding-left: 12px;
+}
+.solutions-image {
+  position: relative; height: 460px; overflow: hidden; background: var(--noite);
+}
+.solutions-image img { width: 100%; height: 100%; object-fit: cover; filter: saturate(82%); }
+.solutions-image::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(17, 54, 94, 0.35) 100%);
+}
+
+/* =============================================================
+   ONLINE × PRESENCIAL
+   ============================================================= */
+.modes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+@media (max-width: 899px) { .modes-grid { grid-template-columns: 1fr; } }
+.mode-card {
+  position: relative; min-height: 380px; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: end;
+  color: var(--pergaminho); padding: var(--space-5) var(--space-4) var(--space-4);
+  background: var(--noite);
+}
+.mode-card-bg { position: absolute; inset: 0; z-index: 0; background-size: cover; background-position: center; filter: saturate(85%) brightness(0.5); transition: transform var(--t-slow); }
+.mode-card:hover .mode-card-bg { transform: scale(1.04); }
+.mode-card-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, transparent 30%, rgba(11, 23, 38, 0.92) 100%); }
+.mode-card-content { position: relative; z-index: 2; }
+.mode-card h3 { font-family: var(--font-serif); font-weight: 600; font-size: 30px; color: var(--pergaminho); margin: 8px 0 var(--space-2); }
+.mode-list { display: flex; flex-wrap: wrap; gap: 8px; margin: var(--space-2) 0 var(--space-3); }
+.mode-list span {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--pergaminho);
+  border: 1px solid rgba(244, 241, 232, 0.35); padding: 5px 10px;
+}
+
+/* =============================================================
+   EVENTON
+   ============================================================= */
+.eventon { position: relative; overflow: hidden; background: var(--noite); color: var(--pergaminho); padding: var(--space-7) 0; }
+.eventon-bg { position: absolute; inset: 0; z-index: 0; background-image: url('./img/fotos/_optimized/eventon-estudio.1920.webp'); background-size: cover; background-position: right center; opacity: 0.20; filter: saturate(80%); }
+.eventon::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, var(--noite) 30%, rgba(11, 23, 38, 0.7) 100%); }
+.eventon-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--space-6); align-items: start; }
+@media (max-width: 899px) { .eventon-grid { grid-template-columns: 1fr; } }
+.eventon h2 { color: var(--pergaminho); }
+.eventon p { color: var(--pergaminho-80); margin: var(--space-3) 0 var(--space-4); max-width: 540px; font-size: 17px; }
+.eventon-ops { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+.eventon-op {
+  background: rgba(244, 241, 232, 0.05);
+  border: 1px solid rgba(244, 241, 232, 0.15);
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  display: flex; flex-direction: column; gap: 8px;
+  transition: border-color var(--t-medium), background var(--t-medium);
+}
+.eventon-op:hover { border-color: var(--dourado); background: rgba(184, 149, 46, 0.08); }
+.eventon-op .op-num { font-family: var(--font-serif); font-weight: 700; font-style: italic; font-size: 24px; color: var(--dourado); line-height: 1; }
+.eventon-op h4 { font-family: var(--font-serif); font-weight: 600; font-size: 18px; color: var(--pergaminho); margin: 0; }
+.eventon-op p { color: var(--pergaminho-80); font-size: 13px; margin: 0 0 8px; }
+.eventon-op a { font-family: var(--font-cond); font-weight: 600; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--dourado); margin-top: auto; }
+.eventon-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: var(--space-4); }
+
+/* =============================================================
+   CONTRATAÇÃO INSTITUCIONAL
+   ============================================================= */
+.contracting { position: relative; overflow: hidden; padding: var(--space-7) 0; background: var(--oxford); color: var(--pergaminho); }
+.contracting-bg { position: absolute; inset: 0; z-index: 0; background-image: url('./img/fotos/_optimized/contratacao.1920.webp'); background-size: cover; background-position: center; opacity: 0.15; filter: saturate(80%); }
+.contracting::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(135deg, var(--oxford) 0%, rgba(17, 54, 94, 0.85) 60%, rgba(11, 23, 38, 0.9) 100%); }
+.contracting-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--space-6); align-items: center; }
+@media (max-width: 899px) { .contracting-grid { grid-template-columns: 1fr; } }
+.contracting h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(30px, 3.8vw, 44px); color: var(--pergaminho); margin: 0 0 var(--space-3); }
+.contracting h2 em { color: var(--dourado-soft); font-weight: 500; font-style: italic; }
+.contracting p { color: var(--pergaminho-80); font-size: 17px; margin: 0 0 var(--space-4); max-width: 600px; }
+.contracting-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+.contracting-options {
+  background: rgba(11, 23, 38, 0.45);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(244, 241, 232, 0.18);
+  padding: var(--space-4);
+}
+.contracting-options h4 {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12px;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--dourado);
+  margin: 0 0 var(--space-3); padding-bottom: var(--space-2);
+  border-bottom: 1px solid rgba(244, 241, 232, 0.15);
+}
+.contracting-options ul { display: grid; gap: 12px; }
+.contracting-options li {
+  display: flex; gap: 12px; align-items: start;
+  font-family: var(--font-sans); font-size: 14.5px; line-height: 1.45; color: var(--pergaminho);
+}
+.contracting-options li::before { content: ''; flex-shrink: 0; width: 6px; height: 6px; background: var(--dourado); margin-top: 8px; }
+
+/* =============================================================
+   DIFERENCIAIS · TOM ELEGANTE
+   ============================================================= */
+.diff-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); }
+@media (max-width: 1099px) { .diff-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .diff-grid { grid-template-columns: 1fr; } }
+
+.diff-card { padding: var(--space-3) 0; border-top: 1px solid var(--prata-30); }
+.diff-num { font-family: var(--font-serif); font-weight: 700; font-style: italic; font-size: 36px; color: var(--dourado); display: block; line-height: 1; }
+.diff-card h4 { font-family: var(--font-serif); font-weight: 600; font-size: 20px; color: var(--tinta); margin: var(--space-2) 0 8px; line-height: 1.2; }
+.diff-card p { font-size: 14px; line-height: 1.55; color: var(--grafite); margin: 0; }
+
+/* =============================================================
+   NÚMEROS · "DUAS DÉCADAS"
+   ============================================================= */
+.numbers-band { background: var(--oxford); color: var(--pergaminho); padding: var(--space-6) 0; position: relative; overflow: hidden; }
+.numbers-band::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, rgba(244, 241, 232, 0.04) 0px, rgba(244, 241, 232, 0.04) 1px, transparent 1px, transparent 80px);
+  pointer-events: none;
+}
+.numbers-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-3);
+  text-align: center; position: relative;
+}
+@media (max-width: 1099px) { .numbers-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); } }
+.number-item .num { font-family: var(--font-serif); font-weight: 700; font-size: clamp(36px, 4.4vw, 56px); line-height: 1; color: var(--dourado); }
+.number-item .num.text { font-style: italic; font-weight: 500; font-size: clamp(20px, 2.4vw, 28px); color: var(--pergaminho); }
+.number-item .label { font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--pergaminho-80); margin-top: 8px; }
+.numbers-disclaimer { text-align: center; margin-top: var(--space-5); font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--pergaminho-80); opacity: 0.7; }
+
+/* =============================================================
+   ESPECIALISTAS E COORDENAÇÃO CIENTÍFICA
+   ============================================================= */
+.experts-section {
+  padding: var(--space-7) 0;
+  background: linear-gradient(180deg, #ECE7D8 0%, var(--pergaminho) 100%);
+}
+.experts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); }
+@media (max-width: 1099px) { .experts-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .experts-grid { grid-template-columns: 1fr; } }
+.expert-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  display: flex; flex-direction: column; overflow: hidden; position: relative;
+  transition: transform var(--t-medium), box-shadow var(--t-medium), border-color var(--t-medium);
+}
+.expert-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); border-color: var(--oxford); }
+.expert-card[data-vert="gov"]:hover { border-color: var(--cardeal); }
+.expert-card[data-vert="sau"]:hover { border-color: var(--oliva); }
+
+.expert-portrait { width: 100%; aspect-ratio: 4 / 5; overflow: hidden; background: var(--noite); position: relative; }
+.expert-portrait img { width: 100%; height: 100%; object-fit: cover; filter: saturate(82%) contrast(1.05); transition: transform var(--t-slow); }
+.expert-card:hover .expert-portrait img { transform: scale(1.04); }
+.expert-portrait::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(11, 23, 38, 0.55) 100%); }
+
+/* Tag da vertical sobre a foto */
+.expert-vertical {
+  position: absolute; bottom: 12px; left: 12px; z-index: 1;
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  letter-spacing: 1.6px; text-transform: uppercase; color: var(--pergaminho);
+  background: rgba(11, 23, 38, 0.7); padding: 4px 10px;
+  border-left: 2px solid var(--dourado);
+}
+
+.expert-info { padding: var(--space-3); display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.expert-info h4 { font-family: var(--font-serif); font-weight: 600; font-size: 19px; color: var(--tinta); margin: 0; line-height: 1.2; }
+.expert-info .role {
+  font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.3px;
+  text-transform: uppercase; color: var(--oxford); font-weight: 600;
+}
+.expert-card[data-vert="gov"] .expert-info .role { color: var(--cardeal); }
+.expert-card[data-vert="sau"] .expert-info .role { color: var(--oliva); }
+
+.expert-info .bio {
+  font-family: var(--font-serif); font-style: italic; font-size: 13.5px;
+  color: var(--grafite); line-height: 1.45; margin: 6px 0 0;
+}
+.expert-program-link {
+  margin-top: auto; padding-top: var(--space-2);
+  border-top: 1px dashed var(--prata-30);
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--grafite);
+}
+.expert-program-link strong {
+  color: var(--oxford); font-family: var(--font-sans); font-weight: 700;
+  font-size: 12px; letter-spacing: 0.4px; text-transform: none;
+}
+.expert-card[data-vert="gov"] .expert-program-link strong { color: var(--cardeal); }
+.expert-card[data-vert="sau"] .expert-program-link strong { color: var(--oliva); }
+
+.experts-cta-foot {
+  display: flex; justify-content: center; gap: var(--space-2);
+  margin-top: var(--space-5); flex-wrap: wrap;
+}
+.placeholder-note { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--prata); margin-top: var(--space-4); text-align: center; }
+
+/* =============================================================
+   PROVA INSTITUCIONAL · CATEGORIAS EDITORIAIS
+   ============================================================= */
+.trust-strip {
+  background: var(--pergaminho);
+  padding: var(--space-6) 0;
+  border-top: 1px solid var(--prata-30);
+  border-bottom: 1px solid var(--prata-30);
+}
+.trust-banner {
+  text-align: center; max-width: 880px; margin: 0 auto var(--space-4);
+}
+.trust-banner .eyebrow { color: var(--dourado); }
+.trust-banner h3 {
+  font-family: var(--font-serif); font-style: italic; font-weight: 500;
+  font-size: clamp(22px, 2.4vw, 30px); line-height: 1.4; color: var(--tinta);
+  margin: var(--space-2) 0 0;
+}
+.trust-categories {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+@media (max-width: 1099px) { .trust-categories { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 599px)  { .trust-categories { grid-template-columns: repeat(2, 1fr); } }
+
+.trust-cat {
+  text-align: center; padding: var(--space-3) var(--space-2);
+  border-top: 2px solid var(--dourado);
+}
+.trust-cat .icon-line {
+  width: 28px; height: 1px; background: var(--prata); margin: 0 auto 12px;
+}
+.trust-cat h4 {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12px;
+  letter-spacing: 1.6px; text-transform: uppercase; color: var(--oxford);
+  margin: 0;
+}
+.trust-cat p {
+  font-family: var(--font-serif); font-style: italic; font-size: 13px;
+  color: var(--grafite); line-height: 1.4; margin: 6px 0 0;
+}
+
+/* =============================================================
+   CONTEÚDOS · MARCADOS COMO DEMONSTRATIVOS
+   ============================================================= */
+.content-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: var(--space-3); }
+@media (max-width: 1099px) { .content-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .content-grid { grid-template-columns: 1fr; } }
+
+.content-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+}
+.content-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); }
+.content-card.featured { grid-row: span 2; }
+@media (max-width: 1099px) { .content-card.featured { grid-row: span 1; grid-column: span 2; } }
+@media (max-width: 599px)  { .content-card.featured { grid-column: span 1; } }
+
+.content-img { width: 100%; aspect-ratio: 16 / 10; position: relative; overflow: hidden; background: var(--noite); }
+.content-card.featured .content-img { aspect-ratio: 16 / 9; }
+.content-img img { width: 100%; height: 100%; object-fit: cover; filter: saturate(82%); transition: transform var(--t-slow); }
+.content-card:hover .content-img img { transform: scale(1.04); }
+
+.content-body { padding: var(--space-3); flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.content-cat {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.6px;
+  text-transform: uppercase; color: var(--oxford); font-weight: 600;
+}
+.content-card.cardeal .content-cat { color: var(--cardeal); }
+.content-card.oliva   .content-cat { color: var(--oliva); }
+.content-body h4 { font-family: var(--font-serif); font-weight: 600; font-size: 22px; line-height: 1.2; color: var(--tinta); margin: 0; }
+.content-card.featured .content-body h4 { font-size: 28px; line-height: 1.15; }
+.content-body p { font-size: 14px; line-height: 1.5; color: var(--grafite); margin: 0; }
+.content-meta {
+  margin-top: auto; padding-top: var(--space-2);
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--prata);
+  display: flex; gap: var(--space-2);
+}
+.content-demo-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--dourado); font-weight: 600;
+  padding: 3px 8px; border: 1px dashed var(--dourado); border-radius: 2px;
+  align-self: start;
+}
+
+/* =============================================================
+   CTA FINAL
+   ============================================================= */
+.cta-final { position: relative; overflow: hidden; text-align: center; background: var(--noite); color: var(--pergaminho); padding: var(--space-7) 0; }
+.cta-final::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(184, 149, 46, 0.10) 0%, transparent 60%); pointer-events: none; }
+.cta-final .container { position: relative; }
+.cta-final h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(32px, 4.4vw, 54px); line-height: 1.15; color: var(--pergaminho); margin: 0 auto var(--space-4); max-width: 920px; }
+.cta-final h2 em { color: var(--dourado-soft); font-weight: 500; font-style: italic; }
+.cta-final-sub { color: var(--pergaminho-80); max-width: 720px; margin: 0 auto var(--space-5); font-size: 17px; }
+.cta-final-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.cta-tagline { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: 16px; color: var(--dourado); margin-top: var(--space-5); letter-spacing: 0.4px; }
+
+/* =============================================================
+   FOOTER
+   ============================================================= */
+.site-footer { background: var(--noite); color: var(--pergaminho-80); padding: var(--space-6) 0 var(--space-4); border-top: 1px solid rgba(244, 241, 232, 0.10); }
+.footer-top { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: var(--space-5); padding-bottom: var(--space-5); border-bottom: 1px solid rgba(244, 241, 232, 0.10); }
+@media (max-width: 1099px) { .footer-top { grid-template-columns: 1fr 1fr; gap: var(--space-4); } }
+@media (max-width: 599px)  { .footer-top { grid-template-columns: 1fr; } }
+.footer-brand img { height: 60px; width: auto; }
+.footer-tagline { font-family: var(--font-serif); font-style: italic; font-weight: 500; color: var(--dourado); font-size: 17px; margin: var(--space-3) 0 var(--space-2); display: block; }
+.footer-address { font-size: 13px; line-height: 1.55; color: var(--pergaminho-80); margin: 0; }
+.footer-address strong { color: var(--pergaminho); font-weight: 600; }
+.footer-col h5 { font-family: var(--font-cond); font-weight: 600; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--dourado); margin: 0 0 var(--space-2); }
+.footer-col ul { display: grid; gap: 10px; }
+.footer-col a { font-size: 14px; color: var(--pergaminho-80); transition: color var(--t-fast); }
+.footer-col a:hover { color: var(--dourado); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); flex-wrap: wrap; gap: var(--space-2); }
+.footer-badge { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--prata); }
+.footer-legal { display: flex; gap: var(--space-3); flex-wrap: wrap; font-family: var(--font-cond); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+.footer-legal a { color: var(--prata); }
+.footer-legal a:hover { color: var(--pergaminho); }
+
+/* =============================================================
+   ACESSIBILIDADE
+   ============================================================= */
+.fade-in { opacity: 0; transform: translateY(16px); transition: opacity 600ms ease-out, transform 600ms ease-out; }
+.fade-in.is-visible { opacity: 1; transform: translateY(0); }
+:focus-visible { outline: 2px solid var(--dourado); outline-offset: 3px; border-radius: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* =============================================================
+   PÁGINA DE VERTICAL · TEMPLATE FIXO (R5)
+   NTC Educação · acento Oxford institucional padrão
+   Variantes futuras: NTC Gestão Pública (Cardeal), NTC Saúde (Oliva)
+   ============================================================= */
+.vertical-page {
+  --vertical-accent: var(--oxford);
+  --vertical-accent-soft: rgba(17, 54, 94, 0.55);
+  --vertical-accent-dark: var(--noite);
+}
+.vertical-page[data-vertical="educacao"] {
+  --vertical-accent: #11365E;
+  --vertical-accent-soft: rgba(17, 54, 94, 0.65);
+  --vertical-accent-dark: #0B1726;
+}
+.vertical-page[data-vertical="gestao-publica"] {
+  --vertical-accent: #8E2A1C;
+  --vertical-accent-soft: rgba(142, 42, 28, 0.55);
+  --vertical-accent-dark: #4A1810;
+}
+.vertical-page[data-vertical="saude"] {
+  --vertical-accent: #4A6A1F;
+  --vertical-accent-soft: rgba(74, 106, 31, 0.55);
+  --vertical-accent-dark: #283912;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background: var(--pergaminho);
+  border-bottom: 1px solid var(--prata-30);
+  padding: 14px 0;
+}
+.breadcrumb-list {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--prata);
+}
+.breadcrumb-list a { color: var(--grafite); transition: color var(--t-fast); }
+.breadcrumb-list a:hover { color: var(--oxford); }
+.breadcrumb-list .sep { color: var(--prata); opacity: 0.6; }
+.breadcrumb-list .current { color: var(--oxford); }
+
+/* HERO da vertical */
+.vert-hero {
+  position: relative;
+  min-height: 580px; padding: var(--space-7) 0;
+  background: var(--noite); color: var(--pergaminho);
+  display: flex; align-items: center; overflow: hidden;
+}
+.vert-hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-size: cover; background-position: center;
+  filter: saturate(82%) brightness(0.45);
+}
+.vert-hero::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(135deg, rgba(11, 23, 38, 0.94) 0%, var(--vertical-accent-soft) 60%, rgba(11, 23, 38, 0.70) 100%);
+}
+.vert-hero::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: linear-gradient(90deg, rgba(168, 172, 182, 0.05) 1px, transparent 1px);
+  background-size: 80px 100%;
+}
+.vert-hero-content {
+  position: relative; z-index: 2; max-width: 980px;
+}
+.vert-hero-eyebrow {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12.5px;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--dourado-soft);
+  margin-bottom: var(--space-2);
+}
+.vert-hero h1 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(48px, 7vw, 96px); line-height: 1.0;
+  color: var(--pergaminho); margin: 0 0 var(--space-3); letter-spacing: -1.5px;
+}
+.vert-hero h1 em { color: var(--dourado-soft); font-style: italic; font-weight: 500; }
+.vert-hero-tagline {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: clamp(20px, 2.2vw, 26px); line-height: 1.4;
+  color: var(--pergaminho); margin: 0 0 var(--space-4);
+  border-left: 2px solid var(--dourado); padding-left: var(--space-3); max-width: 760px;
+}
+.vert-hero-sub {
+  font-family: var(--font-sans); font-size: 17px; line-height: 1.6;
+  color: var(--pergaminho-80); max-width: 720px; margin: 0 0 var(--space-5);
+}
+.vert-hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* Faixa de metadados da vertical */
+.vert-meta-bar {
+  background: var(--pergaminho);
+  border-bottom: 1px solid var(--prata-30);
+  padding: var(--space-4) 0;
+}
+.vert-meta-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3); align-items: center;
+}
+@media (max-width: 1099px) { .vert-meta-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .vert-meta-grid { grid-template-columns: 1fr 1fr; } }
+.vert-meta-item {
+  display: flex; flex-direction: column; gap: 4px;
+  border-left: 2px solid var(--vertical-accent); padding-left: 14px;
+}
+.vert-meta-item .label {
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--prata);
+}
+.vert-meta-item .value {
+  font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  color: var(--tinta); line-height: 1.15;
+}
+.vert-meta-item .value-sub {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--grafite); margin-top: 2px;
+}
+
+/* Nav-bar sticky */
+.vert-nav {
+  position: sticky; top: var(--header-h); z-index: 50;
+  background: var(--noite); color: var(--pergaminho);
+  border-bottom: 1px solid rgba(244, 241, 232, 0.12);
+}
+.vert-nav-inner {
+  display: grid; grid-template-columns: 1fr auto;
+  gap: var(--space-3); align-items: stretch; min-height: 60px;
+}
+@media (max-width: 1099px) { .vert-nav-inner { grid-template-columns: 1fr; } }
+.vert-nav-anchors {
+  display: flex; gap: 0; align-items: stretch;
+  overflow-x: auto; scrollbar-width: thin;
+}
+.vert-nav-anchors::-webkit-scrollbar { height: 3px; }
+.vert-nav-anchors::-webkit-scrollbar-thumb { background: var(--dourado); }
+.vert-nav-link {
+  display: inline-flex; align-items: center; padding: 0 18px;
+  font-family: var(--font-cond); font-weight: 500; font-size: 12.5px;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--pergaminho-80); white-space: nowrap;
+  border-bottom: 2px solid transparent; height: 100%;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.vert-nav-link:hover { color: var(--pergaminho); }
+.vert-nav-link.is-active {
+  color: var(--dourado-soft); border-bottom-color: var(--dourado);
+}
+.vert-nav-actions {
+  display: flex; gap: 0; align-items: stretch;
+  border-left: 1px solid rgba(244, 241, 232, 0.12);
+}
+@media (max-width: 1099px) {
+  .vert-nav-actions { border-left: 0; border-top: 1px solid rgba(244, 241, 232, 0.12); }
+}
+.vert-nav-action {
+  display: inline-flex; align-items: center; padding: 0 18px; height: 100%;
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.3px; text-transform: uppercase;
+  border: 0; cursor: pointer; white-space: nowrap;
+  background: transparent; color: var(--pergaminho);
+  transition: all var(--t-fast);
+  border-right: 1px solid rgba(244, 241, 232, 0.10);
+}
+.vert-nav-action:last-child { border-right: 0; }
+.vert-nav-action:hover { background: rgba(184, 149, 46, 0.10); color: var(--dourado-soft); }
+.vert-nav-action.primary { background: var(--dourado); color: var(--noite); }
+.vert-nav-action.primary:hover { background: var(--dourado-soft); color: var(--noite); }
+
+/* Seções da página de vertical */
+.vert-section { padding: var(--space-7) 0; }
+.vert-section--cream { background: var(--pergaminho); }
+.vert-section--ivory { background: #ECE7D8; }
+.vert-section--dark { background: var(--noite); color: var(--pergaminho); }
+.vert-section--dark h2, .vert-section--dark h3 { color: var(--pergaminho); }
+
+.vert-section-head {
+  display: flex; flex-direction: column; gap: var(--space-2);
+  margin-bottom: var(--space-5); max-width: 880px;
+}
+.vert-section-head .eyebrow { color: var(--vertical-accent); margin-bottom: 4px; }
+.vert-section--dark .vert-section-head .eyebrow { color: var(--dourado); }
+.vert-section-head h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(30px, 3.8vw, 46px); line-height: 1.1;
+  color: var(--tinta); letter-spacing: -0.3px;
+}
+.vert-section--dark .vert-section-head h2 { color: var(--pergaminho); }
+.vert-section-head h2 em { color: var(--dourado); font-style: italic; font-weight: 600; }
+.vert-section-head .intro {
+  font-family: var(--font-sans); font-size: 17px; line-height: 1.6;
+  color: var(--grafite); margin: 0; max-width: 720px;
+}
+.vert-section--dark .vert-section-head .intro { color: var(--pergaminho-80); }
+
+/* Visão geral · texto editorial denso em duas colunas */
+.vert-overview {
+  display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--space-6);
+  align-items: start; margin-top: var(--space-3);
+}
+@media (max-width: 899px) { .vert-overview { grid-template-columns: 1fr; gap: var(--space-3); } }
+.vert-overview .lede {
+  font-family: var(--font-serif); font-style: italic; font-weight: 500;
+  font-size: clamp(22px, 2.4vw, 28px); line-height: 1.4;
+  color: var(--vertical-accent);
+  border-left: 2px solid var(--dourado); padding-left: var(--space-3);
+}
+.vert-overview .body p {
+  font-family: var(--font-sans); font-size: 17px; line-height: 1.7;
+  color: var(--grafite); margin: 0 0 var(--space-3);
+}
+.vert-overview .body p strong { color: var(--vertical-accent); font-weight: 600; }
+
+/* Áreas de atuação interna · grid 3 colunas */
+.areas-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+@media (max-width: 1099px) { .areas-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px) { .areas-grid { grid-template-columns: 1fr; } }
+.area-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  border-top: 3px solid var(--vertical-accent);
+  padding: var(--space-4); display: flex; flex-direction: column; gap: 8px;
+}
+.area-card .a-num {
+  font-family: var(--font-serif); font-weight: 700; font-style: italic;
+  font-size: 22px; color: var(--vertical-accent); line-height: 1;
+}
+.area-card h4 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 19px;
+  color: var(--tinta); margin: 0; line-height: 1.3;
+}
+.area-card p {
+  font-family: var(--font-sans); font-size: 14.5px; line-height: 1.55;
+  color: var(--grafite); margin: 0;
+}
+.area-card .a-program-link {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--dourado);
+  margin-top: auto; padding-top: var(--space-2);
+  border-top: 1px dashed var(--prata-30);
+}
+.area-card .a-program-link strong { color: var(--vertical-accent); }
+
+/* Grade dos 9 programas premium */
+.programs-grid-vert {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+@media (max-width: 1099px) { .programs-grid-vert { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px) { .programs-grid-vert { grid-template-columns: 1fr; } }
+
+.program-card-vert {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: transform var(--t-medium), box-shadow var(--t-medium), border-color var(--t-medium);
+  text-decoration: none;
+}
+.program-card-vert:hover {
+  transform: translateY(-3px); box-shadow: var(--shadow-medium);
+  border-color: var(--vertical-accent);
+}
+.program-card-vert .pc-cover {
+  height: 130px; position: relative; overflow: hidden;
+  background: var(--noite);
+}
+.program-card-vert .pc-cover-img {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  filter: saturate(82%) brightness(0.55);
+  transition: transform var(--t-slow);
+}
+.program-card-vert:hover .pc-cover-img { transform: scale(1.04); }
+.program-card-vert .pc-cover::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(11,23,38,0.6) 100%);
+}
+.program-card-vert .pc-sigla {
+  position: absolute; bottom: 12px; left: 16px; z-index: 1;
+  font-family: var(--font-serif); font-weight: 700;
+  font-size: 38px; color: var(--pergaminho); letter-spacing: -1px; line-height: 1;
+}
+.program-card-vert .pc-flag {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  font-family: var(--font-cond); font-weight: 600; font-size: 10px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  background: var(--dourado); color: var(--noite); padding: 4px 10px;
+}
+.program-card-vert .pc-body {
+  padding: var(--space-3); display: flex; flex-direction: column; gap: 10px; flex: 1;
+}
+.program-card-vert .pc-name {
+  font-family: var(--font-sans); font-weight: 600; font-size: 14.5px;
+  color: var(--tinta); margin: 0; line-height: 1.35;
+}
+.program-card-vert .pc-tagline {
+  font-family: var(--font-serif); font-style: italic; font-size: 14px;
+  color: var(--grafite); margin: 0; line-height: 1.45;
+}
+.program-card-vert .pc-meta {
+  margin-top: auto; padding-top: var(--space-2);
+  border-top: 1px solid var(--prata-30);
+  display: flex; justify-content: space-between;
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--grafite);
+}
+.program-card-vert .pc-meta .pc-cta {
+  color: var(--dourado); font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* Especialistas · grid de 4 */
+.experts-vert {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+@media (max-width: 1099px) { .experts-vert { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px) { .experts-vert { grid-template-columns: 1fr; } }
+.expert-vert-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+}
+.expert-vert-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.expert-vert-portrait {
+  width: 100%; aspect-ratio: 4/5; overflow: hidden;
+  background: var(--noite); position: relative;
+}
+.expert-vert-portrait img { width: 100%; height: 100%; object-fit: cover; filter: saturate(82%); }
+.expert-vert-info { padding: var(--space-3); }
+.expert-vert-info h4 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 17px;
+  color: var(--tinta); margin: 0 0 4px;
+}
+.expert-vert-info .role {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--vertical-accent); font-weight: 600;
+}
+.expert-vert-info .programs {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--grafite);
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px dashed var(--prata-30);
+}
+
+/* =============================================================
+   AUTORIDADE TÉCNICA · v1.1 · Curadoria científica expandida
+   Seção premium de especialistas / corpo docente / coordenação.
+   Aplicada às 3 verticais via var(--vertical-accent).
+   ============================================================= */
+.vert-section--authority { background: var(--ivory, #ECE7D8); }
+.experts-authority { margin-top: var(--space-3); }
+
+.experts-marker {
+  display: flex; align-items: center; gap: 14px;
+  margin: var(--space-4) 0 var(--space-3);
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.8px;
+  font-weight: 600; text-transform: uppercase; color: var(--dourado);
+}
+.experts-marker::before, .experts-marker::after {
+  content: ''; height: 1px; background: var(--dourado-soft); flex: 1; opacity: 0.55;
+}
+
+.experts-featured {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+@media (max-width: 899px) { .experts-featured { grid-template-columns: 1fr; } }
+.expert-featured-card {
+  background: var(--pergaminho);
+  border: 1px solid var(--prata-30);
+  border-top: 3px solid var(--dourado);
+  display: grid; grid-template-columns: 180px 1fr; gap: 0;
+  overflow: hidden;
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+}
+.expert-featured-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); }
+.efc-portrait { position: relative; background: var(--noite); overflow: hidden; }
+.efc-portrait img { width: 100%; height: 100%; object-fit: cover; filter: saturate(85%); display: block; }
+.efc-axis-badge {
+  position: absolute; left: 0; bottom: 12px;
+  background: var(--vertical-accent); color: var(--pergaminho);
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.4px;
+  font-weight: 600; text-transform: uppercase;
+  padding: 5px 12px;
+}
+.efc-info {
+  padding: var(--space-3);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.efc-tag {
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.5px;
+  font-weight: 600; text-transform: uppercase;
+  color: var(--dourado);
+  margin-bottom: 6px;
+}
+.efc-info h4 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  line-height: 1.25; color: var(--tinta); margin: 0 0 6px;
+  letter-spacing: -0.2px;
+}
+.efc-credential { font-size: 14px; line-height: 1.5; color: var(--grafite); margin: 0 0 10px; }
+.efc-meta {
+  display: flex; flex-direction: column; gap: 4px;
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--grafite);
+  padding-top: 10px;
+  border-top: 1px dashed var(--prata-30);
+}
+.efc-meta strong { color: var(--vertical-accent); font-weight: 600; }
+.efc-link {
+  align-self: flex-start; margin-top: 12px;
+  font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.4px;
+  font-weight: 600; text-transform: uppercase;
+  color: var(--dourado);
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: color var(--t-fast);
+}
+.efc-link:hover { color: var(--vertical-accent); }
+@media (max-width: 599px) {
+  .expert-featured-card { grid-template-columns: 1fr; }
+  .efc-portrait { aspect-ratio: 16/10; max-height: 220px; }
+}
+
+.experts-authority-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3);
+}
+@media (max-width: 1099px) { .experts-authority-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .experts-authority-grid { grid-template-columns: 1fr; } }
+
+.expert-authority-card {
+  background: var(--pergaminho);
+  border: 1px solid var(--prata-30);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: transform var(--t-medium), box-shadow var(--t-medium), border-color var(--t-medium);
+}
+.expert-authority-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+  border-color: var(--vertical-accent);
+}
+.eac-portrait {
+  position: relative; width: 100%; aspect-ratio: 4/5;
+  overflow: hidden; background: var(--noite);
+}
+.eac-portrait img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: saturate(82%); display: block;
+}
+.eac-axis-badge {
+  position: absolute; left: 0; bottom: 10px;
+  background: var(--vertical-accent); color: var(--pergaminho);
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.4px;
+  font-weight: 600; text-transform: uppercase;
+  padding: 4px 10px;
+  max-width: calc(100% - 16px);
+}
+.eac-info {
+  padding: var(--space-3);
+  display: flex; flex-direction: column;
+  flex: 1;
+}
+.eac-info h4 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 17px;
+  line-height: 1.25; color: var(--tinta); margin: 0 0 4px;
+}
+.eac-credential {
+  font-size: 13px; line-height: 1.45; color: var(--grafite);
+  margin: 0 0 10px; flex: 1;
+}
+.eac-programs {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--grafite);
+  margin: 0; padding-top: 10px;
+  border-top: 1px dashed var(--prata-30);
+}
+.eac-programs strong { color: var(--vertical-accent); font-weight: 600; }
+.eac-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.3px;
+  font-weight: 600; text-transform: uppercase;
+  color: var(--dourado);
+  margin-top: 10px;
+  transition: color var(--t-fast);
+}
+.eac-link:hover { color: var(--vertical-accent); }
+
+.expert-authority-card.is-axis-card { border-top: 3px solid var(--vertical-accent); }
+.expert-authority-card.is-axis-card .eac-icon-wrap {
+  height: 132px;
+  background: linear-gradient(135deg, var(--vertical-accent) 0%, var(--vertical-accent-dark) 100%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.expert-authority-card.is-axis-card .eac-icon-wrap::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle at 80% 20%, rgba(244, 241, 232, 0.18) 0%, transparent 55%);
+  pointer-events: none;
+}
+.expert-authority-card.is-axis-card .eac-icon {
+  width: 56px; height: 56px; color: var(--pergaminho);
+  position: relative; z-index: 1;
+}
+.expert-authority-card.is-axis-card .eac-axis-tag {
+  position: absolute; left: 0; bottom: 10px;
+  background: var(--noite); color: var(--dourado);
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.6px;
+  font-weight: 600; text-transform: uppercase;
+  padding: 4px 10px;
+  z-index: 1;
+}
+
+.curadoria-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.5px;
+  font-weight: 600; text-transform: uppercase; color: var(--vertical-accent);
+  padding: 5px 12px;
+  background: var(--pergaminho);
+  border: 1px solid var(--prata-30);
+  border-radius: 999px;
+  margin-bottom: var(--space-2);
+}
+.curadoria-pill::before {
+  content: ''; width: 6px; height: 6px; background: var(--dourado);
+  border-radius: 50%; box-shadow: 0 0 0 3px rgba(184, 149, 46, 0.15);
+}
+
+.experts-counters {
+  display: flex; gap: var(--space-5); flex-wrap: wrap;
+  margin-top: var(--space-4);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--prata-30);
+}
+.experts-counter { display: flex; flex-direction: column; gap: 2px; }
+.experts-counter .ec-num {
+  font-family: var(--font-serif); font-weight: 600; font-size: 30px;
+  color: var(--vertical-accent); line-height: 1; letter-spacing: -0.4px;
+}
+.experts-counter .ec-lbl {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.3px;
+  text-transform: uppercase; color: var(--grafite); font-weight: 500;
+}
+
+.experts-authority-cta {
+  display: flex; flex-wrap: wrap; gap: var(--space-2);
+  justify-content: center; align-items: center;
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--prata-30);
+}
+
+/* Botão secundário que respeita o acento cromático da vertical */
+.btn--secondary-vert {
+  background: transparent; color: var(--vertical-accent);
+  border-color: var(--vertical-accent);
+}
+.btn--secondary-vert:hover {
+  background: var(--vertical-accent); color: var(--pergaminho);
+}
+
+/* Eventos abertos da vertical */
+.events-vert-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+@media (max-width: 1099px) { .events-vert-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px) { .events-vert-grid { grid-template-columns: 1fr; } }
+
+/* Soluções institucionais (in company / sob medida) */
+.institutional-solutions {
+  background: var(--noite); color: var(--pergaminho);
+  padding: var(--space-7) 0;
+  position: relative; overflow: hidden;
+}
+.institutional-solutions::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, var(--vertical-accent-soft) 0%, transparent 60%);
+  pointer-events: none;
+}
+.solutions-grid-vert {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5);
+  align-items: start; position: relative;
+}
+@media (max-width: 899px) { .solutions-grid-vert { grid-template-columns: 1fr; } }
+.solutions-grid-vert .vert-section-head { margin-bottom: 0; }
+.solutions-grid-vert .vert-section-head h2 { color: var(--pergaminho); font-size: clamp(28px, 3.4vw, 38px); }
+.solutions-grid-vert .vert-section-head .intro { color: var(--pergaminho-80); }
+.solutions-list-vert {
+  display: grid; gap: var(--space-2);
+}
+.solution-item-vert {
+  background: rgba(244, 241, 232, 0.05);
+  border: 1px solid rgba(244, 241, 232, 0.15);
+  border-left: 3px solid var(--dourado);
+  padding: var(--space-3);
+}
+.solution-item-vert h4 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 18px;
+  color: var(--pergaminho); margin: 0 0 4px;
+}
+.solution-item-vert p {
+  font-family: var(--font-sans); font-size: 13.5px; line-height: 1.55;
+  color: var(--pergaminho-80); margin: 0;
+}
+.solutions-cta-vert {
+  margin-top: var(--space-3); display: flex; gap: 12px; flex-wrap: wrap;
+}
+
+/* Conteúdos editoriais da vertical */
+.contents-vert {
+  display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+@media (max-width: 1099px) { .contents-vert { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px) { .contents-vert { grid-template-columns: 1fr; } }
+.content-vert-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+}
+.content-vert-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-medium); }
+.content-vert-card.featured { grid-row: span 2; }
+@media (max-width: 1099px) { .content-vert-card.featured { grid-row: span 1; grid-column: span 2; } }
+@media (max-width: 599px) { .content-vert-card.featured { grid-column: span 1; } }
+.content-vert-img {
+  width: 100%; aspect-ratio: 16 / 10; position: relative; overflow: hidden;
+  background: var(--noite);
+}
+.content-vert-card.featured .content-vert-img { aspect-ratio: 16 / 9; }
+.content-vert-img img { width: 100%; height: 100%; object-fit: cover; filter: saturate(82%); transition: transform var(--t-slow); }
+.content-vert-card:hover .content-vert-img img { transform: scale(1.04); }
+.content-vert-body { padding: var(--space-3); flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.content-vert-body .cat {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.6px;
+  text-transform: uppercase; color: var(--vertical-accent); font-weight: 600;
+}
+.content-vert-body h4 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  line-height: 1.2; color: var(--tinta); margin: 0;
+}
+.content-vert-card.featured .content-vert-body h4 { font-size: 28px; line-height: 1.15; }
+.content-vert-body p {
+  font-size: 14px; line-height: 1.5; color: var(--grafite); margin: 0;
+}
+.content-vert-body .meta {
+  margin-top: auto; padding-top: var(--space-2);
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--prata);
+  display: flex; gap: var(--space-2);
+}
+.content-demo-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-cond); font-size: 10px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--dourado); font-weight: 600;
+  padding: 3px 8px; border: 1px dashed var(--dourado);
+  align-self: start;
+}
+
+/* FAQ accordion */
+.faq-list { display: flex; flex-direction: column; margin-top: var(--space-3); }
+.faq-item { border-top: 1px solid var(--prata-30); }
+.faq-item:last-child { border-bottom: 1px solid var(--prata-30); }
+.faq-question {
+  width: 100%; text-align: left; background: transparent; border: 0;
+  padding: 18px 0; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: var(--space-2);
+  font-family: var(--font-serif); font-weight: 500; font-style: italic;
+  font-size: 19px; color: var(--tinta); line-height: 1.3;
+  transition: color var(--t-fast);
+}
+.faq-question:hover { color: var(--vertical-accent); }
+.faq-question::after {
+  content: '+'; font-family: var(--font-sans); font-weight: 300; font-size: 26px;
+  color: var(--dourado); transition: transform var(--t-medium); flex-shrink: 0;
+  width: 28px; text-align: center;
+}
+.faq-item.is-open .faq-question::after { content: '−'; }
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 320ms ease-out; }
+.faq-item.is-open .faq-answer { max-height: 500px; }
+.faq-answer-inner {
+  padding: 0 0 var(--space-3); font-size: 15.5px; line-height: 1.6;
+  color: var(--grafite); max-width: 760px;
+}
+
+/* CTA final da vertical */
+.vert-cta-final {
+  background: var(--noite); color: var(--pergaminho);
+  padding: var(--space-7) 0; text-align: center; position: relative; overflow: hidden;
+}
+.vert-cta-final::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(184, 149, 46, 0.10) 0%, transparent 60%);
+  pointer-events: none;
+}
+.vert-cta-final .container { position: relative; }
+.vert-cta-final h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(32px, 4.4vw, 54px); line-height: 1.15;
+  color: var(--pergaminho); margin: 0 auto var(--space-3); max-width: 880px;
+}
+.vert-cta-final h2 em { color: var(--dourado-soft); font-weight: 500; font-style: italic; }
+.vert-cta-final-sub {
+  color: var(--pergaminho-80); max-width: 720px; margin: 0 auto var(--space-5); font-size: 17px;
+}
+
+.placeholder-note {
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--prata);
+  margin-top: var(--space-3); text-align: center;
+}
+
+</style>
+<!-- NTC_COOKIE_CONSENT_CSS_BEGIN -->
+<link rel="stylesheet" href="./assets/cookie_consent.css" />
+<!-- NTC_COOKIE_CONSENT_CSS_END -->
+</head>
+<body>
+
+<a href="#main" class="skip-link">Ir para o conteúdo principal</a>
+
+<!-- ========================== HEADER ========================== -->
+<header class="site-header" id="topo">
+  <div class="container header-inner">
+    <a class="brand" href="#topo" aria-label="Grupo NTC — Página inicial">
+      <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    </a>
+
+    <!-- ⚠ Menu enxuto (R2.5):
+         6 itens com labels uniformes (1 palavra exceto Grupo NTC).
+         Ordem narrativa: identidade → portfólio → oferta ativa →
+         modelo comercial → autoridade → relacionamento.
+         EventOn vive dentro do mega menu de Capacitação. -->
+    <nav class="nav-primary" aria-label="Navegação principal">
+      <a class="nav-item" href="#sobre">Grupo NTC</a>
+      <button class="nav-item has-mega" data-mega="programas" aria-haspopup="true" aria-expanded="false">Programas</button>
+      <button class="nav-item has-mega" data-mega="capacitacao" aria-haspopup="true" aria-expanded="false">Capacitação</button>
+      <button class="nav-item has-mega" data-mega="solucoes" aria-haspopup="true" aria-expanded="false">Soluções</button>
+      <a class="nav-item" href="#conteudos">Conteúdos</a>
+      <a class="nav-item" href="#contato">Contato</a>
+    </nav>
+
+    <div class="header-cta">
+      <a class="btn btn--secondary btn--mini" href="#contratacao" data-cms-link="proposta-institucional">Solicitar proposta</a>
+      <a class="btn btn--participant btn--mini" href="#eventon" data-cms-link="area-participante">Área do Participante</a>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobileDrawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mega menu: Programas (NOMENCLATURA OFICIAL ATUALIZADA) -->
+  <div class="mega" id="mega-programas" data-mega-id="programas">
+    <div class="container">
+      <div class="mega-inner">
+        <div class="mega-col">
+          <h4>NTC Educação · 9 programas</h4>
+          <ul class="mega-list">
+            <li><a href="#programas" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>Educação Digital, Inovação e Tecnologias para Redes Públicas</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-PEAR"><strong>PEAR</strong><span>Alfabetização de Alta Performance e Recomposição da Aprendizagem</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-PEI"><strong>PEI</strong><span>Educação Integral — Gestão, Currículo e Resultados</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-PROGIR"><strong>PROGIR</strong><span>Gestão da Inclusão com Resultado</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-PROGE"><strong>PROGE</strong><span>Gestão Escolar, Coordenação Pedagógica e Resultados</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-EGIDE"><strong>EGIDE</strong><span>IA, Dados e Governança da Transformação Digital</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-VIVAESCOLA"><strong>VIVAESCOLA</strong><span>Convivência, Permanência, Bem-Estar e Proteção Integral</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-PINEI"><strong>PINEI</strong><span>Primeira Infância e Educação Infantil</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-FUTURA"><strong>FUTURA</strong><span>Ensino Médio, Itinerários de Futuro, Empregabilidade</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Gestão Pública · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="#programas" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>Governança, Integridade e Performance nas Contratações Públicas</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>Liderança, Direção Estratégica e Resultados na Administração</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-SIGA"><strong>SIGA</strong><span>Soluções Inteligentes de Governança e Administração</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Saúde · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="#programas" data-cms-link="programa-SIGS"><strong>SIGS</strong><span>Saúde Inteligente, Governança Digital, IA e Transformação do SUS</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-PROAPS"><strong>PROAPS+</strong><span>Alta Performance na Atenção Primária e Redes de Cuidado</span></a></li>
+            <li><a href="#programas" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>Governança, Financiamento e Performance no SUS</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Soluções (R2.5 — renomeado de "Soluções Estratégicas") -->
+  <div class="mega" id="mega-solucoes" data-mega-id="solucoes">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Verticais</h4>
+          <ul class="mega-list">
+            <li><a href="#programas" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>Soluções estruturadas para redes públicas de ensino</span></a></li>
+            <li><a href="#programas" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>Governança, integridade e performance na Administração</span></a></li>
+            <li><a href="#programas" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>Inteligência institucional aplicada ao SUS</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Modelos de contratação</h4>
+          <ul class="mega-list">
+            <li><a href="#contratacao" data-cms-link="modelo-incompany"><strong>Soluções in company</strong><span>Programa entregue exclusivamente à instituição</span></a></li>
+            <li><a href="#contratacao" data-cms-link="modelo-fechada"><strong>Turmas fechadas</strong><span>Edição operacional dedicada à equipe contratante</span></a></li>
+            <li><a href="#contratacao" data-cms-link="modelo-sobmedida"><strong>Soluções sob medida</strong><span>Customização profunda de ementas, módulos e formato</span></a></li>
+            <li><a href="#contratacao" data-cms-link="modelo-trilha"><strong>Trilhas e jornadas</strong><span>Sequências formativas curadas para necessidades específicas</span></a></li>
+            <li><a href="#contratacao" data-cms-link="modelo-institucional"><strong>Contratação institucional</strong><span>Atendimento dedicado a órgãos públicos</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Capacitação (NOVO em R2.5 — absorve EventOn) -->
+  <div class="mega" id="mega-capacitacao" data-mega-id="capacitacao">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Agenda e formatos</h4>
+          <ul class="mega-list">
+            <li><a href="#capacitacao" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos no calendário</span></a></li>
+            <li><a href="#eventos-abertos" data-cms-link="eventos-online"><strong>Eventos online</strong><span>Transmissão ao vivo, replay e certificado</span></a></li>
+            <li><a href="#eventos-abertos" data-cms-link="eventos-presenciais"><strong>Eventos presenciais</strong><span>Encontros executivos em capitais estratégicas</span></a></li>
+            <li><a href="#eventos-abertos" data-cms-link="eventos-hibridos"><strong>Eventos híbridos</strong><span>Combinação de presença e plataforma digital</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Plataforma e curadoria</h4>
+          <ul class="mega-list">
+            <li><a href="#eventon" data-cms-link="eventon-home"><strong>EventOn</strong><span>Plataforma de acesso, replay e certificado do Grupo NTC</span></a></li>
+            <li><a href="#eventon" data-cms-link="area-participante"><strong>Área do Participante</strong><span>Histórico de eventos, materiais e certificados</span></a></li>
+            <li><a href="#capacitacao" data-cms-link="proximas-turmas"><strong>Próximas turmas</strong><span>Turmas em formação e inscrições antecipadas</span></a></li>
+            <li><a href="#capacitacao" data-cms-link="eventos-passados"><strong>Eventos passados</strong><span>Acervo de eventos realizados com replay disponível</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#docentes" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica e especialistas das 3 verticais</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========================== MOBILE DRAWER · FUNCIONAL ========================== -->
+<div class="mobile-drawer-backdrop" id="mobileBackdrop"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-label="Menu principal" aria-hidden="true">
+  <div class="drawer-head">
+    <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    <button class="drawer-close" id="drawerClose" aria-label="Fechar menu">×</button>
+  </div>
+  <nav class="drawer-nav" aria-label="Navegação móvel">
+    <a class="drawer-item" href="#sobre">Grupo NTC</a>
+
+    <button class="drawer-item has-sub" data-sub="programas-mobile" aria-expanded="false">Programas</button>
+    <div class="drawer-sub" id="sub-programas-mobile">
+      <a href="#programas" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>NTC Educação · Educação digital</span></a>
+      <a href="#programas" data-cms-link="programa-PEAR"><strong>PEAR</strong><span>NTC Educação · Alfabetização</span></a>
+      <a href="#programas" data-cms-link="programa-PROGE"><strong>PROGE</strong><span>NTC Educação · Gestão escolar</span></a>
+      <a href="#programas" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></a>
+      <a href="#programas" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></a>
+      <a href="#programas" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></a>
+      <a href="#programas" data-cms-link="ver-todos-programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></a>
+    </div>
+
+    <button class="drawer-item has-sub" data-sub="capacitacao-mobile" aria-expanded="false">Capacitação</button>
+    <div class="drawer-sub" id="sub-capacitacao-mobile">
+      <a href="#capacitacao" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></a>
+      <a href="#eventos-abertos" data-cms-link="eventos-online"><strong>Eventos online</strong><span>Ao vivo + replay</span></a>
+      <a href="#eventos-abertos" data-cms-link="eventos-presenciais"><strong>Eventos presenciais</strong><span>Capitais estratégicas</span></a>
+      <a href="#eventos-abertos" data-cms-link="eventos-hibridos"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></a>
+      <a href="#eventon" data-cms-link="eventon-home"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></a>
+      <a href="#eventon" data-cms-link="area-participante"><strong>Área do Participante</strong><span>Materiais e certificados</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#docentes" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica das 3 verticais</span></a>
+    </div>
+
+    <button class="drawer-item has-sub" data-sub="solucoes-mobile" aria-expanded="false">Soluções</button>
+    <div class="drawer-sub" id="sub-solucoes-mobile">
+      <a href="#programas" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>9 programas estratégicos</span></a>
+      <a href="#programas" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>3 programas estratégicos</span></a>
+      <a href="#programas" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>3 programas estratégicos</span></a>
+      <a href="#contratacao" data-cms-link="modelo-incompany"><strong>Soluções in company</strong><span>Turmas fechadas e sob medida</span></a>
+      <a href="#contratacao" data-cms-link="modelo-institucional"><strong>Contratação institucional</strong><span>Atendimento a órgãos públicos</span></a>
+    </div>
+
+    <a class="drawer-item" href="#conteudos">Conteúdos</a>
+    <a class="drawer-item" href="#contato">Contato</a>
+  </nav>
+  <div class="drawer-cta">
+    <a class="btn btn--gold" href="#contratacao" data-cms-link="proposta-institucional">Solicitar proposta</a>
+    <a class="btn btn--participant" href="#eventon" data-cms-link="area-participante">Área do Participante</a>
+  </div>
+</aside>
+
+<!-- Sistema cromático por vertical (R5):
+     A classe .vertical-page ativa as variáveis de acento da vertical.
+     NTC Educação usa Oxford institucional padrão. -->
+<main id="main" class="vertical-page" data-vertical="saude">
+
+<!-- ========================== BREADCRUMB ========================== -->
+<nav class="breadcrumb" aria-label="Trilha de navegação">
+  <div class="container">
+    <ol class="breadcrumb-list">
+      <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html" data-cms-link="home">Grupo NTC</a></li>
+      <li class="sep">/</li>
+      <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#solucoes" data-cms-link="solucoes">Soluções Estratégicas</a></li>
+      <li class="sep">/</li>
+      <li class="current">NTC Saúde</li>
+    </ol>
+  </div>
+</nav>
+
+<!-- ========================== HERO DA VERTICAL ========================== -->
+<section class="vert-hero" aria-label="NTC Saúde · Vertical Estratégica">
+  <div class="vert-hero-bg" style="background-image: url('./img/fotos/_optimized/area-saude-premium2.1920.webp');" aria-hidden="true"></div>
+  <div class="container vert-hero-content fade-in">
+    <p class="vert-hero-eyebrow">Vertical Estratégica · Grupo NTC</p>
+    <h1>NTC <em>Saúde</em></h1>
+    <p class="vert-hero-tagline">
+      Inteligência institucional aplicada ao Sistema Único de Saúde, à atenção primária e à gestão das redes assistenciais públicas brasileiras.
+    </p>
+    <p class="vert-hero-sub">
+      Três programas estratégicos articulando a gestão integrada do SUS, o fortalecimento da atenção primária e a profissionalização da liderança em saúde pública — desenhados para secretarias estaduais e municipais de saúde, hospitais públicos, redes assistenciais, consórcios intermunicipais e instituições do setor.
+    </p>
+    <div class="vert-hero-ctas">
+      <a class="btn btn--gold" href="#programas-sau">Conhecer os 3 programas <span class="btn-arrow">→</span></a>
+      <a class="btn btn--ghost-light" href="#eventos-sau">Ver eventos abertos da área</a>
+      <a class="btn btn--ghost-light" href="#contato">Solicitar proposta institucional</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== FAIXA DE METADADOS ========================== -->
+<section class="vert-meta-bar" aria-label="Informações da vertical">
+  <div class="container">
+    <div class="vert-meta-grid fade-in">
+      <div class="vert-meta-item">
+        <span class="label">Portfólio</span>
+        <span class="value">3 programas</span>
+        <span class="value-sub">Estratégicos</span>
+      </div>
+      <div class="vert-meta-item">
+        <span class="label">Áreas de atuação</span>
+        <span class="value">3 frentes</span>
+        <span class="value-sub">Gestão do SUS · Atenção primária · Liderança em saúde</span>
+      </div>
+      <div class="vert-meta-item">
+        <span class="label">Modalidades</span>
+        <span class="value">Online · Presencial · Híbrido</span>
+        <span class="value-sub">In company sob medida</span>
+      </div>
+      <div class="vert-meta-item">
+        <span class="label">Atendimento</span>
+        <span class="value">Nacional</span>
+        <span class="value-sub">Secretarias · Hospitais · Consórcios · Redes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== NAV-BAR INTERNA STICKY ========================== -->
+<nav class="vert-nav" aria-label="Navegação interna da vertical">
+  <div class="container vert-nav-inner">
+    <div class="vert-nav-anchors" role="tablist">
+      <a class="vert-nav-link is-active" href="#visao-geral">Visão geral</a>
+      <a class="vert-nav-link" href="#areas">Áreas</a>
+      <a class="vert-nav-link" href="#programas-sau">Programas</a>
+      <a class="vert-nav-link" href="#especialistas">Especialistas</a>
+      <a class="vert-nav-link" href="#eventos-sau">Eventos abertos</a>
+      <a class="vert-nav-link" href="#solucoes-inst">Soluções</a>
+      <a class="vert-nav-link" href="#conteudos">Conteúdos</a>
+      <a class="vert-nav-link" href="#faq">FAQ</a>
+    </div>
+    <div class="vert-nav-actions">
+      <button class="vert-nav-action primary" onclick="document.querySelector('#contato')?.scrollIntoView({behavior:'smooth'})" data-cms-link="proposta-institucional-sau">Solicitar proposta</button>
+      <button class="vert-nav-action" data-cms-link="folder-vertical-sau">Baixar portfólio</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ========================== VISÃO GERAL DA VERTICAL ========================== -->
+<section class="vert-section vert-section--cream" id="visao-geral">
+  <div class="container">
+    <div class="vert-section-head fade-in">
+      <p class="eyebrow">Visão geral</p>
+      <h2>A vertical estratégica do Grupo NTC dedicada à <em>saúde pública brasileira</em>.</h2>
+    </div>
+    <div class="vert-overview fade-in">
+      <p class="lede">
+        A NTC Saúde articula três programas estratégicos em torno dos desafios contemporâneos do Sistema Único de Saúde — da gestão integrada do SUS ao fortalecimento da atenção primária, da liderança das redes assistenciais à profissionalização da gestão hospitalar pública.
+      </p>
+      <div class="body">
+        <p>
+          A NTC Saúde é a vertical do Grupo NTC dedicada à <strong>capacitação técnica e estratégica de quem opera o SUS</strong>: secretários, gestores, dirigentes de hospitais públicos, coordenadores de atenção primária, equipes de auditoria, regulação e vigilância, e quadros executivos de consórcios intermunicipais de saúde e instituições filantrópicas conveniadas.
+        </p>
+        <p>
+          A vertical não opera como uma plataforma de cursos avulsos. Cada programa é uma <strong>solução institucional estruturada</strong> — com identidade própria, ementas alinhadas à legislação sanitária e às pactuações do SUS, coordenação científica dedicada e arquitetura modular flexível. Os programas podem ser contratados como trilhas completas, módulos avulsos, soluções in company ou customizações sob medida para a realidade da rede assistencial.
+        </p>
+        <p>
+          O rigor técnico, o compromisso com a saúde pública e a aderência ao SUS são a marca da NTC Saúde: todos os programas dialogam entre si na construção de uma <strong>agenda nacional para a gestão contemporânea da saúde pública brasileira</strong>, ancorada na universalidade, na integralidade e na equidade.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== ÁREAS DE ATUAÇÃO INTERNA ========================== -->
+<section class="vert-section" id="areas">
+  <div class="container">
+    <div class="vert-section-head fade-in">
+      <p class="eyebrow">Frentes de atuação</p>
+      <h2>Três <em>áreas formativas</em> articuladas</h2>
+      <p class="intro">
+        Cada uma das três frentes da NTC Saúde corresponde a um programa estratégico — abordando uma dimensão específica do desafio contemporâneo do Sistema Único de Saúde e da gestão da saúde pública brasileira.
+      </p>
+    </div>
+
+    <div class="areas-grid fade-in">
+      <article class="area-card">
+        <span class="a-num">01</span>
+        <h4>Gestão integrada do SUS</h4>
+        <p>Sistema integrado de gestão da saúde pública — planejamento, regulação, financiamento, regionalização, pactuação interfederativa e governança das redes assistenciais do SUS.</p>
+        <p class="a-program-link">Programa · <strong>SIGS</strong></p>
+      </article>
+      <article class="area-card">
+        <span class="a-num">02</span>
+        <h4>Atenção primária e redes de saúde</h4>
+        <p>Fortalecimento da atenção primária como ordenadora do cuidado, qualificação das equipes de saúde da família e integração das redes de atenção em sistemas locais robustos e resolutivos.</p>
+        <p class="a-program-link">Programa · <strong>PROAPS+</strong></p>
+      </article>
+      <article class="area-card">
+        <span class="a-num">03</span>
+        <h4>Liderança e alta gestão em saúde pública</h4>
+        <p>Formação executiva de dirigentes, secretários municipais e estaduais, diretores hospitalares e quadros estratégicos do SUS — articulando visão sistêmica, capacidade decisória e desempenho institucional.</p>
+        <p class="a-program-link">Programa · <strong>PROSUS+</strong></p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== GRADE DOS 3 PROGRAMAS ========================== -->
+<section class="vert-section vert-section--ivory" id="programas-sau">
+  <div class="container">
+    <div class="vert-section-head fade-in">
+      <p class="eyebrow">Portfólio estratégico</p>
+      <h2>Três programas estratégicos · <em>NTC Saúde</em></h2>
+      <p class="intro">
+        Cada programa é uma solução estruturada em módulos, com identidade própria, coordenação científica e linha editorial específica. Pode ser contratado como trilha completa, módulos avulsos ou solução institucional sob medida para a realidade da rede de saúde.
+      </p>
+    </div>
+
+    <div class="programs-grid-vert fade-in">
+      <a class="program-card-vert" href="#" data-cms-link="programa-SIGS">
+        <div class="pc-cover">
+          <div class="pc-cover-img" style="background-image:url('./img/fotos/_optimized/area-saude-premium2.1920.webp');" aria-hidden="true"></div>
+          <span class="pc-flag">Módulos abertos</span>
+          <span class="pc-sigla">SIGS</span>
+        </div>
+        <div class="pc-body">
+          <h3 class="pc-name">Sistema Integrado de Gestão da Saúde Pública · Planejamento, Regulação e Governança do SUS</h3>
+          <p class="pc-tagline">Gestão integrada do SUS — planejamento, regulação, financiamento e governança das redes assistenciais.</p>
+          <div class="pc-meta">
+            <span>10 módulos · 80h</span>
+            <span class="pc-cta">Conhecer →</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="program-card-vert" href="#" data-cms-link="programa-PROAPS">
+        <div class="pc-cover">
+          <div class="pc-cover-img" style="background-image:url('./img/fotos/_optimized/autoridade-saude.1920.webp');" aria-hidden="true"></div>
+          <span class="pc-flag">Módulos abertos</span>
+          <span class="pc-sigla">PROAPS+</span>
+        </div>
+        <div class="pc-body">
+          <h3 class="pc-name">Programa Avançado de Fortalecimento da Atenção Primária à Saúde e Redes Assistenciais</h3>
+          <p class="pc-tagline">Atenção primária como ordenadora do cuidado e integração das redes de atenção à saúde.</p>
+          <div class="pc-meta">
+            <span>9 módulos · 72h</span>
+            <span class="pc-cta">Conhecer →</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="program-card-vert" href="#" data-cms-link="programa-PROSUS">
+        <div class="pc-cover">
+          <div class="pc-cover-img" style="background-image:url('./img/fotos/_optimized/area-saude-premium2.1920.webp');" aria-hidden="true"></div>
+          <span class="pc-flag">Módulos abertos</span>
+          <span class="pc-sigla">PROSUS+</span>
+        </div>
+        <div class="pc-body">
+          <h3 class="pc-name">Programa Executivo de Liderança, Alta Gestão e Desenvolvimento Estratégico em Saúde Pública</h3>
+          <p class="pc-tagline">Formação executiva da alta liderança do SUS — visão sistêmica, capacidade decisória e desempenho institucional.</p>
+          <div class="pc-meta">
+            <span>8 módulos · 64h</span>
+            <span class="pc-cta">Conhecer →</span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div style="display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-5); flex-wrap: wrap;">
+      <a class="btn btn--primary" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="ver-todos-programas">Ver todos os 15 programas do Grupo NTC <span class="btn-arrow">→</span></a>
+      <a class="btn btn--secondary" href="#contato" data-cms-link="proposta-institucional-sau">Solicitar proposta institucional</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== AUTORIDADE TÉCNICA · CURADORIA EM ESTRUTURAÇÃO ========================== -->
+<!-- NTC Saúde · Corpo docente em estruturação. Enquanto os nomes não estão validados,
+     a seção apresenta 6 EIXOS TÉCNICOS (não pessoas), preparada para migrar para a
+     grade de especialistas com fotos e perfis quando os nomes forem confirmados via CMS. -->
+<section class="vert-section vert-section--cream" id="especialistas">
+  <div class="container">
+    <div class="vert-section-head fade-in">
+      <span class="curadoria-pill">Curadoria em estruturação</span>
+      <p class="eyebrow">Autoridade técnica</p>
+      <h2>Curadoria técnica em <em>saúde pública e gestão do SUS</em></h2>
+      <p class="intro">
+        A NTC Saúde está estruturando uma curadoria especializada para apoiar gestores, equipes técnicas e instituições públicas nos desafios de governança, atenção primária, redes assistenciais, planejamento, regulação e gestão integrada do Sistema Único de Saúde.
+      </p>
+    </div>
+
+    <div class="experts-authority fade-in">
+
+      <p class="experts-marker">Eixos técnicos · Curadoria por área de atuação</p>
+      <div class="experts-authority-grid">
+
+        <article class="expert-authority-card is-axis-card">
+          <div class="eac-icon-wrap" aria-hidden="true">
+            <svg class="eac-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="10" y="14" width="44" height="36" rx="2" />
+              <path d="M10 22h44" />
+              <path d="M22 32h8M22 38h20M22 44h14" />
+              <circle cx="46" cy="34" r="3" />
+            </svg>
+            <span class="eac-axis-tag">Eixo 01</span>
+          </div>
+          <div class="eac-info">
+            <h4>Governança e gestão do SUS</h4>
+            <p class="eac-credential">Pactuação interfederativa, financiamento, regulação e governança das três esferas do Sistema Único de Saúde.</p>
+            <p class="eac-programs">Programa · <strong>SIGS</strong></p>
+            <a class="eac-link" href="#contato" data-cms-link="curadoria-governanca-sus">Conhecer atuação <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+
+        <article class="expert-authority-card is-axis-card">
+          <div class="eac-icon-wrap" aria-hidden="true">
+            <svg class="eac-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M32 56s-18-10-18-26a18 18 0 1 1 36 0c0 16-18 26-18 26z" />
+              <path d="M32 16v18M23 25h18" />
+            </svg>
+            <span class="eac-axis-tag">Eixo 02</span>
+          </div>
+          <div class="eac-info">
+            <h4>Atenção primária à saúde</h4>
+            <p class="eac-credential">Fortalecimento da APS como ordenadora do cuidado, qualificação das equipes de saúde da família e território.</p>
+            <p class="eac-programs">Programa · <strong>PROAPS+</strong></p>
+            <a class="eac-link" href="#contato" data-cms-link="curadoria-aps">Conhecer atuação <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+
+        <article class="expert-authority-card is-axis-card">
+          <div class="eac-icon-wrap" aria-hidden="true">
+            <svg class="eac-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="16" cy="16" r="6" />
+              <circle cx="48" cy="16" r="6" />
+              <circle cx="32" cy="48" r="6" />
+              <path d="M22 16h20M19 22l11 22M45 22L34 44" />
+            </svg>
+            <span class="eac-axis-tag">Eixo 03</span>
+          </div>
+          <div class="eac-info">
+            <h4>Redes assistenciais e regulação</h4>
+            <p class="eac-credential">Integração das redes de atenção à saúde, regulação assistencial, centrais reguladoras e itinerários de cuidado.</p>
+            <p class="eac-programs">Programa · <strong>SIGS · PROAPS+</strong></p>
+            <a class="eac-link" href="#contato" data-cms-link="curadoria-redes-regulacao">Conhecer atuação <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+
+        <article class="expert-authority-card is-axis-card">
+          <div class="eac-icon-wrap" aria-hidden="true">
+            <svg class="eac-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 50h44" />
+              <rect x="14" y="34" width="8" height="16" />
+              <rect x="28" y="24" width="8" height="26" />
+              <rect x="42" y="14" width="8" height="36" />
+              <path d="M10 16l8-4 6 4 8-2 6 4 8-4 6 2" />
+            </svg>
+            <span class="eac-axis-tag">Eixo 04</span>
+          </div>
+          <div class="eac-info">
+            <h4>Planejamento, financiamento e indicadores</h4>
+            <p class="eac-credential">Planejamento estratégico em saúde pública, financiamento tripartite, indicadores institucionais e monitoramento de desempenho.</p>
+            <p class="eac-programs">Programa · <strong>SIGS · PROSUS+</strong></p>
+            <a class="eac-link" href="#contato" data-cms-link="curadoria-planejamento-financiamento">Conhecer atuação <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+
+        <article class="expert-authority-card is-axis-card">
+          <div class="eac-icon-wrap" aria-hidden="true">
+            <svg class="eac-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="32" cy="22" r="8" />
+              <path d="M16 52v-4a10 10 0 0 1 10-10h12a10 10 0 0 1 10 10v4" />
+              <path d="M12 28l6 4M52 28l-6 4" />
+            </svg>
+            <span class="eac-axis-tag">Eixo 05</span>
+          </div>
+          <div class="eac-info">
+            <h4>Liderança e gestão de equipes em saúde</h4>
+            <p class="eac-credential">Formação de dirigentes, secretários, diretores hospitalares e quadros estratégicos do SUS — visão sistêmica e capacidade decisória.</p>
+            <p class="eac-programs">Programa · <strong>PROSUS+</strong></p>
+            <a class="eac-link" href="#contato" data-cms-link="curadoria-lideranca-saude">Conhecer atuação <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+
+        <article class="expert-authority-card is-axis-card">
+          <div class="eac-icon-wrap" aria-hidden="true">
+            <svg class="eac-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M32 8l20 8v14c0 14-10 22-20 26-10-4-20-12-20-26V16l20-8z" />
+              <path d="M24 32l6 6 12-12" />
+            </svg>
+            <span class="eac-axis-tag">Eixo 06</span>
+          </div>
+          <div class="eac-info">
+            <h4>Controle, compliance e qualidade na saúde pública</h4>
+            <p class="eac-credential">Controle interno, auditoria do SUS, compliance assistencial, segurança do paciente e qualidade dos serviços de saúde pública.</p>
+            <p class="eac-programs">Programa · <strong>SIGS · PROSUS+</strong></p>
+            <a class="eac-link" href="#contato" data-cms-link="curadoria-controle-qualidade">Conhecer atuação <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Contadores discretos · alimentados via CMS -->
+      <div class="experts-counters fade-in" aria-label="Indicadores da curadoria">
+        <div class="experts-counter">
+          <span class="ec-num">6</span>
+          <span class="ec-lbl">Eixos técnicos</span>
+        </div>
+        <div class="experts-counter">
+          <span class="ec-num">3</span>
+          <span class="ec-lbl">Programas relacionados</span>
+        </div>
+        <div class="experts-counter">
+          <span class="ec-num">SUS</span>
+          <span class="ec-lbl">Sistema de referência</span>
+        </div>
+        <div class="experts-counter">
+          <span class="ec-num">2026</span>
+          <span class="ec-lbl">Curadoria em formação</span>
+        </div>
+      </div>
+
+      <p class="placeholder-note" style="text-align: left;">A curadoria técnica da NTC Saúde é atualizada de forma contínua, conforme a consolidação dos programas, temas prioritários e demandas institucionais vinculadas à gestão pública da saúde. Especialistas convidados integram a curadoria por eixo, conforme o escopo de cada órgão, rede ou instituição.</p>
+
+      <!-- CTA da seção -->
+      <div class="experts-authority-cta">
+        <a class="btn btn--gold" href="#contato" data-cms-link="proposta-formacao-saude">Solicitar proposta para formação em saúde pública <span class="btn-arrow">→</span></a>
+        <a class="btn btn--secondary-vert" href="#contato" data-cms-link="folder-curadoria-saude">Receber atualizações da curadoria</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================== EVENTOS ABERTOS DA ÁREA ========================== -->
+<section class="vert-section vert-section--cream" id="eventos-sau">
+  <div class="container">
+    <div class="vert-section-head fade-in">
+      <p class="eyebrow gold">Capacitação · Inscrições abertas</p>
+      <h2>Eventos abertos da <em>NTC Saúde</em></h2>
+      <p class="intro">
+        Edições operacionais dos programas estratégicos da vertical com inscrições ativas — disponíveis para inscrição individual de profissionais e gestores, equipe técnica ou contratação institucional pelo órgão de saúde.
+      </p>
+    </div>
+
+    <div class="events-vert-grid fade-in">
+      <article class="event-secondary-card" data-area="sau">
+        <div class="es-cover">
+          <div class="es-cover-img" style="background-image:url('./img/fotos/_optimized/area-saude-premium2.1920.webp');" aria-hidden="true"></div>
+          <div class="es-cover-overlay"></div>
+          <div class="es-date range">
+            <span class="days">05<span class="dash">–</span>07</span>
+            <span class="mon-yr">Jun · 2026</span>
+          </div>
+        </div>
+        <div class="es-body">
+          <div>
+            <p class="es-program">Simpósio Presencial · NTC Saúde</p>
+            <h4 class="es-title">Liderança e Alta Gestão em Saúde Pública: agenda contemporânea do SUS</h4>
+            <p class="es-program-binding">Integra o programa <strong>PROSUS+</strong></p>
+          </div>
+          <div class="es-meta-row">
+            <span class="es-meta">Brasília · 20h · 3 dias <strong>R$ 2.890</strong></span>
+          </div>
+          <a class="es-cta" href="./03_Pagina_Evento_PROSUS_Brasilia_v3.html" data-cms-link="detalhes-PROSUS-2026-jun">Ver detalhes</a>
+        </div>
+      </article>
+
+      <article class="event-secondary-card" data-area="sau">
+        <div class="es-cover">
+          <div class="es-cover-img" style="background-image:url('./img/fotos/_optimized/autoridade-saude.1920.webp');" aria-hidden="true"></div>
+          <div class="es-cover-overlay"></div>
+          <div class="es-date range">
+            <span class="days">02<span class="dash">–</span>03</span>
+            <span class="mon-yr">Jul · 2026</span>
+          </div>
+        </div>
+        <div class="es-body">
+          <div>
+            <p class="es-program">Seminário Online · NTC Saúde</p>
+            <h4 class="es-title">Atenção Primária como Ordenadora do Cuidado nas Redes de Saúde</h4>
+            <p class="es-program-binding">Integra o programa <strong>PROAPS+</strong></p>
+          </div>
+          <div class="es-meta-row">
+            <span class="es-meta">Online · 16h · 2 dias <strong>R$ 1.490</strong></span>
+          </div>
+          <a class="es-cta" href="#contato" data-cms-link="inscricao-PROAPS-2026-jul">Inscrever-se</a>
+        </div>
+      </article>
+
+      <article class="event-secondary-card" data-area="sau">
+        <div class="es-cover">
+          <div class="es-cover-img" style="background-image:url('./img/fotos/_optimized/area-saude-premium2.1920.webp');" aria-hidden="true"></div>
+          <div class="es-cover-overlay"></div>
+          <div class="es-date single">
+            <span class="day">11</span>
+            <span class="mon-yr">Jun · 2026</span>
+          </div>
+        </div>
+        <div class="es-body">
+          <div>
+            <p class="es-program">Curso Executivo · NTC Saúde</p>
+            <h4 class="es-title">Regulação, Pactuação Interfederativa e Governança das Redes do SUS</h4>
+            <p class="es-program-binding">Integra o programa <strong>SIGS</strong></p>
+          </div>
+          <div class="es-meta-row">
+            <span class="es-meta">Online · 8h · 1 dia <strong>R$ 990</strong></span>
+          </div>
+          <a class="es-cta" href="#contato" data-cms-link="inscricao-SIGS-2026-jun">Inscrever-se</a>
+        </div>
+      </article>
+    </div>
+
+    <div style="display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-5); flex-wrap: wrap;">
+      <a class="btn btn--primary" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#capacitacao" data-cms-link="agenda-completa-sau">Ver agenda completa de Saúde <span class="btn-arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== SOLUÇÕES INSTITUCIONAIS ========================== -->
+<section class="institutional-solutions" id="solucoes-inst">
+  <div class="container">
+    <div class="solutions-grid-vert">
+      <div class="vert-section-head fade-in" style="margin-bottom: 0;">
+        <p class="eyebrow gold">Contratação institucional</p>
+        <h2>Soluções para <em>secretarias de saúde, hospitais e redes assistenciais</em></h2>
+        <p class="intro">
+          Além dos eventos abertos e dos programas com inscrição individual, a NTC Saúde oferece soluções dedicadas a órgãos do SUS e instituições conveniadas — turmas fechadas in company, trilhas customizadas, soluções sob medida e atendimento institucional especializado para secretarias estaduais e municipais de saúde, hospitais públicos, fundações, consórcios intermunicipais e organizações sociais de saúde.
+        </p>
+        <div class="solutions-cta-vert">
+          <a class="btn btn--gold" href="#contato" data-cms-link="proposta-institucional-sau">Solicitar proposta institucional <span class="btn-arrow">→</span></a>
+          <a class="btn btn--ghost-light" href="#" data-cms-link="folder-vertical-sau">Baixar portfólio da vertical</a>
+        </div>
+      </div>
+      <div class="solutions-list-vert fade-in">
+        <article class="solution-item-vert">
+          <h4>Turmas fechadas in company</h4>
+          <p>Programa entregue exclusivamente à secretaria, hospital ou rede contratante, em formato presencial, online ou híbrido. Conteúdo customizável à realidade epidemiológica, à pactuação local e aos indicadores prioritários da rede.</p>
+        </article>
+        <article class="solution-item-vert">
+          <h4>Trilhas customizadas</h4>
+          <p>Sequências formativas curadas combinando módulos de diferentes programas — desenhadas para uma necessidade específica da rede assistencial, do hospital ou da equipe técnica atendida.</p>
+        </article>
+        <article class="solution-item-vert">
+          <h4>Soluções sob medida</h4>
+          <p>Customização profunda de ementas, módulos, cargas horárias e formato — para atender uma demanda institucional específica do SUS que não cabe nos programas standards, com aderência total às pactuações e à legislação sanitária aplicável.</p>
+        </article>
+        <article class="solution-item-vert">
+          <h4>Atendimento dedicado</h4>
+          <p>Equipe comercial dedicada a órgãos do SUS — apoio à formalização da contratação pública (Lei 14.133/2021 e legislação correlata), elaboração de termo de referência, empenho, convênio e nota fiscal direta no CNPJ do órgão.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== CONTEÚDOS EDITORIAIS ========================== -->
+<!-- ⚠ Conteúdos abaixo são DEMONSTRATIVOS — títulos serão substituídos por
+     publicações oficiais da equipe editorial NTC Saúde via CMS. -->
+<section class="vert-section" id="conteudos">
+  <div class="container">
+    <div class="vert-section-head fade-in">
+      <p class="eyebrow">Produção editorial</p>
+      <h2>Conteúdos da <em>NTC Saúde</em></h2>
+      <p class="intro">
+        Análises, publicações e estudos da vertical sobre os desafios contemporâneos do Sistema Único de Saúde e da gestão da saúde pública brasileira.
+      </p>
+    </div>
+
+    <div class="contents-vert fade-in">
+      <article class="content-vert-card featured">
+        <div class="content-vert-img"><img src="./img/fotos/_optimized/conteudo-01.1920.webp" alt="Análise editorial NTC Saúde" loading="lazy" /></div>
+        <div class="content-vert-body">
+          <span class="content-demo-tag">Demonstrativo</span>
+          <span class="cat">Análise · NTC Saúde</span>
+          <h4>Gestão integrada do SUS pós-pandemia: leituras e caminhos institucionais</h4>
+          <p>Diagnóstico estruturado dos gargalos de gestão, regulação e financiamento que emergiram com a pandemia, e os caminhos institucionais para fortalecer a governança das redes assistenciais públicas brasileiras.</p>
+          <div class="meta">
+            <span>Tempo de leitura</span>
+            <span>Próxima publicação</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="content-vert-card">
+        <div class="content-vert-img"><img src="./img/fotos/_optimized/conteudo-02.1920.webp" alt="Insight editorial" loading="lazy" /></div>
+        <div class="content-vert-body">
+          <span class="content-demo-tag">Demonstrativo</span>
+          <span class="cat">Insight · NTC Saúde</span>
+          <h4>Atenção primária resolutiva: a porta de entrada que ordena o cuidado</h4>
+          <p>Caminhos institucionais para fortalecer a atenção primária como ordenadora das redes de atenção à saúde.</p>
+          <div class="meta">
+            <span>Análise</span>
+            <span>Em curadoria</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="content-vert-card">
+        <div class="content-vert-img"><img src="./img/fotos/_optimized/conteudo-03.1920.webp" alt="Publicação editorial" loading="lazy" /></div>
+        <div class="content-vert-body">
+          <span class="content-demo-tag">Demonstrativo</span>
+          <span class="cat">Publicação · NTC Saúde</span>
+          <h4>Liderança em saúde pública: agenda 2026 para o SUS</h4>
+          <p>Estudo sobre formação executiva da alta gestão do SUS e desempenho institucional das secretarias.</p>
+          <div class="meta">
+            <span>Estudo técnico</span>
+            <span>Em desenvolvimento</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== FAQ ========================== -->
+<section class="vert-section vert-section--cream" id="faq">
+  <div class="container">
+    <div class="vert-section-head fade-in">
+      <p class="eyebrow">Perguntas frequentes</p>
+      <h2>FAQ · NTC Saúde</h2>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Como uma secretaria de saúde ou hospital público contrata a NTC Saúde?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">Para órgãos do SUS e instituições conveniadas (secretarias estaduais e municipais de saúde, hospitais públicos, fundações, consórcios intermunicipais, organizações sociais de saúde, autarquias e empresas estatais do setor), oferecemos contratação institucional dedicada com nota fiscal direta no CNPJ do órgão. Atuamos por inexigibilidade, dispensa, convênio ou licitação conforme a hipótese aplicável da Lei 14.133/2021 e legislação correlata. A equipe comercial NTC apoia o trâmite. Solicite proposta institucional pelo botão lateral.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Posso contratar apenas um programa, ou preciso adquirir o portfólio completo?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">Os três programas são independentes e podem ser contratados separadamente. Cada programa tem sua própria arquitetura modular flexível — pode-se contratar a trilha completa, módulos avulsos ou solução sob medida que combine elementos do SIGS, PROAPS+ e PROSUS+ conforme a necessidade da rede de saúde.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Quais modalidades de entrega estão disponíveis?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">Os programas são entregues em modalidades online (via plataforma EventOn NTC), presencial (em capitais estratégicas), híbrida (combinando ambos), in company (na sede do órgão ou da instituição de saúde contratante) ou sob medida. A escolha depende do programa, do volume de profissionais atendidos e da realidade operacional da rede.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Como funciona a customização de programas para minha rede de saúde?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">A customização é feita em duas camadas: ajustes editoriais (linguagem, casos aplicados, perfil epidemiológico local, ênfases temáticas) e ajustes estruturais (cargas horárias, sequência modular, formato). A coordenação científica da NTC Saúde faz a curadoria técnica para garantir que a customização preserve a aderência ao SUS e a integridade técnica e ética do programa.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">A NTC Saúde atende municípios pequenos e regiões de saúde com menor estrutura?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">Sim. A vertical atende redes e instituições de todos os portes — estados, capitais, municípios médios e pequenos, hospitais regionais e unidades de atenção primária. Para municípios pequenos, frequentemente articulamos consórcios intermunicipais de saúde ou modalidades online com escala regional para reduzir o custo institucional preservando a qualidade técnica da formação. Solicite proposta para a realidade da sua rede.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Os profissionais e gestores recebem certificado?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">Sim. Cada módulo e cada programa entregam certificação institucional emitida pelo Instituto NTC do Brasil, validável publicamente via código QR e adequada à comprovação de capacitação para fins de progressão funcional, ocupação de cargos de direção, comissões técnicas, conselhos e exigências da legislação aplicável. Para a trilha completa de um programa, é emitida certificação consolidada após a conclusão de todos os módulos.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== CTA FINAL ========================== -->
+<section class="vert-cta-final" id="contato">
+  <div class="container fade-in">
+    <p class="eyebrow gold">Próximo passo</p>
+    <h2>Leve a <em>NTC Saúde</em> para sua secretaria, hospital ou rede assistencial.</h2>
+    <p class="vert-cta-final-sub">
+      Solicite proposta institucional para os programas estratégicos da vertical · trilhas completas, módulos avulsos, in company ou solução sob medida — com aderência ao SUS, à pactuação local e à realidade epidemiológica da sua rede.
+    </p>
+    <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+      <a class="btn btn--gold" href="#contato" data-cms-link="proposta-institucional-sau">Solicitar proposta institucional <span class="btn-arrow">→</span></a>
+      <a class="btn btn--ghost-light" href="#" data-cms-link="folder-vertical-sau">Baixar portfólio da vertical</a>
+      <a class="btn btn--ghost-light" href="#eventos-sau">Ver eventos abertos</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ========================== FOOTER ========================== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="./img/logos/logo-dark.svg" alt="Grupo NTC" />
+        <span class="footer-tagline">O novo padrão da formação institucional.</span>
+        <p class="footer-address">
+          <strong>Instituto NTC do Brasil</strong><br>
+          SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001<br>
+          Asa Sul · CEP 70308-200 · Brasília – DF<br>
+          (63) 3212-1199 · contato@institutontc.com.br
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h5>Navegação</h5>
+        <ul>
+          <li><a href="#sobre">Grupo NTC</a></li>
+          <li><a href="#programas">Programas</a></li>
+          <li><a href="#capacitacao">Capacitação</a></li>
+          <li><a href="#solucoes">Soluções</a></li>
+          <li><a href="#conteudos">Conteúdos</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#docentes" data-cms-link="pagina-corpo-docente">Corpo Docente</a></li>
+          <li><a href="#eventon">EventOn</a></li>
+          <li><a href="#contato">Contato</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Verticais</h5>
+        <ul>
+          <li><a href="#programas" data-cms-link="vertical-edu">NTC Educação</a></li>
+          <li><a href="#programas" data-cms-link="vertical-gov">NTC Gestão Pública</a></li>
+          <li><a href="#programas" data-cms-link="vertical-sau">NTC Saúde</a></li>
+          <li><a href="#contratacao" data-cms-link="modelo-incompany">Soluções in company</a></li>
+          <li><a href="#contratacao" data-cms-link="modelo-fechada">Turmas fechadas</a></li>
+          <li><a href="#contratacao" data-cms-link="modelo-sobmedida">Soluções sob medida</a></li>
+          <li><a href="#contratacao" data-cms-link="modelo-institucional">Contratação institucional</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Atendimento</h5>
+        <ul>
+          <li><a href="#eventos-abertos">Eventos com inscrições abertas</a></li>
+          <li><a href="#contratacao" data-cms-link="proposta-institucional">Solicitar proposta</a></li>
+          <li><a href="#contratacao" data-cms-link="inscricao-equipe">Inscrever equipe</a></li>
+          <li><a href="#contato" data-cms-link="atendimento-comercial">Atendimento comercial</a></li>
+          <li><a href="#eventon" data-cms-link="eventon-suporte">Suporte ao participante</a></li>
+          <li><a href="#eventon" data-cms-link="area-participante">Área do Participante</a></li>
+          <li><a href="#contato" data-cms-link="whatsapp">WhatsApp · (63) 98444-4040</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-badge">Grupo NTC — Núcleo de Tecnologia e Conhecimento · 2026</p>
+      <ul class="footer-legal">
+        <li><a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a></li>
+        <li><a href="./31_Pagina_Termos_v1.html" data-cms-link="legal-termos">Termos de Uso</a></li>
+        <li><a href="./32_Pagina_Cookies_v1.html" data-cms-link="legal-cookies">Política de Cookies</a></li>
+        <li><a href="./33_Pagina_LGPD_v1.html" data-cms-link="legal-lgpd">LGPD</a></li>
+        <li><a href="./34_Pagina_MapaDoSite_v1.html" data-cms-link="legal-mapa-do-site">Mapa do site</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* =============================================================
+   INTERAÇÕES — MEGA + DRAWER MOBILE + FILTROS + APARIÇÃO
+   ============================================================= */
+
+// 1) Mega menu (desktop)
+(function() {
+  const triggers = document.querySelectorAll('.nav-item.has-mega');
+  const megas = document.querySelectorAll('.mega');
+  let openTimer = null;
+
+  function openMega(id) {
+    closeAllMegas();
+    const m = document.getElementById('mega-' + id);
+    if (m) m.classList.add('is-open');
+    triggers.forEach(t => t.setAttribute('aria-expanded', t.dataset.mega === id ? 'true' : 'false'));
+  }
+  function closeAllMegas() {
+    megas.forEach(m => m.classList.remove('is-open'));
+    triggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
+  }
+
+  triggers.forEach(trigger => {
+    trigger.addEventListener('mouseenter', () => { clearTimeout(openTimer); openMega(trigger.dataset.mega); });
+    trigger.addEventListener('click', e => {
+      e.preventDefault();
+      const id = trigger.dataset.mega;
+      const isOpen = document.getElementById('mega-' + id).classList.contains('is-open');
+      if (isOpen) closeAllMegas(); else openMega(id);
+    });
+    trigger.addEventListener('focus', () => openMega(trigger.dataset.mega));
+  });
+  megas.forEach(mega => {
+    mega.addEventListener('mouseenter', () => clearTimeout(openTimer));
+    mega.addEventListener('mouseleave', () => { openTimer = setTimeout(closeAllMegas, 200); });
+  });
+  document.querySelector('.site-header').addEventListener('mouseleave', () => { openTimer = setTimeout(closeAllMegas, 240); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllMegas(); });
+  document.addEventListener('click', e => { if (!e.target.closest('.site-header')) closeAllMegas(); });
+})();
+
+// 2) Mobile drawer · funcional
+(function() {
+  const toggle = document.getElementById('mobileToggle');
+  const drawer = document.getElementById('mobileDrawer');
+  const backdrop = document.getElementById('mobileBackdrop');
+  const closeBtn = document.getElementById('drawerClose');
+  if (!toggle || !drawer || !backdrop) return;
+
+  function openDrawer() {
+    drawer.classList.add('is-open');
+    backdrop.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
+    setTimeout(() => closeBtn.focus(), 320);
+  }
+  function closeDrawer() {
+    drawer.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll');
+    toggle.focus();
+  }
+  toggle.addEventListener('click', () => {
+    if (drawer.classList.contains('is-open')) closeDrawer(); else openDrawer();
+  });
+  closeBtn.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
+  });
+
+  // Submenus colapsáveis
+  drawer.querySelectorAll('.drawer-item.has-sub').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById('sub-' + btn.dataset.sub);
+      if (!target) return;
+      const isOpen = target.classList.toggle('is-open');
+      btn.classList.toggle('is-expanded', isOpen);
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+
+  // Fecha drawer ao clicar em link interno
+  drawer.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', () => setTimeout(closeDrawer, 80));
+  });
+})();
+
+// 3) Aparição ao scroll
+(function() {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('is-visible'));
+    return;
+  }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+})();
+
+// 4) Smooth scroll para anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', function(e) {
+    const id = this.getAttribute('href');
+    if (id.length > 1) {
+      const target = document.querySelector(id);
+      if (target) {
+        e.preventDefault();
+        const offset = 88;
+        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }
+  });
+});
+
+// ============================================================
+// PÁGINA DE VERTICAL · INTERAÇÕES (R5)
+// ============================================================
+
+// 5) FAQ accordion da página de vertical
+(function() {
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const btn = item.querySelector('.faq-question');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const isOpen = item.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+})();
+
+// 6) Nav-bar interna · scroll-spy
+(function() {
+  const navLinks = document.querySelectorAll('.vert-nav-link');
+  if (!navLinks.length || !('IntersectionObserver' in window)) return;
+  const sections = Array.from(navLinks).map(l => {
+    const id = l.getAttribute('href').replace('#', '');
+    return { link: l, target: document.getElementById(id) };
+  }).filter(o => o.target);
+  if (!sections.length) return;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        navLinks.forEach(l => l.classList.toggle('is-active', l.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-30% 0px -55% 0px', threshold: 0 });
+  sections.forEach(s => obs.observe(s.target));
+})();
+
+/*
+  =============================================================
+  🔌 CMS / INTEGRAÇÃO FUTURA
+  -------------------------------------------------------------
+  Todos os elementos com atributo `data-cms-link` precisarão ser
+  populados pelo CMS ou pelo sistema de inscrição.
+
+  Convenção de chaves:
+    inscricao-{SIGLA}-{ANO}-{MES}     → URL de inscrição do evento
+    detalhes-{SIGLA}-{ANO}-{MES}      → página interna do evento
+    proposta-grupo-{SIGLA}            → formulário institucional do programa
+    programa-{SIGLA}                  → página interna do programa
+    modulo-aberto-{SIGLA}             → filtro da agenda aplicado ao programa
+    vertical-{edu|gov|sau}-programas  → página de listagem de programas da vertical
+    vertical-{edu|gov|sau}-eventos    → agenda da vertical
+    eventon-{acesso|replay|certificado|suporte} → área restrita
+    proposta-institucional            → formulário comercial
+    inscricao-equipe                  → formulário de inscrição em grupo
+    agenda-completa                   → página da agenda geral
+    ver-todos-programas               → página completa de programas
+
+  Ver atributo data-cms-link em cada CTA da Home para mapeamento.
+  =============================================================
+*/
+</script>
+<!-- NTC_COOKIE_CONSENT_JS_BEGIN -->
+<script defer src="./assets/cookie_consent.js"></script>
+<!-- NTC_COOKIE_CONSENT_JS_END -->
+
+</body>
+</html>

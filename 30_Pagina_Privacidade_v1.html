@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Política de Privacidade do Instituto NTC do Brasil · LGPD · Lei 13.709/2018 · canais oficiais do Encarregado (DPO), direitos do titular, bases legais e governança institucional do Grupo NTC." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://www.grupontc.com.br/politica-de-privacidade" />
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:site_name" content="Grupo NTC" />
+<meta property="og:title" content="Política de Privacidade · Grupo NTC" />
+<meta property="og:description" content="Tratamento de dados pessoais no Grupo NTC: bases legais, direitos do titular, DPO e governança institucional." />
+<meta property="og:url" content="https://www.grupontc.com.br/politica-de-privacidade" />
+<meta property="og:image" content="https://www.grupontc.com.br/img/og/og-institucional.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Política de Privacidade · Grupo NTC" />
+<meta name="twitter:description" content="Tratamento de dados pessoais no Grupo NTC: bases legais, direitos do titular, DPO e governança institucional." />
+
+<title>Política de Privacidade · Grupo NTC</title>
+
+<!--
+  ===========================================================================
+  GRUPO NTC · PORTAL · POLÍTICA DE PRIVACIDADE · v1.0 · 14/05/2026
+  ---------------------------------------------------------------------------
+  Sprint E · Página legal institucional.
+  Versão técnica para revisão jurídica e validação do DPO antes de publicação.
+
+  Versão inaugural — paridade Soberana 2026 com Home v2.6, Agenda v2,
+  Contato v1.3, Corpo Docente v2.3, Soluções v1.1, EventOn v1.1.
+
+  data-cms-link="legal-privacidade" — destrava o link correspondente do footer
+  legal das 17 páginas-mãe do portal Grupo NTC.
+
+  Conteúdo jurídico em revisão pelo Encarregado de Tratamento de Dados
+  (DPO) do Instituto NTC do Brasil. Toda alteração editorial substantiva
+  deve ser revisada pelo Encarregado (DPO) e, quando pertinente, pelo
+  jurídico externo, antes de publicação.
+  ===========================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+/* =============================================================
+   SISTEMA SOBERANA 2026 · TOKENS · canon idêntico EventOn/Soluções
+   ============================================================= */
+:root {
+  --oxford:        #11365E;
+  --oxford-90:     rgba(17, 54, 94, 0.92);
+  --oxford-70:     rgba(17, 54, 94, 0.72);
+  --oxford-10:     rgba(17, 54, 94, 0.10);
+  --cardeal:       #8E2A1C;
+  --cardeal-10:    rgba(142, 42, 28, 0.10);
+  --oliva:         #4A6A1F;
+  --oliva-10:      rgba(74, 106, 31, 0.10);
+  --dourado:       #B8952E;
+  --dourado-soft:  #d6b350;
+  --noite:         #0B1726;
+  --pergaminho:    #F4F1E8;
+  --pergaminho-80: rgba(244, 241, 232, 0.80);
+  --pergaminho-50: rgba(244, 241, 232, 0.50);
+  --ivory:         #ECE7D8;
+  --tinta:         #14202E;
+  --grafite:       #3A4050;
+  --prata:         #A8ACB6;
+  --prata-30:      rgba(168, 172, 182, 0.32);
+  --prata-15:      rgba(168, 172, 182, 0.15);
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans:  'Barlow', system-ui, -apple-system, sans-serif;
+  --font-cond:  'Barlow Condensed', 'Barlow', sans-serif;
+
+  --space-1: 8px;  --space-2: 16px; --space-3: 24px; --space-4: 32px;
+  --space-5: 48px; --space-6: 64px; --space-7: 96px; --space-8: 128px;
+
+  --shadow-soft:   0 1px 2px rgba(20, 32, 46, 0.04), 0 2px 8px rgba(20, 32, 46, 0.04);
+  --shadow-medium: 0 2px 4px rgba(20, 32, 46, 0.06), 0 8px 24px rgba(20, 32, 46, 0.10);
+  --shadow-strong: 0 4px 12px rgba(20, 32, 46, 0.12), 0 16px 48px rgba(20, 32, 46, 0.14);
+
+  --container-max: 1280px;
+  --header-h: 88px;
+  --t-fast:   160ms ease-out;
+  --t-medium: 240ms ease-out;
+  --t-slow:   600ms ease-out;
+}
+
+/* RESET + tipografia + botões canon idêntico */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-padding-top: calc(var(--header-h) + 56px); }
+body { margin: 0; font-family: var(--font-sans); font-weight: 400; font-size: 17px; line-height: 1.65; color: var(--grafite); background: var(--pergaminho); text-rendering: optimizeLegibility; }
+body.no-scroll { overflow: hidden; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; transition: color var(--t-fast); }
+button { font-family: inherit; cursor: pointer; }
+ul { list-style: none; padding: 0; margin: 0; }
+:focus-visible { outline: 2px solid var(--dourado); outline-offset: 2px; border-radius: 2px; }
+
+.skip-link { position: absolute; left: -9999px; top: 0; padding: 12px 20px; background: var(--tinta); color: var(--pergaminho); font-family: var(--font-cond); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-size: 13px; z-index: 9999; }
+.skip-link:focus { left: 0; }
+
+h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0; line-height: 1.12; letter-spacing: -0.3px; }
+.eyebrow { font-family: var(--font-cond); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--oxford); margin: 0 0 var(--space-2); }
+.eyebrow.gold  { color: var(--dourado); }
+.eyebrow.light { color: var(--pergaminho-80); }
+.lede { font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 24px; line-height: 1.4; color: var(--tinta); }
+
+.container { width: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 32px; }
+@media (max-width: 1199px) { .container { padding: 0 24px; } }
+@media (max-width: 767px)  { .container { padding: 0 16px; } }
+
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 26px; font-family: var(--font-sans); font-weight: 600; font-size: 13.5px; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 4px; border: 1.5px solid transparent; transition: all var(--t-medium); cursor: pointer; white-space: nowrap; }
+.btn--primary    { background: var(--oxford); color: var(--pergaminho); border-color: var(--oxford); }
+.btn--primary:hover { background: var(--noite); border-color: var(--noite); transform: translateY(-1px); box-shadow: var(--shadow-soft); }
+.btn--gold       { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+.btn--gold:hover { background: var(--noite); color: var(--dourado-soft); border-color: var(--dourado); }
+.btn--secondary  { background: transparent; color: var(--oxford); border-color: var(--oxford); }
+.btn--secondary:hover { background: var(--oxford); color: var(--pergaminho); }
+.btn--ghost-light{ background: transparent; color: var(--pergaminho); border-color: var(--pergaminho-80); }
+.btn--ghost-light:hover { background: var(--pergaminho); color: var(--noite); border-color: var(--pergaminho); }
+.btn--participant { background: var(--noite); color: var(--dourado); border-color: var(--noite); }
+.btn--participant:hover { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+.btn--mini { padding: 10px 16px; font-size: 12px; }
+.btn-arrow { display: inline-block; transition: transform var(--t-medium); }
+.btn:hover .btn-arrow { transform: translateX(3px); }
+
+/* HEADER STICKY + MEGA MENU + DRAWER · canon */
+.site-header { position: sticky; top: 0; z-index: 100; background: rgba(244, 241, 232, 0.94); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid var(--prata-30); height: var(--header-h); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; gap: var(--space-3); }
+.brand { display: flex; align-items: center; }
+.brand img { height: 56px; width: auto; }
+@media (max-width: 599px) { .brand img { height: 44px; } }
+
+.nav-primary { display: flex; align-items: center; gap: 0; }
+.nav-item { position: relative; padding: 30px 14px; font-family: var(--font-cond); font-weight: 500; font-size: 13.5px; color: var(--tinta); text-transform: uppercase; letter-spacing: 1.1px; cursor: pointer; transition: color var(--t-fast); background: transparent; border: 0; }
+.nav-item:hover { color: var(--oxford); }
+.nav-item.is-current { color: var(--oxford); }
+.nav-item.is-current::after { content: ''; position: absolute; left: 14px; right: 14px; bottom: 22px; height: 2px; background: var(--dourado); }
+.nav-item.has-mega::after { content: ''; display: inline-block; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-2px, -2px); margin-left: 7px; opacity: 0.55; }
+.header-cta { display: flex; align-items: center; gap: 10px; }
+
+.mega { position: absolute; top: calc(var(--header-h) - 1px); left: 0; right: 0; background: var(--pergaminho); border-top: 1px solid var(--prata-30); border-bottom: 3px solid var(--oxford); box-shadow: var(--shadow-medium); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity var(--t-medium), transform var(--t-medium), visibility var(--t-medium); z-index: 99; }
+.mega.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+.mega-inner { display: grid; gap: var(--space-5); padding: var(--space-5) 0 var(--space-6); }
+.mega-col h4 { font-family: var(--font-cond); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 2px; color: var(--dourado); margin: 0 0 var(--space-3); padding-bottom: var(--space-2); border-bottom: 1px solid var(--prata-30); }
+.mega-list { display: grid; gap: 12px; }
+.mega-list a { display: block; padding: 6px 0; color: var(--tinta); border-left: 0 solid var(--oxford); padding-left: 0; transition: padding-left var(--t-medium), border-left-width var(--t-medium), color var(--t-fast); }
+.mega-list a strong { font-family: var(--font-serif); font-weight: 600; font-size: 18px; color: var(--tinta); display: block; }
+.mega-list a span { font-family: var(--font-sans); font-size: 12.5px; color: var(--grafite); display: block; line-height: 1.4; margin-top: 2px; }
+.mega-list a:hover { border-left-width: 3px; padding-left: 12px; color: var(--oxford); }
+.mega-list a:hover strong { color: var(--oxford); }
+#mega-programas .mega-inner { grid-template-columns: 1.1fr 1fr 1fr; }
+
+.mobile-toggle { display: none; background: none; border: 0; padding: 12px; color: var(--tinta); cursor: pointer; align-self: center; }
+.mobile-toggle span { display: block; width: 22px; height: 2px; background: currentColor; margin: 5px 0; transition: var(--t-medium); }
+@media (max-width: 1199px) { .nav-primary { display: none; } .header-cta .btn:not(.btn--participant) { display: none; } .mobile-toggle { display: block; } }
+@media (max-width: 599px) { .header-cta .btn--participant { display: none; } }
+
+.mobile-drawer { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 420px; background: var(--pergaminho); z-index: 200; transform: translateX(100%); transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1); display: flex; flex-direction: column; box-shadow: -8px 0 32px rgba(20, 32, 46, 0.18); overflow-y: auto; }
+.mobile-drawer.is-open { transform: translateX(0); }
+.mobile-drawer-backdrop { position: fixed; inset: 0; background: rgba(11, 23, 38, 0.6); opacity: 0; visibility: hidden; transition: opacity 320ms, visibility 320ms; z-index: 199; }
+.mobile-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+.drawer-head { display: flex; justify-content: space-between; align-items: center; padding: 22px 24px; border-bottom: 1px solid var(--prata-30); }
+.drawer-head img { height: 44px; width: auto; }
+.drawer-close { background: none; border: 0; padding: 8px; cursor: pointer; font-family: var(--font-sans); font-size: 28px; color: var(--tinta); line-height: 1; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+.drawer-nav { padding: var(--space-3) 0; flex: 1; }
+.drawer-item { display: block; width: 100%; text-align: left; padding: 18px 24px; border: 0; background: transparent; font-family: var(--font-serif); font-weight: 600; font-size: 22px; color: var(--tinta); cursor: pointer; border-bottom: 1px solid var(--prata-15); transition: background var(--t-fast); }
+.drawer-item:hover, .drawer-item:focus { background: rgba(184, 149, 46, 0.08); }
+.drawer-item.is-current { color: var(--oxford); }
+.drawer-item.has-sub::after { content: '+'; float: right; color: var(--dourado); font-weight: 400; transition: transform var(--t-medium); }
+.drawer-item.has-sub.is-expanded::after { content: '−'; }
+.drawer-sub { display: none; background: rgba(168, 172, 182, 0.08); padding: 8px 0; }
+.drawer-sub.is-open { display: block; }
+.drawer-sub a { display: block; padding: 12px 24px 12px 36px; font-family: var(--font-sans); font-size: 15px; color: var(--grafite); border-bottom: 1px solid var(--prata-15); }
+.drawer-sub a:hover { color: var(--oxford); background: rgba(184, 149, 46, 0.05); }
+.drawer-sub a strong { font-family: var(--font-serif); font-weight: 600; font-size: 16px; color: var(--tinta); display: block; }
+.drawer-sub a span { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--prata); }
+.drawer-cta { padding: var(--space-3) 24px var(--space-4); display: grid; gap: 10px; border-top: 1px solid var(--prata-30); }
+.drawer-cta .btn { width: 100%; justify-content: center; padding: 14px; }
+
+/* HERO INSTITUCIONAL SLIM · padrão páginas-mãe */
+.hero-page { position: relative; min-height: 420px; display: flex; align-items: center; background: var(--noite); color: var(--pergaminho); overflow: hidden; padding: var(--space-6) 0; }
+.hero-page-bg { position: absolute; inset: 0; z-index: 0; background-image: linear-gradient(125deg, rgba(11, 23, 38, 0.96) 0%, rgba(17, 54, 94, 0.78) 55%, rgba(11, 23, 38, 0.78) 100%); }
+.hero-page::before { content: ''; position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse at top right, rgba(184, 149, 46, 0.18) 0%, transparent 55%), radial-gradient(ellipse at bottom left, rgba(17, 54, 94, 0.32) 0%, transparent 60%); pointer-events: none; }
+.hero-page::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background-image: linear-gradient(90deg, rgba(168, 172, 182, 0.05) 1px, transparent 1px); background-size: 80px 100%; }
+.hero-page-content { position: relative; z-index: 2; max-width: 920px; }
+.hero-page h1 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.06; letter-spacing: -0.4px; color: var(--pergaminho); margin: var(--space-3) 0 var(--space-3); }
+.hero-page h1 .accent { color: var(--dourado-soft); font-style: italic; font-weight: 500; }
+.hero-page-sub { font-family: var(--font-sans); font-weight: 400; font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6; color: var(--pergaminho-80); max-width: 760px; margin: 0 0 var(--space-3); }
+.hero-meta { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3); font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--pergaminho-80); }
+.hero-meta strong { color: var(--dourado-soft); font-weight: 600; }
+
+.crumb { font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--pergaminho-80); display: flex; gap: 8px; align-items: center; }
+.crumb a { color: var(--pergaminho-80); transition: color var(--t-fast); }
+.crumb a:hover { color: var(--dourado-soft); }
+.crumb span.sep::before { content: '/'; opacity: 0.5; }
+.crumb span.current { color: var(--dourado-soft); }
+
+/* BARRA INTERNA STICKY · sumário da página */
+.legal-subnav { background: var(--pergaminho); border-bottom: 1px solid var(--prata-30); position: sticky; top: var(--header-h); z-index: 50; box-shadow: 0 2px 8px rgba(20, 32, 46, 0.04); }
+.legal-subnav-inner { display: flex; align-items: center; justify-content: center; gap: var(--space-4); padding: 14px 32px; flex-wrap: wrap; }
+@media (max-width: 767px) { .legal-subnav-inner { gap: var(--space-2); padding: 12px 16px; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; } }
+.legal-subnav a { font-family: var(--font-cond); font-weight: 600; font-size: 12.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--grafite); padding: 4px 2px; border-bottom: 2px solid transparent; transition: color var(--t-fast), border-bottom-color var(--t-fast); white-space: nowrap; }
+.legal-subnav a:hover { color: var(--oxford); border-bottom-color: var(--dourado); }
+.legal-subnav a.is-active { color: var(--oxford); border-bottom-color: var(--dourado); }
+.legal-subnav-sep { color: var(--prata-30); user-select: none; font-size: 12px; }
+@media (max-width: 767px) { .legal-subnav-sep { display: none; } }
+
+/* LAYOUT DUAS COLUNAS · sumário + conteúdo (padrão Soluções/Corpo Docente) */
+.legal-shell { background: var(--pergaminho); padding: var(--space-6) 0 var(--space-7); }
+.legal-grid { display: grid; grid-template-columns: 280px 1fr; gap: var(--space-6); align-items: start; }
+@media (max-width: 1099px) { .legal-grid { grid-template-columns: 1fr; gap: var(--space-4); } }
+
+.legal-aside { position: sticky; top: calc(var(--header-h) + 70px); align-self: start; }
+@media (max-width: 1099px) { .legal-aside { position: static; } }
+.legal-aside h4 { font-family: var(--font-cond); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 2px; color: var(--dourado); margin: 0 0 var(--space-2); padding-bottom: var(--space-2); border-bottom: 1px solid var(--prata-30); }
+.legal-aside ul { display: grid; gap: 6px; }
+.legal-aside li { counter-increment: secn; }
+.legal-aside ol { list-style: none; counter-reset: secn; padding: 0; margin: 0; display: grid; gap: 6px; }
+.legal-aside ol li a { display: flex; align-items: baseline; gap: 10px; font-family: var(--font-sans); font-size: 14px; color: var(--grafite); padding: 6px 0; line-height: 1.4; transition: color var(--t-fast); border-bottom: 1px dashed transparent; }
+.legal-aside ol li a::before { content: counter(secn, decimal-leading-zero); font-family: var(--font-cond); font-weight: 600; font-size: 11px; color: var(--dourado); letter-spacing: 1.2px; min-width: 22px; }
+.legal-aside ol li a:hover { color: var(--oxford); }
+.legal-aside ol li a.is-active { color: var(--oxford); border-bottom-color: var(--dourado); }
+.legal-aside-foot { margin-top: var(--space-3); padding: var(--space-2) var(--space-3); background: var(--ivory); border-left: 3px solid var(--dourado); font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--grafite); line-height: 1.6; }
+.legal-aside-foot strong { display: block; color: var(--oxford); font-size: 12px; }
+
+/* CORPO DAS SEÇÕES LEGAIS */
+.legal-content { max-width: 820px; }
+.legal-section { padding-top: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--prata-30); }
+.legal-section:first-of-type { padding-top: 0; }
+.legal-section:last-of-type { border-bottom: 0; }
+.legal-section .secn-num { font-family: var(--font-cond); font-weight: 600; font-size: 11.5px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--dourado); margin-bottom: var(--space-2); display: block; }
+.legal-section h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(24px, 2.6vw, 32px); color: var(--tinta); line-height: 1.18; margin: 0 0 var(--space-3); letter-spacing: -0.3px; }
+.legal-section h2 em { font-style: italic; color: var(--dourado); font-weight: 500; }
+.legal-section h3 { font-family: var(--font-serif); font-weight: 600; font-size: 20px; color: var(--oxford); line-height: 1.25; margin: var(--space-4) 0 var(--space-2); letter-spacing: -0.1px; }
+.legal-section h4 { font-family: var(--font-cond); font-weight: 600; font-size: 13px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--grafite); margin: var(--space-3) 0 var(--space-1); }
+.legal-section p { font-size: 15.5px; line-height: 1.7; color: var(--grafite); margin: 0 0 var(--space-2); }
+.legal-section ul { margin: var(--space-1) 0 var(--space-3); padding: 0; display: grid; gap: 8px; }
+.legal-section ul li { position: relative; padding-left: 22px; font-size: 15.5px; line-height: 1.65; color: var(--grafite); }
+.legal-section ul li::before { content: ''; position: absolute; left: 4px; top: 11px; width: 6px; height: 6px; background: var(--dourado); }
+.legal-section ol.numbered { list-style: none; counter-reset: olcount; padding: 0; margin: var(--space-2) 0 var(--space-3); display: grid; gap: 10px; }
+.legal-section ol.numbered li { counter-increment: olcount; position: relative; padding-left: 44px; font-size: 15.5px; line-height: 1.65; color: var(--grafite); }
+.legal-section ol.numbered li::before { content: counter(olcount, decimal-leading-zero); position: absolute; left: 0; top: 0; font-family: var(--font-cond); font-weight: 700; font-size: 13px; color: var(--dourado); border: 1px solid var(--dourado); padding: 1px 6px; letter-spacing: 1px; }
+
+/* CALLOUTS · destaque editorial */
+.legal-callout { background: var(--ivory); border-left: 4px solid var(--dourado); padding: var(--space-3) var(--space-4); margin: var(--space-3) 0; }
+.legal-callout .callout-label { font-family: var(--font-cond); font-weight: 600; font-size: 11px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--oxford); margin-bottom: 6px; display: block; }
+.legal-callout p { font-family: var(--font-serif); font-style: italic; font-size: 17px; line-height: 1.55; color: var(--tinta); margin: 0; }
+
+/* TABELA EDITORIAL · estrutura institucional */
+.legal-table { width: 100%; border-collapse: collapse; margin: var(--space-3) 0 var(--space-3); font-size: 14.5px; }
+.legal-table thead th { background: var(--oxford); color: var(--pergaminho); padding: 14px var(--space-2); text-align: left; font-family: var(--font-cond); font-weight: 600; font-size: 11.5px; letter-spacing: 1.6px; text-transform: uppercase; }
+.legal-table tbody td { padding: 14px var(--space-2); border-bottom: 1px solid var(--prata-30); color: var(--grafite); line-height: 1.55; vertical-align: top; }
+.legal-table tbody tr:nth-child(even) td { background: var(--ivory); }
+.legal-table tbody td strong { color: var(--tinta); font-weight: 600; }
+.legal-table tbody td code { font-family: 'SF Mono', 'Monaco', Consolas, monospace; font-size: 13px; background: rgba(17, 54, 94, 0.06); padding: 1px 5px; border-radius: 2px; color: var(--oxford); }
+
+/* MOLDURA DPO · card institucional */
+.dpo-card { background: var(--noite); color: var(--pergaminho); padding: var(--space-4) var(--space-4); margin: var(--space-4) 0; position: relative; overflow: hidden; border-top: 3px solid var(--dourado); }
+.dpo-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 10% 90%, rgba(184, 149, 46, 0.10) 0%, transparent 50%), radial-gradient(circle at 90% 10%, rgba(17, 54, 94, 0.30) 0%, transparent 60%); pointer-events: none; }
+.dpo-card-inner { position: relative; z-index: 1; display: grid; grid-template-columns: auto 1fr; gap: var(--space-3); align-items: center; }
+@media (max-width: 767px) { .dpo-card-inner { grid-template-columns: 1fr; } }
+.dpo-icon { width: 56px; height: 56px; border: 2px solid var(--dourado); display: flex; align-items: center; justify-content: center; color: var(--dourado); }
+.dpo-icon svg { width: 28px; height: 28px; }
+.dpo-card h3 { font-family: var(--font-serif); font-weight: 600; font-size: 22px; color: var(--pergaminho); margin: 0 0 6px; line-height: 1.2; }
+.dpo-card p { font-size: 14.5px; line-height: 1.55; color: var(--pergaminho-80); margin: 0; }
+.dpo-card a { color: var(--dourado-soft); border-bottom: 1px solid rgba(214, 179, 80, 0.4); }
+.dpo-card a:hover { color: var(--pergaminho); border-bottom-color: var(--pergaminho); }
+
+/* FAIXA OXFORD · cabeçalho cerimonial intermediário */
+.legal-faixa-oxford { background: var(--oxford); color: var(--pergaminho); padding: var(--space-6) 0; position: relative; overflow: hidden; }
+.legal-faixa-oxford::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 80% 20%, rgba(184, 149, 46, 0.18) 0%, transparent 55%); pointer-events: none; }
+.legal-faixa-oxford-inner { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; text-align: center; }
+.legal-faixa-oxford h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(26px, 3vw, 38px); color: var(--pergaminho); line-height: 1.12; margin: var(--space-2) 0 var(--space-3); }
+.legal-faixa-oxford h2 em { font-style: italic; color: var(--dourado-soft); font-weight: 500; }
+.legal-faixa-oxford p { font-size: 17px; line-height: 1.6; color: var(--pergaminho-80); max-width: 760px; margin: 0 auto; }
+
+/* CTA INSTITUCIONAL FINAL · padrão página-mãe */
+.legal-cta-final { background: var(--noite); color: var(--pergaminho); padding: var(--space-6) 0; position: relative; overflow: hidden; }
+.legal-cta-final::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 10% 90%, rgba(184, 149, 46, 0.14) 0%, transparent 50%), radial-gradient(circle at 90% 10%, rgba(17, 54, 94, 0.30) 0%, transparent 60%); pointer-events: none; }
+.legal-cta-final-inner { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; text-align: center; }
+.legal-cta-final h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.1; color: var(--pergaminho); margin: var(--space-2) 0 var(--space-3); }
+.legal-cta-final h2 em { font-style: italic; color: var(--dourado-soft); font-weight: 500; }
+.legal-cta-final p { font-size: 17px; color: var(--pergaminho-80); margin: 0 auto var(--space-4); max-width: 720px; line-height: 1.6; }
+.legal-cta-final-actions { display: inline-flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
+
+/* CONTROLES DE COOKIE · botões de preferência (apenas página cookies) */
+.cookie-prefs { background: var(--pergaminho); border: 1px solid var(--prata-30); border-top: 3px solid var(--oxford); padding: var(--space-4); margin: var(--space-3) 0; }
+.cookie-prefs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); margin-top: var(--space-3); }
+@media (max-width: 767px) { .cookie-prefs-grid { grid-template-columns: 1fr; } }
+.cookie-pref { display: flex; align-items: flex-start; gap: var(--space-2); padding: 14px; background: var(--ivory); border-left: 3px solid var(--oxford); }
+.cookie-pref.is-locked { border-left-color: var(--grafite); opacity: 0.78; }
+.cookie-pref-info h4 { font-family: var(--font-serif); font-weight: 600; font-size: 17px; color: var(--tinta); margin: 0 0 4px; }
+.cookie-pref-info p { font-size: 13.5px; line-height: 1.5; color: var(--grafite); margin: 0; }
+.cookie-toggle { position: relative; flex-shrink: 0; width: 44px; height: 24px; background: var(--prata); border-radius: 12px; cursor: pointer; transition: background var(--t-medium); border: 0; padding: 0; }
+.cookie-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: var(--pergaminho); border-radius: 50%; transition: transform var(--t-medium); }
+.cookie-toggle[aria-pressed="true"] { background: var(--dourado); }
+.cookie-toggle[aria-pressed="true"]::after { transform: translateX(20px); }
+.cookie-toggle[disabled] { background: var(--grafite); cursor: not-allowed; opacity: 0.7; }
+.cookie-prefs-actions { margin-top: var(--space-3); display: flex; gap: var(--space-2); flex-wrap: wrap; }
+
+/* MAPA DO SITE · grid de categorias */
+.sitemap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); margin: var(--space-3) 0; }
+@media (max-width: 767px) { .sitemap-grid { grid-template-columns: 1fr; } }
+.sitemap-col { background: var(--pergaminho); border-top: 3px solid var(--oxford); border-left: 1px solid var(--prata-30); border-right: 1px solid var(--prata-30); border-bottom: 1px solid var(--prata-30); padding: var(--space-3) var(--space-3) var(--space-3); position: relative; }
+.sitemap-col-num { position: absolute; top: -14px; left: var(--space-3); background: var(--noite); color: var(--dourado); font-family: var(--font-cond); font-weight: 700; font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; padding: 5px 12px; }
+.sitemap-col h3 { font-family: var(--font-serif); font-weight: 600; font-size: 22px; color: var(--oxford); margin: 0 0 var(--space-2); line-height: 1.2; }
+.sitemap-col h3 small { display: block; font-family: var(--font-cond); font-weight: 500; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--grafite); margin-top: 4px; }
+.sitemap-col ul { display: grid; gap: 8px; padding: 0; }
+.sitemap-col li { font-size: 14.5px; line-height: 1.5; padding-left: 0; }
+.sitemap-col li::before { display: none; }
+.sitemap-col li a { display: block; padding: 6px 0; border-bottom: 1px dashed var(--prata-30); color: var(--grafite); transition: color var(--t-fast), padding-left var(--t-medium); }
+.sitemap-col li a:hover { color: var(--oxford); padding-left: 8px; }
+.sitemap-col li a strong { color: var(--tinta); font-weight: 600; }
+.sitemap-col li a span { display: block; font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--prata); margin-top: 2px; }
+
+/* FOOTER · CANON SOBERANA */
+.site-footer { background: var(--noite); color: var(--pergaminho-80); padding: var(--space-6) 0 var(--space-4); border-top: 1px solid rgba(244, 241, 232, 0.10); }
+.footer-top { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: var(--space-5); padding-bottom: var(--space-5); border-bottom: 1px solid rgba(244, 241, 232, 0.10); }
+@media (max-width: 899px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px) { .footer-top { grid-template-columns: 1fr; } }
+.footer-brand img { height: 60px; width: auto; }
+.footer-tagline { font-family: var(--font-serif); font-style: italic; font-weight: 500; color: var(--dourado); font-size: 17px; margin: var(--space-3) 0 var(--space-2); display: block; }
+.footer-address { font-size: 13px; line-height: 1.55; color: var(--pergaminho-80); margin: 0; }
+.footer-address strong { color: var(--pergaminho); font-weight: 600; }
+.footer-col h5 { font-family: var(--font-cond); font-weight: 600; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--dourado); margin: 0 0 var(--space-2); }
+.footer-col ul { display: grid; gap: 10px; }
+.footer-col a { font-size: 14px; color: var(--pergaminho-80); transition: color var(--t-fast); }
+.footer-col a:hover { color: var(--dourado); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); flex-wrap: wrap; gap: var(--space-2); }
+.footer-badge { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--prata); }
+.footer-legal { display: flex; gap: var(--space-3); flex-wrap: wrap; font-family: var(--font-cond); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+.footer-legal a { color: var(--prata); }
+.footer-legal a:hover { color: var(--pergaminho); }
+.footer-legal a[aria-current="page"] { color: var(--dourado); }
+
+.fade-in { opacity: 0; transform: translateY(12px); transition: opacity 800ms ease-out, transform 800ms ease-out; }
+.fade-in.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } .fade-in { opacity: 1; transform: none; } }
+</style>
+<!-- NTC_COOKIE_CONSENT_CSS_BEGIN -->
+<link rel="stylesheet" href="./assets/cookie_consent.css" />
+<!-- NTC_COOKIE_CONSENT_CSS_END -->
+</head>
+<body>
+<a class="skip-link" href="#main">Pular para o conteúdo principal</a>
+
+<header class="site-header" id="topo">
+  <div class="container header-inner">
+    <a class="brand" href="./02_Prototipo_Home_GrupoNTC_v2_6.html" aria-label="Grupo NTC — Página inicial">
+      <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    </a>
+
+    <nav class="nav-primary" aria-label="Navegação principal">
+      <a class="nav-item" href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a>
+      <button class="nav-item has-mega" data-mega="programas" aria-haspopup="true" aria-expanded="false">Programas</button>
+      <button class="nav-item has-mega" data-mega="capacitacao" aria-haspopup="true" aria-expanded="false">Capacitação</button>
+      <button class="nav-item has-mega" data-mega="solucoes" aria-haspopup="true" aria-expanded="false">Soluções</button>
+      <a class="nav-item" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#conteudos">Conteúdos</a>
+      <a class="nav-item" href="./12_Pagina_Contato_v1.html">Contato</a>
+    </nav>
+
+    <div class="header-cta">
+      <a class="btn btn--secondary btn--mini" href="./12_Pagina_Contato_v1.html#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a>
+      <a class="btn btn--participant btn--mini" href="./29_Pagina_Area_Participante_v1.html" data-cms-link="area-participante">Área do Participante</a>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobileDrawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mega menu: Programas -->
+  <div class="mega" id="mega-programas" data-mega-id="programas">
+    <div class="container">
+      <div class="mega-inner">
+        <div class="mega-col">
+          <h4>NTC Educação · 9 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./16_Pagina_Programa_EDUTEC_v1.html" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>Educação Digital, Inovação e Tecnologias para Redes Públicas</span></a></li>
+            <li><a href="./15_Pagina_Programa_PEAR_v1.html" data-cms-link="programa-PEAR"><strong>PEAR</strong><span>Alfabetização de Alta Performance e Recomposição da Aprendizagem</span></a></li>
+            <li><a href="./19_Pagina_Programa_PEI_v1.html" data-cms-link="programa-PEI"><strong>PEI</strong><span>Educação Integral — Gestão, Currículo e Resultados</span></a></li>
+            <li><a href="./21_Pagina_Programa_PROGIR_v1.html" data-cms-link="programa-PROGIR"><strong>PROGIR</strong><span>Gestão da Inclusão com Resultado</span></a></li>
+            <li><a href="./20_Pagina_Programa_PROGE_v1.html" data-cms-link="programa-PROGE"><strong>PROGE</strong><span>Gestão Escolar, Coordenação Pedagógica e Resultados</span></a></li>
+            <li><a href="./13_Pagina_Programa_EGIDE_v1.html" data-cms-link="programa-EGIDE"><strong>EGIDE</strong><span>IA, Dados e Governança da Transformação Digital</span></a></li>
+            <li><a href="./23_Pagina_Programa_VIVAESCOLA_v1.html" data-cms-link="programa-VIVAESCOLA"><strong>VIVAESCOLA</strong><span>Convivência, Permanência, Bem-Estar e Proteção Integral</span></a></li>
+            <li><a href="./22_Pagina_Programa_PINEI_v1.html" data-cms-link="programa-PINEI"><strong>PINEI</strong><span>Primeira Infância e Educação Infantil</span></a></li>
+            <li><a href="./24_Pagina_Programa_FUTURA_v1.html" data-cms-link="programa-FUTURA"><strong>FUTURA</strong><span>Ensino Médio, Itinerários de Futuro, Empregabilidade</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Gestão Pública · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./10_Pagina_Programa_LIDERA_v1.html" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>Liderança, Direção Estratégica e Resultados na Administração</span></a></li>
+            <li><a href="./06_Pagina_Programa_AGIP_v1.html" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>Governança, Integridade e Performance nas Contratações Públicas</span></a></li>
+            <li><a href="./11_Pagina_Programa_SIGA_v1.html" data-cms-link="programa-SIGA"><strong>SIGA</strong><span>Soluções Inteligentes de Governança e Administração</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Saúde · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./14_Pagina_Programa_SIGS_v1.html" data-cms-link="programa-SIGS"><strong>SIGS</strong><span>Sistema Integrado de Gestão em Saúde</span></a></li>
+            <li><a href="./17_Pagina_Programa_PROAPS_v1.html" data-cms-link="programa-PROAPS"><strong>PROAPS+</strong><span>Alta Performance na Atenção Primária e Redes de Cuidado</span></a></li>
+            <li><a href="./18_Pagina_Programa_PROSUS_v1.html" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>Direção Institucional em Saúde Pública</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Capacitação -->
+  <div class="mega" id="mega-capacitacao" data-mega-id="capacitacao">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Agenda e formatos</h4>
+          <ul class="mega-list">
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos no calendário</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-online"><strong>Eventos online</strong><span>Transmissão ao vivo, replay e certificado</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-presenciais"><strong>Eventos presenciais</strong><span>Encontros executivos em capitais estratégicas</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-hibridos"><strong>Eventos híbridos</strong><span>Combinação de presença e plataforma digital</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Plataforma e curadoria</h4>
+          <ul class="mega-list">
+            <li><a href="./27_Pagina_EventOn_v1.html" data-cms-link="eventon-home"><strong>EventOn</strong><span>Plataforma digital institucional do Grupo NTC</span></a></li>
+            <li><a href="./29_Pagina_Area_Participante_v1.html" data-cms-link="area-participante"><strong>Área do Participante</strong><span>Histórico de eventos, materiais e certificados</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="proximas-turmas"><strong>Próximas turmas</strong><span>Turmas em formação e inscrições antecipadas</span></a></li>
+            <li><a href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica e especialistas das 3 áreas</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Soluções -->
+  <div class="mega" id="mega-solucoes" data-mega-id="solucoes">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Verticais</h4>
+          <ul class="mega-list">
+            <li><a href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>Soluções estruturadas para redes públicas de ensino</span></a></li>
+            <li><a href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>Governança, integridade e performance na Administração</span></a></li>
+            <li><a href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>Inteligência institucional aplicada ao SUS</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Modelos de contratação</h4>
+          <ul class="mega-list">
+            <li><a href="./26_Pagina_Solucoes_v1.html#in-company" data-cms-link="modelo-incompany"><strong>Soluções in company</strong><span>Programa entregue exclusivamente à instituição</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#turmas-fechadas" data-cms-link="modelo-fechada"><strong>Turmas fechadas</strong><span>Edição operacional dedicada à equipe contratante</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#sob-medida" data-cms-link="modelo-sobmedida"><strong>Soluções sob medida</strong><span>Customização profunda de ementas, módulos e formato</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#contratacao-institucional" data-cms-link="modelo-institucional"><strong>Contratação institucional</strong><span>Atendimento dedicado a órgãos públicos</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========================== MOBILE DRAWER ========================== -->
+<div class="mobile-drawer-backdrop" id="mobileBackdrop"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-label="Menu principal" aria-hidden="true">
+  <div class="drawer-head">
+    <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    <button class="drawer-close" id="drawerClose" aria-label="Fechar menu">×</button>
+  </div>
+  <nav class="drawer-nav" aria-label="Navegação móvel">
+    <a class="drawer-item" href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a>
+
+    <button class="drawer-item has-sub" data-sub="programas-mobile" aria-expanded="false">Programas</button>
+    <div class="drawer-sub" id="sub-programas-mobile">
+      <a href="./06_Pagina_Programa_AGIP_v1.html" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></a>
+      <a href="./10_Pagina_Programa_LIDERA_v1.html" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></a>
+      <a href="./16_Pagina_Programa_EDUTEC_v1.html" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>NTC Educação · Educação digital</span></a>
+      <a href="./18_Pagina_Programa_PROSUS_v1.html" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="ver-todos-programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></a>
+    </div>
+
+    <button class="drawer-item has-sub" data-sub="capacitacao-mobile" aria-expanded="false">Capacitação</button>
+    <div class="drawer-sub" id="sub-capacitacao-mobile">
+      <a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></a>
+      <a href="./27_Pagina_EventOn_v1.html" data-cms-link="eventon-home"><strong>EventOn</strong><span>Plataforma EventOn</span></a>
+      <a href="./29_Pagina_Area_Participante_v1.html" data-cms-link="area-participante"><strong>Área do Participante</strong><span>Materiais e certificados</span></a>
+      <a href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria das 3 áreas</span></a>
+    </div>
+
+    <button class="drawer-item has-sub" data-sub="solucoes-mobile" aria-expanded="false">Soluções</button>
+    <div class="drawer-sub" id="sub-solucoes-mobile">
+      <a href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>9 programas estratégicos</span></a>
+      <a href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>3 programas estratégicos</span></a>
+      <a href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>3 programas estratégicos</span></a>
+      <a href="./26_Pagina_Solucoes_v1.html" data-cms-link="pagina-solucoes"><strong>Modelos de contratação</strong><span>In company · turmas fechadas · sob medida</span></a>
+    </div>
+
+    <a class="drawer-item" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#conteudos">Conteúdos</a>
+    <a class="drawer-item" href="./12_Pagina_Contato_v1.html">Contato</a>
+  </nav>
+  <div class="drawer-cta">
+    <a class="btn btn--gold" href="./29_Pagina_Area_Participante_v1.html" data-cms-link="area-participante">Área do Participante</a>
+    <a class="btn btn--secondary" href="./12_Pagina_Contato_v1.html#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ========================== HERO INSTITUCIONAL ========================== -->
+<section class="hero-page" aria-label="Cabeçalho institucional · Política de Privacidade">
+  <div class="hero-page-bg" aria-hidden="true"></div>
+  <div class="container hero-page-content fade-in">
+    <nav class="crumb" aria-label="Você está em">
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html">Grupo NTC</a>
+      <span class="sep" aria-hidden="true"></span>
+      <a href="./34_Pagina_MapaDoSite_v1.html">Governança de dados</a>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="current">Política de Privacidade</span>
+    </nav>
+
+    <p class="eyebrow gold">Governança de dados · Grupo NTC · Edição 2026</p>
+    <h1>Política de Privacidade<span class="accent">.</span><br>O cuidado com os dados que confiam a nós.</h1>
+    <p class="hero-page-sub">Esta Política descreve, de forma transparente, quais dados pessoais o <strong style='color: var(--pergaminho);'>Instituto NTC do Brasil</strong> trata em seus canais, com que finalidades, sob quais bases legais, com quem podem ser compartilhados e como o titular exerce os direitos garantidos pela Lei Geral de Proteção de Dados.</p>
+    <div class="hero-meta"><span><strong>Vigência:</strong> 14/05/2026</span><span><strong>Base legal:</strong> Lei n.º 13.709/2018 (LGPD)</span><span><strong>Encarregado:</strong> dpo@institutontc.com.br</span></div>
+  </div>
+</section>
+
+<nav class="legal-subnav" aria-label="Navegação interna da página">
+  <div class="legal-subnav-inner">
+    <a href="#controlador">Quem somos · Controlador dos dados</a><span class="legal-subnav-sep" aria-hidden="true">·</span><a href="#escopo">Escopo desta Política</a><span class="legal-subnav-sep" aria-hidden="true">·</span><a href="#dados-coletados">Dados pessoais que tratamos</a><span class="legal-subnav-sep" aria-hidden="true">·</span><a href="#finalidades">Finalidades e bases legais</a><span class="legal-subnav-sep" aria-hidden="true">·</span><a href="#compartilhamento">Compartilhamento e operadores</a>
+  </div>
+</nav>
+
+<section class="legal-shell">
+  <div class="container">
+    <div class="legal-grid">
+
+    <aside class="legal-aside" aria-label="Sumário da página">
+      <h4>Sumário</h4>
+      <ol>
+        <li><a href="#controlador">Quem somos · Controlador dos dados</a></li>
+        <li><a href="#escopo">Escopo desta Política</a></li>
+        <li><a href="#dados-coletados">Dados pessoais que tratamos</a></li>
+        <li><a href="#finalidades">Finalidades e bases legais</a></li>
+        <li><a href="#compartilhamento">Compartilhamento e operadores</a></li>
+        <li><a href="#transferencia">Transferência internacional</a></li>
+        <li><a href="#retencao">Retenção e descarte</a></li>
+        <li><a href="#seguranca">Segurança da informação</a></li>
+        <li><a href="#direitos">Direitos do titular</a></li>
+        <li><a href="#encarregado">Encarregado (DPO) e canais</a></li>
+        <li><a href="#incidentes">Incidentes e ANPD</a></li>
+        <li><a href="#alteracoes">Atualizações e versões</a></li>
+      </ol>
+      <div class="legal-aside-foot">
+        <strong>Vigência</strong>
+        Revisada em 14/05/2026 pelo Encarregado de Tratamento de Dados (DPO) do Instituto NTC do Brasil.
+      </div>
+    </aside>
+
+      <div class="legal-content">
+
+<section id="controlador" class="legal-section">
+  <span class="secn-num">Seção 01</span>
+  <h2>Quem somos · <em>Controlador dos dados</em></h2>
+  <p>O <strong>Instituto NTC do Brasil</strong> (CNPJ 10.614.200/0001-98), com sede no SCS Quadra 9, Bloco C, Ed. Parque Cidade Corporate, Sala 1001, Asa Sul, Brasília – DF, CEP 70308-200, é o controlador dos dados pessoais tratados no âmbito desta Política. O Instituto opera as marcas <strong>Grupo NTC</strong>, <strong>NTC Educação</strong>, <strong>NTC Gestão Pública</strong>, <strong>NTC Saúde</strong> e a plataforma digital institucional <strong>EventOn</strong>.</p>
+  <p>Esta Política descreve, de forma transparente, quais dados pessoais são coletados em nossos canais digitais e formativos, com que finalidades, sob quais bases legais, com quem podem ser compartilhados, por quanto tempo são retidos e como o titular pode exercer os direitos assegurados pela <strong>Lei Geral de Proteção de Dados Pessoais — Lei n.º 13.709/2018 (LGPD)</strong>.</p>
+  <div class="legal-callout">
+    <span class="callout-label">Princípio editorial</span>
+    <p>Tratamos dados pessoais com a mesma responsabilidade institucional com que conduzimos a formação de servidores públicos — finalidade declarada, base legal explícita, mínima coleta necessária e ciclo de vida monitorado.</p>
+  </div>
+</section>
+
+<section id="escopo" class="legal-section">
+  <span class="secn-num">Seção 02</span>
+  <h2>Escopo desta <em>Política</em></h2>
+  <p>Esta Política aplica-se ao tratamento de dados pessoais realizado:</p>
+  <ul>
+    <li>nos sítios eletrônicos institucionais do Grupo NTC (<code>institutontc.com.br</code>, <code>grupontc.com.br</code> e subdomínios);</li>
+    <li>na Plataforma EventOn e na Área do Participante;</li>
+    <li>nos formulários de contato, inscrição, proposta institucional e inscrição em grupo;</li>
+    <li>nos eventos abertos, fechados, online, presenciais e híbridos coordenados pelo Instituto NTC do Brasil;</li>
+    <li>nas comunicações eletrônicas institucionais (e-mail, WhatsApp institucional e canais oficiais).</li>
+  </ul>
+  <p>Esta Política não disciplina o tratamento de dados realizado pelas instituições contratantes em suas próprias plataformas, sistemas internos ou bases de dados — sobre os quais o Grupo NTC atua, quando for o caso, como <strong>operador</strong>, conforme contrato de prestação de serviço e Termo de Cooperação Institucional.</p>
+</section>
+
+<section id="dados-coletados" class="legal-section">
+  <span class="secn-num">Seção 03</span>
+  <h2>Dados pessoais que <em>tratamos</em></h2>
+  <p>Coletamos apenas os dados estritamente necessários para o cumprimento da finalidade declarada em cada ponto de coleta. As categorias de dados, organizadas por contexto, são:</p>
+
+  <table class="legal-table">
+    <thead>
+      <tr><th>Categoria</th><th>Exemplos</th><th>Ponto de coleta</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Identificação</strong></td><td>Nome completo, CPF (apenas quando exigido pela emissão de certificado), e-mail institucional, telefone, cargo, instituição vinculada.</td><td>Formulários de inscrição, proposta, contato, EventOn.</td></tr>
+      <tr><td><strong>Profissional / vinculo institucional</strong></td><td>Órgão de atuação, esfera (federal/estadual/municipal), área (educação, gestão pública, saúde), nível de cargo.</td><td>Formulários institucionais e inscrição de equipe.</td></tr>
+      <tr><td><strong>Participação em formação</strong></td><td>Eventos inscritos, presença, conclusão modular, materiais acessados, certificados emitidos.</td><td>Plataforma EventOn · Área do Participante.</td></tr>
+      <tr><td><strong>Navegação e técnica</strong></td><td>Endereço IP, agente de usuário (browser), tipo de dispositivo, páginas acessadas, duração da sessão, referenciador (referrer).</td><td>Cookies analíticos (com consentimento prévio).</td></tr>
+      <tr><td><strong>Comunicação</strong></td><td>Conteúdo das mensagens enviadas espontaneamente pelo titular em formulários, e-mails ou WhatsApp institucional.</td><td>Canais de atendimento.</td></tr>
+    </tbody>
+  </table>
+
+  <p>O Grupo NTC <strong>não coleta dados pessoais sensíveis</strong> (origem racial ou étnica, convicção religiosa, opinião política, filiação sindical, dado referente à saúde ou à vida sexual, dado genético ou biométrico) salvo quando estritamente necessário e mediante consentimento específico e destacado — hipótese excepcional aplicável apenas a programas que envolvam pesquisa institucional autorizada, e sempre comunicada formalmente ao titular antes da coleta.</p>
+</section>
+
+<section id="finalidades" class="legal-section">
+  <span class="secn-num">Seção 04</span>
+  <h2>Finalidades e <em>bases legais</em></h2>
+  <p>Cada operação de tratamento é amparada em uma base legal específica do art. 7.º da LGPD, registrada no <strong>Registro de Operações de Tratamento (ROT)</strong> mantido pelo Encarregado de Dados:</p>
+
+  <table class="legal-table">
+    <thead>
+      <tr><th>Finalidade</th><th>Base legal · Art. 7.º LGPD</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Resposta a contato institucional, dúvida ou solicitação de proposta.</td><td>Art. 7.º, V — <strong>execução de procedimentos preliminares a contrato</strong>.</td></tr>
+      <tr><td>Inscrição em evento, controle de presença, emissão de certificado, gestão da Área do Participante.</td><td>Art. 7.º, V — <strong>execução de contrato</strong> firmado entre o Instituto NTC do Brasil e a instituição contratante ou o titular.</td></tr>
+      <tr><td>Atendimento a obrigações tributárias, contábeis e regulatórias (emissão de nota fiscal, escrituração).</td><td>Art. 7.º, II — <strong>cumprimento de obrigação legal ou regulatória</strong>.</td></tr>
+      <tr><td>Segurança da informação, prevenção a fraude e proteção do crédito.</td><td>Art. 7.º, IX — <strong>legítimo interesse</strong> do controlador, com teste de balanceamento documentado.</td></tr>
+      <tr><td>Análise estatística agregada, métricas de uso, melhoria contínua dos canais.</td><td>Art. 7.º, IX — <strong>legítimo interesse</strong>, ou Art. 7.º, I — <strong>consentimento</strong> (cookies analíticos).</td></tr>
+      <tr><td>Envio de comunicações editoriais (newsletter, agenda de eventos, conteúdos institucionais).</td><td>Art. 7.º, I — <strong>consentimento</strong>, revogável a qualquer tempo.</td></tr>
+      <tr><td>Atendimento à requisição de autoridade competente.</td><td>Art. 7.º, III — <strong>cumprimento de ordem legal regular</strong>.</td></tr>
+    </tbody>
+  </table>
+
+  <p>O consentimento, quando exigido, é colhido de forma destacada, livre, informada e inequívoca, e pode ser revogado pelo titular a qualquer momento, sem prejuízo da licitude do tratamento realizado antes da revogação.</p>
+</section>
+
+<section id="compartilhamento" class="legal-section">
+  <span class="secn-num">Seção 05</span>
+  <h2>Compartilhamento e <em>operadores</em></h2>
+  <p>O Grupo NTC <strong>não comercializa dados pessoais</strong>. O compartilhamento ocorre apenas com agentes estritamente necessários à execução das finalidades acima:</p>
+
+  <ul>
+    <li><strong>Operadores de tecnologia</strong> — provedores de hospedagem, e-mail transacional, infraestrutura de transmissão da Plataforma EventOn, plataforma de assinatura digital, plataforma de pagamentos — todos vinculados por contrato com cláusulas de proteção de dados conforme art. 39 da LGPD.</li>
+    <li><strong>Docentes e palestrantes</strong> — apenas os dados necessários para conferência da presença no momento da realização do evento, sem retenção posterior pelos docentes.</li>
+    <li><strong>Instituição contratante</strong> — quando a inscrição é feita por uma instituição pública contratante, esta recebe o relatório institucional de participação dos servidores indicados, na qualidade de controladora conjunta dos dados de seus próprios servidores.</li>
+    <li><strong>Autoridades competentes</strong> — mediante requisição formal e regular, no estrito limite da ordem recebida.</li>
+  </ul>
+  <p>Todos os operadores contratados pelo Instituto NTC do Brasil são submetidos a um <strong>processo prévio de due diligence de proteção de dados</strong>, incluindo análise contratual, avaliação de medidas técnicas e administrativas, e monitoramento periódico.</p>
+</section>
+
+<section id="transferencia" class="legal-section">
+  <span class="secn-num">Seção 06</span>
+  <h2>Transferência <em>internacional</em></h2>
+  <p>Determinados operadores de infraestrutura tecnológica utilizados pelo Instituto NTC do Brasil podem manter parte da operação em servidores localizados fora do território nacional. Quando isso ocorre, a transferência internacional é amparada em uma das hipóteses do art. 33 da LGPD — preferencialmente <strong>cláusulas contratuais específicas</strong> ou <strong>normas corporativas globais</strong> aprovadas pela Autoridade Nacional de Proteção de Dados (ANPD) quando disponíveis.</p>
+  <p>O titular pode, a qualquer tempo, solicitar ao DPO informações detalhadas sobre os países envolvidos, os fundamentos da transferência e as garantias adotadas para o seu caso específico.</p>
+</section>
+
+<section id="retencao" class="legal-section">
+  <span class="secn-num">Seção 07</span>
+  <h2>Retenção e <em>descarte</em></h2>
+  <p>Os dados pessoais são retidos apenas pelo tempo estritamente necessário ao cumprimento da finalidade que motivou sua coleta, observados os prazos legais aplicáveis:</p>
+  <ul>
+    <li><strong>Dados de inscrição e certificação:</strong> retidos por <strong>até 10 anos</strong> a contar da emissão do certificado, para fins de comprovação de formação e atendimento a auditorias.</li>
+    <li><strong>Dados de contato institucional sem contrato firmado:</strong> retidos por <strong>até 24 meses</strong> a partir da última interação significativa.</li>
+    <li><strong>Dados fiscais e contábeis:</strong> retidos pelo prazo prescricional aplicável à legislação fiscal correspondente — usualmente 5 anos.</li>
+    <li><strong>Dados de navegação técnica:</strong> retidos por períodos variáveis conforme a categoria do cookie, detalhados na <a href="./32_Pagina_Cookies_v1.html">Política de Cookies</a>.</li>
+    <li><strong>Comunicações por e-mail e WhatsApp:</strong> retidas pelo período necessário ao atendimento, com expurgo posterior salvo necessidade de evidência contratual ou regulatória.</li>
+  </ul>
+  <p>Findo o prazo de retenção, os dados são eliminados de forma segura ou anonimizados de modo irreversível, conforme arts. 15 e 16 da LGPD.</p>
+</section>
+
+<section id="seguranca" class="legal-section">
+  <span class="secn-num">Seção 08</span>
+  <h2>Segurança da <em>informação</em></h2>
+  <p>O Instituto NTC do Brasil adota medidas técnicas e administrativas para proteção dos dados pessoais contra acessos não autorizados, perda, alteração, divulgação ou destruição indevida:</p>
+  <ul>
+    <li>Transmissão criptografada (HTTPS/TLS) em todos os formulários e canais digitais;</li>
+    <li>Controle de acesso por identidade e perfil, com princípio do menor privilégio;</li>
+    <li>Armazenamento segregado e backups periódicos com criptografia em repouso;</li>
+    <li>Política interna de mesa limpa, tela limpa e gestão de dispositivos institucionais;</li>
+    <li>Programa contínuo de capacitação interna em proteção de dados e segurança da informação;</li>
+    <li>Plano de resposta a incidentes com fluxos definidos de comunicação ao titular e à ANPD.</li>
+  </ul>
+  <p>Apesar de todos os esforços razoáveis, nenhuma medida de segurança é absoluta. Por isso, o titular também é parte essencial da proteção dos seus dados — mantendo credenciais sigilosas, atualizando senhas periodicamente e comunicando imediatamente qualquer suspeita de uso indevido.</p>
+</section>
+
+<section id="direitos" class="legal-section">
+  <span class="secn-num">Seção 09</span>
+  <h2>Direitos do <em>titular</em></h2>
+  <p>Conforme art. 18 da LGPD, o titular dos dados pessoais pode exercer, a qualquer momento e mediante requisição formal, os seguintes direitos:</p>
+
+  <ol class="numbered">
+    <li><strong>Confirmação</strong> da existência de tratamento de dados pessoais que o identifiquem.</li>
+    <li><strong>Acesso</strong> aos dados pessoais tratados.</li>
+    <li><strong>Correção</strong> de dados incompletos, inexatos ou desatualizados.</li>
+    <li><strong>Anonimização, bloqueio ou eliminação</strong> de dados desnecessários, excessivos ou tratados em desconformidade com a LGPD.</li>
+    <li><strong>Portabilidade</strong> dos dados a outro fornecedor de serviço ou produto, mediante requisição expressa, observados os segredos comercial e industrial.</li>
+    <li><strong>Eliminação</strong> dos dados tratados com o consentimento do titular, ressalvadas as hipóteses de guarda legal.</li>
+    <li><strong>Informação</strong> sobre as entidades públicas e privadas com as quais o controlador realizou uso compartilhado de dados.</li>
+    <li><strong>Informação</strong> sobre a possibilidade de não fornecer consentimento e sobre as consequências da negativa.</li>
+    <li><strong>Revogação do consentimento</strong>, a qualquer momento, mediante manifestação expressa do titular.</li>
+    <li><strong>Oposição</strong> ao tratamento realizado com fundamento em uma das hipóteses de dispensa de consentimento, em caso de descumprimento ao disposto na LGPD.</li>
+  </ol>
+
+  <p>A requisição pode ser feita pelos canais oficiais descritos na seção seguinte. O atendimento será realizado nos prazos previstos na LGPD e na regulamentação aplicável. Quando cabível declaração completa nos termos do <strong>art. 19 da LGPD</strong>, a resposta será fornecida em até 15 dias, contados do recebimento da solicitação, ressalvadas hipóteses legalmente justificadas — sempre com ciência prévia ao titular dos dados.</p>
+</section>
+
+<section id="encarregado" class="legal-section">
+  <span class="secn-num">Seção 10</span>
+  <h2>Encarregado (DPO) e <em>canais oficiais</em></h2>
+
+  <div class="dpo-card" role="region" aria-label="Canal oficial do Encarregado de Tratamento de Dados">
+    <div class="dpo-card-inner">
+      <div class="dpo-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 4 8 11v11c0 9.6 6.5 18.3 16 22 9.5-3.7 16-12.4 16-22V11L24 4z"/><path d="M18 24l4 4 8-9"/></svg>
+      </div>
+      <div>
+        <h3>Encarregado (DPO) — Encarregado de Tratamento de Dados</h3>
+        <p>Canal exclusivo e prioritário para o exercício dos direitos do titular dos dados: <a href="mailto:dpo@institutontc.com.br" data-cms-link="contato-dpo">dpo@institutontc.com.br</a>. O atendimento observará os prazos previstos na LGPD e na regulamentação aplicável; quando cabível declaração completa nos termos do art. 19 da LGPD, a resposta será fornecida em até 15 dias, contados do recebimento, ressalvadas hipóteses legalmente justificadas.</p>
+      </div>
+    </div>
+  </div>
+
+  <p>Os canais oficiais para exercício de direitos, dúvidas ou denúncias relacionadas à proteção de dados são:</p>
+  <ul>
+    <li><strong>E-mail do Encarregado (DPO):</strong> <a href="mailto:dpo@institutontc.com.br">dpo@institutontc.com.br</a> — canal preferencial.</li>
+    <li><strong>Endereço postal:</strong> SCS Quadra 9, Bloco C, Ed. Parque Cidade Corporate, Sala 1001, Asa Sul · Brasília – DF · CEP 70308-200 · A/C Encarregado de Tratamento de Dados.</li>
+    <li><strong>Atendimento institucional:</strong> (63) 3212-1199 (horário comercial, dias úteis).</li>
+  </ul>
+  <p>Para agilidade no atendimento, recomenda-se que a solicitação contenha: nome completo; e-mail vinculado ao tratamento (se houver); descrição clara do direito que se deseja exercer; e, quando aplicável, eventos ou canais de coleta envolvidos.</p>
+</section>
+
+<section id="incidentes" class="legal-section">
+  <span class="secn-num">Seção 11</span>
+  <h2>Incidentes e <em>comunicação à ANPD</em></h2>
+  <p>O Instituto NTC do Brasil mantém um plano formal de resposta a incidentes que envolvam dados pessoais. Detectada uma ocorrência relevante:</p>
+  <ul>
+    <li>O time de segurança da informação e o Encarregado (DPO) são acionados imediatamente, instaurando-se um <strong>plano de contenção</strong>.</li>
+    <li>É realizada avaliação da gravidade, do volume e da natureza dos dados envolvidos, do risco aos direitos e liberdades dos titulares dos dados e das medidas de mitigação aplicáveis.</li>
+    <li>Quando configurado incidente de segurança com dados pessoais que possa acarretar risco ou dano relevante aos titulares, o Instituto NTC do Brasil adotará as medidas de contenção, avaliação, registro e comunicação cabíveis, observando o prazo de <strong>até 3 dias úteis para comunicação à ANPD e aos titulares</strong>, quando aplicável, contado do conhecimento de que o incidente afetou dados pessoais, nos termos da regulamentação vigente da ANPD.</li>
+    <li>É realizado relatório pós-incidente com recomendações de aperfeiçoamento, internalizadas no programa de governança.</li>
+  </ul>
+</section>
+
+<section id="alteracoes" class="legal-section">
+  <span class="secn-num">Seção 12</span>
+  <h2>Atualizações e <em>versões</em></h2>
+  <p>Esta Política pode ser atualizada periodicamente para refletir mudanças regulatórias, evoluções tecnológicas ou aperfeiçoamentos no programa de privacidade. A versão vigente, sua data de revisão e o histórico de alterações estarão sempre disponíveis nesta página.</p>
+  <p><strong>Versão atual:</strong> v1.0 · 14/05/2026.<br>
+  <strong>Última revisão pelo DPO:</strong> 14/05/2026.</p>
+  <p>Recomenda-se a consulta periódica. Alterações substantivas que impliquem novas finalidades ou novas bases legais serão objeto de comunicação prévia e expressa aos titulares ativos.</p>
+</section>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== CTA INSTITUCIONAL FINAL ========================== -->
+<section class="legal-cta-final" aria-label="Encerramento institucional">
+  <div class="container legal-cta-final-inner fade-in">
+    <p class="eyebrow gold" style="color: var(--dourado-soft);">Instituto NTC do Brasil · Governança institucional</p>
+    <h2>Dúvidas, solicitações ou exercício de direitos? <em>Fale com o Encarregado (DPO).</em></h2>
+    <p>O Encarregado (DPO) do Instituto NTC do Brasil é o canal oficial para qualquer questão envolvendo dados pessoais nos canais do Grupo NTC. O atendimento observará os prazos previstos na LGPD e na regulamentação aplicável.</p>
+    <div class="legal-cta-final-actions">
+      <a class="btn btn--gold" href="mailto:dpo@institutontc.com.br" data-cms-link="contato-dpo">Falar com o DPO →</a><a class="btn btn--ghost-light" href="./33_Pagina_LGPD_v1.html#exercicio-direitos" data-cms-link="exercicio-direitos">Exercer direitos do titular</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ========================== FOOTER CANON ========================== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="./img/logos/logo-dark.svg" alt="Grupo NTC" />
+        <span class="footer-tagline">Inteligência institucional. Impacto real.</span>
+        <p class="footer-address">
+          <strong>Instituto NTC do Brasil</strong><br>
+          CNPJ 10.614.200/0001-98<br>
+          SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001<br>
+          Asa Sul · CEP 70308-200 · Brasília – DF<br>
+          (63) 3212-1199 · contato@institutontc.com.br
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h5>Navegação</h5>
+        <ul>
+          <li><a href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas">Programas</a></li>
+          <li><a href="./09_Pagina_Agenda_v2.html">Capacitação</a></li>
+          <li><a href="./26_Pagina_Solucoes_v1.html">Soluções</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#conteudos">Conteúdos</a></li>
+          <li><a href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente">Corpo Docente</a></li>
+          <li><a href="./27_Pagina_EventOn_v1.html" data-cms-link="eventon-home">EventOn</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html">Contato</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Governança de dados</h5>
+        <ul>
+          <li><a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a></li>
+          <li><a href="./33_Pagina_LGPD_v1.html" data-cms-link="legal-lgpd">Governança LGPD</a></li>
+          <li><a href="./32_Pagina_Cookies_v1.html" data-cms-link="legal-cookies">Política de Cookies</a></li>
+          <li><a href="./31_Pagina_Termos_v1.html" data-cms-link="legal-termos">Termos de Uso</a></li>
+          <li><a href="./33_Pagina_LGPD_v1.html#exercicio-direitos" data-cms-link="legal-direitos-titular">Exercer direitos do titular</a></li>
+          <li><a href="mailto:dpo@institutontc.com.br" data-cms-link="contato-dpo">dpo@institutontc.com.br</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Atendimento</h5>
+        <ul>
+          <li><a href="./09_Pagina_Agenda_v2.html">Eventos com inscrições abertas</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html#tab-equipe" data-cms-link="inscricao-equipe">Inscrever equipe</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html#tab-atendimento" data-cms-link="atendimento-comercial">Atendimento comercial</a></li>
+          <li><a href="mailto:contato@institutontc.com.br" data-cms-link="contato-email">contato@institutontc.com.br</a></li>
+          <li><a href="https://wa.me/5563984444040" data-cms-link="whatsapp">WhatsApp · (63) 98444-4040</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-badge">Grupo NTC — Núcleo de Tecnologia e Conhecimento · 2026</p>
+      <ul class="footer-legal">
+        <li><a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade" aria-current="page">Política de Privacidade</a></li>
+        <li><a href="./31_Pagina_Termos_v1.html" data-cms-link="legal-termos">Termos de Uso</a></li>
+        <li><a href="./32_Pagina_Cookies_v1.html" data-cms-link="legal-cookies">Política de Cookies</a></li>
+        <li><a href="./33_Pagina_LGPD_v1.html" data-cms-link="legal-lgpd">LGPD</a></li>
+        <li><a href="./34_Pagina_MapaDoSite_v1.html" data-cms-link="legal-mapa-do-site">Mapa do site</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* PIPELINE CANON · mega + drawer + fade-in + scroll-spy do sumário lateral */
+function track(name, payload) { try { window.dataLayer = window.dataLayer || []; window.dataLayer.push(Object.assign({event:name}, payload || {})); } catch(e) {} }
+
+(function(){
+  const triggers = document.querySelectorAll('.nav-item.has-mega');
+  const megas = document.querySelectorAll('.mega');
+  let t = null;
+  function openMega(id){ closeAll(); const m=document.getElementById('mega-'+id); if(m)m.classList.add('is-open'); triggers.forEach(x=>x.setAttribute('aria-expanded', x.dataset.mega===id?'true':'false')); }
+  function closeAll(){ megas.forEach(m=>m.classList.remove('is-open')); triggers.forEach(x=>x.setAttribute('aria-expanded','false')); }
+  triggers.forEach(tr=>{
+    tr.addEventListener('mouseenter',()=>{clearTimeout(t); openMega(tr.dataset.mega);});
+    tr.addEventListener('click',e=>{e.preventDefault(); const id=tr.dataset.mega; const open=document.getElementById('mega-'+id).classList.contains('is-open'); if(open)closeAll(); else openMega(id);});
+    tr.addEventListener('focus',()=>openMega(tr.dataset.mega));
+  });
+  megas.forEach(m=>{ m.addEventListener('mouseenter',()=>clearTimeout(t)); m.addEventListener('mouseleave',()=>{t=setTimeout(closeAll,200);}); });
+  document.querySelector('.site-header').addEventListener('mouseleave',()=>{t=setTimeout(closeAll,240);});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
+  document.addEventListener('click',e=>{if(!e.target.closest('.site-header'))closeAll();});
+})();
+
+(function(){
+  const tog=document.getElementById('mobileToggle'), drw=document.getElementById('mobileDrawer'), bd=document.getElementById('mobileBackdrop'), cls=document.getElementById('drawerClose'); if(!tog||!drw||!bd)return;
+  function open(){drw.classList.add('is-open');bd.classList.add('is-open');tog.setAttribute('aria-expanded','true');drw.setAttribute('aria-hidden','false');document.body.classList.add('no-scroll');setTimeout(()=>cls.focus(),320);}
+  function close(){drw.classList.remove('is-open');bd.classList.remove('is-open');tog.setAttribute('aria-expanded','false');drw.setAttribute('aria-hidden','true');document.body.classList.remove('no-scroll');tog.focus();}
+  tog.addEventListener('click',()=>{drw.classList.contains('is-open')?close():open();});
+  cls.addEventListener('click',close); bd.addEventListener('click',close);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drw.classList.contains('is-open'))close();});
+  drw.querySelectorAll('.drawer-item.has-sub').forEach(b=>{
+    b.addEventListener('click',()=>{ const sub=document.getElementById('sub-'+b.dataset.sub); if(!sub)return; const o=sub.classList.toggle('is-open'); b.classList.toggle('is-expanded',o); b.setAttribute('aria-expanded',String(o)); });
+  });
+  drw.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',()=>setTimeout(close,80)));
+})();
+
+(function(){
+  const els=document.querySelectorAll('.fade-in'); if(!('IntersectionObserver' in window)){els.forEach(e=>e.classList.add('is-visible'));return;}
+  const io=new IntersectionObserver((entries)=>entries.forEach(en=>{if(en.isIntersecting){en.target.classList.add('is-visible');io.unobserve(en.target);}}),{threshold:0.10});
+  els.forEach(e=>io.observe(e));
+})();
+
+/* Scroll-spy sumário lateral + subnav sticky */
+(function(){
+  const links=[...document.querySelectorAll('.legal-aside ol li a, .legal-subnav a')];
+  if(!links.length)return;
+  const targets=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h'))||88;
+  function setActive(id){ links.forEach(a=>a.classList.toggle('is-active', a.getAttribute('href')==='#'+id)); }
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(en=>{ if(en.isIntersecting) setActive(en.target.id); });
+  },{rootMargin:`-${headerH+80}px 0px -55% 0px`, threshold:0});
+  targets.forEach(t=>io.observe(t));
+})();
+</script>
+<!-- NTC_COOKIE_CONSENT_JS_BEGIN -->
+<script defer src="./assets/cookie_consent.js"></script>
+<!-- NTC_COOKIE_CONSENT_JS_END -->
+
+</body>
+</html>

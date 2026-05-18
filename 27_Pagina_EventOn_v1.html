@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Plataforma EventOn · ambiente digital institucional do Grupo NTC para acesso ao vivo, replay protegido, materiais de apoio, certificação digital e suporte dedicado aos participantes dos eventos online, presenciais e híbridos." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://www.grupontc.com.br/eventon" />
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:site_name" content="Grupo NTC" />
+<meta property="og:title" content="Plataforma EventOn · Grupo NTC" />
+<meta property="og:description" content="Acesso ao vivo, replay, materiais, certificação digital e suporte dedicado. A Plataforma EventOn é o ambiente digital institucional do Grupo NTC." />
+<meta property="og:url" content="https://www.grupontc.com.br/eventon" />
+<meta property="og:image" content="https://www.grupontc.com.br/img/og/og-eventon.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Plataforma EventOn · Grupo NTC" />
+<meta name="twitter:description" content="Acesso, replay, certificado e suporte dedicado. O ambiente digital institucional do Grupo NTC." />
+<meta name="twitter:image" content="https://www.grupontc.com.br/img/og/og-eventon.jpg" />
+
+<title>Plataforma EventOn · Grupo NTC</title>
+
+<!--
+  ===========================================================================
+  GRUPO NTC · PORTAL · PÁGINA EVENTON · v1.1 · 13/05/2026
+  ---------------------------------------------------------------------------
+  Sprint D · Página de produto institucional · APROVADA PARA PUBLICAÇÃO.
+
+  HISTÓRICO DE VERSÕES:
+    v1.0 (13/05/2026): Entrega inaugural · 13 blocos · 6 funcionalidades
+        canon · tour visual em wireframes · processo 4 passos · 4 canais
+        de suporte · Área do Participante com aside · FAQ 8 perguntas.
+    v1.1 (13/05/2026): REFINAMENTOS EDITORIAIS + VISUAIS PRÉ-PUBLICAÇÃO.
+        — Linguagem pública: "recursos canon" substituído por "Recursos
+          da Plataforma" / "Funcionalidades essenciais" em toda a página
+          visível ao usuário.
+        — Métricas reformuladas para formulações institucionalmente
+          seguras: "Centenas de eventos realizados" · "Milhares de
+          agentes públicos alcançados" · "Alta satisfação dos
+          participantes" (substituindo números absolutos não auditáveis).
+        — Subtítulo do hero e manifesto editorial reescritos para
+          versões mais sofisticadas e enxutas.
+        — Expressões com risco técnico absoluto ajustadas: "sem
+          dependência de plataformas terceiras públicas" → "em um
+          ambiente institucional próprio, sem expor a experiência do
+          participante a plataformas públicas dispersas"; "proteção
+          contra cópia" → "controle de acesso, restrição de
+          compartilhamento, rastreamento individual e controle de
+          visualizações".
+        — "LGPD self-service" removido em toda a página · substituído
+          por "gestão dos dados pessoais pelo próprio participante,
+          conforme a LGPD".
+        — "Chancela digital" substituído por "código de validação e
+          QR Code institucional" para refletir o mecanismo real.
+        — Bloco de suporte: redação mais institucional ("Atendimento
+          humano, direto e orientado à solução"), evitando repetição
+          excessiva de "sem chatbot".
+        — Tour visual completamente refeito: 3 mockups CSS premium
+          com aparência de interface real (Tela 01 sala de transmissão
+          com player + chat; Tela 02 sidebar + cards de eventos com
+          progress bar; Tela 03 PDF certificado com QR Code).
+        — Área do Participante reforçada com card-login institucional
+          visual (campos CPF + senha, botão dourado de acesso, link
+          de recuperação, nota institucional LGPD). Não funcional.
+        — Barra de navegação interna sticky pós-métricas com 5
+          atalhos (Recursos · Como funciona · Suporte · Área do
+          Participante · FAQ) e scroll-spy leve.
+        — Título da seção de aplicações por área reescrito: "A mesma
+          plataforma, aplicada às áreas estratégicas do Grupo NTC".
+        — Padronização "Grupo NTC" (marca) vs "Instituto NTC do
+          Brasil" (operação/certificação/dados).
+
+  ESCOPO:
+    1)  Hero institucional com imagem da Plataforma EventOn + sub
+        institucional + 5 quicklinks (acessar · replay · certificado
+        · materiais · suporte).
+    2)  Faixa de 4 métricas operacionais da Plataforma EventOn.
+    3)  Manifesto editorial sobre o que é a Plataforma EventOn —
+        ambiente digital institucional do Grupo NTC.
+    4)  Grade de 6 funcionalidades essenciais (.eo-recurso):
+          01 Acesso ao vivo
+          02 Replay restrito
+          03 Certificação digital com código de validação e QR Code
+          04 Materiais de apoio
+          05 Área do Participante
+          06 Suporte humano dedicado
+    5)  Tour visual da Plataforma (mockup estilizado de 3 telas).
+    6)  Bloco "Como funciona" em 4 passos (credenciais → acesso →
+        conteúdo+materiais → certificado).
+    7)  Faixa parallax editorial (paridade com Soluções v1.1).
+    8)  Vitrine de aplicações por área estratégica (4 cards · Educação ·
+        Gestão Pública · Contratações Públicas · Saúde).
+    9)  Bloco "Suporte ao participante" (faixa Oxford com canais e SLA).
+   10)  Bloco "Área do Participante" — login + benefícios.
+   11)  FAQ comercial (8 perguntas sobre acesso, replay, certificado,
+        materiais, suporte, LGPD).
+   12)  CTA final com 2 CTAs principais + atalho para Agenda.
+   13)  Footer canon Soberana idêntico às demais páginas-mãe.
+
+  HERANÇA DE MATRIZ (paridade com Soluções v1.1 + Corpo Docente v2.3):
+    — Tokens Soberana, tipografia, .container, .btn, .link-arrow, .eyebrow
+    — Header sticky + 3 mega menus (Programas · Capacitação · Soluções)
+    — Mobile drawer funcional · Skip-link · fade-in · scroll suave
+    — Footer institucional idêntico
+    — Padrão visual de cards horizontais e seções alternadas
+    — Sticky CTA mobile · parallax editorial · grid vertical canon
+
+  CONVENÇÃO CMS FUTURA:
+    Cada CTA carrega data-cms-link prontos para mapeamento
+    (eventon-acesso · eventon-replay · eventon-certificado · eventon-suporte
+    · eventon-aovivo · area-participante). Quando o backend EventOn estiver
+    operacional, basta substituir as âncoras internas pelos endpoints reais.
+
+  Esta página DESTRAVA o link "eventon-home" do mega-menu Capacitação,
+  do drawer mobile e do footer das 12 páginas-mãe — que até a entrega
+  apontavam para ./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon (seção
+  da Home).
+  ===========================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+
+<style>
+/* =============================================================
+   SISTEMA SOBERANA 2026 · TOKENS
+   ============================================================= */
+:root {
+  --oxford:        #11365E;
+  --oxford-90:     rgba(17, 54, 94, 0.92);
+  --oxford-70:     rgba(17, 54, 94, 0.72);
+  --oxford-10:     rgba(17, 54, 94, 0.10);
+  --cardeal:       #8E2A1C;
+  --cardeal-10:    rgba(142, 42, 28, 0.10);
+  --oliva:         #4A6A1F;
+  --oliva-10:      rgba(74, 106, 31, 0.10);
+  --dourado:       #B8952E;
+  --dourado-soft:  #d6b350;
+  --noite:         #0B1726;
+  --pergaminho:    #F4F1E8;
+  --pergaminho-80: rgba(244, 241, 232, 0.80);
+  --pergaminho-50: rgba(244, 241, 232, 0.50);
+  --ivory:         #ECE7D8;
+  --tinta:         #14202E;
+  --grafite:       #3A4050;
+  --prata:         #A8ACB6;
+  --prata-30:      rgba(168, 172, 182, 0.32);
+  --prata-15:      rgba(168, 172, 182, 0.15);
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans:  'Barlow', system-ui, -apple-system, sans-serif;
+  --font-cond:  'Barlow Condensed', 'Barlow', sans-serif;
+
+  --space-1: 8px;  --space-2: 16px; --space-3: 24px; --space-4: 32px;
+  --space-5: 48px; --space-6: 64px; --space-7: 96px; --space-8: 128px;
+
+  --shadow-soft:   0 1px 2px rgba(20, 32, 46, 0.04), 0 2px 8px rgba(20, 32, 46, 0.04);
+  --shadow-medium: 0 2px 4px rgba(20, 32, 46, 0.06), 0 8px 24px rgba(20, 32, 46, 0.10);
+  --shadow-strong: 0 4px 12px rgba(20, 32, 46, 0.12), 0 16px 48px rgba(20, 32, 46, 0.14);
+
+  --container-max: 1280px;
+  --header-h: 88px;
+  --t-fast:   160ms ease-out;
+  --t-medium: 240ms ease-out;
+  --t-slow:   600ms ease-out;
+}
+
+/* =============================================================
+   RESET + tipografia + botões + links · canon idêntico
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-padding-top: var(--header-h); }
+body { margin: 0; font-family: var(--font-sans); font-weight: 400; font-size: 17px; line-height: 1.65; color: var(--grafite); background: var(--pergaminho); text-rendering: optimizeLegibility; }
+body.no-scroll { overflow: hidden; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; transition: color var(--t-fast); }
+button { font-family: inherit; cursor: pointer; }
+ul { list-style: none; padding: 0; margin: 0; }
+:focus-visible { outline: 2px solid var(--dourado); outline-offset: 2px; border-radius: 2px; }
+
+.skip-link { position: absolute; left: -9999px; top: 0; padding: 12px 20px; background: var(--tinta); color: var(--pergaminho); font-family: var(--font-cond); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-size: 13px; z-index: 9999; }
+.skip-link:focus { left: 0; }
+
+h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0; line-height: 1.12; letter-spacing: -0.3px; }
+.eyebrow { font-family: var(--font-cond); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: 1.8px; color: var(--oxford); margin: 0 0 var(--space-2); }
+.eyebrow.gold  { color: var(--dourado); }
+.eyebrow.light { color: var(--pergaminho-80); }
+.lede { font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 24px; line-height: 1.4; color: var(--tinta); }
+
+.container { width: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 32px; }
+@media (max-width: 1199px) { .container { padding: 0 24px; } }
+@media (max-width: 767px)  { .container { padding: 0 16px; } }
+
+.section { padding: var(--space-7) 0; }
+.section--cream { background: var(--ivory); }
+.section--pergaminho { background: var(--pergaminho); }
+.section--noite { background: var(--noite); color: var(--pergaminho); }
+.section-head { max-width: 880px; margin: 0 auto var(--space-5); text-align: center; }
+.section-head h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.1; color: var(--tinta); margin: 0 0 var(--space-2); }
+.section-head h2 em { font-style: italic; color: var(--dourado); font-weight: 500; }
+.section-head .intro { font-size: 17px; line-height: 1.6; color: var(--grafite); margin: 0 auto; }
+.section--noite .section-head h2 { color: var(--pergaminho); }
+.section--noite .section-head h2 em { color: var(--dourado-soft); }
+.section--noite .section-head .intro { color: var(--pergaminho-80); }
+
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 26px; font-family: var(--font-sans); font-weight: 600; font-size: 13.5px; letter-spacing: 0.8px; text-transform: uppercase; border-radius: 4px; border: 1.5px solid transparent; transition: all var(--t-medium); cursor: pointer; white-space: nowrap; }
+.btn--primary    { background: var(--oxford); color: var(--pergaminho); border-color: var(--oxford); }
+.btn--primary:hover { background: var(--noite); border-color: var(--noite); transform: translateY(-1px); box-shadow: var(--shadow-soft); }
+.btn--gold       { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+.btn--gold:hover { background: var(--noite); color: var(--dourado-soft); border-color: var(--dourado); }
+.btn--secondary  { background: transparent; color: var(--oxford); border-color: var(--oxford); }
+.btn--secondary:hover { background: var(--oxford); color: var(--pergaminho); }
+.btn--ghost-light{ background: transparent; color: var(--pergaminho); border-color: var(--pergaminho-80); }
+.btn--ghost-light:hover { background: var(--pergaminho); color: var(--noite); border-color: var(--pergaminho); }
+.btn--participant { background: var(--noite); color: var(--dourado); border-color: var(--noite); }
+.btn--participant:hover { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+.btn--mini { padding: 10px 16px; font-size: 12px; }
+.btn-arrow { display: inline-block; transition: transform var(--t-medium); }
+.btn:hover .btn-arrow { transform: translateX(3px); }
+
+/* =============================================================
+   HEADER · STICKY + MEGA MENU + DRAWER (canon)
+   ============================================================= */
+.site-header { position: sticky; top: 0; z-index: 100; background: rgba(244, 241, 232, 0.94); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid var(--prata-30); height: var(--header-h); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; gap: var(--space-3); }
+.brand { display: flex; align-items: center; }
+.brand img { height: 56px; width: auto; }
+@media (max-width: 599px) { .brand img { height: 44px; } }
+
+.nav-primary { display: flex; align-items: center; gap: 0; }
+.nav-item { position: relative; padding: 30px 14px; font-family: var(--font-cond); font-weight: 500; font-size: 13.5px; color: var(--tinta); text-transform: uppercase; letter-spacing: 1.1px; cursor: pointer; transition: color var(--t-fast); background: transparent; border: 0; }
+.nav-item:hover { color: var(--oxford); }
+.nav-item.is-current { color: var(--oxford); }
+.nav-item.is-current::after { content: ''; position: absolute; left: 14px; right: 14px; bottom: 22px; height: 2px; background: var(--dourado); }
+.nav-item.has-mega::after { content: ''; display: inline-block; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translate(-2px, -2px); margin-left: 7px; opacity: 0.55; }
+.header-cta { display: flex; align-items: center; gap: 10px; }
+
+.mega { position: absolute; top: calc(var(--header-h) - 1px); left: 0; right: 0; background: var(--pergaminho); border-top: 1px solid var(--prata-30); border-bottom: 3px solid var(--oxford); box-shadow: var(--shadow-medium); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: opacity var(--t-medium), transform var(--t-medium), visibility var(--t-medium); z-index: 99; }
+.mega.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+.mega-inner { display: grid; gap: var(--space-5); padding: var(--space-5) 0 var(--space-6); }
+.mega-col h4 { font-family: var(--font-cond); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 2px; color: var(--dourado); margin: 0 0 var(--space-3); padding-bottom: var(--space-2); border-bottom: 1px solid var(--prata-30); }
+.mega-list { display: grid; gap: 12px; }
+.mega-list a { display: block; padding: 6px 0; color: var(--tinta); border-left: 0 solid var(--oxford); padding-left: 0; transition: padding-left var(--t-medium), border-left-width var(--t-medium), color var(--t-fast); }
+.mega-list a strong { font-family: var(--font-serif); font-weight: 600; font-size: 18px; color: var(--tinta); display: block; }
+.mega-list a span { font-family: var(--font-sans); font-size: 12.5px; color: var(--grafite); display: block; line-height: 1.4; margin-top: 2px; }
+.mega-list a:hover { border-left-width: 3px; padding-left: 12px; color: var(--oxford); }
+.mega-list a:hover strong { color: var(--oxford); }
+#mega-programas .mega-inner { grid-template-columns: 1.1fr 1fr 1fr; }
+
+.mobile-toggle { display: none; background: none; border: 0; padding: 12px; color: var(--tinta); cursor: pointer; align-self: center; }
+.mobile-toggle span { display: block; width: 22px; height: 2px; background: currentColor; margin: 5px 0; transition: var(--t-medium); }
+@media (max-width: 1199px) { .nav-primary { display: none; } .header-cta .btn:not(.btn--participant) { display: none; } .mobile-toggle { display: block; } }
+@media (max-width: 599px) { .header-cta .btn--participant { display: none; } }
+
+.mobile-drawer { position: fixed; top: 0; right: 0; height: 100%; width: 100%; max-width: 420px; background: var(--pergaminho); z-index: 200; transform: translateX(100%); transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1); display: flex; flex-direction: column; box-shadow: -8px 0 32px rgba(20, 32, 46, 0.18); overflow-y: auto; }
+.mobile-drawer.is-open { transform: translateX(0); }
+.mobile-drawer-backdrop { position: fixed; inset: 0; background: rgba(11, 23, 38, 0.6); opacity: 0; visibility: hidden; transition: opacity 320ms, visibility 320ms; z-index: 199; }
+.mobile-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+.drawer-head { display: flex; justify-content: space-between; align-items: center; padding: 22px 24px; border-bottom: 1px solid var(--prata-30); }
+.drawer-head img { height: 44px; width: auto; }
+.drawer-close { background: none; border: 0; padding: 8px; cursor: pointer; font-family: var(--font-sans); font-size: 28px; color: var(--tinta); line-height: 1; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+.drawer-nav { padding: var(--space-3) 0; flex: 1; }
+.drawer-item { display: block; width: 100%; text-align: left; padding: 18px 24px; border: 0; background: transparent; font-family: var(--font-serif); font-weight: 600; font-size: 22px; color: var(--tinta); cursor: pointer; border-bottom: 1px solid var(--prata-15); transition: background var(--t-fast); }
+.drawer-item:hover, .drawer-item:focus { background: rgba(184, 149, 46, 0.08); }
+.drawer-item.is-current { color: var(--oxford); }
+.drawer-item.has-sub::after { content: '+'; float: right; color: var(--dourado); font-weight: 400; transition: transform var(--t-medium); }
+.drawer-item.has-sub.is-expanded::after { content: '−'; }
+.drawer-sub { display: none; background: rgba(168, 172, 182, 0.08); padding: 8px 0; }
+.drawer-sub.is-open { display: block; }
+.drawer-sub a { display: block; padding: 12px 24px 12px 36px; font-family: var(--font-sans); font-size: 15px; color: var(--grafite); border-bottom: 1px solid var(--prata-15); }
+.drawer-sub a:hover { color: var(--oxford); background: rgba(184, 149, 46, 0.05); }
+.drawer-sub a strong { font-family: var(--font-serif); font-weight: 600; font-size: 16px; color: var(--tinta); display: block; }
+.drawer-sub a span { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--prata); }
+.drawer-cta { padding: var(--space-3) 24px var(--space-4); display: grid; gap: 10px; border-top: 1px solid var(--prata-30); }
+.drawer-cta .btn { width: 100%; justify-content: center; padding: 14px; }
+
+/* =============================================================
+   HERO INSTITUCIONAL SLIM
+   ============================================================= */
+.hero-page { position: relative; min-height: 480px; display: flex; align-items: center; background: var(--noite); color: var(--pergaminho); overflow: hidden; padding: var(--space-6) 0; }
+.hero-page-bg { position: absolute; inset: 0; z-index: 0; background-image: linear-gradient(125deg, rgba(11, 23, 38, 0.94) 0%, rgba(17, 54, 94, 0.78) 55%, rgba(11, 23, 38, 0.72) 100%), url('./img/fotos/_optimized/eventon-estudio.1920.webp'); background-size: cover; background-position: right 32%; filter: saturate(88%) contrast(1.05); }
+.hero-page::before { content: ''; position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse at top right, rgba(184, 149, 46, 0.20) 0%, transparent 55%), radial-gradient(ellipse at bottom left, rgba(17, 54, 94, 0.32) 0%, transparent 60%); pointer-events: none; }
+.hero-page::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background-image: linear-gradient(90deg, rgba(168, 172, 182, 0.05) 1px, transparent 1px); background-size: 80px 100%; }
+.hero-page-content { position: relative; z-index: 2; max-width: 920px; }
+.hero-page h1 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(36px, 5vw, 62px); line-height: 1.06; letter-spacing: -0.4px; color: var(--pergaminho); margin: var(--space-3) 0 var(--space-3); }
+.hero-page h1 .accent { color: var(--dourado-soft); font-style: italic; font-weight: 500; }
+.hero-page-sub { font-family: var(--font-sans); font-weight: 400; font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6; color: var(--pergaminho-80); max-width: 720px; margin: 0 0 var(--space-4); }
+.hero-quicklinks { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3); font-family: var(--font-cond); font-size: 12.5px; letter-spacing: 1.4px; text-transform: uppercase; }
+.hero-quicklinks a { color: var(--pergaminho-80); border-bottom: 1px solid rgba(244, 241, 232, 0.18); padding-bottom: 4px; transition: all var(--t-medium); }
+.hero-quicklinks a:hover { color: var(--dourado-soft); border-bottom-color: var(--dourado-soft); }
+.hero-cta-row { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-4); }
+
+.crumb { font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--pergaminho-80); display: flex; gap: 8px; align-items: center; }
+.crumb a { color: var(--pergaminho-80); transition: color var(--t-fast); }
+.crumb a:hover { color: var(--dourado-soft); }
+.crumb span.sep::before { content: '/'; opacity: 0.5; }
+.crumb span.current { color: var(--dourado-soft); }
+
+/* =============================================================
+   FAIXA DE MÉTRICAS · EVENTON
+   ============================================================= */
+.eo-metrics { background: var(--ivory); padding: var(--space-5) 0; border-top: 1px solid var(--prata-30); border-bottom: 1px solid var(--prata-30); }
+.eo-metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+@media (max-width: 1099px) { .eo-metrics-grid { grid-template-columns: 1fr 1fr; gap: var(--space-3); } }
+@media (max-width: 599px)  { .eo-metrics-grid { grid-template-columns: 1fr; } }
+.eo-metric { display: flex; flex-direction: column; gap: 6px; padding-left: var(--space-3); border-left: 3px solid var(--dourado); }
+.eo-metric .em-num { font-family: var(--font-serif); font-weight: 600; font-size: clamp(36px, 4vw, 52px); line-height: 1; color: var(--oxford); letter-spacing: -0.5px; }
+.eo-metric .em-lbl { font-family: var(--font-cond); font-weight: 600; font-size: 12px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--grafite); }
+.eo-metric .em-detail { font-family: var(--font-sans); font-size: 13px; color: var(--grafite); line-height: 1.5; margin-top: 2px; }
+
+/* =============================================================
+   BARRA DE NAVEGAÇÃO INTERNA · sticky pós-métricas
+   ============================================================= */
+.eo-subnav {
+  background: var(--pergaminho);
+  border-bottom: 1px solid var(--prata-30);
+  position: sticky; top: var(--header-h); z-index: 50;
+  box-shadow: 0 2px 8px rgba(20, 32, 46, 0.04);
+}
+.eo-subnav-inner {
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--space-4); padding: 14px 32px;
+  flex-wrap: wrap;
+}
+@media (max-width: 767px) { .eo-subnav-inner { gap: var(--space-2); padding: 12px 16px; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; } }
+.eo-subnav a {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12.5px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--grafite); padding: 4px 2px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--t-fast), border-bottom-color var(--t-fast);
+  white-space: nowrap;
+}
+.eo-subnav a:hover { color: var(--oxford); border-bottom-color: var(--dourado); }
+.eo-subnav a.is-active { color: var(--oxford); border-bottom-color: var(--dourado); }
+.eo-subnav-sep { color: var(--prata-30); user-select: none; font-size: 12px; }
+@media (max-width: 767px) { .eo-subnav-sep { display: none; } }
+
+/* Ajuste scroll-padding para a barra sticky de 2 níveis */
+@media (min-width: 768px) {
+  html { scroll-padding-top: calc(var(--header-h) + 56px); }
+}
+
+/* =============================================================
+   MANIFESTO EDITORIAL
+   ============================================================= */
+.eo-manifesto { background: var(--pergaminho); padding: var(--space-7) 0; }
+.eo-manifesto-inner { max-width: 920px; margin: 0 auto; text-align: center; }
+.eo-manifesto h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.12; color: var(--tinta); margin: var(--space-2) 0 var(--space-3); letter-spacing: -0.3px; }
+.eo-manifesto h2 em { font-style: italic; color: var(--dourado); font-weight: 500; }
+.eo-manifesto .lede { margin: 0 auto var(--space-3); max-width: 760px; color: var(--tinta); }
+.eo-manifesto p { font-size: 16px; line-height: 1.7; color: var(--grafite); max-width: 760px; margin: 0 auto var(--space-2); }
+.eo-manifesto-marker { display: inline-flex; align-items: center; gap: 14px; margin: var(--space-3) auto var(--space-2); font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.8px; font-weight: 600; text-transform: uppercase; color: var(--dourado); }
+.eo-manifesto-marker::before, .eo-manifesto-marker::after { content: ''; width: 40px; height: 1px; background: var(--dourado-soft); opacity: 0.55; }
+
+/* =============================================================
+   GRADE DE 6 RECURSOS CANON
+   ============================================================= */
+.eo-recursos { background: var(--ivory); padding: var(--space-7) 0; }
+.eo-recursos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); margin-top: var(--space-4); }
+@media (max-width: 899px) { .eo-recursos-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px) { .eo-recursos-grid { grid-template-columns: 1fr; } }
+.eo-recurso { background: var(--pergaminho); border: 1px solid var(--prata-30); border-top: 3px solid var(--oxford); padding: var(--space-4) var(--space-3) var(--space-3); display: flex; flex-direction: column; transition: transform var(--t-medium), box-shadow var(--t-medium), border-top-color var(--t-medium); position: relative; }
+.eo-recurso:hover { transform: translateY(-2px); box-shadow: var(--shadow-medium); border-top-color: var(--dourado); }
+.eo-recurso-num { position: absolute; top: -12px; left: var(--space-3); background: var(--noite); color: var(--dourado); font-family: var(--font-cond); font-weight: 700; font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; }
+.eo-recurso-icon { width: 44px; height: 44px; color: var(--dourado); margin-bottom: var(--space-2); }
+.eo-recurso-icon svg { width: 100%; height: 100%; }
+.eo-recurso h3 { font-family: var(--font-serif); font-weight: 600; font-size: 22px; line-height: 1.18; color: var(--tinta); margin: 0 0 8px; letter-spacing: -0.2px; }
+.eo-recurso p { font-size: 14px; line-height: 1.55; color: var(--grafite); margin: 0 0 var(--space-2); flex: 1; }
+.eo-recurso-meta { font-family: var(--font-cond); font-size: 10.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--oxford); padding-top: var(--space-2); border-top: 1px dashed var(--prata-30); margin-top: auto; font-weight: 600; }
+
+/* =============================================================
+   TOUR VISUAL · MOCKUP ESTILIZADO
+   ============================================================= */
+.eo-tour { background: var(--noite); color: var(--pergaminho); padding: var(--space-7) 0; position: relative; overflow: hidden; }
+.eo-tour::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 85% 15%, rgba(184, 149, 46, 0.14) 0%, transparent 55%), radial-gradient(circle at 12% 88%, rgba(17, 54, 94, 0.40) 0%, transparent 60%); pointer-events: none; }
+.eo-tour-inner { position: relative; z-index: 1; }
+.eo-tour-head { text-align: center; max-width: 880px; margin: 0 auto var(--space-5); }
+.eo-tour-head .eyebrow.light { color: var(--dourado-soft); }
+.eo-tour-head h2 { color: var(--pergaminho); font-family: var(--font-serif); font-weight: 600; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.12; margin: var(--space-2) 0 var(--space-3); }
+.eo-tour-head h2 em { font-style: italic; color: var(--dourado-soft); font-weight: 500; }
+.eo-tour-head .intro { color: var(--pergaminho-80); font-size: 16px; line-height: 1.6; }
+.eo-tour-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-top: var(--space-5); }
+@media (max-width: 1099px) { .eo-tour-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 767px)  { .eo-tour-grid { grid-template-columns: 1fr; } }
+
+.eo-tela {
+  background: linear-gradient(180deg, rgba(244, 241, 232, 0.06) 0%, rgba(244, 241, 232, 0.02) 100%);
+  border: 1px solid rgba(244, 241, 232, 0.12);
+  border-top: 3px solid var(--dourado-soft);
+  padding: var(--space-3);
+  display: flex; flex-direction: column;
+  transition: transform var(--t-medium), box-shadow var(--t-medium);
+}
+.eo-tela:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
+.eo-tela-screen {
+  background: linear-gradient(180deg, #0F2138 0%, var(--noite) 100%);
+  border: 1px solid rgba(244, 241, 232, 0.14);
+  height: 240px; position: relative; overflow: hidden; margin-bottom: var(--space-3);
+  border-radius: 6px;
+  box-shadow: inset 0 1px 0 rgba(244, 241, 232, 0.06), 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.eo-tela-screen::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 26px;
+  background: linear-gradient(180deg, rgba(17, 54, 94, 0.55), rgba(11, 23, 38, 0.35));
+  border-bottom: 1px solid rgba(244, 241, 232, 0.10);
+  z-index: 1;
+}
+.eo-tela-screen::after {
+  content: ''; position: absolute; top: 9px; left: 12px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #ff5e57;
+  box-shadow: 14px 0 0 #ffbd2e, 28px 0 0 #28c940;
+  z-index: 2;
+}
+.eo-tela-screen-body { position: absolute; inset: 30px 0 0 0; padding: 10px; }
+
+/* === TELA 01 · Sala de transmissão === */
+.eo-mock-live { display: grid; grid-template-columns: 1.8fr 1fr; gap: 8px; height: 100%; }
+.eo-mock-live-video { background: linear-gradient(135deg, #1a3556 0%, #0d1c30 70%); border: 1px solid rgba(244, 241, 232, 0.10); border-radius: 3px; position: relative; overflow: hidden; }
+.eo-mock-live-video::before { content: 'AO VIVO'; position: absolute; top: 6px; left: 6px; background: var(--cardeal); color: var(--pergaminho); font-family: var(--font-cond); font-size: 8px; font-weight: 700; letter-spacing: 1.2px; padding: 2px 6px; border-radius: 2px; }
+.eo-mock-live-video::after { content: ''; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 28px; height: 28px; border-radius: 50%; background: rgba(184, 149, 46, 0.20); border: 2px solid var(--dourado-soft); }
+.eo-mock-live-video .play-icon { position: absolute; bottom: 14px; left: 50%; transform: translateX(-37%); width: 0; height: 0; border-left: 8px solid var(--dourado-soft); border-top: 5px solid transparent; border-bottom: 5px solid transparent; z-index: 1; }
+.eo-mock-live-chat { background: rgba(11, 23, 38, 0.7); border: 1px solid rgba(244, 241, 232, 0.08); border-radius: 3px; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.eo-mock-live-chat .chat-h { font-family: var(--font-cond); font-size: 7px; letter-spacing: 1px; color: var(--dourado-soft); text-transform: uppercase; font-weight: 700; padding-bottom: 3px; border-bottom: 1px solid rgba(244, 241, 232, 0.08); }
+.eo-mock-live-chat .msg { display: flex; gap: 4px; align-items: flex-start; }
+.eo-mock-live-chat .msg .av { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, var(--oxford), var(--cardeal)); flex-shrink: 0; margin-top: 2px; }
+.eo-mock-live-chat .msg .ln { height: 4px; background: rgba(244, 241, 232, 0.18); border-radius: 1px; flex: 1; }
+.eo-mock-live-chat .msg .ln.short { max-width: 60%; }
+
+/* === TELA 02 · Área do Participante === */
+.eo-mock-area { display: grid; grid-template-columns: 30% 1fr; gap: 6px; height: 100%; }
+.eo-mock-area-side { background: rgba(11, 23, 38, 0.7); border-right: 1px solid rgba(244, 241, 232, 0.08); border-radius: 3px 0 0 3px; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+.eo-mock-area-side .sd-item { height: 7px; border-radius: 1px; background: rgba(244, 241, 232, 0.10); }
+.eo-mock-area-side .sd-item.active { background: var(--dourado-soft); }
+.eo-mock-area-main { display: flex; flex-direction: column; gap: 5px; }
+.eo-mock-area-main .hd { height: 8px; background: var(--dourado-soft); border-radius: 1px; width: 50%; }
+.eo-mock-area-main .sub { height: 5px; background: rgba(244, 241, 232, 0.16); border-radius: 1px; width: 75%; }
+.eo-mock-area-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 3px; }
+.eo-mock-area-card { background: linear-gradient(135deg, rgba(17, 54, 94, 0.4), rgba(184, 149, 46, 0.10)); border: 1px solid rgba(244, 241, 232, 0.08); border-radius: 2px; padding: 4px; height: 50px; display: flex; flex-direction: column; gap: 3px; }
+.eo-mock-area-card .cd-l { height: 4px; background: rgba(244, 241, 232, 0.20); border-radius: 1px; width: 80%; }
+.eo-mock-area-card .cd-m { height: 3px; background: rgba(244, 241, 232, 0.10); border-radius: 1px; width: 100%; }
+.eo-mock-area-card .cd-bar { height: 3px; background: rgba(184, 149, 46, 0.20); border-radius: 1px; position: relative; margin-top: auto; }
+.eo-mock-area-card .cd-bar::after { content: ''; position: absolute; top: 0; left: 0; height: 100%; width: 65%; background: var(--dourado-soft); border-radius: 1px; }
+
+/* === TELA 03 · Certificado === */
+.eo-mock-cert { padding: 8px 4px; height: 100%; display: flex; align-items: center; justify-content: center; }
+.eo-mock-cert-pdf { background: var(--pergaminho); color: var(--noite); border-radius: 3px; padding: 12px 10px 10px; width: 90%; max-width: 220px; display: grid; grid-template-columns: 1fr auto; gap: 8px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); position: relative; }
+.eo-mock-cert-pdf::before { content: ''; position: absolute; top: 0; right: 0; width: 0; height: 0; border-left: 14px solid transparent; border-bottom: 14px solid var(--ivory); }
+.eo-mock-cert-text { display: flex; flex-direction: column; gap: 4px; }
+.eo-mock-cert-text .ct-title { font-family: var(--font-serif); font-weight: 600; font-size: 9px; color: var(--noite); line-height: 1.1; }
+.eo-mock-cert-text .ct-line { height: 3px; background: var(--prata-30); border-radius: 1px; }
+.eo-mock-cert-text .ct-line.gold { background: var(--dourado); width: 60%; }
+.eo-mock-cert-text .ct-line.w80 { width: 80%; }
+.eo-mock-cert-text .ct-line.w70 { width: 70%; }
+.eo-mock-cert-text .ct-line.w90 { width: 90%; }
+.eo-mock-cert-qr { width: 38px; height: 38px; background: linear-gradient(90deg, var(--noite) 25%, transparent 25%, transparent 50%, var(--noite) 50%, var(--noite) 75%, transparent 75%) 0 0 / 8px 8px, linear-gradient(0deg, var(--noite) 25%, transparent 25%, transparent 50%, var(--noite) 50%, var(--noite) 75%, transparent 75%) 0 0 / 8px 8px, var(--pergaminho); border: 1.5px solid var(--noite); position: relative; flex-shrink: 0; align-self: end; }
+.eo-mock-cert-qr::before, .eo-mock-cert-qr::after { content: ''; position: absolute; width: 10px; height: 10px; background: var(--pergaminho); border: 2px solid var(--noite); }
+.eo-mock-cert-qr::before { top: 2px; left: 2px; }
+.eo-mock-cert-qr::after { top: 2px; right: 2px; }
+
+.eo-tela h4 { font-family: var(--font-serif); font-weight: 600; font-size: 18px; color: var(--pergaminho); margin: 0 0 6px; }
+.eo-tela p { font-size: 13px; line-height: 1.55; color: var(--pergaminho-80); margin: 0; }
+.eo-tela-tag { font-family: var(--font-cond); font-size: 10.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--dourado-soft); margin-bottom: 6px; font-weight: 600; }
+.eo-tela-foot { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-cond); font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--pergaminho-80); margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px dashed rgba(244, 241, 232, 0.12); font-weight: 600; }
+.eo-tela-foot::before { content: ''; width: 5px; height: 5px; background: var(--dourado-soft); border-radius: 50%; }
+
+/* =============================================================
+   COMO FUNCIONA · 4 PASSOS
+   ============================================================= */
+.eo-processo { background: var(--pergaminho); padding: var(--space-7) 0; }
+.eo-processo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); margin-top: var(--space-5); counter-reset: eoproc; }
+@media (max-width: 1099px) { .eo-processo-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .eo-processo-grid { grid-template-columns: 1fr; } }
+.eo-passo { background: var(--ivory); border: 1px solid var(--prata-30); padding: var(--space-3); display: flex; flex-direction: column; position: relative; }
+.eo-passo::before { counter-increment: eoproc; content: '0' counter(eoproc); position: absolute; top: -16px; left: var(--space-3); font-family: var(--font-serif); font-weight: 600; font-size: 32px; color: var(--dourado); line-height: 1; letter-spacing: -0.5px; background: var(--pergaminho); padding: 0 8px; }
+.eo-passo h4 { font-family: var(--font-cond); font-weight: 600; font-size: 13px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--tinta); margin: var(--space-3) 0 8px; }
+.eo-passo p { font-size: 13.5px; line-height: 1.55; color: var(--grafite); margin: 0 0 var(--space-2); }
+.eo-passo-prazo { font-family: var(--font-cond); font-size: 10.5px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--oxford); font-weight: 600; margin-top: auto; padding-top: var(--space-2); border-top: 1px dashed var(--prata-30); }
+
+/* =============================================================
+   PARALLAX EDITORIAL (entre processo e suporte)
+   ============================================================= */
+.eo-parallax { position: relative; min-height: 380px; display: flex; align-items: center; background-color: var(--noite); background-image: linear-gradient(125deg, rgba(11, 23, 38, 0.86) 0%, rgba(17, 54, 94, 0.72) 55%, rgba(11, 23, 38, 0.80) 100%), url('./img/fotos/_optimized/eventon-estudio.1920.webp'); background-size: cover; background-position: center 38%; background-attachment: fixed; overflow: hidden; }
+@media (max-width: 899px) { .eo-parallax { background-attachment: scroll; min-height: 300px; } }
+.eo-parallax::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 85% 25%, rgba(184, 149, 46, 0.16) 0%, transparent 55%), linear-gradient(180deg, rgba(11, 23, 38, 0.06) 0%, transparent 30%, transparent 70%, rgba(11, 23, 38, 0.16) 100%); }
+.eo-parallax::after { content: ''; position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(90deg, rgba(168, 172, 182, 0.05) 1px, transparent 1px); background-size: 80px 100%; }
+.eo-parallax-inner { position: relative; z-index: 2; max-width: 860px; margin: 0 auto; text-align: center; padding: var(--space-6) var(--space-3); }
+.eo-parallax-eyebrow { display: inline-flex; align-items: center; gap: 14px; font-family: var(--font-cond); font-weight: 600; font-size: 11px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--dourado-soft); margin-bottom: var(--space-3); }
+.eo-parallax-eyebrow::before, .eo-parallax-eyebrow::after { content: ''; width: 40px; height: 1px; background: var(--dourado-soft); opacity: 0.55; }
+.eo-parallax h2 { font-family: var(--font-serif); font-style: italic; font-weight: 500; font-size: clamp(22px, 2.8vw, 34px); line-height: 1.3; color: var(--pergaminho); margin: 0; letter-spacing: -0.2px; }
+.eo-parallax h2 strong { font-style: normal; font-weight: 600; color: var(--dourado-soft); }
+
+/* =============================================================
+   VITRINE DE APLICAÇÕES POR ÁREA (4 cards)
+   ============================================================= */
+.eo-vitrine { background: var(--ivory); padding: var(--space-7) 0; }
+.eo-vitrine-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); margin-top: var(--space-4); }
+@media (max-width: 1099px) { .eo-vitrine-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px)  { .eo-vitrine-grid { grid-template-columns: 1fr; } }
+.eo-vert-card { background: var(--pergaminho); border: 1px solid var(--prata-30); border-top: 3px solid var(--vertical-accent, var(--oxford)); padding: var(--space-3); display: flex; flex-direction: column; transition: transform var(--t-medium), box-shadow var(--t-medium); }
+.eo-vert-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+.eo-vert-card[data-vertical="educacao"]      { --vertical-accent: var(--oxford); }
+.eo-vert-card[data-vertical="gestao-publica"] { --vertical-accent: var(--cardeal); }
+.eo-vert-card[data-vertical="contratacoes"]  { --vertical-accent: #7A2F2A; }
+.eo-vert-card[data-vertical="saude"]         { --vertical-accent: var(--oliva); }
+.eo-vert-card-eyebrow { font-family: var(--font-cond); font-weight: 600; font-size: 10.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--vertical-accent); margin-bottom: 4px; }
+.eo-vert-card h3 { font-family: var(--font-serif); font-weight: 600; font-size: 22px; line-height: 1.2; color: var(--tinta); margin: 0 0 6px; letter-spacing: -0.2px; }
+.eo-vert-card p { font-size: 13.5px; line-height: 1.55; color: var(--grafite); margin: 0 0 var(--space-2); flex: 1; }
+.eo-vert-card-meta { font-family: var(--font-cond); font-size: 10.5px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--grafite); margin: 0 0 var(--space-2); }
+.eo-vert-card-meta strong { color: var(--vertical-accent); font-weight: 600; }
+.eo-vert-card-link { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-cond); font-weight: 600; font-size: 11px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--dourado); transition: color var(--t-fast); }
+.eo-vert-card-link:hover { color: var(--vertical-accent); }
+
+/* =============================================================
+   SUPORTE AO PARTICIPANTE · FAIXA OXFORD
+   ============================================================= */
+.eo-suporte { background: var(--oxford); color: var(--pergaminho); padding: var(--space-7) 0; position: relative; overflow: hidden; }
+.eo-suporte::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 10% 50%, rgba(184, 149, 46, 0.10) 0%, transparent 55%); pointer-events: none; }
+.eo-suporte-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1.2fr; gap: var(--space-5); align-items: start; }
+@media (max-width: 1099px) { .eo-suporte-inner { grid-template-columns: 1fr; } }
+.eo-suporte-body h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.12; color: var(--pergaminho); margin: var(--space-2) 0 var(--space-3); }
+.eo-suporte-body h2 em { font-style: italic; color: var(--dourado-soft); font-weight: 500; }
+.eo-suporte-body p { font-size: 16px; line-height: 1.65; color: var(--pergaminho-80); margin: 0 0 var(--space-3); }
+.eo-suporte-canais { display: grid; gap: var(--space-2); }
+.eo-canal { background: rgba(244, 241, 232, 0.05); border: 1px solid rgba(244, 241, 232, 0.12); border-left: 3px solid var(--dourado); padding: var(--space-3); display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--space-3); }
+.eo-canal h4 { font-family: var(--font-serif); font-weight: 600; font-size: 18px; color: var(--pergaminho); margin: 0 0 4px; }
+.eo-canal p { font-size: 13.5px; line-height: 1.5; color: var(--pergaminho-80); margin: 0; }
+.eo-canal-sla { font-family: var(--font-cond); font-weight: 600; font-size: 11px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--dourado-soft); white-space: nowrap; }
+
+/* =============================================================
+   ÁREA DO PARTICIPANTE · BLOCO DESTACADO
+   ============================================================= */
+.eo-area { background: var(--pergaminho); padding: var(--space-7) 0; }
+.eo-area-inner { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--space-5); align-items: stretch; }
+@media (max-width: 1099px) { .eo-area-inner { grid-template-columns: 1fr; } }
+.eo-area-body { display: flex; flex-direction: column; justify-content: center; }
+.eo-area-body h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.12; color: var(--tinta); margin: var(--space-2) 0 var(--space-3); letter-spacing: -0.3px; }
+.eo-area-body h2 em { font-style: italic; color: var(--dourado); font-weight: 500; }
+.eo-area-body p { font-size: 16px; line-height: 1.65; color: var(--grafite); margin: 0 0 var(--space-3); }
+.eo-area-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2); }
+.eo-area-aside { background: var(--noite); color: var(--pergaminho); border-top: 4px solid var(--dourado); padding: var(--space-4); position: relative; overflow: hidden; }
+.eo-area-aside::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 90% 10%, rgba(184, 149, 46, 0.12) 0%, transparent 55%); pointer-events: none; }
+.eo-area-aside-inner { position: relative; z-index: 1; }
+.eo-area-aside-eyebrow { font-family: var(--font-cond); font-weight: 600; font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--dourado-soft); margin-bottom: var(--space-2); }
+.eo-area-aside h3 { font-family: var(--font-serif); font-weight: 600; font-size: 22px; color: var(--pergaminho); margin: 0 0 var(--space-2); line-height: 1.25; }
+.eo-area-aside ul { display: grid; gap: 10px; margin: var(--space-2) 0; }
+.eo-area-aside ul li { font-size: 14px; line-height: 1.5; color: var(--pergaminho-80); padding-left: 22px; position: relative; }
+.eo-area-aside ul li::before { content: '✓'; position: absolute; left: 0; top: 0; color: var(--dourado-soft); font-weight: 700; }
+
+/* === Card-login institucional (visual · não funcional) === */
+.eo-login-card { background: var(--pergaminho); border: 1px solid var(--prata-30); border-top: 4px solid var(--dourado); padding: var(--space-4) var(--space-3) var(--space-3); display: flex; flex-direction: column; box-shadow: var(--shadow-medium); }
+.eo-login-eyebrow { font-family: var(--font-cond); font-weight: 600; font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--dourado); margin-bottom: var(--space-1); }
+.eo-login-card h3 { font-family: var(--font-serif); font-weight: 600; font-size: 22px; color: var(--tinta); margin: 0 0 var(--space-2); line-height: 1.25; }
+.eo-login-card-sub { font-size: 13px; line-height: 1.55; color: var(--grafite); margin: 0 0 var(--space-3); }
+.eo-login-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--space-2); }
+.eo-login-field label { font-family: var(--font-cond); font-weight: 600; font-size: 10.5px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--grafite); }
+.eo-login-input { background: var(--ivory); border: 1px solid var(--prata-30); border-radius: 3px; padding: 12px 14px; font-family: var(--font-sans); font-size: 14px; color: var(--tinta); display: flex; align-items: center; justify-content: space-between; transition: border-color var(--t-fast); }
+.eo-login-input:hover { border-color: var(--oxford); }
+.eo-login-input .eo-login-input-text { color: var(--prata); letter-spacing: 0.5px; font-family: var(--font-sans); }
+.eo-login-input .eo-login-input-icon { color: var(--dourado); width: 16px; height: 16px; display: inline-flex; }
+.eo-login-input .eo-login-input-icon svg { width: 100%; height: 100%; }
+.eo-login-input.is-filled .eo-login-input-text { color: var(--tinta); letter-spacing: normal; }
+.eo-login-input .pwd-mask { letter-spacing: 4px; color: var(--tinta); font-family: monospace; font-size: 16px; }
+.eo-login-actions { display: flex; flex-direction: column; gap: 10px; margin-top: var(--space-2); }
+.eo-login-actions .btn { width: 100%; justify-content: center; padding: 14px; }
+.eo-login-helper { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: var(--space-2); font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.2px; text-transform: uppercase; }
+.eo-login-helper a { color: var(--oxford); border-bottom: 1px solid transparent; padding-bottom: 2px; transition: all var(--t-fast); font-weight: 600; }
+.eo-login-helper a:hover { color: var(--dourado); border-bottom-color: var(--dourado); }
+.eo-login-helper span { color: var(--grafite); }
+.eo-login-foot { font-size: 12px; color: var(--grafite); line-height: 1.55; padding-top: var(--space-3); margin-top: var(--space-3); border-top: 1px solid var(--prata-30); font-style: italic; font-family: var(--font-serif); }
+.eo-login-foot strong { color: var(--tinta); font-weight: 600; font-style: normal; }
+
+/* Layout da Área do Participante com 3 colunas (body + login + aside) */
+@media (min-width: 1100px) {
+  .eo-area-inner { grid-template-columns: 1fr 1fr; align-items: stretch; }
+  .eo-area-aside { display: flex; flex-direction: column; gap: var(--space-3); }
+}
+
+
+/* =============================================================
+   FAQ
+   ============================================================= */
+.eo-faq { background: var(--ivory); padding: var(--space-7) 0; }
+.eo-faq-inner { max-width: 880px; margin: 0 auto; }
+.eo-faq-head { text-align: center; margin-bottom: var(--space-5); }
+.eo-faq-head h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.12; color: var(--tinta); margin: var(--space-2) 0 var(--space-2); }
+.eo-faq-head h2 em { font-style: italic; color: var(--dourado); font-weight: 500; }
+.eo-faq-item { border-top: 1px solid var(--prata-30); }
+.eo-faq-item:last-child { border-bottom: 1px solid var(--prata-30); }
+.eo-faq-toggle { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); width: 100%; background: transparent; border: 0; padding: var(--space-3) 0; cursor: pointer; text-align: left; }
+.eo-faq-toggle h3 { font-family: var(--font-serif); font-weight: 600; font-size: 19px; color: var(--tinta); margin: 0; line-height: 1.35; letter-spacing: -0.1px; }
+.eo-faq-icon { flex-shrink: 0; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; color: var(--dourado); font-family: var(--font-sans); font-weight: 400; font-size: 22px; line-height: 1; border: 1px solid var(--prata-30); border-radius: 50%; transition: all var(--t-fast); background: var(--pergaminho); }
+.eo-faq-toggle[aria-expanded="true"] .eo-faq-icon { background: var(--dourado); color: var(--noite); border-color: var(--dourado); transform: rotate(45deg); }
+.eo-faq-body { max-height: 0; overflow: hidden; transition: max-height var(--t-medium) ease; }
+.eo-faq-body p { font-size: 15px; line-height: 1.7; color: var(--grafite); margin: 0 0 var(--space-3); max-width: 760px; }
+.eo-faq-body p:last-child { margin-bottom: var(--space-3); }
+.eo-faq-item.is-open .eo-faq-body { max-height: 720px; }
+
+/* =============================================================
+   CTA FINAL
+   ============================================================= */
+.eo-cta-final { background: var(--noite); color: var(--pergaminho); padding: var(--space-7) 0; position: relative; overflow: hidden; }
+.eo-cta-final::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 10% 90%, rgba(184, 149, 46, 0.14) 0%, transparent 50%), radial-gradient(circle at 90% 10%, rgba(17, 54, 94, 0.30) 0%, transparent 60%); pointer-events: none; }
+.eo-cta-final-inner { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; text-align: center; }
+.eo-cta-final h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(30px, 3.4vw, 46px); line-height: 1.1; color: var(--pergaminho); margin: var(--space-2) 0 var(--space-3); letter-spacing: -0.3px; }
+.eo-cta-final h2 em { font-style: italic; color: var(--dourado-soft); font-weight: 500; }
+.eo-cta-final p { font-size: 17px; color: var(--pergaminho-80); margin: 0 auto var(--space-4); max-width: 720px; line-height: 1.6; }
+.eo-cta-final-actions { display: inline-flex; gap: var(--space-2); flex-wrap: wrap; justify-content: center; }
+
+/* =============================================================
+   STICKY CTA MOBILE
+   ============================================================= */
+.sticky-cta-mobile { position: fixed; bottom: 0; left: 0; right: 0; z-index: 80; display: none; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: var(--noite); border-top: 1px solid rgba(244, 241, 232, 0.15); transform: translateY(100%); transition: transform var(--t-medium); }
+.sticky-cta-mobile.is-visible { transform: translateY(0); }
+.sticky-cta-mobile .btn { width: 100%; justify-content: center; }
+.sticky-cta-mobile-dismiss { position: absolute; top: 6px; right: 10px; background: transparent; border: 0; color: var(--pergaminho-80); font-size: 14px; padding: 4px 8px; cursor: pointer; line-height: 1; }
+@media (max-width: 767px) { .sticky-cta-mobile { display: block; } }
+
+/* =============================================================
+   FOOTER · CANON SOBERANA
+   ============================================================= */
+.site-footer { background: var(--noite); color: var(--pergaminho-80); padding: var(--space-6) 0 var(--space-4); border-top: 1px solid rgba(244, 241, 232, 0.10); }
+.footer-top { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: var(--space-5); padding-bottom: var(--space-5); border-bottom: 1px solid rgba(244, 241, 232, 0.10); }
+@media (max-width: 899px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 599px) { .footer-top { grid-template-columns: 1fr; } }
+.footer-brand img { height: 60px; width: auto; }
+.footer-tagline { font-family: var(--font-serif); font-style: italic; font-weight: 500; color: var(--dourado); font-size: 17px; margin: var(--space-3) 0 var(--space-2); display: block; }
+.footer-address { font-size: 13px; line-height: 1.55; color: var(--pergaminho-80); margin: 0; }
+.footer-address strong { color: var(--pergaminho); font-weight: 600; }
+.footer-col h5 { font-family: var(--font-cond); font-weight: 600; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--dourado); margin: 0 0 var(--space-2); }
+.footer-col ul { display: grid; gap: 10px; }
+.footer-col a { font-size: 14px; color: var(--pergaminho-80); transition: color var(--t-fast); }
+.footer-col a:hover { color: var(--dourado); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); flex-wrap: wrap; gap: var(--space-2); }
+.footer-badge { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--prata); }
+.footer-legal { display: flex; gap: var(--space-3); flex-wrap: wrap; font-family: var(--font-cond); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+.footer-legal a { color: var(--prata); }
+.footer-legal a:hover { color: var(--pergaminho); }
+
+.fade-in { opacity: 0; transform: translateY(12px); transition: opacity 800ms ease-out, transform 800ms ease-out; }
+.fade-in.is-visible { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } .fade-in { opacity: 1; transform: none; } }
+</style>
+<!-- NTC_COOKIE_CONSENT_CSS_BEGIN -->
+<link rel="stylesheet" href="./assets/cookie_consent.css" />
+<!-- NTC_COOKIE_CONSENT_CSS_END -->
+</head>
+<body>
+<a class="skip-link" href="#main">Pular para o conteúdo principal</a>
+
+<header class="site-header" id="topo">
+  <div class="container header-inner">
+    <a class="brand" href="./02_Prototipo_Home_GrupoNTC_v2_6.html" aria-label="Grupo NTC — Página inicial">
+      <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    </a>
+
+    <nav class="nav-primary" aria-label="Navegação principal">
+      <a class="nav-item" href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a>
+      <button class="nav-item has-mega" data-mega="programas" aria-haspopup="true" aria-expanded="false">Programas</button>
+      <button class="nav-item has-mega is-current" data-mega="capacitacao" aria-haspopup="true" aria-expanded="false">Capacitação</button>
+      <button class="nav-item has-mega" data-mega="solucoes" aria-haspopup="true" aria-expanded="false">Soluções</button>
+      <a class="nav-item" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#conteudos">Conteúdos</a>
+      <a class="nav-item" href="./12_Pagina_Contato_v1.html">Contato</a>
+    </nav>
+
+    <div class="header-cta">
+      <a class="btn btn--secondary btn--mini" href="./12_Pagina_Contato_v1.html#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a>
+      <a class="btn btn--participant btn--mini" href="#area-participante" data-cms-link="area-participante" aria-current="page">Área do Participante</a>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobileDrawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mega menu: Programas -->
+  <div class="mega" id="mega-programas" data-mega-id="programas">
+    <div class="container">
+      <div class="mega-inner">
+        <div class="mega-col">
+          <h4>NTC Educação · 9 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./16_Pagina_Programa_EDUTEC_v1.html" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>Educação Digital, Inovação e Tecnologias para Redes Públicas</span></a></li>
+            <li><a href="./15_Pagina_Programa_PEAR_v1.html" data-cms-link="programa-PEAR"><strong>PEAR</strong><span>Alfabetização de Alta Performance e Recomposição da Aprendizagem</span></a></li>
+            <li><a href="./19_Pagina_Programa_PEI_v1.html" data-cms-link="programa-PEI"><strong>PEI</strong><span>Educação Integral — Gestão, Currículo e Resultados</span></a></li>
+            <li><a href="./21_Pagina_Programa_PROGIR_v1.html" data-cms-link="programa-PROGIR"><strong>PROGIR</strong><span>Gestão da Inclusão com Resultado</span></a></li>
+            <li><a href="./20_Pagina_Programa_PROGE_v1.html" data-cms-link="programa-PROGE"><strong>PROGE</strong><span>Gestão Escolar, Coordenação Pedagógica e Resultados</span></a></li>
+            <li><a href="./13_Pagina_Programa_EGIDE_v1.html" data-cms-link="programa-EGIDE"><strong>EGIDE</strong><span>IA, Dados e Governança da Transformação Digital</span></a></li>
+            <li><a href="./23_Pagina_Programa_VIVAESCOLA_v1.html" data-cms-link="programa-VIVAESCOLA"><strong>VIVAESCOLA</strong><span>Convivência, Permanência, Bem-Estar e Proteção Integral</span></a></li>
+            <li><a href="./22_Pagina_Programa_PINEI_v1.html" data-cms-link="programa-PINEI"><strong>PINEI</strong><span>Primeira Infância e Educação Infantil</span></a></li>
+            <li><a href="./24_Pagina_Programa_FUTURA_v1.html" data-cms-link="programa-FUTURA"><strong>FUTURA</strong><span>Ensino Médio, Itinerários de Futuro, Empregabilidade</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Gestão Pública · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./10_Pagina_Programa_LIDERA_v1.html" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>Liderança, Direção Estratégica e Resultados na Administração</span></a></li>
+            <li><a href="./06_Pagina_Programa_AGIP_v1.html" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>Governança, Integridade e Performance nas Contratações Públicas</span></a></li>
+            <li><a href="./11_Pagina_Programa_SIGA_v1.html" data-cms-link="programa-SIGA"><strong>SIGA</strong><span>Soluções Inteligentes de Governança e Administração</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Saúde · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./14_Pagina_Programa_SIGS_v1.html" data-cms-link="programa-SIGS"><strong>SIGS</strong><span>Sistema Integrado de Gestão em Saúde</span></a></li>
+            <li><a href="./17_Pagina_Programa_PROAPS_v1.html" data-cms-link="programa-PROAPS"><strong>PROAPS+</strong><span>Alta Performance na Atenção Primária e Redes de Cuidado</span></a></li>
+            <li><a href="./18_Pagina_Programa_PROSUS_v1.html" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>Direção Institucional em Saúde Pública</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Capacitação (current) -->
+  <div class="mega" id="mega-capacitacao" data-mega-id="capacitacao">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Agenda e formatos</h4>
+          <ul class="mega-list">
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos no calendário</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-online"><strong>Eventos online</strong><span>Transmissão ao vivo, replay e certificado</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-presenciais"><strong>Eventos presenciais</strong><span>Encontros executivos em capitais estratégicas</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-hibridos"><strong>Eventos híbridos</strong><span>Combinação de presença e plataforma digital</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Plataforma e curadoria</h4>
+          <ul class="mega-list">
+            <li><a href="#main" data-cms-link="eventon-home" aria-current="page"><strong>EventOn</strong><span>Você está aqui · Plataforma EventOn</span></a></li>
+            <li><a href="#area-participante" data-cms-link="area-participante"><strong>Área do Participante</strong><span>Histórico de eventos, materiais e certificados</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="proximas-turmas"><strong>Próximas turmas</strong><span>Turmas em formação e inscrições antecipadas</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-passados"><strong>Eventos passados</strong><span>Acervo de eventos realizados com replay disponível</span></a></li>
+            <li><a href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica e especialistas das 3 áreas</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Soluções -->
+  <div class="mega" id="mega-solucoes" data-mega-id="solucoes">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Verticais</h4>
+          <ul class="mega-list">
+            <li><a href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>Soluções estruturadas para redes públicas de ensino</span></a></li>
+            <li><a href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>Governança, integridade e performance na Administração</span></a></li>
+            <li><a href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>Inteligência institucional aplicada ao SUS</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Modelos de contratação</h4>
+          <ul class="mega-list">
+            <li><a href="./26_Pagina_Solucoes_v1.html#in-company" data-cms-link="modelo-incompany"><strong>Soluções in company</strong><span>Programa entregue exclusivamente à instituição</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#turmas-fechadas" data-cms-link="modelo-fechada"><strong>Turmas fechadas</strong><span>Edição operacional dedicada à equipe contratante</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#sob-medida" data-cms-link="modelo-sobmedida"><strong>Soluções sob medida</strong><span>Customização profunda de ementas, módulos e formato</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#trilhas" data-cms-link="modelo-trilha"><strong>Trilhas e jornadas</strong><span>Sequências formativas curadas para necessidades específicas</span></a></li>
+            <li><a href="./26_Pagina_Solucoes_v1.html#contratacao-institucional" data-cms-link="modelo-institucional"><strong>Contratação institucional</strong><span>Atendimento dedicado a órgãos públicos</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========================== MOBILE DRAWER ========================== -->
+<div class="mobile-drawer-backdrop" id="mobileBackdrop"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-label="Menu principal" aria-hidden="true">
+  <div class="drawer-head">
+    <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    <button class="drawer-close" id="drawerClose" aria-label="Fechar menu">×</button>
+  </div>
+  <nav class="drawer-nav" aria-label="Navegação móvel">
+    <a class="drawer-item" href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a>
+
+    <button class="drawer-item has-sub" data-sub="programas-mobile" aria-expanded="false">Programas</button>
+    <div class="drawer-sub" id="sub-programas-mobile">
+      <a href="./06_Pagina_Programa_AGIP_v1.html" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></a>
+      <a href="./10_Pagina_Programa_LIDERA_v1.html" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></a>
+      <a href="./16_Pagina_Programa_EDUTEC_v1.html" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>NTC Educação · Educação digital</span></a>
+      <a href="./18_Pagina_Programa_PROSUS_v1.html" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="ver-todos-programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></a>
+    </div>
+
+    <button class="drawer-item has-sub is-expanded" data-sub="capacitacao-mobile" aria-expanded="true">Capacitação</button>
+    <div class="drawer-sub is-open" id="sub-capacitacao-mobile">
+      <a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></a>
+      <a href="#main" data-cms-link="eventon-home" aria-current="page"><strong>EventOn</strong><span>Você está aqui · Plataforma EventOn</span></a>
+      <a href="#area-participante" data-cms-link="area-participante"><strong>Área do Participante</strong><span>Materiais e certificados</span></a>
+      <a href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria das 3 áreas</span></a>
+    </div>
+
+    <button class="drawer-item has-sub" data-sub="solucoes-mobile" aria-expanded="false">Soluções</button>
+    <div class="drawer-sub" id="sub-solucoes-mobile">
+      <a href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>9 programas estratégicos</span></a>
+      <a href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>3 programas estratégicos</span></a>
+      <a href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>3 programas estratégicos</span></a>
+      <a href="./26_Pagina_Solucoes_v1.html" data-cms-link="pagina-solucoes"><strong>Modelos de contratação</strong><span>In company · turmas fechadas · sob medida</span></a>
+    </div>
+
+    <a class="drawer-item" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#conteudos">Conteúdos</a>
+    <a class="drawer-item" href="./12_Pagina_Contato_v1.html">Contato</a>
+  </nav>
+  <div class="drawer-cta">
+    <a class="btn btn--gold" href="#area-participante" data-cms-link="area-participante">Área do Participante</a>
+    <a class="btn btn--secondary" href="./12_Pagina_Contato_v1.html#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ========================== HERO INSTITUCIONAL ========================== -->
+<section class="hero-page" aria-label="Cabeçalho institucional · Plataforma EventOn">
+  <div class="hero-page-bg" aria-hidden="true"></div>
+  <div class="container hero-page-content fade-in">
+    <nav class="crumb" aria-label="Você está em">
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html">Grupo NTC</a>
+      <span class="sep" aria-hidden="true"></span>
+      <a href="./09_Pagina_Agenda_v2.html">Capacitação</a>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="current">Plataforma EventOn</span>
+    </nav>
+
+    <p class="eyebrow gold">Plataforma do Grupo NTC · Edição 2026</p>
+    <h1>EventOn<span class="accent">.</span><br>Acesso, replay, certificado e suporte — em um só ambiente.</h1>
+    <p class="hero-page-sub">
+      A Plataforma EventOn é o ambiente digital institucional do <strong style="color: var(--pergaminho);">Instituto NTC do Brasil</strong> para eventos online, presenciais e híbridos. Reúne acesso ao vivo, replay restrito, materiais de apoio, certificação digital validável e suporte humano ao participante em uma única jornada.
+    </p>
+
+    <div class="hero-cta-row">
+      <a class="btn btn--gold" href="#area-participante" data-cms-link="area-participante" data-track="hero_cta_acessar">Acessar Área do Participante <span class="btn-arrow">→</span></a>
+      <a class="btn btn--ghost-light" href="#suporte" data-cms-link="eventon-suporte" data-track="hero_cta_suporte">Falar com suporte</a>
+    </div>
+
+    <div class="hero-quicklinks" aria-label="Atalhos para recursos da Plataforma EventOn">
+      <a href="#recursos" data-track="hero_quicklink_recursos">Recursos</a>
+      <a href="#tour" data-track="hero_quicklink_tour">Tour visual</a>
+      <a href="#como-funciona" data-track="hero_quicklink_processo">Como funciona</a>
+      <a href="#suporte" data-track="hero_quicklink_suporte">Suporte</a>
+      <a href="#area-participante" data-track="hero_quicklink_participante">Área do Participante</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== FAIXA DE MÉTRICAS ========================== -->
+<section class="eo-metrics" aria-label="Métricas operacionais da Plataforma EventOn">
+  <div class="container">
+    <div class="eo-metrics-grid fade-in">
+      <div class="eo-metric">
+        <span class="em-num">Centenas</span>
+        <span class="em-lbl">Eventos realizados</span>
+        <span class="em-detail">Encontros presenciais, online e híbridos entregues pela Plataforma EventOn nas três áreas estratégicas do Grupo NTC.</span>
+      </div>
+      <div class="eo-metric">
+        <span class="em-num">Milhares</span>
+        <span class="em-lbl">Agentes públicos alcançados</span>
+        <span class="em-detail">Servidores federais, estaduais e municipais participantes dos eventos hospedados na Plataforma.</span>
+      </div>
+      <div class="eo-metric">
+        <span class="em-num">Alta</span>
+        <span class="em-lbl">Satisfação dos participantes</span>
+        <span class="em-detail">Avaliação consistentemente positiva da experiência dos participantes na Plataforma EventOn.</span>
+      </div>
+      <div class="eo-metric">
+        <span class="em-num">6</span>
+        <span class="em-lbl">Funcionalidades essenciais</span>
+        <span class="em-detail">Acesso ao vivo · replay restrito · certificação digital · materiais · Área do Participante · suporte humano.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== BARRA DE NAVEGAÇÃO INTERNA · sticky ========================== -->
+<nav class="eo-subnav" aria-label="Navegação interna da Plataforma EventOn">
+  <div class="eo-subnav-inner">
+    <a href="#recursos" data-track="subnav_recursos">Recursos</a>
+    <span class="eo-subnav-sep" aria-hidden="true">·</span>
+    <a href="#como-funciona" data-track="subnav_como_funciona">Como funciona</a>
+    <span class="eo-subnav-sep" aria-hidden="true">·</span>
+    <a href="#suporte" data-track="subnav_suporte">Suporte</a>
+    <span class="eo-subnav-sep" aria-hidden="true">·</span>
+    <a href="#area-participante" data-track="subnav_area_participante">Área do Participante</a>
+    <span class="eo-subnav-sep" aria-hidden="true">·</span>
+    <a href="#faq" data-track="subnav_faq">FAQ</a>
+  </div>
+</nav>
+
+<!-- ========================== MANIFESTO ========================== -->
+<section class="eo-manifesto" aria-label="O que é a Plataforma EventOn">
+  <div class="container">
+    <div class="eo-manifesto-inner fade-in">
+      <span class="eo-manifesto-marker">Sobre a Plataforma EventOn</span>
+      <h2>Uma experiência digital desenhada para a <em>formação institucional pública</em>.</h2>
+      <p class="lede">
+        A EventOn organiza a jornada do participante antes, durante e após cada evento.
+      </p>
+      <p>
+        Do recebimento das credenciais à validação do certificado, a Plataforma centraliza os principais pontos de contato entre o Grupo NTC, os docentes, os participantes e as instituições contratantes — em um ambiente institucional próprio, sem expor a experiência do participante a plataformas públicas dispersas.
+      </p>
+      <p>
+        Operada pelo Instituto NTC do Brasil, a Plataforma foi desenhada para a realidade institucional brasileira: formação de servidores, registro de presença, certificação validável e atendimento humano dedicado a cada etapa.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== 6 RECURSOS CANON ========================== -->
+<section class="eo-recursos" id="recursos" aria-label="Recursos da Plataforma EventOn">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow gold">Recursos da Plataforma</p>
+      <h2>Seis funcionalidades essenciais que entregam a <em>experiência institucional</em></h2>
+      <p class="intro">Tudo no mesmo ambiente — o participante acessa o evento, baixa materiais e emite o certificado sem alternar entre plataformas externas.</p>
+    </div>
+
+    <div class="eo-recursos-grid fade-in">
+
+      <article class="eo-recurso">
+        <span class="eo-recurso-num">Funcionalidade 01</span>
+        <div class="eo-recurso-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="24" r="10"/><circle cx="24" cy="24" r="3" fill="currentColor"/><path d="M8 24c0-8.8 7.2-16 16-16M40 24c0 8.8-7.2 16-16 16"/></svg>
+        </div>
+        <h3>Acesso ao vivo</h3>
+        <p>Sala protegida de transmissão com login institucional, controle de presença, interação com docentes e moderação editorial das perguntas dos participantes.</p>
+        <span class="eo-recurso-meta">Transmissão ao vivo · controle de presença</span>
+      </article>
+
+      <article class="eo-recurso">
+        <span class="eo-recurso-num">Funcionalidade 02</span>
+        <div class="eo-recurso-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="10" width="36" height="26" rx="3"/><path d="M20 18l10 6-10 6V18z" fill="currentColor"/></svg>
+        </div>
+        <h3>Replay restrito</h3>
+        <p>Conteúdo gravado disponível em prazo determinado para inscritos, com controle de acesso, restrição de compartilhamento, rastreamento individual e controle de visualizações.</p>
+        <span class="eo-recurso-meta">Replay com prazo · acesso rastreado</span>
+      </article>
+
+      <article class="eo-recurso">
+        <span class="eo-recurso-num">Funcionalidade 03</span>
+        <div class="eo-recurso-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="32" height="36" rx="2"/><path d="M14 16h20M14 24h20M14 32h12"/><circle cx="34" cy="34" r="4" fill="currentColor"/></svg>
+        </div>
+        <h3>Certificação digital</h3>
+        <p>Certificado em PDF institucional com código de validação e QR Code, emitido após o cumprimento dos requisitos do evento (presença mínima e conclusão dos módulos quando previstos).</p>
+        <span class="eo-recurso-meta">QR Code validável · PDF institucional</span>
+      </article>
+
+      <article class="eo-recurso">
+        <span class="eo-recurso-num">Funcionalidade 04</span>
+        <div class="eo-recurso-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h22l8 8v24a2 2 0 01-2 2H10a2 2 0 01-2-2V10a2 2 0 012-2z"/><path d="M30 8v10h10M16 26h16M16 32h16M16 20h8"/></svg>
+        </div>
+        <h3>Materiais de apoio</h3>
+        <p>Slides, apostilas, normativos, leituras complementares e cases institucionais disponibilizados em formato PDF/Word para download direto na Área do Participante.</p>
+        <span class="eo-recurso-meta">Slides · apostilas · normativos</span>
+      </article>
+
+      <article class="eo-recurso">
+        <span class="eo-recurso-num">Funcionalidade 05</span>
+        <div class="eo-recurso-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="16" r="7"/><path d="M10 40c0-8 6.3-14 14-14s14 6 14 14"/><circle cx="38" cy="14" r="3" fill="currentColor"/></svg>
+        </div>
+        <h3>Área do Participante</h3>
+        <p>Hub individual com histórico de eventos, certificados emitidos, materiais baixados, próximas inscrições e gestão dos dados pessoais pelo próprio participante, conforme a LGPD.</p>
+        <span class="eo-recurso-meta">Login institucional · histórico individual</span>
+      </article>
+
+      <article class="eo-recurso">
+        <span class="eo-recurso-num">Funcionalidade 06</span>
+        <div class="eo-recurso-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h36v22a2 2 0 01-2 2H22l-8 6v-6H8a2 2 0 01-2-2V12z"/><path d="M16 22h16M16 28h10"/></svg>
+        </div>
+        <h3>Suporte dedicado</h3>
+        <p>Atendimento humano, direto e orientado à solução — pelo painel da Plataforma, e-mail e WhatsApp institucional — durante e após cada evento.</p>
+        <span class="eo-recurso-meta">Suporte humano · painel + e-mail + WhatsApp</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================== TOUR VISUAL ========================== -->
+<section class="eo-tour" id="tour" aria-label="Tour visual da Plataforma EventOn">
+  <div class="container eo-tour-inner">
+    <div class="eo-tour-head fade-in">
+      <p class="eyebrow light">Tour visual</p>
+      <h2>Três <em>telas representativas</em> da Plataforma EventOn</h2>
+      <p class="intro">Três telas ilustrativas da experiência. Interface completa apresentada no acesso institucional. Identidade visual Soberana 2026.</p>
+    </div>
+
+    <div class="eo-tour-grid fade-in">
+
+      <article class="eo-tela">
+        <div class="eo-tela-screen" aria-hidden="true">
+          <div class="eo-tela-screen-body">
+            <div class="eo-mock-live">
+              <div class="eo-mock-live-video">
+                <span class="play-icon"></span>
+              </div>
+              <div class="eo-mock-live-chat">
+                <span class="chat-h">Chat moderado</span>
+                <div class="msg"><span class="av"></span><span class="ln"></span></div>
+                <div class="msg"><span class="av"></span><span class="ln short"></span></div>
+                <div class="msg"><span class="av"></span><span class="ln"></span></div>
+                <div class="msg"><span class="av"></span><span class="ln short"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="eo-tela-tag">Tela 01 · Sala de transmissão</span>
+        <h4>Acesso ao evento ao vivo</h4>
+        <p>Player de vídeo institucional, chat moderado pelos coordenadores e painel de presença individual em tempo real.</p>
+        <span class="eo-tela-foot">Sala protegida com login institucional</span>
+      </article>
+
+      <article class="eo-tela">
+        <div class="eo-tela-screen" aria-hidden="true">
+          <div class="eo-tela-screen-body">
+            <div class="eo-mock-area">
+              <div class="eo-mock-area-side">
+                <span class="sd-item active"></span>
+                <span class="sd-item"></span>
+                <span class="sd-item"></span>
+                <span class="sd-item"></span>
+                <span class="sd-item"></span>
+                <span class="sd-item"></span>
+              </div>
+              <div class="eo-mock-area-main">
+                <span class="hd"></span>
+                <span class="sub"></span>
+                <div class="eo-mock-area-cards">
+                  <div class="eo-mock-area-card">
+                    <span class="cd-l"></span>
+                    <span class="cd-m"></span>
+                    <span class="cd-bar"></span>
+                  </div>
+                  <div class="eo-mock-area-card">
+                    <span class="cd-l"></span>
+                    <span class="cd-m"></span>
+                    <span class="cd-bar"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="eo-tela-tag">Tela 02 · Área do Participante</span>
+        <h4>Painel individual do servidor</h4>
+        <p>Sidebar de navegação com histórico, certificados, próximas inscrições, materiais e dados pessoais. Cards de eventos com barra de progresso.</p>
+        <span class="eo-tela-foot">Login institucional com CPF e senha</span>
+      </article>
+
+      <article class="eo-tela">
+        <div class="eo-tela-screen" aria-hidden="true">
+          <div class="eo-tela-screen-body">
+            <div class="eo-mock-cert">
+              <div class="eo-mock-cert-pdf">
+                <div class="eo-mock-cert-text">
+                  <span class="ct-title">Certificado · Instituto NTC do Brasil</span>
+                  <span class="ct-line gold"></span>
+                  <span class="ct-line w90"></span>
+                  <span class="ct-line w80"></span>
+                  <span class="ct-line w70"></span>
+                  <span class="ct-line w80"></span>
+                </div>
+                <div class="eo-mock-cert-qr"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <span class="eo-tela-tag">Tela 03 · Certificado digital</span>
+        <h4>Validação por QR Code institucional</h4>
+        <p>PDF institucional do Instituto NTC do Brasil com código de validação e QR Code que direciona para a página pública de autenticação.</p>
+        <span class="eo-tela-foot">Página pública de autenticação institucional</span>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================== COMO FUNCIONA · 4 PASSOS ========================== -->
+<section class="eo-processo" id="como-funciona" aria-label="Como funciona a Plataforma EventOn">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow gold">Como funciona</p>
+      <h2>Quatro passos do <em>participante</em></h2>
+      <p class="intro">Da inscrição ao certificado, sem precisar sair do ambiente da Plataforma EventOn.</p>
+    </div>
+
+    <div class="eo-processo-grid fade-in">
+      <article class="eo-passo">
+        <h4>Credenciais</h4>
+        <p>Após inscrição no evento (individual ou em grupo), o participante recebe e-mail institucional com login, senha e link de acesso à Plataforma EventOn.</p>
+        <span class="eo-passo-prazo">Prazo · até 24h após confirmação</span>
+      </article>
+      <article class="eo-passo">
+        <h4>Acesso ao evento</h4>
+        <p>Login institucional na sala de transmissão ao vivo, com controle de presença automático e chat moderado para interação com docentes e curadoria.</p>
+        <span class="eo-passo-prazo">Disponível · 30min antes do evento</span>
+      </article>
+      <article class="eo-passo">
+        <h4>Conteúdo e materiais</h4>
+        <p>Replay disponível em prazo determinado para inscritos, materiais de apoio (slides, apostilas, normativos) prontos para download na Área do Participante.</p>
+        <span class="eo-passo-prazo">Replay · 7 a 30 dias após evento</span>
+      </article>
+      <article class="eo-passo">
+        <h4>Certificado</h4>
+        <p>Cumpridos os requisitos (presença mínima, conclusão dos módulos), emissão automática do certificado digital validável por QR Code institucional.</p>
+        <span class="eo-passo-prazo">Emissão · até 5 dias úteis após evento</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== PARALLAX EDITORIAL ========================== -->
+<aside class="eo-parallax" role="presentation" aria-hidden="true">
+  <div class="eo-parallax-inner">
+    <span class="eo-parallax-eyebrow">Um ambiente, todos os recursos</span>
+    <h2>O participante <strong>não navega entre plataformas</strong> — acessa o evento, baixa materiais, emite certificado e fala com suporte no mesmo ambiente da Plataforma EventOn.</h2>
+  </div>
+</aside>
+
+<!-- ========================== VITRINE POR ÁREA ========================== -->
+<section class="eo-vitrine" id="aplicacoes" aria-label="Aplicações da Plataforma EventOn por área estratégica">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow">Aplicações por área estratégica</p>
+      <h2>A mesma plataforma, <em>aplicada às áreas estratégicas do Grupo NTC</em>.</h2>
+      <p class="intro">Educação, Gestão Pública, Contratações Públicas e Saúde contam com agendas, trilhas e formatos próprios operados no ambiente EventOn.</p>
+    </div>
+
+    <div class="eo-vitrine-grid fade-in">
+
+      <article class="eo-vert-card" data-vertical="educacao">
+        <span class="eo-vert-card-eyebrow">NTC Educação</span>
+        <h3>Educação</h3>
+        <p>Seminários, oficinas e cursos executivos sobre alfabetização, gestão escolar, educação digital, primeira infância, ensino médio e políticas educacionais.</p>
+        <p class="eo-vert-card-meta">9 programas · <strong>PEAR · EDUTEC · PROGE · PEI · EGIDE</strong></p>
+        <a class="eo-vert-card-link" href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu" data-track="eo_vitrine_edu">Conhecer NTC Educação <span aria-hidden="true">→</span></a>
+      </article>
+
+      <article class="eo-vert-card" data-vertical="gestao-publica">
+        <span class="eo-vert-card-eyebrow">NTC Gestão Pública</span>
+        <h3>Gestão Pública</h3>
+        <p>Jornadas executivas em liderança institucional, governança, modernização administrativa e direção estratégica do Estado brasileiro.</p>
+        <p class="eo-vert-card-meta">3 programas · <strong>LIDERA · SIGA · AGIP</strong></p>
+        <a class="eo-vert-card-link" href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov" data-track="eo_vitrine_gov">Conhecer NTC Gestão Pública <span aria-hidden="true">→</span></a>
+      </article>
+
+      <article class="eo-vert-card" data-vertical="contratacoes">
+        <span class="eo-vert-card-eyebrow">Núcleo Contratações · Frente NTC GP</span>
+        <h3>Contratações Públicas</h3>
+        <p>Capacitação técnica em Lei 14.133/2021, licitações, contratos administrativos, controle externo, concessões, PPPs, obras e gestão contratual.</p>
+        <p class="eo-vert-card-meta">Programa · <strong>AGIP</strong> · Núcleo Contratações</p>
+        <a class="eo-vert-card-link" href="./06_Pagina_Programa_AGIP_v1.html" data-cms-link="programa-AGIP" data-track="eo_vitrine_cp">Conhecer AGIP · Núcleo Contratações <span aria-hidden="true">→</span></a>
+      </article>
+
+      <article class="eo-vert-card" data-vertical="saude">
+        <span class="eo-vert-card-eyebrow">NTC Saúde</span>
+        <h3>Saúde</h3>
+        <p>Formações em governança do SUS, atenção primária, redes de cuidado, saúde digital, financiamento e direção institucional em saúde pública.</p>
+        <p class="eo-vert-card-meta">3 programas · <strong>SIGS · PROAPS+ · PROSUS+</strong></p>
+        <a class="eo-vert-card-link" href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau" data-track="eo_vitrine_sau">Conhecer NTC Saúde <span aria-hidden="true">→</span></a>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================== SUPORTE AO PARTICIPANTE ========================== -->
+<section class="eo-suporte" id="suporte" aria-label="Suporte ao participante da Plataforma EventOn">
+  <div class="container">
+    <div class="eo-suporte-inner fade-in">
+      <div class="eo-suporte-body">
+        <p class="eyebrow light">Suporte ao participante</p>
+        <h2>Atendimento humano, <em>direto e orientado à solução</em>.</h2>
+        <p>O suporte ao participante da Plataforma EventOn é prestado por equipe dedicada do Instituto NTC do Brasil — com encaminhamento direto à área responsável e acompanhamento até a resolução. Disponível durante a transmissão ao vivo e nas horas posteriores ao encerramento de cada evento.</p>
+      </div>
+
+      <div class="eo-suporte-canais">
+        <div class="eo-canal">
+          <div>
+            <h4>Painel da Plataforma</h4>
+            <p>Botão de "Suporte" disponível em todas as telas após o login institucional do participante.</p>
+          </div>
+          <span class="eo-canal-sla">Resposta · em minutos durante o evento</span>
+        </div>
+        <div class="eo-canal">
+          <div>
+            <h4>E-mail institucional</h4>
+            <p><strong style="color: var(--pergaminho);">suporte@institutontc.com.br</strong> · canal escrito com registro.</p>
+          </div>
+          <span class="eo-canal-sla">Retorno · até 4h úteis</span>
+        </div>
+        <div class="eo-canal">
+          <div>
+            <h4>WhatsApp institucional</h4>
+            <p><strong style="color: var(--pergaminho);">(63) 98444-4040</strong> · canal direto da equipe NTC.</p>
+          </div>
+          <span class="eo-canal-sla">Resposta rápida · horário comercial</span>
+        </div>
+        <div class="eo-canal">
+          <div>
+            <h4>Atendimento institucional (órgãos)</h4>
+            <p>Equipe comercial dedicada a coordenadores de turmas in company e fechadas.</p>
+          </div>
+          <span class="eo-canal-sla">Encaminhamento · prioritário</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== ÁREA DO PARTICIPANTE ========================== -->
+<section class="eo-area" id="area-participante" aria-label="Área do Participante da Plataforma EventOn">
+  <div class="container">
+    <div class="eo-area-inner fade-in">
+
+      <div class="eo-area-body">
+        <p class="eyebrow gold">Área do Participante</p>
+        <h2>Seu histórico institucional, <em>em um só lugar</em>.</h2>
+        <p>
+          Login institucional com CPF e senha cadastrada. A Área do Participante reúne o histórico completo de eventos, certificados emitidos, materiais baixados, próximas inscrições e dados pessoais (com gestão LGPD pelo próprio participante).
+        </p>
+        <p>
+          O acesso é dedicado a quem participou de pelo menos um evento na Plataforma EventOn. Para primeira inscrição, a Área do Participante é criada automaticamente após a confirmação.
+        </p>
+        <div class="eo-area-actions">
+          <a class="btn btn--gold" href="./12_Pagina_Contato_v1.html?categoria=area-participante#tab-atendimento" data-cms-link="acesso-area-participante" data-track="eo_area_acesso">Acessar Área do Participante <span class="btn-arrow">→</span></a>
+          <a class="btn btn--secondary" href="./12_Pagina_Contato_v1.html?categoria=recuperar-acesso#tab-atendimento" data-cms-link="recuperar-acesso" data-track="eo_area_recuperar">Recuperar acesso</a>
+        </div>
+      </div>
+
+      <div class="eo-area-aside">
+        <aside class="eo-area-aside-inner">
+          <p class="eo-area-aside-eyebrow">O que você encontra na Área</p>
+          <h3>Hub institucional do participante</h3>
+          <ul>
+            <li>Histórico completo de eventos com data, formato e carga horária</li>
+            <li>Certificados emitidos · download em PDF + página pública de validação</li>
+            <li>Materiais de apoio · slides, apostilas, normativos por evento</li>
+            <li>Próximas inscrições · agenda confirmada e em formação</li>
+            <li>Replays disponíveis dentro do prazo institucional</li>
+            <li>Acesso, atualização e solicitações dos dados pessoais pelo próprio participante, conforme a LGPD</li>
+            <li>Canal direto com a equipe de suporte da Plataforma</li>
+          </ul>
+        </aside>
+
+        <article class="eo-login-card" aria-label="Card visual de acesso à Área do Participante">
+          <p class="eo-login-eyebrow">Acesso institucional · Visual</p>
+          <h3>Acesso à Área do Participante</h3>
+          <p class="eo-login-card-sub">Login com CPF e senha cadastrada na primeira inscrição.</p>
+
+          <div class="eo-login-field">
+            <label for="eo-login-cpf">CPF do participante</label>
+            <div class="eo-login-input">
+              <span class="eo-login-input-text">000.000.000-00</span>
+              <span class="eo-login-input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="eo-login-field">
+            <label for="eo-login-pwd">Senha</label>
+            <div class="eo-login-input is-filled">
+              <span class="pwd-mask">••••••••</span>
+              <span class="eo-login-input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="eo-login-actions">
+            <a class="btn btn--gold" href="./12_Pagina_Contato_v1.html?categoria=area-participante#tab-atendimento" data-cms-link="acesso-area-participante" data-track="eo_login_card_acesso">Acessar Área do Participante <span class="btn-arrow">→</span></a>
+          </div>
+
+          <div class="eo-login-helper">
+            <a href="./12_Pagina_Contato_v1.html?categoria=recuperar-acesso#tab-atendimento" data-cms-link="recuperar-acesso" data-track="eo_login_card_recuperar">Esqueci minha senha</a>
+            <span>Primeira inscrição? <a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-primeira-inscricao" data-track="eo_login_card_agenda">Ver agenda →</a></span>
+          </div>
+
+          <p class="eo-login-foot">
+            Apresentação visual do acesso institucional. Os dados pessoais são tratados pelo <strong>Instituto NTC do Brasil</strong> conforme a LGPD · DPO: dpo@institutontc.com.br
+          </p>
+        </article>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================== FAQ ========================== -->
+<section class="eo-faq" id="faq" aria-label="Perguntas frequentes sobre a Plataforma EventOn">
+  <div class="container">
+    <div class="eo-faq-inner">
+      <div class="eo-faq-head fade-in">
+        <p class="eyebrow">Dúvidas frequentes</p>
+        <h2>Perguntas <em>frequentes</em></h2>
+      </div>
+
+      <div class="eo-faq-item is-open">
+        <button class="eo-faq-toggle" aria-expanded="true" aria-controls="faq-1">
+          <h3>Como recebo o acesso à Plataforma EventOn?</h3>
+          <span class="eo-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="eo-faq-body" id="faq-1">
+          <p>Após a confirmação da inscrição (individual ou em grupo institucional), você recebe em até <strong>24 horas</strong> um e-mail institucional com login (CPF), senha provisória e link de acesso à Plataforma EventOn. A primeira entrada solicita a troca da senha provisória por uma definitiva escolhida por você.</p>
+          <p>Para turmas in company, o coordenador da instituição contratante recebe as credenciais consolidadas para distribuição interna.</p>
+        </div>
+      </div>
+
+      <div class="eo-faq-item">
+        <button class="eo-faq-toggle" aria-expanded="false" aria-controls="faq-2">
+          <h3>Por quanto tempo o replay fica disponível?</h3>
+          <span class="eo-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="eo-faq-body" id="faq-2">
+          <p>O prazo de disponibilidade do replay varia conforme o evento — em geral entre <strong>7 e 30 dias após o encerramento</strong>. O prazo específico é informado no e-mail de confirmação da inscrição e na própria Plataforma.</p>
+          <p>O replay é protegido contra cópia, rastreado por acesso individual e exclusivo aos inscritos. Não há liberação pública após o evento.</p>
+        </div>
+      </div>
+
+      <div class="eo-faq-item">
+        <button class="eo-faq-toggle" aria-expanded="false" aria-controls="faq-3">
+          <h3>Como funciona a emissão do certificado?</h3>
+          <span class="eo-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="eo-faq-body" id="faq-3">
+          <p>O certificado é emitido automaticamente em até <strong>5 dias úteis</strong> após o encerramento do evento, desde que cumpridos os requisitos (presença mínima na transmissão ao vivo ou conclusão do replay + módulos avaliativos quando previstos).</p>
+          <p>O documento é entregue em PDF institucional do Instituto NTC do Brasil, com código de validação e QR Code que direcionam para a página pública de autenticação, e fica disponível para download na Área do Participante.</p>
+        </div>
+      </div>
+
+      <div class="eo-faq-item">
+        <button class="eo-faq-toggle" aria-expanded="false" aria-controls="faq-4">
+          <h3>O certificado é validável por terceiros?</h3>
+          <span class="eo-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="eo-faq-body" id="faq-4">
+          <p>Sim. O código QR impresso no certificado direciona para uma página pública de validação institucional do Grupo NTC, onde qualquer pessoa pode confirmar a autenticidade do documento — nome do participante, evento, carga horária, data e número de registro.</p>
+          <p>Esse mecanismo atende requisitos institucionais comuns em órgãos públicos para validação de certificados em progressões funcionais e processos seletivos internos.</p>
+        </div>
+      </div>
+
+      <div class="eo-faq-item">
+        <button class="eo-faq-toggle" aria-expanded="false" aria-controls="faq-5">
+          <h3>Esqueci minha senha. Como recupero o acesso?</h3>
+          <span class="eo-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="eo-faq-body" id="faq-5">
+          <p>Na tela de login da Plataforma EventOn, clique em "Esqueci minha senha" e informe o CPF cadastrado. Você receberá um e-mail institucional com instrução de redefinição em até <strong>15 minutos</strong>.</p>
+          <p>Se o e-mail cadastrado não estiver mais ativo, entre em contato com o suporte por WhatsApp ou e-mail (<strong>suporte@institutontc.com.br</strong>) para atendimento personalizado.</p>
+        </div>
+      </div>
+
+      <div class="eo-faq-item">
+        <button class="eo-faq-toggle" aria-expanded="false" aria-controls="faq-6">
+          <h3>Posso baixar os materiais antes do evento?</h3>
+          <span class="eo-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="eo-faq-body" id="faq-6">
+          <p>Os materiais são disponibilizados na Área do Participante <strong>conforme o cronograma editorial do evento</strong>. Materiais preparatórios costumam estar disponíveis 24-48 horas antes; materiais complementares e cases ficam liberados durante e após o evento.</p>
+          <p>Em formações in company e turmas fechadas, o cronograma de liberação pode ser customizado conforme combinado com a instituição contratante.</p>
+        </div>
+      </div>
+
+      <div class="eo-faq-item">
+        <button class="eo-faq-toggle" aria-expanded="false" aria-controls="faq-7">
+          <h3>Como funciona o suporte ao participante?</h3>
+          <span class="eo-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="eo-faq-body" id="faq-7">
+          <p>O suporte da Plataforma EventOn é <strong>humano, direto e orientado à solução</strong>, prestado pela equipe dedicada do Instituto NTC do Brasil. Durante eventos ao vivo há equipe de plantão para responder dúvidas em minutos pelo painel da Plataforma.</p>
+          <p>Em horário comercial, o atendimento humano segue disponível pelo painel, e-mail (<strong>suporte@institutontc.com.br</strong>) e WhatsApp institucional <strong>(63) 98444-4040</strong>.</p>
+        </div>
+      </div>
+
+      <div class="eo-faq-item">
+        <button class="eo-faq-toggle" aria-expanded="false" aria-controls="faq-8">
+          <h3>Como meus dados pessoais são tratados (LGPD)?</h3>
+          <span class="eo-faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="eo-faq-body" id="faq-8">
+          <p>Os dados pessoais cadastrados na Plataforma EventOn são tratados conforme a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018), com finalidade declarada (inscrição, certificação, suporte), retenção pelo período necessário ao vínculo institucional e nunca compartilhados com terceiros sem consentimento explícito.</p>
+          <p>Na Área do Participante, o próprio participante realiza o acesso, a atualização e as solicitações relacionadas aos seus dados pessoais (exportação ou exclusão), conforme a LGPD. O Encarregado de Dados (DPO) do Instituto NTC do Brasil é <strong>dpo@institutontc.com.br</strong>.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================== CTA FINAL ========================== -->
+<section class="eo-cta-final" aria-label="Chamada institucional · Plataforma EventOn">
+  <div class="container">
+    <div class="eo-cta-final-inner fade-in">
+      <p class="eyebrow light">Próximo passo institucional</p>
+      <h2>Acesse a Plataforma EventOn <em>ou conheça a agenda</em>.</h2>
+      <p>
+        Já tem evento confirmado? Acesse direto a Área do Participante. Quer conhecer a agenda completa do Grupo NTC ou contratar uma turma in company para a sua instituição? Os caminhos estão a um clique.
+      </p>
+      <div class="eo-cta-final-actions">
+        <a class="btn btn--gold" href="#area-participante" data-cms-link="area-participante" data-track="eo_cta_final_area">Acessar Área do Participante <span class="btn-arrow">→</span></a>
+        <a class="btn btn--ghost-light" href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa" data-track="eo_cta_final_agenda">Ver Agenda Geral NTC</a>
+        <a class="btn btn--ghost-light" href="./26_Pagina_Solucoes_v1.html" data-cms-link="pagina-solucoes" data-track="eo_cta_final_solucoes">Contratação institucional</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ========================== STICKY CTA MOBILE ========================== -->
+<div class="sticky-cta-mobile" id="stickyCta" role="complementary" aria-label="Chamada institucional móvel">
+  <button class="sticky-cta-mobile-dismiss" id="stickyCtaDismiss" aria-label="Fechar chamada">×</button>
+  <a class="btn btn--gold" href="#area-participante" data-cms-link="sticky-cta-area-participante" data-track="sticky_cta_area_participante">Acessar Área do Participante <span class="btn-arrow">→</span></a>
+</div>
+
+<!-- ========================== FOOTER CANON ========================== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="./img/logos/logo-dark.svg" alt="Grupo NTC" />
+        <span class="footer-tagline">O novo padrão da formação institucional.</span>
+        <p class="footer-address">
+          <strong>Instituto NTC do Brasil</strong><br>
+          SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001<br>
+          Asa Sul · CEP 70308-200 · Brasília – DF<br>
+          (63) 3212-1199 · contato@institutontc.com.br
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h5>Navegação</h5>
+        <ul>
+          <li><a href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas">Programas</a></li>
+          <li><a href="./09_Pagina_Agenda_v2.html">Capacitação</a></li>
+          <li><a href="./26_Pagina_Solucoes_v1.html">Soluções</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#conteudos">Conteúdos</a></li>
+          <li><a href="./25_Pagina_Corpo_Docente_v1.html" data-cms-link="pagina-corpo-docente">Corpo Docente</a></li>
+          <li><a href="#main" data-cms-link="eventon-home" aria-current="page">EventOn</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html">Contato</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Plataforma EventOn</h5>
+        <ul>
+          <li><a href="#recursos" data-cms-link="eventon-recursos">Recursos da Plataforma</a></li>
+          <li><a href="#tour" data-cms-link="eventon-tour">Tour visual</a></li>
+          <li><a href="#como-funciona" data-cms-link="eventon-como-funciona">Como funciona</a></li>
+          <li><a href="#area-participante" data-cms-link="area-participante">Área do Participante</a></li>
+          <li><a href="#suporte" data-cms-link="eventon-suporte">Suporte ao participante</a></li>
+          <li><a href="#faq" data-cms-link="eventon-faq">Perguntas frequentes</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Atendimento</h5>
+        <ul>
+          <li><a href="./09_Pagina_Agenda_v2.html">Eventos com inscrições abertas</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html#tab-equipe" data-cms-link="inscricao-equipe">Inscrever equipe</a></li>
+          <li><a href="./12_Pagina_Contato_v1.html#tab-atendimento" data-cms-link="atendimento-comercial">Atendimento comercial</a></li>
+          <li><a href="mailto:suporte@institutontc.com.br" data-cms-link="eventon-suporte-email">suporte@institutontc.com.br</a></li>
+          <li><a href="https://wa.me/5563984444040" data-cms-link="whatsapp">WhatsApp · (63) 98444-4040</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-badge">Grupo NTC — Núcleo de Tecnologia e Conhecimento · 2026</p>
+      <ul class="footer-legal">
+        <li><a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a></li>
+        <li><a href="./31_Pagina_Termos_v1.html" data-cms-link="legal-termos">Termos de Uso</a></li>
+        <li><a href="./32_Pagina_Cookies_v1.html" data-cms-link="legal-cookies">Política de Cookies</a></li>
+        <li><a href="./33_Pagina_LGPD_v1.html" data-cms-link="legal-lgpd">LGPD</a></li>
+        <li><a href="./34_Pagina_MapaDoSite_v1.html" data-cms-link="legal-mapa-do-site">Mapa do site</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* =============================================================
+   PIPELINE INTERATIVO · EVENTON v1.0
+   Canon: mega-menu + drawer + FAQ accordion + sticky CTA + fade-in
+   ============================================================= */
+
+function track(name, payload) {
+  try {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(Object.assign({ event: name }, payload || {}));
+  } catch (e) { /* noop */ }
+}
+
+/* 1) MEGA MENU (DESKTOP) */
+(function () {
+  const triggers = document.querySelectorAll('.nav-item.has-mega');
+  const megas = document.querySelectorAll('.mega');
+  let openTimer = null;
+  function openMega(id) {
+    closeAllMegas();
+    const m = document.getElementById('mega-' + id);
+    if (m) m.classList.add('is-open');
+    triggers.forEach(t => t.setAttribute('aria-expanded', t.dataset.mega === id ? 'true' : 'false'));
+  }
+  function closeAllMegas() {
+    megas.forEach(m => m.classList.remove('is-open'));
+    triggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
+  }
+  triggers.forEach(trigger => {
+    trigger.addEventListener('mouseenter', () => { clearTimeout(openTimer); openMega(trigger.dataset.mega); });
+    trigger.addEventListener('click', e => {
+      e.preventDefault();
+      const id = trigger.dataset.mega;
+      const isOpen = document.getElementById('mega-' + id).classList.contains('is-open');
+      if (isOpen) closeAllMegas(); else openMega(id);
+    });
+    trigger.addEventListener('focus', () => openMega(trigger.dataset.mega));
+  });
+  megas.forEach(mega => {
+    mega.addEventListener('mouseenter', () => clearTimeout(openTimer));
+    mega.addEventListener('mouseleave', () => { openTimer = setTimeout(closeAllMegas, 200); });
+  });
+  document.querySelector('.site-header').addEventListener('mouseleave', () => { openTimer = setTimeout(closeAllMegas, 240); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllMegas(); });
+  document.addEventListener('click', e => { if (!e.target.closest('.site-header')) closeAllMegas(); });
+})();
+
+/* 2) MOBILE DRAWER */
+(function () {
+  const toggle = document.getElementById('mobileToggle');
+  const drawer = document.getElementById('mobileDrawer');
+  const backdrop = document.getElementById('mobileBackdrop');
+  const closeBtn = document.getElementById('drawerClose');
+  if (!toggle || !drawer || !backdrop) return;
+  function openDrawer() {
+    drawer.classList.add('is-open'); backdrop.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true'); drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
+    setTimeout(() => closeBtn.focus(), 320);
+  }
+  function closeDrawer() {
+    drawer.classList.remove('is-open'); backdrop.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false'); drawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll'); toggle.focus();
+  }
+  toggle.addEventListener('click', () => { if (drawer.classList.contains('is-open')) closeDrawer(); else openDrawer(); });
+  closeBtn.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer(); });
+  drawer.querySelectorAll('.drawer-item.has-sub').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById('sub-' + btn.dataset.sub);
+      if (!target) return;
+      const isOpen = target.classList.toggle('is-open');
+      btn.classList.toggle('is-expanded', isOpen);
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+  drawer.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', () => setTimeout(closeDrawer, 80));
+  });
+})();
+
+/* 3) FAQ ACCORDION */
+(function () {
+  document.querySelectorAll('.eo-faq-item').forEach(item => {
+    const toggle = item.querySelector('.eo-faq-toggle');
+    if (!toggle) return;
+    toggle.addEventListener('click', () => {
+      const isOpen = item.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      track('eo_faq_toggle', { open: isOpen, q: toggle.querySelector('h3')?.textContent?.slice(0, 60) });
+    });
+  });
+})();
+
+/* 4) STICKY CTA MOBILE */
+(function () {
+  const sticky = document.getElementById('stickyCta');
+  const dismiss = document.getElementById('stickyCtaDismiss');
+  if (!sticky || !dismiss) return;
+  let dismissed = false;
+  function onScroll() {
+    if (dismissed) return;
+    const y = window.scrollY || window.pageYOffset;
+    if (y > 800) sticky.classList.add('is-visible'); else sticky.classList.remove('is-visible');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  dismiss.addEventListener('click', () => {
+    dismissed = true; sticky.classList.remove('is-visible');
+    track('sticky_cta_dismissed', { page: 'eventon' });
+  });
+})();
+
+/* 5) FADE-IN OBSERVER */
+(function () {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('is-visible'));
+    return;
+  }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+})();
+
+/* 6) SCROLL SUAVE PARA ÂNCORAS + TRACKING */
+(function () {
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const href = a.getAttribute('href');
+      if (href.length < 2 || href === '#main') return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 88;
+      const top = target.getBoundingClientRect().top + window.pageYOffset - headerH - 8;
+      window.scrollTo({ top, behavior: 'smooth' });
+      history.replaceState(null, '', href);
+      const trackName = a.getAttribute('data-track');
+      if (trackName) track(trackName, { target: href });
+    });
+  });
+})();
+
+/* 7) SCROLL-SPY LEVE PARA BARRA INTERNA */
+(function () {
+  const links = document.querySelectorAll('.eo-subnav a[href^="#"]');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  const map = new Map();
+  links.forEach(a => {
+    const id = a.getAttribute('href').slice(1);
+    const target = document.getElementById(id);
+    if (target) map.set(target, a);
+  });
+  const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 88;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      const a = map.get(e.target);
+      if (!a) return;
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('is-active'));
+        a.classList.add('is-active');
+      }
+    });
+  }, { rootMargin: `-${headerH + 80}px 0px -55% 0px`, threshold: 0 });
+  map.forEach((_, target) => io.observe(target));
+})();
+
+track('page_view', { page: 'eventon' });
+</script>
+
+<!-- ========================== JSON-LD · CollectionPage + EducationalOrganization + SoftwareApplication ========================== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://www.grupontc.com.br/eventon#webpage",
+      "url": "https://www.grupontc.com.br/eventon",
+      "name": "Plataforma EventOn · Grupo NTC",
+      "description": "Ambiente digital institucional do Grupo NTC para acesso ao vivo, replay protegido, materiais de apoio, certificação digital validável e suporte humano dedicado aos participantes.",
+      "inLanguage": "pt-BR",
+      "isPartOf": { "@type": "WebSite", "name": "Grupo NTC", "url": "https://www.grupontc.com.br" },
+      "publisher": { "@id": "https://www.grupontc.com.br/#instituto-ntc-do-brasil" },
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Grupo NTC", "item": "https://www.grupontc.com.br/" },
+          { "@type": "ListItem", "position": 2, "name": "Capacitação", "item": "https://www.grupontc.com.br/agenda" },
+          { "@type": "ListItem", "position": 3, "name": "Plataforma EventOn", "item": "https://www.grupontc.com.br/eventon" }
+        ]
+      }
+    },
+    {
+      "@type": "EducationalOrganization",
+      "@id": "https://www.grupontc.com.br/#instituto-ntc-do-brasil",
+      "name": "Instituto NTC do Brasil",
+      "alternateName": ["INTC", "Grupo NTC"],
+      "url": "https://www.grupontc.com.br",
+      "email": "contato@institutontc.com.br",
+      "telephone": "+556332121199",
+      "logo": "https://www.grupontc.com.br/img/logos/logo-dark.svg",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001",
+        "addressLocality": "Brasília", "addressRegion": "DF",
+        "postalCode": "70308-200", "addressCountry": "BR"
+      },
+      "areaServed": { "@type": "Country", "name": "Brasil" }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Plataforma EventOn",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "description": "Ambiente digital institucional do Grupo NTC para entrega de eventos online, presenciais e híbridos — sala protegida de transmissão, replay, materiais, certificado validável e suporte humano dedicado.",
+      "provider": { "@id": "https://www.grupontc.com.br/#instituto-ntc-do-brasil" },
+      "url": "https://www.grupontc.com.br/eventon",
+      "featureList": [
+        "Acesso ao vivo em sala protegida com controle de presença",
+        "Replay protegido por prazo determinado e rastreamento individual",
+        "Certificação digital validável por código QR institucional",
+        "Materiais de apoio em PDF para download na Área do Participante",
+        "Área do Participante com histórico completo e gestão dos dados pessoais pelo próprio participante",
+        "Suporte humano dedicado por painel, e-mail e WhatsApp institucional"
+      ]
+    }
+  ]
+}
+</script>
+<!-- NTC_COOKIE_CONSENT_JS_BEGIN -->
+<script defer src="./assets/cookie_consent.js"></script>
+<!-- NTC_COOKIE_CONSENT_JS_END -->
+
+</body>
+</html>

@@ -1,0 +1,2788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Contato institucional do Grupo NTC — formulários para proposta institucional, inscrição de equipes, imprensa e atendimento geral. Canais diretos, atendimento por vertical (Educação · Gestão Pública · Saúde) e suporte EventOn." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://www.grupontc.com.br/contato" />
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:site_name" content="Grupo NTC" />
+<meta property="og:title" content="Contato · Grupo NTC" />
+<meta property="og:description" content="Formulários institucionais, canais diretos e atendimento dedicado por vertical do Grupo NTC." />
+<meta property="og:url" content="https://www.grupontc.com.br/contato" />
+
+<title>Contato · Grupo NTC</title>
+
+<!--
+  ===========================================================================
+  GRUPO NTC · PORTAL · PÁGINA CONTATO · v1.3 · 12/05/2026
+  ---------------------------------------------------------------------------
+  Sprint D · Página comercial/funcional canonizada · revisão de publicação
+  + Fluxo único de inscrição em grupo institucional (v1.2)
+  + Hero institucional com imagem `cta-institucional-premium2.png` (v1.3).
+
+  REFINAMENTO v1.2 → v1.3 (12/05/2026):
+    — Hero recebeu imagem de fundo (passou a ter paridade com as demais
+      10 páginas-mãe que já tinham hero-bg).
+    — v1.3.0 (12/05): imagem provisória `cta-institucional-premium2.png`
+      (reuso editorial · variante ainda não utilizada do banco).
+    — v1.3.1 (13/05): imagem OFICIAL gerada no Leonardo.AI especificamente
+      para a página Contato — `hero-contato-escritorio-institucional.png`.
+      Conceito "O escritório-síntese do atendimento institucional":
+      gabinete executivo brasileiro premium, mesa de nogueira, lamparina
+      dourada, telefone executivo, vista de Brasília — sugere atendimento
+      dedicado, não call center.
+    — Filtros institucionais Soberana: saturate(86%) contrast(1.05)
+      background-position: center 42% (foco na composição editorial)
+    — Overlay: radial dourado-suave 18% top-right (acento)
+      + linear Noite→Oxford→Noite 94/80/68% (legibilidade preservada)
+    — min-height: 420px → 460px (respiração editorial)
+    — Camada de grid sutil preservada como ::after (z-index: 1)
+    — Conteúdo elevado para z-index: 2 (precedência sobre imagem + overlays)
+    — Imagem disponível em 3 variantes (.png · 1.png · 2.png) caso seja
+      necessário trocar — todas no mesmo padrão visual.
+
+  REFINAMENTO v1.1 → v1.2 (12/05/2026):
+    — Canal "Inscrever equipe" → "Inscrever equipe ou grupo institucional"
+      (atende de 3 participantes até inscrições em lote acima de 1.000)
+    — Select de quantidade ampliado: 3-5 · 6-10 · 11-20 · 21-50 · 51-100
+      · 101-500 · 501-1000 · acima-1000
+    — Bloco condicional .form-bulk (revelado para faixas >50): download
+      do modelo de planilha (XLSX), upload seguro de planilha
+      (XLSX/XLS/CSV · até 5MB · HTTPS/TLS), consent LGPD específico
+      sobre compartilhamento de dados dos participantes pela instituição
+      demandante (lgpd_lote)
+    — JS: setBulkMode() ativa/desativa o bloco, valida tipo e tamanho do
+      arquivo, exibe nome+tamanho ao anexar, e exige consent_lote como
+      required apenas quando bulk ativo
+    — JS: autofill via URL params ?evento=&evento_url= ao carregar
+      /contato#tab-equipe — usado pelas páginas internas dos eventos para
+      preencher automaticamente o campo "Evento de interesse" + hidden
+      field "eq-evento-url". Limpa a querystring da barra de endereço
+      preservando o hash. Eventos analytics: contato_bulk_toggle ·
+      contato_bulk_file_attached · contato_bulk_file_invalid ·
+      contato_evento_autofill · contato_form_bulk_consent_missing.
+    — Páginas internas de evento (03 PROSUS · 04 EDUTEC · 05 AGIP):
+      CTAs "Inscrever equipe" e "Solicitar proposta para grupo"
+      unificados em "Inscrever equipe ou grupo institucional" apontando
+      para /contato#tab-equipe com ?evento= e ?evento_url= preenchidos.
+      Fluxo único, sincronizado, sem duplicidade comercial.
+
+  REFINAMENTO v1 → v1.1 (12/05/2026):
+    — Hero: subtítulo mais enxuto, sem repetir "sem chatbots/call centers"
+    — Roteador: novo título "Escolha o canal mais adequado à sua demanda"
+                cards com texto e descrição reduzidos
+    — Forms: action="javascript:void(0);" + data-endpoint configurável
+             Cargo / Modalidade / Participantes (proposta) viram opcionais
+             Cargo (equipe) vira opcional
+             Hints e consents LGPD enxutos
+    — Canais: cards Telefone e WhatsApp recebem .is-featured
+              (border-left 6px + selo "Resposta rápida" dourado)
+    — Sede: iframe Google Maps real (não mais bloco esquemático)
+            botão "Abrir no Google Maps" promovido a btn--secondary
+            #agendar-visita → #tab-proposta (com texto
+            "Solicitar reunião institucional")
+    — Verticais: textos mais concisos
+                 CTA "Solicitar proposta" ganha data-vertical-preset
+                 → JS pré-seleciona o <select id="prop-vertical">
+    — Faixa Oxford: "SLA editorial" → "Prazos de retorno"
+    — FAQ: 8 respostas mais enxutas, mesma cobertura informacional
+    — LGPD: link interno apontando para #lgpd (não mais #politica-privacidade)
+    — Footer-legal: links provisórios apontam para #lgpd ou Home com
+                    data-cms-link preparado para o CMS substituir
+    — Âncoras mortas (#programas #conteudos #eventon #docentes #solucoes)
+      → apontam para ./02_Prototipo_Home_GrupoNTC_v2_6.html#XXX
+      (Home tem todas as seções correspondentes)
+
+  ESCOPO ENTREGUE:
+    1) Hero institucional dedicado (versão slim · não full-height)
+    2) Tabs-roteador editorial com 4 caminhos canon:
+         A · Atendimento geral
+         B · Proposta institucional (in company / órgão público)
+         C · Inscrição em grupo / equipe
+         D · Imprensa e relações institucionais
+    3) 4 formulários institucionais com hooks data-cms-link / data-form-id
+       prontos para o CMS futuro (sem backend ativo nesta versão)
+    4) Bloco de canais diretos (e-mail · telefone · WhatsApp) + sede + mapa
+    5) 3 cards de atendimento por vertical (Educação · Gestão Pública · Saúde)
+       respeitando o sistema cromático Soberana (Oxford · Cardeal · Oliva)
+    6) Horários comerciais e SLA editorial ("Retorno em até 1 dia útil")
+    7) FAQ de contato (8 perguntas)
+    8) Aviso LGPD em todos os forms + bloco institucional explícito
+    9) Footer canon Soberana
+
+  HERANÇA DE MATRIZ (paridade com Home v2.6):
+    — Tokens Soberana, tipografia, .container, .btn, .link-arrow, .eyebrow
+    — Header sticky + 3 mega menus (Programas · Capacitação · Soluções)
+    — Mobile drawer funcional
+    — Footer institucional idêntico
+    — Skip-link, fade-in, smooth scroll, focus visível
+
+  CONVENÇÃO DE SUBMISSÃO (data-form-id):
+    form-contato-atendimento        · canal geral · ticket de baixa prioridade
+    form-contato-proposta           · pipe comercial · lead institucional
+    form-contato-equipe             · pipe comercial · lead inscrição em grupo
+    form-contato-imprensa           · canal imprensa · roteia para AssCom
+
+  CMS FUTURO substitui action='javascript:void(0);' pelo endpoint adequado
+  (já indicado em data-endpoint) e o data-form-id vira chave de roteamento
+  no backend (HubSpot / RD Station / pipeline próprio).
+  ===========================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&family=Barlow:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+
+<style>
+/* =============================================================
+   SISTEMA SOBERANA 2026 · TOKENS
+   ============================================================= */
+:root {
+  --oxford:        #11365E;
+  --oxford-90:     rgba(17, 54, 94, 0.92);
+  --oxford-70:     rgba(17, 54, 94, 0.72);
+  --oxford-10:     rgba(17, 54, 94, 0.10);
+  --cardeal:       #8E2A1C;
+  --cardeal-10:    rgba(142, 42, 28, 0.10);
+  --oliva:         #4A6A1F;
+  --oliva-10:      rgba(74, 106, 31, 0.10);
+  --dourado:       #B8952E;
+  --dourado-soft:  #d6b350;
+  --noite:         #0B1726;
+  --pergaminho:    #F4F1E8;
+  --pergaminho-80: rgba(244, 241, 232, 0.80);
+  --pergaminho-50: rgba(244, 241, 232, 0.50);
+  --ivory:         #ECE7D8;
+  --tinta:         #14202E;
+  --grafite:       #3A4050;
+  --prata:         #A8ACB6;
+  --prata-30:      rgba(168, 172, 182, 0.32);
+  --prata-15:      rgba(168, 172, 182, 0.15);
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans:  'Barlow', system-ui, -apple-system, sans-serif;
+  --font-cond:  'Barlow Condensed', 'Barlow', sans-serif;
+
+  --space-1: 8px;  --space-2: 16px; --space-3: 24px; --space-4: 32px;
+  --space-5: 48px; --space-6: 64px; --space-7: 96px; --space-8: 128px;
+
+  --shadow-soft:   0 1px 2px rgba(20, 32, 46, 0.04), 0 2px 8px rgba(20, 32, 46, 0.04);
+  --shadow-medium: 0 2px 4px rgba(20, 32, 46, 0.06), 0 8px 24px rgba(20, 32, 46, 0.10);
+  --shadow-strong: 0 4px 12px rgba(20, 32, 46, 0.12), 0 16px 48px rgba(20, 32, 46, 0.14);
+
+  --container-max: 1280px;
+  --header-h: 88px;
+  --t-fast:   160ms ease-out;
+  --t-medium: 240ms ease-out;
+  --t-slow:   600ms ease-out;
+}
+
+/* =============================================================
+   RESET
+   ============================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-padding-top: var(--header-h); }
+body {
+  margin: 0; font-family: var(--font-sans); font-weight: 400;
+  font-size: 17px; line-height: 1.65; color: var(--grafite);
+  background: var(--pergaminho); text-rendering: optimizeLegibility;
+}
+body.no-scroll { overflow: hidden; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; transition: color var(--t-fast); }
+button { font-family: inherit; cursor: pointer; }
+ul { list-style: none; padding: 0; margin: 0; }
+
+:focus-visible { outline: 2px solid var(--dourado); outline-offset: 2px; border-radius: 2px; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; padding: 12px 20px;
+  background: var(--tinta); color: var(--pergaminho);
+  font-family: var(--font-cond); font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; font-size: 13px; z-index: 9999;
+}
+.skip-link:focus { left: 0; }
+
+/* =============================================================
+   TIPOGRAFIA GLOBAL
+   ============================================================= */
+h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0; line-height: 1.12; letter-spacing: -0.3px; }
+.eyebrow {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12.5px;
+  text-transform: uppercase; letter-spacing: 1.8px; color: var(--oxford);
+  margin: 0 0 var(--space-2);
+}
+.eyebrow.gold  { color: var(--dourado); }
+.eyebrow.light { color: var(--pergaminho-80); }
+.eyebrow.crimson { color: var(--cardeal); }
+.eyebrow.olive { color: var(--oliva); }
+
+.lede {
+  font-family: var(--font-serif); font-style: italic; font-weight: 400;
+  font-size: 24px; line-height: 1.4; color: var(--tinta);
+}
+
+.container { width: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 32px; }
+@media (max-width: 1199px) { .container { padding: 0 24px; } }
+@media (max-width: 767px)  { .container { padding: 0 16px; } }
+
+/* =============================================================
+   BOTÕES E LINKS
+   ============================================================= */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 26px; font-family: var(--font-sans); font-weight: 600;
+  font-size: 13.5px; letter-spacing: 0.8px; text-transform: uppercase;
+  border-radius: 4px; border: 1.5px solid transparent;
+  transition: all var(--t-medium); cursor: pointer; white-space: nowrap;
+}
+.btn--primary    { background: var(--oxford); color: var(--pergaminho); border-color: var(--oxford); }
+.btn--primary:hover { background: var(--noite); border-color: var(--noite); transform: translateY(-1px); box-shadow: var(--shadow-soft); }
+.btn--gold       { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+.btn--gold:hover { background: var(--noite); color: var(--dourado-soft); border-color: var(--dourado); }
+.btn--secondary  { background: transparent; color: var(--oxford); border-color: var(--oxford); }
+.btn--secondary:hover { background: var(--oxford); color: var(--pergaminho); }
+.btn--ghost-light{ background: transparent; color: var(--pergaminho); border-color: var(--pergaminho-80); }
+.btn--ghost-light:hover { background: var(--pergaminho); color: var(--noite); border-color: var(--pergaminho); }
+.btn--mini { padding: 10px 16px; font-size: 12px; }
+.btn-arrow { display: inline-block; transition: transform var(--t-medium); }
+.btn:hover .btn-arrow { transform: translateX(3px); }
+
+.link-arrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-cond); font-weight: 600; font-size: 13px;
+  text-transform: uppercase; letter-spacing: 1.4px; color: var(--oxford);
+  border-bottom: 1px solid transparent; padding-bottom: 3px;
+  transition: all var(--t-medium); cursor: pointer; background: none; border-top: 0; border-left: 0; border-right: 0;
+}
+.link-arrow::after { content: '→'; transition: transform var(--t-medium); }
+.link-arrow:hover { border-bottom-color: var(--dourado); color: var(--dourado); }
+.link-arrow:hover::after { transform: translateX(3px); }
+.link-arrow.light { color: var(--pergaminho); }
+.link-arrow.light:hover { color: var(--dourado-soft); border-bottom-color: var(--dourado-soft); }
+.link-arrow.crimson { color: var(--cardeal); }
+.link-arrow.crimson:hover { color: var(--cardeal); border-bottom-color: var(--cardeal); }
+.link-arrow.olive { color: var(--oliva); }
+.link-arrow.olive:hover { color: var(--oliva); border-bottom-color: var(--oliva); }
+
+/* =============================================================
+   HEADER · STICKY + MEGA MENU
+   ============================================================= */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(244, 241, 232, 0.94);
+  backdrop-filter: saturate(140%) blur(14px);
+  -webkit-backdrop-filter: saturate(140%) blur(14px);
+  border-bottom: 1px solid var(--prata-30);
+  height: var(--header-h);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 100%; gap: var(--space-3); }
+.brand { display: flex; align-items: center; }
+.brand img { height: 56px; width: auto; }
+@media (max-width: 599px) { .brand img { height: 44px; } }
+
+.nav-primary { display: flex; align-items: center; gap: 0; }
+.nav-item {
+  position: relative; padding: 30px 14px;
+  font-family: var(--font-cond); font-weight: 500; font-size: 13.5px;
+  color: var(--tinta); text-transform: uppercase; letter-spacing: 1.1px;
+  cursor: pointer; transition: color var(--t-fast);
+  background: transparent; border: 0;
+}
+.nav-item:hover { color: var(--oxford); }
+.nav-item.is-current { color: var(--oxford); }
+.nav-item.is-current::after {
+  content: ''; position: absolute; left: 14px; right: 14px; bottom: 22px;
+  height: 2px; background: var(--dourado);
+}
+.nav-item.has-mega::after {
+  content: ''; display: inline-block; width: 6px; height: 6px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  margin-left: 7px; opacity: 0.55;
+}
+
+.header-cta { display: flex; align-items: center; gap: 10px; }
+.btn--participant { background: var(--noite); color: var(--dourado); border-color: var(--noite); }
+.btn--participant:hover { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
+
+.mega {
+  position: absolute; top: calc(var(--header-h) - 1px); left: 0; right: 0;
+  background: var(--pergaminho);
+  border-top: 1px solid var(--prata-30);
+  border-bottom: 3px solid var(--oxford);
+  box-shadow: var(--shadow-medium);
+  opacity: 0; visibility: hidden; transform: translateY(-8px);
+  transition: opacity var(--t-medium), transform var(--t-medium), visibility var(--t-medium);
+  z-index: 99;
+}
+.mega.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+.mega-inner { display: grid; gap: var(--space-5); padding: var(--space-5) 0 var(--space-6); }
+.mega-col h4 {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: 2px; color: var(--dourado);
+  margin: 0 0 var(--space-3); padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--prata-30);
+}
+.mega-list { display: grid; gap: 12px; }
+.mega-list a {
+  display: block; padding: 6px 0; color: var(--tinta);
+  border-left: 0 solid var(--oxford); padding-left: 0;
+  transition: padding-left var(--t-medium), border-left-width var(--t-medium), color var(--t-fast);
+}
+.mega-list a strong {
+  font-family: var(--font-serif); font-weight: 600; font-size: 18px;
+  color: var(--tinta); display: block;
+}
+.mega-list a span {
+  font-family: var(--font-sans); font-size: 12.5px; color: var(--grafite);
+  display: block; line-height: 1.4; margin-top: 2px;
+}
+.mega-list a:hover { border-left-width: 3px; padding-left: 12px; color: var(--oxford); }
+.mega-list a:hover strong { color: var(--oxford); }
+#mega-programas .mega-inner { grid-template-columns: 1.1fr 1fr 1fr; }
+
+.mobile-toggle {
+  display: none; background: none; border: 0; padding: 12px;
+  color: var(--tinta); cursor: pointer; align-self: center;
+}
+.mobile-toggle span { display: block; width: 22px; height: 2px; background: currentColor; margin: 5px 0; transition: var(--t-medium); }
+
+@media (max-width: 1199px) {
+  .nav-primary { display: none; }
+  .header-cta .btn:not(.btn--participant) { display: none; }
+  .mobile-toggle { display: block; }
+}
+@media (max-width: 599px) {
+  .header-cta .btn--participant { display: none; }
+}
+
+/* =============================================================
+   MOBILE DRAWER
+   ============================================================= */
+.mobile-drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: 100%;
+  max-width: 420px; background: var(--pergaminho); z-index: 200;
+  transform: translateX(100%); transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  display: flex; flex-direction: column;
+  box-shadow: -8px 0 32px rgba(20, 32, 46, 0.18); overflow-y: auto;
+}
+.mobile-drawer.is-open { transform: translateX(0); }
+.mobile-drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(11, 23, 38, 0.6);
+  opacity: 0; visibility: hidden; transition: opacity 320ms, visibility 320ms; z-index: 199;
+}
+.mobile-drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+
+.drawer-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 24px; border-bottom: 1px solid var(--prata-30);
+}
+.drawer-head img { height: 44px; width: auto; }
+.drawer-close {
+  background: none; border: 0; padding: 8px; cursor: pointer;
+  font-family: var(--font-sans); font-size: 28px; color: var(--tinta);
+  line-height: 1; width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-nav { padding: var(--space-3) 0; flex: 1; }
+.drawer-item {
+  display: block; width: 100%; text-align: left;
+  padding: 18px 24px; border: 0; background: transparent;
+  font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  color: var(--tinta); cursor: pointer;
+  border-bottom: 1px solid var(--prata-15); transition: background var(--t-fast);
+}
+.drawer-item:hover, .drawer-item:focus { background: rgba(184, 149, 46, 0.08); }
+.drawer-item.is-current { color: var(--oxford); }
+.drawer-item.has-sub::after {
+  content: '+'; float: right; color: var(--dourado); font-weight: 400;
+  transition: transform var(--t-medium);
+}
+.drawer-item.has-sub.is-expanded::after { content: '−'; }
+.drawer-sub { display: none; background: rgba(168, 172, 182, 0.08); padding: 8px 0; }
+.drawer-sub.is-open { display: block; }
+.drawer-sub a {
+  display: block; padding: 12px 24px 12px 36px;
+  font-family: var(--font-sans); font-size: 15px; color: var(--grafite);
+  border-bottom: 1px solid var(--prata-15);
+}
+.drawer-sub a:hover { color: var(--oxford); background: rgba(184, 149, 46, 0.05); }
+.drawer-sub a strong { font-family: var(--font-serif); font-weight: 600; font-size: 16px; color: var(--tinta); display: block; }
+.drawer-sub a span { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--prata); }
+
+.drawer-cta {
+  padding: var(--space-3) 24px var(--space-4);
+  display: grid; gap: 10px; border-top: 1px solid var(--prata-30);
+}
+.drawer-cta .btn { width: 100%; justify-content: center; padding: 14px; }
+
+/* =============================================================
+   HERO INSTITUCIONAL · VERSÃO SLIM (página interna)
+   ============================================================= */
+.hero-page {
+  position: relative;
+  min-height: 460px;
+  display: flex; align-items: center;
+  background: var(--noite); color: var(--pergaminho);
+  overflow: hidden;
+  padding: var(--space-6) 0;
+}
+.hero-page-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-image: url('./img/fotos/_optimized/hero-contato-escritorio-institucional.1920.webp');
+  background-size: cover;
+  background-position: center 42%;
+  filter: saturate(86%) contrast(1.05);
+}
+.hero-page::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background:
+    radial-gradient(ellipse at top right, rgba(184, 149, 46, 0.18) 0%, transparent 55%),
+    linear-gradient(125deg, rgba(11, 23, 38, 0.94) 0%, rgba(17, 54, 94, 0.80) 55%, rgba(11, 23, 38, 0.68) 100%);
+}
+.hero-page::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background-image: linear-gradient(90deg, rgba(168, 172, 182, 0.05) 1px, transparent 1px);
+  background-size: 80px 100%;
+}
+.hero-page-content { position: relative; z-index: 2; max-width: 920px; }
+.hero-page h1 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(36px, 5vw, 62px); line-height: 1.06;
+  letter-spacing: -0.4px; color: var(--pergaminho);
+  margin: var(--space-3) 0 var(--space-3);
+}
+.hero-page h1 .accent { color: var(--dourado-soft); font-style: italic; font-weight: 500; }
+.hero-page-sub {
+  font-family: var(--font-sans); font-weight: 400;
+  font-size: clamp(15px, 1.2vw, 18px); line-height: 1.6;
+  color: var(--pergaminho-80); max-width: 720px; margin: 0 0 var(--space-4);
+}
+.hero-quicklinks {
+  display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-3);
+  font-family: var(--font-cond); font-size: 12.5px; letter-spacing: 1.4px; text-transform: uppercase;
+}
+.hero-quicklinks a {
+  color: var(--pergaminho-80); border-bottom: 1px solid rgba(244, 241, 232, 0.18);
+  padding-bottom: 4px; transition: all var(--t-medium);
+}
+.hero-quicklinks a:hover { color: var(--dourado-soft); border-bottom-color: var(--dourado-soft); }
+
+/* Breadcrumb interno do hero */
+.crumb {
+  font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--pergaminho-80); display: flex; gap: 8px; align-items: center;
+}
+.crumb a { color: var(--pergaminho-80); transition: color var(--t-fast); }
+.crumb a:hover { color: var(--dourado-soft); }
+.crumb span.sep::before { content: '/'; opacity: 0.5; }
+.crumb span.current { color: var(--dourado-soft); }
+
+/* =============================================================
+   SEÇÃO BASE
+   ============================================================= */
+.section { padding: var(--space-7) 0; }
+.section--tight { padding: var(--space-6) 0; }
+.section--cream { background: var(--pergaminho); }
+.section--ivory { background: var(--ivory); }
+.section--dark { background: var(--noite); color: var(--pergaminho); }
+.section--dark h2, .section--dark h3 { color: var(--pergaminho); }
+
+.section-head { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-5); max-width: 880px; }
+.section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+.section-head h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(28px, 3.4vw, 42px); line-height: 1.1;
+  color: var(--tinta); letter-spacing: -0.3px;
+}
+.section--dark .section-head h2 { color: var(--pergaminho); }
+.section-intro {
+  font-family: var(--font-sans); font-size: 17px; line-height: 1.6;
+  color: var(--grafite); margin: 0; max-width: 720px;
+}
+.section--dark .section-intro { color: var(--pergaminho-80); }
+
+/* =============================================================
+   TABS-ROTEADOR EDITORIAL · CARDS DE ENTRADA
+   ============================================================= */
+.router {
+  background: var(--pergaminho);
+  padding: var(--space-6) 0 var(--space-4);
+  border-top: 6px solid var(--oxford);
+}
+.router-head {
+  display: flex; align-items: end; justify-content: space-between;
+  gap: var(--space-3); margin-bottom: var(--space-4); flex-wrap: wrap;
+}
+.router-head h2 {
+  font-family: var(--font-serif); font-weight: 600;
+  font-size: clamp(24px, 2.6vw, 32px); line-height: 1.15;
+  color: var(--tinta); letter-spacing: -0.3px; max-width: 720px;
+}
+.router-tabs {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3);
+}
+.router-tab {
+  position: relative; display: flex; flex-direction: column; gap: 8px;
+  padding: 22px 22px 24px; background: var(--ivory);
+  border: 1.5px solid var(--prata-30); border-radius: 6px;
+  text-align: left; font-family: var(--font-sans); color: var(--tinta);
+  cursor: pointer; transition: all var(--t-medium);
+}
+.router-tab::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--dourado); opacity: 0; transition: opacity var(--t-medium);
+  border-radius: 6px 6px 0 0;
+}
+.router-tab:hover {
+  background: var(--pergaminho); border-color: var(--oxford);
+  transform: translateY(-2px); box-shadow: var(--shadow-soft);
+}
+.router-tab.is-active {
+  background: var(--pergaminho); border-color: var(--oxford);
+  box-shadow: var(--shadow-medium);
+}
+.router-tab.is-active::before { opacity: 1; }
+.router-tab .tab-num {
+  font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.8px;
+  text-transform: uppercase; color: var(--dourado); font-weight: 600;
+}
+.router-tab h3 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  line-height: 1.15; color: var(--tinta); margin: 2px 0 4px;
+}
+.router-tab p {
+  font-family: var(--font-sans); font-size: 13.5px; line-height: 1.5;
+  color: var(--grafite); margin: 0;
+}
+.router-tab .tab-foot {
+  margin-top: auto; padding-top: 14px; font-family: var(--font-cond);
+  font-size: 11.5px; letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--oxford); display: flex; align-items: center; gap: 6px;
+}
+.router-tab .tab-foot::after { content: '→'; transition: transform var(--t-medium); }
+.router-tab:hover .tab-foot::after { transform: translateX(3px); }
+.router-tab.is-active .tab-foot { color: var(--dourado); }
+
+@media (max-width: 1099px) { .router-tabs { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 599px)  { .router-tabs { grid-template-columns: 1fr; } }
+
+/* =============================================================
+   FORMS · PAINÉIS EDITORIAIS
+   ============================================================= */
+.forms-wrap {
+  background: var(--pergaminho);
+  padding: var(--space-4) 0 var(--space-7);
+}
+.form-panel { display: none; }
+.form-panel.is-active { display: block; animation: fadePanel 320ms ease-out; }
+@keyframes fadePanel {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.form-shell {
+  display: grid; grid-template-columns: 1.2fr 0.9fr; gap: var(--space-5);
+  background: var(--ivory); border: 1px solid var(--prata-30);
+  border-radius: 8px; overflow: hidden;
+}
+.form-aside {
+  background: var(--noite); color: var(--pergaminho);
+  padding: var(--space-5) var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-3);
+  position: relative;
+}
+.form-aside::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--dourado);
+}
+.form-aside .eyebrow { color: var(--dourado); margin: 0; }
+.form-aside h3 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 26px;
+  line-height: 1.15; color: var(--pergaminho); margin: 0;
+}
+.form-aside p {
+  font-family: var(--font-sans); font-size: 14.5px; line-height: 1.6;
+  color: var(--pergaminho-80); margin: 0;
+}
+.form-aside ul {
+  display: grid; gap: 10px; margin-top: var(--space-2);
+}
+.form-aside li {
+  font-family: var(--font-sans); font-size: 13.5px; line-height: 1.5;
+  color: var(--pergaminho-80); padding-left: 18px; position: relative;
+}
+.form-aside li::before {
+  content: ''; position: absolute; left: 0; top: 8px; width: 8px; height: 2px;
+  background: var(--dourado);
+}
+.form-aside .aside-foot {
+  margin-top: auto; padding-top: var(--space-3); border-top: 1px solid rgba(244, 241, 232, 0.12);
+  font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--pergaminho-80);
+}
+.form-aside .aside-foot strong { color: var(--dourado-soft); }
+
+.form-body { padding: var(--space-5) var(--space-4); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.form-grid > .full { grid-column: 1 / -1; }
+@media (max-width: 599px) { .form-grid { grid-template-columns: 1fr; } }
+
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field label {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--tinta);
+}
+.form-field label .req { color: var(--cardeal); margin-left: 4px; }
+.form-field input,
+.form-field select,
+.form-field textarea {
+  font-family: var(--font-sans); font-size: 15px; color: var(--tinta);
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  border-radius: 4px; padding: 12px 14px; transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  width: 100%;
+}
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: 0; border-color: var(--oxford);
+  box-shadow: 0 0 0 3px rgba(17, 54, 94, 0.12);
+}
+.form-field textarea { resize: vertical; min-height: 130px; line-height: 1.5; }
+.form-field .hint {
+  font-family: var(--font-sans); font-size: 12px; color: var(--grafite); margin-top: 2px;
+}
+.form-field.has-error input,
+.form-field.has-error select,
+.form-field.has-error textarea { border-color: var(--cardeal); box-shadow: 0 0 0 3px rgba(142, 42, 28, 0.12); }
+.form-field .err-msg {
+  font-family: var(--font-sans); font-size: 12px; color: var(--cardeal);
+  display: none; margin-top: 2px;
+}
+.form-field.has-error .err-msg { display: block; }
+
+.form-consent {
+  display: flex; gap: 12px; align-items: flex-start; margin-top: var(--space-3);
+  padding: 14px 16px; background: rgba(184, 149, 46, 0.08);
+  border-left: 3px solid var(--dourado); border-radius: 4px;
+}
+.form-consent input { margin-top: 4px; accent-color: var(--oxford); }
+.form-consent label { font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--grafite); }
+.form-consent label a { color: var(--oxford); text-decoration: underline; }
+.form-consent label a:hover { color: var(--dourado); }
+
+/* =============================================================
+   BLOCO CONDICIONAL · INSCRIÇÃO EM LOTE (>50 participantes)
+   ============================================================= */
+.form-bulk {
+  grid-column: 1 / -1;
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  background:
+    linear-gradient(180deg, rgba(184, 149, 46, 0.06) 0%, rgba(184, 149, 46, 0.02) 100%),
+    var(--pergaminho);
+  border: 1px solid rgba(184, 149, 46, 0.32);
+  border-left: 4px solid var(--dourado);
+  border-radius: 6px;
+  display: none;
+}
+.form-bulk.is-active {
+  display: grid; gap: var(--space-3);
+  animation: bulkReveal 320ms ease-out;
+}
+@keyframes bulkReveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.form-bulk-head {
+  display: grid; gap: 6px;
+}
+.form-bulk-head .eyebrow { margin: 0; }
+.form-bulk-head h4 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 20px;
+  line-height: 1.2; color: var(--tinta); margin: 2px 0 0;
+}
+.form-bulk-head p {
+  font-family: var(--font-sans); font-size: 14px; line-height: 1.55;
+  color: var(--grafite); margin: 4px 0 0;
+}
+.form-bulk-head .bulk-actions {
+  display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center;
+  margin-top: var(--space-2);
+}
+.form-bulk-head .bulk-actions .btn { padding: 10px 18px; font-size: 12px; }
+.form-bulk-head .bulk-actions .meta {
+  font-family: var(--font-cond); font-size: 11.5px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--grafite);
+}
+.form-bulk-head .bulk-actions .meta::before {
+  content: '✓ '; color: var(--oliva); font-weight: 700;
+}
+
+.form-bulk .file-field {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+}
+.form-bulk .file-field label {
+  font-family: var(--font-cond); font-weight: 600; font-size: 12px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--tinta);
+}
+.form-bulk .file-field .req { color: var(--cardeal); margin-left: 4px; }
+.form-bulk .file-input-wrap {
+  position: relative; display: flex; align-items: stretch;
+  border: 1.5px dashed var(--prata-30); border-radius: 4px;
+  background: var(--pergaminho);
+  transition: border-color var(--t-fast), background var(--t-fast);
+  overflow: hidden;
+}
+.form-bulk .file-input-wrap:hover { border-color: var(--dourado); background: rgba(184, 149, 46, 0.04); }
+.form-bulk .file-input-wrap input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2;
+}
+.form-bulk .file-display {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 14px 16px; gap: var(--space-2);
+  font-family: var(--font-sans); font-size: 14px; color: var(--grafite);
+}
+.form-bulk .file-display .file-cta {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--oxford);
+  border: 1px solid var(--oxford); padding: 6px 12px; border-radius: 3px;
+}
+.form-bulk .file-input-wrap.has-file { border-color: var(--oliva); border-style: solid; background: rgba(74, 106, 31, 0.04); }
+.form-bulk .file-input-wrap.has-file .file-display .file-cta { color: var(--oliva); border-color: var(--oliva); }
+.form-bulk .file-field .hint {
+  font-family: var(--font-sans); font-size: 12px; color: var(--grafite); margin-top: 2px;
+}
+.form-bulk .file-field.has-error .file-input-wrap { border-color: var(--cardeal); }
+.form-bulk .file-field .err-msg {
+  font-family: var(--font-sans); font-size: 12px; color: var(--cardeal);
+  display: none; margin-top: 2px;
+}
+.form-bulk .file-field.has-error .err-msg { display: block; }
+
+.form-bulk .form-consent {
+  margin-top: 0;
+  background: rgba(142, 42, 28, 0.06);
+  border-left-color: var(--cardeal);
+}
+.form-bulk .form-consent label a { color: var(--cardeal); }
+
+.form-actions {
+  display: flex; align-items: center; gap: var(--space-3);
+  margin-top: var(--space-3); flex-wrap: wrap;
+}
+.form-status {
+  font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--oxford); display: none;
+}
+.form-status.is-ok { color: var(--oliva); display: inline-flex; align-items: center; gap: 6px; }
+.form-status.is-error { color: var(--cardeal); display: inline-flex; align-items: center; gap: 6px; }
+.form-status::before { content: '●'; font-size: 9px; }
+
+@media (max-width: 899px) {
+  .form-shell { grid-template-columns: 1fr; }
+}
+
+/* =============================================================
+   CANAIS DIRETOS · SEDE + MAPA
+   ============================================================= */
+.channels {
+  background: var(--ivory);
+  padding: var(--space-7) 0;
+}
+.channels-grid {
+  display: grid; grid-template-columns: 0.95fr 1.05fr; gap: var(--space-5);
+}
+@media (max-width: 1099px) { .channels-grid { grid-template-columns: 1fr; } }
+
+.channels-list { display: grid; gap: var(--space-3); }
+.channel-card {
+  display: grid; grid-template-columns: 56px 1fr auto; gap: var(--space-3);
+  align-items: center; padding: var(--space-3) var(--space-4);
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  border-left: 4px solid var(--oxford); border-radius: 6px;
+  transition: all var(--t-medium);
+}
+.channel-card:hover { box-shadow: var(--shadow-soft); transform: translateY(-1px); }
+.channel-icon {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--oxford-10); color: var(--oxford);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-cond); font-weight: 600; font-size: 22px;
+}
+.channel-card[data-channel="whatsapp"] { border-left-color: var(--oliva); }
+.channel-card[data-channel="whatsapp"] .channel-icon { background: var(--oliva-10); color: var(--oliva); }
+.channel-card[data-channel="imprensa"] { border-left-color: var(--cardeal); }
+.channel-card[data-channel="imprensa"] .channel-icon { background: var(--cardeal-10); color: var(--cardeal); }
+
+/* Destaque editorial para canais de conversão rápida (telefone + WhatsApp) */
+.channel-card.is-featured {
+  border-left-width: 6px;
+  box-shadow: var(--shadow-soft);
+  background: linear-gradient(180deg, var(--pergaminho) 0%, rgba(184, 149, 46, 0.04) 100%);
+  position: relative;
+}
+.channel-card.is-featured::before {
+  content: 'Resposta rápida';
+  position: absolute; top: 12px; right: 14px;
+  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--dourado);
+  background: rgba(184, 149, 46, 0.12);
+  padding: 4px 9px; border-radius: 12px;
+}
+.channel-card.is-featured .channel-body .value {
+  font-size: 22px; color: var(--tinta);
+}
+.channel-card.is-featured:hover {
+  box-shadow: var(--shadow-medium); transform: translateY(-2px);
+}
+.channel-body p { margin: 0; font-family: var(--font-sans); }
+.channel-body .label {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--grafite);
+}
+.channel-body .value {
+  font-family: var(--font-serif); font-weight: 600; font-size: 19px;
+  color: var(--tinta); line-height: 1.2; margin-top: 2px;
+}
+.channel-body .note {
+  font-family: var(--font-sans); font-size: 12.5px; color: var(--grafite); margin-top: 2px;
+}
+.channel-action .link-arrow { font-size: 12px; }
+
+/* Sede + mapa */
+.hq-card {
+  background: var(--pergaminho); border: 1px solid var(--prata-30); border-radius: 6px;
+  padding: var(--space-4); display: grid; gap: var(--space-3);
+}
+.hq-head {
+  display: grid; grid-template-columns: 1fr auto; gap: var(--space-3); align-items: end;
+}
+.hq-head h3 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 26px;
+  color: var(--tinta); margin: 0;
+}
+.hq-pill {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--dourado);
+  background: rgba(184, 149, 46, 0.12); padding: 6px 12px; border-radius: 20px;
+  display: inline-block;
+}
+.hq-address {
+  font-family: var(--font-sans); font-size: 15px; line-height: 1.55; color: var(--grafite); margin: 0;
+}
+.hq-address strong { color: var(--tinta); font-weight: 600; }
+.hq-map {
+  display: block; width: 100%; height: 240px; border-radius: 6px;
+  border: 1px solid var(--prata-30);
+  position: relative; overflow: hidden; background: var(--ivory);
+}
+.hq-map iframe {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  border: 0; display: block;
+}
+.hq-foot { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: 4px; align-items: center; }
+.hq-foot .btn { padding: 10px 16px; font-size: 12px; }
+
+/* =============================================================
+   ATENDIMENTO POR VERTICAL (3 CARDS · OXFORD · CARDEAL · OLIVA)
+   ============================================================= */
+.verticals-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3);
+}
+@media (max-width: 1099px) { .verticals-grid { grid-template-columns: 1fr; } }
+
+.vert-card {
+  --vert-accent: var(--oxford);
+  --vert-accent-10: var(--oxford-10);
+  position: relative;
+  background: var(--pergaminho); border: 1px solid var(--prata-30);
+  border-radius: 6px; padding: var(--space-4); display: grid; gap: var(--space-2);
+  transition: all var(--t-medium);
+}
+.vert-card[data-vertical="educacao"]     { --vert-accent: var(--oxford);  --vert-accent-10: var(--oxford-10); }
+.vert-card[data-vertical="gestao-publica"] { --vert-accent: var(--cardeal); --vert-accent-10: var(--cardeal-10); }
+.vert-card[data-vertical="saude"]        { --vert-accent: var(--oliva);   --vert-accent-10: var(--oliva-10); }
+.vert-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: var(--vert-accent); border-radius: 6px 6px 0 0;
+}
+.vert-card:hover { box-shadow: var(--shadow-medium); transform: translateY(-2px); }
+.vert-card .vert-eyebrow {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.8px; text-transform: uppercase; color: var(--vert-accent);
+}
+.vert-card h3 {
+  font-family: var(--font-serif); font-weight: 600; font-size: 24px;
+  line-height: 1.15; color: var(--tinta); margin: 4px 0 2px;
+}
+.vert-card .vert-lede {
+  font-family: var(--font-sans); font-size: 14.5px; line-height: 1.55;
+  color: var(--grafite); margin: 0;
+}
+.vert-card .vert-info {
+  display: grid; gap: 6px; padding: var(--space-3) 0;
+  border-top: 1px solid var(--prata-30); margin-top: var(--space-2);
+  font-family: var(--font-sans); font-size: 13.5px; color: var(--grafite);
+}
+.vert-card .vert-info b {
+  display: block; font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.4px; text-transform: uppercase; color: var(--tinta); margin-bottom: 2px;
+}
+.vert-card .vert-cta { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 14px; }
+.vert-card .btn-vert {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-cond); font-weight: 600; font-size: 12px;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--vert-accent); border-bottom: 1px solid transparent;
+  padding-bottom: 3px; transition: all var(--t-medium);
+}
+.btn-vert::after { content: '→'; transition: transform var(--t-medium); }
+.btn-vert:hover { border-bottom-color: var(--vert-accent); }
+.btn-vert:hover::after { transform: translateX(3px); }
+
+/* =============================================================
+   HORÁRIOS E SLA
+   ============================================================= */
+.sla-bar {
+  background: var(--oxford); color: var(--pergaminho);
+  padding: var(--space-5) 0;
+}
+.sla-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3);
+}
+@media (max-width: 899px) { .sla-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 499px) { .sla-grid { grid-template-columns: 1fr; } }
+.sla-cell {
+  padding: 4px 0; border-left: 2px solid var(--dourado); padding-left: 16px;
+}
+.sla-cell .sla-num {
+  font-family: var(--font-serif); font-weight: 600; font-size: 28px;
+  line-height: 1.1; color: var(--dourado-soft);
+}
+.sla-cell .sla-label {
+  font-family: var(--font-cond); font-weight: 600; font-size: 11.5px;
+  letter-spacing: 1.6px; text-transform: uppercase; color: var(--pergaminho-80); margin-top: 4px;
+}
+.sla-cell .sla-note {
+  font-family: var(--font-sans); font-size: 13px; color: var(--pergaminho-80); margin-top: 4px; line-height: 1.45;
+}
+
+/* =============================================================
+   FAQ
+   ============================================================= */
+.faq { background: var(--pergaminho); padding: var(--space-7) 0; }
+.faq-list { display: grid; gap: 4px; max-width: 920px; }
+.faq-item {
+  border-top: 1px solid var(--prata-30);
+}
+.faq-item:last-child { border-bottom: 1px solid var(--prata-30); }
+.faq-q {
+  width: 100%; text-align: left; background: transparent; border: 0;
+  padding: 22px 0; font-family: var(--font-serif); font-weight: 600; font-size: 22px;
+  color: var(--tinta); cursor: pointer; display: flex; justify-content: space-between;
+  align-items: flex-start; gap: var(--space-3); line-height: 1.2;
+}
+.faq-q::after {
+  content: '+'; font-family: var(--font-sans); font-weight: 400; font-size: 28px;
+  color: var(--dourado); transition: transform var(--t-medium);
+  line-height: 1; flex-shrink: 0;
+}
+.faq-item.is-open .faq-q::after { content: '−'; }
+.faq-item:hover .faq-q { color: var(--oxford); }
+.faq-a {
+  display: none; padding: 0 0 22px;
+  font-family: var(--font-sans); font-size: 15.5px; line-height: 1.65; color: var(--grafite);
+  max-width: 760px;
+}
+.faq-item.is-open .faq-a { display: block; }
+.faq-a a { color: var(--oxford); text-decoration: underline; }
+.faq-a a:hover { color: var(--dourado); }
+
+/* =============================================================
+   LGPD INSTITUCIONAL
+   ============================================================= */
+.lgpd {
+  background: var(--noite); color: var(--pergaminho);
+  padding: var(--space-6) 0;
+}
+.lgpd-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); align-items: start;
+}
+@media (max-width: 899px) { .lgpd-grid { grid-template-columns: 1fr; } }
+.lgpd h2 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(26px, 2.6vw, 34px); color: var(--pergaminho); margin: 0 0 var(--space-2); line-height: 1.15; }
+.lgpd .lgpd-eyebrow { color: var(--dourado); }
+.lgpd p { font-family: var(--font-sans); font-size: 15px; line-height: 1.65; color: var(--pergaminho-80); margin: 0 0 var(--space-2); }
+.lgpd-cards { display: grid; gap: var(--space-2); }
+.lgpd-cell {
+  padding: 16px 18px; background: rgba(244, 241, 232, 0.06);
+  border-left: 3px solid var(--dourado); border-radius: 4px;
+}
+.lgpd-cell b { display: block; font-family: var(--font-cond); font-weight: 600; font-size: 11.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--dourado); margin-bottom: 4px; }
+.lgpd-cell span { font-family: var(--font-sans); font-size: 14px; color: var(--pergaminho-80); line-height: 1.5; }
+
+/* =============================================================
+   CTA INSTITUCIONAL FINAL
+   ============================================================= */
+.cta-final {
+  background: var(--oxford); color: var(--pergaminho);
+  padding: var(--space-7) 0;
+}
+.cta-final-inner {
+  display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--space-5); align-items: center;
+}
+@media (max-width: 899px) { .cta-final-inner { grid-template-columns: 1fr; } }
+.cta-final h2 {
+  font-family: var(--font-serif); font-weight: 600; font-size: clamp(30px, 3.4vw, 44px);
+  line-height: 1.1; color: var(--pergaminho); margin: 0;
+}
+.cta-final h2 em { font-style: italic; color: var(--dourado-soft); font-weight: 500; }
+.cta-final p { font-family: var(--font-sans); font-size: 16px; color: var(--pergaminho-80); margin: var(--space-2) 0 0; }
+.cta-final-actions { display: flex; flex-direction: column; gap: 12px; }
+.cta-final-actions .btn { justify-content: center; padding: 16px 22px; }
+
+/* =============================================================
+   FOOTER
+   ============================================================= */
+.site-footer { background: var(--noite); color: var(--pergaminho-80); padding: var(--space-6) 0 var(--space-4); border-top: 1px solid rgba(244, 241, 232, 0.10); }
+.footer-top { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: var(--space-5); padding-bottom: var(--space-5); border-bottom: 1px solid rgba(244, 241, 232, 0.10); }
+@media (max-width: 1099px) { .footer-top { grid-template-columns: 1fr 1fr; gap: var(--space-4); } }
+@media (max-width: 599px)  { .footer-top { grid-template-columns: 1fr; } }
+.footer-brand img { height: 60px; width: auto; }
+.footer-tagline { font-family: var(--font-serif); font-style: italic; font-weight: 500; color: var(--dourado); font-size: 17px; margin: var(--space-3) 0 var(--space-2); display: block; }
+.footer-address { font-size: 13px; line-height: 1.55; color: var(--pergaminho-80); margin: 0; }
+.footer-address strong { color: var(--pergaminho); font-weight: 600; }
+.footer-col h5 { font-family: var(--font-cond); font-weight: 600; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--dourado); margin: 0 0 var(--space-2); }
+.footer-col ul { display: grid; gap: 10px; }
+.footer-col a { font-size: 14px; color: var(--pergaminho-80); transition: color var(--t-fast); }
+.footer-col a:hover { color: var(--dourado); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-3); flex-wrap: wrap; gap: var(--space-2); }
+.footer-badge { font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--prata); }
+.footer-legal { display: flex; gap: var(--space-3); flex-wrap: wrap; font-family: var(--font-cond); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+.footer-legal a { color: var(--prata); }
+.footer-legal a:hover { color: var(--pergaminho); }
+
+/* fade-in */
+.fade-in { opacity: 0; transform: translateY(16px); transition: opacity 600ms ease-out, transform 600ms ease-out; }
+.fade-in.is-visible { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .fade-in { opacity: 1; transform: none; }
+}
+</style>
+<!-- NTC_COOKIE_CONSENT_CSS_BEGIN -->
+<link rel="stylesheet" href="./assets/cookie_consent.css" />
+<!-- NTC_COOKIE_CONSENT_CSS_END -->
+
+</head>
+<body>
+
+<a href="#main" class="skip-link">Ir para o conteúdo principal</a>
+
+<!-- ========================== HEADER (canon Soberana 2026) ========================== -->
+<header class="site-header" id="topo">
+  <div class="container header-inner">
+    <a class="brand" href="./02_Prototipo_Home_GrupoNTC_v2_6.html" aria-label="Grupo NTC — Página inicial">
+      <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    </a>
+
+    <nav class="nav-primary" aria-label="Navegação principal">
+      <a class="nav-item" href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a>
+      <button class="nav-item has-mega" data-mega="programas" aria-haspopup="true" aria-expanded="false">Programas</button>
+      <button class="nav-item has-mega" data-mega="capacitacao" aria-haspopup="true" aria-expanded="false">Capacitação</button>
+      <button class="nav-item has-mega" data-mega="solucoes" aria-haspopup="true" aria-expanded="false">Soluções</button>
+      <a class="nav-item" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#conteudos">Conteúdos</a>
+      <a class="nav-item is-current" href="#main" aria-current="page">Contato</a>
+    </nav>
+
+    <div class="header-cta">
+      <a class="btn btn--secondary btn--mini" href="#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a>
+      <a class="btn btn--participant btn--mini" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="area-participante">Área do Participante</a>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobileDrawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mega menu: Programas -->
+  <div class="mega" id="mega-programas" data-mega-id="programas">
+    <div class="container">
+      <div class="mega-inner">
+        <div class="mega-col">
+          <h4>NTC Educação · 9 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>Educação Digital, Inovação e Tecnologias para Redes Públicas</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-PEAR"><strong>PEAR</strong><span>Alfabetização de Alta Performance e Recomposição da Aprendizagem</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-PEI"><strong>PEI</strong><span>Educação Integral — Gestão, Currículo e Resultados</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-PROGIR"><strong>PROGIR</strong><span>Gestão da Inclusão com Resultado</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-PROGE"><strong>PROGE</strong><span>Gestão Escolar, Coordenação Pedagógica e Resultados</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-EGIDE"><strong>EGIDE</strong><span>IA, Dados e Governança da Transformação Digital</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-VIVAESCOLA"><strong>VIVAESCOLA</strong><span>Convivência, Permanência, Bem-Estar e Proteção Integral</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-PINEI"><strong>PINEI</strong><span>Primeira Infância e Educação Infantil</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-FUTURA"><strong>FUTURA</strong><span>Ensino Médio, Itinerários de Futuro, Empregabilidade</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Gestão Pública · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./10_Pagina_Programa_LIDERA_v1.html" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>Liderança, Direção Estratégica e Resultados na Administração</span></a></li>
+            <li><a href="./06_Pagina_Programa_AGIP_v1.html" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>Governança, Integridade e Performance nas Contratações Públicas</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-SIGA"><strong>SIGA</strong><span>Soluções Inteligentes de Governança e Administração</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>NTC Saúde · 3 programas</h4>
+          <ul class="mega-list">
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-SIGS"><strong>SIGS</strong><span>Saúde Inteligente, Governança Digital, IA e Transformação do SUS</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-PROAPS"><strong>PROAPS+</strong><span>Alta Performance na Atenção Primária e Redes de Cuidado</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>Governança, Financiamento e Performance no SUS</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Soluções -->
+  <div class="mega" id="mega-solucoes" data-mega-id="solucoes">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Verticais</h4>
+          <ul class="mega-list">
+            <li><a href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>Soluções estruturadas para redes públicas de ensino</span></a></li>
+            <li><a href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>Governança, integridade e performance na Administração</span></a></li>
+            <li><a href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>Inteligência institucional aplicada ao SUS</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Modelos de contratação</h4>
+          <ul class="mega-list">
+            <li><a href="#tab-proposta" data-cms-link="modelo-incompany"><strong>Soluções in company</strong><span>Programa entregue exclusivamente à instituição</span></a></li>
+            <li><a href="#tab-proposta" data-cms-link="modelo-fechada"><strong>Turmas fechadas</strong><span>Edição operacional dedicada à equipe contratante</span></a></li>
+            <li><a href="#tab-proposta" data-cms-link="modelo-sobmedida"><strong>Soluções sob medida</strong><span>Customização profunda de ementas, módulos e formato</span></a></li>
+            <li><a href="#tab-proposta" data-cms-link="modelo-trilha"><strong>Trilhas e jornadas</strong><span>Sequências formativas curadas para necessidades específicas</span></a></li>
+            <li><a href="#tab-proposta" data-cms-link="modelo-institucional"><strong>Contratação institucional</strong><span>Atendimento dedicado a órgãos públicos</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mega menu: Capacitação -->
+  <div class="mega" id="mega-capacitacao" data-mega-id="capacitacao">
+    <div class="container">
+      <div class="mega-inner" style="grid-template-columns: 1fr 1fr;">
+        <div class="mega-col">
+          <h4>Agenda e formatos</h4>
+          <ul class="mega-list">
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos no calendário</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-online"><strong>Eventos online</strong><span>Transmissão ao vivo, replay e certificado</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-presenciais"><strong>Eventos presenciais</strong><span>Encontros executivos em capitais estratégicas</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-hibridos"><strong>Eventos híbridos</strong><span>Combinação de presença e plataforma digital</span></a></li>
+          </ul>
+        </div>
+        <div class="mega-col">
+          <h4>Plataforma e curadoria</h4>
+          <ul class="mega-list">
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="eventon-home"><strong>EventOn</strong><span>Plataforma de acesso, replay e certificado do Grupo NTC</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="area-participante"><strong>Área do Participante</strong><span>Histórico de eventos, materiais e certificados</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="proximas-turmas"><strong>Próximas turmas</strong><span>Turmas em formação e inscrições antecipadas</span></a></li>
+            <li><a href="./09_Pagina_Agenda_v2.html" data-cms-link="eventos-passados"><strong>Eventos passados</strong><span>Acervo de eventos realizados com replay disponível</span></a></li>
+            <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#docentes" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica e especialistas das 3 verticais</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========================== MOBILE DRAWER ========================== -->
+<div class="mobile-drawer-backdrop" id="mobileBackdrop"></div>
+<aside class="mobile-drawer" id="mobileDrawer" aria-label="Menu principal" aria-hidden="true">
+  <div class="drawer-head">
+    <img src="./img/logos/logo-light.svg" alt="Grupo NTC" />
+    <button class="drawer-close" id="drawerClose" aria-label="Fechar menu">×</button>
+  </div>
+  <nav class="drawer-nav" aria-label="Navegação móvel">
+    <a class="drawer-item" href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a>
+
+    <button class="drawer-item has-sub" data-sub="programas-mobile" aria-expanded="false">Programas</button>
+    <div class="drawer-sub" id="sub-programas-mobile">
+      <a href="./06_Pagina_Programa_AGIP_v1.html" data-cms-link="programa-AGIP"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></a>
+      <a href="./10_Pagina_Programa_LIDERA_v1.html" data-cms-link="programa-LIDERA"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-EDUTEC"><strong>EDUTEC</strong><span>NTC Educação · Educação digital</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-PEAR"><strong>PEAR</strong><span>NTC Educação · Alfabetização</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="programa-PROSUS"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas" data-cms-link="ver-todos-programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></a>
+    </div>
+
+    <button class="drawer-item has-sub" data-sub="capacitacao-mobile" aria-expanded="false">Capacitação</button>
+    <div class="drawer-sub" id="sub-capacitacao-mobile">
+      <a href="./09_Pagina_Agenda_v2.html" data-cms-link="agenda-completa"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="eventon-home"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="area-participante"><strong>Área do Participante</strong><span>Materiais e certificados</span></a>
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#docentes" data-cms-link="pagina-corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica das 3 verticais</span></a>
+    </div>
+
+    <button class="drawer-item has-sub" data-sub="solucoes-mobile" aria-expanded="false">Soluções</button>
+    <div class="drawer-sub" id="sub-solucoes-mobile">
+      <a href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu"><strong>NTC Educação</strong><span>9 programas estratégicos</span></a>
+      <a href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov"><strong>NTC Gestão Pública</strong><span>3 programas estratégicos</span></a>
+      <a href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau"><strong>NTC Saúde</strong><span>3 programas estratégicos</span></a>
+      <a href="#tab-proposta" data-cms-link="modelo-incompany"><strong>Soluções in company</strong><span>Turmas fechadas e sob medida</span></a>
+      <a href="#tab-proposta" data-cms-link="modelo-institucional"><strong>Contratação institucional</strong><span>Atendimento a órgãos públicos</span></a>
+    </div>
+
+    <a class="drawer-item" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#conteudos">Conteúdos</a>
+    <a class="drawer-item is-current" href="#main" aria-current="page">Contato</a>
+  </nav>
+  <div class="drawer-cta">
+    <a class="btn btn--gold" href="#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a>
+    <a class="btn btn--participant" href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="area-participante">Área do Participante</a>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ========================== HERO INSTITUCIONAL · SLIM ========================== -->
+<section class="hero-page" aria-label="Cabeçalho institucional · Contato">
+  <div class="hero-page-bg" aria-hidden="true"></div>
+  <div class="container hero-page-content fade-in">
+    <nav class="crumb" aria-label="Você está em">
+      <a href="./02_Prototipo_Home_GrupoNTC_v2_6.html">Grupo NTC</a>
+      <span class="sep"></span>
+      <span class="current">Contato</span>
+    </nav>
+    <p class="eyebrow gold" style="margin-top: var(--space-3);">Canais institucionais · Atendimento dedicado</p>
+    <h1>Fale com quem <span class="accent">decide</span> os rumos da formação institucional.</h1>
+    <p class="hero-page-sub">
+      Atendimento humano, institucional e direcionado à natureza da sua demanda. Escolha o canal mais adequado para proposta institucional, inscrição de equipes ou grupos institucionais, imprensa ou atendimento geral — nossa equipe retorna em horário comercial.
+    </p>
+    <div class="hero-quicklinks">
+      <a href="#tab-atendimento" data-cms-link="rota-atendimento-geral">Atendimento geral</a>
+      <a href="#tab-proposta" data-cms-link="rota-proposta-institucional">Proposta institucional</a>
+      <a href="#tab-equipe" data-cms-link="rota-inscricao-equipe">Equipe ou grupo institucional</a>
+      <a href="#tab-imprensa" data-cms-link="rota-imprensa">Imprensa</a>
+      <a href="#canais-diretos" data-cms-link="rota-canais-diretos">Canais diretos</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== ROTEADOR DE FORMULÁRIOS · TABS ========================== -->
+<section class="router" id="formularios" aria-label="Roteador de formulários institucionais">
+  <div class="container">
+    <div class="router-head fade-in">
+      <h2>Escolha o canal mais adequado à sua demanda</h2>
+      <span class="eyebrow gold" style="margin: 0;">Cada solicitação é direcionada à equipe responsável, com atendimento humano e retorno em horário comercial.</span>
+    </div>
+
+    <div class="router-tabs" role="tablist" aria-label="Tipos de demanda">
+      <button class="router-tab is-active" role="tab"
+              data-tab="atendimento" id="tab-atendimento"
+              aria-controls="panel-atendimento" aria-selected="true"
+              data-cms-link="rota-atendimento-geral">
+        <span class="tab-num">01 · Geral</span>
+        <h3>Atendimento geral</h3>
+        <p>Dúvidas, sugestões, parcerias e articulação institucional.</p>
+        <span class="tab-foot">Falar com a NTC</span>
+      </button>
+
+      <button class="router-tab" role="tab"
+              data-tab="proposta" id="tab-proposta"
+              aria-controls="panel-proposta" aria-selected="false"
+              data-cms-link="rota-proposta-institucional">
+        <span class="tab-num">02 · Proposta</span>
+        <h3>Contratar formação</h3>
+        <p>Programas in company, turmas fechadas e soluções sob medida para órgãos e instituições.</p>
+        <span class="tab-foot">Solicitar proposta</span>
+      </button>
+
+      <button class="router-tab" role="tab"
+              data-tab="equipe" id="tab-equipe"
+              aria-controls="panel-equipe" aria-selected="false"
+              data-cms-link="rota-inscricao-equipe">
+        <span class="tab-num">03 · Equipe ou grupo</span>
+        <h3>Inscrever equipe ou grupo institucional</h3>
+        <p>De 3 participantes a inscrições em lote acima de mil, com faturamento institucional.</p>
+        <span class="tab-foot">Inscrição em grupo</span>
+      </button>
+
+      <button class="router-tab" role="tab"
+              data-tab="imprensa" id="tab-imprensa"
+              aria-controls="panel-imprensa" aria-selected="false"
+              data-cms-link="rota-imprensa">
+        <span class="tab-num">04 · Imprensa</span>
+        <h3>Imprensa e parcerias</h3>
+        <p>Jornalistas, assessorias e entidades parceiras com demandas editoriais e de pauta.</p>
+        <span class="tab-foot">Falar com a AssCom</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== FORMULÁRIOS ========================== -->
+<section class="forms-wrap" aria-label="Formulários institucionais">
+  <div class="container">
+
+    <!-- ===== PAINEL A · ATENDIMENTO GERAL ===== -->
+    <div class="form-panel is-active" id="panel-atendimento" role="tabpanel" aria-labelledby="tab-atendimento">
+      <div class="form-shell">
+        <aside class="form-aside">
+          <p class="eyebrow">Canal · Atendimento geral</p>
+          <h3>Fale com a NTC</h3>
+          <p>Canal aberto para dúvidas, sugestões, parcerias e qualquer demanda que não se encaixe nos canais especializados.</p>
+          <ul>
+            <li>Retorno em até <strong>1 dia útil</strong></li>
+            <li>Atendimento humano direcionado</li>
+            <li>Encaminhamento interno conforme o tema</li>
+            <li>Confidencialidade institucional</li>
+          </ul>
+          <p class="aside-foot">Prefere e-mail? <strong>contato@institutontc.com.br</strong></p>
+        </aside>
+
+        <div class="form-body">
+          <!-- action a ser configurada pelo CMS · roteamento por data-form-id -->
+          <form class="form-grid"
+                action="javascript:void(0);"
+                method="post"
+                data-form-id="form-contato-atendimento"
+                data-cms-link="submit-atendimento-geral"
+                data-endpoint="/api/contato/atendimento"
+                novalidate
+                aria-describedby="status-atendimento">
+
+            <div class="form-field">
+              <label for="atend-nome">Nome completo<span class="req">*</span></label>
+              <input type="text" id="atend-nome" name="nome" required autocomplete="name" />
+              <span class="err-msg">Informe seu nome completo.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="atend-instituicao">Instituição / órgão</label>
+              <input type="text" id="atend-instituicao" name="instituicao" autocomplete="organization" />
+            </div>
+
+            <div class="form-field">
+              <label for="atend-email">E-mail<span class="req">*</span></label>
+              <input type="email" id="atend-email" name="email" required autocomplete="email" />
+              <span class="err-msg">Informe um e-mail válido.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="atend-telefone">Telefone / WhatsApp</label>
+              <input type="tel" id="atend-telefone" name="telefone" autocomplete="tel" placeholder="(__) _____-____" />
+            </div>
+
+            <div class="form-field full">
+              <label for="atend-assunto">Assunto<span class="req">*</span></label>
+              <select id="atend-assunto" name="assunto" required>
+                <option value="">Selecione um assunto</option>
+                <option value="duvida-geral">Dúvida geral sobre o Grupo NTC</option>
+                <option value="parceria">Proposta de parceria institucional</option>
+                <option value="sugestao">Sugestão editorial ou de pauta</option>
+                <option value="articulacao">Articulação com a coordenação</option>
+                <option value="participante">Suporte a participante (acesso · certificado · replay)</option>
+                <option value="outros">Outros</option>
+              </select>
+              <span class="err-msg">Selecione um assunto.</span>
+            </div>
+
+            <div class="form-field full">
+              <label for="atend-mensagem">Mensagem<span class="req">*</span></label>
+              <textarea id="atend-mensagem" name="mensagem" required minlength="20" placeholder="Descreva sua demanda. Quanto mais contexto, mais preciso o retorno."></textarea>
+              <span class="hint">Mínimo 20 caracteres.</span>
+              <span class="err-msg">Descreva sua mensagem com pelo menos 20 caracteres.</span>
+            </div>
+
+            <div class="form-consent full">
+              <input type="checkbox" id="atend-lgpd" name="lgpd" required />
+              <label for="atend-lgpd">
+                Autorizo o tratamento dos meus dados pelo Instituto NTC do Brasil para atendimento desta solicitação, nos termos da nossa <a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a> e da LGPD (Lei 13.709/2018).
+              </label>
+            </div>
+
+            <div class="form-actions full">
+              <button type="submit" class="btn btn--primary" data-cms-link="enviar-atendimento">
+                Enviar mensagem <span class="btn-arrow">→</span>
+              </button>
+              <span class="form-status" id="status-atendimento" aria-live="polite"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAINEL B · PROPOSTA INSTITUCIONAL ===== -->
+    <div class="form-panel" id="panel-proposta" role="tabpanel" aria-labelledby="tab-proposta" hidden>
+      <div class="form-shell">
+        <aside class="form-aside">
+          <p class="eyebrow">Canal · Proposta institucional</p>
+          <h3>Contratar formação para a sua instituição</h3>
+          <p>Para órgãos públicos, redes de ensino, sistemas de saúde e organizações que buscam programas <strong>in company</strong>, turmas fechadas, soluções sob medida ou trilhas estruturadas.</p>
+          <ul>
+            <li>Diagnóstico institucional inicial</li>
+            <li>Proposta técnica e comercial em até 5 dias úteis</li>
+            <li>Documentação para Lei 14.133, dispensa e convênios</li>
+            <li>Coordenação científica dedicada por vertical</li>
+            <li>Faturamento por empenho, NF, convênio ou pactuação</li>
+          </ul>
+          <p class="aside-foot">Atendimento comercial · <strong>(63) 3212-1199</strong></p>
+        </aside>
+
+        <div class="form-body">
+          <!-- action a ser configurada pelo CMS · roteamento por data-form-id -->
+          <form class="form-grid"
+                action="javascript:void(0);"
+                method="post"
+                data-form-id="form-contato-proposta"
+                data-cms-link="submit-proposta-institucional"
+                data-endpoint="/api/contato/proposta"
+                novalidate
+                aria-describedby="status-proposta">
+
+            <div class="form-field">
+              <label for="prop-nome">Nome do solicitante<span class="req">*</span></label>
+              <input type="text" id="prop-nome" name="nome" required autocomplete="name" />
+              <span class="err-msg">Informe seu nome.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-cargo">Cargo / função</label>
+              <input type="text" id="prop-cargo" name="cargo" autocomplete="organization-title" placeholder="Ex.: Secretário, Diretor de RH, Coordenador" />
+            </div>
+
+            <div class="form-field">
+              <label for="prop-instituicao">Instituição / órgão<span class="req">*</span></label>
+              <input type="text" id="prop-instituicao" name="instituicao" required autocomplete="organization" />
+              <span class="err-msg">Informe a instituição.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-natureza">Natureza jurídica<span class="req">*</span></label>
+              <select id="prop-natureza" name="natureza" required>
+                <option value="">Selecione</option>
+                <option value="municipal">Poder público municipal</option>
+                <option value="estadual">Poder público estadual</option>
+                <option value="federal">Poder público federal</option>
+                <option value="judiciario">Poder Judiciário</option>
+                <option value="legislativo">Poder Legislativo / Tribunais de Contas</option>
+                <option value="autarquia">Autarquia · Fundação · Empresa pública</option>
+                <option value="terceiro-setor">Terceiro setor · OS · OSC</option>
+                <option value="privada">Iniciativa privada</option>
+                <option value="outros">Outros</option>
+              </select>
+              <span class="err-msg">Selecione a natureza jurídica.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-email">E-mail institucional<span class="req">*</span></label>
+              <input type="email" id="prop-email" name="email" required autocomplete="email" />
+              <span class="err-msg">Informe um e-mail válido.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-telefone">Telefone / WhatsApp<span class="req">*</span></label>
+              <input type="tel" id="prop-telefone" name="telefone" required autocomplete="tel" placeholder="(__) _____-____" />
+              <span class="err-msg">Informe um telefone para contato.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-vertical">Vertical de interesse<span class="req">*</span></label>
+              <select id="prop-vertical" name="vertical" required>
+                <option value="">Selecione</option>
+                <option value="educacao">NTC Educação · 9 programas</option>
+                <option value="gestao-publica">NTC Gestão Pública · 3 programas</option>
+                <option value="saude">NTC Saúde · 3 programas</option>
+                <option value="multivertical">Trilha multivertical · combinação</option>
+                <option value="indefinido">Ainda em definição</option>
+              </select>
+              <span class="err-msg">Selecione a vertical.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-programa">Programa de interesse</label>
+              <select id="prop-programa" name="programa">
+                <option value="">Selecione (opcional)</option>
+                <optgroup label="NTC Educação">
+                  <option value="EDUTEC">EDUTEC — Educação digital, inovação e tecnologias</option>
+                  <option value="PEAR">PEAR — Alfabetização e recomposição</option>
+                  <option value="PEI">PEI — Educação integral</option>
+                  <option value="PROGE">PROGE — Gestão escolar e coordenação pedagógica</option>
+                  <option value="PROGIR">PROGIR — Inclusão com resultado</option>
+                  <option value="EGIDE">EGIDE — IA, dados e governança digital</option>
+                  <option value="VIVAESCOLA">VIVAESCOLA — Convivência e proteção integral</option>
+                  <option value="PINEI">PINEI — Primeira infância</option>
+                  <option value="FUTURA">FUTURA — Ensino médio</option>
+                </optgroup>
+                <optgroup label="NTC Gestão Pública">
+                  <option value="AGIP">AGIP — Contratações públicas</option>
+                  <option value="LIDERA">LIDERA — Liderança e direção estratégica</option>
+                  <option value="SIGA">SIGA — Governança e administração</option>
+                </optgroup>
+                <optgroup label="NTC Saúde">
+                  <option value="SIGS">SIGS — Governança digital e IA do SUS</option>
+                  <option value="PROAPS">PROAPS+ — Atenção primária</option>
+                  <option value="PROSUS">PROSUS+ — Governança e financiamento do SUS</option>
+                </optgroup>
+                <option value="customizado">Solução totalmente customizada</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-modalidade">Modalidade preferencial</label>
+              <select id="prop-modalidade" name="modalidade">
+                <option value="">Selecione (opcional)</option>
+                <option value="incompany-presencial">In company presencial</option>
+                <option value="incompany-online">In company online</option>
+                <option value="incompany-hibrido">In company híbrido</option>
+                <option value="turma-fechada">Turma fechada</option>
+                <option value="sob-medida">Solução sob medida</option>
+                <option value="trilha">Trilha / jornada formativa</option>
+                <option value="indefinido">Ainda em definição</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-participantes">Nº estimado de participantes</label>
+              <select id="prop-participantes" name="participantes">
+                <option value="">Selecione (opcional)</option>
+                <option value="ate-25">Até 25</option>
+                <option value="26-50">26 a 50</option>
+                <option value="51-100">51 a 100</option>
+                <option value="101-200">101 a 200</option>
+                <option value="201-500">201 a 500</option>
+                <option value="500+">Acima de 500</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-prazo">Prazo previsto para execução</label>
+              <select id="prop-prazo" name="prazo">
+                <option value="">Selecione (opcional)</option>
+                <option value="ate-30">Até 30 dias</option>
+                <option value="2-3-meses">2 a 3 meses</option>
+                <option value="4-6-meses">4 a 6 meses</option>
+                <option value="semestre">Próximo semestre</option>
+                <option value="ano">Próximo ano fiscal</option>
+                <option value="indefinido">Ainda em definição</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="prop-orcamento">Faixa orçamentária estimada</label>
+              <select id="prop-orcamento" name="orcamento">
+                <option value="">Selecione (opcional · confidencial)</option>
+                <option value="ate-50k">Até R$ 50 mil</option>
+                <option value="50-150k">R$ 50 mil a R$ 150 mil</option>
+                <option value="150-500k">R$ 150 mil a R$ 500 mil</option>
+                <option value="500k-1m">R$ 500 mil a R$ 1 milhão</option>
+                <option value="1m+">Acima de R$ 1 milhão</option>
+                <option value="depende">Depende da proposta</option>
+              </select>
+            </div>
+
+            <div class="form-field full">
+              <label for="prop-contexto">Contexto e objetivos institucionais<span class="req">*</span></label>
+              <textarea id="prop-contexto" name="contexto" required minlength="40" placeholder="Cenário institucional, objetivos formativos, público-alvo e marcos temporais relevantes (planejamento, ciclo fiscal, agenda de governo)."></textarea>
+              <span class="hint">Mínimo 40 caracteres · quanto mais contexto, mais precisa a proposta.</span>
+              <span class="err-msg">Descreva o contexto institucional com pelo menos 40 caracteres.</span>
+            </div>
+
+            <div class="form-consent full">
+              <input type="checkbox" id="prop-lgpd" name="lgpd" required />
+              <label for="prop-lgpd">
+                Autorizo o tratamento dos meus dados pelo Instituto NTC do Brasil para elaboração da proposta solicitada, nos termos da nossa <a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a> e da LGPD (Lei 13.709/2018).
+              </label>
+            </div>
+
+            <div class="form-actions full">
+              <button type="submit" class="btn btn--gold" data-cms-link="enviar-proposta">
+                Enviar solicitação de proposta <span class="btn-arrow">→</span>
+              </button>
+              <span class="form-status" id="status-proposta" aria-live="polite"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAINEL C · INSCRIÇÃO EM GRUPO ===== -->
+    <div class="form-panel" id="panel-equipe" role="tabpanel" aria-labelledby="tab-equipe" hidden>
+      <div class="form-shell">
+        <aside class="form-aside">
+          <p class="eyebrow">Canal · Equipe ou grupo institucional</p>
+          <h3>Inscrever equipe ou grupo institucional</h3>
+          <p>Atendimento único para inscrições coletivas — de equipes pequenas a partir de <strong>3 participantes</strong> até inscrições em lote acima de mil participantes, com faturamento institucional.</p>
+          <ul>
+            <li>Condições especiais a partir de 3 inscrições</li>
+            <li>Faturamento por empenho, NF, convênio ou centralizado</li>
+            <li>Reserva de vagas garantida em até 48h</li>
+            <li>Coordenação dedicada para cadastros e certificação</li>
+            <li>Inscrição em lote por planilha (acima de 50 participantes)</li>
+            <li>Material de divulgação interna sob demanda</li>
+          </ul>
+          <p class="aside-foot">Inscrições individuais? Acesse a <strong><a href="./09_Pagina_Agenda_v2.html" style="color: var(--dourado-soft);">Agenda Geral NTC →</a></strong></p>
+        </aside>
+
+        <div class="form-body">
+          <!-- action a ser configurada pelo CMS · roteamento por data-form-id -->
+          <form class="form-grid"
+                action="javascript:void(0);"
+                method="post"
+                data-form-id="form-contato-equipe"
+                data-cms-link="submit-inscricao-equipe"
+                data-endpoint="/api/contato/equipe"
+                novalidate
+                aria-describedby="status-equipe">
+
+            <div class="form-field">
+              <label for="eq-nome">Nome do solicitante<span class="req">*</span></label>
+              <input type="text" id="eq-nome" name="nome" required autocomplete="name" />
+              <span class="err-msg">Informe seu nome.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="eq-cargo">Cargo / função</label>
+              <input type="text" id="eq-cargo" name="cargo" autocomplete="organization-title" />
+            </div>
+
+            <div class="form-field">
+              <label for="eq-instituicao">Instituição / órgão<span class="req">*</span></label>
+              <input type="text" id="eq-instituicao" name="instituicao" required autocomplete="organization" />
+              <span class="err-msg">Informe a instituição.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="eq-cnpj">CNPJ (faturamento)</label>
+              <input type="text" id="eq-cnpj" name="cnpj" placeholder="00.000.000/0000-00" />
+              <span class="hint">Opcional · solicitado posteriormente para emissão de NF.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="eq-email">E-mail institucional<span class="req">*</span></label>
+              <input type="email" id="eq-email" name="email" required autocomplete="email" />
+              <span class="err-msg">Informe um e-mail válido.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="eq-telefone">Telefone / WhatsApp<span class="req">*</span></label>
+              <input type="tel" id="eq-telefone" name="telefone" required autocomplete="tel" placeholder="(__) _____-____" />
+              <span class="err-msg">Informe um telefone.</span>
+            </div>
+
+            <div class="form-field full">
+              <label for="eq-evento">Evento de interesse<span class="req">*</span></label>
+              <input type="text" id="eq-evento" name="evento" required placeholder="Título, sigla do programa, data ou link da Agenda." />
+              <span class="hint">Aceita título, sigla do programa, data ou link.</span>
+              <span class="err-msg">Informe o evento de interesse.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="eq-inscritos">Nº de inscritos previstos<span class="req">*</span></label>
+              <select id="eq-inscritos" name="inscritos" required>
+                <option value="">Selecione</option>
+                <option value="3-5">3 a 5 participantes</option>
+                <option value="6-10">6 a 10 participantes</option>
+                <option value="11-20">11 a 20 participantes</option>
+                <option value="21-50">21 a 50 participantes</option>
+                <option value="51-100">51 a 100 participantes</option>
+                <option value="101-500">101 a 500 participantes</option>
+                <option value="501-1000">501 a 1.000 participantes</option>
+                <option value="acima-1000">Acima de 1.000 participantes</option>
+              </select>
+              <span class="hint">Acima de 50 participantes habilita upload de planilha de inscritos.</span>
+              <span class="err-msg">Selecione a quantidade prevista.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="eq-faturamento">Forma de faturamento prevista<span class="req">*</span></label>
+              <select id="eq-faturamento" name="faturamento" required>
+                <option value="">Selecione</option>
+                <option value="empenho">Empenho (órgão público)</option>
+                <option value="nf-centralizada">Nota fiscal centralizada (instituição privada)</option>
+                <option value="boleto-institucional">Boleto institucional</option>
+                <option value="pagamento-individual">Pagamento individual com indicação coletiva</option>
+                <option value="indefinido">Ainda em definição</option>
+              </select>
+              <span class="err-msg">Selecione a forma de faturamento.</span>
+            </div>
+
+            <div class="form-field full">
+              <label for="eq-observacoes">Observações</label>
+              <textarea id="eq-observacoes" name="observacoes" placeholder="Necessidades específicas: nominata, datas de empenho, requisitos de empenhamento, vagas reservadas, condições especiais."></textarea>
+            </div>
+
+            <!-- ⚠ Hidden field para preservar o link do evento de origem (autofill via URL param ?evento_url=) -->
+            <input type="hidden" id="eq-evento-url" name="evento_url" value="" />
+
+            <!--
+              Bloco condicional para inscrições em lote (>50 participantes).
+              Revelado automaticamente pelo JS quando o select #eq-inscritos
+              assume um valor das faixas: 51-100 · 101-500 · 501-1000 · acima-1000.
+            -->
+            <div class="form-bulk" id="eq-bulk" aria-hidden="true">
+              <div class="form-bulk-head">
+                <p class="eyebrow gold">Inscrição em lote · grandes grupos</p>
+                <h4>Envio de planilha de participantes</h4>
+                <p>Para grupos acima de 50 participantes, recomendamos o envio de uma planilha com os dados dos inscritos. Baixe nosso modelo institucional, preencha e faça upload abaixo — a transmissão é criptografada (HTTPS/TLS).</p>
+                <div class="bulk-actions">
+                  <a class="btn btn--secondary btn--mini"
+                     href="./assets/modelo-inscricao-grupo-NTC.xlsx"
+                     data-cms-link="modelo-planilha-grupo"
+                     download>
+                    Baixar modelo de planilha (XLSX) <span class="btn-arrow">↓</span>
+                  </a>
+                  <span class="meta">Modelo oficial · campos pré-definidos</span>
+                </div>
+              </div>
+
+              <div class="file-field">
+                <label for="eq-planilha">Upload da planilha de inscritos<span class="req">*</span></label>
+                <div class="file-input-wrap" id="eq-planilha-wrap">
+                  <input type="file"
+                         id="eq-planilha"
+                         name="planilha"
+                         accept=".xlsx,.xls,.csv"
+                         aria-describedby="eq-planilha-hint" />
+                  <div class="file-display">
+                    <span class="file-name">Selecionar arquivo .xlsx / .xls / .csv</span>
+                    <span class="file-cta">Escolher arquivo</span>
+                  </div>
+                </div>
+                <span class="hint" id="eq-planilha-hint">Formatos: XLSX, XLS, CSV · tamanho máximo 5 MB · transmissão criptografada.</span>
+                <span class="err-msg">Anexe a planilha de inscritos (XLSX, XLS ou CSV · até 5 MB).</span>
+              </div>
+
+              <div class="form-consent full">
+                <input type="checkbox" id="eq-lgpd-lote" name="lgpd_lote" />
+                <label for="eq-lgpd-lote">
+                  Declaro estar autorizado(a) a compartilhar os dados pessoais dos participantes listados na planilha, na qualidade de representante legítimo(a) da instituição demandante, e ciente de que o Instituto NTC do Brasil tratará esses dados <strong>exclusivamente para processamento da inscrição em lote</strong>, nos termos da LGPD (Lei 13.709/2018) e da nossa <a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a>.
+                </label>
+              </div>
+            </div>
+
+            <div class="form-consent full">
+              <input type="checkbox" id="eq-lgpd" name="lgpd" required />
+              <label for="eq-lgpd">
+                Autorizo o tratamento dos meus dados pelo Instituto NTC do Brasil para processamento da inscrição, proposta e faturamento, nos termos da nossa <a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a> e da LGPD.
+              </label>
+            </div>
+
+            <div class="form-actions full">
+              <button type="submit" class="btn btn--primary" data-cms-link="enviar-equipe">
+                Solicitar inscrição da equipe <span class="btn-arrow">→</span>
+              </button>
+              <span class="form-status" id="status-equipe" aria-live="polite"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PAINEL D · IMPRENSA ===== -->
+    <div class="form-panel" id="panel-imprensa" role="tabpanel" aria-labelledby="tab-imprensa" hidden>
+      <div class="form-shell">
+        <aside class="form-aside">
+          <p class="eyebrow">Canal · Imprensa e relações institucionais</p>
+          <h3>Pautas, entrevistas e parcerias editoriais</h3>
+          <p>Canal dedicado a jornalistas, veículos, assessorias e entidades parceiras. Acesso a porta-vozes, especialistas das três verticais, dados consolidados e materiais editoriais.</p>
+          <ul>
+            <li>Retorno em até <strong>4 horas úteis</strong></li>
+            <li>Coordenação científica e porta-vozes oficiais</li>
+            <li>Releases, banco de imagens e logos</li>
+            <li>Dados consolidados das três verticais</li>
+            <li>Sala de imprensa por solicitação</li>
+          </ul>
+          <p class="aside-foot">Apoio direto · <strong>imprensa@institutontc.com.br</strong></p>
+        </aside>
+
+        <div class="form-body">
+          <!-- action a ser configurada pelo CMS · roteamento por data-form-id -->
+          <form class="form-grid"
+                action="javascript:void(0);"
+                method="post"
+                data-form-id="form-contato-imprensa"
+                data-cms-link="submit-imprensa"
+                data-endpoint="/api/contato/imprensa"
+                novalidate
+                aria-describedby="status-imprensa">
+
+            <div class="form-field">
+              <label for="imp-nome">Nome do(a) jornalista<span class="req">*</span></label>
+              <input type="text" id="imp-nome" name="nome" required autocomplete="name" />
+              <span class="err-msg">Informe seu nome.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="imp-veiculo">Veículo / assessoria<span class="req">*</span></label>
+              <input type="text" id="imp-veiculo" name="veiculo" required autocomplete="organization" />
+              <span class="err-msg">Informe o veículo ou assessoria.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="imp-email">E-mail profissional<span class="req">*</span></label>
+              <input type="email" id="imp-email" name="email" required autocomplete="email" />
+              <span class="err-msg">Informe um e-mail válido.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="imp-telefone">Telefone / WhatsApp</label>
+              <input type="tel" id="imp-telefone" name="telefone" autocomplete="tel" placeholder="(__) _____-____" />
+            </div>
+
+            <div class="form-field">
+              <label for="imp-tipo">Tipo de demanda<span class="req">*</span></label>
+              <select id="imp-tipo" name="tipo" required>
+                <option value="">Selecione</option>
+                <option value="entrevista">Entrevista com porta-voz / coordenação</option>
+                <option value="especialista">Indicação de especialista por área</option>
+                <option value="dados">Dados consolidados / estatísticas</option>
+                <option value="release">Solicitação de release / material editorial</option>
+                <option value="imagens">Banco de imagens e logos</option>
+                <option value="parceria">Parceria de mídia / cobertura conjunta</option>
+                <option value="outros">Outros</option>
+              </select>
+              <span class="err-msg">Selecione o tipo de demanda.</span>
+            </div>
+
+            <div class="form-field">
+              <label for="imp-deadline">Prazo de fechamento (deadline)</label>
+              <input type="text" id="imp-deadline" name="deadline" placeholder="Ex.: 15/05 às 18h" />
+              <span class="hint">Informe data e horário se houver fechamento próximo.</span>
+            </div>
+
+            <div class="form-field full">
+              <label for="imp-pauta">Pauta / contexto editorial<span class="req">*</span></label>
+              <textarea id="imp-pauta" name="pauta" required minlength="30" placeholder="Pauta, ângulo editorial, veículo de publicação e público-alvo."></textarea>
+              <span class="hint">Mínimo 30 caracteres.</span>
+              <span class="err-msg">Descreva a pauta com pelo menos 30 caracteres.</span>
+            </div>
+
+            <div class="form-consent full">
+              <input type="checkbox" id="imp-lgpd" name="lgpd" required />
+              <label for="imp-lgpd">
+                Autorizo o tratamento dos meus dados pelo Instituto NTC do Brasil para atendimento desta demanda editorial, nos termos da nossa <a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a> e da LGPD.
+              </label>
+            </div>
+
+            <div class="form-actions full">
+              <button type="submit" class="btn btn--primary" data-cms-link="enviar-imprensa">
+                Enviar pauta <span class="btn-arrow">→</span>
+              </button>
+              <span class="form-status" id="status-imprensa" aria-live="polite"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========================== CANAIS DIRETOS + SEDE + MAPA ========================== -->
+<section class="channels" id="canais-diretos" aria-label="Canais diretos e sede institucional">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow gold">Canais diretos</p>
+      <h2>Prefere falar diretamente? Use os canais oficiais.</h2>
+      <p class="section-intro">Atendimento humano, com encaminhamento direto à área responsável. Operado pela coordenação do Instituto NTC do Brasil em horário comercial.</p>
+    </div>
+
+    <div class="channels-grid">
+      <div class="channels-list">
+        <div class="channel-card" data-channel="email">
+          <div class="channel-icon" aria-hidden="true">@</div>
+          <div class="channel-body">
+            <p class="label">E-mail institucional</p>
+            <p class="value">contato@institutontc.com.br</p>
+            <p class="note">Atendimento geral · resposta em até 1 dia útil</p>
+          </div>
+          <div class="channel-action">
+            <a class="link-arrow" href="mailto:contato@institutontc.com.br" data-cms-link="mailto-contato">Enviar</a>
+          </div>
+        </div>
+
+        <div class="channel-card is-featured" data-channel="comercial">
+          <div class="channel-icon" aria-hidden="true">☎</div>
+          <div class="channel-body">
+            <p class="label">Atendimento comercial</p>
+            <p class="value">(63) 3212-1199</p>
+            <p class="note">Propostas institucionais e contratação por órgão público</p>
+          </div>
+          <div class="channel-action">
+            <a class="link-arrow" href="tel:+556332121199" data-cms-link="tel-comercial">Ligar</a>
+          </div>
+        </div>
+
+        <div class="channel-card is-featured" data-channel="whatsapp">
+          <div class="channel-icon" aria-hidden="true">W</div>
+          <div class="channel-body">
+            <p class="label">WhatsApp comercial</p>
+            <p class="value">(63) 98444-4040</p>
+            <p class="note">Mensagens · seg–sex · 8h às 18h</p>
+          </div>
+          <div class="channel-action">
+            <a class="link-arrow" href="https://wa.me/5563984444040" data-cms-link="whatsapp-comercial" target="_blank" rel="noopener noreferrer">Conversar</a>
+          </div>
+        </div>
+
+        <div class="channel-card" data-channel="imprensa">
+          <div class="channel-icon" aria-hidden="true">¶</div>
+          <div class="channel-body">
+            <p class="label">Imprensa e AssCom</p>
+            <p class="value">imprensa@institutontc.com.br</p>
+            <p class="note">Pauta · entrevista · dados consolidados</p>
+          </div>
+          <div class="channel-action">
+            <a class="link-arrow crimson" href="mailto:imprensa@institutontc.com.br" data-cms-link="mailto-imprensa">Falar com AssCom</a>
+          </div>
+        </div>
+
+        <div class="channel-card" data-channel="suporte">
+          <div class="channel-icon" aria-hidden="true">⚙</div>
+          <div class="channel-body">
+            <p class="label">Suporte EventOn (participante)</p>
+            <p class="value">suporte@eventon.institutontc.com.br</p>
+            <p class="note">Acesso · certificado · replay · materiais</p>
+          </div>
+          <div class="channel-action">
+            <a class="link-arrow" href="mailto:suporte@eventon.institutontc.com.br" data-cms-link="mailto-suporte">Acionar suporte</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hq-card fade-in">
+        <div class="hq-head">
+          <h3>Sede institucional</h3>
+          <span class="hq-pill">Brasília · DF</span>
+        </div>
+        <p class="hq-address">
+          <strong>Instituto NTC do Brasil</strong><br>
+          SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001<br>
+          Asa Sul · CEP 70308-200 · Brasília – DF<br>
+          (63) 3212-1199 · contato@institutontc.com.br
+        </p>
+        <div class="hq-map" aria-label="Mapa da sede do Instituto NTC do Brasil em Brasília — DF">
+          <iframe
+            src="https://www.google.com/maps?q=Setor%20Comercial%20Sul%2C%20Quadra%209%2C%20Bloco%20C%2C%20Ed.%20Parque%20Cidade%20Corporate%2C%20Bras%C3%ADlia%20-%20DF&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Localização da sede do Instituto NTC do Brasil em Brasília — DF"></iframe>
+        </div>
+        <div class="hq-foot">
+          <a class="btn btn--secondary btn--mini" href="https://www.google.com/maps/search/?api=1&query=SCS+Quadra+9+Bloco+C+Ed+Parque+Cidade+Corporate+Asa+Sul+Brasília" data-cms-link="maps-sede" target="_blank" rel="noopener noreferrer">Abrir no Google Maps <span class="btn-arrow">→</span></a>
+          <a class="link-arrow" href="#tab-proposta" data-cms-link="agendar-visita">Solicitar reunião institucional</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== ATENDIMENTO POR VERTICAL ========================== -->
+<section class="section section--cream" aria-label="Atendimento dedicado por vertical do Grupo NTC">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow gold">Atendimento por vertical</p>
+      <h2>Coordenação dedicada · Educação, Gestão Pública e Saúde.</h2>
+      <p class="section-intro">Cada vertical do Grupo NTC tem uma coordenação técnica e comercial dedicada, com pessoas que conhecem profundamente o setor — redes públicas de ensino, Administração Pública e o SUS. Escolha o canal que faz sentido à sua demanda.</p>
+    </div>
+
+    <div class="verticals-grid">
+      <article class="vert-card fade-in" data-vertical="educacao">
+        <span class="vert-eyebrow">NTC Educação</span>
+        <h3>Coordenação NTC Educação</h3>
+        <p class="vert-lede">Secretarias de Educação, redes municipais e estaduais, escolas e fundações — alfabetização, gestão escolar, educação digital, inclusão e ensino integral.</p>
+        <div class="vert-info">
+          <div>
+            <b>Programas</b>
+            EDUTEC · PEAR · PEI · PROGE · PROGIR · EGIDE · VIVAESCOLA · PINEI · FUTURA
+          </div>
+          <div>
+            <b>Canais</b>
+            educacao@institutontc.com.br<br>
+            (63) 3212-1199 · opção 1
+          </div>
+        </div>
+        <div class="vert-cta">
+          <a class="btn-vert" href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu">Conhecer a vertical</a>
+          <a class="btn-vert" href="#tab-proposta" data-cms-link="proposta-edu" data-vertical-preset="educacao">Solicitar proposta</a>
+        </div>
+      </article>
+
+      <article class="vert-card fade-in" data-vertical="gestao-publica">
+        <span class="vert-eyebrow">NTC Gestão Pública</span>
+        <h3>Coordenação NTC Gestão Pública</h3>
+        <p class="vert-lede">Executivo, Judiciário, Legislativo, Tribunais de Contas e estatais — contratações públicas, governança, integridade e liderança institucional.</p>
+        <div class="vert-info">
+          <div>
+            <b>Programas</b>
+            AGIP · LIDERA · SIGA
+          </div>
+          <div>
+            <b>Canais</b>
+            gestaopublica@institutontc.com.br<br>
+            (63) 3212-1199 · opção 2
+          </div>
+        </div>
+        <div class="vert-cta">
+          <a class="btn-vert" href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov">Conhecer a vertical</a>
+          <a class="btn-vert" href="#tab-proposta" data-cms-link="proposta-gov" data-vertical-preset="gestao-publica">Solicitar proposta</a>
+        </div>
+      </article>
+
+      <article class="vert-card fade-in" data-vertical="saude">
+        <span class="vert-eyebrow">NTC Saúde</span>
+        <h3>Coordenação NTC Saúde</h3>
+        <p class="vert-lede">Secretarias de Saúde, hospitais públicos, redes do SUS e consórcios — atenção primária, governança digital, financiamento e gestão integrada.</p>
+        <div class="vert-info">
+          <div>
+            <b>Programas</b>
+            SIGS · PROAPS+ · PROSUS+
+          </div>
+          <div>
+            <b>Canais</b>
+            saude@institutontc.com.br<br>
+            (63) 3212-1199 · opção 3
+          </div>
+        </div>
+        <div class="vert-cta">
+          <a class="btn-vert" href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau">Conhecer a vertical</a>
+          <a class="btn-vert" href="#tab-proposta" data-cms-link="proposta-sau" data-vertical-preset="saude">Solicitar proposta</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== PRAZOS DE RETORNO ========================== -->
+<section class="sla-bar" aria-label="Prazos de retorno por canal de atendimento">
+  <div class="container">
+    <div class="section-head fade-in" style="margin-bottom: var(--space-4); color: var(--pergaminho);">
+      <p class="eyebrow" style="color: var(--dourado-soft);">Prazos de retorno</p>
+      <h2 style="color: var(--pergaminho); font-size: clamp(24px, 2.6vw, 32px);">Quanto tempo você pode esperar por uma resposta.</h2>
+    </div>
+    <div class="sla-grid fade-in">
+      <div class="sla-cell">
+        <div class="sla-num">1 dia útil</div>
+        <div class="sla-label">Atendimento geral</div>
+        <p class="sla-note">Resposta inicial em horário comercial para qualquer mensagem enviada pelos canais oficiais.</p>
+      </div>
+      <div class="sla-cell">
+        <div class="sla-num">5 dias úteis</div>
+        <div class="sla-label">Proposta institucional</div>
+        <p class="sla-note">Diagnóstico inicial e envio da proposta técnica e comercial estruturada.</p>
+      </div>
+      <div class="sla-cell">
+        <div class="sla-num">48 horas</div>
+        <div class="sla-label">Inscrição em grupo</div>
+        <p class="sla-note">Reserva de vagas, termo de contratação e orientação sobre faturamento.</p>
+      </div>
+      <div class="sla-cell">
+        <div class="sla-num">4 horas úteis</div>
+        <div class="sla-label">Imprensa</div>
+        <p class="sla-note">Retorno prioritário para deadlines editoriais, com indicação de porta-voz.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid rgba(244, 241, 232, 0.18); display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); font-family: var(--font-cond); font-size: 12.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--pergaminho-80);">
+      <span><strong style="color: var(--dourado-soft);">Horário comercial:</strong> segunda a sexta · 8h às 18h (horário de Brasília)</span>
+      <span><strong style="color: var(--dourado-soft);">Suporte EventOn:</strong> seg–sex · 8h–20h · sáb 8h–13h (durante eventos ao vivo)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== FAQ ========================== -->
+<section class="faq" id="faq" aria-label="Perguntas frequentes sobre contato e atendimento">
+  <div class="container">
+    <div class="section-head fade-in">
+      <p class="eyebrow gold">FAQ · Contato e atendimento</p>
+      <h2>Perguntas frequentes sobre relacionamento institucional.</h2>
+      <p class="section-intro">Reunimos as 8 dúvidas mais recorrentes sobre proposta institucional, inscrição em grupo, faturamento por órgão público, certificação e prazos de retorno. Se a sua não está aqui, use o canal de Atendimento Geral.</p>
+    </div>
+
+    <div class="faq-list">
+      <div class="faq-item is-open">
+        <button class="faq-q" aria-expanded="true">Qual é o prazo para receber uma proposta institucional?</button>
+        <div class="faq-a">
+          <p>Até <strong>5 dias úteis</strong> após o envio do formulário de proposta. Em demandas urgentes vinculadas a ciclo orçamentário ou agenda de governo, o prazo pode ser antecipado mediante contato comercial direto.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">O Grupo NTC atende contratação por dispensa, inexigibilidade ou Lei 14.133?</button>
+        <div class="faq-a">
+          <p>Sim. Emitimos a documentação necessária para contratações por <strong>Lei 14.133/2021</strong> (dispensa, inexigibilidade, pregão, credenciamento), adesão a atas de registro de preços, convênios e pactuação interfederativa no SUS. Atendemos os três Poderes, Tribunais de Contas, autarquias, estatais e fundações públicas.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">É possível inscrever equipes pequenas com condições especiais?</button>
+        <div class="faq-a">
+          <p>Sim. A partir de <strong>3 inscrições</strong>, sua instituição já acessa o canal de Inscrição em Grupo, com condição comercial diferenciada, faturamento institucional (empenho, NF ou boleto) e reserva de vagas garantida em até 48 horas.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">Quais formatos de capacitação estão disponíveis?</button>
+        <div class="faq-a">
+          <p>Cinco formatos: <strong>in company</strong> (presencial, online ou híbrido), <strong>turma fechada</strong>, <strong>solução sob medida</strong>, <strong>trilhas e jornadas</strong> e <strong>contratação institucional integrada</strong> — combinação de múltiplas frentes para órgãos públicos.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">O participante recebe certificado? Qual a validade?</button>
+        <div class="faq-a">
+          <p>Sim. Cada participante recebe certificado do Instituto NTC do Brasil com carga horária, código único e QR code de autenticação. Os certificados têm validade nacional e podem ser usados em progressão funcional, editais e RH institucional. Emissão em até 5 dias úteis após a conclusão.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">Como funciona o acesso ao replay e aos materiais de apoio?</button>
+        <div class="faq-a">
+          <p>Replay disponível na <strong>Área do Participante (EventOn)</strong> em até 48 horas após o evento. Acesso por 90 dias (ou prazo definido por evento) a replay, slides, ementa e bibliografia. Em contratações in company, os prazos são acordados em contrato.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">Posso solicitar uma reunião antes de enviar a proposta?</button>
+        <div class="faq-a">
+          <p>Sim. Podemos agendar reunião presencial na sede em Brasília, virtual ou na sede da sua instituição. Use o canal de <a href="#tab-proposta">Proposta institucional</a> indicando "Solicito reunião prévia" no campo de contexto, ou acione diretamente o (63) 3212-1199.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">Como meus dados pessoais e institucionais são tratados?</button>
+        <div class="faq-a">
+          <p>O tratamento segue a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018). Coletamos apenas o necessário para atender sua solicitação, sob base legal definida, e não compartilhamos com terceiros para fins comerciais. Para exercer seus direitos como titular, escreva ao nosso DPO em <strong>dpo@institutontc.com.br</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== LGPD INSTITUCIONAL ========================== -->
+<section class="lgpd" id="lgpd" aria-label="Tratamento de dados e LGPD">
+  <div class="container">
+    <div class="lgpd-grid fade-in">
+      <div>
+        <p class="eyebrow lgpd-eyebrow">Tratamento de dados · LGPD</p>
+        <h2>Seus dados são tratados com a mesma seriedade do nosso compromisso institucional.</h2>
+        <p>O Instituto NTC do Brasil é controlador dos dados pessoais coletados nos formulários institucionais desta página. O tratamento segue a Lei Geral de Proteção de Dados (Lei 13.709/2018) e princípios de finalidade, adequação, necessidade, transparência, segurança e responsabilização.</p>
+        <p>Para exercer seus direitos como titular (acesso, correção, anonimização, portabilidade, eliminação), acione nosso encarregado de proteção de dados pelo e-mail <strong style="color: var(--dourado-soft);">dpo@institutontc.com.br</strong>.</p>
+        <p style="margin-top: var(--space-3);">
+          <a class="link-arrow light" href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade completa</a>
+        </p>
+      </div>
+      <div class="lgpd-cards">
+        <div class="lgpd-cell">
+          <b>Finalidade</b>
+          <span>Atendimento da demanda institucional informada, elaboração de proposta comercial, processamento de inscrição ou resposta editorial.</span>
+        </div>
+        <div class="lgpd-cell">
+          <b>Base legal</b>
+          <span>Procedimentos preliminares ao contrato (art. 7º, V), legítimo interesse institucional (art. 7º, IX) ou consentimento expresso (art. 7º, I), conforme o canal.</span>
+        </div>
+        <div class="lgpd-cell">
+          <b>Retenção</b>
+          <span>Período proporcional ao ciclo de relacionamento institucional, com revisão periódica e descarte após o cumprimento da finalidade.</span>
+        </div>
+        <div class="lgpd-cell">
+          <b>Compartilhamento</b>
+          <span>Não há compartilhamento com terceiros para fins comerciais. Apenas com prestadores essenciais (e-mail, hospedagem) sob contrato de confidencialidade.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== CTA INSTITUCIONAL FINAL ========================== -->
+<section class="cta-final" aria-label="Chamada institucional de encerramento">
+  <div class="container">
+    <div class="cta-final-inner fade-in">
+      <div>
+        <p class="eyebrow light" style="color: var(--dourado-soft);">Pronto para começar?</p>
+        <h2>Vamos transformar a formação da sua instituição em <em>impacto institucional real</em>.</h2>
+        <p>Use o canal mais adequado à sua demanda — a equipe do Instituto NTC do Brasil retorna em horário comercial com a coordenação técnica e comercial dedicada à sua vertical.</p>
+      </div>
+      <div class="cta-final-actions">
+        <a class="btn btn--gold" href="#tab-proposta" data-cms-link="cta-final-proposta">Solicitar proposta institucional <span class="btn-arrow">→</span></a>
+        <a class="btn btn--ghost-light" href="#tab-equipe" data-cms-link="cta-final-equipe">Inscrever minha equipe</a>
+        <a class="btn btn--ghost-light" href="mailto:contato@institutontc.com.br" data-cms-link="cta-final-email">Escrever para contato@institutontc.com.br</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ========================== FOOTER (canon Soberana 2026) ========================== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="./img/logos/logo-dark.svg" alt="Grupo NTC" />
+        <span class="footer-tagline">O novo padrão da formação institucional.</span>
+        <p class="footer-address">
+          <strong>Instituto NTC do Brasil</strong><br>
+          SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001<br>
+          Asa Sul · CEP 70308-200 · Brasília – DF<br>
+          (63) 3212-1199 · contato@institutontc.com.br
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h5>Navegação</h5>
+        <ul>
+          <li><a href="./08_Pagina_O_Grupo_NTC_v3.html">Grupo NTC</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#programas">Programas</a></li>
+          <li><a href="./09_Pagina_Agenda_v2.html">Capacitação</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#solucoes">Soluções</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#conteudos">Conteúdos</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#docentes" data-cms-link="pagina-corpo-docente">Corpo Docente</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon">EventOn</a></li>
+          <li><a href="#main" aria-current="page">Contato</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Verticais</h5>
+        <ul>
+          <li><a href="./07_Pagina_Vertical_NTC_Educacao_v1.html" data-cms-link="vertical-edu">NTC Educação</a></li>
+          <li><a href="./07_Pagina_Vertical_NTC_GestaoPublica_v1.html" data-cms-link="vertical-gov">NTC Gestão Pública</a></li>
+          <li><a href="./07_Pagina_Vertical_NTC_Saude_v1.html" data-cms-link="vertical-sau">NTC Saúde</a></li>
+          <li><a href="#tab-proposta" data-cms-link="modelo-incompany">Soluções in company</a></li>
+          <li><a href="#tab-proposta" data-cms-link="modelo-fechada">Turmas fechadas</a></li>
+          <li><a href="#tab-proposta" data-cms-link="modelo-sobmedida">Soluções sob medida</a></li>
+          <li><a href="#tab-proposta" data-cms-link="modelo-institucional">Contratação institucional</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h5>Atendimento</h5>
+        <ul>
+          <li><a href="./09_Pagina_Agenda_v2.html">Eventos com inscrições abertas</a></li>
+          <li><a href="#tab-proposta" data-cms-link="proposta-institucional">Solicitar proposta</a></li>
+          <li><a href="#tab-equipe" data-cms-link="inscricao-equipe">Inscrever equipe</a></li>
+          <li><a href="#tab-atendimento" data-cms-link="atendimento-comercial">Atendimento comercial</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="eventon-suporte">Suporte ao participante</a></li>
+          <li><a href="./02_Prototipo_Home_GrupoNTC_v2_6.html#eventon" data-cms-link="area-participante">Área do Participante</a></li>
+          <li><a href="https://wa.me/5563984444040" data-cms-link="whatsapp">WhatsApp · (63) 98444-4040</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-badge">Grupo NTC — Núcleo de Tecnologia e Conhecimento · 2026</p>
+      <ul class="footer-legal">
+        <!-- Páginas legais a publicar pelo CMS · enquanto isso apontam para #lgpd (seção desta página) -->
+        <li><a href="./30_Pagina_Privacidade_v1.html" data-cms-link="legal-privacidade">Política de Privacidade</a></li>
+        <li><a href="./31_Pagina_Termos_v1.html" data-cms-link="legal-termos">Termos de Uso</a></li>
+        <li><a href="./32_Pagina_Cookies_v1.html" data-cms-link="legal-cookies">Política de Cookies</a></li>
+        <li><a href="./33_Pagina_LGPD_v1.html" data-cms-link="legal-lgpd">LGPD</a></li>
+        <li><a href="./34_Pagina_MapaDoSite_v1.html" data-cms-link="legal-mapa-do-site">Mapa do site</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* =============================================================
+   INTERAÇÕES · CONTATO v1
+   ============================================================= */
+
+/* analytics centralizado */
+function track(name, payload) {
+  try {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(Object.assign({ event: name }, payload || {}));
+  } catch(e) { /* noop */ }
+}
+
+/* 1) Mega menu (desktop) */
+(function() {
+  const triggers = document.querySelectorAll('.nav-item.has-mega');
+  const megas = document.querySelectorAll('.mega');
+  let openTimer = null;
+  function openMega(id) {
+    closeAllMegas();
+    const m = document.getElementById('mega-' + id);
+    if (m) m.classList.add('is-open');
+    triggers.forEach(t => t.setAttribute('aria-expanded', t.dataset.mega === id ? 'true' : 'false'));
+  }
+  function closeAllMegas() {
+    megas.forEach(m => m.classList.remove('is-open'));
+    triggers.forEach(t => t.setAttribute('aria-expanded', 'false'));
+  }
+  triggers.forEach(trigger => {
+    trigger.addEventListener('mouseenter', () => { clearTimeout(openTimer); openMega(trigger.dataset.mega); });
+    trigger.addEventListener('click', e => {
+      e.preventDefault();
+      const id = trigger.dataset.mega;
+      const isOpen = document.getElementById('mega-' + id).classList.contains('is-open');
+      if (isOpen) closeAllMegas(); else openMega(id);
+    });
+    trigger.addEventListener('focus', () => openMega(trigger.dataset.mega));
+  });
+  megas.forEach(mega => {
+    mega.addEventListener('mouseenter', () => clearTimeout(openTimer));
+    mega.addEventListener('mouseleave', () => { openTimer = setTimeout(closeAllMegas, 200); });
+  });
+  document.querySelector('.site-header').addEventListener('mouseleave', () => { openTimer = setTimeout(closeAllMegas, 240); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllMegas(); });
+  document.addEventListener('click', e => { if (!e.target.closest('.site-header')) closeAllMegas(); });
+})();
+
+/* 2) Mobile drawer */
+(function() {
+  const toggle = document.getElementById('mobileToggle');
+  const drawer = document.getElementById('mobileDrawer');
+  const backdrop = document.getElementById('mobileBackdrop');
+  const closeBtn = document.getElementById('drawerClose');
+  if (!toggle || !drawer || !backdrop) return;
+  function openDrawer() {
+    drawer.classList.add('is-open'); backdrop.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true'); drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
+    setTimeout(() => closeBtn.focus(), 320);
+  }
+  function closeDrawer() {
+    drawer.classList.remove('is-open'); backdrop.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false'); drawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll'); toggle.focus();
+  }
+  toggle.addEventListener('click', () => {
+    if (drawer.classList.contains('is-open')) closeDrawer(); else openDrawer();
+  });
+  closeBtn.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer(); });
+  drawer.querySelectorAll('.drawer-item.has-sub').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById('sub-' + btn.dataset.sub);
+      if (!target) return;
+      const isOpen = target.classList.toggle('is-open');
+      btn.classList.toggle('is-expanded', isOpen);
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+  });
+  drawer.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', () => setTimeout(closeDrawer, 80));
+  });
+})();
+
+/* 3) Tabs-roteador editorial dos formulários */
+(function() {
+  const tabs = document.querySelectorAll('.router-tab');
+  const panels = document.querySelectorAll('.form-panel');
+
+  function activate(tabId, opts) {
+    opts = opts || {};
+    tabs.forEach(t => {
+      const isActive = t.dataset.tab === tabId;
+      t.classList.toggle('is-active', isActive);
+      t.setAttribute('aria-selected', String(isActive));
+    });
+    panels.forEach(p => {
+      const isActive = p.id === ('panel-' + tabId);
+      p.classList.toggle('is-active', isActive);
+      if (isActive) { p.removeAttribute('hidden'); } else { p.setAttribute('hidden', ''); }
+    });
+    track('contato_tab_change', { tab: tabId, source: opts.source || 'click' });
+    if (opts.scroll) {
+      const target = document.getElementById('formularios');
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.pageYOffset - (Number(getComputedStyle(document.documentElement).getPropertyValue('--header-h').replace('px',''))||88) - 8;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => activate(tab.dataset.tab, { source: 'card' }));
+    tab.addEventListener('keydown', e => {
+      const order = Array.from(tabs);
+      const idx = order.indexOf(tab);
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        order[(idx + 1) % order.length].focus();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        order[(idx - 1 + order.length) % order.length].focus();
+      } else if (e.key === 'Home') {
+        e.preventDefault(); order[0].focus();
+      } else if (e.key === 'End') {
+        e.preventDefault(); order[order.length - 1].focus();
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault(); activate(tab.dataset.tab, { source: 'keyboard' });
+      }
+    });
+  });
+
+  /* Roteamento por anchor: hero quicklinks + qualquer link interno #tab-XXX
+     ativa a tab correspondente e rola até a área dos formulários. */
+  function handleAnchor(hash) {
+    if (!hash) return;
+    const map = {
+      '#tab-atendimento': 'atendimento',
+      '#tab-proposta':    'proposta',
+      '#tab-equipe':      'equipe',
+      '#tab-imprensa':    'imprensa'
+    };
+    if (map[hash]) {
+      activate(map[hash], { source: 'anchor', scroll: true });
+      return true;
+    }
+    return false;
+  }
+
+  document.querySelectorAll('a[href^="#tab-"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const h = a.getAttribute('href');
+      const preset = a.getAttribute('data-vertical-preset');
+      if (handleAnchor(h)) {
+        e.preventDefault();
+        history.replaceState(null, '', h);
+        if (preset && h === '#tab-proposta') prefillVertical(preset);
+      }
+    });
+  });
+
+  /* Pré-seleção da vertical no form de proposta · vinda dos cards de vertical */
+  function prefillVertical(verticalKey) {
+    const select = document.getElementById('prop-vertical');
+    if (!select) return;
+    const has = Array.from(select.options).some(o => o.value === verticalKey);
+    if (has) {
+      select.value = verticalKey;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      /* feedback visual sutil */
+      const wrap = select.closest('.form-field');
+      if (wrap) {
+        wrap.style.transition = 'box-shadow 320ms';
+        wrap.style.boxShadow = '0 0 0 3px rgba(184, 149, 46, 0.18)';
+        setTimeout(() => { wrap.style.boxShadow = ''; }, 1400);
+      }
+      track('contato_vertical_preset', { vertical: verticalKey });
+    }
+  }
+  window.__contatoPrefillVertical = prefillVertical;
+
+  /* Hash inicial ao carregar a página */
+  if (window.location.hash) handleAnchor(window.location.hash);
+})();
+
+/* 4) Validação leve dos formulários (client-side) */
+(function() {
+  const forms = document.querySelectorAll('form[data-form-id]');
+  const reEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function setError(field, hasError) {
+    field.classList.toggle('has-error', !!hasError);
+  }
+
+  function validateField(input) {
+    const wrap = input.closest('.form-field') || input.closest('.file-field');
+    if (!wrap) return true;
+    let ok = true;
+    if (input.type === 'file') {
+      /* file: precisa ter arquivo anexado quando required */
+      if (input.hasAttribute('required') && (!input.files || input.files.length === 0)) ok = false;
+    } else {
+      if (input.hasAttribute('required') && !String(input.value || '').trim()) ok = false;
+      if (ok && input.type === 'email' && input.value && !reEmail.test(input.value.trim())) ok = false;
+      if (ok && input.tagName === 'TEXTAREA' && input.hasAttribute('minlength')) {
+        const min = Number(input.getAttribute('minlength')) || 0;
+        if (String(input.value || '').trim().length < min) ok = false;
+      }
+    }
+    setError(wrap, !ok);
+    return ok;
+  }
+
+  forms.forEach(form => {
+    const status = form.querySelector('.form-status');
+    const formId = form.getAttribute('data-form-id');
+
+    form.querySelectorAll('input, select, textarea').forEach(field => {
+      field.addEventListener('blur', () => { if (field.value) validateField(field); });
+      field.addEventListener('input', () => {
+        const wrap = field.closest('.form-field');
+        if (wrap && wrap.classList.contains('has-error')) validateField(field);
+      });
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      let allOk = true;
+      form.querySelectorAll('input, select, textarea').forEach(field => {
+        if (!validateField(field)) allOk = false;
+      });
+      const consent = form.querySelector('input[type="checkbox"][name="lgpd"]');
+      if (consent && !consent.checked) {
+        allOk = false;
+        const wrap = consent.closest('.form-consent');
+        if (wrap) wrap.style.outline = '2px solid var(--cardeal)';
+        track('contato_form_consent_missing', { formId: formId });
+      } else if (consent) {
+        const wrap = consent.closest('.form-consent');
+        if (wrap) wrap.style.outline = '';
+      }
+
+      /* Consent específico de inscrição em lote · validado apenas quando required (modo lote ativo) */
+      const consentLote = form.querySelector('input[type="checkbox"][name="lgpd_lote"]');
+      if (consentLote && consentLote.hasAttribute('required')) {
+        const wrap = consentLote.closest('.form-consent');
+        if (!consentLote.checked) {
+          allOk = false;
+          if (wrap) wrap.style.outline = '2px solid var(--cardeal)';
+          track('contato_form_bulk_consent_missing', { formId: formId });
+        } else if (wrap) {
+          wrap.style.outline = '';
+        }
+      }
+
+      if (!allOk) {
+        if (status) { status.textContent = 'Verifique os campos destacados.'; status.className = 'form-status is-error'; }
+        track('contato_form_invalid', { formId: formId });
+        const firstErr = form.querySelector('.has-error');
+        if (firstErr) {
+          const input = firstErr.querySelector('input, select, textarea');
+          if (input) input.focus();
+        }
+        return;
+      }
+
+      /* ⚠ PLACEHOLDER · sem backend nesta versão.
+         O CMS deve substituir este bloco pela chamada real (fetch POST para `data-endpoint`).
+         Exemplo:
+            fetch(form.getAttribute('data-endpoint'), { method: 'POST', body: new FormData(form) })
+              .then(r => r.ok ? onOk() : onErr())
+              .catch(onErr);
+      */
+      if (status) {
+        status.textContent = 'Mensagem registrada · você receberá retorno em horário comercial.';
+        status.className = 'form-status is-ok';
+      }
+      track('contato_form_submit', {
+        formId: formId,
+        cmsLink: form.getAttribute('data-cms-link'),
+        endpoint: form.getAttribute('data-endpoint')
+      });
+      form.reset();
+    });
+  });
+})();
+
+/* 4.1) Bloco condicional de inscrição em lote (>50 participantes) */
+(function() {
+  const select = document.getElementById('eq-inscritos');
+  const bulk = document.getElementById('eq-bulk');
+  const fileInput = document.getElementById('eq-planilha');
+  const fileWrap = document.getElementById('eq-planilha-wrap');
+  const fileDisplay = fileWrap ? fileWrap.querySelector('.file-name') : null;
+  const consentLote = document.getElementById('eq-lgpd-lote');
+  if (!select || !bulk || !fileInput || !consentLote) return;
+
+  const BULK_RANGES = new Set(['51-100', '101-500', '501-1000', 'acima-1000']);
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; /* 5 MB */
+  const ACCEPTED_EXT = ['xlsx', 'xls', 'csv'];
+
+  function setBulkMode(isBulk) {
+    bulk.classList.toggle('is-active', isBulk);
+    bulk.setAttribute('aria-hidden', String(!isBulk));
+    if (isBulk) {
+      fileInput.setAttribute('required', '');
+      consentLote.setAttribute('required', '');
+    } else {
+      fileInput.removeAttribute('required');
+      consentLote.removeAttribute('required');
+      /* limpa estado de erro ao sair do modo lote */
+      fileInput.value = '';
+      if (fileDisplay) fileDisplay.textContent = 'Selecionar arquivo .xlsx / .xls / .csv';
+      if (fileWrap) fileWrap.classList.remove('has-file');
+      consentLote.checked = false;
+      const fieldWrap = fileInput.closest('.file-field');
+      if (fieldWrap) fieldWrap.classList.remove('has-error');
+    }
+    track('contato_bulk_toggle', { active: isBulk });
+  }
+
+  select.addEventListener('change', () => {
+    setBulkMode(BULK_RANGES.has(select.value));
+  });
+
+  /* Aplicar estado inicial caso o valor venha pré-selecionado por URL/CMS */
+  if (BULK_RANGES.has(select.value)) setBulkMode(true);
+
+  /* Feedback visual ao escolher arquivo + validação client-side */
+  fileInput.addEventListener('change', () => {
+    const fieldWrap = fileInput.closest('.file-field');
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) {
+      if (fileDisplay) fileDisplay.textContent = 'Selecionar arquivo .xlsx / .xls / .csv';
+      if (fileWrap) fileWrap.classList.remove('has-file');
+      return;
+    }
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    let invalidReason = '';
+    if (!ACCEPTED_EXT.includes(ext)) invalidReason = 'Formato não suportado.';
+    else if (file.size > MAX_FILE_SIZE) invalidReason = 'Arquivo acima de 5 MB.';
+
+    if (invalidReason) {
+      if (fileDisplay) fileDisplay.textContent = invalidReason + ' Selecione outro arquivo.';
+      if (fileWrap) fileWrap.classList.remove('has-file');
+      if (fieldWrap) fieldWrap.classList.add('has-error');
+      fileInput.value = '';
+      track('contato_bulk_file_invalid', { reason: invalidReason });
+    } else {
+      const kb = Math.round(file.size / 1024);
+      const sizeStr = kb >= 1024 ? (kb / 1024).toFixed(2) + ' MB' : kb + ' KB';
+      if (fileDisplay) fileDisplay.textContent = file.name + ' · ' + sizeStr;
+      if (fileWrap) fileWrap.classList.add('has-file');
+      if (fieldWrap) fieldWrap.classList.remove('has-error');
+      track('contato_bulk_file_attached', { ext: ext, sizeKB: kb });
+    }
+  });
+})();
+
+/* 5) FAQ accordion */
+(function() {
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const q = item.querySelector('.faq-q');
+    if (!q) return;
+    q.addEventListener('click', () => {
+      const isOpen = item.classList.toggle('is-open');
+      q.setAttribute('aria-expanded', String(isOpen));
+      track('contato_faq_toggle', { open: isOpen, question: q.textContent.trim() });
+    });
+  });
+})();
+
+/* 6) Smooth scroll para anchors */
+document.querySelectorAll('a[href^="#"]:not([href^="#tab-"])').forEach(a => {
+  a.addEventListener('click', function(e) {
+    const id = this.getAttribute('href');
+    if (id.length > 1) {
+      const target = document.querySelector(id);
+      if (target) {
+        e.preventDefault();
+        const top = target.getBoundingClientRect().top + window.pageYOffset - 88;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }
+  });
+});
+
+/* 7) Aparição ao scroll */
+(function() {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('is-visible'));
+    return;
+  }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+})();
+
+/* 8) Autofill do form Equipe via URL params · convenção do fluxo único */
+/*
+   Pages de evento devem linkar para:
+     ./12_Pagina_Contato_v1.html?evento=<titulo>&evento_url=<url>#tab-equipe
+   exemplo:
+     ./12_Pagina_Contato_v1.html?evento=PROSUS%2B%20Bras%C3%ADlia&evento_url=https%3A%2F%2Fwww.grupontc.com.br%2Feventos%2Fprosus-brasilia#tab-equipe
+   O JS abaixo lê os parâmetros, preenche o campo "Evento de interesse",
+   armazena a URL canônica em um hidden field, e limpa a querystring da
+   barra de endereço (sem reload, mantendo o hash). */
+(function() {
+  if (!window.location.search) return;
+  const params = new URLSearchParams(window.location.search);
+  const evento = params.get('evento');
+  const eventoUrl = params.get('evento_url');
+  if (!evento && !eventoUrl) return;
+
+  const inputEvento = document.getElementById('eq-evento');
+  const hiddenUrl   = document.getElementById('eq-evento-url');
+
+  if (inputEvento && evento) {
+    /* combina título + url em uma única linha legível, preservando o link */
+    inputEvento.value = eventoUrl ? evento + ' — ' + eventoUrl : evento;
+  }
+  if (hiddenUrl && eventoUrl) hiddenUrl.value = eventoUrl;
+
+  /* feedback visual sutil + ativa a tab #tab-equipe se ainda não estiver ativa */
+  const fieldWrap = inputEvento && inputEvento.closest('.form-field');
+  if (fieldWrap) {
+    fieldWrap.style.transition = 'box-shadow 320ms';
+    fieldWrap.style.boxShadow = '0 0 0 3px rgba(184, 149, 46, 0.18)';
+    setTimeout(() => { fieldWrap.style.boxShadow = ''; }, 1800);
+  }
+
+  track('contato_evento_autofill', {
+    evento: evento || '',
+    evento_url: eventoUrl || '',
+    source: document.referrer || '(direct)'
+  });
+
+  /* Limpa a querystring da barra de endereço, preserva o hash */
+  if (window.history && window.history.replaceState) {
+    const clean = window.location.pathname + (window.location.hash || '');
+    window.history.replaceState(null, '', clean);
+  }
+})();
+
+/* 9) Page view */
+track('page_view', { page: 'contato', version: 'v1.3' });
+
+/*
+  =============================================================
+  🔌 CMS / INTEGRAÇÃO FUTURA
+  -------------------------------------------------------------
+  Convenção para esta página:
+
+    Forms (data-form-id):
+      form-contato-atendimento    → canal geral / ticket baixa prioridade
+      form-contato-proposta       → pipe comercial / lead institucional
+      form-contato-equipe         → pipe comercial / lead inscrição em grupo
+      form-contato-imprensa       → canal imprensa / AssCom
+
+    Cada form tem data-cms-link="submit-XXX" que deve ser mapeado
+    pelo CMS para o endpoint POST adequado (HubSpot, RD Station,
+    pipeline próprio, etc.). O backend deve:
+      1. validar campos servidor-side novamente
+      2. registrar lead no CRM
+      3. disparar e-mail de confirmação ao remetente
+      4. notificar o canal apropriado da equipe NTC
+      5. respeitar a base legal LGPD declarada no consentimento
+
+    CTAs com data-cms-link conhecidos:
+      proposta-institucional        modelo-incompany
+      inscricao-equipe              modelo-fechada
+      atendimento-comercial         modelo-sobmedida
+      area-participante             modelo-trilha
+      eventon-suporte               modelo-institucional
+      pagina-corpo-docente          politica-privacidade
+
+    Eventos analytics (track()):
+      contato_tab_change            { tab, source }
+      contato_form_consent_missing  { formId }
+      contato_form_invalid          { formId }
+      contato_form_submit           { formId, cmsLink }
+      contato_faq_toggle            { open, question }
+      page_view                     { page: 'contato', version: 'v1' }
+  =============================================================
+*/
+</script>
+<!-- NTC_COOKIE_CONSENT_JS_BEGIN -->
+<script defer src="./assets/cookie_consent.js"></script>
+<!-- NTC_COOKIE_CONSENT_JS_END -->
+
+</body>
+</html>
