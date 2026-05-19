@@ -23,6 +23,11 @@ jobs:
       PAYLOAD_SECRET: ci-only-secret-please-rotate-in-real-environments
       PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3001
       PAYLOAD_PUBLIC_FRONT_URL: http://localhost:3000
+      SUPABASE_S3_ENDPOINT: https://ci.storage.supabase.co/storage/v1/s3
+      SUPABASE_S3_REGION: sa-east-1
+      SUPABASE_S3_ACCESS_KEY_ID: ci-fake-key
+      SUPABASE_S3_SECRET_ACCESS_KEY: ci-fake-secret
+      SUPABASE_BUCKET: ntc-portal-media
 
     steps:
       - name: Checkout
