@@ -72,8 +72,8 @@ Continuando Sprint F do Portal Grupo NTC.
 
 Leia:
 1. docs/12_Inventario_Componentes_Editoriais_v1.md (foco: Seção 2 — Tokens Soberana)
-2. Os SVGs em docs/prototipos/img/logos/ (ou na pasta onde os logos foram colocados)
-3. docs/prototipos/02_Prototipo_Home_GrupoNTC_v2_5.html (referência visual)
+2. Os SVGs em /img/logos/ (ou na pasta onde os logos foram colocados)
+3. 02_Prototipo_Home_GrupoNTC_v3_Premium.html (referência visual)
 
 Sua tarefa nesta sessão:
 

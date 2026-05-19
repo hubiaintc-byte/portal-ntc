@@ -1,8 +1,118 @@
 @import "tailwindcss";
 
 /*
- * Tokens visuais (paleta Soberana 2026, tipografia, espaçamentos) serão
- * definidos em packages/ui/src/tokens.ts em sessão dedicada. Este arquivo
- * mantém apenas o reset Tailwind 4 padrão. Não adicionar CSS literal fora
- * de Tailwind sem revisão (CLAUDE.md §4.1).
+ * Tokens Soberana 2026 mapeados para o sistema @theme do Tailwind 4.
+ * Fonte: packages/ui/src/tokens.ts (espelho da Seção 2 do Inventário).
+ *
+ * Convenção: nomes do Tailwind seguem o esquema --color-*, --font-*, etc.,
+ * o que gera utilitários automáticos (bg-osso, text-grafite, font-titulo,
+ * text-h1). Os tokens "raios" e "transições" são acessíveis como --raio-*
+ * e --transicao-* via classes arbitrárias quando necessário.
  */
+
+@theme {
+  /* Cores Soberana */
+  --color-oxford: #11365e;
+  --color-oxford-escuro: #0b2545;
+  --color-oxford-claro: #1e4e8c;
+  --color-cardeal: #8e2b27;
+  --color-oliva: #5c6b3b;
+  --color-dourado: #b5995a;
+  --color-pergaminho: #f4efe6;
+  --color-osso: #fbf8f2;
+  --color-grafite: #2b2b2b;
+  --color-grafite-suave: #5a5a5a;
+  --color-linha-sutil: #d9d2c4;
+  --color-vermelho-erro: #9a1b1b;
+  --color-verde-sucesso: #3f6b3f;
+
+  /* Fontes (variáveis injetadas pelo next/font no <html>) */
+  --font-titulo: var(--font-titulo);
+  --font-corpo: var(--font-corpo);
+
+  /* Escala tipográfica */
+  --text-h1: clamp(2.75rem, 5vw, 4.5rem);
+  --text-h2: clamp(2rem, 3.5vw, 3rem);
+  --text-h3: clamp(1.5rem, 2.5vw, 2rem);
+  --text-h4: 1.25rem;
+  --text-corpo: 1.0625rem;
+  --text-pequeno: 0.875rem;
+  --text-eyebrow: 0.75rem;
+
+  /* Espaçamento editorial */
+  --spacing-secao-vertical: clamp(4rem, 8vw, 7rem);
+  --spacing-bloco-vertical: clamp(2rem, 4vw, 3.5rem);
+  --spacing-margem-editorial: clamp(1.25rem, 4vw, 3rem);
+
+  /* Largura de container editorial */
+  --container-editorial: min(92ch, 92vw);
+
+  /* Raios — estruturas usam 0 */
+  --radius-nenhum: 0;
+  --radius-foto: 2px;
+  --radius-selo: 999px;
+
+  /* Transições institucionais */
+  --transicao-discreta: 250ms ease-out;
+  --transicao-institucional: 400ms ease-out;
+}
+
+/* Reset e base editorial */
+html {
+  /* iOS Safari: previne zoom em inputs sem prejudicar a11y de zoom manual */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-osso);
+  color: var(--color-grafite);
+  font-family: var(--font-corpo), system-ui, -apple-system, sans-serif;
+  font-size: var(--text-corpo);
+  line-height: 1.55;
+  font-feature-settings: "kern", "liga", "calt";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-titulo), Georgia, "Times New Roman", serif;
+  color: var(--color-oxford);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+/* Foco visível em Oxford (CLAUDE.md §10 — acessibilidade) */
+:focus-visible {
+  outline: 2px solid var(--color-oxford);
+  outline-offset: 2px;
+}
+
+/* Remove o foco padrão quando o teclado não está em uso */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip-link visível ao receber foco (CLAUDE.md §10) */
+.skip-link {
+  position: absolute;
+  top: -10rem;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background-color: var(--color-oxford);
+  color: var(--color-osso);
+  font-family: var(--font-corpo);
+  font-weight: 500;
+  text-decoration: none;
+  transition: top var(--transicao-discreta);
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
