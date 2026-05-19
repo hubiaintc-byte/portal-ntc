@@ -1,8 +1,13 @@
 # CLAUDE.md Operacional — Portal Grupo NTC
 ## Instruções permanentes para o Claude Code · v1 Sprint F
 
-**Versão:** 1.0 · 15 de maio de 2026
-**Destino:** este arquivo é renomeado para `CLAUDE.md` e colocado na raiz do monorepo. O Claude Code o lê automaticamente em toda sessão e o trata como instrução de mais alta prioridade depois do prompt do usuário.
+**Versão:** 1.1 · 19 de maio de 2026
+**Destino:** este arquivo está na raiz do monorepo. O Claude Code o lê automaticamente em toda sessão e o trata como instrução de mais alta prioridade depois do prompt do usuário.
+
+### Histórico de revisões
+
+- **v1.1 — 19/05/2026** — migração de stack: Neon→Supabase Postgres SP, Cloudflare R2→Supabase Storage, RD Station removido (coleção `Lead` no Payload é fonte única). §15 reescrita; §17 atualizada. Detalhes em `docs/10_DAB §1.1`.
+- **v1.0 — 15/05/2026** — versão original Sprint F.
 
 > **Como usar este documento.** Após criar o repositório do portal, copie o conteúdo abaixo (a partir da linha `# Portal Grupo NTC — Instruções Permanentes`) para um arquivo `CLAUDE.md` na raiz. Em todas as sessões de Claude Code daqui em diante, essas instruções estarão ativas como contrato.
 
@@ -259,26 +264,33 @@ pnpm payload:seed      # seed inicial (Áreas + 15 Programas em rascunho)
 Mantenha um `.env.example` versionado e nunca commit `.env`. Variáveis obrigatórias:
 
 ```
-# Database
-DATABASE_URI=postgres://...
+# Database (Supabase Postgres SP · pooler porta 6543)
+DATABASE_URI=postgresql://postgres.<ref>:<senha>@aws-0-sa-east-1.pooler.supabase.com:6543/postgres
+
+# Supabase API
+SUPABASE_URL=https://<ref>.supabase.co
+SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+
+# Supabase Storage (S3-compat)
+SUPABASE_S3_ENDPOINT=https://<ref>.storage.supabase.co/storage/v1/s3
+SUPABASE_S3_REGION=sa-east-1
+SUPABASE_S3_ACCESS_KEY_ID=...
+SUPABASE_S3_SECRET_ACCESS_KEY=...
+SUPABASE_BUCKET=ntc-portal-media
 
 # Payload
 PAYLOAD_SECRET=...
-PAYLOAD_PUBLIC_SERVER_URL=https://...
+PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3001
 
 # Front
-PAYLOAD_PUBLIC_FRONT_URL=https://...
+PAYLOAD_PUBLIC_FRONT_URL=http://localhost:3000
 REVALIDATE_SECRET=...
 
-# Storage R2
-R2_ACCESS_KEY_ID=...
-R2_SECRET_ACCESS_KEY=...
-R2_BUCKET=ntc-portal-media
-R2_ENDPOINT=...
-
-# Integrações
-RDSTATION_TOKEN=...
+# E-mail transacional
 RESEND_API_KEY=...
+
+# Captcha
 HCAPTCHA_SITE_KEY=...
 HCAPTCHA_SECRET=...
 
@@ -298,11 +310,11 @@ SENTRY_DSN=...
 Estas decisões devem ser confirmadas pelo usuário antes da Janela A:
 
 1. Domínio definitivo (gruponctc.org.br confirmado ou alternativo?).
-2. Conta Vercel Pro (quem provisiona, quem paga, quem administra).
-3. Conta Neon Postgres SP (mesmo).
-4. Conta Cloudflare R2 (mesmo).
-5. Conta Resend (mesmo).
-6. Token RD Station (quem gera, quando entrega).
+2. Conta Vercel Pro (quem provisiona, quem paga, quem administra). **Tier:** Pro para o go-live (Web + CMS), Free durante desenvolvimento se houver baixo tráfego.
+3. ~~Conta Neon Postgres SP~~ → **Supabase Postgres SP** provisionado via MCP em 19/05/2026 (projeto `portal-ntc-staging`, ref `irekejunwknguzdfszyi`, região `sa-east-1`). Projeto de produção a criar na Janela C.
+4. ~~Conta Cloudflare R2~~ → **Supabase Storage** (bucket `ntc-portal-media` já criado no projeto de staging).
+5. Conta Resend (quem provisiona, quem paga, quem administra).
+6. ~~Token RD Station~~ → **RD Station removido da v1.** Leads ficam na coleção `Lead` do Payload, com notificação ativa por e-mail interno via Resend.
 7. Logo lockup SVG do admin (variante para fundo claro do painel).
 8. Política de Privacidade — versão final aprovada pelo DPO.
 9. Termos de Uso — idem.

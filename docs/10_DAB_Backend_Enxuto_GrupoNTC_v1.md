@@ -1,12 +1,22 @@
 # Documento de Arquitetura Técnica do Backend (DAB)
 ## Portal Grupo NTC · v1 Enxuto Premium · Sprint F
 
-**Versão:** 1.0 · 15 de maio de 2026
+**Versão:** 1.1 · 19 de maio de 2026
 **Cliente:** Instituto NTC do Brasil
 **Marca:** Grupo NTC — Núcleo de Tecnologia e Conhecimento
 **Verticais:** NTC Educação · NTC Gestão Pública · NTC Saúde
 **Documento-origem:** `01_Concepcao_Estrategica_Portal_GrupoNTC_v1.md`
 **Status editorial:** Versão de execução para Sprint F dirigida por Claude Code
+
+### Histórico de revisões
+
+- **v1.1 — 19 de maio de 2026** — substituições no stack de backend, decididas no início da Sprint F:
+  - **Banco** Neon Postgres SP → **Supabase Postgres SP** (`sa-east-1`).
+  - **Mídia** Cloudflare R2 → **Supabase Storage** via endpoint S3-compatible.
+  - **CRM externo (RD Station)** removido. A coleção `Lead` no Payload passa a ser a fonte única de leads; notificação ativa continua via Resend (e-mail interno + confirmação ao usuário) e dashboard no admin.
+  - **Hospedagem** continua Vercel; tier alvo é Pro (Web + CMS unificados, sem split de deploy).
+  - Princípio de soberania de dados em São Paulo (§2.6) preservado: Supabase projeto em `sa-east-1`.
+- **v1.0 — 15 de maio de 2026** — versão original de execução para Sprint F.
 
 ---
 
@@ -36,7 +46,7 @@
 
 Este documento estabelece a arquitetura técnica do backend do Portal Grupo NTC em sua versão 1 enxuta premium. A versão 1 nasce sob duas restrições estratégicas explícitas. A primeira é temporal — o Grupo NTC precisa do portal no ar em janela de 4 a 6 semanas para começar a publicar as informações editoriais dos eventos. A segunda é operacional — o ciclo de inscrição, controle de presença, replay e certificação será operado, nesta fase, por uma plataforma terceira em negociação, com integração leve via link externo configurável por evento. A versão 2, prevista para quando a OTT proprietária do Grupo NTC estiver pronta, absorverá nativamente o ciclo do participante. Toda decisão deste documento é tomada para preservar essa evolução sem retrabalho.
 
-A arquitetura adotada é **headless premium em Next.js + Payload CMS**, com renderização híbrida (estática, ISR e SSR conforme a página), banco PostgreSQL gerenciado em região São Paulo, mídia em Cloudflare R2, formulários institucionais persistidos no banco próprio e integrados a RD Station como CRM destino, e-mail transacional via Resend (ou Amazon SES como alternativa). O front-end replica com fidelidade absoluta os protótipos HTML já aprovados — paleta Soberana 2026, tipografia Cormorant Garamond e Barlow, hierarquia 60·15·10·5, ausência de gradientes e bordas arredondadas em estruturas. O CMS é tratado como ferramenta de produtividade editorial restrita: o editor preenche schemas controlados, nunca rompe identidade visual.
+A arquitetura adotada é **headless premium em Next.js + Payload CMS**, com renderização híbrida (estática, ISR e SSR conforme a página), banco PostgreSQL gerenciado pelo Supabase em região São Paulo, mídia em Supabase Storage (endpoint S3-compatible), formulários institucionais persistidos no banco próprio como coleção `Lead` (sem CRM externo na v1), e-mail transacional via Resend (ou Amazon SES como alternativa). O front-end replica com fidelidade absoluta os protótipos HTML já aprovados — paleta Soberana 2026, tipografia Cormorant Garamond e Barlow, hierarquia 60·15·10·5, ausência de gradientes e bordas arredondadas em estruturas. O CMS é tratado como ferramenta de produtividade editorial restrita: o editor preenche schemas controlados, nunca rompe identidade visual.
 
 O resultado entregue por este DAB é um portal que parece extensão institucional do Grupo NTC, não plataforma genérica. Edição autônoma da equipe sem janela de manutenção técnica para cadastros do dia a dia. Performance edge global com Core Web Vitals em verde. Caminho técnico desobstruído para a versão 2 com OTT.
 
@@ -46,7 +56,7 @@ O resultado entregue por este DAB é um portal que parece extensão instituciona
 
 A arquitetura segue oito princípios não negociáveis. Eles funcionam como filtro de decisão em qualquer ponto ambíguo do desenvolvimento.
 
-**2.1. Separação rigorosa entre conteúdo editorial e serviços de negócio.** O CMS guarda o que é editorial — programas, eventos, áreas, docentes, conteúdos. Os formulários, leads, integrações com RD Station e disparos de e-mail são serviços de negócio, expostos por rotas dedicadas da camada de aplicação. Misturar as duas responsabilidades em um único modelo de dados é o vício clássico de portais WordPress que esta arquitetura recusa.
+**2.1. Separação rigorosa entre conteúdo editorial e serviços de negócio.** O CMS guarda o que é editorial — programas, eventos, áreas, docentes, conteúdos — e também a coleção `Lead` (registro estruturado de formulários institucionais), com fronteiras claras entre as duas. Os disparos de e-mail e eventuais webhooks para serviços externos são serviços de negócio, expostos por rotas dedicadas da camada de aplicação. Misturar conteúdo editorial com pipelines transacionais no mesmo modelo é o vício clássico de portais WordPress que esta arquitetura recusa.
 
 **2.2. Componente é fonte única de verdade visual.** Todo bloco aprovado nos protótipos vira componente React tipado. O CMS preenche dados; nunca preenche layout. Não há "campos de HTML livre" disponíveis para o editor. Editores produtivos, identidade preservada.
 
@@ -70,19 +80,19 @@ A stack adotada é minimalista e premiada por maturidade. Não há experimentali
 
 **Camada de aplicação (front-end e API).** Next.js 15 com App Router, em TypeScript 5.4 ou superior, modo strict ativado. React 19. Renderização híbrida via React Server Components onde fizer sentido, Client Components quando houver interatividade. Tailwind CSS 4 com tokens da paleta Soberana 2026 definidos em `theme.config.ts`. Fontes auto-hospedadas via `next/font` (Cormorant Garamond e Barlow, com `font-display: swap`). Lint com ESLint 9 e formatação com Prettier 3. Testes unitários com Vitest, testes de integração com Playwright nos fluxos críticos.
 
-**Camada de CMS.** Payload CMS 3 LTS, em modo self-hosted no mesmo monorepo do front-end, expondo admin em `/admin` e API REST/GraphQL em `/api`. Adapter PostgreSQL oficial (`@payloadcms/db-postgres`). Editor rich text com **Lexical** (default do Payload 3), com config restritivo (apenas headings, bold, italic, links, listas — sem cores nem fontes customizadas pelo editor). Storage adapter para Cloudflare R2 via `@payloadcms/storage-s3` apontando ao endpoint R2.
+**Camada de CMS.** Payload CMS 3 LTS, em modo self-hosted no mesmo monorepo do front-end (app dedicado `apps/cms`), expondo admin em `/admin` e API REST/GraphQL em `/api`. Adapter PostgreSQL oficial (`@payloadcms/db-postgres`). Editor rich text com **Lexical** (default do Payload 3), com config restritivo (apenas headings, bold, italic, links, listas — sem cores nem fontes customizadas pelo editor). Storage adapter para Supabase Storage via `@payloadcms/storage-s3` apontando ao endpoint S3-compatible do Supabase (`https://<ref>.storage.supabase.co/storage/v1/s3`).
 
-**Camada de persistência.** PostgreSQL 16 gerenciado em Neon (recomendação primária por DX, branching de banco para staging) ou Supabase BR (alternativa se houver preferência por stack único). Região: `sa-east-1` (São Paulo). Backup diário automático com retenção de 30 dias.
+**Camada de persistência.** PostgreSQL 17 gerenciado pelo Supabase. Região: `sa-east-1` (São Paulo). Conexão via pooler PgBouncer (porta 6543) em modo Transaction para compatibilidade com workloads serverless do Next.js/Payload. Backup diário automático com retenção de 7 dias no plano Free e 30 dias no Pro. Branching de banco disponível no Pro para deploys de PR (futura adoção).
 
-**Camada de mídia.** Cloudflare R2 (zero egress, custo baixo, S3-compatible). Bucket único `ntc-portal-media` com pastas semânticas (`/eventos`, `/programas`, `/docentes`, `/conteudos`, `/institucional`). CDN nativa do R2 com domínio customizado `media.gruponctc.org.br`.
+**Camada de mídia.** Supabase Storage via endpoint S3-compatible (`/storage/v1/s3`). Bucket único `ntc-portal-media` com pastas semânticas (`/eventos`, `/programas`, `/docentes`, `/conteudos`, `/institucional`). Acesso server-side via `@payloadcms/storage-s3` no Payload — o adapter genérico preserva a portabilidade do conteúdo caso o provedor seja trocado no futuro. CDN nativa do Supabase. Domínio customizado `media.gruponctc.org.br` previsto para a Janela C.
 
-**Camada de e-mail.** Resend como provedor primário (DX excelente, templates React Email, dashboard editorial), Amazon SES como alternativa caso o volume mensal supere 50 mil envios. Domínio de envio: `nao-responda@gruponctc.org.br` para transacional, `contato@gruponctc.org.br` para respostas humanas.
+**Camada de e-mail.** Resend como provedor primário (DX excelente, templates React Email, dashboard editorial), Amazon SES como alternativa caso o volume mensal supere 50 mil envios. Domínio de envio: `nao-responda@gruponctc.org.br` para transacional, `contato@gruponctc.org.br` para respostas humanas. Templates da Janela B: confirmação ao usuário e **notificação interna à equipe NTC com link direto ao Lead no admin** (substitui o papel antes ocupado pela esteira RD Station).
 
-**Camada de integração CRM.** RD Station Marketing com integração via API REST. Token armazenado em variável de ambiente, nunca commitado. Identificação por `identificador` da conversão (ex.: `proposta-programa-proge`, `contato-institucional`, `newsletter-rodape`, `candidatura-especialista`).
+**Camada de gestão de leads.** Sem CRM externo na v1. A coleção `Lead` no Payload é a fonte única de leads — todos os submits dos formulários institucionais persistem ali com `tipo`, `status` (novo · em-atendimento · qualificado · descartado · convertido), origem (UTMs, página, referrer), consentimento LGPD e payload bruto. O admin do Payload oferece filtros, exportação CSV e dashboard editorial. Integração com RD Station ou outro CRM pode ser plugada no futuro via webhook do `afterChange` da coleção — sem refatoração disruptiva.
 
 **Camada de observabilidade.** Sentry para captura de erros (front e back), com source maps habilitados em produção. Logs estruturados em JSON via Pino no servidor. Vercel Analytics ou Plausible (auto-hospedado) para web analytics em compliance LGPD por padrão.
 
-**Camada de hospedagem.** Vercel (Pro tier) para front e API do Next.js. Payload roda no mesmo deploy (Next.js + Payload integrados em monorepo) ou em deploy separado em Railway/Render se a equipe preferir isolamento. Recomendação: integrados, pela simplicidade.
+**Camada de hospedagem.** Vercel Pro para front (`apps/web`) e CMS (`apps/cms`) — dois deploys separados a partir do mesmo monorepo, com timeouts de 60s nas funções (necessário para o boot do admin do Payload, que excede o limite de 10s do tier Free). Estratégia possível em ambiente de avaliação: Vercel Free para `apps/web` enquanto o tráfego não exige Pro, com CMS em Render Starter; promover para Pro unificado quando o portal estiver em produção.
 
 **Repositório e CI/CD.** GitHub privado, GitHub Actions para pipeline de testes, lint e build em todo PR. Deploy automático para staging em todo merge na branch `develop`, deploy manual para produção a partir de tags `v*.*.*` na branch `main`.
 
@@ -92,15 +102,15 @@ A stack adotada é minimalista e premiada por maturidade. Não há experimentali
 
 A topologia é deliberadamente simples — três blocos lógicos, conexões explícitas. Toda complexidade que não justifica seu custo de manutenção foi excluída.
 
-**Bloco 1 — Aplicação.** Vercel Pro hospeda o Next.js + Payload no mesmo projeto. Edge runtime para rotas estáticas e ISR, Node runtime para rotas dinâmicas que falam com banco. Variáveis de ambiente segregadas por ambiente (Preview, Development, Production). Domínio principal `gruponctc.org.br` apontando para produção; `staging.gruponctc.org.br` para staging.
+**Bloco 1 — Aplicação.** Vercel Pro hospeda dois projetos a partir do mesmo monorepo: `apps/web` (Next.js front-end + API routes públicas) e `apps/cms` (Payload com admin em `/admin` e API REST/GraphQL em `/api`). Edge runtime para rotas estáticas e ISR, Node runtime para rotas dinâmicas que falam com banco. Variáveis de ambiente segregadas por ambiente (Preview, Development, Production). Domínio principal `gruponctc.org.br` apontando para o web em produção; `staging.gruponctc.org.br` para staging; `admin.gruponctc.org.br` (ou `cms.gruponctc.org.br`) apontando para o deploy do CMS.
 
-**Bloco 2 — Banco.** Neon PostgreSQL na região São Paulo. Dois bancos: `ntc_prod` e `ntc_staging`. Connection pooling habilitado. Schema gerenciado por Payload (sem migrations manuais — Payload gera).
+**Bloco 2 — Banco.** Supabase Postgres 17 na região `sa-east-1` (São Paulo). Dois projetos: `portal-ntc-staging` e (futuramente) `portal-ntc-prod`. Connection pooling habilitado via PgBouncer Transaction mode (porta 6543) — essencial para o modelo serverless da Vercel. Schema gerenciado por Payload (sem migrations manuais — Payload gera; histórico mantido em `apps/cms/src/migrations` quando necessário).
 
-**Bloco 3 — Mídia.** Cloudflare R2 bucket `ntc-portal-media` com domínio customizado. Política de cache 1 ano para assets versionados (hash no nome do arquivo).
+**Bloco 3 — Mídia.** Supabase Storage bucket `ntc-portal-media` (público para leitura, escrita restrita ao service-role do CMS). Acesso via endpoint S3-compatible em `https://<ref>.storage.supabase.co/storage/v1/s3`. Limite de 50 MB por arquivo, mimetypes restritos (imagens, PDF, MP4/WebM). Política de cache 1 ano para assets versionados (hash no nome). Domínio customizado `media.gruponctc.org.br` previsto para Janela C.
 
-**Conexões.** Aplicação → Banco via connection string TLS (variável `DATABASE_URI`). Aplicação → R2 via S3 SDK com credenciais R2 (variáveis `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_ENDPOINT`). Aplicação → RD Station via HTTPS REST (variável `RDSTATION_TOKEN`). Aplicação → Resend via SDK (variável `RESEND_API_KEY`).
+**Conexões.** Aplicação → Banco via connection string TLS no pooler (variável `DATABASE_URI`). Aplicação → Storage via S3 SDK assinando contra Supabase (variáveis `SUPABASE_S3_ENDPOINT`, `SUPABASE_S3_REGION`, `SUPABASE_S3_ACCESS_KEY_ID`, `SUPABASE_S3_SECRET_ACCESS_KEY`, `SUPABASE_BUCKET`). Aplicação → Resend via SDK (variável `RESEND_API_KEY`).
 
-**DNS.** Cloudflare gerenciando o DNS de `gruponctc.org.br`, com registros A/CNAME para Vercel, CNAME para `media.gruponctc.org.br` apontando para R2, MX apontando para provedor de e-mail institucional já existente (Google Workspace ou Microsoft 365), TXT para SPF/DKIM/DMARC do Resend.
+**DNS.** Cloudflare gerenciando o DNS de `gruponctc.org.br`, com registros A/CNAME para Vercel (web e cms), CNAME para `media.gruponctc.org.br` apontando para Supabase Storage, MX apontando para provedor de e-mail institucional já existente (Google Workspace ou Microsoft 365), TXT para SPF/DKIM/DMARC do Resend.
 
 **Domínios complementares (opcionais).** `eventon.gruponctc.org.br` reservado para a plataforma terceira de eventos durante v1, e para a OTT própria na v2. `admin.gruponctc.org.br` (CNAME para Vercel) como alternativa ao acesso `/admin` da raiz, caso se queira ocultar a presença do admin do domínio principal.
 
@@ -134,7 +144,7 @@ Cada rota do portal recebe o modo de renderização adequado ao seu perfil de at
 
 **On-Demand Revalidation.** Webhook do Payload dispara revalidação imediata da página correspondente quando o editor publica/atualiza um Evento ou Programa. Reduz a latência editorial a zero — publicado, no ar em até 5 segundos.
 
-**Estratégia de imagens.** `next/image` em todas as imagens, com componente `<ImagemSoberana>` wrapper aplicando configurações padrão (loading, sizes, quality 85, placeholder blur). R2 como source. Otimização automática pela Vercel Image Optimization.
+**Estratégia de imagens.** `next/image` em todas as imagens, com componente `<ImagemSoberana>` wrapper aplicando configurações padrão (loading, sizes, quality 85, placeholder blur). Supabase Storage como source. Otimização automática pela Vercel Image Optimization.
 
 ---
 
@@ -163,25 +173,25 @@ Request body (TS):
 }
 ```
 
-Pipeline server-side: validação Zod estrita → persistência em `leads` (Payload collection) → envio para RD Station com identificador `proposta-{slug-programa}-{modalidade}` → e-mail de notificação interno para `contato@gruponctc.org.br` com template editorial → e-mail de confirmação para o solicitante com template editorial → retorno `{ ok: true }`.
+Pipeline server-side: validação Zod estrita → persistência em `leads` (Payload collection) com `tipo: 'proposta'`, `status: 'novo'`, origem (UTMs, página, referrer) e consentimento LGPD → e-mail de notificação interna para `contato@gruponctc.org.br` com template editorial e **link direto ao Lead no admin** (`{PAYLOAD_PUBLIC_SERVER_URL}/admin/collections/leads/{id}`) → e-mail de confirmação para o solicitante com template editorial → retorno `{ ok: true }`.
 
 **7.2. `POST /api/forms/contato`** — Contato Institucional Geral.
 
 Request body: nome, email, telefone, instituicao, assunto (select: imprensa, parcerias, fornecedor, duvida-institucional, outro), mensagem, origem, consentimentoLgpd.
 
-Pipeline: validação → persistência → RD Station com identificador `contato-{assunto}` → e-mail interno roteado conforme assunto (imprensa → `imprensa@`, parcerias → `parcerias@`, demais → `contato@`) → confirmação ao usuário → retorno.
+Pipeline: validação → persistência em `leads` (`tipo: 'contato'`, com `assunto` no payload) → e-mail interno roteado conforme assunto (imprensa → `imprensa@`, parcerias → `parcerias@`, demais → `contato@`) com link ao Lead no admin → confirmação ao usuário → retorno.
 
 **7.3. `POST /api/forms/newsletter`** — Cadastro de Newsletter.
 
 Request body: nome, email, areasInteresse (array), origem, consentimentoLgpd.
 
-Pipeline: validação → persistência → RD Station com identificador `newsletter-rodape` e tag de áreas → e-mail de boas-vindas → retorno.
+Pipeline: validação → persistência em `leads` (`tipo: 'newsletter'`, com `areasInteresse`) → e-mail de boas-vindas → retorno. A lista de inscritos vive no admin do Payload; export CSV disponível para uso em campanhas pontuais via Resend Audiences ou similar quando necessário.
 
 **7.4. `POST /api/forms/candidatura-especialista`** — Candidatura de Especialista/Docente.
 
 Request body: nome, email, telefone, titulacao, instituicao, linhasAtuacao (array de áreas), apresentacao (texto), linkLattes, linkLinkedin, anexoCurriculo (upload), origem, consentimentoLgpd.
 
-Pipeline: validação → upload do currículo no R2 (pasta `/candidaturas`) → persistência da Lead com referência ao arquivo → RD Station com identificador `candidatura-especialista` → e-mail interno para `corpo-docente@gruponctc.org.br` com link do anexo → confirmação ao candidato → retorno.
+Pipeline: validação → upload do currículo no Supabase Storage (pasta `candidaturas/`) → persistência da Lead (`tipo: 'candidatura'`) com referência ao arquivo via Media collection → e-mail interno para `corpo-docente@gruponctc.org.br` com link do anexo e link ao Lead no admin → confirmação ao candidato → retorno.
 
 **Endpoint de exclusão LGPD.** `POST /api/forms/exclusao-lgpd` recebe e-mail e dispara fluxo interno de remoção (não é exclusão automática — toda solicitação passa por DPO designado por questão de auditoria).
 
@@ -195,13 +205,13 @@ Cada formulário do portal compartilha o mesmo esqueleto técnico e visual. Vari
 
 **Camada de validação.** Zod schema espelhando o contrato da API. Validação client-side imediata (libera o submit apenas com tudo válido) + revalidação server-side obrigatória.
 
-**Camada de persistência.** Coleção `Lead` em Payload com discriminator `tipo` (proposta | contato | newsletter | candidatura) e payload bruto em campo JSON para auditoria. Cada Lead recebe `status` (novo | em-atendimento | qualificado | descartado | convertido) editável no admin.
+**Camada de persistência.** Coleção `Lead` em Payload com discriminator `tipo` (proposta | contato | newsletter | candidatura) e payload bruto em campo JSON para auditoria. Cada Lead recebe `status` (novo | em-atendimento | qualificado | descartado | convertido) editável no admin, com campos opcionais de `responsavel` (relação com `users`) e `notasInternas` (texto). Sem CRM externo — a coleção `Lead` é a fonte única.
 
-**Camada de notificação interna.** E-mail HTML editorial enviado via Resend para destinatário interno apropriado, com prévia dos dados, link direto para o Lead no admin (`/admin/collections/leads/{id}`), origem, UTMs e consentimento LGPD registrado.
+**Camada de notificação interna.** E-mail HTML editorial enviado via Resend para destinatário interno apropriado (`contato@`, `imprensa@`, `parcerias@`, `corpo-docente@` conforme tipo e assunto), com prévia dos dados, **link direto para o Lead no admin** (`{PAYLOAD_PUBLIC_SERVER_URL}/admin/collections/leads/{id}`), origem, UTMs e consentimento LGPD registrado. Esta camada substitui o papel antes ocupado pela integração externa de CRM (notificação ativa garante que nenhum lead fique invisível até a equipe abrir o admin).
 
 **Camada de notificação ao usuário.** E-mail de confirmação com template editorial premium — header com lockup do Grupo NTC, corpo em Cormorant Garamond e Barlow, mensagem institucional ("Recebemos sua solicitação. Em até X horas úteis, um de nossos consultores institucionais entrará em contato."), assinatura institucional, rodapé com links legais.
 
-**Camada de captura de origem.** Em todo formulário, o componente captura automaticamente: URL atual da página, UTMs (de query string e do cookie de primeira visita), referrer, timestamp. Esses dados vão tanto para a Lead quanto para RD Station.
+**Camada de captura de origem.** Em todo formulário, o componente captura automaticamente: URL atual da página, UTMs (de query string e do cookie de primeira visita), referrer, timestamp. Esses dados são gravados no Lead para análise editorial e funcionam como base para a régua de qualificação manual da equipe NTC no admin.
 
 **Camada LGPD.** Checkbox obrigatório ("Li e concordo com a Política de Privacidade") com link aberto em modal. Versão da política referenciada no payload (`politicaVersao: "2026-05-01"`). Timestamp e IP do aceite registrados.
 
@@ -211,17 +221,17 @@ Cada formulário do portal compartilha o mesmo esqueleto técnico e visual. Vari
 
 ## 9. Integrações Externas v1
 
-A v1 opera com integrações estritamente necessárias. Toda integração tem fallback gracioso: se a integração falhar, o lead **nunca se perde** — fica registrado no banco com flag `sincronizacaoCrmPendente: true` e é reprocessado por job assíncrono.
+A v1 opera com integrações estritamente necessárias. Sem CRM externo — a coleção `Lead` no Payload é a fonte única. Toda integração de e-mail tem fallback gracioso: se o envio falhar, o lead **nunca se perde** — já está persistido no banco com `status: 'novo'`, e job de retry processa pendências.
 
-**9.1. RD Station Marketing.** Endpoint: `https://api.rd.services/platform/conversions`. Autenticação por bearer token (variável `RDSTATION_TOKEN`). Payload: identificador, e-mail, nome, telefone, campos customizados, UTMs. Após o submit do formulário, dispara em background (`waitUntil` da Vercel) — não bloqueia a resposta ao usuário. Em caso de falha, marca o Lead com `sincronizacaoCrmPendente` e job cron a cada 15 minutos reprocessa.
+**9.1. Resend (e-mail transacional).** Templates React Email em `/emails/*.tsx`. Quatro templates de confirmação ao usuário: `ConfirmacaoProposta`, `ConfirmacaoContato`, `BoasVindasNewsletter`, `ConfirmacaoCandidatura`. Quatro templates de notificação interna: `NotificacaoInternaProposta`, `NotificacaoInternaContato`, `NotificacaoInternaNewsletter`, `NotificacaoInternaCandidatura` — cada um com prévia dos dados, link ao Lead no admin, UTMs e aceite LGPD. Domínio verificado `gruponctc.org.br` com SPF/DKIM/DMARC. Disparo em background (`waitUntil` da Vercel) para não bloquear a resposta ao usuário.
 
-**9.2. Resend (e-mail transacional).** Templates React Email em `/emails/*.tsx`. Quatro templates iniciais: `ConfirmacaoProposta`, `ConfirmacaoContato`, `BoasVindasNewsletter`, `ConfirmacaoCandidatura`. Templates internos: `NotificacaoInternaProposta`, etc. Domínio verificado `gruponctc.org.br` com SPF/DKIM/DMARC.
+**9.2. Plataforma terceira de eventos (provisória).** Sem integração ativa. Apenas campo `linkInscricaoExterna` no Evento. Botão "Inscreva-se" no front faz `<a href={evento.linkInscricaoExterna} target="_blank">` com tracking de clique via analytics. Quando a plataforma for definida, abre-se issue para integração específica.
 
-**9.3. Plataforma terceira de eventos (provisória).** Sem integração ativa. Apenas campo `linkInscricaoExterna` no Evento. Botão "Inscreva-se" no front faz `<a href={evento.linkInscricaoExterna} target="_blank">` com tracking de clique via analytics. Quando a plataforma for definida, abre-se issue para integração específica.
+**9.3. Analytics.** Vercel Analytics (incluído no Pro) para Core Web Vitals e tráfego básico, sem cookies. Plausible (auto-hospedado ou SaaS) para tráfego detalhado em compliance LGPD por padrão. Eventos personalizados: clique em "Inscreva-se" (com `eventoSlug`), submit de cada formulário (com `formularioTipo`), download de material editorial.
 
-**9.4. Analytics.** Vercel Analytics (incluído no Pro) para Core Web Vitals e tráfego básico, sem cookies. Plausible (auto-hospedado ou SaaS) para tráfego detalhado em compliance LGPD por padrão. Eventos personalizados: clique em "Inscreva-se" (com `eventoSlug`), submit de cada formulário (com `formularioTipo`), download de material editorial.
+**9.4. hCaptcha.** Captcha invisível em todos os formulários. Free tier suficiente para o volume previsto.
 
-**9.5. hCaptcha.** Captcha invisível em todos os formulários. Free tier suficiente para o volume previsto.
+**9.5. Extensibilidade futura (CRM).** Se a equipe decidir plugar um CRM externo (RD Station, HubSpot, Pipedrive) no futuro, o ponto de integração é um hook `afterChange` na coleção `Lead` que dispara webhook autenticado para o serviço. O contrato `Lead` foi desenhado para essa extensibilidade — sem necessidade de refatorar formulários ou rotas de API.
 
 ---
 
@@ -234,6 +244,8 @@ A segurança do portal cobre quatro frentes: acesso administrativo, dados em tr�
 **10.2. Dados em trânsito.** HTTPS obrigatório (HSTS habilitado), TLS 1.3, certificados gerenciados pela Vercel/Cloudflare.
 
 **10.3. Dados em repouso.** Banco com encriptação at-rest nativa do provedor. Variáveis de ambiente nunca em código — sempre em Vercel Environment Variables com escopo restrito. Senhas administrativas com hash Argon2 (default Payload).
+
+**10.3.1. Isolamento da Data API do Supabase.** O Supabase expõe automaticamente todas as tabelas do schema `public` via PostgREST/GraphQL com a chave `anon`. Como o Payload tem autorização própria (collections, access functions, JWT do Payload) e o front-end nunca fala diretamente com o Supabase, **o schema `public` é removido da lista de "Exposed schemas"** em Settings → API → Data API. Só os schemas `graphql_public` e `storage` permanecem expostos (necessários para Storage assinado e endpoints públicos de imagem). Adicionalmente, **RLS deny-all (sem políticas)** é habilitado em todas as tabelas do schema `public` como defesa em profundidade — o Payload usa o role `postgres` na connection string, que bypassa RLS, então a aplicação continua funcionando normalmente; a `anon key` bate em parede ao tentar ler ou modificar qualquer linha. Validado em 19/05/2026 com `INSERT` anônimo na tabela `users` retornando `42501 / new row violates row-level security policy`.
 
 **10.4. Exposição pública.** Headers de segurança via middleware Next.js: `Content-Security-Policy`, `Strict-Transport-Security`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` restritivo.
 
@@ -249,7 +261,7 @@ A observabilidade é desenhada para que problemas sejam diagnosticados em minuto
 
 **11.2. Logs estruturados.** Pino no servidor, em JSON, com níveis (debug, info, warn, error). Logs de Vercel Functions visíveis no dashboard. Logs administrativos do Payload (`AuditLog`) em banco.
 
-**11.3. Monitoramento de saúde.** Endpoint `/api/health` retornando status do banco, do R2 e da última sincronização com RD Station. Uptime monitorado por UptimeRobot ou Better Stack (free tier).
+**11.3. Monitoramento de saúde.** Endpoint `/api/health` retornando status do banco e do Supabase Storage. Uptime monitorado por UptimeRobot ou Better Stack (free tier).
 
 **11.4. Métricas editoriais.** Vercel Analytics + Plausible respondem por tráfego, conversão, top pages, tempo médio. Dashboard administrativo no Payload com widgets: total de leads por tipo, leads por origem, leads por status, eventos publicados, próximos eventos.
 
@@ -263,7 +275,7 @@ A performance é tratada como requisito editorial, não como tarefa de otimizaç
 
 **12.2. Estratégia de bundle.** Componentes em modo Server Components por padrão; Client Components apenas onde há interação. `dynamic()` para módulos pesados que entram fora da fold. Análise de bundle com `@next/bundle-analyzer` antes de cada release.
 
-**12.3. Estratégia de imagens.** Imagens em R2, servidas via Vercel Image Optimization. Formatos modernos (AVIF, WebP) com fallback. `sizes` explícito em todo componente. Lazy load default; eager apenas no hero da página.
+**12.3. Estratégia de imagens.** Imagens em Supabase Storage, servidas via Vercel Image Optimization. Formatos modernos (AVIF, WebP) com fallback. `sizes` explícito em todo componente. Lazy load default; eager apenas no hero da página.
 
 **12.4. Fontes.** Cormorant Garamond e Barlow servidas auto-hospedadas via `next/font` com subsets latin e latin-ext, `display: swap`, preload das variantes usadas above-the-fold. Fallback stack premium (`Georgia, 'Times New Roman', serif` para Cormorant; `system-ui, sans-serif` para Barlow).
 
@@ -285,14 +297,14 @@ Pipeline minimalista, três ambientes, fluxo Git trunk-based modificado.
 
 **13.3. Ambientes.**
 
-- **Development.** Local. `.env.development` aponta para banco Neon `ntc_dev` (branch do banco staging) e R2 bucket `ntc-dev-media`.
+- **Development.** Local. `.env` aponta para projeto Supabase `portal-ntc-staging` (compartilhado com staging) e bucket `ntc-portal-media`.
 - **Preview.** Cada PR gera deploy automático Vercel com URL `*.vercel.app`. Banco compartilhado com staging.
-- **Staging.** `staging.gruponctc.org.br`. Deploy automático em merge na `develop`. Banco `ntc_staging`. R2 bucket `ntc-staging-media`.
-- **Production.** `gruponctc.org.br`. Deploy manual via tag `v*.*.*`. Banco `ntc_prod`. R2 bucket `ntc-prod-media`.
+- **Staging.** `staging.gruponctc.org.br`. Deploy automático em merge na `develop`. Projeto Supabase `portal-ntc-staging`. Bucket `ntc-portal-media`.
+- **Production.** `gruponctc.org.br`. Deploy manual via tag `v*.*.*`. Projeto Supabase `portal-ntc-prod` (criar na Janela C). Bucket `ntc-portal-media` (mesmo nome no projeto prod).
 
-**13.4. Migrações de schema.** Payload gera automaticamente. Em staging, aplica imediatamente. Em produção, executa em janela aprovada manualmente.
+**13.4. Migrações de schema.** Payload gera automaticamente. Em staging, aplica imediatamente. Em produção, executa em janela aprovada manualmente. Histórico versionado em `apps/cms/src/migrations` quando o Payload exigir migrations explícitas (modelos com transformações de dados, alterações destrutivas).
 
-**13.5. Rollback.** Vercel permite rollback instantâneo para qualquer deploy anterior. Banco com PITR (Point-in-Time Recovery) habilitado pela Neon, 30 dias.
+**13.5. Rollback.** Vercel permite rollback instantâneo para qualquer deploy anterior. Banco com PITR (Point-in-Time Recovery) habilitado pelo Supabase, 7 dias no plano Free e 28 dias no Pro.
 
 ---
 
@@ -300,9 +312,9 @@ Pipeline minimalista, três ambientes, fluxo Git trunk-based modificado.
 
 A Sprint F é dividida em três janelas operacionais. Cada janela tem entregas concretas, critérios de aceite e demos.
 
-**Janela A — Fundação (semanas 1–2).** Scaffold do monorepo Turborepo. Setup do Payload com banco Neon staging. Setup do Next.js com Tailwind, fontes e tokens da paleta Soberana. Tematização do admin do Payload com cores e logo NTC. Criação das 8 coleções e 2 globals no schema (sem dados ainda). Componentes base do design system: `<HeroInstitucional>`, `<CardEvento>`, `<CardPrograma>`, `<BlocoNumeros>`, `<RodapeSoberano>`, `<NavegacaoSoberana>`, `<FormularioSoberano>`. Deploy staging funcional, admin acessível com 2FA. **Critério de aceite:** equipe editorial consegue logar no admin e cadastrar um programa-piloto.
+**Janela A — Fundação (semanas 1–2).** Scaffold do monorepo Turborepo. Setup do Payload com banco Supabase Postgres `portal-ntc-staging` (sa-east-1) e Supabase Storage (bucket `ntc-portal-media`). Setup do Next.js com Tailwind, fontes e tokens da paleta Soberana. Tematização do admin do Payload com cores e logo NTC. Criação das 8 coleções e 2 globals no schema (sem dados ainda). Componentes base do design system: `<HeroInstitucional>`, `<CardEvento>`, `<CardPrograma>`, `<BlocoNumeros>`, `<RodapeSoberano>`, `<NavegacaoSoberana>`, `<FormularioSoberano>`. Deploy staging funcional, admin acessível com 2FA. **Critério de aceite:** equipe editorial consegue logar no admin e cadastrar um programa-piloto.
 
-**Janela B — Páginas institucionais e eventos (semanas 3–4).** Portagem dos HTMLs aprovados para componentes React: Home, O Grupo, Soluções Estratégicas, 3 páginas de Área, template de Programa carregando do CMS, template de Evento carregando do CMS, página Agenda com filtros, página Conteúdos, página Contato. Implementação dos 4 formulários institucionais com pipeline completo (persistência → RD Station → e-mail interno → confirmação). Cadastro editorial dos 15 programas + 10–15 eventos iniciais pela equipe. **Critério de aceite:** o portal navega completo em staging, formulários gravam Leads e disparam para RD Station.
+**Janela B — Páginas institucionais e eventos (semanas 3–4).** Portagem dos HTMLs aprovados para componentes React: Home, O Grupo, Soluções Estratégicas, 3 páginas de Área, template de Programa carregando do CMS, template de Evento carregando do CMS, página Agenda com filtros, página Conteúdos, página Contato. Implementação dos 4 formulários institucionais com pipeline completo (persistência na coleção `Lead` → e-mail interno via Resend com link ao Lead no admin → confirmação ao usuário). Cadastro editorial dos 15 programas + 10–15 eventos iniciais pela equipe. **Critério de aceite:** o portal navega completo em staging, formulários gravam Leads, notificação interna por e-mail funciona, equipe NTC gerencia leads no admin.
 
 **Janela C — Polimento, LGPD e lançamento (semanas 5–6).** SEO técnico (sitemap, schema.org, OG tags) finalizado. Páginas Política de Privacidade, Termos de Uso, LGPD/Exclusão publicadas. Banner de cookies. Headers de segurança. Auditoria Lighthouse (alvo: 95+ em todas as quatro métricas). Testes de carga leves. Domínio em produção, DNS migrado, deploy de produção. Smoke test institucional com 6–8 usuários representativos. **Critério de aceite:** portal no ar em `gruponctc.org.br`, com Core Web Vitals em verde e 4 formulários operantes.
 
@@ -354,16 +366,16 @@ Esta é a seção que torna o DAB premium: cada decisão da v1 é validada contr
 
 **16.3. Pontos de atenção operacionais.**
 
-- Token RD Station precisa ser criado e fornecido antes da Janela B.
 - Conta Resend precisa ser provisionada com domínio verificado (SPF, DKIM, DMARC) antes da Janela B.
-- Banco Neon SP precisa ser criado com 2 bancos (prod e staging) antes da Janela A.
-- Cloudflare R2 com bucket e domínio customizado antes da Janela A.
-- Vercel Pro com domínio configurado antes da Janela A.
+- Projeto Supabase `portal-ntc-staging` em `sa-east-1` provisionado na Janela A. Projeto `portal-ntc-prod` a criar na Janela C, antes do go-live.
+- Bucket `ntc-portal-media` e credenciais S3-compat configuradas na Janela A.
+- Vercel Pro com domínio configurado antes da Janela C (durante a Janela A o desenvolvimento ocorre local; staging pode rodar em Vercel Free enquanto não houver volume).
 - Acordo com plataforma terceira de eventos deve incluir possibilidade de tracking de origem (UTMs) para fechar funil de conversão.
 
 **16.4. Riscos identificados e mitigação.**
 
-- **Risco:** atraso na contratação de RD Station ou Resend. **Mitigação:** desacoplar via interface — `LeadService` com `RdStationAdapter` substituível por `NoOpAdapter` que apenas grava no banco, sem perda de Lead.
+- **Risco:** equipe editorial precisa abrir o admin do Payload diariamente para gerir leads (sem CRM externo). **Mitigação:** notificação ativa por e-mail interno via Resend a cada submit, com link direto ao Lead no admin; widget no dashboard editorial mostrando contagem de leads com `status: 'novo'`.
+- **Risco:** projeto Supabase Free pausar após 7 dias sem atividade (afeta staging em períodos de baixa atividade de desenvolvimento). **Mitigação:** upgrade para Pro antes do go-live; durante desenvolvimento, recurso `restore_project` do MCP retoma o projeto em segundos.
 - **Risco:** equipe editorial não conseguir cadastrar 15 programas na janela B. **Mitigação:** lançar com 6–8 programas-âncora publicados e os demais com status `rascunho` visíveis apenas para preview interno.
 - **Risco:** Claude Code improvisar componentes fora do design system. **Mitigação:** CLAUDE.md operacional com lista de não-fazer explícita + revisão visual obrigatória ao final de cada sessão.
 
