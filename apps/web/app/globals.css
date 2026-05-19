@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/*
+ * Tokens visuais (paleta Soberana 2026, tipografia, espaçamentos) serão
+ * definidos em packages/ui/src/tokens.ts em sessão dedicada. Este arquivo
+ * mantém apenas o reset Tailwind 4 padrão. Não adicionar CSS literal fora
+ * de Tailwind sem revisão (CLAUDE.md §4.1).
+ */

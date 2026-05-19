@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "plugins": [{ "name": "next" }],
+    "allowJs": false,
+    "noEmit": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@ntc/ui": ["../../packages/ui/src"],
+      "@ntc/ui/*": ["../../packages/ui/src/*"],
+      "@ntc/lib": ["../../packages/lib/src"],
+      "@ntc/lib/*": ["../../packages/lib/src/*"],
+      "@ntc/types": ["../../packages/types/src"],
+      "@ntc/types/*": ["../../packages/types/src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", ".next"]
+}

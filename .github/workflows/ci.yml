@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint · Typecheck · Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      # Variáveis mínimas para que o build do Payload (cms) não falhe por env ausente.
+      # Valores fictícios — não conectam a banco real, e o build não exige conexão.
+      DATABASE_URI: postgres://ci:ci@localhost:5432/ci
+      PAYLOAD_SECRET: ci-only-secret-please-rotate-in-real-environments
+      PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3001
+      PAYLOAD_PUBLIC_FRONT_URL: http://localhost:3000
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
