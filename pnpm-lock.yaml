@@ -53,6 +53,9 @@ importers:
       '@payloadcms/storage-s3':
         specifier: 3.18.0
         version: 3.18.0(payload@3.18.0(graphql@16.14.0)(monaco-editor@0.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.9.3))
+      '@payloadcms/translations':
+        specifier: 3.18.0
+        version: 3.18.0
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
@@ -74,6 +77,9 @@ importers:
       sharp:
         specifier: 0.33.5
         version: 0.33.5
+      slugify:
+        specifier: ^1.6.6
+        version: 1.6.9
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.2.0
@@ -150,6 +156,10 @@ importers:
         version: 5.9.3
 
   packages/types:
+    dependencies:
+      payload:
+        specifier: 3.18.0
+        version: 3.18.0(graphql@16.14.0)(monaco-editor@0.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.9.3)
     devDependencies:
       typescript:
         specifier: ^5.7.2
@@ -3580,6 +3590,10 @@ packages:
 
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
+
+  slugify@1.6.9:
+    resolution: {integrity: sha512-vZ7rfeehZui7wQs438JXBckYLkIIdfHOXsaVEUMyS5fHo1483l1bMdo0EDSWYclY0yZKFOipDy4KHuKs6ssvdg==}
+    engines: {node: '>=8.0.0'}
 
   sonic-boom@4.2.1:
     resolution: {integrity: sha512-w6AxtubXa2wTXAUsZMMWERrsIRAdrK0Sc+FUytWvYAhBJLyuI4llrMIC1DtlNSdI99EI86KZum2MMq3EAZlF9Q==}
@@ -7844,6 +7858,8 @@ snapshots:
 
   sisteransi@1.0.5: {}
 
+  slugify@1.6.9: {}
+
   sonic-boom@4.2.1:
     dependencies:
       atomic-sleep: 1.0.0
@@ -8024,7 +8040,7 @@ snapshots:
   tsx@4.19.2:
     dependencies:
       esbuild: 0.23.1
-      get-tsconfig: 4.8.1
+      get-tsconfig: 4.14.0
     optionalDependencies:
       fsevents: 2.3.3
 

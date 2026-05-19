@@ -1,11 +1,12 @@
 # CLAUDE.md Operacional — Portal Grupo NTC
 ## Instruções permanentes para o Claude Code · v1 Sprint F
 
-**Versão:** 1.1 · 19 de maio de 2026
+**Versão:** 1.2 · 19 de maio de 2026
 **Destino:** este arquivo está na raiz do monorepo. O Claude Code o lê automaticamente em toda sessão e o trata como instrução de mais alta prioridade depois do prompt do usuário.
 
 ### Histórico de revisões
 
+- **v1.2 — 19/05/2026** — sessão 3 (setup base do Payload): adiamento de 2FA para Janela C (item 8 de §17), `payload-types.ts` versionado em `packages/types/src` em vez de `apps/web/types` (alinha com §13).
 - **v1.1 — 19/05/2026** — migração de stack: Neon→Supabase Postgres SP, Cloudflare R2→Supabase Storage, RD Station removido (coleção `Lead` no Payload é fonte única). §15 reescrita; §17 atualizada. Detalhes em `docs/10_DAB §1.1`.
 - **v1.0 — 15/05/2026** — versão original Sprint F.
 
@@ -302,7 +303,7 @@ SENTRY_DSN=...
 
 - Erros 5xx em produção → notificar usuário no canal de comunicação acordado, abrir issue, propor fix.
 - Erros 4xx repetitivos no mesmo endpoint → investigar e propor ajuste.
-- Falha em sincronização RD Station → log no Sentry, Lead marcado como pendente, job retoma.
+- Falha em envio de e-mail interno (Resend) → log no Sentry; Lead já está persistido na coleção, equipe acessa via admin direto.
 - Vazamento de dado pessoal → seguir protocolo LGPD (notificar DPO em até 24h via `dpo@gruponctc.org.br`).
 
 ## 17. Decisões pendentes ao iniciar Sprint F
@@ -316,9 +317,10 @@ Estas decisões devem ser confirmadas pelo usuário antes da Janela A:
 5. Conta Resend (quem provisiona, quem paga, quem administra).
 6. ~~Token RD Station~~ → **RD Station removido da v1.** Leads ficam na coleção `Lead` do Payload, com notificação ativa por e-mail interno via Resend.
 7. Logo lockup SVG do admin (variante para fundo claro do painel).
-8. Política de Privacidade — versão final aprovada pelo DPO.
-9. Termos de Uso — idem.
-10. Lista canônica dos 15 programas com siglas oficiais (já há divergências em documentos antigos — confirmar a nomenclatura final na skill `ntc-grupo:ntc-sistema-editorial`).
+8. **2FA do admin (TOTP)** — pendência da Janela C antes do go-live. DAB §10.1 mantém 2FA obrigatório, mas em staging com 1 super-admin e senha forte gerada (login `contato@institutontc.com.br`), a defesa interim é senha forte + JWT do Payload com expiração. Não há plugin oficial Payload 3 mantido em 19/05/2026 — implementar via middleware custom (`otplib`) ou aguardar plugin estável.
+9. Política de Privacidade — versão final aprovada pelo DPO.
+10. Termos de Uso — idem.
+11. Lista canônica dos 15 programas com siglas oficiais (já há divergências em documentos antigos — confirmar a nomenclatura final na skill `ntc-grupo:ntc-sistema-editorial`).
 
 ## 18. O que fazer quando estiver em dúvida
 

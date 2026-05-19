@@ -37,8 +37,8 @@ test-results/
 !.vscode/extensions.json
 .idea/
 
-# Payload
-**/payload-types.ts
+# Payload — payload-types.ts é versionado em packages/types/src
+# para servir como contrato fim-a-fim entre cms e web.
 media/
 uploads/
 
@@ -48,4 +48,9 @@ uploads/
 # Sentry
 .sentryclirc
 
-img.tmp-screenshots/
+# Artefatos transitórios de captura visual
+.tmp-screenshots/
+
+# Pasta /img/ é mantida fora do versionamento (fonte de SVGs/fotos
+# que são copiados para apps/web/public/ conforme uso editorial).
+img/

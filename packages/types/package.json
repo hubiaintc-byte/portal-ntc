@@ -13,6 +13,9 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf .turbo node_modules"
   },
+  "dependencies": {
+    "payload": "3.18.0"
+  },
   "devDependencies": {
     "typescript": "^5.7.2"
   }

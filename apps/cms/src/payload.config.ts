@@ -4,9 +4,14 @@ import { fileURLToPath } from "node:url";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
+import { en } from "@payloadcms/translations/languages/en";
+import { pt } from "@payloadcms/translations/languages/pt";
 import { buildConfig } from "payload";
+import sharp from "sharp";
 
 import { Media } from "./collections/Media";
+import { Users } from "./collections/Users";
+import { lexicalRestrictiveFeatures } from "./shared/lexical-config";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -14,35 +19,51 @@ const dirname = path.dirname(filename);
 const bucket = process.env.SUPABASE_BUCKET || "ntc-portal-media";
 
 /**
- * Configuração mínima do Payload 3 para a Sprint F · Janela A.
+ * Configuração do Payload 3 — Portal Grupo NTC · Sprint F · Janela A.
  *
- * Banco: Supabase Postgres SP via pooler PgBouncer (porta 6543).
- * Mídia: Supabase Storage via endpoint S3-compatible — adapter genérico
- * @payloadcms/storage-s3 facilita troca de provedor no futuro (DAB §3).
+ * Banco: Supabase Postgres SP (sa-east-1) via pooler PgBouncer porta 6543.
+ * Mídia: Supabase Storage via endpoint S3-compatible.
+ * Editor: Lexical restritivo (sem cores/fontes editáveis pelo editor).
  *
- * Coleções editoriais (Area, Programa, Evento, Especialista, Conteudo,
- * Cliente, Lead) e Globals (Home, Rodape) entram nas próximas janelas
- * conforme docs/11_Schema_Payload_CMS_v1.md.
+ * Coleções editoriais (Area, Programa, Modulo, Evento, Especialista, Conteudo,
+ * Cliente, Lead, AuditLog) e Globals (Home, Rodape) entram nas próximas
+ * janelas conforme docs/11_Schema_Payload_CMS_v1.md (Seções 4-14).
  */
 export default buildConfig({
+  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
   admin: {
-    user: "users",
-  },
-  collections: [
-    {
-      slug: "users",
-      auth: true,
-      admin: {
-        useAsTitle: "email",
-      },
-      fields: [],
+    user: Users.slug,
+    theme: "light",
+    meta: {
+      titleSuffix: " · Admin Grupo NTC",
+      icons: [
+        {
+          rel: "icon",
+          type: "image/svg+xml",
+          url: "/favicon.svg",
+        },
+      ],
     },
-    Media,
-  ],
-  editor: lexicalEditor({}),
+    components: {
+      graphics: {
+        Logo: "@/components/admin/LogoNTC#LogoNTC",
+        Icon: "@/components/admin/IconNTC#IconNTC",
+      },
+    },
+  },
+  i18n: {
+    fallbackLanguage: "pt",
+    supportedLanguages: { pt, en },
+  },
+  collections: [Users, Media],
+  editor: lexicalEditor({ features: () => lexicalRestrictiveFeatures }),
+  sharp,
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
-    outputFile: path.resolve(dirname, "payload-types.ts"),
+    outputFile: path.resolve(dirname, "../../../packages/types/src/payload-types.ts"),
+  },
+  graphQL: {
+    schemaOutputFile: path.resolve(dirname, "generated-schema.graphql"),
   },
   db: postgresAdapter({
     pool: {

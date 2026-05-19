@@ -1,12 +1,15 @@
-/* THIS FILE WAS GENERATED AUTOMATICALLY BY PAYLOAD. */
-/* DO NOT MODIFY IT BECAUSE IT COULD BE REWRITTEN AT ANY TIME. */
+/* Layout do admin Grupo NTC — base gerada pelo Payload (não alterar
+ * serverFunction e RootLayout). Custom: importa custom.scss que aplica
+ * a paleta Soberana 2026 + carregamento das fontes via @import direto
+ * (Cormorant + Barlow), já que RootLayout do Payload constrói o <html>
+ * internamente e não aceita className. */
 import config from "@payload-config";
 import "@payloadcms/next/css";
 import type { ServerFunctionClient } from "payload";
 import { handleServerFunctions, RootLayout } from "@payloadcms/next/layouts";
 import React from "react";
 
-import { importMap } from "./admin/importMap";
+import { importMap } from "./admin/importMap.js";
 import "./custom.scss";
 
 type Args = {
