@@ -9,7 +9,14 @@ import { pt } from "@payloadcms/translations/languages/pt";
 import { buildConfig } from "payload";
 import sharp from "sharp";
 
+import { Areas } from "./collections/Areas";
+import { Clientes } from "./collections/Clientes";
+import { Conteudos } from "./collections/Conteudos";
+import { Especialistas } from "./collections/Especialistas";
+import { Eventos } from "./collections/Eventos";
 import { Media } from "./collections/Media";
+import { Modulos } from "./collections/Modulos";
+import { Programas } from "./collections/Programas";
 import { Users } from "./collections/Users";
 import { lexicalRestrictiveFeatures } from "./shared/lexical-config";
 
@@ -55,7 +62,17 @@ export default buildConfig({
     fallbackLanguage: "pt",
     supportedLanguages: { pt, en },
   },
-  collections: [Users, Media],
+  collections: [
+    Users,
+    Media,
+    Areas,
+    Programas,
+    Modulos,
+    Eventos,
+    Especialistas,
+    Conteudos,
+    Clientes,
+  ],
   editor: lexicalEditor({ features: () => lexicalRestrictiveFeatures }),
   sharp,
   secret: process.env.PAYLOAD_SECRET || "",

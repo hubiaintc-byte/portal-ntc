@@ -13,6 +13,13 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    areas: Area;
+    programas: Programa;
+    modulos: Modulo;
+    eventos: Evento;
+    especialistas: Especialista;
+    conteudos: Conteudo;
+    clientes: Cliente;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -21,6 +28,13 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    areas: AreasSelect<false> | AreasSelect<true>;
+    programas: ProgramasSelect<false> | ProgramasSelect<true>;
+    modulos: ModulosSelect<false> | ModulosSelect<true>;
+    eventos: EventosSelect<false> | EventosSelect<true>;
+    especialistas: EspecialistasSelect<false> | EspecialistasSelect<true>;
+    conteudos: ConteudosSelect<false> | ConteudosSelect<true>;
+    clientes: ClientesSelect<false> | ClientesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -141,6 +155,567 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "areas".
+ */
+export interface Area {
+  id: number;
+  /**
+   * Identificador interno da área.
+   */
+  sigla: 'educacao' | 'gestao-publica' | 'saude';
+  nome: string;
+  slug: string;
+  eyebrow?: string | null;
+  tituloHero: string;
+  subtituloHero: string;
+  imagemHero: number | Media;
+  /**
+   * Cor de acento da área (Oxford/Cardeal/Oliva). Mantém hierarquia 60·15·10·5 da Soberana 2026.
+   */
+  corAcento: string;
+  posicionamento: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  numerosImpacto?:
+    | {
+        valor: string;
+        rotulo: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Programas exibidos em destaque na página da área.
+   */
+  programasDestacados?: (number | Programa)[] | null;
+  /**
+   * Campos opcionais — quando vazios, o sistema usa fallback editorial automaticamente.
+   */
+  seo?: {
+    /**
+     * Título usado na SERP e em Open Graph. Máx. 60 caracteres.
+     */
+    tituloSeo?: string | null;
+    /**
+     * Meta description e Open Graph description. Máx. 160 caracteres.
+     */
+    descricaoSeo?: string | null;
+    /**
+     * Imagem Open Graph (1200×630 recomendado).
+     */
+    imagemOg?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "programas".
+ */
+export interface Programa {
+  id: number;
+  /**
+   * Ex.: PROGE, EDUTEC, PROSUS+
+   */
+  sigla: string;
+  nomeCompleto: string;
+  eyebrow?: string | null;
+  area: number | Area;
+  imagemCapa: number | Media;
+  /**
+   * Lockup SVG vertical do programa.
+   */
+  lockupSvg?: (number | null) | Media;
+  cargaHorariaTotal: string;
+  modulosQuantidade?: number | null;
+  visaoGeral: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  problema?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  objetivo?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  publicoAlvo?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  eixosTematicos?:
+    | {
+        titulo: string;
+        descricao: string;
+        id?: string | null;
+      }[]
+    | null;
+  resultadosEsperados?:
+    | {
+        resultado: string;
+        id?: string | null;
+      }[]
+    | null;
+  diferenciais?:
+    | {
+        titulo: string;
+        descricao?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  coordenacaoCientifica?: (number | Especialista)[] | null;
+  docentes?: (number | Especialista)[] | null;
+  modalidadesEntrega?:
+    | {
+        tipo: 'in-company' | 'turma-aberta' | 'sob-medida' | 'hibrida';
+        descricao?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  contratacaoInstitucional?: {
+    disponivel?: boolean | null;
+    observacoes?: string | null;
+  };
+  faq?:
+    | {
+        pergunta: string;
+        resposta: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  programasRelacionados?: (number | Programa)[] | null;
+  slug: string;
+  /**
+   * Campos opcionais — quando vazios, o sistema usa fallback editorial automaticamente.
+   */
+  seo?: {
+    /**
+     * Título usado na SERP e em Open Graph. Máx. 60 caracteres.
+     */
+    tituloSeo?: string | null;
+    /**
+     * Meta description e Open Graph description. Máx. 160 caracteres.
+     */
+    descricaoSeo?: string | null;
+    /**
+     * Imagem Open Graph (1200×630 recomendado).
+     */
+    imagemOg?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "especialistas".
+ */
+export interface Especialista {
+  id: number;
+  nome: string;
+  slug: string;
+  /**
+   * Proporção 20:23 — conforme skill ntc-palestrantes.
+   */
+  foto: number | Media;
+  titulacao: 'doutorado' | 'pos-doutorado' | 'mestrado' | 'especializacao' | 'graduacao';
+  instituicao: string;
+  cargoAtual?: string | null;
+  /**
+   * 3 a 5 linhas — destaque editorial.
+   */
+  curriculoCurto: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  curriculoCompleto?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  linkLattes?: string | null;
+  linkLinkedin?: string | null;
+  linhasAtuacao?: (number | Area)[] | null;
+  /**
+   * [Reservado v2 — perfil público na OTT própria]
+   */
+  apresentacaoOTT?: {
+    ativo?: boolean | null;
+    biografiaEstendida?: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modulos".
+ */
+export interface Modulo {
+  id: number;
+  programa: number | Programa;
+  numero: number;
+  titulo: string;
+  ementa: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  cargaHoraria?: string | null;
+  /**
+   * Eventos abertos que derivam deste módulo.
+   */
+  eventosVinculados?: (number | Evento)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventos".
+ */
+export interface Evento {
+  id: number;
+  nome: string;
+  eyebrow?: string | null;
+  /**
+   * Programa do qual o evento deriva (opcional).
+   */
+  programa?: (number | null) | Programa;
+  area: number | Area;
+  imagemCapa: number | Media;
+  dataInicio: string;
+  dataFim?: string | null;
+  fusoHorario?: string | null;
+  modalidade: 'online' | 'presencial' | 'hibrido';
+  local?: {
+    nomeLocal?: string | null;
+    endereco?: string | null;
+    cidade?: string | null;
+    estado?: string | null;
+  };
+  cargaHoraria: string;
+  resumo: string;
+  publicoAlvo?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  objetivos?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  conteudoProgramatico?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  programacaoDetalhada?:
+    | {
+        horario: string;
+        titulo: string;
+        descricao?: string | null;
+        palestrante?: (number | Especialista)[] | null;
+        id?: string | null;
+      }[]
+    | null;
+  palestrantes?: (number | Especialista)[] | null;
+  diferenciais?:
+    | {
+        titulo?: string | null;
+        descricao?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  inscricaoAberta?: boolean | null;
+  /**
+   * URL da plataforma terceira de inscrição (v1).
+   */
+  linkInscricaoExterna?: string | null;
+  /**
+   * Plataforma que processa a inscrição (provisório v1).
+   */
+  plataformaTerceira?: ('sympla' | 'even3' | 'eventbrite' | 'webinar-atual' | 'outra') | null;
+  /**
+   * Ex.: "Gratuito" · "R$ 480" · "Sob proposta"
+   */
+  valor?: string | null;
+  vagasLimitadas?: boolean | null;
+  totalVagas?: number | null;
+  /**
+   * [Reservado v2 — OTT própria] Ativado quando plataforma própria estiver pronta.
+   */
+  inscricaoNativa?: {
+    ativa?: boolean | null;
+    idEventoOTT?: string | null;
+  };
+  replayDisponivel?: boolean | null;
+  linkReplay?: string | null;
+  prazoReplay?: string | null;
+  certificadoEmitido?: boolean | null;
+  observacoesCertificado?: string | null;
+  eventosRelacionados?: (number | Evento)[] | null;
+  faq?:
+    | {
+        pergunta: string;
+        resposta: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  slug: string;
+  /**
+   * Campos opcionais — quando vazios, o sistema usa fallback editorial automaticamente.
+   */
+  seo?: {
+    /**
+     * Título usado na SERP e em Open Graph. Máx. 60 caracteres.
+     */
+    tituloSeo?: string | null;
+    /**
+     * Meta description e Open Graph description. Máx. 160 caracteres.
+     */
+    descricaoSeo?: string | null;
+    /**
+     * Imagem Open Graph (1200×630 recomendado).
+     */
+    imagemOg?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "conteudos".
+ */
+export interface Conteudo {
+  id: number;
+  titulo: string;
+  slug: string;
+  categoria: 'artigo' | 'insight' | 'publicacao' | 'material-download' | 'noticia';
+  area?: (number | null) | Area;
+  lide: string;
+  imagemDestaque: number | Media;
+  corpo: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  autor?: (number | Especialista)[] | null;
+  dataPublicacao: string;
+  anexoDownload?: (number | null) | Media;
+  conteudosRelacionados?: (number | Conteudo)[] | null;
+  /**
+   * Campos opcionais — quando vazios, o sistema usa fallback editorial automaticamente.
+   */
+  seo?: {
+    /**
+     * Título usado na SERP e em Open Graph. Máx. 60 caracteres.
+     */
+    tituloSeo?: string | null;
+    /**
+     * Meta description e Open Graph description. Máx. 160 caracteres.
+     */
+    descricaoSeo?: string | null;
+    /**
+     * Imagem Open Graph (1200×630 recomendado).
+     */
+    imagemOg?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clientes".
+ */
+export interface Cliente {
+  id: number;
+  nome: string;
+  logo: number | Media;
+  esfera: 'municipal' | 'estadual' | 'federal' | 'privada' | 'terceiro-setor';
+  estado?: string | null;
+  cidade?: string | null;
+  areasAtendidas?: (number | Area)[] | null;
+  descricaoBreve?: string | null;
+  destaqueHome?: boolean | null;
+  ordem?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -153,6 +728,34 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'areas';
+        value: number | Area;
+      } | null)
+    | ({
+        relationTo: 'programas';
+        value: number | Programa;
+      } | null)
+    | ({
+        relationTo: 'modulos';
+        value: number | Modulo;
+      } | null)
+    | ({
+        relationTo: 'eventos';
+        value: number | Evento;
+      } | null)
+    | ({
+        relationTo: 'especialistas';
+        value: number | Especialista;
+      } | null)
+    | ({
+        relationTo: 'conteudos';
+        value: number | Conteudo;
+      } | null)
+    | ({
+        relationTo: 'clientes';
+        value: number | Cliente;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -267,6 +870,276 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "areas_select".
+ */
+export interface AreasSelect<T extends boolean = true> {
+  sigla?: T;
+  nome?: T;
+  slug?: T;
+  eyebrow?: T;
+  tituloHero?: T;
+  subtituloHero?: T;
+  imagemHero?: T;
+  corAcento?: T;
+  posicionamento?: T;
+  numerosImpacto?:
+    | T
+    | {
+        valor?: T;
+        rotulo?: T;
+        id?: T;
+      };
+  programasDestacados?: T;
+  seo?:
+    | T
+    | {
+        tituloSeo?: T;
+        descricaoSeo?: T;
+        imagemOg?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "programas_select".
+ */
+export interface ProgramasSelect<T extends boolean = true> {
+  sigla?: T;
+  nomeCompleto?: T;
+  eyebrow?: T;
+  area?: T;
+  imagemCapa?: T;
+  lockupSvg?: T;
+  cargaHorariaTotal?: T;
+  modulosQuantidade?: T;
+  visaoGeral?: T;
+  problema?: T;
+  objetivo?: T;
+  publicoAlvo?: T;
+  eixosTematicos?:
+    | T
+    | {
+        titulo?: T;
+        descricao?: T;
+        id?: T;
+      };
+  resultadosEsperados?:
+    | T
+    | {
+        resultado?: T;
+        id?: T;
+      };
+  diferenciais?:
+    | T
+    | {
+        titulo?: T;
+        descricao?: T;
+        id?: T;
+      };
+  coordenacaoCientifica?: T;
+  docentes?: T;
+  modalidadesEntrega?:
+    | T
+    | {
+        tipo?: T;
+        descricao?: T;
+        id?: T;
+      };
+  contratacaoInstitucional?:
+    | T
+    | {
+        disponivel?: T;
+        observacoes?: T;
+      };
+  faq?:
+    | T
+    | {
+        pergunta?: T;
+        resposta?: T;
+        id?: T;
+      };
+  programasRelacionados?: T;
+  slug?: T;
+  seo?:
+    | T
+    | {
+        tituloSeo?: T;
+        descricaoSeo?: T;
+        imagemOg?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modulos_select".
+ */
+export interface ModulosSelect<T extends boolean = true> {
+  programa?: T;
+  numero?: T;
+  titulo?: T;
+  ementa?: T;
+  cargaHoraria?: T;
+  eventosVinculados?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventos_select".
+ */
+export interface EventosSelect<T extends boolean = true> {
+  nome?: T;
+  eyebrow?: T;
+  programa?: T;
+  area?: T;
+  imagemCapa?: T;
+  dataInicio?: T;
+  dataFim?: T;
+  fusoHorario?: T;
+  modalidade?: T;
+  local?:
+    | T
+    | {
+        nomeLocal?: T;
+        endereco?: T;
+        cidade?: T;
+        estado?: T;
+      };
+  cargaHoraria?: T;
+  resumo?: T;
+  publicoAlvo?: T;
+  objetivos?: T;
+  conteudoProgramatico?: T;
+  programacaoDetalhada?:
+    | T
+    | {
+        horario?: T;
+        titulo?: T;
+        descricao?: T;
+        palestrante?: T;
+        id?: T;
+      };
+  palestrantes?: T;
+  diferenciais?:
+    | T
+    | {
+        titulo?: T;
+        descricao?: T;
+        id?: T;
+      };
+  inscricaoAberta?: T;
+  linkInscricaoExterna?: T;
+  plataformaTerceira?: T;
+  valor?: T;
+  vagasLimitadas?: T;
+  totalVagas?: T;
+  inscricaoNativa?:
+    | T
+    | {
+        ativa?: T;
+        idEventoOTT?: T;
+      };
+  replayDisponivel?: T;
+  linkReplay?: T;
+  prazoReplay?: T;
+  certificadoEmitido?: T;
+  observacoesCertificado?: T;
+  eventosRelacionados?: T;
+  faq?:
+    | T
+    | {
+        pergunta?: T;
+        resposta?: T;
+        id?: T;
+      };
+  slug?: T;
+  seo?:
+    | T
+    | {
+        tituloSeo?: T;
+        descricaoSeo?: T;
+        imagemOg?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "especialistas_select".
+ */
+export interface EspecialistasSelect<T extends boolean = true> {
+  nome?: T;
+  slug?: T;
+  foto?: T;
+  titulacao?: T;
+  instituicao?: T;
+  cargoAtual?: T;
+  curriculoCurto?: T;
+  curriculoCompleto?: T;
+  linkLattes?: T;
+  linkLinkedin?: T;
+  linhasAtuacao?: T;
+  apresentacaoOTT?:
+    | T
+    | {
+        ativo?: T;
+        biografiaEstendida?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "conteudos_select".
+ */
+export interface ConteudosSelect<T extends boolean = true> {
+  titulo?: T;
+  slug?: T;
+  categoria?: T;
+  area?: T;
+  lide?: T;
+  imagemDestaque?: T;
+  corpo?: T;
+  autor?: T;
+  dataPublicacao?: T;
+  anexoDownload?: T;
+  conteudosRelacionados?: T;
+  seo?:
+    | T
+    | {
+        tituloSeo?: T;
+        descricaoSeo?: T;
+        imagemOg?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clientes_select".
+ */
+export interface ClientesSelect<T extends boolean = true> {
+  nome?: T;
+  logo?: T;
+  esfera?: T;
+  estado?: T;
+  cidade?: T;
+  areasAtendidas?: T;
+  descricaoBreve?: T;
+  destaqueHome?: T;
+  ordem?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
