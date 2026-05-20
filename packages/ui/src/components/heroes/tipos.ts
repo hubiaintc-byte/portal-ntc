@@ -81,14 +81,15 @@ export function formatarData(d: Date | string, formato: "curto" | "longo" = "lon
 }
 
 function partesEmBR(d: Date): { ano: string; mes: string; dia: string } {
-  const fmt = new Intl.DateTimeFormat("en-CA", {
+  const partes = new Intl.DateTimeFormat("en-CA", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
     timeZone: TZ_BR,
-  });
-  const parts = fmt.format(d).split("-");
-  return { ano: parts[0]!, mes: parts[1]!, dia: parts[2]! };
+  }).formatToParts(d);
+  const get = (t: Intl.DateTimeFormatPartTypes) =>
+    partes.find((p) => p.type === t)?.value ?? "";
+  return { ano: get("year"), mes: get("month"), dia: get("day") };
 }
 
 export function formatarPeriodo(
