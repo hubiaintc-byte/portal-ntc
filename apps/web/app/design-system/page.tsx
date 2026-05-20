@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
+import type { Route } from "next";
 
 import {
   Breadcrumbs,
+  CardCliente,
+  CardConteudo,
+  CardEspecialista,
+  CardEvento,
+  CardPrograma,
   Container,
   Grade,
+  HeroArea,
+  HeroConteudo,
+  HeroEvento,
+  HeroInstitucional,
+  HeroPrograma,
   type ItemMenu,
   NavegacaoSoberana,
   Secao,
+  tokens,
 } from "@ntc/ui";
 
 export const metadata: Metadata = {
@@ -43,14 +55,26 @@ const ROTAS: ItemMenu[] = [
   { rotulo: "Contato", href: "/contato" },
 ];
 
-const PROGRAMAS_DEMO = [
-  { sigla: "EDUTEC", titulo: "Educação Digital", vertical: "NTC Educação" },
-  { sigla: "PEAR", titulo: "Alfabetização de Alta Performance", vertical: "NTC Educação" },
-  { sigla: "PEI", titulo: "Educação Integral", vertical: "NTC Educação" },
-  { sigla: "AGIP", titulo: "Contratações Públicas", vertical: "NTC Gestão Pública" },
-  { sigla: "LIDERA", titulo: "Direção Estratégica", vertical: "NTC Gestão Pública" },
-  { sigla: "PROSUS+", titulo: "Governança no SUS", vertical: "NTC Saúde" },
-];
+const IMG = {
+  institucional: "https://picsum.photos/seed/ntc-institucional/1920/1080",
+  educacao: "https://picsum.photos/seed/ntc-educacao/1600/1000",
+  gestao: "https://picsum.photos/seed/ntc-gestao/1600/1000",
+  saude: "https://picsum.photos/seed/ntc-saude/1600/1000",
+  programa: "https://picsum.photos/seed/ntc-programa/1200/900",
+  evento: "https://picsum.photos/seed/ntc-evento/1600/1000",
+  conteudo: "https://picsum.photos/seed/ntc-conteudo/1600/700",
+  conteudo2: "https://picsum.photos/seed/ntc-conteudo2/1600/900",
+  especialista1: "https://picsum.photos/seed/ntc-pessoa1/600/690",
+  especialista2: "https://picsum.photos/seed/ntc-pessoa2/600/690",
+  especialista3: "https://picsum.photos/seed/ntc-pessoa3/600/690",
+  cliente1: "https://picsum.photos/seed/ntc-logo1/240/120",
+  cliente2: "https://picsum.photos/seed/ntc-logo2/240/120",
+  cliente3: "https://picsum.photos/seed/ntc-logo3/240/120",
+  cliente4: "https://picsum.photos/seed/ntc-logo4/240/120",
+};
+
+// Hrefs mock — rotas reais ainda não existem; cast explícito para typedRoutes.
+const r = (path: string): Route => path as Route;
 
 export default function DesignSystemPage() {
   return (
@@ -67,8 +91,8 @@ export default function DesignSystemPage() {
             <Breadcrumbs
               itens={[
                 { rotulo: "Início", href: "/" },
-                { rotulo: "Design System", href: "/_design-system" },
-                { rotulo: "Layout e Navegação" },
+                { rotulo: "Design System", href: "/design-system" },
+                { rotulo: "Heroes e Cards" },
               ]}
             />
           </Container>
@@ -80,79 +104,270 @@ export default function DesignSystemPage() {
               Sandbox interna · não-listada no sitemap
             </p>
             <h1 className="mt-4 text-h1 text-balance">
-              Layout primitives e navegação <em className="text-cardeal">Soberana</em>
+              Heroes e Cards <em className="text-cardeal">Soberana</em>
             </h1>
             <p className="mt-6 max-w-[60ch] font-corpo text-corpo text-pretty">
-              Esta página existe apenas como checkpoint visual da Janela A do Sprint F.
-              Aqui você confere a navegação principal, o drawer mobile, breadcrumbs com
-              JSON-LD e os três primitives de layout — <code>Container</code>,{" "}
-              <code>Secao</code> e <code>Grade</code> — que são a base de todas as páginas
-              do portal.
+              Checkpoint visual da sessão 7 do Sprint F. Cinco famílias de hero (Inventário §5)
+              e cinco famílias de card (§6), todos com dados mock.
             </p>
           </Container>
         </Secao>
 
+        <Secao fundo="pergaminho" vertical="compacto">
+          <Container variante="amplo">
+            <p className="font-corpo text-eyebrow uppercase tracking-[0.22em] text-cardeal">
+              Hero family — §5 do Inventário
+            </p>
+            <h2 className="mt-3 text-h2 text-oxford">Cinco variantes canônicas</h2>
+          </Container>
+        </Secao>
+
+        <HeroInstitucional
+          eyebrow="Instituto NTC do Brasil"
+          titulo="Inteligência institucional. Impacto real."
+          subtitulo="Formação de capacidades públicas em educação, gestão e saúde — com método editorial, currículos próprios e corpo docente sênior."
+          imagem={{ src: IMG.institucional, alt: "Cenário institucional NTC" }}
+          ctas={[
+            { rotulo: "Conhecer o Grupo", href: r("/grupo"), variante: "primario" },
+            { rotulo: "Falar com a equipe", href: r("/contato"), variante: "secundario" },
+          ]}
+        />
+
+        <HeroArea
+          area="educacao"
+          eyebrow="Vertical de Educação"
+          titulo="Redes públicas que aprendem com método."
+          subtitulo="Programas para secretarias estaduais e municipais com foco em alfabetização, educação integral e digitalização do ensino."
+          imagem={{ src: IMG.educacao, alt: "Sala de aula pública" }}
+          corAcento={tokens.cores.oxford}
+        />
+
+        <HeroArea
+          area="gestao-publica"
+          eyebrow="Vertical de Gestão Pública"
+          titulo="Direção estratégica para o serviço público."
+          subtitulo="Liderança, contratações, integridade e modernização para administrações públicas comprometidas com resultado."
+          imagem={{ src: IMG.gestao, alt: "Cenário institucional" }}
+          corAcento={tokens.cores.cardeal}
+        />
+
+        <HeroPrograma
+          sigla="EDUTEC"
+          nomeCompleto="Educação Digital de Alta Performance"
+          eyebrow="Programa"
+          imagem={{ src: IMG.programa, alt: "Imagem editorial do programa" }}
+          area="educacao"
+          cargaHorariaTotal="180 horas"
+          modulosQuantidade={6}
+          ctaPrincipal={{ rotulo: "Solicitar proposta", href: r("/contato?programa=edutec") }}
+        />
+
+        <HeroEvento
+          nome="Encontro PROSUS+ Brasília 2026"
+          eyebrow="Capacitação · Saúde"
+          imagem={{ src: IMG.evento, alt: "Auditório do evento" }}
+          dataInicio="2026-08-12"
+          dataFim="2026-08-14"
+          modalidade="presencial"
+          local={{ cidade: "Brasília", estado: "DF", nomeLocal: "Centro Internacional de Convenções" }}
+          programa={{ sigla: "PROSUS+", href: r("/programas/prosus") }}
+          area="saude"
+          ctaInscricao={{ rotulo: "Inscrever-se", href: r("/eventon/prosus-brasilia-2026"), externo: false }}
+        />
+
+        <HeroConteudo
+          categoria="Insights · Gestão Pública"
+          titulo="A nova fronteira da liderança no Estado brasileiro"
+          lide="Por que a próxima década exigirá um modelo de direção pública mais analítica, mais ética e mais editorial — e como o Grupo NTC vem formando esses quadros."
+          imagem={{ src: IMG.conteudo, alt: "Cenário editorial" }}
+          autor={{ nome: "Profa. Dra. M. Andrade", titulacao: "Diretora editorial" }}
+          dataPublicacao="2026-04-12"
+          tempoLeitura="9 min de leitura"
+        />
+
+        <Secao fundo="osso" vertical="padrao">
+          <Container variante="amplo">
+            <p className="font-corpo text-eyebrow uppercase tracking-[0.22em] text-cardeal">
+              Cards editoriais — §6 do Inventário
+            </p>
+            <h2 className="mt-3 text-h2 text-oxford">CardPrograma</h2>
+            <p className="mt-3 max-w-[60ch] font-corpo text-corpo text-grafite-suave">
+              Variantes editorial (com imagem) e compacto (texto + tag de área).
+            </p>
+            <Grade colunas={3} gap="medio" className="mt-12">
+              <CardPrograma
+                sigla="EDUTEC"
+                nomeCompleto="Educação Digital de Alta Performance"
+                eyebrow="Programa NTC Educação"
+                imagem={{ src: IMG.programa, alt: "Imagem editorial do EDUTEC" }}
+                area="educacao"
+                resumoVisaoGeral="Trilha de 180h para secretarias de educação que querem profissionalizar a integração de tecnologia ao currículo."
+                href={r("/programas/edutec")}
+                variante="editorial"
+              />
+              <CardPrograma
+                sigla="LIDERA"
+                nomeCompleto="Direção Estratégica no Setor Público"
+                eyebrow="Programa NTC Gestão Pública"
+                imagem={{ src: IMG.gestao, alt: "Imagem editorial do LIDERA" }}
+                area="gestao-publica"
+                resumoVisaoGeral="Formação de direção para gestores em transição de carreira para o alto escalão do Estado."
+                href={r("/programas/lidera")}
+                variante="editorial"
+              />
+              <CardPrograma
+                sigla="PROSUS+"
+                nomeCompleto="Governança no SUS"
+                area="saude"
+                href={r("/programas/prosus")}
+                variante="compacto"
+              />
+            </Grade>
+          </Container>
+        </Secao>
+
         <Secao fundo="pergaminho" vertical="padrao">
-          <Container variante="editorial">
-            <p className="font-corpo text-eyebrow uppercase tracking-[0.18em] text-grafite-suave">
-              Container · variante editorial
+          <Container variante="amplo">
+            <h2 className="text-h2 text-oxford">CardEvento</h2>
+            <p className="mt-3 max-w-[60ch] font-corpo text-corpo text-grafite-suave">
+              CTA muda conforme inscricaoAberta.
             </p>
-            <h2 className="mt-3 text-h2">Largura editorial padrão (92ch)</h2>
-            <p className="mt-6 font-corpo text-corpo text-pretty">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris.
-              Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus
-              rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie
-              magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat
-              nisl ut dapibus.
-            </p>
-            <p className="mt-4 font-corpo text-corpo text-pretty">
-              Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio.
-              Proin quis tortor orci. Etiam at risus et justo dignissim congue. Donec
-              congue lacinia dui, a porttitor lectus condimentum laoreet. Nunc eu ullamcorper
-              orci. Quisque eget odio ac lectus vestibulum faucibus eget in metus.
-            </p>
+            <Grade colunas={2} gap="medio" className="mt-12">
+              <CardEvento
+                nome="Encontro PROSUS+ Brasília 2026"
+                eyebrow="Programa PROSUS+"
+                imagem={{ src: IMG.evento, alt: "Auditório do evento" }}
+                dataInicio="2026-08-12"
+                modalidade="presencial"
+                local={{ cidade: "Brasília", estado: "DF" }}
+                programa={{ sigla: "PROSUS+" }}
+                area="saude"
+                inscricaoAberta
+                href={r("/eventos/prosus-brasilia-2026")}
+              />
+              <CardEvento
+                nome="EDUTEC · Módulo 1 Online"
+                imagem={{ src: IMG.educacao, alt: "Cenário do evento online" }}
+                dataInicio="2026-03-08"
+                modalidade="online"
+                programa={{ sigla: "EDUTEC" }}
+                area="educacao"
+                inscricaoAberta={false}
+                href={r("/eventos/edutec-m01")}
+              />
+            </Grade>
           </Container>
         </Secao>
 
         <Secao fundo="osso" vertical="padrao">
           <Container variante="amplo">
-            <p className="font-corpo text-eyebrow uppercase tracking-[0.18em] text-grafite-suave">
-              Grade · 3 colunas · gap médio
+            <h2 className="text-h2 text-oxford">CardEspecialista</h2>
+            <p className="mt-3 max-w-[60ch] font-corpo text-corpo text-grafite-suave">
+              Foto 20:23. Variantes regular, expandido e cerimonial.
             </p>
-            <h2 className="mt-3 text-h2">Programas em evidência (placeholder)</h2>
-            <Grade colunas={3} gap="medio" className="mt-10">
-              {PROGRAMAS_DEMO.map((programa) => (
-                <article
-                  key={programa.sigla}
-                  className="flex h-full flex-col border border-linha-sutil bg-osso p-8 transition-colors hover:border-oxford"
-                >
-                  <p className="font-corpo text-eyebrow uppercase tracking-[0.18em] text-grafite-suave">
-                    {programa.vertical}
-                  </p>
-                  <h3 className="mt-4 font-titulo text-h3 text-oxford">{programa.sigla}</h3>
-                  <p className="mt-3 font-corpo text-corpo text-grafite text-pretty">
-                    {programa.titulo}
-                  </p>
-                </article>
-              ))}
+            <Grade colunas={3} gap="medio" className="mt-12">
+              <CardEspecialista
+                nome="Profa. Dra. Maria Andrade"
+                titulacao="PhD em Educação"
+                instituicao="USP · NTC Educação"
+                foto={{ src: IMG.especialista1, alt: "Retrato editorial" }}
+                href={r("/corpo-docente/maria-andrade")}
+                variante="regular"
+              />
+              <CardEspecialista
+                nome="Prof. Dr. João Soares"
+                titulacao="Doutor em Administração Pública"
+                instituicao="FGV · NTC Gestão Pública"
+                cargoAtual="Ex-secretário estadual de fazenda; consultor sênior do Banco Mundial em modernização de gestão pública."
+                foto={{ src: IMG.especialista2, alt: "Retrato editorial" }}
+                href={r("/corpo-docente/joao-soares")}
+                variante="expandido"
+              />
+              <CardEspecialista
+                nome="Profa. Dra. Helena Lima"
+                titulacao="PhD em Saúde Coletiva"
+                instituicao="Fiocruz · NTC Saúde"
+                cargoAtual="Diretora editorial do programa PROSUS+"
+                foto={{ src: IMG.especialista3, alt: "Retrato editorial" }}
+                href={r("/corpo-docente/helena-lima")}
+                variante="cerimonial"
+              />
             </Grade>
           </Container>
         </Secao>
 
-        <Secao fundo="oxford" vertical="padrao">
-          <Container variante="texto">
-            <p className="font-corpo text-eyebrow uppercase tracking-[0.18em] text-dourado">
-              Secao · fundo oxford · variante texto (62ch)
+        <Secao fundo="pergaminho" vertical="padrao">
+          <Container variante="amplo">
+            <h2 className="text-h2 text-oxford">CardConteudo</h2>
+            <Grade colunas={2} gap="medio" className="mt-12">
+              <CardConteudo
+                titulo="A nova fronteira da liderança no Estado brasileiro"
+                lide="Por que a próxima década exigirá um modelo de direção pública mais analítica, mais ética e mais editorial."
+                categoria="Insights · Gestão Pública"
+                imagem={{ src: IMG.conteudo2, alt: "Cenário editorial" }}
+                area="gestao-publica"
+                dataPublicacao="2026-04-12"
+                tempoLeitura="9 min de leitura"
+                href={r("/conteudos/lideranca-estado")}
+              />
+              <CardConteudo
+                titulo="Alfabetização: o gargalo silencioso da educação brasileira"
+                lide="Dados do PEAR mostram que redes com método estruturado dobram o rendimento ao fim do 2º ano."
+                categoria="Insights · Educação"
+                imagem={{ src: IMG.educacao, alt: "Sala de aula" }}
+                area="educacao"
+                dataPublicacao="2026-03-20"
+                tempoLeitura="7 min de leitura"
+                href={r("/conteudos/alfabetizacao-gargalo")}
+              />
+            </Grade>
+          </Container>
+        </Secao>
+
+        <Secao fundo="osso" vertical="padrao">
+          <Container variante="amplo">
+            <h2 className="text-h2 text-oxford">CardCliente</h2>
+            <p className="mt-3 max-w-[60ch] font-corpo text-corpo text-grafite-suave">
+              Mosaico (logo central) e lista (logo + nome + esfera/estado).
             </p>
-            <h2 className="mt-3 text-h2 text-osso">
-              Tipografia editorial em fundo institucional
-            </h2>
-            <p className="mt-6 font-corpo text-corpo text-osso/90 text-pretty">
-              Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-              ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-              ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-              velit esse cillum dolore eu fugiat nulla pariatur.
-            </p>
+            <Grade colunas={4} gap="medio" className="mt-12">
+              <CardCliente
+                nome="Secretaria de Educação de Goiás"
+                logo={{ src: IMG.cliente1, alt: "SEDUC-GO" }}
+                variante="mosaico"
+              />
+              <CardCliente
+                nome="Secretaria de Saúde da Bahia"
+                logo={{ src: IMG.cliente2, alt: "SESAB" }}
+                variante="mosaico"
+              />
+              <CardCliente
+                nome="Tribunal de Contas do Estado do Ceará"
+                logo={{ src: IMG.cliente3, alt: "TCE-CE" }}
+                variante="mosaico"
+              />
+              <CardCliente
+                nome="Prefeitura de Recife"
+                logo={{ src: IMG.cliente4, alt: "PCR" }}
+                variante="mosaico"
+              />
+            </Grade>
+            <Grade colunas={2} gap="medio" className="mt-10">
+              <CardCliente
+                nome="Secretaria de Educação de Goiás"
+                logo={{ src: IMG.cliente1, alt: "SEDUC-GO" }}
+                esfera="Estadual"
+                estado="GO"
+                variante="lista"
+              />
+              <CardCliente
+                nome="Prefeitura de Recife"
+                logo={{ src: IMG.cliente4, alt: "PCR" }}
+                esfera="Municipal"
+                estado="PE"
+                variante="lista"
+              />
+            </Grade>
           </Container>
         </Secao>
       </main>
