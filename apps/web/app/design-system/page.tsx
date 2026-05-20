@@ -151,6 +151,15 @@ export default function DesignSystemPage() {
           corAcento={tokens.cores.cardeal}
         />
 
+        <HeroArea
+          area="saude"
+          eyebrow="Vertical de Saúde"
+          titulo="Governança no SUS com método e rigor editorial."
+          subtitulo="Formação para gestores e quadros técnicos do Sistema Único de Saúde — da Atenção Primária à direção de redes complexas."
+          imagem={{ src: IMG.saude, alt: "Centro de saúde pública" }}
+          corAcento={tokens.cores.oliva}
+        />
+
         <HeroPrograma
           sigla="EDUTEC"
           nomeCompleto="Educação Digital de Alta Performance"
