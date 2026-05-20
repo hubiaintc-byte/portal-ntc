@@ -69,13 +69,26 @@ function paraDate(d: Date | string): Date {
   return d instanceof Date ? d : new Date(d);
 }
 
+const TZ_BR = "America/Sao_Paulo";
+
 export function formatarData(d: Date | string, formato: "curto" | "longo" = "longo"): string {
   const data = paraDate(d);
   const opts: Intl.DateTimeFormatOptions =
     formato === "curto"
-      ? { day: "2-digit", month: "short", year: "numeric" }
-      : { day: "2-digit", month: "long", year: "numeric" };
+      ? { day: "2-digit", month: "short", year: "numeric", timeZone: TZ_BR }
+      : { day: "2-digit", month: "long", year: "numeric", timeZone: TZ_BR };
   return new Intl.DateTimeFormat("pt-BR", opts).format(data);
+}
+
+function partesEmBR(d: Date): { ano: string; mes: string; dia: string } {
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: TZ_BR,
+  });
+  const parts = fmt.format(d).split("-");
+  return { ano: parts[0]!, mes: parts[1]!, dia: parts[2]! };
 }
 
 export function formatarPeriodo(
@@ -86,18 +99,17 @@ export function formatarPeriodo(
   if (!fim) return formatarData(inicio, formato);
   const i = paraDate(inicio);
   const f = paraDate(fim);
-  if (
-    i.getFullYear() === f.getFullYear() &&
-    i.getMonth() === f.getMonth() &&
-    i.getDate() === f.getDate()
-  ) {
+  const pi = partesEmBR(i);
+  const pf = partesEmBR(f);
+  if (pi.ano === pf.ano && pi.mes === pf.mes && pi.dia === pf.dia) {
     return formatarData(i, formato);
   }
-  if (i.getFullYear() === f.getFullYear() && i.getMonth() === f.getMonth()) {
-    const dias = new Intl.DateTimeFormat("pt-BR", { day: "2-digit" });
+  if (pi.ano === pf.ano && pi.mes === pf.mes) {
+    const dias = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", timeZone: TZ_BR });
     const restante = new Intl.DateTimeFormat("pt-BR", {
       month: formato === "curto" ? "short" : "long",
       year: "numeric",
+      timeZone: TZ_BR,
     });
     return `${dias.format(i)}–${dias.format(f)} de ${restante.format(i)}`;
   }
