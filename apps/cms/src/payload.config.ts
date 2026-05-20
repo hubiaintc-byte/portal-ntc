@@ -10,14 +10,18 @@ import { buildConfig } from "payload";
 import sharp from "sharp";
 
 import { Areas } from "./collections/Areas";
+import { AuditLog } from "./collections/AuditLog";
 import { Clientes } from "./collections/Clientes";
 import { Conteudos } from "./collections/Conteudos";
 import { Especialistas } from "./collections/Especialistas";
 import { Eventos } from "./collections/Eventos";
+import { Leads } from "./collections/Leads";
 import { Media } from "./collections/Media";
 import { Modulos } from "./collections/Modulos";
 import { Programas } from "./collections/Programas";
 import { Users } from "./collections/Users";
+import { Home } from "./globals/Home";
+import { Rodape } from "./globals/Rodape";
 import { lexicalRestrictiveFeatures } from "./shared/lexical-config";
 
 const filename = fileURLToPath(import.meta.url);
@@ -26,15 +30,15 @@ const dirname = path.dirname(filename);
 const bucket = process.env.SUPABASE_BUCKET || "ntc-portal-media";
 
 /**
- * Configuração do Payload 3 — Portal Grupo NTC · Sprint F · Janela A.
+ * Configuração do Payload 3 — Portal Grupo NTC · Sprint F.
  *
  * Banco: Supabase Postgres SP (sa-east-1) via pooler PgBouncer porta 6543.
  * Mídia: Supabase Storage via endpoint S3-compatible.
  * Editor: Lexical restritivo (sem cores/fontes editáveis pelo editor).
  *
  * Coleções editoriais (Area, Programa, Modulo, Evento, Especialista, Conteudo,
- * Cliente, Lead, AuditLog) e Globals (Home, Rodape) entram nas próximas
- * janelas conforme docs/11_Schema_Payload_CMS_v1.md (Seções 4-14).
+ * Cliente) e operacionais (Lead, AuditLog) + Globals (Home, Rodape) conforme
+ * docs/11_Schema_Payload_CMS_v1.md §§4-14.
  */
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
@@ -72,7 +76,10 @@ export default buildConfig({
     Especialistas,
     Conteudos,
     Clientes,
+    Leads,
+    AuditLog,
   ],
+  globals: [Home, Rodape],
   editor: lexicalEditor({ features: () => lexicalRestrictiveFeatures }),
   sharp,
   secret: process.env.PAYLOAD_SECRET || "",

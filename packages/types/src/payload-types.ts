@@ -20,6 +20,8 @@ export interface Config {
     especialistas: Especialista;
     conteudos: Conteudo;
     clientes: Cliente;
+    leads: Lead;
+    'audit-log': AuditLog;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -35,6 +37,8 @@ export interface Config {
     especialistas: EspecialistasSelect<false> | EspecialistasSelect<true>;
     conteudos: ConteudosSelect<false> | ConteudosSelect<true>;
     clientes: ClientesSelect<false> | ClientesSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -42,8 +46,14 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    home: Home;
+    rodape: Rodape;
+  };
+  globalsSelect: {
+    home: HomeSelect<false> | HomeSelect<true>;
+    rodape: RodapeSelect<false> | RodapeSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
@@ -716,6 +726,100 @@ export interface Cliente {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads".
+ */
+export interface Lead {
+  id: number;
+  tipo: 'proposta' | 'contato' | 'newsletter' | 'candidatura';
+  identificacao?: string | null;
+  status: 'novo' | 'em-atendimento' | 'qualificado' | 'descartado' | 'convertido';
+  observacoesInternas?: string | null;
+  nome: string;
+  email: string;
+  telefone?: string | null;
+  cargo?: string | null;
+  instituicao?: string | null;
+  esfera?: ('municipal' | 'estadual' | 'federal' | 'privada' | 'terceiro-setor') | null;
+  detalhesProposta?: {
+    programa?: (number | null) | Programa;
+    modalidade?: ('in-company' | 'turma-aberta' | 'sob-medida' | 'proposta-livre') | null;
+    participantesEstimados?: number | null;
+    mensagem?: string | null;
+  };
+  detalhesContato?: {
+    assunto?: ('imprensa' | 'parcerias' | 'fornecedor' | 'duvida-institucional' | 'outro') | null;
+    mensagem?: string | null;
+  };
+  detalhesNewsletter?: {
+    areasInteresse?: (number | Area)[] | null;
+  };
+  detalhesCandidatura?: {
+    titulacao?: string | null;
+    linhasAtuacao?: (number | Area)[] | null;
+    apresentacao?: string | null;
+    linkLattes?: string | null;
+    linkLinkedin?: string | null;
+    curriculo?: (number | null) | Media;
+  };
+  /**
+   * Página, referrer e UTMs no momento do submit.
+   */
+  origem?: {
+    paginaSubmissao?: string | null;
+    referrer?: string | null;
+    utmSource?: string | null;
+    utmMedium?: string | null;
+    utmCampaign?: string | null;
+    utmTerm?: string | null;
+    utmContent?: string | null;
+  };
+  /**
+   * Registro do aceite LGPD (CLAUDE.md §12).
+   */
+  consentimentoLgpd: {
+    aceito: boolean;
+    timestamp?: string | null;
+    politicaVersao?: string | null;
+    ipSubmissao?: string | null;
+  };
+  payloadBruto?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  usuario?: (number | null) | User;
+  acao?: ('criar' | 'atualizar' | 'publicar' | 'despublicar' | 'deletar' | 'login' | 'logout') | null;
+  entidade?: string | null;
+  entidadeId?: string | null;
+  descricao?: string | null;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  ip?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -756,6 +860,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'clientes';
         value: number | Cliente;
+      } | null)
+    | ({
+        relationTo: 'leads';
+        value: number | Lead;
+      } | null)
+    | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1143,6 +1255,88 @@ export interface ClientesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads_select".
+ */
+export interface LeadsSelect<T extends boolean = true> {
+  tipo?: T;
+  identificacao?: T;
+  status?: T;
+  observacoesInternas?: T;
+  nome?: T;
+  email?: T;
+  telefone?: T;
+  cargo?: T;
+  instituicao?: T;
+  esfera?: T;
+  detalhesProposta?:
+    | T
+    | {
+        programa?: T;
+        modalidade?: T;
+        participantesEstimados?: T;
+        mensagem?: T;
+      };
+  detalhesContato?:
+    | T
+    | {
+        assunto?: T;
+        mensagem?: T;
+      };
+  detalhesNewsletter?:
+    | T
+    | {
+        areasInteresse?: T;
+      };
+  detalhesCandidatura?:
+    | T
+    | {
+        titulacao?: T;
+        linhasAtuacao?: T;
+        apresentacao?: T;
+        linkLattes?: T;
+        linkLinkedin?: T;
+        curriculo?: T;
+      };
+  origem?:
+    | T
+    | {
+        paginaSubmissao?: T;
+        referrer?: T;
+        utmSource?: T;
+        utmMedium?: T;
+        utmCampaign?: T;
+        utmTerm?: T;
+        utmContent?: T;
+      };
+  consentimentoLgpd?:
+    | T
+    | {
+        aceito?: T;
+        timestamp?: T;
+        politicaVersao?: T;
+        ipSubmissao?: T;
+      };
+  payloadBruto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  usuario?: T;
+  acao?: T;
+  entidade?: T;
+  entidadeId?: T;
+  descricao?: T;
+  metadata?: T;
+  ip?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -1172,6 +1366,179 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home".
+ */
+export interface Home {
+  id: number;
+  hero: {
+    eyebrow?: string | null;
+    titulo: string;
+    subtitulo?: string | null;
+    imagem: number | Media;
+    ctas?:
+      | {
+          rotulo: string;
+          link: string;
+          variante?: ('primario' | 'secundario') | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  destaquesEditoriais?:
+    | {
+        titulo: string;
+        resumo: string;
+        imagem: number | Media;
+        link: string;
+        eyebrow?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  areasEmFoco?: (number | Area)[] | null;
+  /**
+   * Eventos exibidos na seção de agenda da Home.
+   */
+  eventosAgendaDestaque?: (number | Evento)[] | null;
+  numerosImpacto?:
+    | {
+        valor: string;
+        rotulo: string;
+        id?: string | null;
+      }[]
+    | null;
+  clientesDestaque?: (number | Cliente)[] | null;
+  ctaInstitucional?: {
+    titulo?: string | null;
+    descricao?: string | null;
+    rotuloCta?: string | null;
+    linkCta?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rodape".
+ */
+export interface Rodape {
+  id: number;
+  assinaturaInstitucional?: string | null;
+  enderecoCompleto?: string | null;
+  emailInstitucional: string;
+  emailImprensa?: string | null;
+  emailParcerias?: string | null;
+  emailDpo?: string | null;
+  telefoneInstitucional?: string | null;
+  whatsappInstitucional?: string | null;
+  redesSociais?:
+    | {
+        rede?: ('linkedin' | 'instagram' | 'youtube' | 'facebook' | 'x' | 'tiktok') | null;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  linksLegais?:
+    | {
+        rotulo: string;
+        link: string;
+        id?: string | null;
+      }[]
+    | null;
+  cnpj?: string | null;
+  razaoSocial?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home_select".
+ */
+export interface HomeSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        titulo?: T;
+        subtitulo?: T;
+        imagem?: T;
+        ctas?:
+          | T
+          | {
+              rotulo?: T;
+              link?: T;
+              variante?: T;
+              id?: T;
+            };
+      };
+  destaquesEditoriais?:
+    | T
+    | {
+        titulo?: T;
+        resumo?: T;
+        imagem?: T;
+        link?: T;
+        eyebrow?: T;
+        id?: T;
+      };
+  areasEmFoco?: T;
+  eventosAgendaDestaque?: T;
+  numerosImpacto?:
+    | T
+    | {
+        valor?: T;
+        rotulo?: T;
+        id?: T;
+      };
+  clientesDestaque?: T;
+  ctaInstitucional?:
+    | T
+    | {
+        titulo?: T;
+        descricao?: T;
+        rotuloCta?: T;
+        linkCta?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rodape_select".
+ */
+export interface RodapeSelect<T extends boolean = true> {
+  assinaturaInstitucional?: T;
+  enderecoCompleto?: T;
+  emailInstitucional?: T;
+  emailImprensa?: T;
+  emailParcerias?: T;
+  emailDpo?: T;
+  telefoneInstitucional?: T;
+  whatsappInstitucional?: T;
+  redesSociais?:
+    | T
+    | {
+        rede?: T;
+        url?: T;
+        id?: T;
+      };
+  linksLegais?:
+    | T
+    | {
+        rotulo?: T;
+        link?: T;
+        id?: T;
+      };
+  cnpj?: T;
+  razaoSocial?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
