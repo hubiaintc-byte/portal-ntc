@@ -69,3 +69,83 @@ export type { CardConteudoProps } from "./components/cards/CardConteudo";
 
 export { CardCliente } from "./components/cards/CardCliente";
 export type { CardClienteProps } from "./components/cards/CardCliente";
+
+// Blocos editoriais — doc 12 §7
+export type { FundoBloco, ClassesFundo } from "./components/blocos/tipos";
+export { fundoPorTipo } from "./components/blocos/tipos";
+
+export { BlocoNumeros } from "./components/blocos/BlocoNumeros";
+export type { BlocoNumerosProps } from "./components/blocos/BlocoNumeros";
+
+export { BlocoCitacao } from "./components/blocos/BlocoCitacao";
+export type { BlocoCitacaoProps } from "./components/blocos/BlocoCitacao";
+
+export { BlocoTexto } from "./components/blocos/BlocoTexto";
+export type { BlocoTextoProps } from "./components/blocos/BlocoTexto";
+
+export { BlocoCtaInstitucional } from "./components/blocos/BlocoCtaInstitucional";
+export type { BlocoCtaInstitucionalProps, VarianteCta } from "./components/blocos/BlocoCtaInstitucional";
+
+export { BlocoImagemLegenda } from "./components/blocos/BlocoImagemLegenda";
+export type { BlocoImagemLegendaProps } from "./components/blocos/BlocoImagemLegenda";
+
+export { BlocoFaq } from "./components/blocos/BlocoFaq";
+export type { BlocoFaqProps } from "./components/blocos/BlocoFaq";
+
+export { FaqAcordeao } from "./components/blocos/FaqAcordeao";
+export type { FaqAcordeaoProps, FaqItem } from "./components/blocos/FaqAcordeao";
+
+export { BlocoProgramacao } from "./components/blocos/BlocoProgramacao";
+export type { BlocoProgramacaoProps, ItemProgramacao } from "./components/blocos/BlocoProgramacao";
+
+// Listings — doc 12 §8
+export type {
+  ProgramaItem,
+  EventoItem,
+  EspecialistaItem,
+  ModuloItem,
+  FiltroEstado,
+} from "./components/listings/tipos";
+export { FILTRO_INICIAL } from "./components/listings/tipos";
+
+export { GradeProgramas } from "./components/listings/GradeProgramas";
+export type { GradeProgramasProps } from "./components/listings/GradeProgramas";
+
+export { GradeEventos } from "./components/listings/GradeEventos";
+export type { GradeEventosProps } from "./components/listings/GradeEventos";
+
+export { GradeEspecialistas } from "./components/listings/GradeEspecialistas";
+export type { GradeEspecialistasProps } from "./components/listings/GradeEspecialistas";
+
+export { ListaModulos } from "./components/listings/ListaModulos";
+export type { ListaModulosProps } from "./components/listings/ListaModulos";
+
+export { FiltrosAgenda } from "./components/listings/FiltrosAgenda";
+export type { FiltrosAgendaProps } from "./components/listings/FiltrosAgenda";
+
+// Utilitários — doc 12 §10
+export { Eyebrow } from "./components/utilitarios/Eyebrow";
+export type { EyebrowProps } from "./components/utilitarios/Eyebrow";
+
+export { TituloSecao } from "./components/utilitarios/TituloSecao";
+export type { TituloSecaoProps } from "./components/utilitarios/TituloSecao";
+
+export { LinkEditorial } from "./components/utilitarios/LinkEditorial";
+export type { LinkEditorialProps } from "./components/utilitarios/LinkEditorial";
+
+export { Selo } from "./components/utilitarios/Selo";
+export type { SeloProps, VarianteSelo } from "./components/utilitarios/Selo";
+
+// Helpers sistêmicos — doc 12 §12
+export { ImagemSoberana } from "./components/helpers/ImagemSoberana";
+export type { ImagemSoberanaProps, ProporcaoImagem } from "./components/helpers/ImagemSoberana";
+
+export { JsonLd } from "./components/helpers/JsonLd";
+export type { JsonLdProps } from "./components/helpers/JsonLd";
+
+export { Revelar } from "./components/helpers/Revelar";
+export type { RevelarProps } from "./components/helpers/Revelar";
+
+export { RenderizadorLexical } from "./components/helpers/richtext/RenderizadorLexical";
+export type { RenderizadorLexicalProps } from "./components/helpers/richtext/RenderizadorLexical";
+export type { RichTextContent, LexicalNode } from "./components/helpers/richtext/tipos";
