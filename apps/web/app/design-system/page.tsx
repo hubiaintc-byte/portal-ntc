@@ -93,7 +93,7 @@ export default function DesignSystemIndex() {
               Design System <em className="text-cardeal">Soberana 2026</em>
             </h1>
             <p className="mt-6 max-w-[60ch] font-corpo text-corpo text-grafite text-pretty">
-              Catálogo navegável dos componentes do `@ntc/ui`. Cada categoria abre uma
+              Catálogo navegável dos componentes do <code className="font-mono text-pequeno text-oxford">@ntc/ui</code>. Cada categoria abre uma
               página com amostras, variantes e dados mock para validação visual.
             </p>
           </Container>
