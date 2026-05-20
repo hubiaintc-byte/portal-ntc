@@ -172,6 +172,10 @@ importers:
         version: 5.9.3
 
   packages/ui:
+    dependencies:
+      '@ntc/types':
+        specifier: workspace:*
+        version: link:../types
     devDependencies:
       '@types/react':
         specifier: ^19.0.2
@@ -182,6 +186,9 @@ importers:
       next:
         specifier: ^15.0.0
         version: 15.1.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sass@1.77.4)
+      payload:
+        specifier: 3.18.0
+        version: 3.18.0(graphql@16.14.0)(monaco-editor@0.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.9.3)
       react:
         specifier: 19.0.0
         version: 19.0.0

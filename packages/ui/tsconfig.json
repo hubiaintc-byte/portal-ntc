@@ -2,9 +2,13 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
-    "rootDir": "src",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@ntc/types": ["../types/src/index.ts"],
+      "@ntc/types/*": ["../types/src/*"],
+      "payload": ["./node_modules/payload/dist/index.d.ts"]
+    }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../types/src/**/*"],
   "exclude": ["node_modules", "dist", ".turbo"]
 }
