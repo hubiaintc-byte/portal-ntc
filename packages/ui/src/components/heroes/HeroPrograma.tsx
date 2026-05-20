@@ -39,10 +39,7 @@ export function HeroPrograma({
             <p className={`mt-6 font-corpo text-eyebrow uppercase tracking-[0.22em] ${acento.texto}`}>
               {rotuloArea(area)}
             </p>
-            <h1
-              className="mt-4 font-titulo font-medium text-oxford"
-              style={{ letterSpacing: "0.04em", fontSize: "clamp(3.5rem, 8vw, 6.5rem)", lineHeight: 0.95 }}
-            >
+            <h1 className="mt-4 font-titulo font-medium text-oxford text-[clamp(3.5rem,8vw,6.5rem)] leading-[0.95] tracking-[0.04em]">
               {sigla}
             </h1>
             <p className="mt-4 max-w-[28ch] font-titulo text-h3 text-balance text-grafite">
