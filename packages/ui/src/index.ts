@@ -27,3 +27,45 @@ export { Breadcrumbs } from "./components/navegacao/Breadcrumbs";
 export type { BreadcrumbsProps, ItemBreadcrumb } from "./components/navegacao/Breadcrumbs";
 
 export type { ItemMenu, ItemMenuFilho } from "./components/navegacao/tipos";
+
+// Tipos e helpers compartilhados — doc 12 §5/§6
+export type { Area, Modalidade, ImagemRef, CtaHero, AcentoArea } from "./components/heroes/tipos";
+export {
+  acentoPorArea,
+  rotuloArea,
+  rotuloModalidade,
+  formatarData,
+  formatarPeriodo,
+} from "./components/heroes/tipos";
+
+// Hero family — doc 12 §5
+export { HeroInstitucional } from "./components/heroes/HeroInstitucional";
+export type { HeroInstitucionalProps } from "./components/heroes/HeroInstitucional";
+
+export { HeroArea } from "./components/heroes/HeroArea";
+export type { HeroAreaProps } from "./components/heroes/HeroArea";
+
+export { HeroPrograma } from "./components/heroes/HeroPrograma";
+export type { HeroProgramaProps } from "./components/heroes/HeroPrograma";
+
+export { HeroEvento } from "./components/heroes/HeroEvento";
+export type { HeroEventoProps } from "./components/heroes/HeroEvento";
+
+export { HeroConteudo } from "./components/heroes/HeroConteudo";
+export type { HeroConteudoProps } from "./components/heroes/HeroConteudo";
+
+// Cards editoriais — doc 12 §6
+export { CardPrograma } from "./components/cards/CardPrograma";
+export type { CardProgramaProps } from "./components/cards/CardPrograma";
+
+export { CardEvento } from "./components/cards/CardEvento";
+export type { CardEventoProps } from "./components/cards/CardEvento";
+
+export { CardEspecialista } from "./components/cards/CardEspecialista";
+export type { CardEspecialistaProps } from "./components/cards/CardEspecialista";
+
+export { CardConteudo } from "./components/cards/CardConteudo";
+export type { CardConteudoProps } from "./components/cards/CardConteudo";
+
+export { CardCliente } from "./components/cards/CardCliente";
+export type { CardClienteProps } from "./components/cards/CardCliente";
