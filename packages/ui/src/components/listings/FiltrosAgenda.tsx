@@ -31,9 +31,8 @@ export function FiltrosAgenda({
   const baseId = useId();
 
   useEffect(() => {
+    // onChange é prop estável vinda do consumidor; fora das deps deliberadamente.
     onChange(estado);
-    // onChange é prop estável vinda do consumidor; deliberadamente fora das deps para evitar loops.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estado]);
 
   return (

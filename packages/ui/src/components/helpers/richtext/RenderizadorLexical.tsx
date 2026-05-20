@@ -92,7 +92,6 @@ function NoLexical({ no }: { no: BaseNode }): ReactNode {
     }
     default:
       if (process.env.NODE_ENV !== "production") {
-        // eslint-disable-next-line no-console
         console.warn(`[RenderizadorLexical] node type não suportado: ${no.type}`);
       }
       return null;
