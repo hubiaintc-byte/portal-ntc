@@ -7,7 +7,7 @@ export interface CardProgramaProps {
   sigla: string;
   nomeCompleto: string;
   eyebrow?: string;
-  imagem: ImagemRef;
+  imagem?: ImagemRef;
   area: Area;
   resumoVisaoGeral?: string;
   href: string;
@@ -51,15 +51,17 @@ export function CardPrograma({
       href={href}
       className="group flex h-full flex-col border border-linha-sutil bg-osso transition-colors hover:border-oxford focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dourado"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-pergaminho">
-        <Image
-          src={imagem.src}
-          alt={imagem.alt}
-          fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.02]"
-        />
-      </div>
+      {imagem && (
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-pergaminho">
+          <Image
+            src={imagem.src}
+            alt={imagem.alt}
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover transition-transform duration-[400ms] ease-out group-hover:scale-[1.02]"
+          />
+        </div>
+      )}
       <div className="flex flex-1 flex-col p-7">
         {eyebrow && (
           <p className={`font-corpo text-eyebrow uppercase tracking-[0.18em] ${acento.texto}`}>
