@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import "./home.css";
 import { HeaderHome } from "./HeaderHome";
 import { FooterHome } from "./FooterHome";
 

@@ -6,6 +6,14 @@ import { POLITICA_VERSAO_ATUAL } from "@ntc/lib";
 
 import { barlow, cormorant } from "./fonts";
 import "./globals.css";
+// CSS da Home v3 Premium (portada literal do HTML do protótipo).
+// Importado aqui no root layout porque o Next 15 entrega CSS via
+// path do componente importador; route groups com parênteses
+// `(home)` causam 404 (parens não escapados pelo browser). O escopo
+// das regras é seguro pois usam classes específicas (.site-header,
+// .hero-slide, .event-card, etc.) que não colidem com /o-grupo,
+// /solucoes-estrategicas* ou /design-system/*.
+import "./home-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas

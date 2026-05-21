@@ -158,7 +158,17 @@ export function SliderHero({ slides, intervaloMs = 7000 }: SliderHeroProps) {
                     {slide.eventoPill.texto}
                   </span>
                 ) : null}
-                <h2 className="hero-slide-title">{renderTituloComAccent(slide.titulo)}</h2>
+                {/*
+                  H1 no slide institucional, H2 nos demais — espelha
+                  o HTML original (linhas 2187 e 2213+).
+                  Mantém o CSS .hero-slide h1 e .hero-slide-title
+                  ativos conforme cada caso.
+                */}
+                {slide.tipo === "institucional" ? (
+                  <h1>{renderTituloComAccent(slide.titulo)}</h1>
+                ) : (
+                  <h2 className="hero-slide-title">{renderTituloComAccent(slide.titulo)}</h2>
+                )}
                 <p className="hero-slide-sub">{slide.subtitulo}</p>
                 {slide.ctas.length > 0 ? (
                   <div className="hero-slide-ctas">
