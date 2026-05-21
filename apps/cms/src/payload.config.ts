@@ -100,6 +100,22 @@ export default buildConfig({
       collections: {
         media: {
           prefix: "media",
+          // disablePayloadAccessControl: o Payload deixa de servir
+          // /api/media/file/X e o front consome a URL pública do
+          // Supabase Storage direto. O bucket ntc-portal-media é
+          // público para leitura.
+          disablePayloadAccessControl: true,
+          // generateFileURL: o adapter padrão devolve a URL do
+          // endpoint S3 (.../storage/v1/s3/...) que requer assinatura.
+          // O Supabase expõe um endpoint público em
+          // .../storage/v1/object/public/<bucket>/<path> — usamos esse
+          // para que <Image src> funcione no front sem assinar.
+          generateFileURL: ({ filename, prefix }) => {
+            const supabaseUrl = process.env.SUPABASE_URL ?? "";
+            const bucketName = process.env.SUPABASE_BUCKET || "ntc-portal-media";
+            const fullPath = prefix ? `${prefix}/${filename}` : filename;
+            return `${supabaseUrl}/storage/v1/object/public/${bucketName}/${fullPath}`;
+          },
         },
       },
       bucket,
