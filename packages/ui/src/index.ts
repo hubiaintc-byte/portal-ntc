@@ -70,6 +70,9 @@ export type { CardConteudoProps } from "./components/cards/CardConteudo";
 export { CardCliente } from "./components/cards/CardCliente";
 export type { CardClienteProps } from "./components/cards/CardCliente";
 
+export { CardArea } from "./components/cards/CardArea";
+export type { CardAreaProps } from "./components/cards/CardArea";
+
 // Blocos editoriais — doc 12 §7
 export type { FundoBloco, ClassesFundo } from "./components/blocos/tipos";
 export { fundoPorTipo } from "./components/blocos/tipos";
@@ -122,6 +125,9 @@ export type { ListaModulosProps } from "./components/listings/ListaModulos";
 
 export { FiltrosAgenda } from "./components/listings/FiltrosAgenda";
 export type { FiltrosAgendaProps } from "./components/listings/FiltrosAgenda";
+
+export { GradeClientes } from "./components/listings/GradeClientes";
+export type { GradeClientesProps, ClienteItem } from "./components/listings/GradeClientes";
 
 // Utilitários — doc 12 §10
 export { Eyebrow } from "./components/utilitarios/Eyebrow";
