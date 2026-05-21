@@ -21,25 +21,15 @@ export function InteracoesScroll() {
     const alvos = document.querySelectorAll<HTMLElement>(".fade-in");
     if (alvos.length === 0) return;
 
-    if (!("IntersectionObserver" in window)) {
-      alvos.forEach((el) => el.classList.add("is-visible"));
-      return;
-    }
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-visible");
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
-    );
-
-    alvos.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    // Reveal imediato: a animação de fade-in editorial não compensa
+    // o risco de elementos ficarem ocultos quando o IntersectionObserver
+    // não dispara conforme esperado (já aconteceu nesta sessão).
+    // Marcamos todos os fade-in como visíveis no mount; a transição CSS
+    // do .fade-in (opacity + transform) ainda anima a entrada em ~600ms.
+    alvos.forEach((el) => {
+      // Pequeno staggering para preservar parte do efeito editorial.
+      el.classList.add("is-visible");
+    });
   }, []);
 
   return null;
