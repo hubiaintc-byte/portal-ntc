@@ -54,3 +54,11 @@ uploads/
 # Pasta /img/ é mantida fora do versionamento (fonte de SVGs/fotos
 # que são copiados para apps/web/public/ conforme uso editorial).
 img/
+
+# Assets binários do seed — vivem no Supabase Storage após
+# pnpm payload:seed:imagens-home; o repo guarda só a estrutura e o
+# manifesto de cada arquivo (alt, prefix, contexto). Mantemos um
+# .gitkeep e o README do seed na pasta para indicar o caminho.
+apps/cms/src/seed/assets/*
+!apps/cms/src/seed/assets/.gitkeep
+!apps/cms/src/seed/assets/README.md
