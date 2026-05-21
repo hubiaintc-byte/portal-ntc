@@ -1375,16 +1375,60 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Home {
   id: number;
-  hero: {
+  /**
+   * Hero único, usado APENAS como fallback quando heroSlider não tem slides preenchidos. A Home v3 Premium usa heroSlider.
+   */
+  hero?: {
     eyebrow?: string | null;
-    titulo: string;
+    titulo?: string | null;
     subtitulo?: string | null;
-    imagem: number | Media;
+    imagem?: (number | null) | Media;
     ctas?:
       | {
           rotulo: string;
           link: string;
           variante?: ('primario' | 'secundario') | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Vitrine editorial da Home v3 Premium (até 6 slides com autoplay 7s e parallax). Quando há ao menos 1 slide preenchido, este slider substitui o hero único acima.
+   */
+  heroSlider?: {
+    /**
+     * Intervalo de troca de slides em milissegundos. Padrão 7000 (7s). Mínimo 3000 por acessibilidade (WCAG 2.2.2).
+     */
+    intervaloMs?: number | null;
+    /**
+     * Cada slide herda o vocabulário de doc 13 §2.1 — tipo, eyebrow, título (com sintaxe <accent>palavra</accent> para destaque dourado italic), subtítulo, pílula de evento opcional, CTAs (até 3).
+     */
+    slides?:
+      | {
+          tipo: 'institucional' | 'evento' | 'programa' | 'solucao' | 'eventon';
+          imagem: number | Media;
+          eyebrow: string;
+          /**
+           * Use <accent>palavra</accent> para marcar a palavra ou expressão destacada em dourado italic. Ex.: 'Capacitações <accent>sob medida</accent> para a sua instituição.'
+           */
+          titulo: string;
+          subtitulo: string;
+          /**
+           * Pílula de resumo de evento (data, local, modalidade). Preencha apenas em slides com tipo=evento.
+           */
+          eventoPill?: {
+            data?: string | null;
+            local?: string | null;
+            modalidade?: string | null;
+          };
+          ctas?:
+            | {
+                rotulo: string;
+                link: string;
+                variante?: ('primario' | 'secundario' | 'textlink') | null;
+                id?: string | null;
+              }[]
+            | null;
           id?: string | null;
         }[]
       | null;
@@ -1582,6 +1626,36 @@ export interface HomeSelect<T extends boolean = true> {
               rotulo?: T;
               link?: T;
               variante?: T;
+              id?: T;
+            };
+      };
+  heroSlider?:
+    | T
+    | {
+        intervaloMs?: T;
+        slides?:
+          | T
+          | {
+              tipo?: T;
+              imagem?: T;
+              eyebrow?: T;
+              titulo?: T;
+              subtitulo?: T;
+              eventoPill?:
+                | T
+                | {
+                    data?: T;
+                    local?: T;
+                    modalidade?: T;
+                  };
+              ctas?:
+                | T
+                | {
+                    rotulo?: T;
+                    link?: T;
+                    variante?: T;
+                    id?: T;
+                  };
               id?: T;
             };
       };
