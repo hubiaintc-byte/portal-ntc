@@ -108,11 +108,13 @@ export const PROGRAMAS_CANONICOS: ProgramaShell[] = [
 ];
 
 /**
- * Slug canônico a partir da sigla: minúsculas, sem `+`, sem
- * caracteres especiais. Usado em /programas/[slug] e nos cards.
+ * Slug canônico a partir da sigla: minúsculas, `+` vira `-plus`.
+ * Usado em /programas/[slug] e nos cards.
  *
- * Exemplos: "EDUTEC" → "edutec", "PROSUS+" → "prosus", "PROAPS+" → "proaps".
+ * Exemplos: "EDUTEC" → "edutec", "PROSUS+" → "prosus-plus",
+ * "PROAPS+" → "proaps-plus". Alinhado ao que o seed.ts original já
+ * persistiu no banco (autoSlug do nome aplicava esta regra).
  */
 export function slugDoPrograma(sigla: string): string {
-  return sigla.toLowerCase().replace(/\+/g, "");
+  return sigla.toLowerCase().replace(/\+/g, "-plus");
 }
