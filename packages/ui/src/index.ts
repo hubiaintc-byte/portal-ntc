@@ -105,6 +105,9 @@ export type { BlocoImagemLegendaProps } from "./components/blocos/BlocoImagemLeg
 export { BlocoFaq } from "./components/blocos/BlocoFaq";
 export type { BlocoFaqProps } from "./components/blocos/BlocoFaq";
 
+export { BlocoEventOn } from "./components/blocos/BlocoEventOn";
+export type { BlocoEventOnProps, OperacaoEventOn } from "./components/blocos/BlocoEventOn";
+
 export { FaqAcordeao } from "./components/blocos/FaqAcordeao";
 export type { FaqAcordeaoProps, FaqItem } from "./components/blocos/FaqAcordeao";
 
