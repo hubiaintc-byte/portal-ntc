@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
-import { BannerCookies, RodapeSoberano } from "@ntc/ui";
+import { BannerCookies, NavegacaoSoberana, RodapeSoberano } from "@ntc/ui";
 import { POLITICA_VERSAO_ATUAL } from "@ntc/lib";
 import type { RodapeData } from "@ntc/types";
 
 import { barlow, cormorant } from "./fonts";
 import "./globals.css";
 import { obterPayload } from "@/lib/payloadClient";
+import { CTA_PRINCIPAL, CTA_SECUNDARIO, ROTAS_MENU } from "@/lib/menu";
 
 export const metadata: Metadata = {
   title: {
@@ -53,6 +54,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <a href="#conteudo" className="skip-link">
           Pular para o conteúdo principal
         </a>
+        <NavegacaoSoberana
+          rotas={ROTAS_MENU}
+          ctaPrincipal={CTA_PRINCIPAL}
+          ctaSecundario={CTA_SECUNDARIO}
+        />
         {children}
         <RodapeSoberano dados={rodape} />
         <BannerCookies politicaVersao={POLITICA_VERSAO_ATUAL} />
