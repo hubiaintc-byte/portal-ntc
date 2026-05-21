@@ -42,16 +42,6 @@ export {
 export { HeroInstitucional } from "./components/heroes/HeroInstitucional";
 export type { HeroInstitucionalProps } from "./components/heroes/HeroInstitucional";
 
-export { HeroSliderPremium } from "./components/heroes/HeroSliderPremium";
-export type {
-  HeroSliderPremiumProps,
-  SlidePremium,
-  TipoSlide,
-  VarianteCtaSlide,
-  CtaSlide,
-  EventoPillSlide,
-} from "./components/heroes/HeroSliderPremium";
-
 export { HeroArea } from "./components/heroes/HeroArea";
 export type { HeroAreaProps } from "./components/heroes/HeroArea";
 
@@ -104,9 +94,6 @@ export type { BlocoImagemLegendaProps } from "./components/blocos/BlocoImagemLeg
 
 export { BlocoFaq } from "./components/blocos/BlocoFaq";
 export type { BlocoFaqProps } from "./components/blocos/BlocoFaq";
-
-export { BlocoEventOn } from "./components/blocos/BlocoEventOn";
-export type { BlocoEventOnProps, OperacaoEventOn } from "./components/blocos/BlocoEventOn";
 
 export { FaqAcordeao } from "./components/blocos/FaqAcordeao";
 export type { FaqAcordeaoProps, FaqItem } from "./components/blocos/FaqAcordeao";
