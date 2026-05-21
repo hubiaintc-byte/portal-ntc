@@ -9,18 +9,19 @@
 Entregar a camada de captura de leads do portal institucional:
 
 1. Família `<FormularioSoberano>` + 10 campos atômicos + `<BotaoSoberano>` em `packages/ui`.
-2. 4 rotas POST sob `/api/forms/*` no `apps/web` com validação Zod, persistência no Payload, e-mail interno + confirmação ao usuário via Resend.
+2. 4 rotas POST sob `/api/forms/*` no `apps/web` com validação Zod e persistência no Payload.
 3. `<RodapeSoberano>` em `packages/ui` consumindo o Global `Rodape`.
 4. `<BannerCookies>` (LGPD) persistido em cookie.
-5. 8 templates React Email (4 confirmação + 4 notificação interna).
+
+**Fora desta sessão:** disparo real de e-mails (Resend + templates React Email). Decisão do PO em 2026-05-21: adiar para sessão própria. Esta sessão deixa um hook `aposCriarLead(tipo, lead)` no-op, pronto para receber a integração depois sem refator de rota.
 
 ## 2. Restrições de governança
 
 - **RD Station removido da v1** (CLAUDE.md §17.6). Sem `packages/lib/integracoes/rdstation.ts`. Lead persistido no Payload é a fonte única; CRM futuro é externo e consome `/api/leads` do Payload (memória `project_crm_externo`).
 - **Sem novos componentes além do Inventário** (CLAUDE.md §5.1). Todos os componentes desta sessão constam em doc 12 §9, §11, §12.3.
 - **2FA do admin é pendência da Janela C** (CLAUDE.md §17.8) — fora do escopo.
-- **Stack aprovada apenas** (§5.4). Bibliotecas novas autorizadas nesta sessão: `zod`, `resend`, `react-email`, `@react-email/components`. Sem shadcn/MUI/Chakra.
-- **Validação visual é humana** (memória `feedback_validacao_visual`). Não declaramos pronto sem você submeter os 4 forms e ver Lead no admin + e-mail na caixa.
+- **Stack aprovada apenas** (§5.4). Bibliotecas novas autorizadas nesta sessão: `zod`. Sem shadcn/MUI/Chakra. Resend/React Email entram em sessão própria.
+- **Validação visual é humana** (memória `feedback_validacao_visual`). Não declaramos pronto sem você submeter os 4 forms e ver Lead no admin.
 
 ## 3. Arquitetura de pacotes
 
@@ -55,19 +56,16 @@ packages/ui/src/components/
 packages/lib/src/
   integracoes/
     payloadClient.ts               obterPayload() cacheado com React cache()
-    resend.ts                      cliente lazy + enviarEmail() + helpers semânticos
-    destinatarios.ts               destinatarioInterno(tipo, assunto?) com fallback
   forms/
     schemas.ts                     schemaProposta, schemaContato, schemaNewsletter, schemaCandidatura
     politicaVersao.ts              POLITICA_VERSAO_ATUAL constant
     origemRequest.ts               extrairOrigem(request) — UTMs, referrer, IP, pagina
+    aposCriarLead.ts               hook no-op: console.log estruturado (Resend entra aqui depois)
     hcaptcha.ts                    verificarHcaptcha(token) — stub flag-controlled
     rateLimit.ts                   checarRateLimit(ip, rota) — stub em memória, flag-controlled
-    __tests__/
-      schemas.test.ts
-      origemRequest.test.ts
-      destinatarios.test.ts
 ```
+
+Sem Resend nesta sessão. Sem `destinatarios.ts`. Sem `apps/web/emails/`. Sem `package.json` ganhando `resend`/`react-email`.
 
 ```
 packages/types/src/
@@ -85,24 +83,7 @@ apps/web/
     design-system/
       forms/page.tsx               página interna para checkpoint humano dos 4 forms
     layout.tsx                     monta RodapeSoberano + BannerCookies (server)
-  emails/
-    componentes/
-      Layout.tsx
-      Header.tsx
-      Footer.tsx
-      Titulo.tsx
-      Texto.tsx
-      Eyebrow.tsx
-      BotaoEditorial.tsx
-    ConfirmacaoProposta.tsx
-    ConfirmacaoContato.tsx
-    BoasVindasNewsletter.tsx
-    ConfirmacaoCandidatura.tsx
-    NotificacaoInternaProposta.tsx
-    NotificacaoInternaContato.tsx
-    NotificacaoInternaNewsletter.tsx
-    NotificacaoInternaCandidatura.tsx
-  package.json                     + @ntc/cms workspace:* (devDep), zod, resend, react-email, @react-email/components
+  package.json                     + @ntc/cms workspace:* (devDep), zod
 ```
 
 ```
@@ -112,8 +93,7 @@ apps/cms/package.json              + exports: './payload.config', './shared/type
 ### 3.1. Por que essa divisão
 
 - `@ntc/ui/forms` é client-heavy mas isolado: o resto de `@ntc/ui` (blocos, listings, helpers) continua server-friendly e sem regressão.
-- `@ntc/lib/forms` concentra lógica server-only pura (Zod, validação de origem, rate limit). Sem imports React.
-- `apps/web/emails/` fica no app porque depende de assets em `apps/web/public/` (logos institucionais) — não compartilhado com `apps/cms`.
+- `@ntc/lib/forms` concentra lógica server-only pura (Zod, validação de origem, rate limit, hook pós-criação). Sem imports React.
 - `@ntc/cms` é importado por `apps/web` apenas server-side via `getPayload({ config })`. devDependency mantém o bundle do client limpo.
 
 ## 4. `<FormularioSoberano>` — contrato
@@ -235,22 +215,22 @@ checarRateLimit(ip, rota)                    // no-op se RATELIMIT_ENABLED=false
   → erro: 429 + retry-after
 extrairOrigem(req)                           // headers IP, referer, pagina, UTMs
 [candidatura] uploadCurriculo()              // payload.create({collection:'media'}) prefix candidaturas/
-payload.create({ collection:'leads', data }) // persiste antes do envio
-waitUntil(
-  enviarConfirmacaoUsuario(tipo, dados, lead) +
-  enviarNotificacaoInterna(tipo, dados, lead, assunto?)
-)                                            // não bloqueia resposta
+payload.create({ collection:'leads', data }) // persiste antes de qualquer side-effect
+aposCriarLead(tipo, lead)                    // no-op nesta sessão: console.log estruturado
+                                             // — sessão futura troca por enviarConfirmacao + enviarNotificacaoInterna
 200 { ok:true, leadId, message }
 ```
 
 ### 6.1. Matriz das 4 rotas
 
-| Rota | tipo | Schema | Anexo | Destino interno | Template usuário |
-|---|---|---|---|---|---|
-| `POST /api/forms/proposta` | `proposta` | `schemaProposta` | não | `contato@` | `ConfirmacaoProposta` |
-| `POST /api/forms/contato` | `contato` | `schemaContato` | não | `imprensa@` \| `parcerias@` \| `contato@` (por `assunto`) | `ConfirmacaoContato` |
-| `POST /api/forms/newsletter` | `newsletter` | `schemaNewsletter` | não | `contato@` | `BoasVindasNewsletter` |
-| `POST /api/forms/candidatura-especialista` | `candidatura` | `schemaCandidatura` | sim (PDF ≤10MB) | `corpo-docente@` | `ConfirmacaoCandidatura` |
+| Rota | tipo | Schema | Anexo | Destino interno (futuro) |
+|---|---|---|---|---|
+| `POST /api/forms/proposta` | `proposta` | `schemaProposta` | não | `contato@` |
+| `POST /api/forms/contato` | `contato` | `schemaContato` | não | `imprensa@` \| `parcerias@` \| `contato@` (por `assunto`) |
+| `POST /api/forms/newsletter` | `newsletter` | `schemaNewsletter` | não | `contato@` |
+| `POST /api/forms/candidatura-especialista` | `candidatura` | `schemaCandidatura` | sim (PDF ≤10MB) | `corpo-docente@` |
+
+A coluna "Destino interno" informa a sessão futura de e-mail; não é implementada agora.
 
 ### 6.2. Schemas Zod (resumo do contrato — DAB §7)
 
@@ -308,19 +288,16 @@ export const schemaProposta = z.object({
 }
 ```
 
-### 6.4. Roteamento de destinatário interno
+### 6.4. Hook `aposCriarLead` (placeholder de e-mail)
 
 ```ts
-function destinatarioInterno(tipo, assunto?) {
-  const fallback = process.env.RESEND_TO_FALLBACK ?? 'contato@institutontc.com.br';
-  if (tipo === 'contato' && assunto === 'imprensa')   return process.env.RESEND_TO_IMPRENSA ?? fallback;
-  if (tipo === 'contato' && assunto === 'parcerias')  return process.env.RESEND_TO_PARCERIAS ?? fallback;
-  if (tipo === 'candidatura')                         return process.env.RESEND_TO_CORPO_DOCENTE ?? fallback;
-  return process.env.RESEND_TO_CONTATO ?? fallback;
+// packages/lib/src/forms/aposCriarLead.ts
+export async function aposCriarLead(tipo: LeadTipo, lead: { id: string|number; email: string; nome: string }): Promise<void> {
+  console.info('[lead.criado]', { tipo, leadId: lead.id, email: lead.email, nome: lead.nome });
 }
 ```
 
-Em dev sem nenhuma env: todos caem em `contato@institutontc.com.br`.
+A sessão futura de e-mail substitui o corpo desta função por `enviarConfirmacaoUsuario` + `enviarNotificacaoInterna` (Resend + React Email). Rotas chamam `aposCriarLead` em fire-and-forget (`void aposCriarLead(...).catch(console.error)`) — sem `waitUntil` agora porque não há side-effect externo.
 
 ## 7. `<RodapeSoberano>` — contrato
 
@@ -402,37 +379,13 @@ Não carrega `/politica-de-privacidade` em iframe (UX ruim para conteúdo editor
 
 ## 10. Templates React Email
 
-Primitivos compartilhados em `apps/web/emails/componentes/`:
-
-- `Layout.tsx` — `<Html><Head><Body>` shell, importa fontes via CDN (Cormorant Garamond, Barlow).
-- `Header.tsx` — lockup Grupo NTC (logo em `apps/web/public/static/`).
-- `Footer.tsx` — assinatura institucional + links legais + endereço.
-- `BotaoEditorial.tsx` — CTA com fundo Oxford.
-- `Titulo.tsx`, `Texto.tsx`, `Eyebrow.tsx`.
-
-8 templates: 4 confirmação ao usuário + 4 notificação interna.
-
-Templates internos incluem:
-- Listagem editorial dos campos enviados.
-- Link direto ao Lead: `{PAYLOAD_PUBLIC_SERVER_URL}/admin/collections/leads/{leadId}`.
-- UTMs e origem.
-- Versão da política aceita + timestamp + IP.
+**Adiados.** Sessão própria criará `apps/web/emails/` com primitivos compartilhados e os 8 templates (4 confirmação + 4 notificação interna). Esta sessão não introduz `resend`, `react-email` ou dependências relacionadas no `package.json`.
 
 ## 11. Variáveis de ambiente
 
-`.env.example` ganha:
+`.env.example` ganha (apenas o necessário para esta sessão):
 
 ```
-# Resend
-RESEND_API_KEY=
-RESEND_FROM=Grupo NTC <noreply@gruponctc.org.br>
-RESEND_DRY_RUN=false                  # true = loga sem enviar
-RESEND_TO_FALLBACK=contato@institutontc.com.br
-RESEND_TO_CONTATO=
-RESEND_TO_IMPRENSA=
-RESEND_TO_PARCERIAS=
-RESEND_TO_CORPO_DOCENTE=
-
 # Segurança (stubs até janela própria)
 HCAPTCHA_ENABLED=false
 HCAPTCHA_SITE_KEY=
@@ -440,35 +393,34 @@ HCAPTCHA_SECRET=
 RATELIMIT_ENABLED=false
 
 # LGPD
-POLITICA_VERSAO=2026-05-20
+POLITICA_VERSAO=2026-05-21
 ```
+
+Variáveis Resend/destinatários ficam para a sessão de e-mail.
 
 ## 12. Error handling — matriz explícita
 
-| Cenário | HTTP | Lead persistido? | E-mail enviado? |
-|---|---|---|---|
-| Zod inválido | 422 | não | não |
-| hCaptcha falha (enabled) | 400 | não | não |
-| Rate limit excedido | 429 | não | não |
-| Upload PDF >10MB | 413 | não | não |
-| Erro upload Supabase Storage | 500 | não | não |
-| Erro persistência Payload | 500 | não | não |
-| Erro Resend (interno) | **200** | **sim** | parcial, log |
-| Erro Resend (usuário) | **200** | **sim** | parcial, log |
-| Erro inesperado | 500 | depende | depende |
+| Cenário | HTTP | Lead persistido? |
+|---|---|---|
+| Zod inválido | 422 | não |
+| hCaptcha falha (enabled) | 400 | não |
+| Rate limit excedido | 429 | não |
+| Upload PDF >10MB | 413 | não |
+| Erro upload Supabase Storage | 500 | não |
+| Erro persistência Payload | 500 | não |
+| Erro em `aposCriarLead` (hook no-op) | **200** | **sim** (hook é fire-and-forget, log do erro) |
+| Erro inesperado | 500 | depende |
 
-Regra DAB §9: persistência precede disparo de e-mail, disparo roda em `waitUntil` sem propagar exceção. Lead **nunca se perde** se e-mail falha.
+Regra DAB §9 preservada: persistência precede `aposCriarLead`; o hook é fire-and-forget e nunca propaga exceção. Lead **nunca se perde** mesmo quando o hook (futuro Resend) falhar.
 
 ## 13. Testes
 
-Esta sessão não tem TDD formal. Cobertura mínima:
+Sem testes automatizados nesta sessão — alinha com o padrão das sessões anteriores (sessão 7 em diante: validação humana, Vitest entra na sessão 15). Smoke check via:
 
-- **Vitest em `packages/lib/src/forms/__tests__/`:**
-  - `schemas.test.ts` — parse válido + parse inválido por schema.
-  - `origemRequest.test.ts` — `x-forwarded-for`, `referer`, UTMs do query string.
-  - `destinatarios.test.ts` — matriz de roteamento `destinatarioInterno`.
-- **Sem testes UI** dos campos — coberto pelo checkpoint humano.
-- **Sem testes HTTP** das rotas — coberto pelo checkpoint humano via submits reais.
+- `pnpm typecheck` em todo o monorepo.
+- `pnpm lint`.
+- `pnpm build`.
+- Submit manual dos 4 forms pela página de showcase.
 
 ## 14. Checkpoint visual e protocolo de aceite
 
@@ -479,21 +431,22 @@ Validação humana (memória `feedback_validacao_visual`):
 3. Reportar ao PO:
    - URL `http://localhost:3000/design-system/forms` com os 4 forms em sequência.
    - URL `http://localhost:3001/admin/collections/leads` para confirmar Lead criado.
-   - Caixa onde os e-mails internos chegam (default `contato@institutontc.com.br`).
-   - Quais env vars preencher (mínimo `RESEND_API_KEY` ou `RESEND_DRY_RUN=true`).
+   - Banner LGPD em primeira visita; deixar de aparecer após aceite.
 4. Aguardar OK humano antes de commitar.
 
-Critérios de aceite (espelham o prompt original):
+Critérios de aceite (revisados para o escopo desta sessão):
 
-- Submit de cada um dos 4 formulários cria Lead no admin.
-- E-mails de confirmação chegam à caixa do testador.
-- E-mails internos chegam à caixa configurada.
+- Submit de cada um dos 4 formulários cria Lead no admin com payload bruto correto + consentimento LGPD gravado.
+- Currículo (PDF) da candidatura aparece na coleção Media com prefixo `candidaturas/`.
 - Banner LGPD aparece em primeira visita; não reaparece após aceite.
+- Rodapé aparece com dados do Global Rodape em todas as páginas.
+- `aposCriarLead` loga no console do dev server cada submissão.
 
 ## 15. Fora do escopo desta sessão
 
 Para evitar escopo inflado (CLAUDE.md §5.5 + brainstorming YAGNI):
 
+- Disparo real de e-mail (Resend + 8 templates React Email) → **sessão própria** decidida em 2026-05-21.
 - Rotas institucionais do portal (`/contato`, `/proposta`, etc) → Sprint F.5.
 - Página `/politica-de-privacidade` real → usa placeholder de rota nesta sessão.
 - Endpoint `/api/forms/exclusao-lgpd` (DAB §7 final) → fora do prompt.
@@ -505,7 +458,7 @@ Para evitar escopo inflado (CLAUDE.md §5.5 + brainstorming YAGNI):
 ## 16. Commit final
 
 ```
-feat(formularios): 4 formulários institucionais com LGPD, Rodapé e Banner LGPD
+feat(formularios): 4 formulários, Rodapé e Banner LGPD
 ```
 
-(O prompt original menciona "RD Station e Resend" no commit. Substituído por "Rodapé e Banner LGPD" para refletir a v1.1 de governança e o escopo real entregue.)
+(O prompt original menciona "LGPD, RD Station e Resend" no commit. Substituído porque RD Station foi removido em v1.1 e e-mails entram em sessão própria.)
