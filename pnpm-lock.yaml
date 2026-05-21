@@ -186,6 +186,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@ntc/lib':
+        specifier: workspace:*
+        version: link:../lib
       '@ntc/types':
         specifier: workspace:*
         version: link:../types
@@ -211,6 +214,9 @@ importers:
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
 
 packages:
 

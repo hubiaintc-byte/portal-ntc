@@ -149,3 +149,28 @@ export type { RevelarProps } from "./components/helpers/Revelar";
 export { RenderizadorLexical } from "./components/helpers/richtext/RenderizadorLexical";
 export type { RenderizadorLexicalProps } from "./components/helpers/richtext/RenderizadorLexical";
 export type { RichTextContent, LexicalNode } from "./components/helpers/richtext/tipos";
+
+// Forms — doc 12 §9
+export { FormularioSoberano } from "./components/forms/FormularioSoberano";
+export { BotaoSoberano } from "./components/forms/BotaoSoberano";
+export type { BotaoSoberanoProps } from "./components/forms/BotaoSoberano";
+export { FormularioContexto, useFormulario } from "./components/forms/contexto";
+export type {
+  CampoBaseProps,
+  FormularioContextValue,
+  FormularioResposta,
+  FormularioSucesso,
+  FormularioErroValidacao,
+  EstadoSucessoProps,
+} from "./components/forms/tipos";
+
+export { CampoTexto } from "./components/forms/campos/CampoTexto";
+export { CampoEmail } from "./components/forms/campos/CampoEmail";
+export { CampoUrl } from "./components/forms/campos/CampoUrl";
+export { CampoTelefone } from "./components/forms/campos/CampoTelefone";
+export { CampoSelect } from "./components/forms/campos/CampoSelect";
+export { CampoSelectMulti } from "./components/forms/campos/CampoSelectMulti";
+export { CampoTextarea } from "./components/forms/campos/CampoTextarea";
+export { CampoNumber } from "./components/forms/campos/CampoNumber";
+export { CampoUpload } from "./components/forms/campos/CampoUpload";
+export { CampoCheckbox } from "./components/forms/campos/CampoCheckbox";
