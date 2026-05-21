@@ -42,6 +42,16 @@ export {
 export { HeroInstitucional } from "./components/heroes/HeroInstitucional";
 export type { HeroInstitucionalProps } from "./components/heroes/HeroInstitucional";
 
+export { HeroSliderPremium } from "./components/heroes/HeroSliderPremium";
+export type {
+  HeroSliderPremiumProps,
+  SlidePremium,
+  TipoSlide,
+  VarianteCtaSlide,
+  CtaSlide,
+  EventoPillSlide,
+} from "./components/heroes/HeroSliderPremium";
+
 export { HeroArea } from "./components/heroes/HeroArea";
 export type { HeroAreaProps } from "./components/heroes/HeroArea";
 
