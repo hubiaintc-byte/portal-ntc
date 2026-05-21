@@ -1350,8 +1350,18 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 /* =============================================================
    ACESSIBILIDADE
    ============================================================= */
-.fade-in { opacity: 0; transform: translateY(16px); transition: opacity 600ms ease-out, transform 600ms ease-out; }
-.fade-in.is-visible { opacity: 1; transform: translateY(0); }
+/*
+ * .fade-in foi neutralizado no port: o protótipo original usa
+ * IntersectionObserver inline (script linhas 3551–3561) para adicionar
+ * `is-visible` quando o elemento entra no viewport. Em Next 15 com
+ * RSC + hidratação, o IO não disparou de forma confiável e a página
+ * ficava 100% oculta abaixo do hero. Decisão: render imediato sem
+ * animação de entrada. Se quisermos reintroduzir a animação, fazer
+ * via Client Component que adicione a classe `is-visible` no mount
+ * (em vez de depender de IO + classe-base-invisível).
+ */
+.fade-in,
+.fade-in.is-visible { opacity: 1; transform: none; }
 :focus-visible { outline: 2px solid var(--dourado); outline-offset: 3px; border-radius: 2px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
