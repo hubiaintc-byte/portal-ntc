@@ -85,6 +85,27 @@ export const Areas: CollectionConfig = {
       hasMany: true,
       admin: { description: "Programas exibidos em destaque na página da área." },
     },
+    {
+      name: "cardHome",
+      type: "group",
+      label: "Card Home v3 (3 áreas premium)",
+      admin: {
+        description:
+          "Campos do card grande de área na Home portada (.area-card).",
+      },
+      fields: [
+        { name: "num", type: "text", admin: { description: 'Ex.: "01", "02", "03"' } },
+        { name: "verticalCode", type: "select", options: [{ label: "edu", value: "edu" }, { label: "gov", value: "gov" }, { label: "sau", value: "sau" }] },
+        { name: "tituloLinha1", type: "text", admin: { description: 'Ex.: "Educação"' } },
+        { name: "tituloLinha2", type: "text", admin: { description: 'Ex.: "com excelência."' } },
+        { name: "tagline", type: "textarea" },
+        { name: "programasCount", type: "text", admin: { description: 'Ex.: "9"' } },
+        { name: "linkProgramasRotulo", type: "text", defaultValue: "Ver programas da área" },
+        { name: "linkProgramasHref", type: "text" },
+        { name: "linkEventosRotulo", type: "text", defaultValue: "Ver módulos e eventos abertos" },
+        { name: "linkEventosHref", type: "text" },
+      ],
+    },
     ...seoFields,
   ],
 };
