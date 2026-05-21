@@ -1,8 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+import { BannerCookies, RodapeSoberano } from "@ntc/ui";
+import { POLITICA_VERSAO_ATUAL } from "@ntc/lib";
+import type { RodapeData } from "@ntc/types";
+
 import { barlow, cormorant } from "./fonts";
 import "./globals.css";
+import { obterPayload } from "@/lib/payloadClient";
 
 export const metadata: Metadata = {
   title: {
@@ -23,7 +28,25 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
-export default function RootLayout({ children }: RootLayoutProps) {
+const RODAPE_FALLBACK: RodapeData = {
+  id: 0,
+  assinaturaInstitucional: "Inteligência institucional. Impacto real.",
+  emailInstitucional: "contato@institutontc.com.br",
+  razaoSocial: "Instituto NTC do Brasil",
+};
+
+async function carregarRodape(): Promise<RodapeData> {
+  try {
+    const payload = await obterPayload();
+    return (await payload.findGlobal({ slug: "rodape", depth: 1 })) as RodapeData;
+  } catch (err) {
+    console.warn("[layout] falha ao carregar Global rodape — usando fallback", err);
+    return RODAPE_FALLBACK;
+  }
+}
+
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const rodape = await carregarRodape();
   return (
     <html lang="pt-BR" className={`${cormorant.variable} ${barlow.variable}`}>
       <body>
@@ -31,6 +54,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
           Pular para o conteúdo principal
         </a>
         {children}
+        <RodapeSoberano dados={rodape} />
+        <BannerCookies politicaVersao={POLITICA_VERSAO_ATUAL} />
       </body>
     </html>
   );

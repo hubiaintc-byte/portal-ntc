@@ -72,6 +72,12 @@ const SECOES: { slug: string; titulo: string; descricao: string }[] = [
     titulo: "Helpers sistêmicos",
     descricao: "ImagemSoberana, JsonLd, Revelar, RenderizadorLexical. §12.",
   },
+  {
+    slug: "forms",
+    titulo: "Formulários institucionais",
+    descricao:
+      "FormularioSoberano + 10 campos + BotaoSoberano. Os 4 forms (proposta, contato, newsletter, candidatura) cabeados às rotas /api/forms. §9.",
+  },
 ];
 
 export default function DesignSystemIndex() {
