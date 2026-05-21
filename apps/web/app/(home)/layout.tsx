@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { HeaderHome } from "./HeaderHome";
 import { FooterHome } from "./FooterHome";
+import { InteracoesScroll } from "./InteracoesScroll";
 
 /**
  * Layout da rota raiz `/` (Home v3 Premium portada literalmente do
@@ -18,6 +19,7 @@ export default function HomeLayout({ children }: { children: ReactNode }) {
       <HeaderHome />
       {children}
       <FooterHome />
+      <InteracoesScroll />
     </>
   );
 }
