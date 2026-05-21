@@ -1,14 +1,25 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
-import { BannerCookies, NavegacaoSoberana, RodapeSoberano } from "@ntc/ui";
+import { BannerCookies } from "@ntc/ui";
 import { POLITICA_VERSAO_ATUAL } from "@ntc/lib";
-import type { RodapeData } from "@ntc/types";
 
 import { barlow, cormorant } from "./fonts";
 import "./globals.css";
-import { obterPayload } from "@/lib/payloadClient";
-import { CTA_PRINCIPAL, CTA_SECUNDARIO, ROTAS_MENU } from "@/lib/menu";
+
+/**
+ * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
+ * (next/font) e o `<BannerCookies>` que precisa aparecer em toda
+ * rota (LGPD — CLAUDE.md §12).
+ *
+ * Cabeçalho e rodapé moveram-se para layouts de route group:
+ * - `app/(home)/layout.tsx`: header + footer do protótipo (CSS literal).
+ * - `app/(site)/layout.tsx`: `<NavegacaoSoberana>` + `<RodapeSoberano>`
+ *   do @ntc/ui (rotas institucionais que ainda não foram portadas do
+ *   HTML).
+ *
+ * Skip-link permanece no root para acessibilidade global.
+ */
 
 export const metadata: Metadata = {
   title: {
@@ -29,38 +40,14 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
-const RODAPE_FALLBACK: RodapeData = {
-  id: 0,
-  assinaturaInstitucional: "Inteligência institucional. Impacto real.",
-  emailInstitucional: "contato@institutontc.com.br",
-  razaoSocial: "Instituto NTC do Brasil",
-};
-
-async function carregarRodape(): Promise<RodapeData> {
-  try {
-    const payload = await obterPayload();
-    return (await payload.findGlobal({ slug: "rodape", depth: 1 })) as RodapeData;
-  } catch (err) {
-    console.warn("[layout] falha ao carregar Global rodape — usando fallback", err);
-    return RODAPE_FALLBACK;
-  }
-}
-
-export default async function RootLayout({ children }: RootLayoutProps) {
-  const rodape = await carregarRodape();
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="pt-BR" className={`${cormorant.variable} ${barlow.variable}`}>
       <body>
-        <a href="#conteudo" className="skip-link">
+        <a href="#main" className="skip-link">
           Pular para o conteúdo principal
         </a>
-        <NavegacaoSoberana
-          rotas={ROTAS_MENU}
-          ctaPrincipal={CTA_PRINCIPAL}
-          ctaSecundario={CTA_SECUNDARIO}
-        />
         {children}
-        <RodapeSoberano dados={rodape} />
         <BannerCookies politicaVersao={POLITICA_VERSAO_ATUAL} />
       </body>
     </html>
