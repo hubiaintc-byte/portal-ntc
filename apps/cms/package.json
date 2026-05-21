@@ -17,6 +17,8 @@
     "payload": "cross-env PAYLOAD_CONFIG_PATH=src/payload.config.ts payload",
     "payload:generate": "pnpm payload generate:types",
     "payload:seed": "pnpm payload run src/seed/seed.ts",
+    "payload:seed:imagens-home": "pnpm payload run src/seed/uploadImagensHome.ts",
+    "payload:seed:home-v3": "pnpm payload run src/seed/seedHomeV3.ts",
     "clean": "rm -rf .next .turbo node_modules"
   },
   "dependencies": {

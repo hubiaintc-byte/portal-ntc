@@ -20,6 +20,8 @@
     "test:e2e": "turbo run test:e2e",
     "payload:generate": "pnpm --filter @ntc/cms payload:generate",
     "payload:seed": "pnpm --filter @ntc/cms payload:seed",
+    "payload:seed:imagens-home": "pnpm --filter @ntc/cms payload:seed:imagens-home",
+    "payload:seed:home-v3": "pnpm --filter @ntc/cms payload:seed:home-v3",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "clean": "turbo run clean && rm -rf node_modules .turbo"
