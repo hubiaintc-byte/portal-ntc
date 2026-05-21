@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 
+import { DialogoPolitica } from "../../helpers/DialogoPolitica";
 import { useFormulario } from "../contexto";
 import type { CampoBaseProps } from "../tipos";
 import { Erro } from "./primitives";
@@ -73,68 +74,14 @@ export function CampoCheckbox({
         </p>
       ) : null}
       {erroAtivo ? <Erro id={`${nome}-erro`}>{erroAtivo}</Erro> : null}
-      {dialogoAberto && linkPolitica ? (
+      {linkPolitica ? (
         <DialogoPolitica
+          aberto={dialogoAberto}
           href={linkPolitica}
           titulo={rotuloPolitica}
           onClose={() => setDialogoAberto(false)}
         />
       ) : null}
-    </div>
-  );
-}
-
-interface DialogoPoliticaInlineProps {
-  href: string;
-  titulo: string;
-  onClose: () => void;
-}
-
-function DialogoPolitica({ href, titulo, onClose }: DialogoPoliticaInlineProps) {
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="dialogo-politica-titulo"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-grafite/40 p-4"
-      onClick={onClose}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") onClose();
-      }}
-    >
-      <div
-        className="max-w-lg bg-osso p-8 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 id="dialogo-politica-titulo" className="text-h3 font-titulo text-oxford">
-          {titulo}
-        </h3>
-        <p className="mt-4 font-corpo text-corpo text-grafite">
-          O Instituto NTC do Brasil trata seus dados pessoais com base na Lei Geral de Proteção de
-          Dados (LGPD). Ao prosseguir, você consente com o uso dos dados informados exclusivamente
-          para responder à sua solicitação institucional.
-        </p>
-        <p className="mt-4 font-corpo text-corpo text-grafite">
-          Você pode solicitar exclusão, acesso ou correção dos seus dados a qualquer tempo.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-4">
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 border border-oxford px-6 py-3 font-corpo uppercase tracking-[0.12em] text-oxford hover:bg-oxford hover:text-pergaminho"
-          >
-            Ler política completa
-          </a>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex items-center justify-center gap-2 bg-oxford px-6 py-3 font-corpo uppercase tracking-[0.12em] text-pergaminho hover:bg-oxford-claro"
-          >
-            Fechar
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

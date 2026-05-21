@@ -174,3 +174,10 @@ export { CampoTextarea } from "./components/forms/campos/CampoTextarea";
 export { CampoNumber } from "./components/forms/campos/CampoNumber";
 export { CampoUpload } from "./components/forms/campos/CampoUpload";
 export { CampoCheckbox } from "./components/forms/campos/CampoCheckbox";
+
+// Rodapé institucional — doc 12 §11.1
+export { RodapeSoberano } from "./components/layout/RodapeSoberano";
+
+// Banner LGPD e diálogo de política — doc 12 §9 e §12.3
+export { BannerCookies } from "./components/helpers/BannerCookies";
+export { DialogoPolitica } from "./components/helpers/DialogoPolitica";

@@ -12,3 +12,4 @@
  */
 
 export * from "./payload-types";
+export type { RodapeData, RedeSocial, ItemRedeSocial, ItemLinkLegal } from "./rodape";
