@@ -48,10 +48,12 @@ export interface Config {
   };
   globals: {
     home: Home;
+    'o-grupo': OGrupo;
     rodape: Rodape;
   };
   globalsSelect: {
     home: HomeSelect<false> | HomeSelect<true>;
+    'o-grupo': OGrupoSelect<false> | OGrupoSelect<true>;
     rodape: RodapeSelect<false> | RodapeSelect<true>;
   };
   locale: null;
@@ -1422,6 +1424,115 @@ export interface Home {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "o-grupo".
+ */
+export interface OGrupo {
+  id: number;
+  hero?: {
+    eyebrow?: string | null;
+    titulo?: string | null;
+    subtitulo?: string | null;
+    imagem?: (number | null) | Media;
+  };
+  /**
+   * Quem somos. Texto editorial curto, 2-3 parágrafos.
+   */
+  apresentacao?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Origens, marcos e evolução.
+   */
+  trajetoria?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Onde nos colocamos diante do ecossistema público.
+   */
+  posicionamento?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  numerosImpacto?:
+    | {
+        valor: string;
+        rotulo: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Como entregamos. Pilares, princípios, abordagem.
+   */
+  metodologia?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Especialistas exibidos em destaque no /o-grupo. Em vazio, a seção é omitida.
+   */
+  especialistasDestaque?: (number | Especialista)[] | null;
+  /**
+   * Clientes exibidos em destaque no /o-grupo. Em vazio, a seção é omitida.
+   */
+  clientesDestaque?: (number | Cliente)[] | null;
+  ctaInstitucional?: {
+    titulo?: string | null;
+    descricao?: string | null;
+    rotuloCta?: string | null;
+    linkCta?: string | null;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "rodape".
  */
 export interface Rodape {
@@ -1493,6 +1604,45 @@ export interface HomeSelect<T extends boolean = true> {
         rotulo?: T;
         id?: T;
       };
+  clientesDestaque?: T;
+  ctaInstitucional?:
+    | T
+    | {
+        titulo?: T;
+        descricao?: T;
+        rotuloCta?: T;
+        linkCta?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "o-grupo_select".
+ */
+export interface OGrupoSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        titulo?: T;
+        subtitulo?: T;
+        imagem?: T;
+      };
+  apresentacao?: T;
+  trajetoria?: T;
+  posicionamento?: T;
+  numerosImpacto?:
+    | T
+    | {
+        valor?: T;
+        rotulo?: T;
+        id?: T;
+      };
+  metodologia?: T;
+  especialistasDestaque?: T;
   clientesDestaque?: T;
   ctaInstitucional?:
     | T

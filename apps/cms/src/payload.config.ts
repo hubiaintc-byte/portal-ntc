@@ -21,6 +21,7 @@ import { Modulos } from "./collections/Modulos";
 import { Programas } from "./collections/Programas";
 import { Users } from "./collections/Users";
 import { Home } from "./globals/Home";
+import { OGrupo } from "./globals/OGrupo";
 import { Rodape } from "./globals/Rodape";
 import { lexicalRestrictiveFeatures } from "./shared/lexical-config";
 
@@ -79,7 +80,7 @@ export default buildConfig({
     Leads,
     AuditLog,
   ],
-  globals: [Home, Rodape],
+  globals: [Home, OGrupo, Rodape],
   editor: lexicalEditor({ features: () => lexicalRestrictiveFeatures }),
   sharp,
   secret: process.env.PAYLOAD_SECRET || "",
