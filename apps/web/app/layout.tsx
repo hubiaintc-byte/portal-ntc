@@ -29,17 +29,28 @@ import "./o-grupo-prototipo.css";
 // cromáticas vêm de .vertical-page[data-vertical=educacao|gestao-publica|saude].
 // Tokens base e regras de header/footer/btn vêm de home-prototipo.css.
 import "./verticais-prototipo.css";
+// CSS das páginas individuais de programa (/programas/[slug]).
+// Portado literal de 10_Pagina_Programa_LIDERA_v1.html. Os 15 HTMLs
+// de programa usam o MESMO CSS — variações cromáticas vêm de
+// .program-page[data-programa="LIDERA|EDUTEC|SIGS|..."].
+import "./programas-prototipo.css";
+// CSS da página /o-grupo/corpo-docente. Portado literal de
+// 25_Pagina_Corpo_Docente_v1.html (linhas 504-1411). Só carrega classes
+// específicas (.hero-page, .docentes-metrics, .arch-card, .experts-authority,
+// .expert-authority-card, .docentes-credibilidade, .cta-credenciamento,
+// .docentes-faq, .docentes-cta-final). Tokens e header/footer vêm de
+// home-prototipo.css.
+import "./corpo-docente-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
  * (next/font) e o `<BannerCookies>` que precisa aparecer em toda
  * rota (LGPD — CLAUDE.md §12).
  *
- * Cabeçalho e rodapé moveram-se para layouts de route group:
+ * Cabeçalho e rodapé vivem nos layouts de route group:
  * - `app/(home)/layout.tsx`: header + footer do protótipo (CSS literal).
- * - `app/(site)/layout.tsx`: `<NavegacaoSoberana>` + `<RodapeSoberano>`
- *   do @ntc/ui (rotas institucionais que ainda não foram portadas do
- *   HTML).
+ * - `app/(o-grupo)/layout.tsx`: reusa HeaderHome/FooterHome.
+ * - `app/(vertical)/layout.tsx`: reusa HeaderHome/FooterHome.
  *
  * Skip-link permanece no root para acessibilidade global.
  */
