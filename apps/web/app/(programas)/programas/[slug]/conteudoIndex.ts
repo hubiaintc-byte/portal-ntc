@@ -93,6 +93,12 @@ export interface ConteudoPrograma {
   modalidades: BlocoEditorial;
   modulosAbertos: BlocoEditorial;
   faq: { eyebrow: string; titulo: string; itens: FaqItem[] };
+  sidebar?: {
+    titulo: string;
+    rows: { rotulo: string; valor: string }[];
+    entregasTitulo: string;
+    entregas: string[];
+  };
 }
 
 import { LIDERA } from "./conteudoLIDERA";

@@ -265,6 +265,53 @@ export default async function ProgramaPage({ params }: Props) {
               </article>
 
             </div>
+
+            {p.sidebar ? (
+              <aside className="prog-sidebar" aria-label="Card comercial do programa">
+                <div className="prog-sb-card">
+                  <div className="prog-sb-cover">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.hero.bgSrc}
+                      alt={`${p.siglaExibida} · ${p.nomeCompleto}`}
+                      loading="lazy"
+                    />
+                    <span className="sigla-watermark">{p.siglaExibida}</span>
+                  </div>
+                  <div className="prog-sb-body">
+                    <p className="prog-sb-title">{p.sidebar.titulo}</p>
+                    <div className="prog-sb-rows">
+                      {p.sidebar.rows.map((r, i) => (
+                        <div key={i} className="prog-sb-row">
+                          <span>{r.rotulo}</span>
+                          <strong>{r.valor}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="prog-sb-includes">
+                    <h4>{p.sidebar.entregasTitulo}</h4>
+                    <ul>
+                      {p.sidebar.entregas.map((e, i) => (
+                        <li key={i}>{e}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="prog-sb-actions">
+                    <a className="btn btn--gold" href={`/contato/proposta?programa=${p.slug}`}>
+                      Solicitar proposta <span className="btn-arrow">→</span>
+                    </a>
+                    <a className="btn btn--secondary" href={`/contato/proposta?programa=${p.slug}&assunto=folder`}>
+                      Solicitar folder do programa
+                    </a>
+                    <a className="link-arrow" href="#modulos-abertos">
+                      Ver módulos abertos
+                    </a>
+                  </div>
+                </div>
+              </aside>
+            ) : null}
+
           </div>
         </div>
       </section>

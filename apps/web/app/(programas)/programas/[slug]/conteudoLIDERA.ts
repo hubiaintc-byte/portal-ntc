@@ -238,4 +238,23 @@ export const LIDERA: ConteudoPrograma = {
       },
     ],
   },
+  sidebar: {
+    titulo: "Programa estratégico",
+    rows: [
+      { rotulo: "Vertical",     valor: "NTC Gestão Pública" },
+      { rotulo: "Estrutura",    valor: "8 módulos · 64h" },
+      { rotulo: "Eixos",        valor: "4 eixos formativos" },
+      { rotulo: "Modalidades",  valor: "Online · Presencial · Híbrido · In company" },
+      { rotulo: "Status",       valor: "Módulos abertos" },
+    ],
+    entregasTitulo: "O programa entrega",
+    entregas: [
+      "8 módulos formativos sequenciais",
+      "Capacidade de direção estratégica",
+      "Decisão baseada em evidências",
+      "Painel de indicadores estratégicos",
+      "Matriz aplicada de liderança",
+      "Certificação institucional NTC",
+    ],
+  },
 };
