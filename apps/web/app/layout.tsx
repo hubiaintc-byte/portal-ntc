@@ -14,6 +14,21 @@ import "./globals.css";
 // .hero-slide, .event-card, etc.) que não colidem com /o-grupo,
 // /solucoes-estrategicas* ou /design-system/*.
 import "./home-prototipo.css";
+// CSS da página /o-grupo v3 (portada literal de
+// 08_Pagina_O_Grupo_NTC_v3.html). Reaproveita os tokens base de
+// home-prototipo.css; este arquivo só carrega classes específicas
+// da página (.grupo-hero, .grupo-meta-bar, .sintese-editorial,
+// .pilares-grid--dark, .mvv-band-grid, .portfolio-vert-card,
+// .trajetoria-visual, .programas-matrix, .metodo-flow,
+// .autoridade-mosaic, .credibilidade-mosaic, .eventon-mockup,
+// .juridico-block, .grupo-cta-final--image).
+import "./o-grupo-prototipo.css";
+// CSS das páginas de vertical (/solucoes-estrategicas/[area]).
+// Portado literal de 07_Pagina_Vertical_NTC_Educacao_v1.html (linhas
+// 1467-2188). Os 3 HTMLs das verticais usam o MESMO CSS — variações
+// cromáticas vêm de .vertical-page[data-vertical=educacao|gestao-publica|saude].
+// Tokens base e regras de header/footer/btn vêm de home-prototipo.css.
+import "./verticais-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
