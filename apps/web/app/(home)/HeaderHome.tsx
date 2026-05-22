@@ -175,58 +175,58 @@ export function HeaderHome() {
                 <h4>NTC Educação · 9 programas</h4>
                 <ul className="mega-list">
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/edutec">
                       <strong>EDUTEC</strong>
                       <span>Educação Digital, Inovação e Tecnologias para Redes Públicas</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/pear">
                       <strong>PEAR</strong>
                       <span>Alfabetização de Alta Performance e Recomposição da Aprendizagem</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/pei">
                       <strong>PEI</strong>
                       <span>Educação Integral — Gestão, Currículo e Resultados</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/progir">
                       <strong>PROGIR</strong>
                       <span>Gestão da Inclusão com Resultado</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/proge">
                       <strong>PROGE</strong>
                       <span>Gestão Escolar, Coordenação Pedagógica e Resultados</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/egide">
                       <strong>EGIDE</strong>
                       <span>IA, Dados e Governança da Transformação Digital</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/vivaescola">
                       <strong>VIVAESCOLA</strong>
                       <span>Convivência, Permanência, Bem-Estar e Proteção Integral</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/pinei">
                       <strong>PINEI</strong>
                       <span>Primeira Infância e Educação Infantil</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/futura">
                       <strong>FUTURA</strong>
                       <span>Ensino Médio, Itinerários de Futuro, Empregabilidade</span>
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -234,22 +234,22 @@ export function HeaderHome() {
                 <h4>NTC Gestão Pública · 3 programas</h4>
                 <ul className="mega-list">
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/agip">
                       <strong>AGIP</strong>
                       <span>Governança, Integridade e Performance nas Contratações Públicas</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/lidera">
                       <strong>LIDERA</strong>
                       <span>Liderança, Direção Estratégica e Resultados na Administração</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/siga">
                       <strong>SIGA</strong>
                       <span>Soluções Inteligentes de Governança e Administração</span>
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -257,22 +257,22 @@ export function HeaderHome() {
                 <h4>NTC Saúde · 3 programas</h4>
                 <ul className="mega-list">
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/sigs">
                       <strong>SIGS</strong>
                       <span>Saúde Inteligente, Governança Digital, IA e Transformação do SUS</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/proaps">
                       <strong>PROAPS+</strong>
                       <span>Alta Performance na Atenção Primária e Redes de Cuidado</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/programas/prosus">
                       <strong>PROSUS+</strong>
                       <span>Governança, Financiamento e Performance no SUS</span>
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
