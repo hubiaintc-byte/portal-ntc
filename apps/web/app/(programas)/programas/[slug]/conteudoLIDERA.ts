@@ -48,6 +48,7 @@ export const LIDERA: ConteudoPrograma = {
   visaoGeral: {
     eyebrow: "Visão geral",
     titulo: "Um programa estratégico para a direção institucional da Administração Pública brasileira.",
+    tituloHtml: `Um programa estratégico para a <em>direção institucional</em> da Administração Pública brasileira.`,
     corpoHtml: `<p class="lede-block">O LIDERA articula liderança pública contemporânea, direção estratégica, governança de resultados e cultura de performance em um arco formativo de 8 módulos e 64 horas, dimensionado para gestores que ocupam — ou são preparados para ocupar — posições de direção na Administração.</p>
 <p>O programa foi estruturado para profissionais com responsabilidade direta sobre a direção institucional — secretários, secretários-adjuntos, superintendentes, diretores e coordenadores de áreas estratégicas — que precisam de <strong>repertório executivo atualizado</strong>, <strong>metodologia aplicada à decisão pública</strong> e <strong>protocolos institucionais</strong> que conversem com a complexidade real da gestão pública brasileira contemporânea.</p>
 <p>O LIDERA não é um curso de liderança comportamental nem um programa genérico de gestão. É um programa de direção estratégica aplicada — articulando visão institucional, decisão baseada em evidências, gestão de pessoas, performance e articulação política em uma arquitetura institucional integrada. A entrega final é uma <strong>matriz aplicada de liderança e direção</strong>, construída pelos próprios participantes para sua instituição de origem.</p>`,
@@ -55,6 +56,7 @@ export const LIDERA: ConteudoPrograma = {
   problema: {
     eyebrow: "Problema público que enfrentamos",
     titulo: "O desafio institucional contemporâneo",
+    tituloHtml: `O desafio institucional <em>contemporâneo</em>`,
     corpoHtml: `<p>A Administração Pública brasileira opera em ambiente de complexidade crescente — multiplicidade de stakeholders, ciclos políticos curtos, pressão social por resultados verificáveis e regulação cada vez mais densa. Cargos de direção exigem hoje uma combinação rara de visão estratégica, capacidade técnica e habilidade institucional.</p>
 <p>A maioria das instituições convive simultaneamente com três pressões: rotatividade de quadros estratégicos, decisões cada vez mais complexas com janelas mais curtas e expectativa social por performance mensurável. Programas de capacitação que tratam liderança como tema comportamental abstrato perdem o ponto.</p>
 <p>O LIDERA responde a essa pressão construindo capacidade institucional avançada: lideranças que dirigem com método, instituições que operam com cultura de performance documentada e quadros estratégicos preparados para sustentar a continuidade institucional para além de ciclos políticos.</p>`,
@@ -63,6 +65,7 @@ export const LIDERA: ConteudoPrograma = {
   objetivoGeral: {
     eyebrow: "Objetivo geral",
     titulo: "O que o programa entrega",
+    tituloHtml: `O que o programa <em>entrega</em>`,
     corpoHtml: `<p class="lede-block">Desenvolver capacidade institucional avançada de liderança e direção estratégica na Administração Pública — articulando visão institucional, decisão baseada em evidências, gestão de pessoas e cultura de performance verificável aplicadas à rotina das posições de direção.</p>`,
   },
   publico: {
@@ -83,6 +86,7 @@ export const LIDERA: ConteudoPrograma = {
   eixos: {
     eyebrow: "Eixos formativos",
     titulo: "Quatro eixos estruturantes",
+    tituloHtml: `Quatro <em>eixos estruturantes</em>`,
     itens: [
       {
         titulo: "Liderança pública contemporânea",
@@ -105,6 +109,7 @@ export const LIDERA: ConteudoPrograma = {
   modulos: {
     eyebrow: "Arquitetura formativa",
     titulo: "Estrutura modular · 8 módulos",
+    tituloHtml: `Estrutura modular · <em>8 módulos</em>`,
     intro: "O LIDERA é composto por 8 módulos sequenciais de 8 horas cada, totalizando 64 horas de formação executiva. Pode ser contratado como trilha completa ou módulo a módulo.",
     itens: [
       {
@@ -282,6 +287,7 @@ export const LIDERA: ConteudoPrograma = {
   resultados: {
     eyebrow: "Resultados esperados",
     titulo: "O que a instituição leva do LIDERA",
+    tituloHtml: `O que a instituição <em>leva</em> do LIDERA`,
     corpoHtml: `<div class="results-grid">
   <div class="result-card"><span class="r-num">01</span><p>Capacidade institucional de direção estratégica fortalecida nos quadros de comando.</p></div>
   <div class="result-card"><span class="r-num">02</span><p>Tomada de decisão pública estruturada em evidências, dados e responsabilidade institucional.</p></div>
@@ -294,6 +300,7 @@ export const LIDERA: ConteudoPrograma = {
   diferenciais: {
     eyebrow: "Diferenciais",
     titulo: "O que torna o LIDERA uma referência",
+    tituloHtml: `O que torna o LIDERA <em>uma referência</em>`,
     itens: [
       {
         titulo: "Liderança aplicada à realidade brasileira",
@@ -324,6 +331,7 @@ export const LIDERA: ConteudoPrograma = {
   docentes: {
     eyebrow: "Autoridade técnica",
     titulo: "Lideranças e especialistas para a alta gestão pública",
+    tituloHtml: `Lideranças e especialistas para a <em>alta gestão pública</em>`,
     pill: "Curadoria científica · Em estruturação contínua",
     introHtml: `<p class="faculty-prime-intro">O LIDERA articula gestores públicos, especialistas em liderança, governança, estratégia, comunicação, pessoas, inovação e resultados institucionais para apoiar dirigentes e equipes na tomada de decisão e na condução de organizações públicas.</p>`,
     coordenacaoMarker: "Coordenação e curadoria",
@@ -429,33 +437,39 @@ export const LIDERA: ConteudoPrograma = {
   modalidades: {
     eyebrow: "Como contratar",
     titulo: "Modalidades de entrega",
+    tituloHtml: `Modalidades de <em>entrega</em>`,
     corpoHtml: `<p>O LIDERA é flexível em sua contratação — o conteúdo pode ser adquirido como trilha completa, módulo avulso, in company para órgãos públicos, ou solução sob medida.</p>
 <div class="modes-grid">
   <article class="mode-card-prog featured">
     <span class="tag">Trilha completa · Recomendado</span>
     <h4>Os 8 módulos · 64 horas</h4>
     <p>Acesso integral à arquitetura formativa do LIDERA — liderança pública, direção estratégica, decisão por evidências, gestão de pessoas, performance, comunicação, gestão de crises e construção da matriz institucional. Certificação consolidada da trilha.</p>
+    <a class="cta" href="/contato/proposta?programa=lidera&modalidade=trilha">Solicitar proposta da trilha →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Módulo avulso</span>
     <h4>Qualquer módulo individual</h4>
     <p>Inscrição em módulos específicos conforme necessidade do participante ou da instituição. Pode-se iniciar pela trilha em qualquer módulo aberto e progredir conforme calendário.</p>
+    <a class="cta" href="#modulos-abertos">Ver módulos abertos →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">In company</span>
     <h4>Turma fechada para a instituição</h4>
     <p>Programa entregue exclusivamente à instituição contratante (secretaria, autarquia, fundação, órgão público), em formato presencial, online ou híbrido. Conteúdo customizável para a realidade institucional e o perfil dos quadros de direção.</p>
+    <a class="cta" href="/contato/proposta?programa=lidera&modalidade=incompany">Solicitar proposta in company →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Sob medida</span>
     <h4>Customização profunda</h4>
     <p>Customização avançada da trilha — ementas, módulos, cargas horárias, formato e linguagem ajustados a uma necessidade institucional específica. Inclui consultoria de adaptação institucional.</p>
+    <a class="cta" href="/contato/proposta?programa=lidera&modalidade=sob-medida">Solicitar proposta sob medida →</a>
   </article>
 </div>`,
   },
   modulosAbertos: {
     eyebrow: "Próximas oportunidades",
     titulo: "Próximos módulos do LIDERA",
+    tituloHtml: `Próximos módulos do <em>LIDERA</em>`,
     corpoHtml: `<p>A agenda pode reunir módulos avulsos, turmas da trilha completa, encontros online ao vivo, formações presenciais e soluções híbridas vinculadas ao programa.</p>`,
     feature: {
       badge: "Próximo módulo · Em destaque",

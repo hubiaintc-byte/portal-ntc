@@ -2709,3 +2709,21 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   border-bottom-color: var(--program-secondary);
 }
 
+/* ========================================================
+   AUDIENCE CHIPS  (porta dos inline styles do .audience-chips
+   do 10_Pagina_Programa_LIDERA_v1.html — extração dos estilos
+   inline para uma regra reutilizável).
+   ======================================================== */
+.audience-chips {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+.audience-chips span {
+  font-family: var(--font-cond); font-weight: 500;
+  font-size: 13px; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--tinta);
+  background: var(--pergaminho);
+  border: 1px solid var(--prata-30);
+  padding: 8px 14px; border-radius: 22px;
+}
+

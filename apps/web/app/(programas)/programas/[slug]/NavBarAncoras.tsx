@@ -58,7 +58,7 @@ export function NavBarAncoras({ anchors, slug }: Props) {
 
   return (
     <nav className="prog-nav" aria-label="Navegação interna do programa">
-      <div className="container">
+      <div className="container prog-nav-inner">
         <div className="prog-nav-anchors" role="tablist">
           {anchors.map((a) => {
             const id = a.href.replace(/^#/, "");

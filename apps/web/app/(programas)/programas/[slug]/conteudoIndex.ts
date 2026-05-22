@@ -62,6 +62,7 @@ export interface NavAnchor {
 export interface BlocoEditorial {
   eyebrow: string;
   titulo: string;
+  tituloHtml?: string;
   corpoHtml: string;
 }
 
@@ -77,6 +78,7 @@ export interface DetalhamentoItem {
 export interface Detalhamento {
   eyebrow: string;
   titulo: string;
+  tituloHtml?: string;
   intro: string;
   itens: DetalhamentoItem[];
 }
@@ -89,6 +91,7 @@ export interface DiferencialItem {
 export interface Diferenciais {
   eyebrow: string;
   titulo: string;
+  tituloHtml?: string;
   itens: DiferencialItem[];
 }
 
@@ -115,6 +118,7 @@ export interface EspecialistaDocente {
 export interface DocentesRich {
   eyebrow: string;
   titulo: string;
+  tituloHtml?: string;
   pill: string;
   introHtml: string;
   coordenacaoMarker: string;
@@ -152,6 +156,7 @@ export interface EventoFeature {
 export interface ModulosAbertosRich {
   eyebrow: string;
   titulo: string;
+  tituloHtml?: string;
   corpoHtml: string;
   feature?: EventoFeature;
   miniStack?: EventoMini[];
@@ -188,15 +193,15 @@ export interface ConteudoPrograma {
   problema: BlocoEditorial & { destaqueHtml?: string };
   objetivoGeral?: BlocoEditorial;
   publico: BlocoEditorial & { chips?: string[] };
-  eixos: { eyebrow: string; titulo: string; itens: EixoTematico[] };
-  modulos: { eyebrow: string; titulo: string; intro?: string; itens: Modulo[] };
+  eixos: { eyebrow: string; titulo: string; tituloHtml?: string; itens: EixoTematico[] };
+  modulos: { eyebrow: string; titulo: string; tituloHtml?: string; intro?: string; itens: Modulo[] };
   detalhamento?: Detalhamento;
   resultados: BlocoEditorial;
   diferenciais?: Diferenciais;
   docentes: DocentesRich;
   modalidades: BlocoEditorial;
   modulosAbertos: ModulosAbertosRich;
-  faq: { eyebrow: string; titulo: string; itens: FaqItem[] };
+  faq: { eyebrow: string; titulo: string; tituloHtml?: string; itens: FaqItem[] };
   ctaFinal?: CtaFinal;
   sidebar?: {
     titulo: string;

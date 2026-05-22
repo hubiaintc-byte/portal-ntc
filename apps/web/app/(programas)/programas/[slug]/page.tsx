@@ -164,14 +164,20 @@ export default async function ProgramaPage({ params }: Props) {
               {/* VISÃO GERAL */}
               <article className="prog-section fade-in" id="visao-geral">
                 <p className="eyebrow">{p.visaoGeral.eyebrow}</p>
-                <h2>{p.visaoGeral.titulo}</h2>
+                {p.visaoGeral.tituloHtml
+                  ? <h2 dangerouslySetInnerHTML={{ __html: p.visaoGeral.tituloHtml }} />
+                  : <h2>{p.visaoGeral.titulo}</h2>
+                }
                 <div dangerouslySetInnerHTML={{ __html: p.visaoGeral.corpoHtml }} />
               </article>
 
               {/* PROBLEMA */}
               <article className="prog-section fade-in" id="problema">
                 <p className="eyebrow">{p.problema.eyebrow}</p>
-                <h2>{p.problema.titulo}</h2>
+                {p.problema.tituloHtml
+                  ? <h2 dangerouslySetInnerHTML={{ __html: p.problema.tituloHtml }} />
+                  : <h2>{p.problema.titulo}</h2>
+                }
                 <div dangerouslySetInnerHTML={{ __html: p.problema.corpoHtml }} />
                 {p.problema.destaqueHtml ? (
                   <div
@@ -185,7 +191,10 @@ export default async function ProgramaPage({ params }: Props) {
               {p.objetivoGeral ? (
                 <article className="prog-section fade-in">
                   <p className="eyebrow">{p.objetivoGeral.eyebrow}</p>
-                  <h2>{p.objetivoGeral.titulo}</h2>
+                  {p.objetivoGeral.tituloHtml
+                    ? <h2 dangerouslySetInnerHTML={{ __html: p.objetivoGeral.tituloHtml }} />
+                    : <h2>{p.objetivoGeral.titulo}</h2>
+                  }
                   <div dangerouslySetInnerHTML={{ __html: p.objetivoGeral.corpoHtml }} />
                 </article>
               ) : null}
@@ -193,7 +202,10 @@ export default async function ProgramaPage({ params }: Props) {
               {/* PÚBLICO */}
               <article className="prog-section fade-in" id="publico">
                 <p className="eyebrow">{p.publico.eyebrow}</p>
-                <h2>{p.publico.titulo}</h2>
+                {p.publico.tituloHtml
+                  ? <h2 dangerouslySetInnerHTML={{ __html: p.publico.tituloHtml }} />
+                  : <h2>{p.publico.titulo}</h2>
+                }
                 <div dangerouslySetInnerHTML={{ __html: p.publico.corpoHtml }} />
                 {p.publico.chips && p.publico.chips.length > 0 ? (
                   <div className="audience-chips">
@@ -207,7 +219,10 @@ export default async function ProgramaPage({ params }: Props) {
               {/* EIXOS */}
               <article className="prog-section fade-in" id="eixos">
                 <p className="eyebrow">{p.eixos.eyebrow}</p>
-                <h2>{p.eixos.titulo}</h2>
+                {p.eixos.tituloHtml
+                  ? <h2 dangerouslySetInnerHTML={{ __html: p.eixos.tituloHtml }} />
+                  : <h2>{p.eixos.titulo}</h2>
+                }
                 <div className="axes-grid">
                   {p.eixos.itens.map((e, i) => (
                     <article key={i} className="axis-card">
@@ -222,7 +237,10 @@ export default async function ProgramaPage({ params }: Props) {
               {/* MÓDULOS — tabela com status */}
               <article className="prog-section fade-in" id="modulos">
                 <p className="eyebrow">{p.modulos.eyebrow}</p>
-                <h2 dangerouslySetInnerHTML={{ __html: p.modulos.titulo.replace(" · ", " · <em>").replace(" módulos</em>", " módulos</em>").replace("· <em>8 módulos</em>", "· <em>8 módulos</em>") }} />
+                {p.modulos.tituloHtml
+                  ? <h2 dangerouslySetInnerHTML={{ __html: p.modulos.tituloHtml }} />
+                  : <h2>{p.modulos.titulo}</h2>
+                }
                 {p.modulos.intro ? <p>{p.modulos.intro}</p> : null}
                 <table className="modules-table">
                   <thead>
@@ -256,7 +274,10 @@ export default async function ProgramaPage({ params }: Props) {
               {p.detalhamento ? (
                 <article className="prog-section fade-in">
                   <p className="eyebrow">{p.detalhamento.eyebrow}</p>
-                  <h2>{p.detalhamento.titulo}</h2>
+                  {p.detalhamento.tituloHtml
+                    ? <h2 dangerouslySetInnerHTML={{ __html: p.detalhamento.tituloHtml }} />
+                    : <h2>{p.detalhamento.titulo}</h2>
+                  }
                   <p>{p.detalhamento.intro}</p>
                   <ModulosAcordeao itens={p.detalhamento.itens} slug={p.slug} />
                 </article>
@@ -265,7 +286,10 @@ export default async function ProgramaPage({ params }: Props) {
               {/* RESULTADOS */}
               <article className="prog-section fade-in" id="resultados">
                 <p className="eyebrow">{p.resultados.eyebrow}</p>
-                <h2>{p.resultados.titulo}</h2>
+                {p.resultados.tituloHtml
+                  ? <h2 dangerouslySetInnerHTML={{ __html: p.resultados.tituloHtml }} />
+                  : <h2>{p.resultados.titulo}</h2>
+                }
                 <div dangerouslySetInnerHTML={{ __html: p.resultados.corpoHtml }} />
               </article>
 
@@ -273,7 +297,10 @@ export default async function ProgramaPage({ params }: Props) {
               {p.diferenciais ? (
                 <article className="prog-section fade-in">
                   <p className="eyebrow">{p.diferenciais.eyebrow}</p>
-                  <h2 dangerouslySetInnerHTML={{ __html: p.diferenciais.titulo.replace("uma referência", "<em>uma referência</em>") }} />
+                  {p.diferenciais.tituloHtml
+                    ? <h2 dangerouslySetInnerHTML={{ __html: p.diferenciais.tituloHtml }} />
+                    : <h2>{p.diferenciais.titulo}</h2>
+                  }
                   <div className="diffs-grid">
                     {p.diferenciais.itens.map((d, i) => (
                       <div key={i} className="diff-item">
@@ -295,7 +322,10 @@ export default async function ProgramaPage({ params }: Props) {
                   <div className="faculty-prime-head">
                     <span className="faculty-prime-pill">{p.docentes.pill}</span>
                     <p className="eyebrow">{p.docentes.eyebrow}</p>
-                    <h2 dangerouslySetInnerHTML={{ __html: p.docentes.titulo.replace("alta gestão pública", "<em>alta gestão pública</em>") }} />
+                    {p.docentes.tituloHtml
+                      ? <h2 dangerouslySetInnerHTML={{ __html: p.docentes.tituloHtml }} />
+                      : <h2>{p.docentes.titulo}</h2>
+                    }
                     <div dangerouslySetInnerHTML={{ __html: p.docentes.introHtml }} />
                   </div>
 
@@ -373,14 +403,20 @@ export default async function ProgramaPage({ params }: Props) {
               {/* MODALIDADES */}
               <article className="prog-section fade-in" id="modalidades">
                 <p className="eyebrow">{p.modalidades.eyebrow}</p>
-                <h2>{p.modalidades.titulo}</h2>
+                {p.modalidades.tituloHtml
+                  ? <h2 dangerouslySetInnerHTML={{ __html: p.modalidades.tituloHtml }} />
+                  : <h2>{p.modalidades.titulo}</h2>
+                }
                 <div dangerouslySetInnerHTML={{ __html: p.modalidades.corpoHtml }} />
               </article>
 
               {/* MÓDULOS ABERTOS — layout de eventos */}
               <article className="prog-section fade-in" id="modulos-abertos">
                 <p className="eyebrow">{p.modulosAbertos.eyebrow}</p>
-                <h2 dangerouslySetInnerHTML={{ __html: p.modulosAbertos.titulo.replace(p.siglaExibida, `<em>${p.siglaExibida}</em>`) }} />
+                {p.modulosAbertos.tituloHtml
+                  ? <h2 dangerouslySetInnerHTML={{ __html: p.modulosAbertos.tituloHtml }} />
+                  : <h2>{p.modulosAbertos.titulo}</h2>
+                }
                 <div dangerouslySetInnerHTML={{ __html: p.modulosAbertos.corpoHtml }} />
 
                 {(p.modulosAbertos.feature ?? p.modulosAbertos.miniStack) ? (
