@@ -242,7 +242,7 @@ export function calcularRelacionados(slugAtual: string): RelacionadoPrograma[] {
   if (!atual) return [];
   return Object.values(PROGRAMAS)
     .filter((p) => p.vertical === atual.vertical && p.slug !== slugAtual)
-    .slice(0, 4)
+    .slice(0, 3)
     .map((p) => ({
       slug: p.slug,
       sigla: p.siglaExibida,

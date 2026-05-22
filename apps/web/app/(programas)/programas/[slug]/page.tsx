@@ -679,6 +679,18 @@ export default async function ProgramaPage({ params }: Props) {
                 </article>
               ))}
             </div>
+            <div
+              className="fade-in"
+              style={{
+                marginTop: "var(--space-4)",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <Link className="btn btn--primary" href="/#solucoes">
+                Ver todos os 15 programas <span className="btn-arrow">→</span>
+              </Link>
+            </div>
           </div>
         </section>
       ) : null}
