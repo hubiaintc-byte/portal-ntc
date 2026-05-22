@@ -25,6 +25,7 @@ export interface StatHero {
 export interface MetaItem {
   rotulo: string;
   valor: string;
+  valorSub?: string;
 }
 
 export interface EixoTematico {
@@ -82,8 +83,9 @@ export interface ConteudoPrograma {
   metaBar: MetaItem[];
   navAnchors: NavAnchor[];
   visaoGeral: BlocoEditorial;
-  problema: BlocoEditorial;
-  publico: BlocoEditorial;
+  problema: BlocoEditorial & { destaqueHtml?: string };
+  objetivoGeral?: BlocoEditorial;
+  publico: BlocoEditorial & { chips?: string[] };
   eixos: { eyebrow: string; titulo: string; itens: EixoTematico[] };
   modulos: { eyebrow: string; titulo: string; itens: Modulo[] };
   resultados: BlocoEditorial;

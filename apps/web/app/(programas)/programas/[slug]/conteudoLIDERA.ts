@@ -27,11 +27,11 @@ export const LIDERA: ConteudoPrograma = {
     ],
   },
   metaBar: [
-    { rotulo: "Vertical",      valor: "NTC Gestão Pública" },
-    { rotulo: "Estrutura",     valor: "8 módulos" },
-    { rotulo: "Carga horária", valor: "64 horas" },
-    { rotulo: "Modalidades",   valor: "Híbrido" },
-    { rotulo: "Status",        valor: "Módulos abertos" },
+    { rotulo: "Vertical",      valor: "NTC Gestão Pública", valorSub: "Liderança e Direção Estratégica" },
+    { rotulo: "Estrutura",     valor: "8 módulos",          valorSub: "8 horas por módulo" },
+    { rotulo: "Carga horária", valor: "64 horas",           valorSub: "Total do programa" },
+    { rotulo: "Modalidades",   valor: "Híbrido",            valorSub: "Online · Presencial · In company" },
+    { rotulo: "Status",        valor: "Módulos abertos",    valorSub: "Inscrições ativas" },
   ],
   navAnchors: [
     { href: "#visao-geral",     rotulo: "Visão geral" },
@@ -57,23 +57,28 @@ export const LIDERA: ConteudoPrograma = {
     titulo: "O desafio institucional contemporâneo",
     corpoHtml: `<p>A Administração Pública brasileira opera em ambiente de complexidade crescente — multiplicidade de stakeholders, ciclos políticos curtos, pressão social por resultados verificáveis e regulação cada vez mais densa. Cargos de direção exigem hoje uma combinação rara de visão estratégica, capacidade técnica e habilidade institucional.</p>
 <p>A maioria das instituições convive simultaneamente com três pressões: rotatividade de quadros estratégicos, decisões cada vez mais complexas com janelas mais curtas e expectativa social por performance mensurável. Programas de capacitação que tratam liderança como tema comportamental abstrato perdem o ponto.</p>
-<div class="problem-block">O que está em jogo não é a aquisição de competências genéricas de liderança. <strong>É a arquitetura institucional da direção pública como instrumento de governança</strong> — articulando visão estratégica, decisão baseada em evidências, gestão de pessoas, performance e articulação política em um sistema coerente, defensável e replicável.</div>
 <p>O LIDERA responde a essa pressão construindo capacidade institucional avançada: lideranças que dirigem com método, instituições que operam com cultura de performance documentada e quadros estratégicos preparados para sustentar a continuidade institucional para além de ciclos políticos.</p>`,
+    destaqueHtml: `O que está em jogo não é a aquisição de competências genéricas de liderança. <strong>É a arquitetura institucional da direção pública como instrumento de governança</strong> — articulando visão estratégica, decisão baseada em evidências, gestão de pessoas, performance e articulação política em um sistema coerente, defensável e replicável.`,
+  },
+  objetivoGeral: {
+    eyebrow: "Objetivo geral",
+    titulo: "O que o programa entrega",
+    corpoHtml: `<p class="lede-block">Desenvolver capacidade institucional avançada de liderança e direção estratégica na Administração Pública — articulando visão institucional, decisão baseada em evidências, gestão de pessoas e cultura de performance verificável aplicadas à rotina das posições de direção.</p>`,
   },
   publico: {
     eyebrow: "Para quem",
     titulo: "Público-alvo",
-    corpoHtml: `<p>O LIDERA é dimensionado para profissionais com responsabilidade direta — ou em formação — sobre a direção institucional:</p>
-<div class="audience-chips" style="display:flex; gap:10px; flex-wrap:wrap; margin-top: var(--space-2);">
-  <span style="font-family: var(--font-cond); font-weight: 500; font-size: 13px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--tinta); background: var(--pergaminho); border: 1px solid var(--prata-30); padding: 8px 14px; border-radius: 22px;">Secretários e secretários-adjuntos</span>
-  <span style="font-family: var(--font-cond); font-weight: 500; font-size: 13px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--tinta); background: var(--pergaminho); border: 1px solid var(--prata-30); padding: 8px 14px; border-radius: 22px;">Superintendentes e diretores executivos</span>
-  <span style="font-family: var(--font-cond); font-weight: 500; font-size: 13px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--tinta); background: var(--pergaminho); border: 1px solid var(--prata-30); padding: 8px 14px; border-radius: 22px;">Chefes de gabinete</span>
-  <span style="font-family: var(--font-cond); font-weight: 500; font-size: 13px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--tinta); background: var(--pergaminho); border: 1px solid var(--prata-30); padding: 8px 14px; border-radius: 22px;">Coordenadores e gerentes estratégicos</span>
-  <span style="font-family: var(--font-cond); font-weight: 500; font-size: 13px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--tinta); background: var(--pergaminho); border: 1px solid var(--prata-30); padding: 8px 14px; border-radius: 22px;">Cargos de direção e assessoramento (DAS · CC)</span>
-  <span style="font-family: var(--font-cond); font-weight: 500; font-size: 13px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--tinta); background: var(--pergaminho); border: 1px solid var(--prata-30); padding: 8px 14px; border-radius: 22px;">Equipes de planejamento estratégico</span>
-  <span style="font-family: var(--font-cond); font-weight: 500; font-size: 13px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--tinta); background: var(--pergaminho); border: 1px solid var(--prata-30); padding: 8px 14px; border-radius: 22px;">Lideranças em formação na Administração</span>
-  <span style="font-family: var(--font-cond); font-weight: 500; font-size: 13px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--tinta); background: var(--pergaminho); border: 1px solid var(--prata-30); padding: 8px 14px; border-radius: 22px;">Quadros sucessórios institucionais</span>
-</div>`,
+    corpoHtml: `<p>O LIDERA é dimensionado para profissionais com responsabilidade direta — ou em formação — sobre a direção institucional:</p>`,
+    chips: [
+      "Secretários e secretários-adjuntos",
+      "Superintendentes e diretores executivos",
+      "Chefes de gabinete",
+      "Coordenadores e gerentes estratégicos",
+      "Cargos de direção e assessoramento (DAS · CC)",
+      "Equipes de planejamento estratégico",
+      "Lideranças em formação na Administração",
+      "Quadros sucessórios institucionais",
+    ],
   },
   eixos: {
     eyebrow: "Eixos formativos",
