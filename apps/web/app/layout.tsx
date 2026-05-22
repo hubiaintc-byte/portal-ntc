@@ -34,23 +34,17 @@ import "./verticais-prototipo.css";
 // de programa usam o MESMO CSS — variações cromáticas vêm de
 // .program-page[data-programa="LIDERA|EDUTEC|SIGS|..."].
 import "./programas-prototipo.css";
-// CSS da página /o-grupo/corpo-docente. Portado literal de
-// 25_Pagina_Corpo_Docente_v1.html (linhas 504-1411). Só carrega classes
-// específicas (.hero-page, .docentes-metrics, .arch-card, .experts-authority,
-// .expert-authority-card, .docentes-credibilidade, .cta-credenciamento,
-// .docentes-faq, .docentes-cta-final). Tokens e header/footer vêm de
-// home-prototipo.css.
-import "./corpo-docente-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
  * (next/font) e o `<BannerCookies>` que precisa aparecer em toda
  * rota (LGPD — CLAUDE.md §12).
  *
- * Cabeçalho e rodapé vivem nos layouts de route group:
+ * Cabeçalho e rodapé moveram-se para layouts de route group:
  * - `app/(home)/layout.tsx`: header + footer do protótipo (CSS literal).
- * - `app/(o-grupo)/layout.tsx`: reusa HeaderHome/FooterHome.
- * - `app/(vertical)/layout.tsx`: reusa HeaderHome/FooterHome.
+ * - `app/(site)/layout.tsx`: `<NavegacaoSoberana>` + `<RodapeSoberano>`
+ *   do @ntc/ui (rotas institucionais que ainda não foram portadas do
+ *   HTML).
  *
  * Skip-link permanece no root para acessibilidade global.
  */
