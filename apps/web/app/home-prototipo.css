@@ -47,7 +47,7 @@
 
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-sans:  'Barlow', system-ui, -apple-system, sans-serif;
-  --font-cond:  'Barlow Condensed', 'Barlow', sans-serif;
+  --font-cond:  var(--font-corpo-cond), 'Barlow Condensed', 'Barlow', sans-serif;
 
   --space-1: 8px;  --space-2: 16px; --space-3: 24px; --space-4: 32px;
   --space-5: 48px; --space-6: 64px; --space-7: 96px; --space-8: 128px;

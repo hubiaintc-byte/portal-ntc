@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { BannerCookies } from "@ntc/ui";
 import { POLITICA_VERSAO_ATUAL } from "@ntc/lib";
 
-import { barlow, cormorant } from "./fonts";
+import { barlow, barlowCondensed, cormorant } from "./fonts";
 import "./globals.css";
 // CSS da Home v3 Premium (portada literal do HTML do protótipo).
 // Importado aqui no root layout porque o Next 15 entrega CSS via
@@ -70,7 +70,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="pt-BR" className={`${cormorant.variable} ${barlow.variable}`}>
+    <html lang="pt-BR" className={`${cormorant.variable} ${barlow.variable} ${barlowCondensed.variable}`}>
       <body>
         <a href="#main" className="skip-link">
           Pular para o conteúdo principal

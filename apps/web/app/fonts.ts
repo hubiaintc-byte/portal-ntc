@@ -1,4 +1,4 @@
-import { Barlow, Cormorant_Garamond } from "next/font/google";
+import { Barlow, Barlow_Condensed, Cormorant_Garamond } from "next/font/google";
 
 /**
  * Fontes Soberana 2026 (CLAUDE.md §3, Inventário §2).
@@ -23,5 +23,20 @@ export const barlow = Barlow({
   style: ["normal"],
   display: "swap",
   variable: "--font-corpo",
+  preload: true,
+});
+
+/**
+ * Barlow Condensed — variante condensada para navs internas, eyebrows,
+ * tags e elementos UI compactos do protótipo (var --font-cond no CSS).
+ * Sem ela, o fallback Barlow regular fica mais largo e quebra a nav
+ * sticky das páginas de programa.
+ */
+export const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal"],
+  display: "swap",
+  variable: "--font-corpo-cond",
   preload: true,
 });

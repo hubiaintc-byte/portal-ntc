@@ -1472,10 +1472,9 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 @media (max-width: 1099px) { .prog-nav-inner { grid-template-columns: 1fr; } }
 .prog-nav-anchors {
   display: flex; gap: 0; align-items: stretch;
-  overflow-x: auto; scrollbar-width: thin;
+  overflow-x: auto; scrollbar-width: none;
 }
-.prog-nav-anchors::-webkit-scrollbar { height: 3px; }
-.prog-nav-anchors::-webkit-scrollbar-thumb { background: var(--dourado); }
+.prog-nav-anchors::-webkit-scrollbar { display: none; }
 .prog-nav-link {
   display: inline-flex; align-items: center; padding: 0 16px;
   font-family: var(--font-cond); font-weight: 500; font-size: 12.5px;
