@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
@@ -262,22 +263,22 @@ export function HeaderHome() {
                 <h4>Verticais</h4>
                 <ul className="mega-list">
                   <li>
-                    <a href="#programas">
+                    <Link href="/solucoes-estrategicas/educacao">
                       <strong>NTC Educação</strong>
                       <span>Soluções estruturadas para redes públicas de ensino</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/solucoes-estrategicas/gestao-publica">
                       <strong>NTC Gestão Pública</strong>
                       <span>Governança, integridade e performance na Administração</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#programas">
+                    <Link href="/solucoes-estrategicas/saude">
                       <strong>NTC Saúde</strong>
                       <span>Inteligência institucional aplicada ao SUS</span>
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -465,9 +466,18 @@ export function HeaderHome() {
             Soluções
           </button>
           <div className={`drawer-sub ${subDrawerAberto["solucoes-mobile"] ? "is-open" : ""}`}>
-            <a href="#programas"><strong>NTC Educação</strong><span>9 programas estratégicos</span></a>
-            <a href="#programas"><strong>NTC Gestão Pública</strong><span>3 programas estratégicos</span></a>
-            <a href="#programas"><strong>NTC Saúde</strong><span>3 programas estratégicos</span></a>
+            <Link href="/solucoes-estrategicas/educacao" onClick={() => setDrawerAberto(false)}>
+              <strong>NTC Educação</strong>
+              <span>9 programas estratégicos</span>
+            </Link>
+            <Link href="/solucoes-estrategicas/gestao-publica" onClick={() => setDrawerAberto(false)}>
+              <strong>NTC Gestão Pública</strong>
+              <span>3 programas estratégicos</span>
+            </Link>
+            <Link href="/solucoes-estrategicas/saude" onClick={() => setDrawerAberto(false)}>
+              <strong>NTC Saúde</strong>
+              <span>3 programas estratégicos</span>
+            </Link>
             <a href="#contratacao"><strong>Soluções in company</strong><span>Turmas fechadas e sob medida</span></a>
             <a href="#contratacao"><strong>Contratação institucional</strong><span>Atendimento a órgãos públicos</span></a>
           </div>
