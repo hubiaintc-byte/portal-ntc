@@ -454,12 +454,12 @@ export function HeaderHome() {
             Programas
           </button>
           <div className={`drawer-sub ${subDrawerAberto["programas-mobile"] ? "is-open" : ""}`}>
-            <a href="#programas"><strong>EDUTEC</strong><span>NTC Educação · Educação digital</span></a>
-            <a href="#programas"><strong>PEAR</strong><span>NTC Educação · Alfabetização</span></a>
-            <a href="#programas"><strong>PROGE</strong><span>NTC Educação · Gestão escolar</span></a>
-            <a href="#programas"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></a>
-            <a href="#programas"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></a>
-            <a href="#programas"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></a>
+            <Link href="/programas/edutec"><strong>EDUTEC</strong><span>NTC Educação · Educação digital</span></Link>
+            <Link href="/programas/pear"><strong>PEAR</strong><span>NTC Educação · Alfabetização</span></Link>
+            <Link href="/programas/proge"><strong>PROGE</strong><span>NTC Educação · Gestão escolar</span></Link>
+            <Link href="/programas/agip"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></Link>
+            <Link href="/programas/lidera"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></Link>
+            <Link href="/programas/prosus"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></Link>
             <a href="#programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></a>
           </div>
 
