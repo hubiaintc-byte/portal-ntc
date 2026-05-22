@@ -212,15 +212,21 @@ export interface ConteudoPrograma {
 }
 
 import { EDUTEC } from "./conteudoEDUTEC";
+import { EGIDE } from "./conteudoEGIDE";
 import { LIDERA } from "./conteudoLIDERA";
 import { PEAR } from "./conteudoPEAR";
 import { PEI } from "./conteudoPEI";
+import { PROGE } from "./conteudoPROGE";
+import { PROGIR } from "./conteudoPROGIR";
 
 export const PROGRAMAS: Record<string, ConteudoPrograma> = {
   [EDUTEC.slug]: EDUTEC,
+  [EGIDE.slug]: EGIDE,
   [LIDERA.slug]: LIDERA,
   [PEAR.slug]: PEAR,
   [PEI.slug]: PEI,
+  [PROGE.slug]: PROGE,
+  [PROGIR.slug]: PROGIR,
 };
 
 export const SLUGS_VALIDOS: string[] = Object.keys(PROGRAMAS);
