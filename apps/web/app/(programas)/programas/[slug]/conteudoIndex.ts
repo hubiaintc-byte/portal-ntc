@@ -38,6 +38,8 @@ export interface Modulo {
   titulo: string;
   descricao: string;
   cargaHoraria?: string;
+  statusRotulo?: string;
+  statusTipo?: "aberto" | "breve";
 }
 
 export interface FaqItem {
@@ -61,6 +63,106 @@ export interface BlocoEditorial {
   eyebrow: string;
   titulo: string;
   corpoHtml: string;
+}
+
+export interface DetalhamentoItem {
+  numero: string;
+  titulo: string;
+  cargaHoraria: string;
+  descricao: string;
+  topicos: string[];
+  ctaInscricao?: boolean;
+}
+
+export interface Detalhamento {
+  eyebrow: string;
+  titulo: string;
+  intro: string;
+  itens: DetalhamentoItem[];
+}
+
+export interface DiferencialItem {
+  titulo: string;
+  descricao: string;
+}
+
+export interface Diferenciais {
+  eyebrow: string;
+  titulo: string;
+  itens: DiferencialItem[];
+}
+
+export interface CoordenacaoDocente {
+  tag: string;
+  imgSrc: string;
+  imgAlt: string;
+  axisBadge: string;
+  nome: string;
+  credencial: string;
+  eixo: string;
+  modulos: string;
+}
+
+export interface EspecialistaDocente {
+  imgSrc: string;
+  imgAlt: string;
+  axisBadge: string;
+  nome: string;
+  credencial: string;
+  modulos: string;
+}
+
+export interface DocentesRich {
+  eyebrow: string;
+  titulo: string;
+  pill: string;
+  introHtml: string;
+  coordenacaoMarker: string;
+  coordenacao: CoordenacaoDocente[];
+  especialistasMarker: string;
+  especialistas: EspecialistaDocente[];
+  counters: { num: string; lbl: string }[];
+  nota: string;
+  ctaPrimario: string;
+  ctaSecundario: string;
+}
+
+export interface EventoMini {
+  bgImg: string;
+  dataLabel: { dias: string; mesAno: string };
+  eyebrow: string;
+  titulo: string;
+  metaHtml: string;
+  ctaRotulo: string;
+}
+
+export interface EventoFeature {
+  badge: string;
+  bgImg: string;
+  dataLabel: { dias: string; mesAno: string };
+  modalidade: string;
+  eyebrow: string;
+  titulo: string;
+  binding: string;
+  metas: string[];
+  ctaPrimario: string;
+  ctaSecundario: string;
+}
+
+export interface ModulosAbertosRich {
+  eyebrow: string;
+  titulo: string;
+  corpoHtml: string;
+  feature?: EventoFeature;
+  miniStack?: EventoMini[];
+  microcopy: string;
+  bottomCtas: { rotulo: string; href: string; primario: boolean }[];
+}
+
+export interface CtaFinal {
+  eyebrow: string;
+  tituloHtml: string;
+  corpo: string;
 }
 
 export interface ConteudoPrograma {
@@ -87,12 +189,15 @@ export interface ConteudoPrograma {
   objetivoGeral?: BlocoEditorial;
   publico: BlocoEditorial & { chips?: string[] };
   eixos: { eyebrow: string; titulo: string; itens: EixoTematico[] };
-  modulos: { eyebrow: string; titulo: string; itens: Modulo[] };
+  modulos: { eyebrow: string; titulo: string; intro?: string; itens: Modulo[] };
+  detalhamento?: Detalhamento;
   resultados: BlocoEditorial;
-  docentes: { eyebrow: string; titulo: string; descricaoHtml?: string };
+  diferenciais?: Diferenciais;
+  docentes: DocentesRich;
   modalidades: BlocoEditorial;
-  modulosAbertos: BlocoEditorial;
+  modulosAbertos: ModulosAbertosRich;
   faq: { eyebrow: string; titulo: string; itens: FaqItem[] };
+  ctaFinal?: CtaFinal;
   sidebar?: {
     titulo: string;
     rows: { rotulo: string; valor: string }[];
