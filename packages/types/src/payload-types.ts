@@ -212,33 +212,6 @@ export interface Area {
    */
   programasDestacados?: (number | Programa)[] | null;
   /**
-   * Campos do card grande de área na Home portada (.area-card).
-   */
-  cardHome?: {
-    /**
-     * Ex.: "01", "02", "03"
-     */
-    num?: string | null;
-    verticalCode?: ('edu' | 'gov' | 'sau') | null;
-    /**
-     * Ex.: "Educação"
-     */
-    tituloLinha1?: string | null;
-    /**
-     * Ex.: "com excelência."
-     */
-    tituloLinha2?: string | null;
-    tagline?: string | null;
-    /**
-     * Ex.: "9"
-     */
-    programasCount?: string | null;
-    linkProgramasRotulo?: string | null;
-    linkProgramasHref?: string | null;
-    linkEventosRotulo?: string | null;
-    linkEventosHref?: string | null;
-  };
-  /**
    * Campos opcionais — quando vazios, o sistema usa fallback editorial automaticamente.
    */
   seo?: {
@@ -395,41 +368,6 @@ export interface Programa {
     | null;
   programasRelacionados?: (number | Programa)[] | null;
   slug: string;
-  /**
-   * Campos exibidos no card 'Programas em evidência' da Home portada — vivem separados do conteúdo editorial completo do programa.
-   */
-  cardHome?: {
-    /**
-     * Ex.: "NTC Educação"
-     */
-    areaLabel?: string | null;
-    /**
-     * Ex.: "Alfabetização e Recomposição"
-     */
-    nameEvidencia?: string | null;
-    /**
-     * Frase de valor curta.
-     */
-    valueEvidencia?: string | null;
-    /**
-     * Ex.: "8 módulos"
-     */
-    modulosCount?: string | null;
-    /**
-     * Ex.: "64h"
-     */
-    cargaHorariaEvidencia?: string | null;
-    flagModuloAberto?: boolean | null;
-    /**
-     * Title HTML (tooltip).
-     */
-    tituloLong?: string | null;
-    linkAreaCor?: ('padrao' | 'crimson' | 'olive') | null;
-    ctaConhecer?: string | null;
-    ctaConhecerLink?: string | null;
-    ctaSecundario?: string | null;
-    ctaSecundarioLink?: string | null;
-  };
   /**
    * Campos opcionais — quando vazios, o sistema usa fallback editorial automaticamente.
    */
@@ -697,87 +635,6 @@ export interface Evento {
       }[]
     | null;
   slug: string;
-  /**
-   * Campos exibidos no card da Home — formato comercial, selo de status, datas montadas, modalidade, preços e flag de destaque. Vivem fora do conteúdo editorial completo do evento.
-   */
-  cardHome?: {
-    formato?:
-      | (
-          | 'Seminário'
-          | 'Simpósio'
-          | 'Oficina'
-          | 'Jornada'
-          | 'Congresso'
-          | 'Curso Executivo'
-          | 'Fórum'
-          | 'Encontro'
-          | 'Imersão'
-        )
-      | null;
-    /**
-     * Quando true, o card recebe a borda dourada e o selo 'Evento em destaque' (máx. 1 por vez).
-     */
-    destaque?: boolean | null;
-    selo?: ('inscricoes-abertas' | 'ultimas-vagas' | 'em-breve') | null;
-    /**
-     * Texto pré-formatado para o card (não é a data ISO do dataInicio/dataFim — esses ficam para a página interna).
-     */
-    datas?: {
-      variante?: ('single' | 'range' | 'multi') | null;
-      /**
-       * Ex.: "05" ou "22"
-       */
-      diasInicio?: string | null;
-      /**
-       * Ex.: "07" ou "23"
-       */
-      diasFim?: string | null;
-      /**
-       * Ex.: "Jun · 2026"
-       */
-      monYr?: string | null;
-      /**
-       * Ex.: "4 encontros"
-       */
-      encontros?: string | null;
-      /**
-       * Ex.: "Jun – Jul · 2026"
-       */
-      periodo?: string | null;
-    };
-    /**
-     * Ex.: "Presencial · Brasília", "Online ao vivo + replay", "Híbrido · SP".
-     */
-    modalidadeTexto?: string | null;
-    modalidadeCor?: ('padrao' | 'presencial' | 'hibrido') | null;
-    /**
-     * Ex.: "Seminário · NTC Saúde"
-     */
-    programLink?: string | null;
-    coordenacaoTexto?: string | null;
-    /**
-     * Ex.: "20h · 3 dias"
-     */
-    metaCargaHoraria?: string | null;
-    /**
-     * Ex.: "Brasília · DF"
-     */
-    metaLocal?: string | null;
-    /**
-     * Ex.: "PROSUS+"
-     */
-    programaBindingSigla?: string | null;
-    /**
-     * Ex.: "R$ 2.890"
-     */
-    precoIndividual?: string | null;
-    precoInstitucional?: string | null;
-    /**
-     * Card secundário · Ex.: "Online · 12h · 2 tardes R$ 1.290" (concatena tudo em uma linha).
-     */
-    esMetaCompacto?: string | null;
-    areaVert?: ('edu' | 'gov' | 'sau') | null;
-  };
   /**
    * Campos opcionais — quando vazios, o sistema usa fallback editorial automaticamente.
    */
@@ -1150,20 +1007,6 @@ export interface AreasSelect<T extends boolean = true> {
         id?: T;
       };
   programasDestacados?: T;
-  cardHome?:
-    | T
-    | {
-        num?: T;
-        verticalCode?: T;
-        tituloLinha1?: T;
-        tituloLinha2?: T;
-        tagline?: T;
-        programasCount?: T;
-        linkProgramasRotulo?: T;
-        linkProgramasHref?: T;
-        linkEventosRotulo?: T;
-        linkEventosHref?: T;
-      };
   seo?:
     | T
     | {
@@ -1236,22 +1079,6 @@ export interface ProgramasSelect<T extends boolean = true> {
       };
   programasRelacionados?: T;
   slug?: T;
-  cardHome?:
-    | T
-    | {
-        areaLabel?: T;
-        nameEvidencia?: T;
-        valueEvidencia?: T;
-        modulosCount?: T;
-        cargaHorariaEvidencia?: T;
-        flagModuloAberto?: T;
-        tituloLong?: T;
-        linkAreaCor?: T;
-        ctaConhecer?: T;
-        ctaConhecerLink?: T;
-        ctaSecundario?: T;
-        ctaSecundarioLink?: T;
-      };
   seo?:
     | T
     | {
@@ -1347,34 +1174,6 @@ export interface EventosSelect<T extends boolean = true> {
         id?: T;
       };
   slug?: T;
-  cardHome?:
-    | T
-    | {
-        formato?: T;
-        destaque?: T;
-        selo?: T;
-        datas?:
-          | T
-          | {
-              variante?: T;
-              diasInicio?: T;
-              diasFim?: T;
-              monYr?: T;
-              encontros?: T;
-              periodo?: T;
-            };
-        modalidadeTexto?: T;
-        modalidadeCor?: T;
-        programLink?: T;
-        coordenacaoTexto?: T;
-        metaCargaHoraria?: T;
-        metaLocal?: T;
-        programaBindingSigla?: T;
-        precoIndividual?: T;
-        precoInstitucional?: T;
-        esMetaCompacto?: T;
-        areaVert?: T;
-      };
   seo?:
     | T
     | {
@@ -1593,18 +1392,30 @@ export interface Home {
         }[]
       | null;
   };
+  /**
+   * Vitrine editorial da Home v3 Premium (até 6 slides com autoplay 7s e parallax). Quando há ao menos 1 slide preenchido, este slider substitui o hero único acima.
+   */
   heroSlider?: {
+    /**
+     * Intervalo de troca de slides em milissegundos. Padrão 7000 (7s). Mínimo 3000 por acessibilidade (WCAG 2.2.2).
+     */
     intervaloMs?: number | null;
+    /**
+     * Cada slide herda o vocabulário de doc 13 §2.1 — tipo, eyebrow, título (com sintaxe <accent>palavra</accent> para destaque dourado italic), subtítulo, pílula de evento opcional, CTAs (até 3).
+     */
     slides?:
       | {
           tipo: 'institucional' | 'evento' | 'programa' | 'solucao' | 'eventon';
           imagem: number | Media;
           eyebrow: string;
           /**
-           * Use <accent>palavra</accent> para destaque dourado italic.
+           * Use <accent>palavra</accent> para marcar a palavra ou expressão destacada em dourado italic. Ex.: 'Capacitações <accent>sob medida</accent> para a sua instituição.'
            */
           titulo: string;
           subtitulo: string;
+          /**
+           * Pílula de resumo de evento (data, local, modalidade). Preencha apenas em slides com tipo=evento.
+           */
           eventoPill?: {
             data?: string | null;
             local?: string | null;
@@ -1622,230 +1433,35 @@ export interface Home {
         }[]
       | null;
   };
-  statusBar?: {
-    livePillTexto?: string | null;
-    atualizadoEm?: string | null;
-  };
-  eventosSecao?: {
-    eyebrow?: string | null;
-    titulo?: string | null;
-    intro?: string | null;
-  };
-  /**
-   * Até 3 eventos para a grade principal (cards grandes).
-   */
-  eventosPrincipais?: (number | Evento)[] | null;
-  /**
-   * Até 3 eventos para a grade secundária (cards horizontais).
-   */
-  eventosSecundarios?: (number | Evento)[] | null;
-  agendaBand?: {
-    titulo?: string | null;
-    descricao?: string | null;
-    chips?:
-      | {
-          rotulo: string;
-          id?: string | null;
-        }[]
-      | null;
-    ctaRotulo?: string | null;
-    ctaLink?: string | null;
-  };
-  introCurta?: {
-    headline?: string | null;
-    corpo?: string | null;
-    highlights?:
-      | {
-          num: string;
-          numEhTexto?: boolean | null;
-          lbl: string;
-          id?: string | null;
-        }[]
-      | null;
-    linkRotulo?: string | null;
-    linkHref?: string | null;
-  };
-  programasSecao?: {
-    eyebrow?: string | null;
-    titulo?: string | null;
-    intro?: string | null;
-    introLinha?: string | null;
-    evidenciaTitulo?: string | null;
-    evidenciaSub?: string | null;
-  };
-  /**
-   * Até 6 programas exibidos na grade 'Programas em evidência'.
-   */
-  programasEmEvidencia?: (number | Programa)[] | null;
-  areasEmFoco?: (number | Area)[] | null;
-  curadoria?: {
-    eyebrow?: string | null;
-    headlineBold?: string | null;
-    subhead?: string | null;
-    contexto?: string | null;
-    ctaTexto?: string | null;
-    ctaLink?: string | null;
-    vitrines?:
-      | {
-          vertical: 'gov' | 'edu' | 'sau';
-          labelCuradoria: string;
-          labelDestaque: string;
-          nome: string;
-          credenciais?:
-            | {
-                texto: string;
-                id?: string | null;
-              }[]
-            | null;
-          cta?: string | null;
-          link?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    rodapeTexto?: string | null;
-    rodapeCta?: string | null;
-  };
-  solucoes?: {
-    eyebrow?: string | null;
-    titulo?: string | null;
-    corpo?: string | null;
-    lista?:
-      | {
-          texto: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  modalidades?: {
-    eyebrow?: string | null;
-    titulo?: string | null;
-    intro?: string | null;
-    online?: {
-      titulo?: string | null;
-      lista?:
-        | {
-            texto: string;
-            id?: string | null;
-          }[]
-        | null;
-      ctaRotulo?: string | null;
-      ctaLink?: string | null;
-    };
-    presencial?: {
-      titulo?: string | null;
-      lista?:
-        | {
-            texto: string;
-            id?: string | null;
-          }[]
-        | null;
-      ctaRotulo?: string | null;
-      ctaLink?: string | null;
-    };
-  };
-  eventOn?: {
-    eyebrow?: string | null;
-    titulo?: string | null;
-    descricao?: string | null;
-    ctas?:
-      | {
-          rotulo: string;
-          link: string;
-          variante?: ('gold' | 'ghost-light') | null;
-          id?: string | null;
-        }[]
-      | null;
-    operacoes?:
-      | {
-          num: string;
-          titulo: string;
-          descricao?: string | null;
-          linkRotulo?: string | null;
-          link?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  contratacao?: {
-    eyebrow?: string | null;
-    titulo?: string | null;
-    descricao?: string | null;
-    ctas?:
-      | {
-          rotulo: string;
-          link: string;
-          variante?: ('gold' | 'ghost-light') | null;
-          id?: string | null;
-        }[]
-      | null;
-    asideTitulo?: string | null;
-    modelos?:
-      | {
-          texto: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  diferenciaisSecao?: {
-    eyebrow?: string | null;
-    titulo?: string | null;
-  };
-  diferenciais?:
+  destaquesEditoriais?:
     | {
-        num: string;
         titulo: string;
-        descricao: string;
+        resumo: string;
+        imagem: number | Media;
+        link: string;
+        eyebrow?: string | null;
         id?: string | null;
       }[]
     | null;
+  areasEmFoco?: (number | Area)[] | null;
+  /**
+   * Eventos exibidos na seção de agenda da Home.
+   */
+  eventosAgendaDestaque?: (number | Evento)[] | null;
   numerosImpacto?:
     | {
         valor: string;
-        valorEhTexto?: boolean | null;
         rotulo: string;
         id?: string | null;
       }[]
     | null;
-  numerosDisclaimer?: string | null;
-  provaInstitucional?: {
-    eyebrow?: string | null;
-    headline?: string | null;
-    categorias?:
-      | {
-          texto: string;
-          id?: string | null;
-        }[]
-      | null;
-    nota?: string | null;
-  };
   clientesDestaque?: (number | Cliente)[] | null;
-  ctaFinal?: {
-    eyebrow?: string | null;
-    titulo?: string | null;
-    subtitulo?: string | null;
-    ctas?:
-      | {
-          rotulo: string;
-          link: string;
-          variante?: ('gold' | 'ghost-light') | null;
-          id?: string | null;
-        }[]
-      | null;
-    tagline?: string | null;
-  };
-  /**
-   * Campo legacy — preserva o CTA institucional original. Substituído pelo ctaFinal na Home v3 portada.
-   */
   ctaInstitucional?: {
     titulo?: string | null;
     descricao?: string | null;
     rotuloCta?: string | null;
     linkCta?: string | null;
   };
-  /**
-   * Campo legacy — usado pela Home antiga (compose com @ntc/ui). Substituído por eventosPrincipais + eventosSecundarios.
-   */
-  eventosAgendaDestaque?: (number | Evento)[] | null;
   _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -2043,238 +1659,26 @@ export interface HomeSelect<T extends boolean = true> {
               id?: T;
             };
       };
-  statusBar?:
+  destaquesEditoriais?:
     | T
     | {
-        livePillTexto?: T;
-        atualizadoEm?: T;
-      };
-  eventosSecao?:
-    | T
-    | {
+        titulo?: T;
+        resumo?: T;
+        imagem?: T;
+        link?: T;
         eyebrow?: T;
-        titulo?: T;
-        intro?: T;
-      };
-  eventosPrincipais?: T;
-  eventosSecundarios?: T;
-  agendaBand?:
-    | T
-    | {
-        titulo?: T;
-        descricao?: T;
-        chips?:
-          | T
-          | {
-              rotulo?: T;
-              id?: T;
-            };
-        ctaRotulo?: T;
-        ctaLink?: T;
-      };
-  introCurta?:
-    | T
-    | {
-        headline?: T;
-        corpo?: T;
-        highlights?:
-          | T
-          | {
-              num?: T;
-              numEhTexto?: T;
-              lbl?: T;
-              id?: T;
-            };
-        linkRotulo?: T;
-        linkHref?: T;
-      };
-  programasSecao?:
-    | T
-    | {
-        eyebrow?: T;
-        titulo?: T;
-        intro?: T;
-        introLinha?: T;
-        evidenciaTitulo?: T;
-        evidenciaSub?: T;
-      };
-  programasEmEvidencia?: T;
-  areasEmFoco?: T;
-  curadoria?:
-    | T
-    | {
-        eyebrow?: T;
-        headlineBold?: T;
-        subhead?: T;
-        contexto?: T;
-        ctaTexto?: T;
-        ctaLink?: T;
-        vitrines?:
-          | T
-          | {
-              vertical?: T;
-              labelCuradoria?: T;
-              labelDestaque?: T;
-              nome?: T;
-              credenciais?:
-                | T
-                | {
-                    texto?: T;
-                    id?: T;
-                  };
-              cta?: T;
-              link?: T;
-              id?: T;
-            };
-        rodapeTexto?: T;
-        rodapeCta?: T;
-      };
-  solucoes?:
-    | T
-    | {
-        eyebrow?: T;
-        titulo?: T;
-        corpo?: T;
-        lista?:
-          | T
-          | {
-              texto?: T;
-              id?: T;
-            };
-      };
-  modalidades?:
-    | T
-    | {
-        eyebrow?: T;
-        titulo?: T;
-        intro?: T;
-        online?:
-          | T
-          | {
-              titulo?: T;
-              lista?:
-                | T
-                | {
-                    texto?: T;
-                    id?: T;
-                  };
-              ctaRotulo?: T;
-              ctaLink?: T;
-            };
-        presencial?:
-          | T
-          | {
-              titulo?: T;
-              lista?:
-                | T
-                | {
-                    texto?: T;
-                    id?: T;
-                  };
-              ctaRotulo?: T;
-              ctaLink?: T;
-            };
-      };
-  eventOn?:
-    | T
-    | {
-        eyebrow?: T;
-        titulo?: T;
-        descricao?: T;
-        ctas?:
-          | T
-          | {
-              rotulo?: T;
-              link?: T;
-              variante?: T;
-              id?: T;
-            };
-        operacoes?:
-          | T
-          | {
-              num?: T;
-              titulo?: T;
-              descricao?: T;
-              linkRotulo?: T;
-              link?: T;
-              id?: T;
-            };
-      };
-  contratacao?:
-    | T
-    | {
-        eyebrow?: T;
-        titulo?: T;
-        descricao?: T;
-        ctas?:
-          | T
-          | {
-              rotulo?: T;
-              link?: T;
-              variante?: T;
-              id?: T;
-            };
-        asideTitulo?: T;
-        modelos?:
-          | T
-          | {
-              texto?: T;
-              id?: T;
-            };
-      };
-  diferenciaisSecao?:
-    | T
-    | {
-        eyebrow?: T;
-        titulo?: T;
-      };
-  diferenciais?:
-    | T
-    | {
-        num?: T;
-        titulo?: T;
-        descricao?: T;
         id?: T;
       };
+  areasEmFoco?: T;
+  eventosAgendaDestaque?: T;
   numerosImpacto?:
     | T
     | {
         valor?: T;
-        valorEhTexto?: T;
         rotulo?: T;
         id?: T;
       };
-  numerosDisclaimer?: T;
-  provaInstitucional?:
-    | T
-    | {
-        eyebrow?: T;
-        headline?: T;
-        categorias?:
-          | T
-          | {
-              texto?: T;
-              id?: T;
-            };
-        nota?: T;
-      };
   clientesDestaque?: T;
-  ctaFinal?:
-    | T
-    | {
-        eyebrow?: T;
-        titulo?: T;
-        subtitulo?: T;
-        ctas?:
-          | T
-          | {
-              rotulo?: T;
-              link?: T;
-              variante?: T;
-              id?: T;
-            };
-        tagline?: T;
-      };
   ctaInstitucional?:
     | T
     | {
@@ -2283,7 +1687,6 @@ export interface HomeSelect<T extends boolean = true> {
         rotuloCta?: T;
         linkCta?: T;
       };
-  eventosAgendaDestaque?: T;
   _status?: T;
   updatedAt?: T;
   createdAt?: T;

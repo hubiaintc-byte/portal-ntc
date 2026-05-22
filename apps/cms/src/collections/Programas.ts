@@ -178,38 +178,6 @@ export const Programas: CollectionConfig = {
       admin: { position: "sidebar" },
       hooks: { beforeChange: [autoSlug("nomeCompleto")] },
     },
-    {
-      name: "cardHome",
-      type: "group",
-      label: "Card 'Em evidência' (Home v3)",
-      admin: {
-        description:
-          "Campos exibidos no card 'Programas em evidência' da Home portada — vivem separados do conteúdo editorial completo do programa.",
-      },
-      fields: [
-        { name: "areaLabel", type: "text", admin: { description: 'Ex.: "NTC Educação"' } },
-        { name: "nameEvidencia", type: "text", admin: { description: 'Ex.: "Alfabetização e Recomposição"' } },
-        { name: "valueEvidencia", type: "textarea", admin: { description: "Frase de valor curta." } },
-        { name: "modulosCount", type: "text", admin: { description: 'Ex.: "8 módulos"' } },
-        { name: "cargaHorariaEvidencia", type: "text", admin: { description: 'Ex.: "64h"' } },
-        { name: "flagModuloAberto", type: "checkbox", defaultValue: false },
-        { name: "tituloLong", type: "text", admin: { description: "Title HTML (tooltip)." } },
-        {
-          name: "linkAreaCor",
-          type: "select",
-          options: [
-            { label: "Padrão (Oxford)", value: "padrao" },
-            { label: "Cardeal (Gov)", value: "crimson" },
-            { label: "Oliva (Saúde)", value: "olive" },
-          ],
-          defaultValue: "padrao",
-        },
-        { name: "ctaConhecer", type: "text", defaultValue: "Conhecer programa" },
-        { name: "ctaConhecerLink", type: "text" },
-        { name: "ctaSecundario", type: "text" },
-        { name: "ctaSecundarioLink", type: "text" },
-      ],
-    },
     ...seoFields,
   ],
 };
