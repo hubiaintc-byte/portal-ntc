@@ -211,10 +211,16 @@ export interface ConteudoPrograma {
   };
 }
 
+import { EDUTEC } from "./conteudoEDUTEC";
 import { LIDERA } from "./conteudoLIDERA";
+import { PEAR } from "./conteudoPEAR";
+import { PEI } from "./conteudoPEI";
 
 export const PROGRAMAS: Record<string, ConteudoPrograma> = {
+  [EDUTEC.slug]: EDUTEC,
   [LIDERA.slug]: LIDERA,
+  [PEAR.slug]: PEAR,
+  [PEI.slug]: PEI,
 };
 
 export const SLUGS_VALIDOS: string[] = Object.keys(PROGRAMAS);
