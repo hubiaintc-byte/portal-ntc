@@ -211,6 +211,7 @@ export interface ConteudoPrograma {
   };
 }
 
+import { AGIP } from "./conteudoAGIP";
 import { EDUTEC } from "./conteudoEDUTEC";
 import { EGIDE } from "./conteudoEGIDE";
 import { FUTURA } from "./conteudoFUTURA";
@@ -220,9 +221,11 @@ import { PEI } from "./conteudoPEI";
 import { PINEI } from "./conteudoPINEI";
 import { PROGE } from "./conteudoPROGE";
 import { PROGIR } from "./conteudoPROGIR";
+import { SIGA } from "./conteudoSIGA";
 import { VIVAESCOLA } from "./conteudoVIVAESCOLA";
 
 export const PROGRAMAS: Record<string, ConteudoPrograma> = {
+  [AGIP.slug]: AGIP,
   [EDUTEC.slug]: EDUTEC,
   [EGIDE.slug]: EGIDE,
   [FUTURA.slug]: FUTURA,
@@ -232,6 +235,7 @@ export const PROGRAMAS: Record<string, ConteudoPrograma> = {
   [PINEI.slug]: PINEI,
   [PROGE.slug]: PROGE,
   [PROGIR.slug]: PROGIR,
+  [SIGA.slug]: SIGA,
   [VIVAESCOLA.slug]: VIVAESCOLA,
 };
 
