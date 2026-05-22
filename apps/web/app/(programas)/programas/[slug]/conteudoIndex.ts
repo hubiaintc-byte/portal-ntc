@@ -213,20 +213,26 @@ export interface ConteudoPrograma {
 
 import { EDUTEC } from "./conteudoEDUTEC";
 import { EGIDE } from "./conteudoEGIDE";
+import { FUTURA } from "./conteudoFUTURA";
 import { LIDERA } from "./conteudoLIDERA";
 import { PEAR } from "./conteudoPEAR";
 import { PEI } from "./conteudoPEI";
+import { PINEI } from "./conteudoPINEI";
 import { PROGE } from "./conteudoPROGE";
 import { PROGIR } from "./conteudoPROGIR";
+import { VIVAESCOLA } from "./conteudoVIVAESCOLA";
 
 export const PROGRAMAS: Record<string, ConteudoPrograma> = {
   [EDUTEC.slug]: EDUTEC,
   [EGIDE.slug]: EGIDE,
+  [FUTURA.slug]: FUTURA,
   [LIDERA.slug]: LIDERA,
   [PEAR.slug]: PEAR,
   [PEI.slug]: PEI,
+  [PINEI.slug]: PINEI,
   [PROGE.slug]: PROGE,
   [PROGIR.slug]: PROGIR,
+  [VIVAESCOLA.slug]: VIVAESCOLA,
 };
 
 export const SLUGS_VALIDOS: string[] = Object.keys(PROGRAMAS);
