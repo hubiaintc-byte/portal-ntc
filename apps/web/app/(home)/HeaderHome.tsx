@@ -37,6 +37,30 @@ export function HeaderHome() {
     closeTimerRef.current = window.setTimeout(() => setMegaAberto(null), 180);
   }, []);
 
+  const fecharTudo = useCallback(() => {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setMegaAberto(null);
+    setDrawerAberto(false);
+  }, []);
+
+  /**
+   * Event delegation: qualquer clique em <a> (incluindo <Link> do
+   * Next, que renderiza um <a> internamente) dentro do header
+   * fecha o mega-menu e o drawer mobile. Garante que cliques em
+   * NTC Educação, AGIP, EventOn, etc. levem para a nova rota
+   * SEM deixar o overlay aberto.
+   */
+  const handleHeaderClick = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("a")) fecharTudo();
+    },
+    [fecharTudo],
+  );
+
   // ESC fecha tudo
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -76,16 +100,16 @@ export function HeaderHome() {
 
   return (
     <>
-      <header className="site-header" id="topo">
+      <header className="site-header" id="topo" onClick={handleHeaderClick}>
         <div className="container header-inner">
-          <a className="brand" href="#topo" aria-label="Grupo NTC — Página inicial">
+          <Link className="brand" href="/" aria-label="Grupo NTC — Página inicial">
             <img src="/logos/logo-light.svg" alt="Grupo NTC" />
-          </a>
+          </Link>
 
           <nav className="nav-primary" aria-label="Navegação principal">
-            <a className="nav-item" href="#sobre">
+            <Link className="nav-item" href="/o-grupo">
               Grupo NTC
-            </a>
+            </Link>
             <button
               type="button"
               className="nav-item has-mega"
