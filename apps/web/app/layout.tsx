@@ -79,6 +79,30 @@ export const metadata: Metadata = {
   },
   description: "Inteligência institucional. Impacto real.",
   metadataBase: new URL(process.env.PAYLOAD_PUBLIC_FRONT_URL || "http://localhost:3000"),
+  openGraph: {
+    type: "website",
+    siteName: "Grupo NTC",
+    locale: "pt_BR",
+    url: "/",
+    title: "Portal Grupo NTC · Inteligência institucional. Impacto real.",
+    description:
+      "O novo padrão da formação institucional para a Administração Pública brasileira.",
+    images: [
+      {
+        url: "/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Grupo NTC — Inteligência institucional. Impacto real.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Portal Grupo NTC",
+    description:
+      "Inteligência institucional. Impacto real. Grupo NTC — formação para a Administração Pública brasileira.",
+    images: ["/og-default.jpg"],
+  },
 };
 
 export const viewport: Viewport = {
