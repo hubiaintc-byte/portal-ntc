@@ -34,6 +34,14 @@ import "./verticais-prototipo.css";
 // de programa usam o MESMO CSS — variações cromáticas vêm de
 // .program-page[data-programa="LIDERA|EDUTEC|SIGS|..."].
 import "./programas-prototipo.css";
+// CSS da página de Corpo Docente (/o-grupo/corpo-docente).
+// Portado literal dos 2 blocos <style> de
+// 25_Pagina_Corpo_Docente_v1.html. Tokens base vêm de
+// home-prototipo.css; aqui só vão classes específicas
+// (.docentes-*, .arch-*, .expert-*, .efc-*, .eac-*, .ec-*,
+// .credibilidade-*, .ci-*, .cta-credenciamento-*, .sticky-cta-mobile,
+// .pg-*, .docentes-chip, .docentes-empty, .curadoria-pill).
+import "./corpo-docente-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
