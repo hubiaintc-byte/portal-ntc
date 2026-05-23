@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { CSSProperties, KeyboardEvent } from "react";
 
 import {
   AREA_LABELS,
@@ -273,36 +274,684 @@ function writeFiltersToURL(f: FiltersState): void {
 }
 
 /* ============================================================
-   Reservas para Task 10 (JSX) — evitam erros de noUnusedLocals
-   enquanto o componente ainda não renderiza nada de fato.
+   COMPONENT
    ============================================================ */
-void useCallback;
-void useEffect;
-void useMemo;
-void useState;
-void useCorpoDocenteCtx;
-void ATUACAO_OPTIONS;
-void CONTADORES;
-void FORMACAO_OPTIONS;
-void NOTAS;
-void PERPAGE_OPTIONS;
-void PROGRAMAS_OPTIONS;
-void SORT_OPTIONS;
-void toCardLike;
-void applyFilters;
-void sortCards;
-void paginate;
-void computeTabCounts;
-void compactRange;
-void buildChips;
-void readFiltersFromURL;
-void writeFiltersToURL;
+
+export function FilterBarDocentes({
+  featured,
+  experts,
+  axisSaude,
+}: FilterBarDocentesProps) {
+  const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
+  const [hydrated, setHydrated] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const ctx = useCorpoDocenteCtx();
+
+  const allCards: CardLike[] = useMemo(
+    () => [
+      ...experts.map((c) => toCardLike(c, "expert")),
+      ...axisSaude.map((c) => toCardLike(c, "axis")),
+    ],
+    [experts, axisSaude]
+  );
+
+  const filtered = useMemo(() => applyFilters(allCards, filters), [allCards, filters]);
+  const sorted = useMemo(() => sortCards(filtered, filters.sort), [filtered, filters.sort]);
+  const { visible, total, totalPages, currentPage } = useMemo(
+    () => paginate(sorted, filters.page, filters.perpage),
+    [sorted, filters.page, filters.perpage]
+  );
+  const tabCounts = useMemo(() => computeTabCounts(allCards, filters), [allCards, filters]);
+  const chips = useMemo(() => buildChips(filters), [filters]);
+
+  // Hidratação inicial via URL + popstate
+  useEffect(() => {
+    const initial = readFiltersFromURL();
+    setFilters(initial);
+    setSearchInput(initial.search);
+    if (
+      initial.programa ||
+      initial.formacao ||
+      initial.atuacao ||
+      initial.sort !== "editorial"
+    ) {
+      setAdvancedOpen(true);
+    }
+    setHydrated(true);
+
+    const onPop = () => {
+      const next = readFiltersFromURL();
+      setFilters(next);
+      setSearchInput(next.search);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  // URL-sync (depois da hidratação)
+  useEffect(() => {
+    if (!hydrated) return;
+    writeFiltersToURL(filters);
+  }, [filters, hydrated]);
+
+  // Hero quicklinks: observar tabRequest do context
+  useEffect(() => {
+    if (!ctx.tabRequest) return;
+    setFilters((prev) => ({ ...prev, tab: ctx.tabRequest!.id, page: 1 }));
+    const el = document.getElementById("especialistas");
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.pageYOffset - 148;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
+  }, [ctx.tabRequest]);
+
+  // Debounce da busca
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setFilters((prev) =>
+        prev.search === searchInput.trim()
+          ? prev
+          : { ...prev, search: searchInput.trim(), page: 1 }
+      );
+    }, 200);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  // Handlers
+  const setTab = useCallback((tab: TabId) => {
+    setFilters((prev) => ({ ...prev, tab, page: 1 }));
+  }, []);
+
+  const setField = useCallback(
+    <K extends keyof FiltersState>(key: K, value: FiltersState[K]) => {
+      setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
+    },
+    []
+  );
+
+  const removeChip = useCallback((chip: Chip) => {
+    if (chip.key === "tab") setFilters((p) => ({ ...p, tab: "todos", page: 1 }));
+    else if (chip.key === "search") {
+      setSearchInput("");
+      setFilters((p) => ({ ...p, search: "", page: 1 }));
+    } else {
+      setFilters((p) => ({ ...p, [chip.key]: "", page: 1 }));
+    }
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setSearchInput("");
+    setFilters({ ...DEFAULT_FILTERS });
+  }, []);
+
+  const goToPage = useCallback((page: number) => {
+    setFilters((prev) => ({ ...prev, page }));
+    requestAnimationFrame(() => {
+      const el = document.getElementById("especialistas");
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.pageYOffset - 148;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    });
+  }, []);
+
+  const onTabKeyDown = (e: KeyboardEvent<HTMLButtonElement>, currentTab: TabId) => {
+    const order = ["todos", "educacao", "gestao-publica", "contratacoes", "saude"] as const;
+    const idx = order.indexOf(currentTab);
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      setTab(order[(idx + 1) % order.length]!);
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      setTab(order[(idx - 1 + order.length) % order.length]!);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setTab(order[0]);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setTab(order[order.length - 1]!);
+    }
+  };
+
+  const activeFilterCount = chips.length;
+
+  return (
+    <>
+      {/* ===== FILTERBAR ===== */}
+      <div
+        className={`docentes-filterbar ${mobileOpen ? "is-open" : ""}`}
+        id="docentes-filterbar"
+        aria-label="Filtros do corpo docente"
+      >
+        <button
+          type="button"
+          className="docentes-mobile-filter-toggle"
+          id="btn-mobile-filter-toggle"
+          aria-expanded={mobileOpen}
+          aria-controls="docentes-filters-inner"
+          onClick={() => setMobileOpen((v) => !v)}
+        >
+          Filtros{" "}
+          {activeFilterCount > 0 ? (
+            <span id="mft-active-count">{activeFilterCount}</span>
+          ) : null}
+        </button>
+
+        <div className="container docentes-filterbar-inner" id="docentes-filters-inner">
+          <nav className="docentes-tabs-inner" role="tablist" aria-label="Área estratégica">
+            {(["todos", "educacao", "gestao-publica", "contratacoes", "saude"] as TabId[]).map(
+              (tab) => {
+                const isActive = filters.tab === tab;
+                const count = tabCounts[tab];
+                const disabled = count === 0 && !isActive;
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    className={`docentes-tab ${isActive ? "is-active" : ""}`}
+                    data-tab={tab}
+                    role="tab"
+                    aria-selected={isActive}
+                    disabled={disabled}
+                    onClick={() => setTab(tab)}
+                    onKeyDown={(e) => onTabKeyDown(e, tab)}
+                  >
+                    <span className="tab-row">
+                      {TAB_LABELS[tab]} <span className="tab-count">{count}</span>
+                    </span>
+                    {tab === "contratacoes" ? (
+                      <span className="tab-microcopy">
+                        Frente especializada da NTC Gestão Pública
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              }
+            )}
+          </nav>
+
+          <div className="docentes-filters-row is-primary">
+            <label className="docentes-search" aria-label="Buscar especialista">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M16 16l5 5" />
+              </svg>
+              <input
+                id="filter-search"
+                type="search"
+                placeholder="Buscar por eixo, programa, credencial ou área de atuação"
+                autoComplete="off"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+              {searchInput ? (
+                <button
+                  type="button"
+                  id="btn-clear-search"
+                  aria-label="Limpar busca"
+                  onClick={() => setSearchInput("")}
+                >
+                  ×
+                </button>
+              ) : null}
+            </label>
+
+            <label className="docentes-filter">
+              Área formativa
+              <select
+                id="filter-area"
+                aria-label="Filtrar por área formativa"
+                value={filters.area}
+                onChange={(e) => setField("area", e.target.value)}
+              >
+                <option value="">Todas as áreas</option>
+                {Object.entries(AREA_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="docentes-filter">
+              Vínculo
+              <select
+                id="filter-tipo"
+                aria-label="Filtrar por vínculo"
+                value={filters.tipo}
+                onChange={(e) => setField("tipo", e.target.value as Tipo | "")}
+              >
+                <option value="">Todos os vínculos</option>
+                {(Object.entries(TIPO_LABELS) as [Tipo, string][]).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <button
+              type="button"
+              className="docentes-advanced-toggle"
+              id="btn-toggle-advanced"
+              aria-expanded={advancedOpen}
+              aria-controls="filters-advanced"
+              onClick={() => setAdvancedOpen((v) => !v)}
+            >
+              {advancedOpen ? "Filtros avançados ▴" : "Filtros avançados ▾"}
+            </button>
+
+            <button
+              type="button"
+              id="btn-clear-filters"
+              className={`docentes-filter-clear ${activeFilterCount === 0 ? "is-hidden" : ""}`}
+              onClick={clearAll}
+            >
+              Limpar filtros ×
+            </button>
+          </div>
+
+          <div
+            className={`docentes-filters-row is-advanced ${advancedOpen ? "is-open" : ""}`}
+            id="filters-advanced"
+            aria-label="Filtros avançados"
+          >
+            <label className="docentes-filter">
+              Programa
+              <select
+                id="filter-programa"
+                aria-label="Filtrar por programa"
+                value={filters.programa}
+                onChange={(e) => setField("programa", e.target.value)}
+              >
+                <option value="">Todos os programas</option>
+                {PROGRAMAS_OPTIONS.map((p) => (
+                  <option key={p.value} value={p.value}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="docentes-filter">
+              Formação
+              <select
+                id="filter-formacao"
+                aria-label="Filtrar por formação"
+                value={filters.formacao}
+                onChange={(e) => setField("formacao", e.target.value)}
+              >
+                <option value="">Todas as formações</option>
+                {FORMACAO_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="docentes-filter">
+              Atuação
+              <select
+                id="filter-atuacao"
+                aria-label="Filtrar por atuação"
+                value={filters.atuacao}
+                onChange={(e) => setField("atuacao", e.target.value)}
+              >
+                <option value="">Todas as atuações</option>
+                {ATUACAO_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="docentes-filter">
+              Ordenar
+              <select
+                id="filter-sort"
+                aria-label="Ordenar resultados"
+                value={filters.sort}
+                onChange={(e) => setField("sort", e.target.value as SortMode)}
+              >
+                {SORT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="docentes-filter">
+              Por página
+              <select
+                id="filter-perpage"
+                aria-label="Itens por página"
+                value={filters.perpage}
+                onChange={(e) => setField("perpage", parseInt(e.target.value, 10) || 24)}
+              >
+                {PERPAGE_OPTIONS.map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="docentes-chips" id="docentes-chips" aria-live="polite" aria-label="Filtros ativos">
+            {chips.map((c, i) => (
+              <span key={`${c.key}-${i}`} className={`docentes-chip ${c.vertClass ?? ""}`}>
+                {c.label}
+                <button
+                  type="button"
+                  aria-label={`Remover filtro ${c.label}`}
+                  onClick={() => removeChip(c)}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ===== SEÇÃO ESPECIALISTAS ===== */}
+      <section className="section" id="especialistas" aria-label="Curadoria docente do Grupo NTC">
+        <div className="container">
+          <div
+            className="section-head fade-in"
+            style={{ textAlign: "left", maxWidth: "none", marginBottom: "var(--space-4)" }}
+          >
+            <span className="curadoria-pill">
+              Curadoria científica · Em estruturação contínua
+            </span>
+            <p className="eyebrow">Corpo docente do Grupo NTC</p>
+            <h2
+              style={{ textAlign: "left" }}
+              dangerouslySetInnerHTML={{
+                __html:
+                  "Especialistas que conectam <em>política pública, gestão institucional e prática de rede</em>",
+              }}
+            />
+          </div>
+
+          <div className="docentes-results-head">
+            <p className="docentes-results-counter" aria-live="polite">
+              Exibindo <strong id="docentes-counter-shown">{visible.length}</strong> de{" "}
+              <strong id="docentes-counter-total">{total}</strong> especialistas
+            </p>
+          </div>
+
+          {/* Destaques institucionais — fora da pipeline */}
+          <p className="experts-marker">Destaques institucionais da curadoria</p>
+          <div className="experts-featured fade-in">
+            {featured.map((f) => (
+              <article
+                key={f.cmsLink}
+                className="expert-featured-card"
+                data-vertical={f.vertical}
+                data-area={f.area}
+                data-tipo={f.tipo}
+                data-frente={f.frente}
+                data-programas={f.programas}
+                data-formacao={f.formacao}
+                data-atuacao={f.atuacao}
+                data-cms-link={f.cmsLink}
+                data-name={f.nome}
+              >
+                <div className="efc-portrait">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={f.imagemSrc} alt={f.imagemAlt} loading="lazy" />
+                  <span className="efc-axis-badge">{f.axisBadge}</span>
+                </div>
+                <div className="efc-info">
+                  <span className="efc-tag">{f.tag}</span>
+                  <h4>{f.nome}</h4>
+                  <p className="efc-credential">{f.credencial}</p>
+                  <div className="efc-meta">
+                    <span dangerouslySetInnerHTML={{ __html: f.metaAtuacao }} />
+                    <span dangerouslySetInnerHTML={{ __html: f.metaEixos }} />
+                  </div>
+                  <a className="efc-link" href={f.ctaHref}>
+                    {f.ctaRotulo} <span aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {/* Grade principal — experts + axis-saúde filtrados */}
+          <p className="experts-marker">Especialistas convidados · Por eixo formativo</p>
+          <div className="experts-authority-grid" id="docentes-grid">
+            {visible.map((card) =>
+              card.kind === "expert" ? (
+                <ExpertAuthorityCard key={card.cmsLink} c={card.original as CardExpert} />
+              ) : (
+                <AxisCard key={card.cmsLink} c={card.original as CardAxis} />
+              )
+            )}
+          </div>
+
+          {/* Empty state */}
+          <div
+            className={`docentes-empty ${total === 0 ? "is-visible" : ""}`}
+            id="docentes-empty"
+          >
+            <p>Nenhum especialista encontrado para os filtros selecionados.</p>
+            <button type="button" id="empty-clear" onClick={clearAll}>
+              Limpar filtros
+            </button>
+          </div>
+
+          {/* Paginação */}
+          {totalPages > 1 ? (
+            <div className="docentes-pagination" id="docentes-pagination">
+              <button
+                type="button"
+                disabled={currentPage === 1}
+                onClick={() => goToPage(currentPage - 1)}
+              >
+                ←
+              </button>
+              {compactRange(currentPage, totalPages).map((p, i) =>
+                p === "…" ? (
+                  <span key={`e-${i}`} className="pg-ellipsis">
+                    …
+                  </span>
+                ) : (
+                  <button
+                    key={p}
+                    type="button"
+                    className={p === currentPage ? "is-current" : ""}
+                    onClick={() => goToPage(p)}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+              <button
+                type="button"
+                disabled={currentPage === totalPages}
+                onClick={() => goToPage(currentPage + 1)}
+              >
+                →
+              </button>
+            </div>
+          ) : null}
+
+          {/* Contadores institucionais */}
+          <div
+            className="experts-counters fade-in"
+            aria-label="Indicadores institucionais da curadoria"
+          >
+            {CONTADORES.map((c) => (
+              <div key={c.label} className="experts-counter">
+                <span className="ec-num">
+                  {c.num}
+                  {c.sufixoOuro ? (
+                    <span
+                      style={{
+                        fontSize: 18,
+                        color: "var(--dourado)",
+                        marginLeft: 2,
+                      }}
+                    >
+                      {c.sufixoOuro}
+                    </span>
+                  ) : null}
+                </span>
+                <span className="ec-lbl">
+                  {c.label}
+                  {c.asterisco ? (
+                    <sup
+                      style={{
+                        fontSize: 11,
+                        color: "var(--dourado)",
+                        fontFamily: "var(--font-sans)",
+                      }}
+                    >
+                      *
+                    </sup>
+                  ) : null}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Nota 122+ */}
+          <p
+            style={{
+              fontFamily: "var(--font-cond)",
+              fontSize: 11.5,
+              letterSpacing: "1.3px",
+              textTransform: "uppercase",
+              color: "var(--dourado)",
+              margin: "var(--space-2) 0 0",
+            }}
+          >
+            <strong style={{ color: "var(--dourado)" }}>*</strong>{" "}
+            {NOTAS.indicador122.rotulo.replace(/^\*\s*/, "")}
+          </p>
+          <p
+            style={{
+              fontStyle: "italic",
+              fontFamily: "var(--font-serif)",
+              fontSize: 15,
+              color: "var(--grafite)",
+              margin: "6px 0 0",
+              maxWidth: 920,
+              lineHeight: 1.55,
+            }}
+            dangerouslySetInnerHTML={{ __html: NOTAS.indicador122.texto }}
+          />
+
+          {/* Nota seleção operacional */}
+          <p
+            style={{
+              textAlign: "left",
+              fontStyle: "italic",
+              fontFamily: "var(--font-serif)",
+              fontSize: 16,
+              color: "var(--grafite)",
+              margin: "var(--space-4) 0 0",
+              maxWidth: 920,
+            }}
+            dangerouslySetInnerHTML={{ __html: NOTAS.selecaoOperacional }}
+          />
+        </div>
+      </section>
+    </>
+  );
+}
 
 /* ============================================================
-   COMPONENT (JSX vem na Task 10)
+   SUBCOMPONENTES DE CARD
    ============================================================ */
 
-export function FilterBarDocentes(_props: FilterBarDocentesProps) {
-  void _props;
-  return null;
+function ExpertAuthorityCard({ c }: { c: CardExpert }) {
+  return (
+    <article
+      className="expert-authority-card"
+      data-vertical={c.vertical}
+      data-area={c.area}
+      data-tipo={c.tipo}
+      data-frente={c.frente}
+      data-programas={c.programas}
+      data-formacao={c.formacao}
+      data-atuacao={c.atuacao}
+      data-cms-link={c.cmsLink}
+      data-name={c.nome}
+    >
+      <div className="eac-portrait">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={c.imagemSrc} alt={c.imagemAlt} loading="lazy" />
+        <span className="eac-axis-badge">{c.axisBadge}</span>
+        <span className="eac-tipo-tag">{c.tipoTag}</span>
+      </div>
+      <div className="eac-info">
+        <h4>{c.nomeExibido}</h4>
+        <p className="eac-credential">{c.credencial}</p>
+        <p className="eac-programs">
+          {c.programasTexto}<strong>{c.programasStrong}</strong>
+          {c.sufixoPrograma ?? ""}
+        </p>
+        <a className="eac-link" href={c.ctaHref}>
+          {c.ctaRotulo} <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </article>
+  );
+}
+
+function AxisCard({ c }: { c: CardAxis }) {
+  return (
+    <article
+      className="expert-authority-card is-axis-card"
+      data-vertical={c.vertical}
+      data-area={c.area}
+      data-tipo={c.tipo}
+      data-frente={c.frente}
+      data-programas={c.programas}
+      data-cms-link={c.cmsLink}
+      data-name={c.nome}
+      style={
+        {
+          "--vertical-accent": c.styleAccent,
+          "--vertical-accent-dark": c.styleAccentDark,
+        } as CSSProperties
+      }
+    >
+      <div className="eac-portrait" style={{ aspectRatio: "4/5" }}>
+        <div className="eac-icon-wrap">
+          <svg
+            className="eac-icon"
+            viewBox="0 0 64 64"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            dangerouslySetInnerHTML={{ __html: c.iconeSvgInner }}
+          />
+        </div>
+        <span className="eac-axis-tag">{c.axisTag}</span>
+      </div>
+      <div className="eac-info">
+        <h4>{c.titulo}</h4>
+        <p className="eac-credential">{c.credencial}</p>
+        <p className="eac-programs">
+          {c.programasTexto}<strong>{c.programasStrong}</strong>
+        </p>
+        <a className="eac-link" href={c.ctaHref}>
+          {c.ctaRotulo} <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </article>
+  );
 }
