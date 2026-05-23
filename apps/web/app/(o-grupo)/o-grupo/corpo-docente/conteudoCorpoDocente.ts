@@ -19,6 +19,8 @@ export type Tipo =
   | "doutrinador"
   | "consultor"
   | "pesquisador";
+// "" = sem frente; preserva data-frente="" do HTML para a pipeline de filtro
+// (matchTab faz `card.frente === "contratacoes"`).
 export type Frente = "" | "contratacoes";
 export type TabId =
   | "todos"
@@ -36,7 +38,12 @@ export type Quicklink =
   | { tipo: "anchor"; rotulo: string; href: string }
   | { tipo: "tab"; rotulo: string; vertShortcut: TabId };
 
-export interface CardFeatured {
+/**
+ * Campos compartilhados pelas duas formas de card "humano"
+ * (featured + expert). Espelha os atributos data-* exigidos pela
+ * pipeline de filtros do FilterBarDocentes.
+ */
+export interface CardDataset {
   vertical: Vertical;
   area: string;
   tipo: Tipo;
@@ -49,6 +56,9 @@ export interface CardFeatured {
   imagemSrc: string;
   imagemAlt: string;
   axisBadge: string;
+}
+
+export interface CardFeatured extends CardDataset {
   tag: string;
   credencial: string;
   metaAtuacao: string;
@@ -57,19 +67,7 @@ export interface CardFeatured {
   ctaRotulo: string;
 }
 
-export interface CardExpert {
-  vertical: Vertical;
-  area: string;
-  tipo: Tipo;
-  frente: Frente;
-  programas: string;
-  formacao: string;
-  atuacao: string;
-  cmsLink: string;
-  nome: string;
-  imagemSrc: string;
-  imagemAlt: string;
-  axisBadge: string;
+export interface CardExpert extends CardDataset {
   tipoTag: string;
   nomeExibido: string;
   credencial: string;
