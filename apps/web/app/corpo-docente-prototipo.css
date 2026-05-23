@@ -333,7 +333,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   position: absolute; inset: 0; z-index: 0;
   background-image:
     linear-gradient(125deg, rgba(11, 23, 38, 0.96) 0%, rgba(17, 54, 94, 0.84) 55%, rgba(11, 23, 38, 0.72) 100%),
-    url('./img/fotos/_optimized/cta-institucional-premium.1920.webp');
+    url('/img/fotos/_optimized/cta-institucional-premium.1920.webp');
   background-size: cover;
   background-position: center 40%;
   filter: saturate(86%) contrast(1.05);
