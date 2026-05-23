@@ -89,7 +89,7 @@ Garante alinhamento perfeito com o CMS real. Quando `pnpm payload:generate` roda
 
 ### 3.2. RenderizadorLexical — escopo de nodes
 
-O `lexical-config.ts` em `apps/cms/src/shared/lexical-config.ts` define um conjunto restritivo de features. Por estarem ativadas: parágrafo, headings (H2/H3/H4), link, list (ordered/unordered), bold, italic. Vamos cobrir esses nodes explicitamente. Para nodes não suportados, logar `console.warn` em dev e fazer skip (não derrubar a página).
+O `lexical-config.ts` em `apps/cms/src/shared/lexical-config.ts` define um conjunto restritivo de features ativas: `Paragraph`, `Heading h2/h3/h4`, `Bold`, `Italic`, `Underline`, `Link`, `OrderedList`, `UnorderedList`. Vamos cobrir esses nodes explicitamente. Para nodes não suportados, logar `console.warn` em dev e fazer skip (não derrubar a página).
 
 Mapeamento canônico:
 
@@ -103,7 +103,6 @@ Mapeamento canônico:
 | `list ul` | `<ul className="ml-6 list-disc font-corpo text-corpo">` |
 | `list ol` | `<ol className="ml-6 list-decimal font-corpo text-corpo">` |
 | `listitem` | `<li>` |
-| `quote` | `<blockquote className="border-l-2 border-dourado pl-6 font-titulo italic text-grafite">` |
 | `link` | `<LinkEditorial href={node.fields.url} externo={node.fields.newTab}>` |
 | `text` com format bitmask | `<strong>` (1), `<em>` (2), `<u>` (8). Sem mistura visual além disso. |
 | `linebreak` | `<br />` |
