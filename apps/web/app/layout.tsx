@@ -42,6 +42,13 @@ import "./programas-prototipo.css";
 // .credibilidade-*, .ci-*, .cta-credenciamento-*, .sticky-cta-mobile,
 // .pg-*, .docentes-chip, .docentes-empty, .curadoria-pill).
 import "./corpo-docente-prototipo.css";
+// CSS das 5 páginas institucionais (/politica-de-privacidade,
+// /termos-de-uso, /politica-de-cookies, /lgpd, /mapa-do-site).
+// Portado literal de 30_Pagina_Privacidade_v1.html (linhas 51-345).
+// Os 5 HTMLs institucionais compartilham o MESMO <style> — diff
+// byte-a-byte confirmou. Tokens base e regras de header/footer/btn
+// já vêm de home-prototipo.css.
+import "./institucional-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
