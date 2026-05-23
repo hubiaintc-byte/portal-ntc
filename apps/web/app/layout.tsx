@@ -90,8 +90,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-default.jpg",
-        width: 1200,
-        height: 630,
+        width: 1242,
+        height: 907,
         alt: "Grupo NTC — Inteligência institucional. Impacto real.",
       },
     ],
