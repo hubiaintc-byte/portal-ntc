@@ -88,7 +88,14 @@ export interface CardAxis {
   atuacao: string;
   cmsLink: string;
   nome: string;
-  iconePath: string;
+  /**
+   * innerHTML completo do <svg class="eac-icon"> do card.
+   * Pode conter <path>, <circle>, <rect>, <line>, <polygon>, etc.
+   * O renderer usa dangerouslySetInnerHTML no <svg> para suportar
+   * qualquer combinação de primitivas SVG (Frente 02 tem <circle>,
+   * Frente 03 tem <rect>, demais usam só <path>).
+   */
+  iconeSvgInner: string;
   axisTag: string;
   titulo: string;
   credencial: string;
@@ -1581,8 +1588,8 @@ export const CARDS_AXIS_SAUDE: CardAxis[] = [
     atuacao: "",
     cmsLink: "frente-01-governanca-sus",
     nome: "Frente 01 · Gestão do SUS e governança",
-    iconePath:
-      "M32 8L8 20v18c0 14 11 22 24 26 13-4 24-12 24-26V20L32 8z M32 24v18M24 32l8 8 8-8",
+    iconeSvgInner: `<path d="M32 8L8 20v18c0 14 11 22 24 26 13-4 24-12 24-26V20L32 8z"/>
+              <path d="M32 24v18M24 32l8 8 8-8"/>`,
     axisTag: "Frente 01 · Saúde",
     titulo: "Gestão do SUS e governança",
     credencial:
@@ -1605,8 +1612,8 @@ export const CARDS_AXIS_SAUDE: CardAxis[] = [
     atuacao: "",
     cmsLink: "frente-02-aps",
     nome: "Frente 02 · Atenção primária e redes de cuidado",
-    iconePath:
-      "M32 18v14l10 6M18 22l-4-4M46 22l4-4M14 50l4-4M50 46l-4-4",
+    iconeSvgInner: `<circle cx="32" cy="32" r="20"/>
+              <path d="M32 18v14l10 6M18 22l-4-4M46 22l4-4M14 50l4-4M50 46l-4-4"/>`,
     axisTag: "Frente 02 · Saúde",
     titulo: "Atenção primária e redes de cuidado",
     credencial:
@@ -1629,8 +1636,8 @@ export const CARDS_AXIS_SAUDE: CardAxis[] = [
     atuacao: "",
     cmsLink: "frente-03-saude-digital",
     nome: "Frente 03 · Saúde digital, dados e IA",
-    iconePath:
-      "M22 50h20M28 44v6M36 44v6M18 24h10M18 32h6M30 28h18",
+    iconeSvgInner: `<rect x="10" y="14" width="44" height="30" rx="3"/>
+              <path d="M22 50h20M28 44v6M36 44v6M18 24h10M18 32h6M30 28h18"/>`,
     axisTag: "Frente 03 · Saúde",
     titulo: "Saúde digital, dados e IA",
     credencial:
@@ -1653,7 +1660,7 @@ export const CARDS_AXIS_SAUDE: CardAxis[] = [
     atuacao: "",
     cmsLink: "frente-04-planejamento-financiamento",
     nome: "Frente 04 · Planejamento, financiamento e performance",
-    iconePath: "M8 50h48M14 42v8M24 32v18M34 24v26M44 36v14M54 14v36",
+    iconeSvgInner: `<path d="M8 50h48M14 42v8M24 32v18M34 24v26M44 36v14M54 14v36"/>`,
     axisTag: "Frente 04 · Saúde",
     titulo: "Planejamento, financiamento e performance",
     credencial:
@@ -1676,8 +1683,8 @@ export const CARDS_AXIS_SAUDE: CardAxis[] = [
     atuacao: "",
     cmsLink: "frente-05-regulacao-compliance",
     nome: "Frente 05 · Regulação, controle, compliance e qualidade",
-    iconePath:
-      "M32 8L10 18v16c0 14 10 22 22 24 12-2 22-10 22-24V18L32 8z M24 32l6 6 12-12",
+    iconeSvgInner: `<path d="M32 8L10 18v16c0 14 10 22 22 24 12-2 22-10 22-24V18L32 8z"/>
+              <path d="M24 32l6 6 12-12"/>`,
     axisTag: "Frente 05 · Saúde",
     titulo: "Regulação, controle, compliance e qualidade",
     credencial:
