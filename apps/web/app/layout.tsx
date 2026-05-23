@@ -49,6 +49,14 @@ import "./corpo-docente-prototipo.css";
 // byte-a-byte confirmou. Tokens base e regras de header/footer/btn
 // já vêm de home-prototipo.css.
 import "./institucional-prototipo.css";
+// CSS da página /contato (portada literal de 12_Pagina_Contato_v1.html,
+// linhas 141-1078). Classes específicas: .hero-page, .router,
+// .router-tab, .form-panel, .form-shell, .form-aside, .form-grid,
+// .form-field, .form-bulk, .file-field, .channels, .channel-card,
+// .hq-card, .vert-card, .sla-bar, .sla-cell, .faq, .faq-item,
+// .lgpd, .lgpd-cell, .cta-final, .cta-final-inner. Tokens base e
+// regras de header/footer/btn já vêm de home-prototipo.css.
+import "./contato-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
