@@ -323,13 +323,13 @@ export const AREA_LABELS: Record<string, string> = {
   "controle-externo-tcu": "Controle externo e TCU",
   "obras-publicas": "Obras públicas",
   "concessoes-ppps": "Concessões, PPPs e infraestrutura",
-  "compliance-contratacoes": "Compliance e integridade nas contratações",
+  "compliance-contratacoes": "Compliance nas contratações",
   // Saúde · 5 frentes
   "governanca-sus": "Frente 01 · Gestão do SUS e governança",
-  "aps": "Frente 02 · Atenção primária e redes de cuidado",
+  "aps": "Frente 02 · Atenção primária e redes",
   "saude-digital": "Frente 03 · Saúde digital, dados e IA",
-  "planejamento-financiamento-saude": "Frente 04 · Planejamento, financiamento e performance",
-  "regulacao-compliance-saude": "Frente 05 · Regulação, controle, compliance e qualidade",
+  "planejamento-financiamento-saude": "Frente 04 · Planejamento e financiamento",
+  "regulacao-compliance-saude": "Frente 05 · Regulação e compliance",
 };
 
 export const TIPO_LABELS: Record<Tipo, string> = {
@@ -340,28 +340,33 @@ export const TIPO_LABELS: Record<Tipo, string> = {
   "pesquisador": "Pesquisador / coordenação científica",
 };
 
-// Extraído do <select id="filter-programa">. Ordem preservada conforme HTML:
+// Extraído do <select id="filter-programa">. Ordem e optgroups preservados
+// conforme HTML linhas 1883-1903:
 // NTC Educação (9): EDUTEC, PEAR, PEI, PROGE, PROGIR, EGIDE, VIVAESCOLA, PINEI, FUTURA
 // NTC Gestão Pública (3): AGIP, LIDERA, SIGA
-// NTC Saúde (3): SIGS, PROAPS, PROSUS
-// Total: 15 programas (PROAPS/PROSUS aparecem com "+" no label do HTML mas
-// como value puro "PROAPS"/"PROSUS").
-export const PROGRAMAS_OPTIONS: string[] = [
-  "EDUTEC",
-  "PEAR",
-  "PEI",
-  "PROGE",
-  "PROGIR",
-  "EGIDE",
-  "VIVAESCOLA",
-  "PINEI",
-  "FUTURA",
-  "AGIP",
-  "LIDERA",
-  "SIGA",
-  "SIGS",
-  "PROAPS",
-  "PROSUS",
+// NTC Saúde (3): SIGS, PROAPS+, PROSUS+ (value puro, label com sufixo "+")
+export interface ProgramaOption {
+  value: string;
+  label: string;
+  group?: string;
+}
+
+export const PROGRAMAS_OPTIONS: ProgramaOption[] = [
+  { value: "EDUTEC", label: "EDUTEC", group: "NTC Educação" },
+  { value: "PEAR", label: "PEAR", group: "NTC Educação" },
+  { value: "PEI", label: "PEI", group: "NTC Educação" },
+  { value: "PROGE", label: "PROGE", group: "NTC Educação" },
+  { value: "PROGIR", label: "PROGIR", group: "NTC Educação" },
+  { value: "EGIDE", label: "EGIDE", group: "NTC Educação" },
+  { value: "VIVAESCOLA", label: "VIVAESCOLA", group: "NTC Educação" },
+  { value: "PINEI", label: "PINEI", group: "NTC Educação" },
+  { value: "FUTURA", label: "FUTURA", group: "NTC Educação" },
+  { value: "AGIP", label: "AGIP", group: "NTC Gestão Pública" },
+  { value: "LIDERA", label: "LIDERA", group: "NTC Gestão Pública" },
+  { value: "SIGA", label: "SIGA", group: "NTC Gestão Pública" },
+  { value: "SIGS", label: "SIGS", group: "NTC Saúde" },
+  { value: "PROAPS", label: "PROAPS+", group: "NTC Saúde" },
+  { value: "PROSUS", label: "PROSUS+", group: "NTC Saúde" },
 ];
 
 export const FORMACAO_OPTIONS: SelectOption[] = [
@@ -382,14 +387,14 @@ export const ATUACAO_OPTIONS: SelectOption[] = [
 ];
 
 export const SORT_OPTIONS: SelectOption[] = [
-  { value: "editorial", label: "Ordem editorial" },
-  { value: "alfa", label: "A → Z" },
-  { value: "alfa-desc", label: "Z → A" },
+  { value: "editorial", label: "Editorial (curadoria primeiro)" },
+  { value: "alfa", label: "Alfabética (A–Z)" },
+  { value: "alfa-desc", label: "Alfabética (Z–A)" },
   { value: "programa", label: "Por programa" },
   { value: "area", label: "Por área formativa" },
 ];
 
-export const PERPAGE_OPTIONS: number[] = [12, 24, 48, 96];
+export const PERPAGE_OPTIONS: number[] = [12, 24, 48];
 
 /* ============================================================
    CARDS — Task 5 preenche os 3 arrays abaixo
