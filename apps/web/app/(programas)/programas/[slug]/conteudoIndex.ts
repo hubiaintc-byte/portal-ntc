@@ -219,9 +219,12 @@ import { LIDERA } from "./conteudoLIDERA";
 import { PEAR } from "./conteudoPEAR";
 import { PEI } from "./conteudoPEI";
 import { PINEI } from "./conteudoPINEI";
+import { PROAPS } from "./conteudoPROAPS";
 import { PROGE } from "./conteudoPROGE";
 import { PROGIR } from "./conteudoPROGIR";
+import { PROSUS } from "./conteudoPROSUS";
 import { SIGA } from "./conteudoSIGA";
+import { SIGS } from "./conteudoSIGS";
 import { VIVAESCOLA } from "./conteudoVIVAESCOLA";
 
 export const PROGRAMAS: Record<string, ConteudoPrograma> = {
@@ -233,9 +236,12 @@ export const PROGRAMAS: Record<string, ConteudoPrograma> = {
   [PEAR.slug]: PEAR,
   [PEI.slug]: PEI,
   [PINEI.slug]: PINEI,
+  [PROAPS.slug]: PROAPS,
   [PROGE.slug]: PROGE,
   [PROGIR.slug]: PROGIR,
+  [PROSUS.slug]: PROSUS,
   [SIGA.slug]: SIGA,
+  [SIGS.slug]: SIGS,
   [VIVAESCOLA.slug]: VIVAESCOLA,
 };
 
