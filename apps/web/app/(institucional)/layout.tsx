@@ -5,20 +5,24 @@ import { FooterHome } from "../(home)/FooterHome";
 import { InteracoesScroll } from "../(home)/InteracoesScroll";
 
 /**
- * Layout das 5 páginas institucionais:
+ * Layout das páginas institucionais:
  *   /politica-de-privacidade
  *   /termos-de-uso
  *   /politica-de-cookies
  *   /lgpd
  *   /mapa-do-site
+ *   /contato
  *
- * Portadas literalmente dos protótipos 30, 31, 32, 33 e 34. Os 5
- * compartilham o mesmo header, o mesmo footer e o mesmo bloco <style>
- * inline — todos consolidados em apps/web/app/institucional-prototipo.css
- * (importado no root layout) e nos componentes `HeaderHome`/`FooterHome`
- * do route group (home). `InteracoesScroll` revela os elementos com
- * classe `.fade-in` (hero-page-content, legal-cta-final-inner) que de
- * outra forma ficariam invisíveis pelo CSS `opacity: 0` inicial.
+ * Portadas literalmente dos protótipos 30, 31, 32, 33, 34 e 12. As 5
+ * primeiras compartilham o mesmo bloco <style> (em
+ * apps/web/app/institucional-prototipo.css); /contato tem seu próprio
+ * CSS portado (apps/web/app/contato-prototipo.css). Todas usam o
+ * mesmo header e footer (HeaderHome/FooterHome do route group (home)).
+ *
+ * `<InteracoesScroll />` é obrigatório: os CSSs portados definem
+ * `.fade-in { opacity: 0 }` e dependem da classe `.is-visible`
+ * adicionada via JS para revelar os elementos. Sem ele, blocos como
+ * hero-page-content e cta-final-inner ficam invisíveis.
  */
 export default function LayoutInstitucional({ children }: { children: ReactNode }) {
   return (
