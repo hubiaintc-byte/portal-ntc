@@ -120,21 +120,21 @@ export default function MapaDoSitePage() {
                     <span className="sitemap-col-num">NTC Educação</span>
                     <h3>Educação <small>Excelência e formação com resultado</small></h3>
                     <ul>
-                      <li><Link href="/solucoes-estrategicas/ntc-educacao"><strong>NTC Educação</strong><span>Vertical completa · 9 programas</span></Link></li>
+                      <li><Link href="/solucoes-estrategicas/educacao"><strong>NTC Educação</strong><span>Vertical completa · 9 programas</span></Link></li>
                     </ul>
                   </div>
                   <div className="sitemap-col">
                     <span className="sitemap-col-num">NTC Gestão Pública</span>
                     <h3>Gestão Pública <small>Governança com transformação</small></h3>
                     <ul>
-                      <li><Link href="/solucoes-estrategicas/ntc-gestao-publica"><strong>NTC Gestão Pública</strong><span>Vertical completa · 3 programas</span></Link></li>
+                      <li><Link href="/solucoes-estrategicas/gestao-publica"><strong>NTC Gestão Pública</strong><span>Vertical completa · 3 programas</span></Link></li>
                     </ul>
                   </div>
                   <div className="sitemap-col">
                     <span className="sitemap-col-num">NTC Saúde</span>
                     <h3>Saúde <small>Gestão com competência</small></h3>
                     <ul>
-                      <li><Link href="/solucoes-estrategicas/ntc-saude"><strong>NTC Saúde</strong><span>Vertical completa · 3 programas</span></Link></li>
+                      <li><Link href="/solucoes-estrategicas/saude"><strong>NTC Saúde</strong><span>Vertical completa · 3 programas</span></Link></li>
                     </ul>
                   </div>
                 </div>
