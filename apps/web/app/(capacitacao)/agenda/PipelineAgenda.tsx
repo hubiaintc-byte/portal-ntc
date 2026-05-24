@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -248,6 +249,53 @@ export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
   useEffect(() => {
     setHidratado(true);
   }, []);
+
+  // Relógio para recálculo do selo de deadline. Atualiza a cada 30s e
+  // após o mount (evita mismatch SSR/CSR: durante SSR usamos new Date()
+  // de referência, mas o card só ganha selo dinâmico após a hidratação).
+  const [now, setNow] = useState<Date>(() => new Date());
+  useEffect(() => {
+    setNow(new Date());
+    const id = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  // Pipeline (espelha apply() do protótipo).
+  const { visiveis, total, totalPages, pageEfetiva, destaques } = useMemo(() => {
+    let pool = filterByTab(eventos, state.tab);
+    pool = filterByControls(pool, state);
+    pool = filterBySearch(pool, state.busca);
+    pool = sortCards(pool, state.sort);
+    const pag = paginate(pool, state.page, state.perPage);
+    const semFiltros =
+      !state.area &&
+      !state.programa &&
+      !state.formato &&
+      !state.modalidade &&
+      !state.cidade &&
+      !state.mes &&
+      !state.busca;
+    const dest =
+      state.tab === "abertas" && semFiltros
+        ? eventos
+            .filter((e) => e.tab === "abertas" && e.flags.includes("destaque_editorial"))
+            .slice(0, 3)
+        : [];
+    return {
+      visiveis: pag.visiveis,
+      total: pag.total,
+      totalPages: pag.totalPages,
+      pageEfetiva: pag.pageEfetiva,
+      destaques: dest,
+    };
+  }, [eventos, state]);
+
+  // Sincroniza page efetiva (paginate pode reduzir page se for inválida).
+  useEffect(() => {
+    if (state.page !== pageEfetiva) {
+      setState((s) => ({ ...s, page: pageEfetiva }));
+    }
+  }, [pageEfetiva, state.page]);
 
   return (
     <>
@@ -504,46 +552,404 @@ export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
         </div>
       </div>
 
-      {/* Placeholder · grid + paginação entram no Task 11 */}
       <section className="section" id="agenda-eventos" aria-label="Resultados da agenda">
         <div className="container">
-          <p
-            style={{
-              padding: "var(--space-4)",
-              textAlign: "center",
-              color: "var(--oxford)",
-            }}
-          >
-            Carregando agenda…
-          </p>
+          {/* DESTAQUES */}
+          {destaques.length > 0 && (
+            <div className="agenda-destaques" id="agenda-destaques">
+              <header className="agenda-destaques-head">
+                <div>
+                  <p className="destaques-eyebrow">Curadoria editorial</p>
+                  <h2>
+                    Destaques da <em>agenda</em>
+                  </h2>
+                </div>
+              </header>
+              <div className="agenda-destaques-grid" id="agenda-destaques-grid">
+                {destaques.map((e) => (
+                  <CardEvento key={`dest-${e.ordem}`} evento={e} now={now} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <header className="agenda-todos-head">
+            <div>
+              <p className="todos-eyebrow">Todos os eventos abertos</p>
+              <h2>
+                Agenda <em>completa</em>
+              </h2>
+            </div>
+          </header>
+
+          {/* CONTROL ROW */}
+          <div className="agenda-controlrow">
+            <p className="agenda-counter" aria-live="polite" id="counter-text">
+              {renderCounterText(total, pageEfetiva, state.perPage, visiveis.length)}
+            </p>
+            <div className="agenda-controls-right">
+              <span className="agenda-perpage">
+                Mostrar
+                <span
+                  className="agenda-perpage-buttons"
+                  role="group"
+                  aria-label="Eventos por página"
+                >
+                  {PERPAGE_OPCOES.map((pp) => (
+                    <button
+                      key={pp}
+                      type="button"
+                      data-perpage={pp}
+                      className={state.perPage === pp ? "is-active" : undefined}
+                      onClick={() => {
+                        setState((s) => ({ ...s, perPage: pp, page: 1 }));
+                        track("perpage_change", { value: pp });
+                      }}
+                    >
+                      {pp}
+                    </button>
+                  ))}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          {/* APPLIED CHIPS */}
+          <div className="agenda-applied" id="applied-filters" aria-live="polite">
+            {chipsAplicados(state).map((chip) => (
+              <span key={chip.key} className="chip-applied">
+                {chip.label}{" "}
+                <button
+                  type="button"
+                  aria-label={`Remover filtro ${chip.label}`}
+                  data-clear-key={chip.key}
+                  onClick={() => removerFiltro(chip.key)}
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+
+          {/* GRID + EMPTY */}
+          <div className="agenda-grid" id="agenda-grid">
+            {visiveis.map((e) => (
+              <CardEvento key={e.ordem} evento={e} now={now} />
+            ))}
+            {total === 0 && (
+              <div className="agenda-empty" id="agenda-empty">
+                <span className="empty-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M16 16l5 5" />
+                    <path d="M8 11h6" />
+                  </svg>
+                </span>
+                <h3>{EMPTY_AGENDA.titulo}</h3>
+                <p>{EMPTY_AGENDA.descricao}</p>
+                <div className="empty-actions">
+                  <a
+                    className="btn btn--primary"
+                    href={EMPTY_AGENDA.ctaLimpar.href}
+                    id="btn-empty-clear"
+                    onClick={(ev) => {
+                      ev.preventDefault();
+                      clearAll();
+                    }}
+                  >
+                    {EMPTY_AGENDA.ctaLimpar.texto}
+                  </a>
+                  <a
+                    className="btn btn--ghost"
+                    href={EMPTY_AGENDA.ctaSobMedida.href}
+                    data-cms-link={EMPTY_AGENDA.ctaSobMedida.cmsLink}
+                    data-track={EMPTY_AGENDA.ctaSobMedida.track}
+                  >
+                    {EMPTY_AGENDA.ctaSobMedida.texto}
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* PAGINAÇÃO */}
+          {totalPages > 1 && (
+            <nav
+              className="agenda-pagination"
+              id="agenda-pagination"
+              aria-label="Paginação dos resultados"
+            >
+              <button
+                type="button"
+                className="page-nav prev"
+                disabled={pageEfetiva === 1}
+                onClick={() => {
+                  setState((s) => ({ ...s, page: Math.max(1, s.page - 1) }));
+                  track("pagination_change", { label: "Anterior" });
+                }}
+              >
+                Anterior
+              </button>
+              {compactRange(pageEfetiva, totalPages).map((p, idx) => {
+                if (p === "…") {
+                  return (
+                    <span key={`gap-${idx}`} className="page-ellipsis">
+                      …
+                    </span>
+                  );
+                }
+                const ativa = p === pageEfetiva;
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    className={ativa ? "is-current" : undefined}
+                    onClick={() => {
+                      setState((s) => ({ ...s, page: p }));
+                      track("pagination_change", { label: String(p) });
+                    }}
+                  >
+                    {p}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                className="page-nav next"
+                disabled={pageEfetiva === totalPages}
+                onClick={() => {
+                  setState((s) => ({ ...s, page: Math.min(totalPages, s.page + 1) }));
+                  track("pagination_change", { label: "Próxima" });
+                }}
+              >
+                Próxima
+              </button>
+            </nav>
+          )}
         </div>
       </section>
 
-      {/* Reservas: hooks/símbolos consumidos no Task 11 */}
       {hidratado ? null : null}
-      <RemoverFiltroReserva removerFiltro={removerFiltro} eventos={eventos} />
     </>
   );
 }
 
-// Stub para manter `removerFiltro`, `eventos` e helpers/imports consumidos
-// até o Task 11 plumbar grid + applied chips + paginação. Renderiza nada.
-interface RemoverFiltroReservaProps {
-  removerFiltro: (key: keyof EstadoAgenda) => void;
-  eventos: CartaoEvento[];
+// ----------------- helpers de render -----------------
+
+function renderCounterText(
+  total: number,
+  page: number,
+  perPage: number,
+  visiveisLen: number,
+): React.ReactNode {
+  if (total === 0) {
+    return "Nenhum evento encontrado com os filtros aplicados";
+  }
+  if (total <= perPage) {
+    return (
+      <>
+        <strong>{total}</strong> {total === 1 ? "evento encontrado" : "eventos encontrados"}
+      </>
+    );
+  }
+  const start = (page - 1) * perPage + 1;
+  const end = start + visiveisLen - 1;
+  return (
+    <>
+      Mostrando <strong>{start}–{end}</strong> de <strong>{total}</strong> eventos encontrados
+    </>
+  );
 }
-function RemoverFiltroReserva({ removerFiltro, eventos }: RemoverFiltroReservaProps) {
-  void removerFiltro;
-  void eventos;
-  void EMPTY_AGENDA;
-  void LABELS;
-  void PERPAGE_OPCOES;
-  void filterByTab;
-  void filterByControls;
-  void filterBySearch;
-  void sortCards;
-  void paginate;
-  void compactRange;
-  void computeDeadline;
-  return null;
+
+type ChipKey =
+  | "area"
+  | "programa"
+  | "formato"
+  | "modalidade"
+  | "cidade"
+  | "mes"
+  | "busca";
+
+function chipsAplicados(state: EstadoAgenda): { key: ChipKey; label: string }[] {
+  const items: { key: ChipKey; label: string }[] = [];
+  if (state.area) items.push({ key: "area", label: LABELS.area[state.area] });
+  if (state.programa) items.push({ key: "programa", label: state.programa });
+  if (state.formato) items.push({ key: "formato", label: LABELS.formato[state.formato] });
+  if (state.modalidade) {
+    items.push({ key: "modalidade", label: LABELS.modalidade[state.modalidade] });
+  }
+  if (state.cidade) items.push({ key: "cidade", label: LABELS.cidade[state.cidade] });
+  if (state.mes) {
+    const mesLabel = LABELS.mes[state.mes];
+    if (mesLabel) items.push({ key: "mes", label: mesLabel });
+  }
+  if (state.busca) items.push({ key: "busca", label: `"${state.busca}"` });
+  return items;
+}
+
+// ----------------- CardEvento -----------------
+
+interface CardEventoProps {
+  evento: CartaoEvento;
+  now: Date;
+}
+
+function CardEvento({ evento: e, now }: CardEventoProps) {
+  const deadline = computeDeadline(e.deadlineIso, now);
+  const seal =
+    deadline && !deadline.expired && deadline.diffDays <= 7
+      ? deadline.diffDays <= 2
+        ? {
+            texto: "Inscrições encerrando",
+            classe: "is-critical",
+            aria: "Inscrições encerrando em até 48 horas",
+          }
+        : {
+            texto: `Encerram em ${deadline.diffDays} dias`,
+            classe: "",
+            aria: `Inscrições encerram em ${deadline.diffDays} dias`,
+          }
+      : null;
+
+  return (
+    <article
+      className={`event-card${e.eventoEmDestaque ? " is-featured" : ""}`}
+      data-area={e.area}
+      data-programa={e.programa}
+      data-formato={e.formato}
+      data-modalidade={e.modalidade}
+      data-cidade={e.cidade}
+      data-mes={e.mes}
+      data-ch={e.cargaHorariaHoras}
+      data-valor={e.valorReais}
+      data-dateiso={e.dataIso}
+      data-deadline-iso={e.deadlineIso}
+      data-tab={e.tab}
+      data-flags={e.flags.join(",")}
+      data-keywords={e.keywords}
+      data-status={e.status}
+    >
+      {e.eventoEmDestaque && e.badgeDestaqueTexto && (
+        <span className="event-featured-badge">{e.badgeDestaqueTexto}</span>
+      )}
+      <span className={`event-status-tag ${e.selo.classe}`}>{e.selo.texto}</span>
+      <div className="event-cover">
+        <div
+          className="event-cover-img"
+          style={{ backgroundImage: `url('${e.imagemUrl}')` }}
+          aria-hidden="true"
+        />
+        <div className="event-cover-overlay" />
+        <div className="event-cover-meta">
+          <DataBlocoView bloco={e.dataBloco} />
+          <span
+            className={`event-modality${
+              e.modalidadeClasseExtra ? ` ${e.modalidadeClasseExtra}` : ""
+            }`}
+          >
+            {e.modalidadeLabel}
+          </span>
+        </div>
+        {seal && (
+          <span
+            className={`event-deadline-seal ${seal.classe}`.trim()}
+            aria-label={seal.aria}
+          >
+            {seal.texto}
+          </span>
+        )}
+      </div>
+      <div className="event-body">
+        <p className="event-program-link">
+          {e.formatoLabel} <span className="dot">·</span> {e.areaLabel}
+        </p>
+        <h3 dangerouslySetInnerHTML={{ __html: e.tituloHtml }} />
+        <div className="event-speakers-line">
+          <span className="label">Coordenação científica</span>
+          <span className="names">{e.coordenacaoNomes}</span>
+        </div>
+        <div className="event-meta-essentials">
+          <span>{e.metaEssenciais[0]}</span>
+          <span>{e.metaEssenciais[1]}</span>
+        </div>
+        <div className="event-program-binding">
+          <span className="epb-label">Integra o programa</span>
+          <span className="epb-program">
+            <a href={e.programaBinding.href} data-cms-link={e.programaBinding.cmsLink}>
+              {e.programaBinding.sigla}
+            </a>
+          </span>
+        </div>
+        <div className="event-pricing">
+          <span className="event-price">
+            Inscrição individual<strong>{e.precoIndividualLabel}</strong>
+          </span>
+          <span className="event-price institutional">
+            Equipes / órgãos<strong>{e.precoEquipesLabel}</strong>
+          </span>
+        </div>
+      </div>
+      <div className="event-actions">
+        <a
+          className="btn btn--gold"
+          href={e.ctaInscrever.href}
+          title={e.ctaInscrever.title}
+          data-cms-link={e.ctaInscrever.cmsLink}
+          data-track={e.ctaInscrever.track}
+        >
+          {e.ctaInscrever.texto} <span className="btn-arrow">→</span>
+        </a>
+        <div className="event-actions-row">
+          <a
+            className="link-arrow"
+            href={e.linkDetalhes.href}
+            title={e.linkDetalhes.title}
+            data-cms-link={e.linkDetalhes.cmsLink}
+            data-track={e.linkDetalhes.track}
+          >
+            {e.linkDetalhes.texto}
+          </a>
+          <a
+            className="link-arrow"
+            href={e.linkInscreverEquipe.href}
+            data-cms-link={e.linkInscreverEquipe.cmsLink}
+            data-track={e.linkInscreverEquipe.track}
+          >
+            {e.linkInscreverEquipe.texto}
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function DataBlocoView({ bloco }: { bloco: CartaoEvento["dataBloco"] }) {
+  if (bloco.tipo === "range") {
+    return (
+      <div className="event-date-block range">
+        <span className="days">
+          {bloco.diaInicio}
+          <span className="dash">–</span>
+          {bloco.diaFim}
+        </span>
+        <span className="mon-yr">{bloco.mesAno}</span>
+      </div>
+    );
+  }
+  if (bloco.tipo === "multi") {
+    return (
+      <div className="event-date-block multi">
+        <span className="count">
+          <span className="number">{bloco.quantidade}</span> {bloco.rotulo}
+        </span>
+        <span className="period">{bloco.periodo}</span>
+      </div>
+    );
+  }
+  return (
+    <div className="event-date-block single">
+      <span className="day">{bloco.dia}</span>
+      <span className="mon-yr">{bloco.mesAno}</span>
+    </div>
+  );
 }
