@@ -57,6 +57,13 @@ import "./institucional-prototipo.css";
 // .lgpd, .lgpd-cell, .cta-final, .cta-final-inner. Tokens base e
 // regras de header/footer/btn já vêm de home-prototipo.css.
 import "./contato-prototipo.css";
+// CSS da página /agenda (portada literal de 09_Pagina_Agenda_v2.html).
+// Tokens base e regras de header/footer/btn vêm de home-prototipo.css;
+// aqui só vão classes específicas da página (.agenda-hero, .agenda-tabs,
+// .agenda-filterbar, .agenda-grid, .event-card, .agenda-destaques,
+// .agenda-empty, .agenda-pagination, .agenda-intercta, .agenda-context,
+// .agenda-sticky-mobile-cta, .event-deadline-seal).
+import "./agenda-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
