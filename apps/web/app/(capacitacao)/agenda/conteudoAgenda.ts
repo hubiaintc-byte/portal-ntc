@@ -43,7 +43,9 @@ export type FlagEvento =
   | "destaque_editorial"
   | "prioridade_comercial"
   | "ultimas_vagas"
-  | "fixado_na_agenda";
+  | "fixado_na_agenda"
+  | "evento_em_destaque"
+  | "inscricoes_encerrando";
 
 export type CidadeSlug = "" | "brasilia" | "sp" | "recife" | "salvador" | "fortaleza";
 
@@ -84,6 +86,10 @@ export interface CartaoEvento {
   flags: FlagEvento[];
   keywords: string;
   status: StatusEvento;
+
+  // Featured (espelha class="event-card is-featured" + <span class="event-featured-badge">)
+  eventoEmDestaque?: boolean;
+  badgeDestaqueTexto?: string;
 
   // Conteúdo visual
   selo: { texto: string; classe: string }; // ex.: "Inscrições abertas" / "status-open"
@@ -424,4 +430,332 @@ export const BREADCRUMB_AGENDA = [
   { texto: "Grupo NTC", href: "/", cmsLink: "home" },
   { texto: "Capacitação", href: null }, // sem rota ainda
   { texto: "Agenda Geral", href: null, current: true },
+];
+
+// ----------------- 18 EVENTOS (ordem literal do protótipo) -----------------
+//
+// Mapeamento fiel de cada <article class="event-card"> do <main> do HTML
+// (linhas 2475-2998 de 09_Pagina_Agenda_v2.html). Nenhum texto é rephrased.
+// Todos os data-* são preservados nos campos do CartaoEvento.
+
+export const EVENTOS: CartaoEvento[] = [
+  // EV 01 · PEAR · Online · Seminário · NTC Educação
+  {
+    ordem: 1,
+    area: "edu",
+    programa: "PEAR",
+    formato: "seminario",
+    modalidade: "online",
+    cidade: "",
+    mes: "2026-05",
+    cargaHorariaHoras: 16,
+    valorReais: 1490,
+    dataIso: "2026-05-22",
+    deadlineIso: "2026-05-13",
+    tab: "abertas",
+    flags: ["destaque_editorial", "prioridade_comercial"],
+    keywords: "alfabetizacao recomposicao aprendizagem currículo formacao docente",
+    status: "abertas",
+    selo: { texto: "Inscrições abertas", classe: "status-open" },
+    imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
+    dataBloco: { tipo: "range", diaInicio: "22", diaFim: "23", mesAno: "Mai · 2026" },
+    modalidadeLabel: "Online ao vivo + replay",
+    formatoLabel: "Seminário",
+    areaLabel: "NTC Educação",
+    tituloHtml: "Alfabetização de Alta Performance: estratégias para recomposição da aprendizagem",
+    coordenacaoNomes:
+      "NTC Educação · Especialistas em alfabetização, currículo e formação docente · com convidados",
+    metaEssenciais: ["16h · 2 dias", "Plataforma EventOn"],
+    precoIndividualLabel: "R$ 1.490",
+    precoEquipesLabel: "Sob consulta",
+    programaBinding: { sigla: "PEAR", href: "/programas/pear", cmsLink: "programa-PEAR" },
+    ctaInscrever: {
+      texto: "Inscrever-se",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "inscricao-PEAR-2026-mai",
+      track: "cta_inscrever",
+    },
+    linkDetalhes: {
+      texto: "Ver detalhes",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "detalhes-PEAR-2026-mai",
+      track: "event_card_detail",
+    },
+    linkInscreverEquipe: {
+      texto: "Inscrever equipe",
+      href: "/contato",
+      cmsLink: "proposta-grupo-PEAR",
+      track: "cta_proposta_grupo",
+    },
+  },
+
+  // EV 02 · EDUTEC · Híbrido · Oficina · NTC Educação
+  {
+    ordem: 2,
+    area: "edu",
+    programa: "EDUTEC",
+    formato: "oficina",
+    modalidade: "hibrido",
+    cidade: "sp",
+    mes: "2026-06",
+    cargaHorariaHoras: 12,
+    valorReais: 980,
+    dataIso: "2026-06-12",
+    deadlineIso: "2026-06-05",
+    tab: "abertas",
+    flags: [],
+    keywords: "ia generativa tecnologia educacional pedagogia",
+    status: "abertas",
+    selo: { texto: "Inscrições abertas", classe: "status-open" },
+    imagemUrl: "/img/fotos/_optimized/educacao-inclusiva.1920.webp",
+    dataBloco: { tipo: "multi", quantidade: 3, rotulo: "encontros", periodo: "Jun · 2026" },
+    modalidadeLabel: "Híbrido · SP",
+    modalidadeClasseExtra: "hibrido",
+    formatoLabel: "Oficina",
+    areaLabel: "NTC Educação",
+    tituloHtml: "EDUTEC · IA generativa aplicada à gestão pedagógica e à formação docente",
+    coordenacaoNomes:
+      "NTC Educação · Especialistas em tecnologias educacionais e formação · com convidados",
+    metaEssenciais: ["12h · 3 encontros", "São Paulo · SP"],
+    precoIndividualLabel: "R$ 980",
+    precoEquipesLabel: "Sob consulta",
+    programaBinding: { sigla: "EDUTEC", href: "/programas/edutec", cmsLink: "programa-EDUTEC" },
+    ctaInscrever: {
+      texto: "Inscrever-se",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "inscricao-EDUTEC-2026-jun",
+      track: "cta_inscrever",
+    },
+    linkDetalhes: {
+      texto: "Ver detalhes",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "detalhes-EDUTEC-2026-jun",
+      track: "event_card_detail",
+    },
+    linkInscreverEquipe: {
+      texto: "Inscrever equipe",
+      href: "/contato",
+      cmsLink: "proposta-grupo-EDUTEC",
+      track: "cta_proposta_grupo",
+    },
+  },
+
+  // EV 03 · PROGE · Presencial · Curso Executivo · NTC Educação (últimas vagas)
+  {
+    ordem: 3,
+    area: "edu",
+    programa: "PROGE",
+    formato: "curso",
+    modalidade: "presencial",
+    cidade: "brasilia",
+    mes: "2026-06",
+    cargaHorariaHoras: 24,
+    valorReais: 3290,
+    dataIso: "2026-06-05",
+    deadlineIso: "2026-05-15",
+    tab: "abertas",
+    flags: ["ultimas_vagas"],
+    keywords: "gestao escolar coordenacao pedagogica resultados",
+    status: "abertas",
+    selo: { texto: "Últimas vagas", classe: "status-last" },
+    imagemUrl: "/img/fotos/_optimized/area-educacao.1920.webp",
+    dataBloco: { tipo: "range", diaInicio: "05", diaFim: "07", mesAno: "Jun · 2026" },
+    modalidadeLabel: "Presencial · Brasília",
+    modalidadeClasseExtra: "presencial",
+    formatoLabel: "Curso Executivo",
+    areaLabel: "NTC Educação",
+    tituloHtml: "PROGE · Gestão escolar, coordenação pedagógica e resultados de aprendizagem",
+    coordenacaoNomes:
+      "NTC Educação · Especialistas em gestão escolar, currículo e avaliação · com convidados",
+    metaEssenciais: ["24h · 3 dias", "Brasília · DF"],
+    precoIndividualLabel: "R$ 3.290",
+    precoEquipesLabel: "Sob consulta",
+    programaBinding: { sigla: "PROGE", href: "/programas/proge", cmsLink: "programa-PROGE" },
+    ctaInscrever: {
+      texto: "Inscrever-se",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "inscricao-PROGE-2026-jun",
+      track: "cta_inscrever",
+    },
+    linkDetalhes: {
+      texto: "Ver detalhes",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "detalhes-PROGE-2026-jun",
+      track: "event_card_detail",
+    },
+    linkInscreverEquipe: {
+      texto: "Proposta para grupo",
+      href: "/contato",
+      cmsLink: "proposta-grupo-PROGE",
+      track: "cta_proposta_grupo",
+    },
+  },
+
+  // EV 04 · VIVAESCOLA · Online · Jornada · NTC Educação
+  {
+    ordem: 4,
+    area: "edu",
+    programa: "VIVAESCOLA",
+    formato: "jornada",
+    modalidade: "online",
+    cidade: "",
+    mes: "2026-06",
+    cargaHorariaHoras: 32,
+    valorReais: 2490,
+    dataIso: "2026-06-18",
+    deadlineIso: "2026-06-10",
+    tab: "abertas",
+    flags: [],
+    keywords: "convivencia escolar bem-estar protecao integral",
+    status: "abertas",
+    selo: { texto: "Inscrições abertas", classe: "status-open" },
+    imagemUrl: "/img/fotos/_optimized/conteudo-01.1920.webp",
+    dataBloco: { tipo: "multi", quantidade: 4, rotulo: "encontros", periodo: "Jun – Jul · 2026" },
+    modalidadeLabel: "Online ao vivo + replay",
+    formatoLabel: "Jornada",
+    areaLabel: "NTC Educação",
+    tituloHtml: "VIVAESCOLA · Convivência, permanência, bem-estar e proteção integral",
+    coordenacaoNomes:
+      "NTC Educação · Especialistas em convivência escolar, bem-estar e proteção · com convidados",
+    metaEssenciais: ["32h · 4 encontros", "Plataforma EventOn"],
+    precoIndividualLabel: "R$ 2.490",
+    precoEquipesLabel: "Sob consulta",
+    programaBinding: {
+      sigla: "VIVAESCOLA",
+      href: "/programas/vivaescola",
+      cmsLink: "programa-VIVAESCOLA",
+    },
+    ctaInscrever: {
+      texto: "Inscrever-se",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "inscricao-VIVAESCOLA-2026-jun",
+      track: "cta_inscrever",
+    },
+    linkDetalhes: {
+      texto: "Ver detalhes",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "detalhes-VIVAESCOLA-2026-jun",
+      track: "event_card_detail",
+    },
+    linkInscreverEquipe: {
+      texto: "Inscrever equipe",
+      href: "/contato",
+      cmsLink: "proposta-grupo-VIVAESCOLA",
+      track: "cta_proposta_grupo",
+    },
+  },
+
+  // EV 05 · PEI · Presencial · Simpósio · NTC Educação
+  {
+    ordem: 5,
+    area: "edu",
+    programa: "PEI",
+    formato: "simposio",
+    modalidade: "presencial",
+    cidade: "salvador",
+    mes: "2026-06",
+    cargaHorariaHoras: 12,
+    valorReais: 1690,
+    dataIso: "2026-06-26",
+    deadlineIso: "2026-06-19",
+    tab: "abertas",
+    flags: [],
+    keywords: "educacao integral curriculo gestao redes",
+    status: "abertas",
+    selo: { texto: "Inscrições abertas", classe: "status-open" },
+    imagemUrl: "/img/fotos/_optimized/conteudo-02.1920.webp",
+    dataBloco: { tipo: "range", diaInicio: "26", diaFim: "27", mesAno: "Jun · 2026" },
+    modalidadeLabel: "Presencial · Salvador",
+    modalidadeClasseExtra: "presencial",
+    formatoLabel: "Simpósio",
+    areaLabel: "NTC Educação",
+    tituloHtml: "PEI · Educação Integral — gestão, currículo e resultados em escala",
+    coordenacaoNomes:
+      "NTC Educação · Especialistas em educação integral, currículo e gestão de redes · com convidados",
+    metaEssenciais: ["12h · 2 tardes", "Salvador · BA"],
+    precoIndividualLabel: "R$ 1.690",
+    precoEquipesLabel: "Sob consulta",
+    programaBinding: { sigla: "PEI", href: "/programas/pei", cmsLink: "programa-PEI" },
+    ctaInscrever: {
+      texto: "Inscrever-se",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "inscricao-PEI-2026-jun",
+      track: "cta_inscrever",
+    },
+    linkDetalhes: {
+      texto: "Ver detalhes",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "detalhes-PEI-2026-jun",
+      track: "event_card_detail",
+    },
+    linkInscreverEquipe: {
+      texto: "Inscrever equipe",
+      href: "/contato",
+      cmsLink: "proposta-grupo-PEI",
+      track: "cta_proposta_grupo",
+    },
+  },
+
+  // EV 06 · PINEI · Híbrido · Congresso · NTC Educação
+  {
+    ordem: 6,
+    area: "edu",
+    programa: "PINEI",
+    formato: "congresso",
+    modalidade: "hibrido",
+    cidade: "brasilia",
+    mes: "2026-07",
+    cargaHorariaHoras: 40,
+    valorReais: 3890,
+    dataIso: "2026-07-12",
+    deadlineIso: "2026-07-04",
+    tab: "abertas",
+    flags: [],
+    keywords: "primeira infancia educacao infantil 0-6 politicas",
+    status: "abertas",
+    selo: { texto: "Inscrições abertas", classe: "status-open" },
+    imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
+    dataBloco: { tipo: "range", diaInicio: "12", diaFim: "16", mesAno: "Jul · 2026" },
+    modalidadeLabel: "Híbrido · Brasília",
+    modalidadeClasseExtra: "hibrido",
+    formatoLabel: "Congresso",
+    areaLabel: "NTC Educação",
+    tituloHtml: "PINEI · I Congresso Nacional da Primeira Infância e Educação Infantil",
+    coordenacaoNomes:
+      "NTC Educação · Especialistas em primeira infância, educação infantil e políticas para zero a seis anos · com convidados",
+    metaEssenciais: ["40h · 5 dias", "Brasília · DF"],
+    precoIndividualLabel: "R$ 3.890",
+    precoEquipesLabel: "Sob consulta",
+    programaBinding: { sigla: "PINEI", href: "/programas/pinei", cmsLink: "programa-PINEI" },
+    ctaInscrever: {
+      texto: "Inscrever-se",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "inscricao-PINEI-2026-jul",
+      track: "cta_inscrever",
+    },
+    linkDetalhes: {
+      texto: "Ver detalhes",
+      href: "#agenda-eventos",
+      title: "Página interna em construção · disponível com a publicação do CMS",
+      cmsLink: "detalhes-PINEI-2026-jul",
+      track: "event_card_detail",
+    },
+    linkInscreverEquipe: {
+      texto: "Proposta para grupo",
+      href: "/contato",
+      cmsLink: "proposta-grupo-PINEI",
+      track: "cta_proposta_grupo",
+    },
+  },
 ];
