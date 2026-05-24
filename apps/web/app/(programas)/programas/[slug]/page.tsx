@@ -346,9 +346,9 @@ export default async function ProgramaPage({ params }: Props) {
                             <span>Eixo · <strong>{c.eixo}</strong></span>
                             <span>Módulos · <strong>{c.modulos}</strong></span>
                           </div>
-                          <a className="fpc-link" href="#contato">
+                          <Link className="fpc-link" href="/contato">
                             Conhecer atuação <span aria-hidden="true">→</span>
-                          </a>
+                          </Link>
                         </div>
                       </article>
                     ))}
@@ -369,9 +369,9 @@ export default async function ProgramaPage({ params }: Props) {
                           <p className="fac-modules">
                             {e.modulos.includes("·") ? "Módulos" : "Módulo"} · <strong>{e.modulos}</strong>
                           </p>
-                          <a className="fac-link" href="#contato">
+                          <Link className="fac-link" href="/contato">
                             Conhecer atuação <span aria-hidden="true">→</span>
-                          </a>
+                          </Link>
                         </div>
                       </article>
                     ))}
@@ -389,12 +389,12 @@ export default async function ProgramaPage({ params }: Props) {
                   <p className="faculty-prime-note">{p.docentes.nota}</p>
 
                   <div className="faculty-prime-actions">
-                    <a className="btn btn--gold" href="#contato">
+                    <Link className="btn btn--gold" href="/contato">
                       {p.docentes.ctaPrimario} <span className="btn-arrow">→</span>
-                    </a>
-                    <a className="btn btn--secondary" href="#contato">
+                    </Link>
+                    <Link className="btn btn--secondary" href="/contato">
                       {p.docentes.ctaSecundario}
-                    </a>
+                    </Link>
                   </div>
 
                 </div>

@@ -140,9 +140,9 @@ export function HeaderHome() {
             <a className="nav-item" href="#conteudos">
               Conteúdos
             </a>
-            <a className="nav-item" href="#contato">
+            <Link className="nav-item" href="/contato">
               Contato
-            </a>
+            </Link>
           </nav>
 
           <div className="header-cta">
@@ -509,9 +509,9 @@ export function HeaderHome() {
           <a className="drawer-item" href="#conteudos" onClick={() => setDrawerAberto(false)}>
             Conteúdos
           </a>
-          <a className="drawer-item" href="#contato" onClick={() => setDrawerAberto(false)}>
+          <Link className="drawer-item" href="/contato" onClick={() => setDrawerAberto(false)}>
             Contato
-          </a>
+          </Link>
         </nav>
         <div className="drawer-cta">
           <a className="btn btn--gold" href="#contratacao">

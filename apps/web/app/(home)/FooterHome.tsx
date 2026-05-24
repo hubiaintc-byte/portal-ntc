@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 /**
  * `FooterHome` — rodapé institucional literal do protótipo
  * (02_Prototipo_Home_GrupoNTC_v3_Premium.html, linhas 3392–3458).
@@ -35,7 +37,7 @@ export function FooterHome() {
               <li><a href="#conteudos">Conteúdos</a></li>
               <li><a href="#docentes">Corpo Docente</a></li>
               <li><a href="#eventon">EventOn</a></li>
-              <li><a href="#contato">Contato</a></li>
+              <li><Link href="/contato">Contato</Link></li>
             </ul>
           </div>
 
@@ -58,10 +60,10 @@ export function FooterHome() {
               <li><a href="#eventos-abertos">Eventos com inscrições abertas</a></li>
               <li><a href="#contratacao">Solicitar proposta</a></li>
               <li><a href="#contratacao">Inscrever equipe</a></li>
-              <li><a href="#contato">Atendimento comercial</a></li>
+              <li><Link href="/contato">Atendimento comercial</Link></li>
               <li><a href="#eventon">Suporte ao participante</a></li>
               <li><a href="#eventon">Área do Participante</a></li>
-              <li><a href="#contato">WhatsApp · (63) 98444-4040</a></li>
+              <li><Link href="/contato">WhatsApp · (63) 98444-4040</Link></li>
             </ul>
           </div>
         </div>

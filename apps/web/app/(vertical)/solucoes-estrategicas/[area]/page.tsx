@@ -254,9 +254,9 @@ export default async function VerticalPage({ params }: Props) {
                               Programas · <strong>{e.metaPrograma}</strong>
                             </span>
                           </div>
-                          <a className="efc-link" href="#contato">
+                          <Link className="efc-link" href="/contato">
                             Conhecer atuação <span aria-hidden="true">→</span>
-                          </a>
+                          </Link>
                         </div>
                       </article>
                     ))}
@@ -284,9 +284,9 @@ export default async function VerticalPage({ params }: Props) {
                           <p className="eac-programs">
                             Programa · <strong>{e.programa}</strong>
                           </p>
-                          <a className="eac-link" href="#contato">
+                          <Link className="eac-link" href="/contato">
                             Conhecer atuação <span aria-hidden="true">→</span>
-                          </a>
+                          </Link>
                         </div>
                       </article>
                     ))}
@@ -311,9 +311,9 @@ export default async function VerticalPage({ params }: Props) {
                           <p className="eac-programs">
                             Programa · <strong>{c.programa}</strong>
                           </p>
-                          <a className="eac-link" href="#contato">
+                          <Link className="eac-link" href="/contato">
                             Conhecer atuação <span aria-hidden="true">→</span>
-                          </a>
+                          </Link>
                         </div>
                       </article>
                     ))}
