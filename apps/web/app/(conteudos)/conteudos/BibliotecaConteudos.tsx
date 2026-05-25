@@ -98,7 +98,7 @@ export function BibliotecaConteudos({ cards, head }: BibliotecaConteudosProps) {
   const [state, setState] = useState<EstadoBiblioteca>(ESTADO_INICIAL);
   const [buscaLocal, setBuscaLocal] = useState("");
   const [hidratado, setHidratado] = useState(false);
-  const buscaInputRef = useRef<HTMLInputElement>(null);
+  const lastTracked = useRef("");
 
   useEffect(() => {
     const fromUrl = readURL();
@@ -114,12 +114,13 @@ export function BibliotecaConteudos({ cards, head }: BibliotecaConteudosProps) {
       setState((s) =>
         s.busca === buscaLocal ? s : { ...s, busca: buscaLocal },
       );
-      if (buscaLocal !== state.busca) {
+      if (buscaLocal !== lastTracked.current && buscaLocal.length >= 2) {
         track("cont_search", { q: buscaLocal.slice(0, 60) });
+        lastTracked.current = buscaLocal;
       }
     }, 180);
     return () => window.clearTimeout(timer);
-  }, [buscaLocal, state.busca]);
+  }, [buscaLocal]);
 
   useEffect(() => {
     if (!hidratado) return;
@@ -143,7 +144,7 @@ export function BibliotecaConteudos({ cards, head }: BibliotecaConteudosProps) {
     <section
       className="cont-biblioteca"
       id="biblioteca"
-      aria-label="Biblioteca filtravel do Grupo NTC"
+      aria-label="Biblioteca filtrável do Grupo NTC"
     >
       <div className="container">
         <div className="section-head fade-in">
@@ -178,7 +179,6 @@ export function BibliotecaConteudos({ cards, head }: BibliotecaConteudosProps) {
         <div className="cont-filterbar fade-in">
           <div className="cont-search">
             <input
-              ref={buscaInputRef}
               id="contSearch"
               type="search"
               placeholder={BIBLIOTECA_SEARCH_PLACEHOLDER}
@@ -210,7 +210,12 @@ export function BibliotecaConteudos({ cards, head }: BibliotecaConteudosProps) {
               );
             })}
           </div>
-          <div className="cont-filterbar-stats" id="contStats">
+          <div
+            className="cont-filterbar-stats"
+            id="contStats"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <strong id="contCount">{shown}</strong> conteúdos em preparação
           </div>
         </div>
