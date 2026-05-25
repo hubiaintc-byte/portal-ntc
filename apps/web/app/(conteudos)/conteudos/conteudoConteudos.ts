@@ -437,3 +437,319 @@ export const BIBLIOTECA_FOOTER = {
     classe: "btn btn--primary",
   } as LinkInterno,
 };
+
+// ----------------- 5 TIPOS EDITORIAIS -----------------
+
+export interface TipoEditorial {
+  num: string;
+  titulo: string;
+  descricao: string;
+  tag: string;
+}
+
+export const TIPOS_HEAD = {
+  eyebrow: "Tipos editoriais institucionais",
+  tituloHtml: "Cinco formatos para <em>cada momento</em> da operação pública.",
+  intro:
+    "A biblioteca NTC se organiza em cinco formatos editoriais complementares. Cada um responde a um tipo distinto de pergunta institucional — do diagnóstico estruturado ao apoio operacional cotidiano.",
+};
+
+export const TIPOS_EDITORIAIS: TipoEditorial[] = [
+  {
+    num: "01",
+    titulo: "Artigos",
+    descricao:
+      "Posições técnicas autorais sobre temas em discussão. Texto editorial fundamentado, leitura média de 12 a 25 minutos, autoria institucional.",
+    tag: "Posição · análise · leitura",
+  },
+  {
+    num: "02",
+    titulo: "Estudos",
+    descricao:
+      "Pesquisas longas com leitura empírica da administração pública — diagnósticos de campo, séries históricas, leitura de indicadores. PDF de 30 a 80 páginas.",
+    tag: "Diagnóstico · pesquisa · profundidade",
+  },
+  {
+    num: "03",
+    titulo: "Notas técnicas",
+    descricao:
+      "Pareceres editoriais curtos sobre temas pontuais — uma decisão de tribunal, uma alteração legal, um novo programa federal. Foco em utilidade decisória.",
+    tag: "Parecer · decisório · objetividade",
+  },
+  {
+    num: "04",
+    titulo: "Webinars",
+    descricao:
+      "Encontros formativos abertos, com transmissão pelo EventOn, materiais editoriais sincronizados e replay disponível para os inscritos pelos prazos previstos.",
+    tag: "Ao vivo · replay · formação",
+  },
+  {
+    num: "05",
+    titulo: "Materiais didáticos",
+    descricao:
+      "Kits operacionais — checklists, fluxos, modelos e roteiros — para apoiar a aplicação cotidiana de políticas, normas e procedimentos pela equipe técnica.",
+    tag: "Operacional · prático · download",
+  },
+];
+
+// ----------------- CURADORIA POR VERTICAL (3) -----------------
+
+export interface VertCard {
+  vert: "edu" | "gov" | "sau";
+  bandMark: string;
+  bandNum: string;
+  titulo: string;
+  descricao: string;
+  listaHtml: string[];
+  link: LinkInterno;
+}
+
+export const VERTICAIS_HEAD = {
+  eyebrow: "Curadoria editorial por vertical",
+  tituloHtml: "Três trilhas editoriais, <em>uma só doutrina</em>.",
+  intro:
+    "Cada vertical formativa do Grupo NTC opera também como linha editorial — com equipe técnica dedicada à produção de conteúdo, calendário próprio de publicação e diálogo direto com os programas estratégicos.",
+};
+
+export const VERT_CARDS: VertCard[] = [
+  {
+    vert: "edu",
+    bandMark: "NTC Educação",
+    bandNum: "01",
+    titulo: "Educação pública em circulação",
+    descricao:
+      "Acervo dedicado à formação institucional de redes de ensino — alfabetização, gestão escolar, inclusão, educação integral, educação digital e primeira infância.",
+    listaHtml: [
+      "<strong>3</strong> conteúdos em preparação editorial",
+      "<strong>9</strong> programas estratégicos relacionados",
+      "<strong>Equipe Técnica NTC Educação</strong>",
+    ],
+    link: {
+      texto: "Conhecer a vertical",
+      href: "/solucoes-estrategicas/educacao",
+      cmsLink: "vertical-edu",
+      track: "cont_vert_click",
+    },
+  },
+  {
+    vert: "gov",
+    bandMark: "NTC Gestão Pública",
+    bandNum: "02",
+    titulo: "Direção e governança em pauta",
+    descricao:
+      "Acervo dedicado à alta gestão da administração pública brasileira — Lei 14.133/2021, direção estratégica, governança institucional e sistemas administrativos.",
+    listaHtml: [
+      "<strong>2</strong> conteúdos em preparação editorial",
+      "<strong>3</strong> programas estratégicos relacionados",
+      "<strong>Curadoria NTC Gestão Pública</strong>",
+    ],
+    link: {
+      texto: "Conhecer a vertical",
+      href: "/solucoes-estrategicas/gestao-publica",
+      cmsLink: "vertical-gov",
+      track: "cont_vert_click",
+    },
+  },
+  {
+    vert: "sau",
+    bandMark: "NTC Saúde",
+    bandNum: "03",
+    titulo: "Inteligência institucional para o SUS",
+    descricao:
+      "Acervo dedicado ao Sistema Único de Saúde — atenção primária resolutiva, redes territoriais, gestão integrada e direção institucional da saúde pública.",
+    listaHtml: [
+      "<strong>2</strong> conteúdos em preparação editorial",
+      "<strong>3</strong> programas estratégicos relacionados",
+      "<strong>Equipe Técnica NTC Saúde</strong>",
+    ],
+    link: {
+      texto: "Conhecer a vertical",
+      href: "/solucoes-estrategicas/saude",
+      cmsLink: "vertical-sau",
+      track: "cont_vert_click",
+    },
+  },
+];
+
+// ----------------- NEWSLETTER -----------------
+
+export const NEWSLETTER_TEXT = {
+  eyebrow: "Boletim NTC",
+  tituloHtml:
+    "Receba a inteligência <em>editorial</em> da NTC<br>direto na sua caixa.",
+  paragrafosHtml: [
+    "O <strong>Boletim NTC</strong> é a curadoria mensal da Direção Científica do Instituto — uma seleção comentada dos conteúdos mais relevantes do período, organizada por vertical formativa. Sem rastreio de comportamento, sem ofertas comerciais, sem ruído.",
+    "Você escolhe se quer receber tudo ou apenas a vertical que interessa ao seu cenário institucional — e pode descadastrar a qualquer momento pelo link no rodapé de cada edição.",
+  ],
+  pills: [
+    "Curadoria mensal",
+    "Sem rastreio",
+    "Por vertical",
+    "Descadastro livre",
+  ],
+};
+
+export const NEWSLETTER_FORM = {
+  labels: {
+    nome: "Nome completo",
+    email: "E-mail institucional",
+    vertical: "Vertical de interesse",
+    orgao: "Órgão ou instituição",
+  },
+  placeholders: {
+    nome: "Como prefere ser chamado(a)",
+    email: "nome@orgao.gov.br",
+    orgao: "Município, estado, autarquia...",
+  },
+  verticais: [
+    { value: "todas", label: "Todas as verticais" },
+    { value: "educacao", label: "NTC Educação" },
+    { value: "gestao", label: "NTC Gestão Pública" },
+    { value: "saude", label: "NTC Saúde" },
+    { value: "transversal", label: "Apenas transversais" },
+  ],
+  consentHtml:
+    'Concordo em receber o Boletim NTC e autorizo o tratamento dos meus dados para essa finalidade, nos termos da <a href="/lgpd" data-cms-link="legal-lgpd">Política de Privacidade · LGPD</a> do Instituto NTC do Brasil. Posso descadastrar a qualquer momento.',
+  botaoTexto: "Assinar o Boletim NTC",
+  msgOk:
+    "Inscrição realizada. Confirme no e-mail que enviaremos a seguir.",
+  msgErr: "Verifique os campos obrigatórios.",
+};
+
+// ----------------- FAQ (8 itens) -----------------
+
+export interface ItemFaq {
+  id: string;
+  pergunta: string;
+  respostaHtml: string;
+}
+
+export const FAQ_HEAD = {
+  eyebrow: "Perguntas frequentes",
+  tituloHtml: "O que <em>perguntam</em> sobre os Conteúdos NTC.",
+  intro:
+    "Reunimos oito perguntas frequentes sobre o acervo editorial — política de acesso, licenciamento, certificação, replays, contribuições externas e privacidade.",
+};
+
+export const FAQ_CONTEUDOS: ItemFaq[] = [
+  {
+    id: "cont-faq-1",
+    pergunta: "Os conteúdos são abertos ao público?",
+    respostaHtml:
+      '<p>Sim. Parte do acervo editorial do Grupo NTC — artigos, notas técnicas, estudos e materiais didáticos — será disponibilizada ao público sem login obrigatório, conforme a política editorial de publicação.</p><p>Webinars com replay e alguns materiais didáticos exclusivos podem exigir cadastro no <a href="/o-grupo#eventon" data-cms-link="eventon-home">EventOn</a> — sem cobrança e apenas para identificação do servidor, em coerência com a Área do Participante.</p>',
+  },
+  {
+    id: "cont-faq-2",
+    pergunta: "Posso citar os conteúdos NTC em meus trabalhos?",
+    respostaHtml:
+      '<p>Sim, e ficamos honrados quando isso acontece. Os conteúdos podem ser citados com atribuição à frente editorial responsável (Curadoria, Direção Científica ou Equipe Técnica da vertical correspondente), título completo, ano de publicação e URL.</p><p>A reprodução integral, adaptação, incorporação em materiais comerciais ou uso institucional em larga escala depende de autorização prévia do Instituto NTC do Brasil. Para esses casos, entre em contato pelo <a href="/contato" data-cms-link="atendimento-licenciamento">canal de atendimento institucional</a>.</p>',
+  },
+  {
+    id: "cont-faq-3",
+    pergunta: "Webinars geram certificado?",
+    respostaHtml:
+      '<p>Webinars abertos publicados na biblioteca, em formato editorial, não geram certificado de horas — são publicação institucional de acesso livre.</p><p>Já os <strong>eventos abertos da Agenda</strong> (turmas regulares com data, ementa e inscrição) geram certificado oficial NTC pela plataforma EventOn. Veja a <a href="/agenda" data-cms-link="agenda-completa">Agenda Geral</a> para os eventos certificáveis.</p>',
+  },
+  {
+    id: "cont-faq-4",
+    pergunta: "Os replays ficam disponíveis para sempre?",
+    respostaHtml:
+      "<p>Os replays de webinars abertos publicados na biblioteca ficam disponíveis pelo período declarado em cada card — geralmente entre 6 e 24 meses após a transmissão original.</p><p>Conteúdos retirados de circulação por desatualização técnica ou jurídica permanecem catalogados internamente, mas deixam de estar acessíveis publicamente para evitar a circulação de informação obsoleta na administração pública.</p>",
+  },
+  {
+    id: "cont-faq-5",
+    pergunta: "Quem escreve os conteúdos? Por que autoria institucional?",
+    respostaHtml:
+      "<p>Os conteúdos são produzidos por três frentes editoriais do Instituto NTC do Brasil: a <strong>Curadoria</strong> (linha editorial geral e Gestão Pública), a <strong>Direção Científica</strong> (transversal e temas estratégicos) e as <strong>Equipes Técnicas</strong> das três verticais (Educação, Gestão Pública e Saúde).</p><p>A autoria institucional é uma escolha editorial: cada conteúdo passa por revisão técnica coletiva antes de ser publicado e expressa a posição da frente editorial, não a opinião individual de quem o redigiu. Quando há contribuição autoral de um especialista externo, a co-autoria é declarada no início do texto.</p>",
+  },
+  {
+    id: "cont-faq-6",
+    pergunta: "É possível propor um tema para a biblioteca?",
+    respostaHtml:
+      '<p>Sim. Servidores, dirigentes, pesquisadores e equipes técnicas das três áreas podem propor temas pelo <a href="/contato" data-cms-link="atendimento-editorial">canal de atendimento institucional</a>, indicando o tipo desejado (artigo, estudo, nota técnica ou webinar) e o problema institucional concreto que motiva a sugestão.</p><p>A curadoria editorial avalia a proposta e responde se entra ou não no planejamento editorial — sempre com explicação técnica, mesmo nos casos negativos.</p>',
+  },
+  {
+    id: "cont-faq-7",
+    pergunta: "Os conteúdos têm versão em outros idiomas?",
+    respostaHtml:
+      "<p>A biblioteca NTC publica em português brasileiro. Alguns estudos transversais relevantes ao debate latino-americano podem ser publicados também em espanhol — sempre indicado no card do conteúdo.</p><p>Não traduzimos por demanda automática para outras línguas. Em contratações institucionais dedicadas, pode haver versão localizada conforme o público da formação.</p>",
+  },
+  {
+    id: "cont-faq-8",
+    pergunta: "A NTC respeita a LGPD nos cadastros da biblioteca?",
+    respostaHtml:
+      '<p>Sim. O Instituto NTC do Brasil é controlador dos dados pessoais coletados pelo Boletim NTC e pelos cadastros do EventOn, sob a Lei 13.709/2018 (LGPD). Os dados são tratados exclusivamente para a finalidade da comunicação editorial e do acesso aos conteúdos, e não são compartilhados com terceiros para fins comerciais.</p><p>Você pode solicitar acesso, retificação ou exclusão dos seus dados a qualquer momento pelo encarregado de dados (DPO) indicado na <a href="/lgpd" data-cms-link="legal-lgpd">Política de Privacidade · LGPD</a>.</p>',
+  },
+];
+
+// ----------------- CTA FINAL (3 pontes) -----------------
+
+export interface PonteCta {
+  ponte: "agenda" | "solucoes" | "docentes";
+  eyebrow: string;
+  titulo: string;
+  descricao: string;
+  link: LinkInterno;
+}
+
+export const CTA_FINAL_HEAD = {
+  eyebrow: "Próximo passo",
+  tituloHtml: "Depois da leitura, vem o <em>encontro</em>.",
+  intro:
+    "Os Conteúdos são a entrada editorial do Grupo NTC — a partir deles, você pode aprofundar pela Agenda formativa, contratar uma formação institucional dedicada ou conhecer quem efetivamente assina a curadoria.",
+};
+
+export const CTA_FINAL_PONTES: PonteCta[] = [
+  {
+    ponte: "agenda",
+    eyebrow: "Agenda formativa",
+    titulo: "Ir para os eventos abertos",
+    descricao:
+      "Inscrição em turmas regulares — online, híbridas e presenciais — com certificado oficial NTC e replay no EventOn.",
+    link: {
+      texto: "Ver Agenda Geral",
+      href: "/agenda",
+      cmsLink: "agenda-completa",
+      track: "cont_cta_agenda",
+    },
+  },
+  {
+    ponte: "solucoes",
+    eyebrow: "Contratação institucional",
+    titulo: "Conhecer Soluções dedicadas",
+    descricao:
+      "In company, turmas fechadas, sob medida e trilhas — para órgãos que precisam de formação institucional dedicada.",
+    link: {
+      texto: "Ir para Soluções",
+      href: "/solucoes",
+      cmsLink: "pagina-solucoes",
+      track: "cont_cta_solucoes",
+    },
+  },
+  {
+    ponte: "docentes",
+    eyebrow: "Curadoria científica",
+    titulo: "Conhecer o corpo docente",
+    descricao:
+      "Especialistas, autoridades públicas, juristas, gestores, pesquisadores e docentes de referência nacional articulados pela curadoria NTC.",
+    link: {
+      texto: "Conhecer o corpo docente",
+      href: "/o-grupo/corpo-docente",
+      cmsLink: "pagina-corpo-docente",
+      track: "cont_cta_docentes",
+    },
+  },
+];
+
+// ----------------- STICKY CTA MOBILE -----------------
+
+export const STICKY_CTA_CONTEUDOS = {
+  cta: {
+    texto: "Assinar Boletim NTC",
+    href: "#newsletter",
+    cmsLink: "cta-newsletter-sticky",
+    track: "cont_sticky_cta",
+    arrow: true,
+    classe: "btn btn--gold",
+  } as LinkInterno,
+};
