@@ -37,15 +37,16 @@ export function SubnavSticky({ label, links }: SubnavStickyProps) {
       .filter((el): el is HTMLElement => el !== null);
     if (sections.length === 0) return;
 
-    const subnavTop = subnav.offsetTop;
+    let subnavTop = subnav.offsetTop;
+    let headerH =
+      parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue("--header-h"),
+      ) || 88;
+    let raf = 0;
 
-    const onScroll = () => {
+    const compute = () => {
       const y = window.scrollY;
       setSticky(y >= subnavTop - 1);
-      const headerH =
-        parseInt(
-          getComputedStyle(document.documentElement).getPropertyValue("--header-h"),
-        ) || 88;
       const subnavH = subnav.offsetHeight;
       const margin = headerH + subnavH + 24;
       let nextActive: string | null = null;
@@ -56,12 +57,30 @@ export function SubnavSticky({ label, links }: SubnavStickyProps) {
       setActiveId(nextActive);
     };
 
-    onScroll();
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        compute();
+      });
+    };
+
+    const onResize = () => {
+      subnavTop = subnav.offsetTop;
+      headerH =
+        parseInt(
+          getComputedStyle(document.documentElement).getPropertyValue("--header-h"),
+        ) || 88;
+      compute();
+    };
+
+    compute();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
+      if (raf) window.cancelAnimationFrame(raf);
     };
   }, [links]);
 
@@ -82,6 +101,7 @@ export function SubnavSticky({ label, links }: SubnavStickyProps) {
                 href={link.href}
                 data-cms-link={link.cmsLink}
                 className={ativo ? "is-active" : undefined}
+                aria-current={ativo ? "location" : undefined}
               >
                 {link.texto}
               </a>
