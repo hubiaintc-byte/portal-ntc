@@ -180,6 +180,83 @@ function track(_action: string, _payload?: Record<string, unknown>) {
   // No-op intencional para manter call sites prontos.
 }
 
+// ----------------- URL sync (espelha writeURL/readURL/hydrate) -----------------
+
+function readURL(): Partial<EstadoAgenda> {
+  if (typeof window === "undefined") return {};
+  const p = new URLSearchParams(window.location.search);
+  const out: Partial<EstadoAgenda> = {};
+  const tab = p.get("tab");
+  if (tab && (TABS_AGENDA as readonly { slug: string }[]).some((t) => t.slug === tab)) {
+    out.tab = tab as TabSlug;
+  }
+  const area = p.get("area");
+  if (area && FILTRO_AREA.some((o) => o.value === area && o.value)) {
+    out.area = area as AreaSlug;
+  }
+  const programa = p.get("programa");
+  if (
+    programa &&
+    FILTRO_PROGRAMA_GROUPS.some((g) => g.opcoes.some((o) => o.value === programa))
+  ) {
+    out.programa = programa as ProgramaSlug;
+  }
+  const formato = p.get("formato");
+  if (formato && FILTRO_FORMATO.some((o) => o.value === formato && o.value)) {
+    out.formato = formato as FormatoEvento;
+  }
+  const modalidade = p.get("modalidade");
+  if (modalidade && FILTRO_MODALIDADE.some((o) => o.value === modalidade && o.value)) {
+    out.modalidade = modalidade as ModalidadeEvento;
+  }
+  const cidade = p.get("cidade");
+  if (cidade && FILTRO_CIDADE.some((o) => o.value === cidade && o.value)) {
+    out.cidade = cidade as CidadeSlug;
+  }
+  const mes = p.get("mes");
+  if (mes && FILTRO_MES.some((o) => o.value === mes && o.value)) {
+    out.mes = mes;
+  }
+  const sort = p.get("sort");
+  if (sort && FILTRO_SORT.some((o) => o.value === sort)) {
+    out.sort = sort as SortSlug;
+  }
+  const page = p.get("page");
+  if (page) {
+    const n = parseInt(page, 10);
+    if (Number.isFinite(n) && n >= 1) out.page = n;
+  }
+  const perPage = p.get("perPage");
+  if (perPage) {
+    const n = parseInt(perPage, 10);
+    if ((PERPAGE_OPCOES as readonly number[]).includes(n)) {
+      out.perPage = n as PerPageOpcao;
+    }
+  }
+  const q = p.get("q");
+  if (q) out.busca = q;
+  return out;
+}
+
+function writeURL(state: EstadoAgenda): void {
+  if (typeof window === "undefined") return;
+  const p = new URLSearchParams();
+  if (state.tab !== DEFAULTS.tab) p.set("tab", state.tab);
+  if (state.area) p.set("area", state.area);
+  if (state.programa) p.set("programa", state.programa);
+  if (state.formato) p.set("formato", state.formato);
+  if (state.modalidade) p.set("modalidade", state.modalidade);
+  if (state.cidade) p.set("cidade", state.cidade);
+  if (state.mes) p.set("mes", state.mes);
+  if (state.sort !== DEFAULTS.sort) p.set("sort", state.sort);
+  if (state.page !== DEFAULTS.page) p.set("page", String(state.page));
+  if (state.perPage !== DEFAULTS.perPage) p.set("perPage", String(state.perPage));
+  if (state.busca) p.set("q", state.busca);
+  const qs = p.toString();
+  const url = qs ? `?${qs}` : window.location.pathname;
+  window.history.replaceState(null, "", url);
+}
+
 // ----------------- Componente principal -----------------
 
 export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
@@ -245,10 +322,21 @@ export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
     (state.mes ? 1 : 0) +
     (state.busca ? 1 : 0);
 
-  // Hidratação inicial (Task 12 vai sobrescrever isso com leitura de URL).
+  // Hidratação inicial: lê querystring e aplica ao estado.
   useEffect(() => {
+    const fromUrl = readURL();
+    if (Object.keys(fromUrl).length > 0) {
+      setState((s) => ({ ...s, ...fromUrl }));
+      if (fromUrl.busca) setBuscaLocal(fromUrl.busca);
+    }
     setHidratado(true);
   }, []);
+
+  // URL sync: re-escreve querystring a cada mudança (após hidratação).
+  useEffect(() => {
+    if (!hidratado) return;
+    writeURL(state);
+  }, [state, hidratado]);
 
   // Relógio para recálculo do selo de deadline. Atualiza a cada 30s e
   // após o mount (evita mismatch SSR/CSR: durante SSR usamos new Date()
