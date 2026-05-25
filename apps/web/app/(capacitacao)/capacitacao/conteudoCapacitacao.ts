@@ -424,3 +424,133 @@ export const formatosCapacitacao: FormatoCap[] = [
     tag: "Capitais · networking · alta gestão",
   },
 ];
+
+// ----------------- EIXOS (5) -----------------
+
+export interface EixoCap {
+  num: string;
+  titulo: string;
+  descricao: string;
+}
+
+export const eixosEyebrow = "Eixos formativos transversais";
+export const eixosH2 = `Cinco eixos que <em>atravessam</em> todos os programas.`;
+export const eixosP1 =
+  "Independentemente da vertical, todos os programas NTC mobilizam ao menos um destes cinco eixos. Eles dão consistência editorial à oferta e permitem que diferentes públicos da administração pública se reconheçam no que estão fazendo.";
+export const eixosImpact =
+  "Cada programa fala mais de um eixo — e cada servidor encontra, em pelo menos um deles, a sua leitura.";
+
+export const eixosCapacitacao: EixoCap[] = [
+  {
+    num: "01",
+    titulo: "Executivo e estratégico",
+    descricao:
+      "Direção institucional, tomada de decisão, governança da política pública, articulação federativa e leitura de cenário. Para a alta gestão.",
+  },
+  {
+    num: "02",
+    titulo: "Técnico-jurídico",
+    descricao:
+      "Lei 14.133/2021, controle, integridade, contratações públicas, direito administrativo aplicado. Para áreas-meio, jurídicas e de controle.",
+  },
+  {
+    num: "03",
+    titulo: "Pedagógico-formativo",
+    descricao:
+      "Alfabetização, currículo, avaliação, formação de professores, inclusão e gestão pedagógica. Para áreas-fim da educação pública.",
+  },
+  {
+    num: "04",
+    titulo: "Operacional e de gestão",
+    descricao:
+      "Processos, rotinas, indicadores, planejamento, monitoramento, prestação de contas. Para o quadro técnico que executa a política.",
+  },
+  {
+    num: "05",
+    titulo: "Dados, IA e governança digital",
+    descricao:
+      "Transformação digital, governança de dados, inteligência artificial aplicada ao setor público, cibersegurança e privacidade. Eixo emergente.",
+  },
+];
+
+// ----------------- CURADORIA -----------------
+
+export const curadoriaEyebrow = "Curadoria científica";
+export const curadoriaH2 = `A diferença entre treinar e <em>formar</em> está em quem ensina.`;
+export const curadoriaP1 =
+  "A capacitação institucional do Grupo NTC é sustentada por uma rede curada de especialistas, autoridades públicas, juristas, gestores, pesquisadores e docentes de referência nacional — convocados pelo encaixe técnico ao programa, à modalidade e ao público da turma.";
+export const curadoriaP2 =
+  "A curadoria científica não é um catálogo: é um critério editorial. Por isso publicamos a página do Corpo Docente — para que cada órgão contratante saiba, antes de contratar, quem efetivamente entregará a formação.";
+export const curadoriaPills: string[] = [
+  "Educação",
+  "Gestão Pública",
+  "Contratações Públicas",
+  "Saúde",
+];
+export const curadoriaCtas: LinkInterno[] = [
+  {
+    texto: "Conhecer o corpo docente",
+    href: "/o-grupo/corpo-docente",
+    cmsLink: "pagina-corpo-docente",
+    track: "cap_corpo_docente_click",
+    classe: "btn btn--primary",
+    arrow: true,
+  },
+  {
+    texto: "Falar com a curadoria",
+    href: "/contato#tab-atendimento",
+    cmsLink: "atendimento-curadoria",
+    track: "cap_corpo_docente_atendimento",
+    classe: "btn btn--secondary",
+  },
+];
+
+// ----------------- EVENTON -----------------
+
+export interface EventonFeature {
+  strong: string;
+  span: string;
+}
+
+export const eventonEyebrow = "Plataforma proprietária";
+export const eventonH2 = `EventOn — a plataforma <em>editorial</em> de transmissão do Grupo NTC.`;
+export const eventonP1 =
+  "O EventOn é a plataforma proprietária do Grupo NTC — pensada não como mera sala de webinar, mas como <strong>ambiente de experiência formativa</strong>: transmissão executiva, replay institucional, materiais editoriais, certificação dos participantes e relatórios consolidados ao órgão contratante.";
+export const eventonP2 =
+  "O servidor inscrito acessa um único hub — a <strong>Área do Participante</strong> — em que encontra os eventos ao vivo, os replays, os materiais oficiais e os certificados. O órgão contratante recebe os indicadores de presença, conclusão e avaliação por turma.";
+export const eventonCtas: LinkInterno[] = [
+  {
+    texto: "Conhecer o EventOn",
+    href: "/#eventon",
+    cmsLink: "eventon-home",
+    track: "cap_eventon_click",
+    classe: "btn btn--gold",
+    arrow: true,
+  },
+  {
+    texto: "Área do Participante",
+    href: "/#eventon",
+    cmsLink: "area-participante",
+    track: "cap_area_participante",
+    classe: "btn btn--ghost-light",
+  },
+];
+
+export const eventonFeatures: EventonFeature[] = [
+  {
+    strong: "Transmissão executiva",
+    span: "Estúdio NTC com regie, chat moderado, materiais sincronizados e qualidade broadcast.",
+  },
+  {
+    strong: "Replay institucional",
+    span: "Gravação editada e disponibilizada aos inscritos pela duração contratada.",
+  },
+  {
+    strong: "Certificado oficial",
+    span: "Emissão automática com identidade NTC, registro digital e validação institucional.",
+  },
+  {
+    strong: "Relatório ao contratante",
+    span: "Presença, conclusão, avaliação e indicadores consolidados ao órgão demandante.",
+  },
+];
