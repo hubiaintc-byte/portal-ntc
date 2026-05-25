@@ -869,3 +869,99 @@ export const faqCapacitacao: ItemFaqCap[] = [
 <p>Para demandas emergenciais (formação executiva em curto prazo), há rito acelerado que pode ser combinado com o atendimento institucional.</p>`,
   },
 ];
+
+// ----------------- CTA FINAL -----------------
+
+export interface CardCtaVertical {
+  vert: VerticalCapacitacao;
+  eyebrow: string;
+  titulo: string;
+  descricao: string;
+  link: LinkInterno;
+}
+
+export const ctaFinalEyebrow = "Próximo passo";
+export const ctaFinalH2 = `Onde começa o <em>seu plano</em> de capacitação NTC?`;
+export const ctaFinalP =
+  "Você pode começar pela agenda aberta, pelo corpo docente, pela conversa com a curadoria ou direto pela proposta institucional. Estamos prontos para o caminho que fizer mais sentido para o seu cenário.";
+
+export const ctaFinalBtns: LinkInterno[] = [
+  {
+    texto: "Solicitar proposta institucional",
+    href: "/contato#tab-proposta",
+    cmsLink: "proposta-institucional",
+    track: "cap_cta_proposta",
+    classe: "btn btn--gold",
+    arrow: true,
+  },
+  {
+    texto: "Ver agenda completa",
+    href: "/capacitacao/agenda",
+    cmsLink: "agenda-completa",
+    track: "cap_cta_agenda",
+    classe: "btn btn--ghost-light",
+  },
+  {
+    texto: "Conhecer o corpo docente",
+    href: "/o-grupo/corpo-docente",
+    cmsLink: "pagina-corpo-docente",
+    track: "cap_cta_docentes",
+    classe: "btn btn--ghost-light",
+  },
+];
+
+export const ctaFinalVerticais: CardCtaVertical[] = [
+  {
+    vert: "edu",
+    eyebrow: "NTC Educação",
+    titulo: "Formação para redes públicas de ensino",
+    descricao:
+      "9 programas estratégicos — alfabetização, gestão escolar, inclusão, educação integral, IA pedagógica, primeira infância e mais.",
+    link: {
+      texto: "Conhecer NTC Educação",
+      href: "/solucoes-estrategicas/educacao",
+      cmsLink: "vertical-edu",
+      track: "cap_cta_edu",
+      classe: "link-arrow light",
+    },
+  },
+  {
+    vert: "gov",
+    eyebrow: "NTC Gestão Pública",
+    titulo: "Direção, governança e contratações",
+    descricao:
+      "3 programas estratégicos — Lei 14.133/2021, direção estratégica, governança administrativa e a frente de Contratações Públicas.",
+    link: {
+      texto: "Conhecer NTC Gestão Pública",
+      href: "/solucoes-estrategicas/gestao-publica",
+      cmsLink: "vertical-gov",
+      track: "cap_cta_gov",
+      classe: "link-arrow light",
+    },
+  },
+  {
+    vert: "sau",
+    eyebrow: "NTC Saúde",
+    titulo: "Inteligência institucional para o SUS",
+    descricao:
+      "3 programas estratégicos — alta gestão do SUS, atenção primária, redes territoriais e gestão integrada da saúde pública.",
+    link: {
+      texto: "Conhecer NTC Saúde",
+      href: "/solucoes-estrategicas/saude",
+      cmsLink: "vertical-sau",
+      track: "cap_cta_sau",
+      classe: "link-arrow light",
+    },
+  },
+];
+
+// ----------------- STICKY CTA MOBILE -----------------
+
+export const stickyCtaCapacitacao: LinkInterno = {
+  texto: "Solicitar proposta",
+  href: "/contato#tab-proposta",
+  cmsLink: "proposta-institucional",
+  track: "cap_sticky_cta",
+  classe: "btn btn--gold",
+  arrow: true,
+};
