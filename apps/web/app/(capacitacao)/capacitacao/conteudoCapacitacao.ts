@@ -713,3 +713,159 @@ export const proximosFooterLink: LinkInterno = {
   classe: "btn btn--primary",
   arrow: true,
 };
+
+// ----------------- CAMINHOS (2) -----------------
+
+export interface PassoCaminho {
+  title: string;
+  sub: string;
+}
+
+export interface CaminhoCap {
+  tipo: CaminhoTipo;
+  eyebrow: string;
+  titulo: string;
+  descricao: string;
+  passos: PassoCaminho[];
+  cta: LinkInterno;
+}
+
+export const caminhosEyebrow = "Como participar";
+export const caminhosH2 = `Dois caminhos paralelos, <em>uma só curadoria</em>.`;
+export const caminhosIntro =
+  "A capacitação NTC pode ser acessada de duas maneiras complementares: pelo caminho do participante individual ou do grupo institucional inscrito em evento aberto, e pelo caminho da contratação institucional dedicada. Em ambos, a curadoria editorial é a mesma.";
+
+export const caminhosCapacitacao: CaminhoCap[] = [
+  {
+    tipo: "participante",
+    eyebrow: "Caminho A · Servidor ou grupo",
+    titulo: "Quero me inscrever em um evento aberto",
+    descricao:
+      "O caminho do servidor individual ou da equipe institucional que se inscreve em uma turma regular da agenda NTC. Use este caminho quando a sua necessidade já está bem atendida por um programa do nosso calendário aberto.",
+    passos: [
+      {
+        title: "Encontre o evento",
+        sub: "Navegue pela Agenda Geral · filtre por área, formato e período",
+      },
+      {
+        title: "Escolha a modalidade de inscrição",
+        sub: "Individual com cartão · ou em grupo institucional com nota fiscal e empenho",
+      },
+      {
+        title: "Inscreva-se",
+        sub: "Pelo formulário oficial · com autofill quando vier de uma página de evento",
+      },
+      {
+        title: "Acesse o EventOn",
+        sub: "Acompanhe a turma, baixe materiais, assista ao replay, receba certificado",
+      },
+    ],
+    cta: {
+      texto: "Ver agenda completa",
+      href: "/capacitacao/agenda",
+      cmsLink: "agenda-completa",
+      track: "cap_caminho_a",
+      classe: "btn btn--primary",
+      arrow: true,
+    },
+  },
+  {
+    tipo: "instituicao",
+    eyebrow: "Caminho B · Órgão público",
+    titulo: "Quero contratar uma formação institucional",
+    descricao:
+      "O caminho do órgão público que precisa formar quadros institucionais com uma turma exclusiva, customização de conteúdo ou trilha plurianual. A contratação institucional dedicada ocorre por via direta — especialmente por inexigibilidade ou dispensa de licitação, conforme a hipótese aplicável — ou por instrumentos de parceria e cooperação, quando cabíveis.",
+    passos: [
+      {
+        title: "Solicite o briefing",
+        sub: "Conte ao atendimento institucional o cenário, o público e o objetivo formativo",
+      },
+      {
+        title: "Receba o diagnóstico técnico",
+        sub: "Em até 10 dias úteis, devolvemos a leitura técnica e a recomendação editorial",
+      },
+      {
+        title: "Aprove a proposta",
+        sub: "Programa-mãe ou customizado · turma fechada ou sob medida · escopo, prazo, valor",
+      },
+      {
+        title: "Execução com EventOn e relatórios",
+        sub: "Entrega dedicada · curadoria científica · relatórios consolidados ao órgão",
+      },
+    ],
+    cta: {
+      texto: "Solicitar proposta",
+      href: "/contato#tab-proposta",
+      cmsLink: "proposta-institucional",
+      track: "cap_caminho_b",
+      classe: "btn btn--gold",
+      arrow: true,
+    },
+  },
+];
+
+// ----------------- FAQ (8) -----------------
+
+export interface ItemFaqCap {
+  id: string;
+  pergunta: string;
+  respostaHtml: string;
+}
+
+export const faqEyebrow = "Perguntas frequentes";
+export const faqH2 = `O que <em>perguntam</em> antes de contratar.`;
+export const faqIntro =
+  "Reunimos as oito perguntas mais comuns que recebemos sobre a capacitação institucional NTC. Se a sua dúvida não estiver aqui, o atendimento institucional responde diretamente.";
+
+export const faqCapacitacao: ItemFaqCap[] = [
+  {
+    id: "cap-faq-1",
+    pergunta: "Qual a diferença entre modalidade e formato?",
+    respostaHtml: `<p><strong>Modalidade</strong> é a forma comercial-institucional de contratar a formação: eventos abertos, in company, turmas fechadas, sob medida ou trilhas. É a resposta à pergunta "quem é a turma?".</p>
+<p><strong>Formato</strong> é como a entrega acontece operacionalmente: online, presencial ou híbrido. É a resposta à pergunta "onde a turma se encontra?".</p>
+<p>Os dois eixos se combinam. Uma mesma modalidade pode ser entregue em qualquer dos três formatos — e cada órgão escolhe a combinação que melhor responde ao seu cenário.</p>`,
+  },
+  {
+    id: "cap-faq-2",
+    pergunta: "Os certificados têm validação oficial?",
+    respostaHtml: `<p>Sim. Todos os certificados são emitidos pelo Instituto NTC do Brasil — instituição responsável pela curadoria, pela docência e pela operação das formações — com identidade visual NTC, registro digital único, código de validação e descrição editorial do conteúdo, das horas e da turma.</p>
+<p>O certificado é emitido automaticamente pelo EventOn ao final da formação, mediante cumprimento dos critérios mínimos de presença e/ou conclusão definidos para cada evento.</p>`,
+  },
+  {
+    id: "cap-faq-3",
+    pergunta: "Como funciona o replay no EventOn?",
+    respostaHtml: `<p>Todos os eventos online e híbridos são gravados, editados e disponibilizados aos inscritos pela Área do Participante. O acesso ao replay é nominal — vinculado ao CPF do servidor inscrito — e dura pela janela contratada (em geral, entre 30 e 90 dias após o último encontro).</p>
+<p>Para turmas fechadas e in company, o replay pode ser estendido conforme acordo institucional. Eventos presenciais sem transmissão híbrida não geram replay público — mas podem gerar registros editoriais entregues como material da turma.</p>`,
+  },
+  {
+    id: "cap-faq-4",
+    pergunta: "Como a NTC é contratada por órgãos públicos?",
+    respostaHtml: `<p>A contratação da NTC por órgãos públicos ocorre <strong>exclusivamente por via direta</strong> — inexigibilidade ou dispensa de licitação, conforme a hipótese aplicável — ou por convênios, parcerias e instrumentos de cooperação, quando juridicamente cabíveis.</p>
+<p>A NTC <strong>não participa</strong> de licitações, pregões, concorrências, ARP, registro de preços ou processos similares. Esta é uma diretriz institucional do Instituto, em razão da natureza especializada das formações que desenvolve. A página de <a href="/solucoes#contratacao-institucional" data-cms-link="modelo-institucional">Soluções</a> detalha as hipóteses jurídicas e o apoio técnico que oferecemos ao órgão na formalização.</p>`,
+  },
+  {
+    id: "cap-faq-5",
+    pergunta: "Posso combinar módulos de programas diferentes?",
+    respostaHtml: `<p>Sim. Essa é exatamente a função da modalidade de <strong>trilhas e jornadas curadas</strong>. A curadoria científica da NTC combina módulos de diferentes programas — articulando, por exemplo, módulos de AGIP (contratações), LIDERA (direção) e SIGA (governança administrativa) em uma trilha de formação plurianual para uma carreira pública.</p>
+<p>As trilhas são sempre articuladas com apoio da curadoria desde o briefing, para preservar a coerência editorial e técnica da jornada formativa.</p>`,
+  },
+  {
+    id: "cap-faq-6",
+    pergunta: "A NTC respeita a LGPD nas inscrições?",
+    respostaHtml: `<p>Sim. O Instituto NTC do Brasil é controlador dos dados pessoais coletados em inscrições, formulários e na operação do EventOn, sob a Lei 13.709/2018 (LGPD). Os dados são tratados exclusivamente para a finalidade da formação contratada — operação, comunicação, certificação, relatório institucional — e não são compartilhados com terceiros para fins comerciais.</p>
+<p>O encarregado de dados (DPO) e os direitos titulares estão disponíveis na página de <a href="/lgpd" data-cms-link="legal-lgpd">Contato · LGPD</a>.</p>`,
+  },
+  {
+    id: "cap-faq-7",
+    pergunta: "Posso inscrever uma equipe institucional inteira?",
+    respostaHtml: `<p>Sim. Há um fluxo dedicado a inscrições em grupo institucional — pelo formulário "Equipe ou grupo institucional" da página de Contato. Suportamos inscrições de qualquer tamanho, com faixas de atendimento de até 50 participantes (preenchimento direto) e a partir de 50 (envio do modelo XLSX oficial com a relação de servidores).</p>
+<p>Em grupos maiores, o atendimento institucional pode também avaliar se a hipótese mais aderente é a contratação direta de uma turma fechada — o que muitas vezes oferece melhor custo institucional e mais customização.</p>`,
+  },
+  {
+    id: "cap-faq-8",
+    pergunta: "Quanto tempo leva para a NTC apresentar uma proposta?",
+    respostaHtml: `<p>Para inscrição em evento aberto: o atendimento responde em até <strong>2 dias úteis</strong>.</p>
+<p>Para proposta institucional dedicada (in company, turma fechada, sob medida, trilha): após o briefing recebido, devolvemos a leitura técnica e a recomendação editorial em <strong>até 10 dias úteis</strong>. A proposta formal — com escopo, prazo, equipe docente, formato e valor — segue em até 15 dias úteis, conforme a complexidade do desenho.</p>
+<p>Para demandas emergenciais (formação executiva em curto prazo), há rito acelerado que pode ser combinado com o atendimento institucional.</p>`,
+  },
+];
