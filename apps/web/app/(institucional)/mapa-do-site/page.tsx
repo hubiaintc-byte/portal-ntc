@@ -96,7 +96,7 @@ export default function MapaDoSitePage() {
                     <ul>
                       <li><Link href="/"><strong>Home Grupo NTC</strong><span>Página inicial · hero institucional</span></Link></li>
                       <li><Link href="/o-grupo"><strong>O Grupo NTC</strong><span>Quem somos · MVV · linha do tempo</span></Link></li>
-                      <li><Link href="/#conteudos"><strong>Conteúdos</strong><span>Biblioteca editorial institucional</span></Link></li>
+                      <li><Link href="/conteudos"><strong>Conteúdos</strong><span>Biblioteca editorial institucional</span></Link></li>
                     </ul>
                   </div>
                   <div className="sitemap-col">

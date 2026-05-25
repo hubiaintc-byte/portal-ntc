@@ -137,9 +137,9 @@ export function HeaderHome() {
             >
               Soluções
             </button>
-            <a className="nav-item" href="#conteudos">
+            <Link className="nav-item" href="/conteudos">
               Conteúdos
-            </a>
+            </Link>
             <Link className="nav-item" href="/contato">
               Contato
             </Link>
@@ -506,9 +506,9 @@ export function HeaderHome() {
             <Link href="/solucoes#contratacao-institucional"><strong>Contratação institucional</strong><span>Atendimento a órgãos públicos</span></Link>
           </div>
 
-          <a className="drawer-item" href="#conteudos" onClick={() => setDrawerAberto(false)}>
+          <Link className="drawer-item" href="/conteudos" onClick={() => setDrawerAberto(false)}>
             Conteúdos
-          </a>
+          </Link>
           <Link className="drawer-item" href="/contato" onClick={() => setDrawerAberto(false)}>
             Contato
           </Link>

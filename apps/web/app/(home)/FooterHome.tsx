@@ -34,7 +34,7 @@ export function FooterHome() {
               <li><a href="#programas">Programas</a></li>
               <li><a href="#capacitacao">Capacitação</a></li>
               <li><a href="#solucoes">Soluções</a></li>
-              <li><a href="#conteudos">Conteúdos</a></li>
+              <li><Link href="/conteudos">Conteúdos</Link></li>
               <li><a href="#docentes">Corpo Docente</a></li>
               <li><a href="#eventon">EventOn</a></li>
               <li><Link href="/contato">Contato</Link></li>
