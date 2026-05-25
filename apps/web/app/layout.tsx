@@ -78,6 +78,14 @@ import "./solucoes-prototipo.css";
 // .cont-card, .cont-tipos, .cont-verticais, .cont-newsletter, .cont-faq,
 // .cont-cta-final, .sticky-cta-mobile).
 import "./conteudos-prototipo.css";
+// CSS da página /capacitacao (portada literal de 27_Pagina_Capacitacao_v1.html).
+// Tokens base e regras de header/footer/btn vêm de home-prototipo.css;
+// aqui só vão classes específicas da página (.cap-metrics, .cap-subnav,
+// .cap-manifesto, .cap-pilares, .cap-verticais, .cap-modalidades,
+// .cap-vs-solucoes, .cap-formatos, .cap-eixos, .cap-curadoria,
+// .cap-eventon, .cap-proximos, .cap-evento-card, .cap-caminhos,
+// .cap-faq, .cap-cta-final, .sticky-cta-mobile).
+import "./capacitacao-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
