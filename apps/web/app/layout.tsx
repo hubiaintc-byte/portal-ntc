@@ -71,6 +71,13 @@ import "./agenda-prototipo.css";
 // .sol-parallax, .sol-juridico, .sol-vitrine, .sol-processo, .sol-faq,
 // .sol-cta-final, .sticky-cta-mobile).
 import "./solucoes-prototipo.css";
+// CSS da página /conteudos (portada literal de 28_Pagina_Conteudos_v1.html).
+// Tokens base e regras de header/footer/btn vêm de home-prototipo.css;
+// aqui só vão classes específicas da página (.cont-metrics, .cont-subnav,
+// .cont-manifesto, .cont-thesis, .cont-featured, .cont-biblioteca,
+// .cont-card, .cont-tipos, .cont-verticais, .cont-newsletter, .cont-faq,
+// .cont-cta-final, .sticky-cta-mobile).
+import "./conteudos-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
