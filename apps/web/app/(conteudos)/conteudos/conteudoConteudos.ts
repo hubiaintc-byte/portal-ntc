@@ -495,7 +495,7 @@ export const TIPOS_EDITORIAIS: TipoEditorial[] = [
 // ----------------- CURADORIA POR VERTICAL (3) -----------------
 
 export interface VertCard {
-  vert: "edu" | "gov" | "sau";
+  vert: Exclude<VerticalConteudo, "trans">;
   bandMark: string;
   bandNum: string;
   titulo: string;
