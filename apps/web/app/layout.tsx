@@ -64,6 +64,13 @@ import "./contato-prototipo.css";
 // .agenda-empty, .agenda-pagination, .agenda-intercta, .agenda-context,
 // .agenda-sticky-mobile-cta, .event-deadline-seal).
 import "./agenda-prototipo.css";
+// CSS da página /solucoes (portada literal de 26_Pagina_Solucoes_v1.html).
+// Tokens base e regras de header/footer/btn vêm de home-prototipo.css;
+// aqui só vão classes específicas da página (.hero-page, .sol-metrics,
+// .sol-manifesto, .sol-pilares, .sol-modalidades, .sol-card, .sol-detail,
+// .sol-parallax, .sol-juridico, .sol-vitrine, .sol-processo, .sol-faq,
+// .sol-cta-final, .sticky-cta-mobile).
+import "./solucoes-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
