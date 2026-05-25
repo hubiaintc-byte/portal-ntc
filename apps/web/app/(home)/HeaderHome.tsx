@@ -146,9 +146,9 @@ export function HeaderHome() {
           </nav>
 
           <div className="header-cta">
-            <a className="btn btn--secondary btn--mini" href="#contratacao">
+            <Link className="btn btn--secondary btn--mini" href="/solucoes">
               Solicitar proposta
-            </a>
+            </Link>
             <a className="btn btn--participant btn--mini" href="#eventon">
               Área do Participante
             </a>
@@ -310,34 +310,34 @@ export function HeaderHome() {
                 <h4>Modelos de contratação</h4>
                 <ul className="mega-list">
                   <li>
-                    <a href="#contratacao">
+                    <Link href="/solucoes#in-company">
                       <strong>Soluções in company</strong>
                       <span>Programa entregue exclusivamente à instituição</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#contratacao">
+                    <Link href="/solucoes#turmas-fechadas">
                       <strong>Turmas fechadas</strong>
                       <span>Edição operacional dedicada à equipe contratante</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#contratacao">
+                    <Link href="/solucoes#sob-medida">
                       <strong>Soluções sob medida</strong>
                       <span>Customização profunda de ementas, módulos e formato</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#contratacao">
+                    <Link href="/solucoes#trilhas">
                       <strong>Trilhas e jornadas</strong>
                       <span>Sequências formativas curadas para necessidades específicas</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#contratacao">
+                    <Link href="/solucoes#contratacao-institucional">
                       <strong>Contratação institucional</strong>
                       <span>Atendimento dedicado a órgãos públicos</span>
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -502,8 +502,8 @@ export function HeaderHome() {
               <strong>NTC Saúde</strong>
               <span>3 programas estratégicos</span>
             </Link>
-            <a href="#contratacao"><strong>Soluções in company</strong><span>Turmas fechadas e sob medida</span></a>
-            <a href="#contratacao"><strong>Contratação institucional</strong><span>Atendimento a órgãos públicos</span></a>
+            <Link href="/solucoes#in-company"><strong>Soluções in company</strong><span>Turmas fechadas e sob medida</span></Link>
+            <Link href="/solucoes#contratacao-institucional"><strong>Contratação institucional</strong><span>Atendimento a órgãos públicos</span></Link>
           </div>
 
           <a className="drawer-item" href="#conteudos" onClick={() => setDrawerAberto(false)}>
@@ -514,9 +514,9 @@ export function HeaderHome() {
           </Link>
         </nav>
         <div className="drawer-cta">
-          <a className="btn btn--gold" href="#contratacao">
+          <Link className="btn btn--gold" href="/solucoes">
             Solicitar proposta
-          </a>
+          </Link>
           <a className="btn btn--participant" href="#eventon">
             Área do Participante
           </a>
