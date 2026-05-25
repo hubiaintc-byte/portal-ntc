@@ -230,8 +230,15 @@ export default function CapacitacaoPage() {
                   <div className="cap-vert-body">
                     <h3>{v.titulo}</h3>
                     <p>{v.descricao}</p>
-                    <span className="cap-vert-contagem">{v.contagem}</span>
-                    <ul className="cap-vert-list">
+                    <span className="cap-vert-count">{v.contagem}</span>
+                    <ul
+                      className="cap-vert-list"
+                      aria-label={
+                        v.vert === "edu"
+                          ? `Programas da ${v.bandMark} em destaque`
+                          : `Programas da ${v.bandMark}`
+                      }
+                    >
                       {v.programas.map((p) => (
                         <li key={p.href}>
                           <a
@@ -271,7 +278,7 @@ export default function CapacitacaoPage() {
             </div>
             <div className="cap-modalidades-grid fade-in">
               {modalidadesCapacitacao.map((m) => (
-                <article key={m.num} className="cap-modalidade">
+                <article key={m.num} className="cap-modalidade-card">
                   <span className="cap-mod-num">{m.num}</span>
                   <h3>{m.titulo}</h3>
                   <p>{m.descricao}</p>
@@ -280,7 +287,7 @@ export default function CapacitacaoPage() {
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
-                  <aside
+                  <div
                     className="cap-mod-aside"
                     dangerouslySetInnerHTML={{ __html: m.contratacaoHtml }}
                   />
@@ -304,22 +311,24 @@ export default function CapacitacaoPage() {
           aria-label="Diferença entre Capacitação e Soluções"
         >
           <div className="container">
-            <div className="cap-vs-grid fade-in">
-              {vsBlocks.map((b) => (
-                <div key={b.tipo} className="cap-vs-cell" data-tipo={b.tipo}>
-                  <p className="eyebrow">{b.eyebrow}</p>
-                  <h3>{b.titulo}</h3>
-                  <p dangerouslySetInnerHTML={{ __html: b.paragrafoHtml }} />
-                  <a
-                    className={b.link.classe}
-                    href={b.link.href}
-                    data-cms-link={b.link.cmsLink}
-                    data-track={b.link.track}
-                  >
-                    {b.link.texto}
-                  </a>
-                </div>
-              ))}
+            <div className="cap-vs-solucoes-inner fade-in">
+              <div className="cap-vs-solucoes-grid">
+                {vsBlocks.map((b) => (
+                  <div key={b.tipo} className="cap-vs-cell" data-tipo={b.tipo}>
+                    <p className="eyebrow">{b.eyebrow}</p>
+                    <h3>{b.titulo}</h3>
+                    <p dangerouslySetInnerHTML={{ __html: b.paragrafoHtml }} />
+                    <a
+                      className={b.link.classe}
+                      href={b.link.href}
+                      data-cms-link={b.link.cmsLink}
+                      data-track={b.link.track}
+                    >
+                      {b.link.texto}
+                    </a>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -330,7 +339,7 @@ export default function CapacitacaoPage() {
           id="formatos"
           aria-label="Formatos de entrega das formações NTC"
         >
-          <div className="container">
+          <div className="container cap-formatos-inner">
             <div className="section-head fade-in">
               <p className="eyebrow light">{formatosEyebrow}</p>
               <h2 dangerouslySetInnerHTML={{ __html: formatosH2 }} />
@@ -338,11 +347,11 @@ export default function CapacitacaoPage() {
             </div>
             <div className="cap-formatos-grid fade-in">
               {formatosCapacitacao.map((f) => (
-                <article key={f.num} className="cap-formato">
-                  <div className="cap-formato-numeral">
-                    <span className="cap-formato-num">{f.num}</span>
-                    <span className="cap-formato-num-rule" />
-                    <span className="cap-formato-num-tag">Formato</span>
+                <article key={f.num} className="cap-formato-card">
+                  <div className="cap-formato-numeral" aria-hidden="true">
+                    <span className="num">{f.num}</span>
+                    <span className="num-rule" />
+                    <span className="num-tag">Formato</span>
                   </div>
                   <h3>{f.titulo}</h3>
                   <p>{f.descricao}</p>
@@ -360,21 +369,25 @@ export default function CapacitacaoPage() {
           aria-label="Eixos formativos transversais NTC"
         >
           <div className="container">
-            <aside className="cap-eixos-aside">
-              <p className="eyebrow">{eixosEyebrow}</p>
-              <h2 dangerouslySetInnerHTML={{ __html: eixosH2 }} />
-              <p>{eixosP1}</p>
-              <p className="impact">{eixosImpact}</p>
-            </aside>
-            <ol className="cap-eixos-list">
-              {eixosCapacitacao.map((e) => (
-                <li key={e.num} className="cap-eixo">
-                  <span className="cap-eixo-num">{e.num}</span>
-                  <h3>{e.titulo}</h3>
-                  <p>{e.descricao}</p>
-                </li>
-              ))}
-            </ol>
+            <div className="cap-eixos-layout fade-in">
+              <aside className="cap-eixos-aside">
+                <p className="eyebrow">{eixosEyebrow}</p>
+                <h2 dangerouslySetInnerHTML={{ __html: eixosH2 }} />
+                <p>{eixosP1}</p>
+                <p className="impact">{eixosImpact}</p>
+              </aside>
+              <ol className="cap-eixos-list" aria-label="Lista de eixos formativos">
+                {eixosCapacitacao.map((e) => (
+                  <li key={e.num} className="cap-eixo-item">
+                    <span className="cap-eixo-num-edit">{e.num}</span>
+                    <div>
+                      <h3>{e.titulo}</h3>
+                      <p>{e.descricao}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
         </section>
 
@@ -384,33 +397,35 @@ export default function CapacitacaoPage() {
           id="curadoria"
           aria-label="Curadoria científica do Grupo NTC"
         >
-          <div className="container cap-curadoria-inner">
-            <div className="cap-curadoria-text fade-in">
-              <p className="eyebrow">{curadoriaEyebrow}</p>
-              <h2 dangerouslySetInnerHTML={{ __html: curadoriaH2 }} />
-              <p>{curadoriaP1}</p>
-              <p>{curadoriaP2}</p>
-              <div className="cap-curadoria-pills">
-                {curadoriaPills.map((pill) => (
-                  <span key={pill} className="cap-curadoria-pill">{pill}</span>
-                ))}
+          <div className="container">
+            <div className="cap-curadoria-grid fade-in">
+              <div className="cap-curadoria-text">
+                <p className="eyebrow">{curadoriaEyebrow}</p>
+                <h2 dangerouslySetInnerHTML={{ __html: curadoriaH2 }} />
+                <p>{curadoriaP1}</p>
+                <p>{curadoriaP2}</p>
+                <div className="cap-curadoria-pills">
+                  {curadoriaPills.map((pill) => (
+                    <span key={pill} className="cap-curadoria-pill">{pill}</span>
+                  ))}
+                </div>
+                <div className="cap-curadoria-cta">
+                  {curadoriaCtas.map((cta) => (
+                    <a
+                      key={cta.href}
+                      className={cta.classe}
+                      href={cta.href}
+                      data-cms-link={cta.cmsLink}
+                      data-track={cta.track}
+                    >
+                      {cta.texto}
+                      {cta.arrow && <span className="btn-arrow"> →</span>}
+                    </a>
+                  ))}
+                </div>
               </div>
-              <div className="cap-curadoria-cta">
-                {curadoriaCtas.map((cta) => (
-                  <a
-                    key={cta.href}
-                    className={cta.classe}
-                    href={cta.href}
-                    data-cms-link={cta.cmsLink}
-                    data-track={cta.track}
-                  >
-                    {cta.texto}
-                    {cta.arrow && <span className="btn-arrow"> →</span>}
-                  </a>
-                ))}
-              </div>
+              <div className="cap-curadoria-figura" aria-hidden="true" />
             </div>
-            <div className="cap-curadoria-figura" aria-hidden="true" />
           </div>
         </section>
 
@@ -421,33 +436,35 @@ export default function CapacitacaoPage() {
           aria-label="Plataforma EventOn do Grupo NTC"
         >
           <div className="container cap-eventon-inner">
-            <div className="cap-eventon-text fade-in">
-              <p className="eyebrow light">{eventonEyebrow}</p>
-              <h2 dangerouslySetInnerHTML={{ __html: eventonH2 }} />
-              <p dangerouslySetInnerHTML={{ __html: eventonP1 }} />
-              <p dangerouslySetInnerHTML={{ __html: eventonP2 }} />
-              <div className="cap-eventon-cta">
-                {eventonCtas.map((cta) => (
-                  <a
-                    key={`${cta.href}-${cta.cmsLink}`}
-                    className={cta.classe}
-                    href={cta.href}
-                    data-cms-link={cta.cmsLink}
-                    data-track={cta.track}
-                  >
-                    {cta.texto}
-                    {cta.arrow && <span className="btn-arrow"> →</span>}
-                  </a>
+            <div className="cap-eventon-grid fade-in">
+              <div className="cap-eventon-text">
+                <p className="eyebrow light">{eventonEyebrow}</p>
+                <h2 dangerouslySetInnerHTML={{ __html: eventonH2 }} />
+                <p dangerouslySetInnerHTML={{ __html: eventonP1 }} />
+                <p dangerouslySetInnerHTML={{ __html: eventonP2 }} />
+                <div className="cap-eventon-cta">
+                  {eventonCtas.map((cta) => (
+                    <a
+                      key={`${cta.href}-${cta.cmsLink}`}
+                      className={cta.classe}
+                      href={cta.href}
+                      data-cms-link={cta.cmsLink}
+                      data-track={cta.track}
+                    >
+                      {cta.texto}
+                      {cta.arrow && <span className="btn-arrow"> →</span>}
+                    </a>
+                  ))}
+                </div>
+              </div>
+              <div className="cap-eventon-features">
+                {eventonFeatures.map((f) => (
+                  <div key={f.strong} className="cap-eventon-feature">
+                    <strong>{f.strong}</strong>
+                    <span>{f.span}</span>
+                  </div>
                 ))}
               </div>
-            </div>
-            <div className="cap-eventon-features fade-in">
-              {eventonFeatures.map((f) => (
-                <div key={f.strong} className="cap-eventon-feature">
-                  <strong>{f.strong}</strong>
-                  <span>{f.span}</span>
-                </div>
-              ))}
             </div>
           </div>
         </section>
@@ -480,27 +497,30 @@ export default function CapacitacaoPage() {
             <div className="cap-caminhos-grid fade-in">
               {caminhosCapacitacao.map((c) => (
                 <article key={c.tipo} className="cap-caminho" data-tipo={c.tipo}>
-                  <p className="eyebrow">{c.eyebrow}</p>
+                  <p className="cap-caminho-eyebrow">{c.eyebrow}</p>
                   <h3>{c.titulo}</h3>
                   <p>{c.descricao}</p>
-                  <ol className="cap-caminho-passos">
+                  <div className="cap-caminho-passos">
                     {c.passos.map((p, i) => (
-                      <li key={i} className="cap-caminho-passo">
-                        <span className="cap-caminho-passo-num">{String(i + 1).padStart(2, "0")}</span>
-                        <strong>{p.title}</strong>
-                        <span>{p.sub}</span>
-                      </li>
+                      <div key={i} className="cap-caminho-passo">
+                        <div>
+                          <strong>{p.title}</strong>
+                          <span>{p.sub}</span>
+                        </div>
+                      </div>
                     ))}
-                  </ol>
-                  <a
-                    className={c.cta.classe}
-                    href={c.cta.href}
-                    data-cms-link={c.cta.cmsLink}
-                    data-track={c.cta.track}
-                  >
-                    {c.cta.texto}
-                    {c.cta.arrow && <span className="btn-arrow"> →</span>}
-                  </a>
+                  </div>
+                  <div className="cap-caminho-cta">
+                    <a
+                      className={c.cta.classe}
+                      href={c.cta.href}
+                      data-cms-link={c.cta.cmsLink}
+                      data-track={c.cta.track}
+                    >
+                      {c.cta.texto}
+                      {c.cta.arrow && <span className="btn-arrow"> →</span>}
+                    </a>
+                  </div>
                 </article>
               ))}
             </div>

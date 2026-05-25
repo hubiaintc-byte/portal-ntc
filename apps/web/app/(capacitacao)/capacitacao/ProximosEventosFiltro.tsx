@@ -72,10 +72,16 @@ export function ProximosEventosFiltro({
           <p className="eyebrow">{head.eyebrow}</p>
           <h2 dangerouslySetInnerHTML={{ __html: head.tituloHtml }} />
           <p className="intro">{head.intro}</p>
-          <span className="cap-proximos-selo">{head.selo}</span>
+          <span className="cap-proximos-selo" aria-label="Selo institucional">
+            {head.selo}
+          </span>
         </div>
 
-        <div className="cap-proximos-filterbar fade-in" role="tablist" aria-label="Filtrar por vertical">
+        <div
+          className="cap-proximos-filters fade-in"
+          role="tablist"
+          aria-label="Filtrar eventos por vertical"
+        >
           {filtros.map((f) => {
             const ativa = filtro === f.value;
             return (
@@ -94,33 +100,39 @@ export function ProximosEventosFiltro({
           })}
         </div>
 
-        <div className="cap-proximos-grid">
+        <div className="cap-proximos-grid fade-in">
           {visiveis.map(({ evento, visible }, i) => (
             <article
               key={i}
               className={`cap-evento-card${visible ? "" : " is-hidden"}`}
               data-vert={evento.vert}
             >
-              <p className="cap-evento-vert">{evento.eyebrow}</p>
-              <h3>
-                <span dangerouslySetInnerHTML={{ __html: evento.prefixoHtml }} />
-                {evento.titulo}
-              </h3>
-              <div className="cap-evento-meta">
-                <span>{evento.data}</span>
-                <span>{evento.formato}</span>
-                <span>{evento.local}</span>
+              <div className="cap-evento-band" aria-hidden="true" />
+              <div className="cap-evento-body">
+                <p className="cap-evento-vert">{evento.eyebrow}</p>
+                <h3
+                  dangerouslySetInnerHTML={{
+                    __html: `${evento.prefixoHtml}${evento.titulo}`,
+                  }}
+                />
+                <div className="cap-evento-meta">
+                  <span>{evento.data}</span>
+                  <span className="fmt">{evento.formato}</span>
+                  <span>{evento.local}</span>
+                </div>
+                <p>{evento.descricao}</p>
               </div>
-              <p>{evento.descricao}</p>
-              <div className="cap-evento-preco">{evento.preco}</div>
-              <a
-                className={evento.cta.classe}
-                href={evento.cta.href}
-                data-cms-link={evento.cta.cmsLink}
-                data-track={evento.cta.track}
-              >
-                {evento.cta.texto}
-              </a>
+              <div className="cap-evento-foot">
+                <span className="cap-evento-price">{evento.preco}</span>
+                <a
+                  className="cap-evento-link"
+                  href={evento.cta.href}
+                  data-cms-link={evento.cta.cmsLink}
+                  data-track={evento.cta.track}
+                >
+                  {evento.cta.texto}
+                </a>
+              </div>
             </article>
           ))}
         </div>
