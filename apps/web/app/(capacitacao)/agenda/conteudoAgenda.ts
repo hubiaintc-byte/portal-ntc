@@ -377,10 +377,9 @@ export const RODAPE_CONTEXTUAL: ColunaRodape[] = [
   {
     titulo: "Áreas estratégicas",
     itens: [
-      { texto: "NTC Educação", href: "/solucoes-estrategicas/ntc-educacao", cmsLink: "vertical-edu" },
-      // TODO: rota /solucoes-estrategicas/ntc-gestao-publica existe — verificar slug
-      { texto: "NTC Gestão Pública", href: "/solucoes-estrategicas/ntc-gestao-publica", cmsLink: "vertical-gov" },
-      { texto: "NTC Saúde", href: "/solucoes-estrategicas/ntc-saude", cmsLink: "vertical-sau" },
+      { texto: "NTC Educação", href: "/solucoes-estrategicas/educacao", cmsLink: "vertical-edu" },
+      { texto: "NTC Gestão Pública", href: "/solucoes-estrategicas/gestao-publica", cmsLink: "vertical-gov" },
+      { texto: "NTC Saúde", href: "/solucoes-estrategicas/saude", cmsLink: "vertical-sau" },
     ],
   },
   {
