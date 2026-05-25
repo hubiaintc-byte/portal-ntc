@@ -554,3 +554,162 @@ export const eventonFeatures: EventonFeature[] = [
     span: "Presença, conclusão, avaliação e indicadores consolidados ao órgão demandante.",
   },
 ];
+
+// ----------------- PRÓXIMOS EVENTOS (6) -----------------
+
+export interface EventoCap {
+  vert: VerticalCapacitacao;
+  eyebrow: string;
+  prefixoHtml: string;
+  titulo: string;
+  data: string;
+  formato: string;
+  local: string;
+  descricao: string;
+  preco: string;
+  cta: LinkInterno;
+}
+
+export interface FiltroProximos {
+  value: "all" | VerticalCapacitacao;
+  label: string;
+}
+
+export const proximosEyebrow = "Próximos eventos abertos";
+export const proximosH2 = `Inscrições <em>em aberto</em> no calendário NTC.`;
+export const proximosIntro =
+  "Uma seleção dos próximos eventos abertos — turmas regulares organizadas pela NTC nas três verticais, em diferentes formatos. A agenda completa, com filtros por área, formato e período, está na página da Agenda.";
+export const proximosSelo = "Eventos alimentados pela Agenda Geral NTC";
+
+export const filtrosProximos: FiltroProximos[] = [
+  { value: "all", label: "Todos" },
+  { value: "edu", label: "Educação" },
+  { value: "gov", label: "Gestão Pública" },
+  { value: "sau", label: "Saúde" },
+];
+
+export const eventosCapacitacao: EventoCap[] = [
+  {
+    vert: "sau",
+    eyebrow: "NTC Saúde · PROSUS+ · Brasília",
+    prefixoHtml: `<span class="ev-prefix">Seminário executivo</span>`,
+    titulo: "Direção institucional em saúde pública — alta gestão do SUS",
+    data: "04–05 jun 2026",
+    formato: "Presencial",
+    local: "Brasília · DF",
+    descricao:
+      "Dois dias de imersão executiva sobre a alta gestão do Sistema Único de Saúde, articulando direito sanitário, financiamento e governança institucional.",
+    preco: "R$ 4.890 · servidor",
+    cta: {
+      texto: "Ver e inscrever →",
+      href: "#", // TODO: rota /agenda/<slug> ainda não criada
+      cmsLink: "evento-PROSUS-bsb",
+      track: "cap_evento_click",
+      classe: "cap-evento-link",
+    },
+  },
+  {
+    vert: "edu",
+    eyebrow: "NTC Educação · EDUTEC · Online",
+    prefixoHtml: `<span class="ev-prefix">Módulo formativo</span>`,
+    titulo: "IA generativa em sala de aula — fundamentos e aplicações",
+    data: "11–13 jun 2026",
+    formato: "Online",
+    local: "EventOn · ao vivo",
+    descricao:
+      "Três encontros online sobre o uso pedagógico e ético da IA generativa por professores e coordenadores das redes públicas de ensino.",
+    preco: "R$ 1.190 · individual",
+    cta: {
+      texto: "Ver e inscrever →",
+      href: "#", // TODO: rota /agenda/<slug> ainda não criada
+      cmsLink: "evento-EDUTEC-m01",
+      track: "cap_evento_click",
+      classe: "cap-evento-link",
+    },
+  },
+  {
+    vert: "gov",
+    eyebrow: "NTC Gestão Pública · AGIP · São Paulo",
+    prefixoHtml: `<span class="ev-prefix">Jornada executiva</span>`,
+    titulo: "Lei 14.133/2021 — governança e integridade nas contratações",
+    data: "18–20 jun 2026",
+    formato: "Híbrido",
+    local: "São Paulo · SP",
+    descricao:
+      "Jornada híbrida de três dias com núcleo presencial executivo em São Paulo e participação remota via EventOn pelas equipes técnicas das redes.",
+    preco: "R$ 5.290 · servidor",
+    cta: {
+      texto: "Ver e inscrever →",
+      href: "#", // TODO: rota /agenda/<slug> ainda não criada
+      cmsLink: "evento-AGIP-sp",
+      track: "cap_evento_click",
+      classe: "cap-evento-link",
+    },
+  },
+  {
+    vert: "sau",
+    eyebrow: "NTC Saúde · PROAPS+ · Online",
+    prefixoHtml: `<span class="ev-prefix">Formação executiva</span>`,
+    titulo: "Previne Brasil, redes territoriais e atenção primária resolutiva",
+    data: "02–04 jul 2026",
+    formato: "Online",
+    local: "EventOn · ao vivo",
+    descricao:
+      "Três encontros sobre o desenho da APS contemporânea no SUS — financiamento Previne Brasil, redes territoriais e arquitetura institucional.",
+    preco: "R$ 1.490 · individual",
+    cta: {
+      texto: "Ver e inscrever →",
+      href: "/capacitacao/agenda#agenda-eventos",
+      cmsLink: "evento-PROAPS",
+      track: "cap_evento_click",
+      classe: "cap-evento-link",
+    },
+  },
+  {
+    vert: "edu",
+    eyebrow: "NTC Educação · PEAR · Brasília",
+    prefixoHtml: `<span class="ev-prefix">Seminário nacional</span>`,
+    titulo: "Alfabetização na idade certa — recomposição da aprendizagem",
+    data: "16–17 jul 2026",
+    formato: "Presencial",
+    local: "Brasília · DF",
+    descricao:
+      "Encontro nacional dedicado à alfabetização baseada em evidências e à recomposição da aprendizagem nos anos iniciais do ensino fundamental.",
+    preco: "R$ 3.890 · servidor",
+    cta: {
+      texto: "Ver e inscrever →",
+      href: "/capacitacao/agenda#agenda-eventos",
+      cmsLink: "evento-PEAR",
+      track: "cap_evento_click",
+      classe: "cap-evento-link",
+    },
+  },
+  {
+    vert: "gov",
+    eyebrow: "NTC Gestão Pública · LIDERA · Online",
+    prefixoHtml: `<span class="ev-prefix">Programa executivo</span>`,
+    titulo: "Direção estratégica e governança da política pública",
+    data: "30 jul – 01 ago 2026",
+    formato: "Online",
+    local: "EventOn · ao vivo",
+    descricao:
+      "Programa executivo de três encontros para dirigentes públicos sobre governança institucional, leitura estratégica de cenário e articulação federativa.",
+    preco: "R$ 1.690 · individual",
+    cta: {
+      texto: "Ver e inscrever →",
+      href: "/capacitacao/agenda#agenda-eventos",
+      cmsLink: "evento-LIDERA",
+      track: "cap_evento_click",
+      classe: "cap-evento-link",
+    },
+  },
+];
+
+export const proximosFooterLink: LinkInterno = {
+  texto: "Ver agenda completa",
+  href: "/capacitacao/agenda",
+  cmsLink: "agenda-completa",
+  track: "cap_agenda_completa",
+  classe: "btn btn--primary",
+  arrow: true,
+};
