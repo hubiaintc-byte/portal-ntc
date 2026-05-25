@@ -72,7 +72,7 @@ export default function ConteudosPage() {
                 <Fragment key={`crumb-${i}`}>
                   {c.href ? <a href={c.href}>{c.texto}</a> : null}
                   {c.current ? <span className="current">{c.texto}</span> : null}
-                  {i < HERO_CONTEUDOS.crumb.length - 1 && <span className="sep" />}
+                  {i < HERO_CONTEUDOS.crumb.length - 1 && <span className="sep" aria-hidden="true" />}
                 </Fragment>
               ))}
             </nav>
