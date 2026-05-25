@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import { NEWSLETTER_FORM } from "./conteudoConteudos";
 
@@ -26,7 +26,6 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function NewsletterForm() {
   const [status, setStatus] = useState<Status>("idle");
-  const formRef = useRef<HTMLFormElement>(null);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,7 +36,7 @@ export function NewsletterForm() {
     const email = String(data.get("email") ?? "").trim();
     const vertical = String(data.get("vertical") ?? "");
     const orgao = String(data.get("orgao") ?? "").trim();
-    const consent = data.get("consent") === "on";
+    const consent = data.get("consent") !== null;
 
     const validEmail = EMAIL_REGEX.test(email);
 
@@ -47,6 +46,8 @@ export function NewsletterForm() {
       return;
     }
 
+    // TODO(fase-real): ao trocar mock por POST, registrar versão da política,
+    // timestamp e IP no Lead conforme CLAUDE.md §12.
     setStatus("ok");
     track("cont_newsletter_subscribe", { vertical, hasOrg: !!orgao });
     form.reset();
@@ -54,7 +55,6 @@ export function NewsletterForm() {
 
   return (
     <form
-      ref={formRef}
       className="cont-newsletter-form"
       id="contNewsletterForm"
       noValidate
@@ -111,12 +111,16 @@ export function NewsletterForm() {
       <div
         className={`cont-newsletter-msg success${status === "ok" ? " is-visible" : ""}`}
         id="contNewsletterMsgOk"
+        role="status"
+        aria-live="polite"
       >
         {NEWSLETTER_FORM.msgOk}
       </div>
       <div
         className={`cont-newsletter-msg error${status === "err" ? " is-visible" : ""}`}
         id="contNewsletterMsgErr"
+        role="alert"
+        aria-live="assertive"
       >
         {NEWSLETTER_FORM.msgErr}
       </div>
