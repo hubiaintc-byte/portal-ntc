@@ -507,28 +507,247 @@ const eventoProsusBrasilia: EventoPresencial = {
     ],
   },
   local: {
-    eyebrow: "",
-    h2: "",
-    venueInfo: { titulo: "", enderecoLinhas: [], meta: "", hospedagemHtml: "" },
-    mapLabel: "",
-    pinLabel: "",
+    eyebrow: "Onde acontece",
+    h2: "Local do seminário",
+    venueInfo: {
+      titulo: "Hotel sede · Brasília · DF",
+      enderecoLinhas: [
+        "Setor Hoteleiro Sul · Asa Sul",
+        "Brasília · Distrito Federal",
+        "Endereço completo confirmado nos e-mails de credenciamento",
+      ],
+      meta: "Estacionamento institucional · Fácil acesso ao Eixo Monumental · 15 min do Aeroporto JK",
+      hospedagemHtml: "A NTC tem desconto institucional negociado com hotéis-rede em Brasília. Após a confirmação da inscrição, os participantes recebem orientações de hospedagem e logística.",
+    },
+    mapLabel: "Brasília · DF · Asa Sul",
+    pinLabel: "Brasília · DF · Asa Sul",
   },
-  replayCert: { eyebrow: "", h2: "", cards: [] },
-  investimento: { eyebrow: "", h2: "", rules: [] },
-  faq: { eyebrow: "", h2: "", faqs: [] },
-  ctaFinal: { eyebrowGold: "", h2: "", paragrafo: "", ctas: [] },
+
+  replayCert: {
+    eyebrow: "Acesso pós-evento",
+    h2: "Replay e certificação",
+    cards: [
+      {
+        icone: "↻",
+        titulo: "Replay da edição",
+        descricao: "Disponível por 90 dias após o evento na plataforma EventOn, exclusivo para participantes inscritos. Acesso por login institucional.",
+      },
+      {
+        icone: "⌬",
+        titulo: "Certificado validável",
+        descricao: "Emissão automática 7 dias após o evento, mediante presença mínima de 75%. Validação pública por código QR na plataforma.",
+      },
+    ],
+  },
+
+  investimento: {
+    eyebrow: "Política comercial",
+    h2: "Regras de inscrição e investimento",
+    h2Id: "regras",
+    rules: [
+      "Inscrições abertas até 30 de maio de 2026 ou enquanto houver vagas disponíveis.",
+      "Política de cancelamento sem ônus até 7 dias antes do início do evento.",
+      "Desconto institucional de 10% para grupos de 3 a 5 participantes da mesma instituição.",
+      "Para inscrição de equipes acima de 5 participantes, condição comercial dedicada — solicitar proposta para grupo.",
+      "Pagamento via PIX, boleto, cartão de crédito (até 6× sem juros) ou empenho institucional para órgãos públicos.",
+      "Para órgãos públicos: emissão de nota fiscal com CNPJ direto da instituição, conforme regras de empenho e contratação.",
+      "Não inclui hospedagem nem deslocamento aéreo. Material editorial e almoços institucionais inclusos.",
+      "Em caso de cancelamento pela NTC por força maior, reembolso integral em até 10 dias úteis.",
+    ],
+  },
+
+  faq: {
+    eyebrow: "Perguntas frequentes",
+    h2: "FAQ",
+    faqs: [
+      {
+        id: "evento-faq-1",
+        pergunta: "O evento aceita inscrições de equipe?",
+        respostaHtml: "<p>Sim. Equipes de 3 a 5 participantes da mesma instituição recebem desconto de 10%. Acima de 5 participantes, a NTC oferece condição comercial dedicada — basta solicitar proposta para grupo no botão lateral.</p>",
+      },
+      {
+        id: "evento-faq-2",
+        pergunta: "Como funciona a inscrição institucional para órgãos públicos?",
+        respostaHtml: "<p>Para órgãos públicos, emitimos nota fiscal direta no CNPJ da instituição contratante. Aceitamos empenho, dispensa de licitação por valor (quando aplicável) e demais modalidades previstas em lei. A equipe comercial NTC apoia o trâmite.</p>",
+      },
+      {
+        id: "evento-faq-3",
+        pergunta: "Qual a política de cancelamento?",
+        respostaHtml: "<p>Cancelamento sem ônus até 7 dias antes do início do evento. Após esse prazo, o valor pode ser convertido em crédito para outra edição ou outro evento NTC dentro de 12 meses.</p>",
+      },
+      {
+        id: "evento-faq-4",
+        pergunta: "Como funciona o replay?",
+        respostaHtml: "<p>Os participantes recebem acesso à gravação completa por 90 dias após o evento, no EventOn (plataforma própria do Grupo NTC). Acesso por login institucional individual, com proteção contra compartilhamento.</p>",
+      },
+      {
+        id: "evento-faq-5",
+        pergunta: "Como é emitido o certificado?",
+        respostaHtml: "<p>O certificado é emitido automaticamente 7 dias após o término do evento, mediante presença mínima de 75% nas atividades. Pode ser baixado pela Área do Participante e validado publicamente via código QR.</p>",
+      },
+      {
+        id: "evento-faq-6",
+        pergunta: "A inscrição inclui hospedagem?",
+        respostaHtml: "<p>Não. A inscrição inclui credenciamento, conteúdo dos três dias, material editorial NTC, almoços institucionais, replay e certificado. Hospedagem e deslocamento são por conta do participante. A NTC indica hotéis-rede com desconto institucional.</p>",
+      },
+      {
+        id: "evento-faq-7",
+        pergunta: "Como solicitar uma turma fechada para minha instituição?",
+        respostaHtml: "<p>A NTC desenvolve turmas fechadas in company para secretarias, autarquias e órgãos públicos. O conteúdo pode ser entregue na sede da instituição ou em formato online dedicado. Solicite proposta institucional pelo botão lateral.</p>",
+      },
+    ],
+  },
+
+  ctaFinal: {
+    eyebrowGold: "Próximo passo",
+    h2: "Garanta sua participação no Seminário PROSUS+ Brasília 2026.",
+    paragrafo: "Vagas limitadas. Inscrições abertas até 30 de maio de 2026 ou enquanto houver vagas disponíveis.",
+    ctas: [
+      {
+        texto: "Inscrever-se agora",
+        href: "#contato",
+        cmsLink: "inscricao-PROSUS-2026-jun",
+        classe: "btn btn--gold",
+        arrow: true,
+      },
+      {
+        texto: "Inscrever equipe ou grupo institucional",
+        href: "/contato?evento=PROSUS%2B+Brasília+–+Seminário&evento_url=/agenda/prosus-brasilia#tab-equipe",
+        cmsLink: "proposta-grupo-PROSUS",
+        classe: "btn btn--secondary",
+      },
+    ],
+  },
+
   sidebar: {
-    coverImg: "",
-    status: "",
-    tituloCard: "",
-    rows: [],
-    includes: { titulo: "", items: [] },
-    countdown: { label: "", dateText: "", deadline: "", tipo: "numerico" },
-    acoes: [],
-    share: { label: "", links: [] },
+    coverImg: "/img/fotos/_optimized/area-saude.1920.webp",
+    status: "Últimas vagas",
+    tituloCard: "Inscrição · Edição 2026",
+    rows: [
+      { label: "Quando", value: "5 a 7 · Junho · 2026" },
+      { label: "Onde", value: "Brasília · DF" },
+      { label: "Modalidade", value: "Presencial · 20 horas" },
+      { label: "Individual", value: "R$ 2.890", price: true },
+      { label: "Equipes / órgãos", value: "Sob consulta" },
+    ],
+    includes: {
+      titulo: "O que está incluído",
+      items: [
+        "Conteúdo presencial dos 3 dias",
+        "Material editorial NTC",
+        "Almoços institucionais",
+        "Replay por 90 dias no EventOn",
+        "Certificado validável",
+        "Networking executivo curado",
+      ],
+    },
+    countdown: {
+      label: "Prazo de inscrição",
+      dateText: "Até 29 de Maio de 2026",
+      deadline: "2026-05-29T23:59:59-03:00",
+      tipo: "numerico",
+    },
+    acoes: [
+      {
+        texto: "Inscrever-se",
+        href: "#contato",
+        cmsLink: "inscricao-PROSUS-2026-jun",
+        classe: "btn btn--gold",
+        arrow: true,
+      },
+      {
+        texto: "Inscrever equipe ou grupo institucional",
+        href: "/contato?evento=PROSUS%2B+Brasília+–+Seminário&evento_url=/agenda/prosus-brasilia#tab-equipe",
+        cmsLink: "inscricao-equipe-PROSUS",
+        classe: "btn btn--secondary",
+      },
+    ],
+    share: {
+      label: "Compartilhar:",
+      links: [
+        { texto: "WhatsApp", href: "#", cmsLink: "share-whatsapp" },
+        { texto: "E-mail", href: "#", cmsLink: "share-email" },
+        { texto: "LinkedIn", href: "#", cmsLink: "share-linkedin" },
+      ],
+    },
   },
-  relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
-  agendaIcs: { titulo: "", descricao: "", location: "", startISO: "", endISO: "", filename: "" },
+
+  relatedEvents: {
+    eyebrowGold: "Também na vertical",
+    h2: "Outros eventos da NTC Saúde",
+    intro: "Edições e módulos abertos vinculados aos programas <strong>PROSUS+</strong>, <strong>PROAPS+</strong> e <strong>SIGS</strong> nas próximas semanas.",
+    cards: [
+      {
+        area: "sau",
+        coverImg: "/img/fotos/_optimized/area-saude.1920.webp",
+        date: { tipo: "range", days: "02", dash: "–", monYr: "Jul · 2026" },
+        program: "Simpósio · NTC Saúde",
+        titulo: "Alta performance na atenção primária e redes de cuidado",
+        programBinding: "PROAPS+",
+        metaHtml: "Online · 16h · 2 dias <strong>R$ 1.490</strong>",
+        cta: {
+          texto: "Inscrever-se",
+          href: "#contato",
+          cmsLink: "inscricao-PROAPS-2026-jul",
+          classe: "es-cta",
+        },
+      },
+      {
+        area: "sau",
+        coverImg: "/img/fotos/_optimized/area-saude.1920.webp",
+        date: { tipo: "multi", count: "encontros", number: "4", period: "Jul · 2026" },
+        program: "Curso Executivo · NTC Saúde",
+        titulo: "Saúde inteligente, dados e governança digital no SUS",
+        programBinding: "SIGS",
+        metaHtml: "Híbrido · DF · 24h <strong>R$ 2.290</strong>",
+        cta: {
+          texto: "Inscrever-se",
+          href: "#contato",
+          cmsLink: "inscricao-SIGS-2026-jul",
+          classe: "es-cta",
+        },
+      },
+      {
+        area: "sau",
+        coverImg: "/img/fotos/_optimized/area-saude.1920.webp",
+        date: { tipo: "range", days: "14", dash: "–", monYr: "Ago · 2026" },
+        program: "Oficina · NTC Saúde",
+        titulo: "Financiamento e indicadores de performance no SUS — fundamentos aplicados",
+        programBinding: "PROSUS+",
+        metaHtml: "Online · 16h · 2 dias <strong>R$ 1.690</strong>",
+        cta: {
+          texto: "Inscrever-se",
+          href: "#contato",
+          cmsLink: "inscricao-PROSUS-2026-ago",
+          classe: "es-cta",
+        },
+      },
+    ],
+    footerCtas: [
+      {
+        texto: "Ver agenda completa",
+        href: "/capacitacao",
+        cmsLink: "agenda-completa",
+        classe: "btn btn--primary",
+        arrow: true,
+      },
+      {
+        texto: "Solicitar proposta institucional",
+        href: "/solucoes#contratacao-institucional",
+        cmsLink: "proposta-institucional",
+        classe: "btn btn--secondary",
+      },
+    ],
+  },
+
+  agendaIcs: {
+    titulo: "Seminário PROSUS+ Brasília 2026",
+    descricao: "Encontro executivo dedicado a secretários, gestores e lideranças do SUS sobre a nova arquitetura institucional, financeira e de performance do Sistema Único de Saúde.",
+    location: "Setor Hoteleiro Sul · Asa Sul, Brasília · Distrito Federal",
+    startISO: "20260605T120000Z",
+    endISO: "20260607T210000Z",
+    filename: "prosus-brasilia-2026.ics",
+  },
 };
 
 // ----------------- Record exportado -----------------
