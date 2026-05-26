@@ -86,6 +86,14 @@ import "./conteudos-prototipo.css";
 // .cap-eventon, .cap-proximos, .cap-evento-card, .cap-caminhos,
 // .cap-faq, .cap-cta-final, .sticky-cta-mobile).
 import "./capacitacao-prototipo.css";
+// CSS da página /agenda/[slug] (template de evento — portada literal de
+// 03_Pagina_Evento_PROSUS_Brasilia_v3.html e futuros AGIP SP, EDUTEC M01, etc).
+// Tokens base e regras de header/footer/btn vêm de home-prototipo.css;
+// aqui só vão classes específicas (.event-hero, .event-meta-bar, .evt-nav,
+// .event-layout, .event-section, .event-sidebar, .sidebar-card, .schedule-day,
+// .speaker-detail-card, .event-diff-card, .venue-grid, .replay-cert-card,
+// .rules-list, .faq-item, .related-events-section, .event-secondary-card).
+import "./evento-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
