@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 
 import type { Modulo } from "./conteudoModulos";
+import { ModuloCountdownSidebar } from "./ModuloCountdownSidebar";
 import { ModuloFaq } from "./ModuloFaq";
 import { ModuloSubnav } from "./ModuloSubnav";
 
@@ -398,12 +399,174 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
               </article>
             </div>
 
-            {/* SIDEBAR — Task 13 */}
+            {/* SIDEBAR */}
+            <aside className="evt-sidebar" aria-label="Card de inscrição">
+              <div className="sb-card">
+                <div className="sb-cover">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={modulo.sidebar.coverImg} alt={modulo.metaTitle} loading="lazy" />
+                  <span className="sb-status">{modulo.sidebar.status}</span>
+                  <span
+                    className="sb-cover-eventon"
+                    dangerouslySetInnerHTML={{ __html: modulo.sidebar.coverEventon }}
+                  />
+                </div>
+                <div className="sb-body">
+                  <p className="sb-title-tag">{modulo.sidebar.titleTag}</p>
+                  <div className="sb-rows">
+                    {modulo.sidebar.rows.map((row, i) => (
+                      <div
+                        key={i}
+                        className={`sb-row${row.price ? " price" : ""}`}
+                      >
+                        <span>{row.label}</span>
+                        <strong>{row.value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="sb-includes">
+                  <h4>{modulo.sidebar.includes.titulo}</h4>
+                  <ul>
+                    {modulo.sidebar.includes.items.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <ModuloCountdownSidebar
+                  label={modulo.sidebar.countdown.label}
+                  dateText={modulo.sidebar.countdown.dateText}
+                  deadline={modulo.sidebar.countdown.deadline}
+                  tipo={modulo.sidebar.countdown.tipo}
+                />
+                <div className="sb-actions">
+                  {modulo.sidebar.acoes.map((acao, i) => (
+                    <a
+                      key={i}
+                      className={acao.classe}
+                      href={acao.href}
+                      data-cms-link={acao.cmsLink}
+                    >
+                      {acao.texto}
+                      {acao.arrow && <span className="btn-arrow"> →</span>}
+                    </a>
+                  ))}
+                </div>
+                <div className="sb-share">
+                  <span style={{ color: "var(--prata)", marginRight: "4px" }}>
+                    {modulo.sidebar.share.label}
+                  </span>
+                  {modulo.sidebar.share.links.map((link, i) => (
+                    <a
+                      key={i}
+                      href={link.href}
+                      data-cms-link={link.cmsLink}
+                    >
+                      {link.texto}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* RELATED MODULOS — Task 13 */}
+      {/* 6. RELATED MODULOS */}
+      <section
+        className="related-events-section"
+        aria-label="Outros eventos da trilha EDUTEC e da NTC Educação"
+      >
+        <div className="container">
+          <div className="section-head fade-in">
+            <p className="eyebrow gold">{modulo.relatedModulos.eyebrowGold}</p>
+            <h2>{modulo.relatedModulos.h2}</h2>
+            <p
+              className="section-intro"
+              dangerouslySetInnerHTML={{ __html: modulo.relatedModulos.intro }}
+            />
+          </div>
+          <div className="related-events-grid fade-in">
+            {modulo.relatedModulos.cards.map((card, i) => (
+              <article
+                key={i}
+                className="event-secondary-card"
+                data-area={card.area}
+              >
+                <div className="es-cover">
+                  <div
+                    className="es-cover-img"
+                    aria-hidden="true"
+                    style={{ backgroundImage: `url('${card.coverImg}')` }}
+                  />
+                  <div className="es-cover-overlay" />
+                  {card.date.tipo === "range" ? (
+                    <div className="es-date range">
+                      <span className="days">
+                        {card.date.daysStart}
+                        <span className="dash">{card.date.dash}</span>
+                        {card.date.daysEnd}
+                      </span>
+                      <span className="mon-yr">{card.date.monYr}</span>
+                    </div>
+                  ) : (
+                    <div className="es-date single">
+                      <span className="day">{card.date.day}</span>
+                      <span className="mon-yr">{card.date.monYr}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="es-body">
+                  <div>
+                    <p className="es-program">{card.program}</p>
+                    <h4 className="es-title">{card.titulo}</h4>
+                    <p
+                      className="es-program-binding"
+                      dangerouslySetInnerHTML={{
+                        __html: `Integra o programa <strong>${card.programBinding}</strong>`,
+                      }}
+                    />
+                  </div>
+                  <div className="es-meta-row">
+                    <span
+                      className="es-meta"
+                      dangerouslySetInnerHTML={{ __html: card.metaHtml }}
+                    />
+                  </div>
+                  <a
+                    className="es-cta"
+                    href={card.cta.href}
+                    data-cms-link={card.cta.cmsLink}
+                  >
+                    {card.cta.texto}
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "var(--space-2)",
+              marginTop: "var(--space-5)",
+              flexWrap: "wrap",
+            }}
+          >
+            {modulo.relatedModulos.footerCtas.map((cta, i) => (
+              <a
+                key={i}
+                className={cta.classe}
+                href={cta.href}
+                data-cms-link={cta.cmsLink}
+              >
+                {cta.texto}
+                {cta.arrow && <span className="btn-arrow"> →</span>}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
