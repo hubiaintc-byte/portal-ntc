@@ -371,16 +371,141 @@ const eventoProsusBrasilia: EventoPresencial = {
     { texto: "FAQ", href: "#faq" },
   ],
 
-  // visaoGeral, publico, objetivos, conteudoProgramatico, programacao,
-  // palestrantes, diferenciais, local, replayCert, investimento, faq,
-  // ctaFinal, sidebar, relatedEvents, agendaIcs vêm em Tasks 5 e 6.
-  visaoGeral: { eyebrow: "", h2: "", lede: "", paragrafos: [] },
-  publico: { eyebrow: "", h2: "", intro: "", chips: [] },
-  objetivos: { eyebrow: "", h2: "", objetivos: [] },
-  conteudoProgramatico: { eyebrow: "", h2: "", intro: "", itens: [] },
-  programacao: { eyebrow: "", h2: "", intro: "", dias: [] },
-  palestrantes: { eyebrow: "", h2: "", intro: "", palestrantes: [], nota: "" },
-  diferenciais: { eyebrow: "", h2: "", diferenciais: [] },
+  // local, replayCert, investimento, faq,
+  // ctaFinal, sidebar, relatedEvents, agendaIcs vêm em Task 6.
+  visaoGeral: {
+    eyebrow: "Resumo executivo",
+    h2: "O encontro",
+    lede: "Três dias intensivos em Brasília reunindo gestores estaduais e municipais de saúde sobre a nova arquitetura de governança e financiamento do SUS — com diagnóstico estruturado, modelos institucionais consolidados e construção de planos aplicados.",
+    paragrafos: [
+      `O Seminário PROSUS+ Brasília 2026 é a edição executiva do programa estratégico <strong>PROSUS+ — Governança, Financiamento e Performance no SUS</strong>. Reúne secretários estaduais e municipais, diretores de redes assistenciais, coordenadores de planejamento e lideranças técnicas para discutir, ao longo de três dias, os desafios contemporâneos da gestão do Sistema Único de Saúde.`,
+      "A edição 2026 traz como eixos centrais a nova arquitetura de financiamento federal, os modelos de pagamento por performance, a articulação assistencial regional e o uso de tecnologia e dados para tomada de decisão. O formato presencial em Brasília favorece o networking executivo qualificado entre gestores de toda a federação.",
+    ],
+  },
+
+  publico: {
+    eyebrow: "Para quem",
+    h2: "Público-alvo",
+    intro: "O seminário é dimensionado para lideranças com poder de decisão nas redes públicas de saúde:",
+    chips: [
+      { texto: "Secretários estaduais de saúde" },
+      { texto: "Secretários municipais de saúde" },
+      { texto: "Gestores de redes assistenciais" },
+      { texto: "Diretores de hospitais públicos" },
+      { texto: "Coordenadores de planejamento e financiamento" },
+      { texto: "Lideranças técnicas do SUS" },
+      { texto: "Gestores de UPA e UBS" },
+      { texto: "Equipes de governo e assessoria estratégica" },
+    ],
+  },
+
+  objetivos: {
+    eyebrow: "O que entregamos",
+    h2: "Objetivos do seminário",
+    objetivos: [
+      { texto: "Diagnosticar os principais desafios contemporâneos da governança do SUS, com leitura institucional e perspectiva de federação." },
+      { texto: "Apresentar a nova arquitetura de financiamento federal e seus impactos diretos para gestões estaduais e municipais." },
+      { texto: "Discutir indicadores de performance institucional aplicáveis à gestão da saúde pública e modelos de pagamento por resultado." },
+      { texto: "Construir, com cada participante, um plano aplicado de governança e financiamento para sua instituição de origem." },
+      { texto: "Promover networking executivo qualificado entre lideranças do SUS de diferentes regiões, esferas e perfis institucionais." },
+    ],
+  },
+
+  conteudoProgramatico: {
+    eyebrow: "Estrutura",
+    h2: "Conteúdo programático",
+    intro: "O conteúdo é distribuído em sete eixos temáticos complementares, articulados ao longo dos três dias:",
+    itens: [
+      { num: "01", texto: "Governança contemporânea do SUS — estrutura institucional, atores estratégicos e marcos regulatórios." },
+      { num: "02", texto: "Financiamento da saúde pública — novos blocos, transferências federais e modelos de pagamento." },
+      { num: "03", texto: "Performance institucional — indicadores, metas e metodologias de monitoramento." },
+      { num: "04", texto: "Atenção primária e redes de cuidado — articulação assistencial e governança regional." },
+      { num: "05", texto: "Tecnologia e dados em saúde — instrumentos de gestão e tomada de decisão baseada em evidências." },
+      { num: "06", texto: "Estudos de caso brasileiros — boas práticas em estados e municípios de diferentes portes." },
+      { num: "07", texto: "Construção dos planos institucionais — sessão prática orientada à aplicação dos conteúdos." },
+    ],
+  },
+
+  programacao: {
+    eyebrow: "Cronograma",
+    h2: "Programação detalhada",
+    intro: "Três dias com programação executiva, almoços institucionais, mesas-redondas com gestores e construção orientada de planos institucionais.",
+    dias: [
+      {
+        dateBig: "5 de junho",
+        dateSub: "Quinta-feira · 2026",
+        dayTag: "Dia 1",
+        rows: [
+          { time: "08:00 — 09:00", titulo: "Credenciamento e abertura institucional", descricao: "Boas-vindas pela Coordenação Científica e enquadramento dos três dias." },
+          { time: "09:00 — 12:00", titulo: "Módulo 1 · Governança contemporânea do SUS", descricao: "Estrutura institucional, atores estratégicos e marcos regulatórios atualizados." },
+          { time: "12:00 — 14:00", titulo: "Almoço institucional", descricao: "Networking executivo orientado por mesas temáticas." },
+          { time: "14:00 — 17:00", titulo: "Módulo 2 · Financiamento da saúde pública", descricao: "Novos blocos, transferências federais e modelos de pagamento." },
+          { time: "17:00 — 18:00", titulo: "Mesa-redonda · Secretários estaduais", descricao: "Diálogo entre gestores estaduais sobre desafios e soluções de governança." },
+        ],
+      },
+      {
+        dateBig: "6 de junho",
+        dateSub: "Sexta-feira · 2026",
+        dayTag: "Dia 2",
+        rows: [
+          { time: "09:00 — 12:00", titulo: "Módulo 3 · Performance institucional e indicadores", descricao: "Indicadores, metas e metodologias de monitoramento aplicáveis à gestão da saúde." },
+          { time: "12:00 — 14:00", titulo: "Almoço institucional", descricao: "Networking executivo continuado." },
+          { time: "14:00 — 17:00", titulo: "Módulo 4 · Atenção primária e redes de cuidado", descricao: "Articulação assistencial regional e governança das redes públicas." },
+          { time: "17:00 — 18:00", titulo: "Estudo de caso · Sistema estadual", descricao: "Apresentação de experiência institucional consolidada e debate aberto." },
+        ],
+      },
+      {
+        dateBig: "7 de junho",
+        dateSub: "Sábado · 2026",
+        dayTag: "Dia 3",
+        rows: [
+          { time: "09:00 — 12:00", titulo: "Módulo 5 · Tecnologia e dados em saúde", descricao: "Instrumentos de gestão e tomada de decisão baseada em evidências." },
+          { time: "12:00 — 13:00", titulo: "Construção dos planos institucionais", descricao: "Sessão prática orientada à aplicação dos conteúdos nas instituições dos participantes." },
+          { time: "13:00 — 14:00", titulo: "Encerramento · Almoço de rede", descricao: "Síntese, próximos passos e construção de comunidade entre participantes." },
+        ],
+      },
+    ],
+  },
+
+  palestrantes: {
+    eyebrow: "Quem ensina",
+    h2: "Coordenação científica e especialistas",
+    intro: "Coordenação dedicada à edição, com participação de especialistas convidados de diferentes regiões e instituições do SUS.",
+    palestrantes: [
+      {
+        foto: "/img/fotos/_optimized/expert-04.1920.webp",
+        role: "Coordenação Científica",
+        nome: "NTC Saúde",
+        credenciais: "Direção científica do programa PROSUS+ · Especialista em gestão do SUS, governança digital e financiamento da saúde pública.",
+      },
+      {
+        foto: "/img/fotos/_optimized/expert-03.1920.webp",
+        role: "Especialista convidado",
+        nome: "Financiamento federal",
+        credenciais: "Atuação em transferências federais, blocos de financiamento e modelos de pagamento por performance no SUS.",
+      },
+      {
+        foto: "/img/fotos/_optimized/expert-02.1920.webp",
+        role: "Especialista convidada",
+        nome: "Atenção primária e redes",
+        credenciais: "Trajetória em coordenação de redes de cuidado, articulação regional e fortalecimento da APS.",
+      },
+    ],
+    nota: "Nomes, fotos e currículos completos dos especialistas confirmados serão publicados via CMS.",
+  },
+
+  diferenciais: {
+    eyebrow: "Por que participar",
+    h2: "Diferenciais do seminário",
+    diferenciais: [
+      { num: "01", titulo: "Encontro presencial qualificado", descricao: "Reúne gestores de toda a federação em formato executivo dedicado a tomadores de decisão." },
+      { num: "02", titulo: "Conteúdo aplicado à realidade do SUS", descricao: "Cada eixo temático parte de problemas concretos da Administração Pública brasileira em saúde." },
+      { num: "03", titulo: "Construção de plano institucional", descricao: "Cada participante constrói um plano aplicado para sua instituição de origem ao longo dos três dias." },
+      { num: "04", titulo: "Networking executivo orientado", descricao: "Almoços institucionais com mesas temáticas curadas e tempo dedicado a relacionamentos estratégicos." },
+      { num: "05", titulo: "Material editorial completo", descricao: "Cadernos institucionais NTC com conteúdo programático, leituras complementares e templates aplicáveis." },
+      { num: "06", titulo: "Replay e certificado", descricao: "Acesso ao replay da edição por 90 dias após o evento, no EventOn, com certificado validável." },
+    ],
+  },
   local: {
     eyebrow: "",
     h2: "",
