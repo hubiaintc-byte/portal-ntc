@@ -273,11 +273,176 @@ export interface Modulo {
   };
 }
 
+// ----------------- Módulo: EDUTEC M01 (online ao vivo) -----------------
+// Porta literal de 04_Pagina_Evento_EDUTEC_M01_Online_v2.html
+
+const moduloEdutecM01: Modulo = {
+  slugPrograma: "edutec",
+  slugModulo: "m01",
+  formato: "online-ao-vivo",
+  metaTitle:
+    "Seminário EDUTEC · Cultura Digital, Educação Midiática e Transformação da Educação · 27 Mai 2026 · Grupo NTC",
+  metaDescription:
+    "Seminário On-Line ao Vivo · Cultura Digital, Educação Midiática e Transformação da Educação · 27 de Maio de 2026 · 8 horas · Plataforma EventON NTC. Integra o programa estratégico EDUTEC do NTC Educação.",
+  area: "edu",
+
+  crumb: [
+    { texto: "Grupo NTC", href: "/", cmsLink: "home" },
+    { texto: "Capacitação", href: "/capacitacao", cmsLink: "agenda-completa" },
+    { texto: "Eventos online", href: "/capacitacao/agenda", cmsLink: "eventos-online" },
+    { texto: "Seminário EDUTEC · Cultura Digital", current: true },
+  ],
+
+  hero: {
+    bgImg: "/img/fotos/_optimized/area-educacao.1920.webp",
+    tags: [
+      { texto: "Inscrições abertas", classe: "evt-hero-status" },
+      { texto: "Seminário Online ao Vivo", classe: "evt-hero-format" },
+      { texto: "NTC Educação", classe: "evt-hero-vert" },
+    ],
+    h1: `Cultura Digital, Educação Midiática e <em>Transformação</em> da Educação`,
+    sub: "Fundamentos, repertórios e práticas para consolidar uma pedagogia crítica, conectada e institucionalmente alinhada à cultura digital contemporânea.",
+    programBinding: {
+      texto: "Integra o programa",
+      href: "/programas/edutec",
+      cmsLink: "programa-EDUTEC",
+      nomePrograma:
+        "EDUTEC — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino",
+    },
+    ctas: [
+      {
+        texto: "Inscrever-se",
+        href: "#contato",
+        cmsLink: "inscricao-EDUTEC-M01-2026-mai",
+        classe: "btn btn--gold",
+        arrow: true,
+      },
+      {
+        texto: "Baixar folder",
+        href: "#",
+        cmsLink: "folder-EDUTEC-M01",
+        classe: "btn btn--ghost-light",
+      },
+      {
+        texto: "Inscrever equipe ou grupo",
+        href: "/contato?evento=Seminário+EDUTEC+M01+–+Cultura+Digital&evento_url=/programas/edutec/modulos/m01#tab-equipe",
+        cmsLink: "proposta-grupo-EDUTEC-M01",
+        classe: "btn btn--ghost-light",
+      },
+    ],
+  },
+
+  metas: [
+    { label: "Quando", value: "27 · Maio", valueSub: "2026 · Quarta-feira" },
+    { label: "Modalidade", value: "Ao vivo", valueSub: "+ replay por 7 dias" },
+    { label: "Carga horária", value: "8 horas", valueSub: "Manhã (4h) + Tarde (4h)" },
+    { label: "Plataforma", value: "EventON NTC", valueSub: "Acesso individual" },
+    { label: "Investimento", value: "Sob consulta", valueSub: "Equipes e órgãos" },
+  ],
+
+  navLinks: [
+    { texto: "Visão geral", href: "#visao-geral", isActive: true },
+    { texto: "Público", href: "#publico" },
+    { texto: "Programação", href: "#programacao" },
+    { texto: "Palestrantes", href: "#palestrantes" },
+    { texto: "EventOn", href: "#eventon" },
+    { texto: "Investimento", href: "#investimento" },
+    { texto: "Regras", href: "#regras" },
+    { texto: "FAQ", href: "#faq" },
+  ],
+
+  // visaoGeral, publico, programacao, palestrantes, eventon, investimento,
+  // regras, faq, ctaFinal, sidebar, relatedModulos vêm em Tasks 5 e 6.
+  visaoGeral: {
+    eyebrow: "",
+    h2: "",
+    lede: "",
+    paragrafos: [],
+    moduleBindingNote: "",
+    segundoH2: "",
+    whyCards: [],
+  },
+  publico: {
+    eyebrow: "",
+    h2: "",
+    intro: "",
+    chips: [],
+    objetivoH2: "",
+    objetivoTexto: "",
+    destaquesH2: "",
+    highlights: [],
+  },
+  programacao: {
+    eyebrow: "",
+    h2: "",
+    intro: "",
+    timeline: { ttDay: "", ttMeta: "", nodes: [] },
+  },
+  palestrantes: { eyebrow: "", h2: "", palestrantes: [], nota: "" },
+  eventon: {
+    eyebrow: "",
+    h2: "",
+    intro: "",
+    markName: "",
+    markTag: "",
+    stats: [],
+    features: [],
+  },
+  investimento: {
+    eyebrow: "",
+    h2: "",
+    block: {
+      priceLabel: "",
+      priceCur: "",
+      priceAmt: "",
+      priceSub: "",
+      includesTitulo: "",
+      includesItems: [],
+    },
+    modes: [],
+  },
+  regras: { eyebrow: "", h2: "", rules: [] },
+  faq: { eyebrow: "", h2: "", faqs: [] },
+  ctaFinal: { eyebrowGold: "", h2: "", paragrafo: "", ctas: [] },
+  sidebar: {
+    coverImg: "",
+    status: "",
+    coverEventon: "",
+    titleTag: "",
+    rows: [],
+    includes: { titulo: "", items: [] },
+    countdown: { label: "", dateText: "", deadline: "", tipo: "numerico" },
+    acoes: [],
+    share: { label: "", links: [] },
+  },
+  relatedModulos: {
+    eyebrowGold: "",
+    h2: "",
+    intro: "",
+    cards: [],
+    footerCtas: [],
+  },
+
+  agendaIcs: {
+    titulo:
+      "Seminário EDUTEC · Cultura Digital, Educação Midiática e Transformação da Educação",
+    descricao:
+      "Seminário On-Line ao Vivo · Cultura Digital, Educação Midiática e Transformação da Educação · 27 de Maio de 2026 · 8 horas · Plataforma EventON NTC. Integra o programa estratégico EDUTEC do NTC Educação.",
+    location: "EventON NTC — Plataforma Online",
+    startISO: "20260527T110000Z",
+    endISO: "20260527T210000Z",
+    filename: "EDUTEC-M01-2026-mai.ics",
+  },
+};
+
 // ----------------- Lookup nested -----------------
 // MODULOS_PROGRAMAS é um Record nested: programa-slug → módulo-slug → Modulo.
-// Dados vêm em Tasks 4-6.
 
-export const MODULOS_PROGRAMAS: Record<string, Record<string, Modulo>> = {};
+export const MODULOS_PROGRAMAS: Record<string, Record<string, Modulo>> = {
+  edutec: {
+    m01: moduloEdutecM01,
+  },
+};
 
 export function lookupModulo(
   slugPrograma: string,
