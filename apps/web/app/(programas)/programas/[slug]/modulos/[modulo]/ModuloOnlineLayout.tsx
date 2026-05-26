@@ -137,12 +137,12 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                 {modulo.visaoGeral.paragrafos.map((p, i) => (
                   <p key={i} dangerouslySetInnerHTML={{ __html: p }} />
                 ))}
-                <p
+                <div
                   className="module-binding-note"
                   dangerouslySetInnerHTML={{ __html: modulo.visaoGeral.moduleBindingNote }}
                 />
                 <h2
-                  style={{ marginTop: "var(--space-6)" }}
+                  style={{ marginTop: "var(--space-5)" }}
                   dangerouslySetInnerHTML={{ __html: modulo.visaoGeral.segundoH2 }}
                 />
                 <div className="why-grid">
@@ -168,11 +168,11 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                     <span key={i}>{chip.texto}</span>
                   ))}
                 </div>
-                <h2 style={{ marginTop: "var(--space-6)" }}>
+                <h2 style={{ marginTop: "var(--space-5)" }}>
                   {modulo.publico.objetivoH2}
                 </h2>
                 <p>{modulo.publico.objetivoTexto}</p>
-                <h2 style={{ marginTop: "var(--space-6)" }}>
+                <h2 style={{ marginTop: "var(--space-5)" }}>
                   {modulo.publico.destaquesH2}
                 </h2>
                 <div className="highlights-list">
@@ -208,7 +208,7 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                         <span className="ttag">{node.ttag}</span>
                       </div>
                       <div className="sn-marker">
-                        <span className="sn-num">{node.num}</span>
+                        <div className="sn-num">{node.num}</div>
                       </div>
                       <div className="sn-content">
                         <h4>{node.titulo}</h4>
@@ -231,12 +231,13 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
               <article className="evt-section fade-in" id="palestrantes">
                 <p className="eyebrow">{modulo.palestrantes.eyebrow}</p>
                 <h2 dangerouslySetInnerHTML={{ __html: modulo.palestrantes.h2 }} />
+                <p>{modulo.palestrantes.intro}</p>
                 <div className="speakers-detailed">
                   {modulo.palestrantes.palestrantes.map((p, i) => (
                     <article key={i} className="speaker-detail-card">
                       <div className="speaker-detail-portrait">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={p.foto} alt={p.nome} loading="lazy" />
+                        <img src={p.foto} alt={`${p.nome} · ${p.roleTag}`} loading="lazy" />
                         <span className="speaker-role-tag">{p.roleTag}</span>
                       </div>
                       <div className="speaker-detail-info">
@@ -247,7 +248,9 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                     </article>
                   ))}
                 </div>
-                <p className="placeholder-note">{modulo.palestrantes.nota}</p>
+                <p className="placeholder-note" style={{ textAlign: "left" }}>
+                  {modulo.palestrantes.nota}
+                </p>
               </article>
 
               {/* 5.5 EVENTON (plataforma) */}
@@ -267,8 +270,8 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                     <div className="eventon-stats">
                       {modulo.eventon.stats.map((stat, i) => (
                         <div key={i} className="eventon-stat">
-                          <span className="n">{stat.n}</span>
-                          <span className="l">{stat.l}</span>
+                          <div className="n">{stat.n}</div>
+                          <div className="l">{stat.l}</div>
                         </div>
                       ))}
                     </div>
@@ -276,7 +279,7 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                   <div className="eventon-features">
                     {modulo.eventon.features.map((feat, i) => (
                       <div key={i} className="eventon-feat">
-                        <span className="feat-icon" aria-hidden="true">
+                        <div className="feat-icon">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -284,12 +287,12 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="1.8"
+                            strokeWidth={2}
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             dangerouslySetInnerHTML={{ __html: feat.iconSvg }}
                           />
-                        </span>
+                        </div>
                         <div className="feat-body">
                           <h4>{feat.titulo}</h4>
                           <p>{feat.descricao}</p>
@@ -304,6 +307,7 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
               <article className="evt-section fade-in" id="investimento">
                 <p className="eyebrow">{modulo.investimento.eyebrow}</p>
                 <h2>{modulo.investimento.h2}</h2>
+                <p>{modulo.investimento.intro}</p>
                 <div className="investment-block">
                   <div className="invest-price">
                     <span className="label">{modulo.investimento.block.priceLabel}</span>
@@ -328,7 +332,7 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                       key={i}
                       className={`invest-mode${mode.featured ? " featured" : ""}`}
                     >
-                      <span className="tag">{mode.tag}</span>
+                      <div className="tag">{mode.tag}</div>
                       <h4>{mode.titulo}</h4>
                       <p>{mode.descricao}</p>
                     </div>
@@ -340,13 +344,11 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
               <article className="evt-section fade-in" id="regras">
                 <p className="eyebrow">{modulo.regras.eyebrow}</p>
                 <h2>{modulo.regras.h2}</h2>
-                <div className="rules-list">
-                  <ul>
-                    {modulo.regras.rules.map((rule, i) => (
-                      <li key={i}>{rule}</li>
-                    ))}
-                  </ul>
-                </div>
+                <ul className="rules-list">
+                  {modulo.regras.rules.map((rule, i) => (
+                    <li key={i}>{rule}</li>
+                  ))}
+                </ul>
               </article>
 
               {/* 5.8 FAQ */}

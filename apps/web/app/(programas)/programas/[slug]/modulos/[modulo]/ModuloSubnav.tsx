@@ -79,6 +79,7 @@ export function ModuloSubnav({
                 key={link.href}
                 href={link.href}
                 className={`evt-nav-link${ativo ? " is-active" : ""}`}
+                data-anchor={link.href.replace(/^#/, "")}
                 aria-current={ativo ? "location" : undefined}
               >
                 {link.texto}

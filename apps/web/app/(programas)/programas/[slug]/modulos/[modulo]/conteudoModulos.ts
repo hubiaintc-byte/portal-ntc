@@ -184,6 +184,7 @@ export interface SecaoProgramacao {
 export interface SecaoPalestrantes {
   eyebrow: string;
   h2: string;
+  intro: string;
   palestrantes: Palestrante[];
   nota: string;
 }
@@ -201,6 +202,7 @@ export interface SecaoEventon {
 export interface SecaoInvestimento {
   eyebrow: string;
   h2: string;
+  intro: string;
   block: {
     priceLabel: string;
     priceCur: string;
@@ -482,6 +484,7 @@ const moduloEdutecM01: Modulo = {
   palestrantes: {
     eyebrow: "Quem ensina",
     h2: `Três especialistas de <em>referência nacional</em>`,
+    intro: "Cultura digital, educação midiática e inovação pedagógica conduzidas por nomes consolidados no Brasil e na América Latina.",
     palestrantes: [
       {
         foto: "/img/fotos/_optimized/expert-03.1920.webp",
@@ -555,6 +558,7 @@ const moduloEdutecM01: Modulo = {
   investimento: {
     eyebrow: "Investimento",
     h2: "Investimento e condições",
+    intro: "Modalidades de contratação flexíveis para inscrição individual, equipes e instituições públicas.",
     block: {
       priceLabel: "Inscrição individual",
       priceCur: "R$",
