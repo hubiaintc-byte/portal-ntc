@@ -94,6 +94,12 @@ import "./capacitacao-prototipo.css";
 // .speaker-detail-card, .event-diff-card, .venue-grid, .replay-cert-card,
 // .rules-list, .faq-item, .related-events-section, .event-secondary-card).
 import "./evento-prototipo.css";
+// CSS da página /programas/[slug]/modulos/[modulo] (template de módulo de programa —
+// portada literal de 04_Pagina_Evento_EDUTEC_M01_Online_v2.html).
+// Tokens base e regras de header/footer/btn vêm de home-prototipo.css;
+// aqui só vão classes específicas (prefixos .evt-*, .sb-*, .sn-*, .es-*,
+// .eventon-*, .why-*, .highlight-*, .invest-*, .faq-*, .speaker-*).
+import "./modulo-prototipo.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
