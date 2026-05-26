@@ -89,13 +89,18 @@ export function EventoSubnav({
           >
             Inscrever-se
           </button>
-          <a
-            href={folderHref}
+          <button
+            type="button"
             className="evt-nav-action"
             data-cms-link={folderCmsLink}
+            onClick={() => {
+              if (folderHref && folderHref !== "#") {
+                window.open(folderHref, "_blank", "noopener");
+              }
+            }}
           >
             Baixar folder
-          </a>
+          </button>
           <AgendaDropdown dados={agendaIcs} />
         </div>
       </div>
