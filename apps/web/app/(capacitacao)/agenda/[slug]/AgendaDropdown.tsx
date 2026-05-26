@@ -113,7 +113,7 @@ export function AgendaDropdown({ dados }: AgendaDropdownProps) {
           <a
             href={urlGoogle}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener"
             data-cms-link="cal-google"
           >
             Google Calendar
@@ -121,17 +121,17 @@ export function AgendaDropdown({ dados }: AgendaDropdownProps) {
           <a
             href={urlOutlook}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener"
             data-cms-link="cal-outlook"
           >
-            Outlook
+            Outlook · Office 365
           </a>
           <a
             href={icsUri}
             download={dados.filename}
             data-cms-link="cal-apple"
           >
-            Apple Calendar (.ics)
+            Apple Calendar
           </a>
           <a
             href={icsUri}

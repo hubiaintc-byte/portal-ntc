@@ -65,30 +65,35 @@ export function CountdownSidebar({ label, dateText, deadline, tipo }: CountdownS
       <div className="sidebar-cd-label">{label}</div>
       <div className="sidebar-cd-date">{dateText}</div>
 
-      {expirado ? (
-        <div className="sidebar-cd-text" style={{ display: "block" }}>
+      <div
+        className="sidebar-cd-counter"
+        id="sidebarCdCounter"
+        style={tipo === "numerico" && !expirado ? undefined : { display: "none" }}
+      >
+        <div className="item">
+          <span className="num" data-cd="d">{tempo ? d : "—"}</span>
+          <span className="lbl">dias</span>
+        </div>
+        <div className="item">
+          <span className="num" data-cd="h">{tempo ? h : "—"}</span>
+          <span className="lbl">horas</span>
+        </div>
+        <div className="item">
+          <span className="num" data-cd="m">{tempo ? m : "—"}</span>
+          <span className="lbl">min</span>
+        </div>
+      </div>
+      <div
+        className="sidebar-cd-text"
+        id="sidebarCdText"
+        style={tipo === "textual" || expirado ? undefined : { display: "none" }}
+      >
+        {expirado ? (
           <strong>Inscrições encerradas</strong>
-        </div>
-      ) : tipo === "numerico" ? (
-        <div className="sidebar-cd-counter" id="sidebarCdCounter">
-          <div className="item">
-            <span className="num" data-cd="d">{tempo ? d : "—"}</span>
-            <span className="lbl">dias</span>
-          </div>
-          <div className="item">
-            <span className="num" data-cd="h">{tempo ? h : "—"}</span>
-            <span className="lbl">horas</span>
-          </div>
-          <div className="item">
-            <span className="num" data-cd="m">{tempo ? m : "—"}</span>
-            <span className="lbl">min</span>
-          </div>
-        </div>
-      ) : (
-        <div className="sidebar-cd-text" id="sidebarCdText">
-          Faltam <strong>{tempo ? d : "—"}</strong> dias
-        </div>
-      )}
+        ) : (
+          <>Faltam <strong>{tempo ? d : "—"}</strong> dias</>
+        )}
+      </div>
     </div>
   );
 }

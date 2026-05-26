@@ -88,7 +88,7 @@ export interface ItemFaqEvento {
 }
 
 export type RelatedEventDate =
-  | { tipo: "range"; days: string; dash: string; monYr: string }
+  | { tipo: "range"; daysStart: string; dash: string; daysEnd: string; monYr: string }
   | { tipo: "multi"; count: string; number: string; period: string };
 
 export interface RelatedEventCard {
@@ -680,7 +680,7 @@ const eventoProsusBrasilia: EventoPresencial = {
       {
         area: "sau",
         coverImg: "/img/fotos/_optimized/area-saude.1920.webp",
-        date: { tipo: "range", days: "02", dash: "–", monYr: "Jul · 2026" },
+        date: { tipo: "range", daysStart: "02", dash: "–", daysEnd: "03", monYr: "Jul · 2026" },
         program: "Simpósio · NTC Saúde",
         titulo: "Alta performance na atenção primária e redes de cuidado",
         programBinding: "PROAPS+",
@@ -710,7 +710,7 @@ const eventoProsusBrasilia: EventoPresencial = {
       {
         area: "sau",
         coverImg: "/img/fotos/_optimized/area-saude.1920.webp",
-        date: { tipo: "range", days: "14", dash: "–", monYr: "Ago · 2026" },
+        date: { tipo: "range", daysStart: "14", dash: "–", daysEnd: "15", monYr: "Ago · 2026" },
         program: "Oficina · NTC Saúde",
         titulo: "Financiamento e indicadores de performance no SUS — fundamentos aplicados",
         programBinding: "PROSUS+",

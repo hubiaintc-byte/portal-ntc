@@ -29,15 +29,15 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
           <ol className="breadcrumb-list">
             {evento.crumb.map((c, i) => (
               <Fragment key={`crumb-${i}`}>
-                <li>
-                  {c.href ? (
+                {c.href ? (
+                  <li>
                     <a href={c.href} data-cms-link={c.cmsLink}>
                       {c.texto}
                     </a>
-                  ) : (
-                    <span className="current">{c.texto}</span>
-                  )}
-                </li>
+                  </li>
+                ) : (
+                  <li className="current">{c.texto}</li>
+                )}
                 {i < evento.crumb.length - 1 && (
                   <li className="sep" aria-hidden="true">/</li>
                 )}
@@ -222,12 +222,8 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                 <p
                   className="placeholder-note"
                   style={{
-                    fontFamily: "var(--font-cond)",
-                    fontSize: "12px",
-                    letterSpacing: "1.6px",
-                    textTransform: "uppercase",
-                    color: "var(--grafite)",
                     marginTop: "var(--space-3)",
+                    textAlign: "left",
                   }}
                 >
                   {evento.palestrantes.nota}
@@ -269,9 +265,10 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                     <p className="venue-meta">{evento.local.venueInfo.meta}</p>
                     <p
                       style={{
-                        marginTop: "var(--space-3)",
-                        fontSize: "14px",
+                        fontSize: "14.5px",
                         color: "var(--grafite)",
+                        lineHeight: 1.55,
+                        margin: "6px 0 0",
                       }}
                       dangerouslySetInnerHTML={{
                         __html: evento.local.venueInfo.hospedagemHtml,
@@ -332,14 +329,20 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                 <h2 style={{ maxWidth: "720px", margin: "0 auto var(--space-3)" }}>
                   {evento.ctaFinal.h2}
                 </h2>
-                <p>{evento.ctaFinal.paragrafo}</p>
+                <p
+                  style={{
+                    maxWidth: "640px",
+                    margin: "0 auto var(--space-4)",
+                  }}
+                >
+                  {evento.ctaFinal.paragrafo}
+                </p>
                 <div
                   style={{
                     display: "flex",
-                    gap: "12px",
-                    flexWrap: "wrap",
+                    gap: "14px",
                     justifyContent: "center",
-                    marginTop: "var(--space-3)",
+                    flexWrap: "wrap",
                   }}
                 >
                   {evento.ctaFinal.ctas.map((cta, i) => (
@@ -362,7 +365,7 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
               <div className="sidebar-card">
                 <div className="sidebar-card-cover">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={evento.sidebar.coverImg} alt="" loading="lazy" />
+                  <img src={evento.sidebar.coverImg} alt={evento.titulo} loading="lazy" />
                   <span className="sidebar-card-status">{evento.sidebar.status}</span>
                 </div>
                 <div className="sidebar-card-body">
@@ -373,8 +376,8 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                         key={i}
                         className={`sidebar-row${row.price ? " price" : ""}`}
                       >
-                        <span className="label">{row.label}</span>
-                        <span className="value">{row.value}</span>
+                        <span>{row.label}</span>
+                        <strong>{row.value}</strong>
                       </div>
                     ))}
                   </div>
@@ -407,7 +410,9 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                   ))}
                 </div>
                 <div className="sidebar-share">
-                  <span>{evento.sidebar.share.label}</span>
+                  <span style={{ color: "var(--prata)", marginRight: "4px" }}>
+                    {evento.sidebar.share.label}
+                  </span>
                   {evento.sidebar.share.links.map((link, i) => (
                     <a
                       key={i}
@@ -427,7 +432,11 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
       {/* 6. RELATED EVENTS */}
       <section
         className="related-events-section"
-        aria-label={`Outros eventos da vertical ${evento.relatedEvents.h2}`}
+        aria-label={`Outros eventos da vertical ${
+          evento.area === "edu" ? "NTC Educação"
+            : evento.area === "gov" ? "NTC Gestão Pública"
+              : "NTC Saúde"
+        }`}
       >
         <div className="container">
           <div className="section-head fade-in">
@@ -454,8 +463,11 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                   <div className="es-cover-overlay" />
                   {card.date.tipo === "range" ? (
                     <div className="es-date range">
-                      <span className="days">{card.date.days}</span>
-                      <span className="dash">{card.date.dash}</span>
+                      <span className="days">
+                        {card.date.daysStart}
+                        <span className="dash">{card.date.dash}</span>
+                        {card.date.daysEnd}
+                      </span>
                       <span className="mon-yr">{card.date.monYr}</span>
                     </div>
                   ) : (
@@ -471,7 +483,12 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                   <div>
                     <p className="es-program">{card.program}</p>
                     <h4 className="es-title">{card.titulo}</h4>
-                    <p className="es-program-binding">{card.programBinding}</p>
+                    <p
+                      className="es-program-binding"
+                      dangerouslySetInnerHTML={{
+                        __html: `Integra o programa <strong>${card.programBinding}</strong>`,
+                      }}
+                    />
                   </div>
                   <div className="es-meta-row">
                     <span
@@ -493,10 +510,10 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
           <div
             style={{
               display: "flex",
-              gap: "12px",
-              flexWrap: "wrap",
               justifyContent: "center",
+              gap: "var(--space-2)",
               marginTop: "var(--space-5)",
+              flexWrap: "wrap",
             }}
           >
             {evento.relatedEvents.footerCtas.map((cta, i) => (
