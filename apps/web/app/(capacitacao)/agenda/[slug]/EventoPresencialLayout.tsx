@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 
 import type { EventoPresencial } from "./conteudoEventos";
+import { CountdownSidebar } from "./CountdownSidebar";
 import { EventoSubnav } from "./EventoSubnav";
 import { FaqEvento } from "./FaqEvento";
 
@@ -356,12 +357,162 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
               </article>
             </div>
 
-            {/* SIDEBAR — Task 13 */}
+            {/* SIDEBAR */}
+            <aside className="event-sidebar" aria-label="Card de inscrição">
+              <div className="sidebar-card">
+                <div className="sidebar-card-cover">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={evento.sidebar.coverImg} alt="" loading="lazy" />
+                  <span className="sidebar-card-status">{evento.sidebar.status}</span>
+                </div>
+                <div className="sidebar-card-body">
+                  <h3>{evento.sidebar.tituloCard}</h3>
+                  <div className="sidebar-rows">
+                    {evento.sidebar.rows.map((row, i) => (
+                      <div
+                        key={i}
+                        className={`sidebar-row${row.price ? " price" : ""}`}
+                      >
+                        <span className="label">{row.label}</span>
+                        <span className="value">{row.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="sidebar-includes">
+                  <h4>{evento.sidebar.includes.titulo}</h4>
+                  <ul>
+                    {evento.sidebar.includes.items.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+                <CountdownSidebar
+                  label={evento.sidebar.countdown.label}
+                  dateText={evento.sidebar.countdown.dateText}
+                  deadline={evento.sidebar.countdown.deadline}
+                  tipo={evento.sidebar.countdown.tipo}
+                />
+                <div className="sidebar-actions">
+                  {evento.sidebar.acoes.map((acao, i) => (
+                    <a
+                      key={i}
+                      className={acao.classe}
+                      href={acao.href}
+                      data-cms-link={acao.cmsLink}
+                    >
+                      {acao.texto}
+                      {acao.arrow && <span className="btn-arrow"> →</span>}
+                    </a>
+                  ))}
+                </div>
+                <div className="sidebar-share">
+                  <span>{evento.sidebar.share.label}</span>
+                  {evento.sidebar.share.links.map((link, i) => (
+                    <a
+                      key={i}
+                      href={link.href}
+                      data-cms-link={link.cmsLink}
+                    >
+                      {link.texto}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* RELATED EVENTS — Task 13 */}
+      {/* 6. RELATED EVENTS */}
+      <section
+        className="related-events-section"
+        aria-label={`Outros eventos da vertical ${evento.relatedEvents.h2}`}
+      >
+        <div className="container">
+          <div className="section-head fade-in">
+            <p className="eyebrow gold">{evento.relatedEvents.eyebrowGold}</p>
+            <h2>{evento.relatedEvents.h2}</h2>
+            <p
+              className="section-intro"
+              dangerouslySetInnerHTML={{ __html: evento.relatedEvents.intro }}
+            />
+          </div>
+          <div className="related-events-grid fade-in">
+            {evento.relatedEvents.cards.map((card, i) => (
+              <article
+                key={i}
+                className="event-secondary-card"
+                data-area={card.area}
+              >
+                <div className="es-cover">
+                  <div
+                    className="es-cover-img"
+                    aria-hidden="true"
+                    style={{ backgroundImage: `url('${card.coverImg}')` }}
+                  />
+                  <div className="es-cover-overlay" />
+                  {card.date.tipo === "range" ? (
+                    <div className="es-date range">
+                      <span className="days">{card.date.days}</span>
+                      <span className="dash">{card.date.dash}</span>
+                      <span className="mon-yr">{card.date.monYr}</span>
+                    </div>
+                  ) : (
+                    <div className="es-date multi">
+                      <span className="count">
+                        <span className="number">{card.date.number}</span> {card.date.count}
+                      </span>
+                      <span className="period">{card.date.period}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="es-body">
+                  <div>
+                    <p className="es-program">{card.program}</p>
+                    <h4 className="es-title">{card.titulo}</h4>
+                    <p className="es-program-binding">{card.programBinding}</p>
+                  </div>
+                  <div className="es-meta-row">
+                    <span
+                      className="es-meta"
+                      dangerouslySetInnerHTML={{ __html: card.metaHtml }}
+                    />
+                  </div>
+                  <a
+                    className={card.cta.classe}
+                    href={card.cta.href}
+                    data-cms-link={card.cta.cmsLink}
+                  >
+                    {card.cta.texto}
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              marginTop: "var(--space-5)",
+            }}
+          >
+            {evento.relatedEvents.footerCtas.map((cta, i) => (
+              <a
+                key={i}
+                className={cta.classe}
+                href={cta.href}
+                data-cms-link={cta.cmsLink}
+              >
+                {cta.texto}
+                {cta.arrow && <span className="btn-arrow"> →</span>}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
