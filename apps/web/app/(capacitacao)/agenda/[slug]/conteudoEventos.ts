@@ -285,6 +285,129 @@ export interface EventoOnline extends EventoBase {
 
 export type Evento = EventoPresencial | EventoHibrido | EventoOnline;
 
-// ----------------- Record exportado (dados vêm em Tasks 4-6) -----------------
+// ----------------- Evento: PROSUS Brasília 2026 (presencial) -----------------
+// Porta literal de 03_Pagina_Evento_PROSUS_Brasilia_v3.html
 
-export const EVENTOS_AGENDA: Record<string, Evento> = {};
+const eventoProsusBrasilia: EventoPresencial = {
+  slug: "prosus-brasilia",
+
+  titulo: "Governança, financiamento e performance no SUS — Edição 2026",
+
+  subtitulo:
+    "Encontro executivo dedicado a secretários, gestores e lideranças do SUS sobre a nova arquitetura institucional, financeira e de performance do Sistema Único de Saúde.",
+
+  formato: "presencial",
+
+  dataEvento: "5 a 7 de junho de 2026",
+
+  area: "sau",
+
+  crumb: [
+    { texto: "Grupo NTC", href: "/", cmsLink: "home" },
+    { texto: "Capacitação", href: "/capacitacao", cmsLink: "agenda-completa" },
+    {
+      texto: "Eventos presenciais",
+      href: "/capacitacao/agenda",
+      cmsLink: "eventos-presenciais",
+    },
+    { texto: "Seminário PROSUS+ · Brasília", current: true },
+  ],
+
+  hero: {
+    tags: [
+      { texto: "Últimas vagas", classe: "event-hero-status" },
+      { texto: "Seminário", classe: "event-hero-format" },
+      { texto: "Presencial · Brasília", classe: "event-hero-format" },
+      { texto: "NTC Saúde", classe: "event-hero-vert" },
+    ],
+    h1: "Governança, financiamento e performance no SUS — Edição 2026",
+    sub: "Encontro executivo dedicado a secretários, gestores e lideranças do SUS sobre a nova arquitetura institucional, financeira e de performance do Sistema Único de Saúde.",
+    programBinding: {
+      texto: "Integra o programa",
+      href: "/#programas",
+      cmsLink: "programa-PROSUS",
+      nomePrograma:
+        "PROSUS+ — Governança, Financiamento e Performance no SUS",
+    },
+    ctas: [
+      {
+        texto: "Inscrever-se",
+        href: "#contato",
+        cmsLink: "inscricao-PROSUS-2026-jun",
+        classe: "btn btn--gold",
+        arrow: true,
+      },
+      {
+        texto: "Baixar folder",
+        href: "#",
+        cmsLink: "folder-PROSUS-2026-jun",
+        classe: "btn btn--ghost-light",
+      },
+      {
+        texto: "Inscrever equipe ou grupo",
+        href: "/contato?evento=PROSUS%2B+Brasília+–+Seminário&evento_url=/agenda/prosus-brasilia#tab-equipe",
+        cmsLink: "proposta-grupo-PROSUS",
+        classe: "btn btn--ghost-light",
+      },
+    ],
+  },
+
+  metas: [
+    { label: "Quando", value: "5 a 7 · Junho", valueSub: "2026 · 3 dias consecutivos" },
+    { label: "Modalidade", value: "Presencial", valueSub: "Brasília · DF" },
+    { label: "Carga horária", value: "20 horas", valueSub: "Programação executiva" },
+    { label: "Inscrição individual", value: "R$ 2.890", valueSub: "Até 30 de maio" },
+    { label: "Equipes / órgãos", value: "Sob consulta", valueSub: "Desconto institucional" },
+  ],
+
+  navLinks: [
+    { texto: "Visão geral", href: "#visao-geral", isActive: true },
+    { texto: "Público", href: "#publico" },
+    { texto: "Programação", href: "#programacao" },
+    { texto: "Palestrantes", href: "#palestrantes" },
+    { texto: "Local", href: "#local" },
+    { texto: "Investimento", href: "#investimento" },
+    { texto: "Regras", href: "#regras" },
+    { texto: "FAQ", href: "#faq" },
+  ],
+
+  // visaoGeral, publico, objetivos, conteudoProgramatico, programacao,
+  // palestrantes, diferenciais, local, replayCert, investimento, faq,
+  // ctaFinal, sidebar, relatedEvents, agendaIcs vêm em Tasks 5 e 6.
+  visaoGeral: { eyebrow: "", h2: "", lede: "", paragrafos: [] },
+  publico: { eyebrow: "", h2: "", intro: "", chips: [] },
+  objetivos: { eyebrow: "", h2: "", objetivos: [] },
+  conteudoProgramatico: { eyebrow: "", h2: "", intro: "", itens: [] },
+  programacao: { eyebrow: "", h2: "", intro: "", dias: [] },
+  palestrantes: { eyebrow: "", h2: "", intro: "", palestrantes: [], nota: "" },
+  diferenciais: { eyebrow: "", h2: "", diferenciais: [] },
+  local: {
+    eyebrow: "",
+    h2: "",
+    venueInfo: { titulo: "", enderecoLinhas: [], meta: "", hospedagemHtml: "" },
+    mapLabel: "",
+    pinLabel: "",
+  },
+  replayCert: { eyebrow: "", h2: "", cards: [] },
+  investimento: { eyebrow: "", h2: "", rules: [] },
+  faq: { eyebrow: "", h2: "", faqs: [] },
+  ctaFinal: { eyebrowGold: "", h2: "", paragrafo: "", ctas: [] },
+  sidebar: {
+    coverImg: "",
+    status: "",
+    tituloCard: "",
+    rows: [],
+    includes: { titulo: "", items: [] },
+    countdown: { label: "", dateText: "", deadline: "", tipo: "numerico" },
+    acoes: [],
+    share: { label: "", links: [] },
+  },
+  relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
+  agendaIcs: { titulo: "", descricao: "", location: "", startISO: "", endISO: "", filename: "" },
+};
+
+// ----------------- Record exportado -----------------
+
+export const EVENTOS_AGENDA: Record<string, Evento> = {
+  "prosus-brasilia": eventoProsusBrasilia,
+};
