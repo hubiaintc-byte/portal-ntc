@@ -404,7 +404,7 @@ export default function CapacitacaoPage() {
                 <h2 dangerouslySetInnerHTML={{ __html: curadoriaH2 }} />
                 <p>{curadoriaP1}</p>
                 <p>{curadoriaP2}</p>
-                <div className="cap-curadoria-pills">
+                <div className="cap-curadoria-pills" aria-label="Áreas de curadoria">
                   {curadoriaPills.map((pill) => (
                     <span key={pill} className="cap-curadoria-pill">{pill}</span>
                   ))}
