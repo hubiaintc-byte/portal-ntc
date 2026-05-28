@@ -367,7 +367,203 @@ export const CorpoDocente: GlobalConfig = {
             },
           ],
         },
-        // Tabs 5-9 adicionadas nas próximas tasks
+        {
+          label: "Credibilidade",
+          fields: [
+            {
+              name: "credibilidade",
+              type: "group",
+              fields: [
+                { name: "eyebrow", type: "text", required: true },
+                {
+                  name: "tituloCredibilidade",
+                  type: "richText",
+                  required: true,
+                },
+                { name: "lede", type: "textarea", required: true },
+                {
+                  name: "items",
+                  type: "array",
+                  minRows: 1,
+                  fields: [
+                    { name: "num", type: "text", required: true },
+                    { name: "label", type: "text", required: true },
+                    { name: "detalhe", type: "textarea", required: true },
+                  ],
+                },
+                {
+                  name: "rodape",
+                  type: "richText",
+                  required: true,
+                  admin: { description: "Aceita <strong>." },
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: "Credenciamento",
+          fields: [
+            {
+              name: "credenciamento",
+              type: "group",
+              fields: [
+                { name: "eyebrow", type: "text", required: true },
+                {
+                  name: "tituloCredenciamento",
+                  type: "richText",
+                  required: true,
+                },
+                { name: "descricao", type: "textarea", required: true },
+                {
+                  name: "lista",
+                  type: "array",
+                  minRows: 1,
+                  fields: [{ name: "texto", type: "text", required: true }],
+                },
+                {
+                  name: "ctas",
+                  type: "array",
+                  minRows: 1,
+                  fields: [
+                    { name: "rotulo", type: "text", required: true },
+                    { name: "href", type: "text", required: true },
+                    {
+                      name: "variante",
+                      type: "select",
+                      required: true,
+                      options: [
+                        { label: "gold", value: "gold" },
+                        { label: "ghost-light", value: "ghost-light" },
+                        { label: "primario", value: "primario" },
+                        { label: "secundario", value: "secundario" },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  name: "aside",
+                  type: "group",
+                  fields: [
+                    { name: "eyebrow", type: "text", required: true },
+                    { name: "tituloAside", type: "text", required: true },
+                    { name: "intro", type: "textarea", required: true },
+                    {
+                      name: "checklist",
+                      type: "array",
+                      minRows: 1,
+                      fields: [{ name: "texto", type: "text", required: true }],
+                    },
+                    { name: "nota", type: "textarea", required: true },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: "FAQ",
+          fields: [
+            {
+              name: "faqItems",
+              type: "array",
+              minRows: 1,
+              fields: [
+                { name: "id", type: "text", required: true, admin: { description: 'Ex: "faq-1".' } },
+                { name: "pergunta", type: "text", required: true },
+                {
+                  name: "parags",
+                  type: "array",
+                  minRows: 1,
+                  fields: [
+                    {
+                      name: "texto",
+                      type: "textarea",
+                      required: true,
+                      admin: { description: "Aceita <strong>." },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: "CTA Final",
+          fields: [
+            {
+              name: "ctaFinal",
+              type: "group",
+              fields: [
+                { name: "eyebrow", type: "text", required: true },
+                {
+                  name: "tituloCtaFinal",
+                  type: "richText",
+                  required: true,
+                  admin: { description: "Aceita <em>." },
+                },
+                { name: "descricao", type: "textarea", required: true },
+                {
+                  name: "ctaPrincipal",
+                  type: "group",
+                  fields: [
+                    { name: "rotulo", type: "text", required: true },
+                    { name: "href", type: "text", required: true },
+                    {
+                      name: "variante",
+                      type: "select",
+                      required: true,
+                      options: [
+                        { label: "gold", value: "gold" },
+                        { label: "ghost-light", value: "ghost-light" },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  name: "ctaSecundario",
+                  type: "group",
+                  fields: [
+                    { name: "rotulo", type: "text", required: true },
+                    { name: "href", type: "text", required: true },
+                    {
+                      name: "variante",
+                      type: "select",
+                      required: true,
+                      options: [
+                        { label: "gold", value: "gold" },
+                        { label: "ghost-light", value: "ghost-light" },
+                      ],
+                    },
+                  ],
+                },
+                { name: "separadorAreas", type: "text", required: true },
+                {
+                  name: "ctasArea",
+                  type: "array",
+                  minRows: 1,
+                  fields: [
+                    { name: "rotulo", type: "text", required: true },
+                    { name: "href", type: "text", required: true },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          label: "Sticky CTA Mobile",
+          fields: [
+            {
+              name: "stickyCta",
+              type: "group",
+              fields: [
+                { name: "rotulo", type: "text", required: true },
+                { name: "href", type: "text", required: true },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],
