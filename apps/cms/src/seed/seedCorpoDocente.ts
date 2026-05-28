@@ -90,6 +90,117 @@ function resolverFotosBaseDir(): string {
 
 type FotoIdMap = Record<string, Id>;
 
+/**
+ * Especialistas Featured — extraídos literalmente de
+ * apps/web/app/(o-grupo)/o-grupo/corpo-docente/conteudoCorpoDocente.ts
+ * (linhas 408-506). Currículo curto = credencial do card. Programas
+ * relacionados resolvidos por slug em runtime (Programas precisam
+ * existir — seedHomeV3 já cria os 15).
+ *
+ * Nota: o card de Min. Vital do Rêgo no HTML usa `autoridade-tcu.1920.webp`
+ * que não está no nosso set de fotos — substituído por
+ * `autoridade-contratacoes.1920.webp` (TCU = controle externo, mesma
+ * família visual).
+ */
+interface EspecialistaFeaturedSeed {
+  slug: string;
+  nome: string;
+  fotoArquivo: string;
+  vertical: "educacao" | "gestao-publica" | "saude";
+  tipo: "autoridade" | "palestrante" | "doutrinador" | "consultor" | "pesquisador";
+  frente?: "contratacoes";
+  formacao: "doutorado" | "mestrado" | "especializacao" | "graduacao-experiencia";
+  atuacao: ("universidade" | "gestao-publica" | "controle" | "judiciario" | "multilateral" | "terceiro-setor" | "consultoria")[];
+  programasSlugs: string[];
+  titulacao: "doutorado" | "pos-doutorado" | "mestrado" | "especializacao" | "graduacao";
+  instituicao: string;
+  curriculoCurtoTexto: string;
+}
+
+const ESPECIALISTAS_FEATURED: EspecialistaFeaturedSeed[] = [
+  {
+    slug: "perfil-luiz-fux",
+    nome: "Min. Luiz Fux",
+    fotoArquivo: "autoridade-gestao-publica.1920.webp",
+    vertical: "gestao-publica",
+    tipo: "autoridade",
+    formacao: "doutorado",
+    atuacao: ["judiciario"],
+    programasSlugs: ["lidera", "siga"],
+    titulacao: "doutorado",
+    instituicao: "Supremo Tribunal Federal",
+    curriculoCurtoTexto:
+      "Ministro do Supremo Tribunal Federal. Autoridade em direito constitucional, jurisdição superior, governança pública e liderança institucional do Estado.",
+  },
+  {
+    slug: "perfil-vital-do-rego",
+    nome: "Min. Vital do Rêgo Filho",
+    fotoArquivo: "autoridade-contratacoes.1920.webp",
+    vertical: "gestao-publica",
+    tipo: "autoridade",
+    formacao: "doutorado",
+    atuacao: ["controle"],
+    programasSlugs: ["siga", "lidera", "agip"],
+    titulacao: "doutorado",
+    instituicao: "Tribunal de Contas da União · Presidência",
+    curriculoCurtoTexto:
+      "Ministro e atual Presidente do Tribunal de Contas da União. Referência em controle externo, governança pública, contas públicas e modernização institucional do Estado brasileiro.",
+  },
+  {
+    slug: "perfil-jorge-jacoby",
+    nome: "Jorge Jacoby Fernandes",
+    fotoArquivo: "autoridade-contratacoes.1920.webp",
+    vertical: "gestao-publica",
+    tipo: "doutrinador",
+    frente: "contratacoes",
+    formacao: "doutorado",
+    atuacao: ["universidade", "consultoria"],
+    programasSlugs: ["agip"],
+    titulacao: "doutorado",
+    instituicao: "Doutrina nacional · Licitações e contratos",
+    curriculoCurtoTexto:
+      "Doutrinador de referência nacional em licitações, contratos administrativos, contratação direta, controle e capacitação de agentes públicos.",
+  },
+  {
+    slug: "perfil-maria-ines-fini",
+    nome: "Maria Inês Fini",
+    fotoArquivo: "autoridade-educacao.1920.webp",
+    vertical: "educacao",
+    tipo: "autoridade",
+    formacao: "doutorado",
+    atuacao: ["gestao-publica", "universidade"],
+    programasSlugs: ["proge", "pear", "futura", "edutec"],
+    titulacao: "doutorado",
+    instituicao: "Avaliação educacional · políticas públicas",
+    curriculoCurtoTexto:
+      "Coordenadora científica da curadoria educacional do Grupo NTC. Referência nacional em avaliação educacional, ENEM, políticas públicas e formação de redes públicas de ensino.",
+  },
+];
+
+function richTextFromTexto(texto: string) {
+  return {
+    root: {
+      type: "root",
+      format: "" as const,
+      indent: 0,
+      version: 1,
+      direction: "ltr" as const,
+      children: [
+        {
+          type: "paragraph",
+          format: "" as const,
+          indent: 0,
+          version: 1,
+          direction: "ltr" as const,
+          children: [
+            { type: "text", format: 0, mode: "normal", style: "", text: texto, version: 1, detail: 0 },
+          ],
+        },
+      ],
+    },
+  };
+}
+
 async function uploadFotos(payload: Awaited<ReturnType<typeof getPayload>>): Promise<FotoIdMap> {
   payload.logger.info(`[seed:corpo-docente] Upload de ${FOTOS.length} fotos.`);
   const map: FotoIdMap = {};
@@ -132,14 +243,96 @@ async function uploadFotos(payload: Awaited<ReturnType<typeof getPayload>>): Pro
   return map;
 }
 
+async function resolverProgramasIds(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  slugs: string[],
+): Promise<Id[]> {
+  const ids: Id[] = [];
+  for (const slug of slugs) {
+    const r = await payload.find({
+      collection: "programas",
+      where: { slug: { equals: slug } },
+      limit: 1,
+    });
+    if (r.docs[0]) {
+      ids.push(r.docs[0].id as Id);
+    } else {
+      payload.logger.warn(`[seed:corpo-docente] programa '${slug}' não encontrado — pulando.`);
+    }
+  }
+  return ids;
+}
+
+type EspecialistaIdMap = Record<string, Id>;
+
+async function upsertEspecialistasFeatured(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  fotos: FotoIdMap,
+): Promise<EspecialistaIdMap> {
+  payload.logger.info(`[seed:corpo-docente] Upsert de ${ESPECIALISTAS_FEATURED.length} Especialistas Featured.`);
+  const map: EspecialistaIdMap = {};
+
+  for (const esp of ESPECIALISTAS_FEATURED) {
+    const fotoId = fotos[esp.fotoArquivo];
+    if (!fotoId) throw new Error(`foto '${esp.fotoArquivo}' não foi carregada (etapa 1).`);
+
+    const programasIds = await resolverProgramasIds(payload, esp.programasSlugs);
+
+    const dadosBase = {
+      nome: esp.nome,
+      slug: esp.slug,
+      foto: fotoId,
+      titulacao: esp.titulacao,
+      instituicao: esp.instituicao,
+      curriculoCurto: richTextFromTexto(esp.curriculoCurtoTexto) as never,
+      vertical: esp.vertical,
+      tipo: esp.tipo,
+      ...(esp.frente ? { frente: esp.frente } : {}),
+      formacao: esp.formacao,
+      atuacao: esp.atuacao,
+      ...(programasIds.length ? { programasRelacionados: programasIds } : {}),
+    };
+
+    const existente = await payload.find({
+      collection: "especialistas",
+      where: { slug: { equals: esp.slug } },
+      limit: 1,
+    });
+
+    if (existente.docs[0]) {
+      const atualizado = await payload.update({
+        collection: "especialistas",
+        id: existente.docs[0].id,
+        data: dadosBase as never,
+        overrideAccess: true,
+      });
+      map[esp.slug] = atualizado.id as Id;
+      payload.logger.info(`[seed:corpo-docente] atualiza Especialista '${esp.slug}' (id=${atualizado.id})`);
+    } else {
+      const criado = await payload.create({
+        collection: "especialistas",
+        data: dadosBase as never,
+        overrideAccess: true,
+      });
+      map[esp.slug] = criado.id as Id;
+      payload.logger.info(`[seed:corpo-docente] cria Especialista '${esp.slug}' (id=${criado.id})`);
+    }
+  }
+
+  return map;
+}
+
 async function main(): Promise<void> {
   const payload = await getPayload({ config });
 
   const fotos = await uploadFotos(payload);
   payload.logger.info(`[seed:corpo-docente] Fotos OK (${Object.keys(fotos).length}).`);
 
-  // TODO próximas tasks: especialistas + global
-  payload.logger.info("[seed:corpo-docente] Etapa fotos concluída (etapas 2+3 nas próximas tasks).");
+  const especialistas = await upsertEspecialistasFeatured(payload, fotos);
+  payload.logger.info(`[seed:corpo-docente] Especialistas Featured OK (${Object.keys(especialistas).length}).`);
+
+  // TODO próxima task: Global CorpoDocente
+  payload.logger.info("[seed:corpo-docente] Etapas 1+2 concluídas (Global na próxima task).");
   process.exit(0);
 }
 
