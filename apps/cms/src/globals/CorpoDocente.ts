@@ -192,7 +192,182 @@ export const CorpoDocente: GlobalConfig = {
             },
           ],
         },
-        // Tabs 4-9 adicionadas nas próximas tasks
+        {
+          label: "Cards (Featured/Experts/Axis)",
+          fields: [
+            {
+              name: "cards",
+              type: "array",
+              minRows: 1,
+              admin: {
+                description:
+                  "Lista única ordenável. Cada item tem 'formato' (featured/expert/axis) que decide quais campos aparecem. Cards featured/expert apontam para Especialistas; cards axis (Saúde) são narrativas de eixo sem pessoa relacionada.",
+              },
+              fields: [
+                {
+                  name: "formato",
+                  type: "select",
+                  required: true,
+                  options: [
+                    { label: "Featured (autoridade grande)", value: "featured" },
+                    { label: "Expert (card menor)", value: "expert" },
+                    { label: "Axis Saúde (sem foto, com SVG)", value: "axis" },
+                  ],
+                },
+
+                // ---- featured/expert: relação com Especialista ----
+                {
+                  name: "especialista",
+                  type: "relationship",
+                  relationTo: "especialistas",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato !== "axis",
+                    description:
+                      "Especialista relacionado. Foto, nome e dataset de filtro são herdados dele.",
+                  },
+                },
+
+                // ---- embrulho editorial comum ----
+                {
+                  name: "tag",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato !== "axis",
+                    description: 'Ex: "Autoridade convidada", "Coordenação científica · Educação".',
+                  },
+                },
+                {
+                  name: "axisBadge",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato !== "axis",
+                    description: 'Selo no rodapé da foto. Ex: "Gestão Pública · Direito constitucional".',
+                  },
+                },
+                {
+                  name: "credencialCard",
+                  type: "textarea",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato !== "axis",
+                    description: "Parágrafo de credencial exibido no card (≠ currículo curto do Especialista).",
+                  },
+                },
+                {
+                  name: "metaAtuacao",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato !== "axis",
+                    description: 'Linha "Atuação · Tribunal X" (use <strong> no valor).',
+                  },
+                },
+                {
+                  name: "metaEixos",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato !== "axis",
+                    description: 'Linha "Eixos · LIDERA · SIGA" (use <strong> no valor).',
+                  },
+                },
+                {
+                  name: "ctaHref",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato !== "axis",
+                  },
+                },
+                {
+                  name: "ctaRotulo",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato !== "axis",
+                    description: 'Default no adapter: "Consultar disponibilidade".',
+                  },
+                },
+
+                // ---- expert only ----
+                {
+                  name: "programasTexto",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato === "expert",
+                    description: 'Prefixo antes do strong. Ex: "Vinculação · ".',
+                  },
+                },
+                {
+                  name: "programasStrong",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato === "expert",
+                  },
+                },
+                {
+                  name: "sufixoPrograma",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato === "expert",
+                  },
+                },
+
+                // ---- axis only ----
+                {
+                  name: "area",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato === "axis",
+                    description: 'Slug do eixo. Ex: "atencao-primaria".',
+                  },
+                },
+                {
+                  name: "axisTag",
+                  type: "text",
+                  admin: { condition: (_, sibling) => sibling?.formato === "axis" },
+                },
+                {
+                  name: "tituloAxis",
+                  type: "text",
+                  admin: { condition: (_, sibling) => sibling?.formato === "axis" },
+                },
+                {
+                  name: "credencialAxis",
+                  type: "textarea",
+                  admin: { condition: (_, sibling) => sibling?.formato === "axis" },
+                },
+                {
+                  name: "programasTextoAxis",
+                  type: "text",
+                  admin: { condition: (_, sibling) => sibling?.formato === "axis" },
+                },
+                {
+                  name: "programasStrongAxis",
+                  type: "text",
+                  admin: { condition: (_, sibling) => sibling?.formato === "axis" },
+                },
+                {
+                  name: "styleAccent",
+                  type: "text",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato === "axis",
+                    description: "Cor de destaque CSS (hex ou token).",
+                  },
+                },
+                {
+                  name: "styleAccentDark",
+                  type: "text",
+                  admin: { condition: (_, sibling) => sibling?.formato === "axis" },
+                },
+                {
+                  name: "iconeSvgInner",
+                  type: "textarea",
+                  admin: {
+                    condition: (_, sibling) => sibling?.formato === "axis",
+                    description: "innerHTML completo do <svg> do card (path/circle/rect).",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        // Tabs 5-9 adicionadas nas próximas tasks
       ],
     },
   ],
