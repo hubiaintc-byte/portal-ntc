@@ -97,7 +97,39 @@ export const CorpoDocente: GlobalConfig = {
             },
           ],
         },
-        // Tabs 2-9 adicionadas nas próximas tasks
+        {
+          label: "Métricas",
+          fields: [
+            {
+              name: "metricas",
+              type: "array",
+              minRows: 4,
+              maxRows: 4,
+              admin: {
+                description:
+                  "4 cards de números: Educação · Gestão Pública · Núcleo Contratações · Saúde.",
+              },
+              fields: [
+                {
+                  name: "classe",
+                  type: "select",
+                  required: true,
+                  options: [
+                    { label: "is-edu (Educação · esmeralda)", value: "is-edu" },
+                    { label: "is-gov (Gestão Pública · Oxford)", value: "is-gov" },
+                    { label: "is-cpr (Contratações · cardeal)", value: "is-cpr" },
+                    { label: "is-sau (Saúde · oliva)", value: "is-sau" },
+                  ],
+                },
+                { name: "sublabel", type: "text", required: true },
+                { name: "num", type: "text", required: true, admin: { description: "Número exibido (ex: '60', '31', '5')." } },
+                { name: "label", type: "text", required: true },
+                { name: "detalhe", type: "textarea", required: true },
+              ],
+            },
+          ],
+        },
+        // Tabs 3-9 adicionadas nas próximas tasks
       ],
     },
   ],
