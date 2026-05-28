@@ -71,6 +71,7 @@ export const CorpoDocente: GlobalConfig = {
                     {
                       name: "href",
                       type: "text",
+                      required: true,
                       admin: {
                         condition: (_, sibling) => sibling?.tipo === "anchor",
                       },
@@ -78,6 +79,7 @@ export const CorpoDocente: GlobalConfig = {
                     {
                       name: "vertShortcut",
                       type: "select",
+                      required: true,
                       options: [
                         { label: "todos", value: "todos" },
                         { label: "educacao", value: "educacao" },
