@@ -129,7 +129,70 @@ export const CorpoDocente: GlobalConfig = {
             },
           ],
         },
-        // Tabs 3-9 adicionadas nas próximas tasks
+        {
+          label: "Manifesto",
+          fields: [
+            { name: "marker", type: "text", required: true },
+            {
+              name: "tituloManifesto",
+              type: "richText",
+              required: true,
+              admin: { description: "Aceita <em>." },
+            },
+            { name: "lede", type: "textarea", required: true },
+            {
+              name: "archCards",
+              type: "array",
+              minRows: 4,
+              maxRows: 4,
+              admin: { description: "Educação · Gestão Pública · Contratações · Saúde." },
+              fields: [
+                {
+                  name: "area",
+                  type: "select",
+                  required: true,
+                  options: [
+                    { label: "educacao", value: "educacao" },
+                    { label: "gestao-publica", value: "gestao-publica" },
+                    { label: "contratacoes", value: "contratacoes" },
+                    { label: "saude", value: "saude" },
+                  ],
+                },
+                { name: "eyebrow", type: "text", required: true },
+                { name: "tituloArch", type: "text", required: true },
+                { name: "descricao", type: "textarea", required: true },
+                { name: "selo", type: "text", required: true },
+              ],
+            },
+            {
+              name: "camadas",
+              type: "array",
+              minRows: 5,
+              maxRows: 5,
+              admin: { description: "5 camadas de autoridade (01..05)." },
+              fields: [
+                { name: "num", type: "text", required: true },
+                { name: "tituloCamada", type: "text", required: true },
+                { name: "descricao", type: "textarea", required: true },
+              ],
+            },
+            {
+              name: "callout",
+              type: "group",
+              fields: [
+                { name: "tituloCallout", type: "text", required: true },
+                { name: "descricao", type: "textarea", required: true },
+              ],
+            },
+            {
+              name: "nota",
+              type: "richText",
+              required: true,
+              admin: { description: "Aceita <strong>." },
+            },
+          ],
+        },
+        // Tabs 4-9 adicionadas nas próximas tasks
       ],
     },
   ],
