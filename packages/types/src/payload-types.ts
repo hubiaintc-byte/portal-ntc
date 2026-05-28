@@ -49,11 +49,13 @@ export interface Config {
   globals: {
     home: Home;
     'o-grupo': OGrupo;
+    'corpo-docente': CorpoDocente;
     rodape: Rodape;
   };
   globalsSelect: {
     home: HomeSelect<false> | HomeSelect<true>;
     'o-grupo': OGrupoSelect<false> | OGrupoSelect<true>;
+    'corpo-docente': CorpoDocenteSelect<false> | CorpoDocenteSelect<true>;
     rodape: RodapeSelect<false> | RodapeSelect<true>;
   };
   locale: null;
@@ -440,6 +442,40 @@ export interface Especialista {
   linkLattes?: string | null;
   linkLinkedin?: string | null;
   linhasAtuacao?: (number | Area)[] | null;
+  /**
+   * Vertical institucional do especialista. Usado em filtros do Corpo Docente e em listagens por vertical.
+   */
+  vertical?: ('educacao' | 'gestao-publica' | 'saude') | null;
+  /**
+   * Camada de autoridade da curadoria (doc 25 — 5 camadas).
+   */
+  tipo?: ('autoridade' | 'palestrante' | 'doutrinador' | 'consultor' | 'pesquisador') | null;
+  /**
+   * Marcador opcional: 'contratacoes' indica que o especialista compõe o núcleo Contratações Públicas dentro de Gestão Pública.
+   */
+  frente?: 'contratacoes' | null;
+  /**
+   * Maior titulação relevante para o dataset de filtro.
+   */
+  formacao?: ('doutorado' | 'mestrado' | 'especializacao' | 'graduacao-experiencia') | null;
+  /**
+   * Esferas de atuação profissional (múltipla escolha).
+   */
+  atuacao?:
+    | (
+        | 'universidade'
+        | 'gestao-publica'
+        | 'controle'
+        | 'judiciario'
+        | 'multilateral'
+        | 'terceiro-setor'
+        | 'consultoria'
+      )[]
+    | null;
+  /**
+   * Programas em que o especialista figura como referência. Usado para derivar o dataset de filtro 'programas' no FilterBarDocentes.
+   */
+  programasRelacionados?: (number | Programa)[] | null;
   /**
    * [Reservado v2 — perfil público na OTT própria]
    */
@@ -1201,6 +1237,12 @@ export interface EspecialistasSelect<T extends boolean = true> {
   linkLattes?: T;
   linkLinkedin?: T;
   linhasAtuacao?: T;
+  vertical?: T;
+  tipo?: T;
+  frente?: T;
+  formacao?: T;
+  atuacao?: T;
+  programasRelacionados?: T;
   apresentacaoOTT?:
     | T
     | {
@@ -1577,6 +1619,357 @@ export interface OGrupo {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "corpo-docente".
+ */
+export interface CorpoDocente {
+  id: number;
+  hero: {
+    eyebrow: string;
+    /**
+     * Aceita <span class='accent'> e <br>. Lexical restritivo aplicado globalmente.
+     */
+    titulo: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    /**
+     * Aceita <em>. Lexical restritivo.
+     */
+    subtitulo: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    quicklinks?:
+      | {
+          tipo: 'anchor' | 'tab';
+          rotulo: string;
+          href?: string | null;
+          vertShortcut?: ('todos' | 'educacao' | 'gestao-publica' | 'contratacoes' | 'saude') | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * 4 cards de números: Educação · Gestão Pública · Núcleo Contratações · Saúde.
+   */
+  metricas?:
+    | {
+        classe: 'is-edu' | 'is-gov' | 'is-cpr' | 'is-sau';
+        sublabel: string;
+        /**
+         * Número exibido (ex: '60', '31', '5').
+         */
+        num: string;
+        label: string;
+        detalhe: string;
+        id?: string | null;
+      }[]
+    | null;
+  marker: string;
+  /**
+   * Aceita <em>.
+   */
+  tituloManifesto: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  lede: string;
+  /**
+   * Educação · Gestão Pública · Contratações · Saúde.
+   */
+  archCards?:
+    | {
+        area: 'educacao' | 'gestao-publica' | 'contratacoes' | 'saude';
+        eyebrow: string;
+        tituloArch: string;
+        descricao: string;
+        selo: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * 5 camadas de autoridade (01..05).
+   */
+  camadas?:
+    | {
+        num: string;
+        tituloCamada: string;
+        descricao: string;
+        id?: string | null;
+      }[]
+    | null;
+  callout: {
+    tituloCallout: string;
+    descricao: string;
+  };
+  /**
+   * Aceita <strong>.
+   */
+  nota: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Lista única ordenável. Cada item tem 'formato' (featured/expert/axis) que decide quais campos aparecem. Cards featured/expert apontam para Especialistas; cards axis (Saúde) são narrativas de eixo sem pessoa relacionada.
+   */
+  cards?:
+    | {
+        formato: 'featured' | 'expert' | 'axis';
+        /**
+         * Especialista relacionado. Foto, nome e dataset de filtro são herdados dele.
+         */
+        especialista?: (number | null) | Especialista;
+        /**
+         * Ex: "Autoridade convidada", "Coordenação científica · Educação".
+         */
+        tag?: string | null;
+        /**
+         * Selo no rodapé da foto. Ex: "Gestão Pública · Direito constitucional".
+         */
+        axisBadge?: string | null;
+        /**
+         * Parágrafo de credencial exibido no card (≠ currículo curto do Especialista).
+         */
+        credencialCard?: string | null;
+        /**
+         * Linha "Atuação · Tribunal X" (use <strong> no valor).
+         */
+        metaAtuacao?: string | null;
+        /**
+         * Linha "Eixos · LIDERA · SIGA" (use <strong> no valor).
+         */
+        metaEixos?: string | null;
+        ctaHref?: string | null;
+        /**
+         * Default no adapter: "Consultar disponibilidade".
+         */
+        ctaRotulo?: string | null;
+        /**
+         * Prefixo antes do strong. Ex: "Vinculação · ".
+         */
+        programasTexto?: string | null;
+        programasStrong?: string | null;
+        sufixoPrograma?: string | null;
+        /**
+         * Slug do eixo. Ex: "atencao-primaria".
+         */
+        area?: string | null;
+        axisTag?: string | null;
+        tituloAxis?: string | null;
+        credencialAxis?: string | null;
+        programasTextoAxis?: string | null;
+        programasStrongAxis?: string | null;
+        /**
+         * Cor de destaque CSS (hex ou token).
+         */
+        styleAccent?: string | null;
+        styleAccentDark?: string | null;
+        /**
+         * innerHTML completo do <svg> do card (path/circle/rect).
+         */
+        iconeSvgInner?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  credibilidade: {
+    eyebrow: string;
+    tituloCredibilidade: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    lede: string;
+    items?:
+      | {
+          num: string;
+          label: string;
+          detalhe: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Aceita <strong>.
+     */
+    rodape: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+  };
+  credenciamento: {
+    eyebrow: string;
+    tituloCredenciamento: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    descricao: string;
+    lista?:
+      | {
+          texto: string;
+          id?: string | null;
+        }[]
+      | null;
+    ctas?:
+      | {
+          rotulo: string;
+          href: string;
+          variante: 'gold' | 'ghost-light' | 'primario' | 'secundario';
+          id?: string | null;
+        }[]
+      | null;
+    aside: {
+      eyebrow: string;
+      tituloAside: string;
+      intro: string;
+      checklist?:
+        | {
+            texto: string;
+            id?: string | null;
+          }[]
+        | null;
+      nota: string;
+    };
+  };
+  faqItems?:
+    | {
+        id: string | null;
+        pergunta: string;
+        parags?:
+          | {
+              /**
+               * Aceita <strong>.
+               */
+              texto: string;
+              id?: string | null;
+            }[]
+          | null;
+      }[]
+    | null;
+  ctaFinal: {
+    eyebrow: string;
+    /**
+     * Aceita <em>.
+     */
+    tituloCtaFinal: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    descricao: string;
+    ctaPrincipal: {
+      rotulo: string;
+      href: string;
+      variante: 'gold' | 'ghost-light';
+    };
+    ctaSecundario: {
+      rotulo: string;
+      href: string;
+      variante: 'gold' | 'ghost-light';
+    };
+    separadorAreas: string;
+    ctasArea?:
+      | {
+          rotulo: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  stickyCta: {
+    rotulo: string;
+    href: string;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "rodape".
  */
 export interface Rodape {
@@ -1725,6 +2118,194 @@ export interface OGrupoSelect<T extends boolean = true> {
         descricao?: T;
         rotuloCta?: T;
         linkCta?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "corpo-docente_select".
+ */
+export interface CorpoDocenteSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        titulo?: T;
+        subtitulo?: T;
+        quicklinks?:
+          | T
+          | {
+              tipo?: T;
+              rotulo?: T;
+              href?: T;
+              vertShortcut?: T;
+              id?: T;
+            };
+      };
+  metricas?:
+    | T
+    | {
+        classe?: T;
+        sublabel?: T;
+        num?: T;
+        label?: T;
+        detalhe?: T;
+        id?: T;
+      };
+  marker?: T;
+  tituloManifesto?: T;
+  lede?: T;
+  archCards?:
+    | T
+    | {
+        area?: T;
+        eyebrow?: T;
+        tituloArch?: T;
+        descricao?: T;
+        selo?: T;
+        id?: T;
+      };
+  camadas?:
+    | T
+    | {
+        num?: T;
+        tituloCamada?: T;
+        descricao?: T;
+        id?: T;
+      };
+  callout?:
+    | T
+    | {
+        tituloCallout?: T;
+        descricao?: T;
+      };
+  nota?: T;
+  cards?:
+    | T
+    | {
+        formato?: T;
+        especialista?: T;
+        tag?: T;
+        axisBadge?: T;
+        credencialCard?: T;
+        metaAtuacao?: T;
+        metaEixos?: T;
+        ctaHref?: T;
+        ctaRotulo?: T;
+        programasTexto?: T;
+        programasStrong?: T;
+        sufixoPrograma?: T;
+        area?: T;
+        axisTag?: T;
+        tituloAxis?: T;
+        credencialAxis?: T;
+        programasTextoAxis?: T;
+        programasStrongAxis?: T;
+        styleAccent?: T;
+        styleAccentDark?: T;
+        iconeSvgInner?: T;
+        id?: T;
+      };
+  credibilidade?:
+    | T
+    | {
+        eyebrow?: T;
+        tituloCredibilidade?: T;
+        lede?: T;
+        items?:
+          | T
+          | {
+              num?: T;
+              label?: T;
+              detalhe?: T;
+              id?: T;
+            };
+        rodape?: T;
+      };
+  credenciamento?:
+    | T
+    | {
+        eyebrow?: T;
+        tituloCredenciamento?: T;
+        descricao?: T;
+        lista?:
+          | T
+          | {
+              texto?: T;
+              id?: T;
+            };
+        ctas?:
+          | T
+          | {
+              rotulo?: T;
+              href?: T;
+              variante?: T;
+              id?: T;
+            };
+        aside?:
+          | T
+          | {
+              eyebrow?: T;
+              tituloAside?: T;
+              intro?: T;
+              checklist?:
+                | T
+                | {
+                    texto?: T;
+                    id?: T;
+                  };
+              nota?: T;
+            };
+      };
+  faqItems?:
+    | T
+    | {
+        id?: T;
+        pergunta?: T;
+        parags?:
+          | T
+          | {
+              texto?: T;
+              id?: T;
+            };
+      };
+  ctaFinal?:
+    | T
+    | {
+        eyebrow?: T;
+        tituloCtaFinal?: T;
+        descricao?: T;
+        ctaPrincipal?:
+          | T
+          | {
+              rotulo?: T;
+              href?: T;
+              variante?: T;
+            };
+        ctaSecundario?:
+          | T
+          | {
+              rotulo?: T;
+              href?: T;
+              variante?: T;
+            };
+        separadorAreas?: T;
+        ctasArea?:
+          | T
+          | {
+              rotulo?: T;
+              href?: T;
+              id?: T;
+            };
+      };
+  stickyCta?:
+    | T
+    | {
+        rotulo?: T;
+        href?: T;
       };
   _status?: T;
   updatedAt?: T;
