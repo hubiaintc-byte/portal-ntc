@@ -2,7 +2,14 @@ import type { CollectionConfig } from "payload";
 
 import { editorInstitucional } from "../access/editorInstitucional";
 import { autoSlug } from "../hooks/autoSlug";
-import { TITULACAO_DOCENTE } from "../shared/types";
+import {
+  ATUACAO_DOCENTE,
+  FORMACAO_DOCENTE,
+  FRENTE_DOCENTE,
+  TIPO_DOCENTE,
+  TITULACAO_DOCENTE,
+  VERTICAL_DOCENTE,
+} from "../shared/types";
 
 /**
  * Especialistas (doc 11 §8).
@@ -65,6 +72,60 @@ export const Especialistas: CollectionConfig = {
       type: "relationship",
       relationTo: "areas",
       hasMany: true,
+    },
+    {
+      name: "vertical",
+      type: "select",
+      options: VERTICAL_DOCENTE.map((v) => ({ label: v, value: v })),
+      admin: {
+        description:
+          "Vertical institucional do especialista. Usado em filtros do Corpo Docente e em listagens por vertical.",
+      },
+    },
+    {
+      name: "tipo",
+      type: "select",
+      options: TIPO_DOCENTE.map((v) => ({ label: v, value: v })),
+      admin: {
+        description:
+          "Camada de autoridade da curadoria (doc 25 — 5 camadas).",
+      },
+    },
+    {
+      name: "frente",
+      type: "select",
+      options: FRENTE_DOCENTE.map((v) => ({ label: v, value: v })),
+      admin: {
+        description:
+          "Marcador opcional: 'contratacoes' indica que o especialista compõe o núcleo Contratações Públicas dentro de Gestão Pública.",
+      },
+    },
+    {
+      name: "formacao",
+      type: "select",
+      options: FORMACAO_DOCENTE.map((v) => ({ label: v, value: v })),
+      admin: {
+        description: "Maior titulação relevante para o dataset de filtro.",
+      },
+    },
+    {
+      name: "atuacao",
+      type: "select",
+      hasMany: true,
+      options: ATUACAO_DOCENTE.map((v) => ({ label: v, value: v })),
+      admin: {
+        description: "Esferas de atuação profissional (múltipla escolha).",
+      },
+    },
+    {
+      name: "programasRelacionados",
+      type: "relationship",
+      relationTo: "programas",
+      hasMany: true,
+      admin: {
+        description:
+          "Programas em que o especialista figura como referência. Usado para derivar o dataset de filtro 'programas' no FilterBarDocentes.",
+      },
     },
     {
       name: "apresentacaoOTT",

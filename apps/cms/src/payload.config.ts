@@ -20,6 +20,7 @@ import { Media } from "./collections/Media";
 import { Modulos } from "./collections/Modulos";
 import { Programas } from "./collections/Programas";
 import { Users } from "./collections/Users";
+import { CorpoDocente } from "./globals/CorpoDocente";
 import { Home } from "./globals/Home";
 import { OGrupo } from "./globals/OGrupo";
 import { Rodape } from "./globals/Rodape";
@@ -80,7 +81,7 @@ export default buildConfig({
     Leads,
     AuditLog,
   ],
-  globals: [Home, OGrupo, Rodape],
+  globals: [Home, OGrupo, CorpoDocente, Rodape],
   editor: lexicalEditor({ features: () => lexicalRestrictiveFeatures }),
   sharp,
   secret: process.env.PAYLOAD_SECRET || "",

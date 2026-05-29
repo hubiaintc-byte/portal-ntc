@@ -1,18 +1,8 @@
 import type { Metadata } from "next";
 
-import {
-  CARDS_AXIS_SAUDE,
-  CARDS_EXPERTS,
-  CARDS_FEATURED,
-  CREDENCIAMENTO,
-  CREDIBILIDADE,
-  CTA_FINAL,
-  FAQ,
-  HERO,
-  MANIFESTO,
-  METRICAS,
-  STICKY_CTA,
-} from "./conteudoCorpoDocente";
+import { fetchCorpoDocente } from "@/lib/cms/corpoDocente";
+
+import { conteudoFallback } from "./conteudoFallback";
 import { CorpoDocenteProvider } from "./CorpoDocenteContext";
 import { FadeInObserver } from "./FadeInObserver";
 import { FaqAcordeao } from "./FaqAcordeao";
@@ -32,7 +22,27 @@ function html(s: string) {
   return { __html: s };
 }
 
-export default function CorpoDocentePage() {
+export default async function CorpoDocentePage() {
+  const dados =
+    (await fetchCorpoDocente().catch((err) => {
+      console.error("[corpo-docente] fetch CMS falhou, usando fallback:", err);
+      return null;
+    })) ?? conteudoFallback;
+
+  const {
+    HERO,
+    METRICAS,
+    MANIFESTO,
+    CARDS_FEATURED,
+    CARDS_EXPERTS,
+    CARDS_AXIS_SAUDE,
+    CREDIBILIDADE,
+    CREDENCIAMENTO,
+    FAQ,
+    CTA_FINAL,
+    STICKY_CTA,
+  } = dados;
+
   return (
     <CorpoDocenteProvider>
       <main id="main">

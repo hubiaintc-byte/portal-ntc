@@ -59,3 +59,50 @@ export const PERFIL_ADMIN = [
   "atendimento-comercial",
 ] as const;
 export type PerfilAdmin = (typeof PERFIL_ADMIN)[number];
+
+/**
+ * Enums do Corpo Docente — usados em Especialistas (atributos da pessoa)
+ * e replicados no dataset de filtro do FilterBarDocentes (web).
+ *
+ * Devem permanecer alinhados com os valores hardcoded em
+ * apps/web/app/(o-grupo)/o-grupo/corpo-docente/conteudoCorpoDocente.ts
+ * (TAB_LABELS, AREA_LABELS, TIPO_LABELS, FORMACAO_OPTIONS, ATUACAO_OPTIONS).
+ */
+
+export const VERTICAL_DOCENTE = [
+  "educacao",
+  "gestao-publica",
+  "saude",
+] as const;
+export type VerticalDocente = (typeof VERTICAL_DOCENTE)[number];
+
+export const TIPO_DOCENTE = [
+  "autoridade",
+  "palestrante",
+  "doutrinador",
+  "consultor",
+  "pesquisador",
+] as const;
+export type TipoDocente = (typeof TIPO_DOCENTE)[number];
+
+export const FRENTE_DOCENTE = ["contratacoes"] as const;
+export type FrenteDocente = (typeof FRENTE_DOCENTE)[number];
+
+export const FORMACAO_DOCENTE = [
+  "doutorado",
+  "mestrado",
+  "especializacao",
+  "graduacao-experiencia",
+] as const;
+export type FormacaoDocente = (typeof FORMACAO_DOCENTE)[number];
+
+export const ATUACAO_DOCENTE = [
+  "universidade",
+  "gestao-publica",
+  "controle",
+  "judiciario",
+  "multilateral",
+  "terceiro-setor",
+  "consultoria",
+] as const;
+export type AtuacaoDocente = (typeof ATUACAO_DOCENTE)[number];
