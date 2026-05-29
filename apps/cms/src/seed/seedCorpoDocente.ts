@@ -1444,7 +1444,22 @@ async function upsertGlobal(
     },
   ];
 
-  const cards = [...cardsFeatured, ...cardsAxis];
+  // Experts cards — mapeados 1:1 de EXPERTS_DATA. metaAtuacao/metaEixos
+  // ficam ausentes; admin.condition do CMS esconde para formato=expert.
+  const cardsExperts = EXPERTS_DATA.map((esp) => ({
+    formato: "expert" as const,
+    especialista: especialistas[esp.slug],
+    tag: esp.tipoTag,
+    axisBadge: esp.axisBadge,
+    credencialCard: esp.credencialTexto,
+    ctaHref: esp.ctaHref,
+    ctaRotulo: "Consultar disponibilidade",
+    programasTexto: esp.programasTexto,
+    programasStrong: esp.programasStrong,
+    ...(esp.sufixoPrograma ? { sufixoPrograma: esp.sufixoPrograma } : {}),
+  })).filter((c) => c.especialista !== undefined);
+
+  const cards = [...cardsFeatured, ...cardsExperts, ...cardsAxis];
 
   await payload.updateGlobal({
     slug: "corpo-docente",
