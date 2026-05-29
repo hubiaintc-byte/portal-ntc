@@ -1235,6 +1235,69 @@ async function upsertEspecialistasFeatured(
   return map;
 }
 
+async function upsertEspecialistasExperts(
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  fotos: FotoIdMap,
+): Promise<EspecialistaIdMap> {
+  payload.logger.info(
+    `[seed:corpo-docente] Upsert de ${EXPERTS_DATA.length} Especialistas Experts.`,
+  );
+  const map: EspecialistaIdMap = {};
+
+  for (const esp of EXPERTS_DATA) {
+    const fotoId = fotos[esp.fotoArquivo];
+    if (!fotoId) throw new Error(`foto '${esp.fotoArquivo}' não foi carregada (etapa 1).`);
+
+    const programasIds = await resolverProgramasIds(payload, esp.programasSlugs);
+
+    const dadosBase = {
+      nome: esp.nome,
+      slug: esp.slug,
+      foto: fotoId,
+      titulacao: TITULACAO_POR_FORMACAO[esp.formacao],
+      instituicao: extrairInstituicao(esp.credencialTexto),
+      curriculoCurto: richTextFromTexto(esp.credencialTexto) as never,
+      vertical: esp.vertical,
+      tipo: esp.tipo,
+      ...(esp.frente ? { frente: esp.frente } : {}),
+      formacao: esp.formacao,
+      atuacao: esp.atuacao,
+      ...(programasIds.length ? { programasRelacionados: programasIds } : {}),
+    };
+
+    const existente = await payload.find({
+      collection: "especialistas",
+      where: { slug: { equals: esp.slug } },
+      limit: 1,
+    });
+
+    if (existente.docs[0]) {
+      const atualizado = await payload.update({
+        collection: "especialistas",
+        id: existente.docs[0].id,
+        data: dadosBase as never,
+        overrideAccess: true,
+      });
+      map[esp.slug] = atualizado.id as Id;
+      payload.logger.info(
+        `[seed:corpo-docente] atualiza Expert '${esp.slug}' (id=${atualizado.id})`,
+      );
+    } else {
+      const criado = await payload.create({
+        collection: "especialistas",
+        data: dadosBase as never,
+        overrideAccess: true,
+      });
+      map[esp.slug] = criado.id as Id;
+      payload.logger.info(
+        `[seed:corpo-docente] cria Expert '${esp.slug}' (id=${criado.id})`,
+      );
+    }
+  }
+
+  return map;
+}
+
 async function upsertGlobal(
   payload: Awaited<ReturnType<typeof getPayload>>,
   especialistas: EspecialistaIdMap,
