@@ -177,6 +177,71 @@ const ESPECIALISTAS_FEATURED: EspecialistaFeaturedSeed[] = [
   },
 ];
 
+/**
+ * Especialistas Experts — extraídos literalmente de
+ * apps/web/app/(o-grupo)/o-grupo/corpo-docente/conteudoCorpoDocente.ts
+ * (linhas 508-1579, CARDS_EXPERTS).
+ *
+ * Distribuição: 16 Educação + 14 Gestão Pública + 15 Núcleo
+ * Contratações (frente="contratacoes"). 0 Saúde — Saúde tem só
+ * os 5 Axis populados na sessão 1.
+ *
+ * Reusa as 4 fotos placeholder (expert-01..04.1920.webp) já
+ * carregadas na etapa 1. Equipe editorial substitui por fotos
+ * reais via admin depois.
+ *
+ * `instituicao` é derivada da primeira frase do `credencialTexto`
+ * via `extrairInstituicao()`. `titulacao` é derivada de `formacao`
+ * via `TITULACAO_POR_FORMACAO`.
+ */
+interface ExpertSeed {
+  slug: string;
+  nome: string;
+  fotoArquivo: string;
+  vertical: "educacao" | "gestao-publica";
+  tipo: "autoridade" | "palestrante" | "doutrinador" | "consultor" | "pesquisador";
+  frente?: "contratacoes";
+  formacao: "doutorado" | "mestrado" | "especializacao" | "graduacao-experiencia";
+  atuacao: ("universidade" | "gestao-publica" | "controle" | "judiciario" | "multilateral" | "terceiro-setor" | "consultoria")[];
+  programasSlugs: string[];
+  credencialTexto: string;
+  axisBadge: string;
+  tipoTag: string;
+  programasTexto: string;
+  programasStrong: string;
+  sufixoPrograma?: string;
+  ctaHref: string;
+}
+
+// Exportado para uso em upsertEspecialistasExperts (Task 5).
+export const TITULACAO_POR_FORMACAO: Record<
+  ExpertSeed["formacao"],
+  "doutorado" | "pos-doutorado" | "mestrado" | "especializacao" | "graduacao"
+> = {
+  doutorado: "doutorado",
+  mestrado: "mestrado",
+  especializacao: "especializacao",
+  "graduacao-experiencia": "graduacao",
+};
+
+/**
+ * Extrai a primeira frase do `credencial` para usar como `instituicao`.
+ * Ex: "Ex-presidente do INEP. Políticas públicas..." → "Ex-presidente do INEP".
+ * Fallback: primeiros 80 caracteres se não encontrar ponto final.
+ *
+ * Exportado para uso em upsertEspecialistasExperts (Task 5).
+ */
+export function extrairInstituicao(credencial: string): string {
+  const match = credencial.match(/^([^.]+)\./);
+  // match[1] é garantido quando match !== null (captura de grupo 1 sempre presente nesse regex).
+  return match !== null ? (match[1] ?? "").trim() : credencial.slice(0, 80).trim();
+}
+
+// Exportado para uso em upsertEspecialistasExperts (Task 5). Preenchido nas Tasks 2-4.
+export const EXPERTS_DATA: ExpertSeed[] = [
+  // Preenchido nas Tasks 2-4
+];
+
 function richTextFromTexto(texto: string) {
   return {
     root: {
