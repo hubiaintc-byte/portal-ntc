@@ -1740,12 +1740,21 @@ async function main(): Promise<void> {
   const fotos = await uploadFotos(payload);
   payload.logger.info(`[seed:corpo-docente] Fotos OK (${Object.keys(fotos).length}).`);
 
-  const especialistas = await upsertEspecialistasFeatured(payload, fotos);
-  payload.logger.info(`[seed:corpo-docente] Especialistas Featured OK (${Object.keys(especialistas).length}).`);
+  const featured = await upsertEspecialistasFeatured(payload, fotos);
+  payload.logger.info(
+    `[seed:corpo-docente] Especialistas Featured OK (${Object.keys(featured).length}).`,
+  );
+
+  const experts = await upsertEspecialistasExperts(payload, fotos);
+  payload.logger.info(
+    `[seed:corpo-docente] Especialistas Experts OK (${Object.keys(experts).length}).`,
+  );
+
+  const especialistas = { ...featured, ...experts };
 
   await upsertGlobal(payload, especialistas);
 
-  payload.logger.info("[seed:corpo-docente] Concluído (3 etapas).");
+  payload.logger.info("[seed:corpo-docente] Concluído (4 etapas).");
   process.exit(0);
 }
 
