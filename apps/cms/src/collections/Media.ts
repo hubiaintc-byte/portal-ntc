@@ -40,24 +40,34 @@ export const Media: CollectionConfig = {
       "video/mp4",
       "video/webm",
     ],
+    // Variantes em proporção 20:23 (retrato de palestrante — doc 12 §324,
+    // doc 11 §782, skill ntc-palestrantes). altura = largura × 23/20.
+    // `withoutEnlargement: false` garante que a variante seja SEMPRE gerada
+    // mesmo quando a foto original é menor que o alvo — caso contrário o
+    // Sharp pula o resize e o Payload grava `url: .../null`, quebrando o
+    // preview do admin (retratos verticais ~768px caíam nisso). O card no
+    // front usa `object-fit: cover`, então o leve upscale não degrada.
     imageSizes: [
       {
         name: "thumbnail",
         width: 400,
-        height: undefined,
+        height: 460,
         position: "centre",
+        withoutEnlargement: false,
       },
       {
         name: "card",
-        width: 800,
-        height: undefined,
+        width: 600,
+        height: 690,
         position: "centre",
+        withoutEnlargement: false,
       },
       {
         name: "hero",
-        width: 1600,
-        height: undefined,
+        width: 800,
+        height: 920,
         position: "centre",
+        withoutEnlargement: false,
       },
     ],
     adminThumbnail: "thumbnail",
