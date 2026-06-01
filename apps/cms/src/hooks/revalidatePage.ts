@@ -1,4 +1,4 @@
-import type { CollectionAfterChangeHook } from "payload";
+import type { CollectionAfterChangeHook, GlobalAfterChangeHook } from "payload";
 
 /**
  * Dispara revalidação on-demand das páginas afetadas no front Next.js
@@ -8,14 +8,19 @@ import type { CollectionAfterChangeHook } from "payload";
  * Em desenvolvimento (NODE_ENV !== production), é no-op — o ISR não está
  * em uso e o restart manual do dev server basta. Em produção, faz POST
  * autenticado ao endpoint /api/revalidate do front-end com o caminho
- * interpolado a partir do slug do documento.
+ * interpolado a partir do slug do documento (`:slug`). Paths sem `:slug`
+ * (Globals como `corpo-docente`, ou coleções cuja edição revalida uma
+ * página fixa) passam intactos — a interpolação vira no-op.
+ *
+ * Tipado para servir tanto `hooks.afterChange` de coleções quanto de
+ * Globals: ambos recebem `{ doc }`, então a mesma factory atende os dois.
  *
  * Falhas de rede são logadas mas não bloqueiam o save: a estratégia é
  * "publicação primeiro, revalidação melhor-esforço" — a próxima request
  * ao ISR vai revalidar naturalmente em ≤300s.
  */
 export const revalidatePage =
-  (paths: string[]): CollectionAfterChangeHook =>
+  (paths: string[]): CollectionAfterChangeHook & GlobalAfterChangeHook =>
   async ({ doc }) => {
     if (process.env.NODE_ENV !== "production") return doc;
 

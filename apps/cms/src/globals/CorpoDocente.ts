@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
 
 import { editorInstitucional } from "../access/editorInstitucional";
+import { revalidatePage } from "../hooks/revalidatePage";
 
 /**
  * Global CorpoDocente — página /o-grupo/corpo-docente.
@@ -22,6 +23,8 @@ export const CorpoDocente: GlobalConfig = {
   label: "Corpo Docente (/o-grupo/corpo-docente)",
   admin: { group: "Páginas Singleton" },
   access: { read: () => true, update: editorInstitucional },
+  // Publicar edições dos textos da página revalida a rota no front.
+  hooks: { afterChange: [revalidatePage(["/o-grupo/corpo-docente"])] },
   versions: { drafts: true, max: 20 },
   fields: [
     {

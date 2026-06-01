@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { editorInstitucional } from "../access/editorInstitucional";
 import { autoSlug } from "../hooks/autoSlug";
+import { revalidatePage } from "../hooks/revalidatePage";
 import {
   ATUACAO_DOCENTE,
   FORMACAO_DOCENTE,
@@ -31,6 +32,12 @@ export const Especialistas: CollectionConfig = {
     create: editorInstitucional,
     update: editorInstitucional,
     delete: editorInstitucional,
+  },
+  // Editar/publicar um especialista revalida a página de Corpo Docente,
+  // que renderiza foto/credenciais via Global corpo-docente. Sem isto, a
+  // edição só apareceria após o ISR (1h) ou um rebuild.
+  hooks: {
+    afterChange: [revalidatePage(["/o-grupo/corpo-docente"])],
   },
   versions: { drafts: true },
   fields: [
