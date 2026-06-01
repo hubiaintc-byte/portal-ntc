@@ -1191,10 +1191,12 @@ async function upsertEspecialistasFeatured(
 
     const programasIds = await resolverProgramasIds(payload, esp.programasSlugs);
 
+    // `foto` é aplicada APENAS na criação. No update, o seed não toca no
+    // campo foto — assim as fotos reais subidas pela equipe editorial via
+    // admin não são sobrescritas pela placeholder a cada re-execução do seed.
     const dadosBase = {
       nome: esp.nome,
       slug: esp.slug,
-      foto: fotoId,
       titulacao: esp.titulacao,
       instituicao: esp.instituicao,
       curriculoCurto: richTextFromTexto(esp.curriculoCurtoTexto) as never,
@@ -1220,11 +1222,11 @@ async function upsertEspecialistasFeatured(
         overrideAccess: true,
       });
       map[esp.slug] = atualizado.id as Id;
-      payload.logger.info(`[seed:corpo-docente] atualiza Especialista '${esp.slug}' (id=${atualizado.id})`);
+      payload.logger.info(`[seed:corpo-docente] atualiza Especialista '${esp.slug}' (id=${atualizado.id}) — foto preservada`);
     } else {
       const criado = await payload.create({
         collection: "especialistas",
-        data: dadosBase as never,
+        data: { ...dadosBase, foto: fotoId } as never,
         overrideAccess: true,
       });
       map[esp.slug] = criado.id as Id;
@@ -1250,10 +1252,11 @@ async function upsertEspecialistasExperts(
 
     const programasIds = await resolverProgramasIds(payload, esp.programasSlugs);
 
+    // `foto` é aplicada APENAS na criação (mesma proteção da função Featured):
+    // no update o seed não toca em foto, preservando uploads reais do admin.
     const dadosBase = {
       nome: esp.nome,
       slug: esp.slug,
-      foto: fotoId,
       titulacao: TITULACAO_POR_FORMACAO[esp.formacao],
       instituicao: extrairInstituicao(esp.credencialTexto),
       curriculoCurto: richTextFromTexto(esp.credencialTexto) as never,
@@ -1280,12 +1283,12 @@ async function upsertEspecialistasExperts(
       });
       map[esp.slug] = atualizado.id as Id;
       payload.logger.info(
-        `[seed:corpo-docente] atualiza Expert '${esp.slug}' (id=${atualizado.id})`,
+        `[seed:corpo-docente] atualiza Expert '${esp.slug}' (id=${atualizado.id}) — foto preservada`,
       );
     } else {
       const criado = await payload.create({
         collection: "especialistas",
-        data: dadosBase as never,
+        data: { ...dadosBase, foto: fotoId } as never,
         overrideAccess: true,
       });
       map[esp.slug] = criado.id as Id;
