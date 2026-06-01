@@ -77,7 +77,7 @@ EventoPresencialLayout (INALTERADO) renderiza .speaker-detail-card
 
 - Mesmo padrão de `seedCorpoDocente.ts`: **upsert idempotente por `slug`**.
 - Popula **o evento PROSUS+ Brasília** (único existente), a partir do conteúdo de `conteudoEventos.ts` (porta literal — fidelidade 100% ao protótipo, ver memória `feedback_porta_html_fidelidade`).
-- A relação `palestrantes` é criada com uma **seleção inicial** (mínima ou definida pelo usuário). Como a curadoria é do usuário via admin, o seed garante que o registro exista; o usuário ajusta a seleção depois. **Seed não inventa quem é palestrante** (CLAUDE.md §5.3).
+- A relação `palestrantes` é criada com uma **seleção inicial sugerida** (decisão do usuário em 2026-06-01): o seed vincula alguns Especialistas plausíveis para PROSUS+ — os da vertical **Saúde** (os 5 Axis Saúde populados na sessão 1) e/ou com `programasRelacionados` contendo PROSUS — como ponto de partida visível no card. **O usuário ajusta/confirma a curadoria final pelo admin** (a seleção sugerida não é afirmação editorial definitiva; CLAUDE.md §5.3). O seed resolve os Especialistas por slug; se um slug sugerido não existir, faz `warn` e segue (não quebra).
 - **Proteção de dados editoriais:** seguindo o ajuste feito em `seedCorpoDocente` (commit `9c22770`), campos que a equipe edita no admin (notadamente a seleção de `palestrantes` e a `foto`/conteúdo) devem ser aplicados de forma que o re-seed não sobrescreva curadoria humana. Padrão: campos estruturais no update; seleção de palestrantes apenas na criação (ou via flag), a confirmar no plano.
 
 ## 7. Página com fallback (`page.tsx`)
@@ -91,7 +91,7 @@ EventoPresencialLayout (INALTERADO) renderiza .speaker-detail-card
 
 ## 8. Decomposição em sub-sessões (implementação)
 
-Por ser grande, a **implementação** divide-se (o spec cobre tudo; cada sub-sessão tem seu plano):
+Por ser grande, a **implementação** divide-se (o spec cobre tudo; cada sub-sessão tem seu plano). **Decisão do usuário (2026-06-01): começar pela 3a; o plano de 3b é gerado depois, separadamente.**
 
 - **Sessão 3a (núcleo do pedido):** verificação de schema + `seedEventos` (PROSUS+) + adapter `lib/cms/eventos.ts` + `page.tsx` lendo do CMS com fallback, com foco em **palestrantes reais renderizando** no `.speaker-detail-card`. Seções não-palestrante podem usar valores do adapter/estáticos no início.
 - **Sessão 3b:** migrar as demais seções de conteúdo (programação, FAQ, investimento, objetivos etc.) para serem 100% editáveis no admin, refinando o adapter.
