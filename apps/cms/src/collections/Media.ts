@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { authenticated } from "../access/authenticated";
 import { editorInstitucional } from "../access/editorInstitucional";
+import { sanitizarFilename } from "../hooks/sanitizarFilename";
 
 /**
  * Coleção Media — base para uploads do Portal Grupo NTC.
@@ -28,6 +29,11 @@ export const Media: CollectionConfig = {
     update: editorInstitucional,
     delete: editorInstitucional,
     readVersions: authenticated,
+  },
+  // Normaliza o nome do arquivo antes do upload: o Supabase Storage (S3)
+  // rejeita acentos/caracteres especiais na chave (InvalidKey → 500).
+  hooks: {
+    beforeOperation: [sanitizarFilename],
   },
   upload: {
     mimeTypes: [
