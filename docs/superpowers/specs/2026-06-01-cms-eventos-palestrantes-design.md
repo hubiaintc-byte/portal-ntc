@@ -73,7 +73,15 @@ EventoPresencialLayout (INALTERADO) renderiza .speaker-detail-card
 - **Resolução de foto:** a URL pública vem do campo Media do Especialista (Supabase Storage), igual ao corpo-docente.
 - **Ordem dos palestrantes:** respeita a ordem do array `palestrantes` definida no admin.
 
-## 6. Seed (`apps/cms/src/seed/seedEventos.ts`)
+## 5.1. Atualização de escopo (2026-06-01, pós-decisão do usuário)
+
+Duas decisões finais simplificam a 3a:
+1. **Ligar a página ao CMS para os 3 eventos já cadastrados** (`agip-sp-junho-2026`, `pear-online-maio-2026`, `prosus-mais-brasilia-2026-junho`) — não só PROSUS. O foco é a página `/agenda/[slug]` **genérica** lendo qualquer evento do CMS.
+2. **Palestrantes 100% selecionados pelo usuário no admin** (campo `palestrantes`). Nada de seleção sugerida/inventada — descartada a §6 de seed com sugestão (não há especialistas de Saúde, e o usuário fará a curadoria no admin).
+
+**Consequência:** o **seed `seedEventos.ts` é desnecessário** — os 3 eventos já existem no admin (criados manualmente). A 3a vira: **adapter + página com fallback**, e o usuário publica/seleciona pelo admin. Isso reduz a 3a a 2 peças e remove a §6 abaixo do caminho crítico.
+
+## 6. Seed (`apps/cms/src/seed/seedEventos.ts`) — REMOVIDO do escopo da 3a
 
 - Mesmo padrão de `seedCorpoDocente.ts`: **upsert idempotente por `slug`**.
 - Popula **o evento PROSUS+ Brasília** (único existente), a partir do conteúdo de `conteudoEventos.ts` (porta literal — fidelidade 100% ao protótipo, ver memória `feedback_porta_html_fidelidade`).
