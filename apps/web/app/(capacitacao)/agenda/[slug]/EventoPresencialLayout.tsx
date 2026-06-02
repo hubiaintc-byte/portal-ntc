@@ -125,239 +125,269 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
           <div className="event-layout-grid">
             <div className="event-main-content">
               {/* 5.1 VISÃO GERAL */}
-              <article className="event-section fade-in" id="visao-geral">
-                <p className="eyebrow">{evento.visaoGeral.eyebrow}</p>
-                <h2>{evento.visaoGeral.h2}</h2>
-                <p className="lede-block">{evento.visaoGeral.lede}</p>
-                {evento.visaoGeral.paragrafos.map((p, i) => (
-                  <p key={i} dangerouslySetInnerHTML={{ __html: p }} />
-                ))}
-              </article>
+              {(evento.visaoGeral.lede.trim() !== "" ||
+                evento.visaoGeral.paragrafos.length > 0) && (
+                <article className="event-section fade-in" id="visao-geral">
+                  <p className="eyebrow">{evento.visaoGeral.eyebrow}</p>
+                  <h2>{evento.visaoGeral.h2}</h2>
+                  <p className="lede-block">{evento.visaoGeral.lede}</p>
+                  {evento.visaoGeral.paragrafos.map((p, i) => (
+                    <p key={i} dangerouslySetInnerHTML={{ __html: p }} />
+                  ))}
+                </article>
+              )}
 
               {/* 5.2 PÚBLICO */}
-              <article className="event-section fade-in" id="publico">
-                <p className="eyebrow">{evento.publico.eyebrow}</p>
-                <h2>{evento.publico.h2}</h2>
-                <p>{evento.publico.intro}</p>
-                <div className="audience-chips">
-                  {evento.publico.chips.map((chip, i) => (
-                    <span key={i}>{chip.texto}</span>
-                  ))}
-                </div>
-              </article>
+              {(evento.publico.intro.trim() !== "" ||
+                evento.publico.chips.length > 0) && (
+                <article className="event-section fade-in" id="publico">
+                  <p className="eyebrow">{evento.publico.eyebrow}</p>
+                  <h2>{evento.publico.h2}</h2>
+                  <p>{evento.publico.intro}</p>
+                  <div className="audience-chips">
+                    {evento.publico.chips.map((chip, i) => (
+                      <span key={i}>{chip.texto}</span>
+                    ))}
+                  </div>
+                </article>
+              )}
 
               {/* 5.3 OBJETIVOS (sem id) */}
-              <article className="event-section fade-in">
-                <p className="eyebrow">{evento.objetivos.eyebrow}</p>
-                <h2>{evento.objetivos.h2}</h2>
-                <ol className="objective-list">
-                  {evento.objetivos.objetivos.map((o, i) => (
-                    <li key={i}>{o.texto}</li>
-                  ))}
-                </ol>
-              </article>
+              {evento.objetivos.objetivos.length > 0 && (
+                <article className="event-section fade-in">
+                  <p className="eyebrow">{evento.objetivos.eyebrow}</p>
+                  <h2>{evento.objetivos.h2}</h2>
+                  <ol className="objective-list">
+                    {evento.objetivos.objetivos.map((o, i) => (
+                      <li key={i}>{o.texto}</li>
+                    ))}
+                  </ol>
+                </article>
+              )}
 
               {/* 5.4 CONTEÚDO PROGRAMÁTICO (sem id) */}
-              <article className="event-section fade-in">
-                <p className="eyebrow">{evento.conteudoProgramatico.eyebrow}</p>
-                <h2>{evento.conteudoProgramatico.h2}</h2>
-                <p>{evento.conteudoProgramatico.intro}</p>
-                <div className="program-content">
-                  {evento.conteudoProgramatico.itens.map((item, i) => (
-                    <div key={i} className="program-content-item">
-                      <span className="num">{item.num}</span>
-                      <span className="text">{item.texto}</span>
-                    </div>
-                  ))}
-                </div>
-              </article>
+              {(evento.conteudoProgramatico.intro.trim() !== "" ||
+                evento.conteudoProgramatico.itens.length > 0) && (
+                <article className="event-section fade-in">
+                  <p className="eyebrow">{evento.conteudoProgramatico.eyebrow}</p>
+                  <h2>{evento.conteudoProgramatico.h2}</h2>
+                  <p>{evento.conteudoProgramatico.intro}</p>
+                  <div className="program-content">
+                    {evento.conteudoProgramatico.itens.map((item, i) => (
+                      <div key={i} className="program-content-item">
+                        <span className="num">{item.num}</span>
+                        <span className="text">{item.texto}</span>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              )}
 
               {/* 5.5 PROGRAMAÇÃO */}
-              <article className="event-section fade-in" id="programacao">
-                <p className="eyebrow">{evento.programacao.eyebrow}</p>
-                <h2>{evento.programacao.h2}</h2>
-                <p>{evento.programacao.intro}</p>
-                {evento.programacao.dias.map((dia, i) => (
-                  <div key={i} className="schedule-day">
-                    <div className="schedule-day-head">
-                      <span className="date-big">{dia.dateBig}</span>
-                      <span className="date-sub">{dia.dateSub}</span>
-                      <span className="day-tag">{dia.dayTag}</span>
-                    </div>
-                    <div className="schedule-rows">
-                      {dia.rows.map((row, j) => (
-                        <div key={j} className="schedule-row">
-                          <span className="time">{row.time}</span>
-                          <div className="activity">
-                            <strong>{row.titulo}</strong>
-                            <span>{row.descricao}</span>
+              {evento.programacao.dias.length > 0 && (
+                <article className="event-section fade-in" id="programacao">
+                  <p className="eyebrow">{evento.programacao.eyebrow}</p>
+                  <h2>{evento.programacao.h2}</h2>
+                  <p>{evento.programacao.intro}</p>
+                  {evento.programacao.dias.map((dia, i) => (
+                    <div key={i} className="schedule-day">
+                      <div className="schedule-day-head">
+                        <span className="date-big">{dia.dateBig}</span>
+                        <span className="date-sub">{dia.dateSub}</span>
+                        <span className="day-tag">{dia.dayTag}</span>
+                      </div>
+                      <div className="schedule-rows">
+                        {dia.rows.map((row, j) => (
+                          <div key={j} className="schedule-row">
+                            <span className="time">{row.time}</span>
+                            <div className="activity">
+                              <strong>{row.titulo}</strong>
+                              <span>{row.descricao}</span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </article>
+                  ))}
+                </article>
+              )}
 
               {/* 5.6 PALESTRANTES */}
-              <article className="event-section fade-in" id="palestrantes">
-                <p className="eyebrow">{evento.palestrantes.eyebrow}</p>
-                <h2>{evento.palestrantes.h2}</h2>
-                <p>{evento.palestrantes.intro}</p>
-                <div className="speakers-detailed">
-                  {evento.palestrantes.palestrantes.map((p, i) => (
-                    <article key={i} className="speaker-detail-card">
-                      <div className="speaker-detail-portrait">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={p.foto} alt={p.nome} loading="lazy" />
-                      </div>
-                      <div className="speaker-detail-info">
-                        <span className="role">{p.role}</span>
-                        <h3>{p.nome}</h3>
-                        <p className="cred">{p.credenciais}</p>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-                <p
-                  className="placeholder-note"
-                  style={{
-                    marginTop: "var(--space-3)",
-                    textAlign: "left",
-                  }}
-                >
-                  {evento.palestrantes.nota}
-                </p>
-              </article>
+              {evento.palestrantes.palestrantes.length > 0 && (
+                <article className="event-section fade-in" id="palestrantes">
+                  <p className="eyebrow">{evento.palestrantes.eyebrow}</p>
+                  <h2>{evento.palestrantes.h2}</h2>
+                  <p>{evento.palestrantes.intro}</p>
+                  <div className="speakers-detailed">
+                    {evento.palestrantes.palestrantes.map((p, i) => (
+                      <article key={i} className="speaker-detail-card">
+                        <div className="speaker-detail-portrait">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={p.foto} alt={p.nome} loading="lazy" />
+                        </div>
+                        <div className="speaker-detail-info">
+                          <span className="role">{p.role}</span>
+                          <h3>{p.nome}</h3>
+                          <p className="cred">{p.credenciais}</p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                  <p
+                    className="placeholder-note"
+                    style={{
+                      marginTop: "var(--space-3)",
+                      textAlign: "left",
+                    }}
+                  >
+                    {evento.palestrantes.nota}
+                  </p>
+                </article>
+              )}
 
               {/* 5.7 DIFERENCIAIS (sem id) */}
-              <article className="event-section fade-in">
-                <p className="eyebrow">{evento.diferenciais.eyebrow}</p>
-                <h2>{evento.diferenciais.h2}</h2>
-                <div className="event-differentials">
-                  {evento.diferenciais.diferenciais.map((d, i) => (
-                    <div key={i} className="event-diff-card">
-                      <span className="diff-num">{d.num}</span>
-                      <div className="diff-body">
-                        <h4>{d.titulo}</h4>
-                        <p>{d.descricao}</p>
+              {evento.diferenciais.diferenciais.length > 0 && (
+                <article className="event-section fade-in">
+                  <p className="eyebrow">{evento.diferenciais.eyebrow}</p>
+                  <h2>{evento.diferenciais.h2}</h2>
+                  <div className="event-differentials">
+                    {evento.diferenciais.diferenciais.map((d, i) => (
+                      <div key={i} className="event-diff-card">
+                        <span className="diff-num">{d.num}</span>
+                        <div className="diff-body">
+                          <h4>{d.titulo}</h4>
+                          <p>{d.descricao}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </article>
+                    ))}
+                  </div>
+                </article>
+              )}
 
               {/* 5.8 LOCAL (só presencial) */}
-              <article className="event-section fade-in" id="local">
-                <p className="eyebrow">{evento.local.eyebrow}</p>
-                <h2>{evento.local.h2}</h2>
-                <div className="venue-grid">
-                  <div className="venue-info">
-                    <h4>{evento.local.venueInfo.titulo}</h4>
-                    <address>
-                      {evento.local.venueInfo.enderecoLinhas.map((linha, i) => (
-                        <Fragment key={i}>
-                          {linha}
-                          {i < evento.local.venueInfo.enderecoLinhas.length - 1 && <br />}
-                        </Fragment>
-                      ))}
-                    </address>
-                    <p className="venue-meta">{evento.local.venueInfo.meta}</p>
-                    <p
-                      style={{
-                        fontSize: "14.5px",
-                        color: "var(--grafite)",
-                        lineHeight: 1.55,
-                        margin: "6px 0 0",
-                      }}
-                      dangerouslySetInnerHTML={{
-                        __html: evento.local.venueInfo.hospedagemHtml,
-                      }}
-                    />
+              {(evento.local.venueInfo.titulo.trim() !== "" ||
+                evento.local.venueInfo.enderecoLinhas.length > 0) && (
+                <article className="event-section fade-in" id="local">
+                  <p className="eyebrow">{evento.local.eyebrow}</p>
+                  <h2>{evento.local.h2}</h2>
+                  <div className="venue-grid">
+                    <div className="venue-info">
+                      <h4>{evento.local.venueInfo.titulo}</h4>
+                      <address>
+                        {evento.local.venueInfo.enderecoLinhas.map((linha, i) => (
+                          <Fragment key={i}>
+                            {linha}
+                            {i < evento.local.venueInfo.enderecoLinhas.length - 1 && <br />}
+                          </Fragment>
+                        ))}
+                      </address>
+                      <p className="venue-meta">{evento.local.venueInfo.meta}</p>
+                      <p
+                        style={{
+                          fontSize: "14.5px",
+                          color: "var(--grafite)",
+                          lineHeight: 1.55,
+                          margin: "6px 0 0",
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: evento.local.venueInfo.hospedagemHtml,
+                        }}
+                      />
+                    </div>
+                    <div
+                      className="venue-map"
+                      aria-label={`Mapa institucional · ${evento.local.mapLabel}`}
+                    >
+                      <div className="pin" />
+                      <span className="map-label">{evento.local.pinLabel}</span>
+                    </div>
                   </div>
-                  <div
-                    className="venue-map"
-                    aria-label={`Mapa institucional · ${evento.local.mapLabel}`}
-                  >
-                    <div className="pin" />
-                    <span className="map-label">{evento.local.pinLabel}</span>
-                  </div>
-                </div>
-              </article>
+                </article>
+              )}
 
               {/* 5.9 REPLAY E CERTIFICAÇÃO (sem id) */}
-              <article className="event-section fade-in">
-                <p className="eyebrow">{evento.replayCert.eyebrow}</p>
-                <h2>{evento.replayCert.h2}</h2>
-                <div className="replay-cert-grid">
-                  {evento.replayCert.cards.map((card, i) => (
-                    <div key={i} className="replay-cert-card">
-                      <span className="icon-line" aria-hidden="true">{card.icone}</span>
-                      <h4>{card.titulo}</h4>
-                      <p>{card.descricao}</p>
-                    </div>
-                  ))}
-                </div>
-              </article>
+              {evento.replayCert.cards.length > 0 && (
+                <article className="event-section fade-in">
+                  <p className="eyebrow">{evento.replayCert.eyebrow}</p>
+                  <h2>{evento.replayCert.h2}</h2>
+                  <div className="replay-cert-grid">
+                    {evento.replayCert.cards.map((card, i) => (
+                      <div key={i} className="replay-cert-card">
+                        <span className="icon-line" aria-hidden="true">{card.icone}</span>
+                        <h4>{card.titulo}</h4>
+                        <p>{card.descricao}</p>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              )}
 
               {/* 5.10 INVESTIMENTO/REGRAS */}
-              <article className="event-section fade-in" id="investimento">
-                <p className="eyebrow">{evento.investimento.eyebrow}</p>
-                <h2 id={evento.investimento.h2Id}>{evento.investimento.h2}</h2>
-                <ul className="rules-list">
-                  {evento.investimento.rules.map((rule, i) => (
-                    <li key={i}>{rule}</li>
-                  ))}
-                </ul>
-              </article>
+              {evento.investimento.rules.length > 0 && (
+                <article className="event-section fade-in" id="investimento">
+                  <p className="eyebrow">{evento.investimento.eyebrow}</p>
+                  <h2 id={evento.investimento.h2Id}>{evento.investimento.h2}</h2>
+                  <ul className="rules-list">
+                    {evento.investimento.rules.map((rule, i) => (
+                      <li key={i}>{rule}</li>
+                    ))}
+                  </ul>
+                </article>
+              )}
 
               {/* 5.11 FAQ */}
-              <article className="event-section fade-in" id="faq">
-                <p className="eyebrow">{evento.faq.eyebrow}</p>
-                <h2>{evento.faq.h2}</h2>
-                <div className="faq-list">
-                  <FaqEvento itens={evento.faq.faqs} />
-                </div>
-              </article>
+              {evento.faq.faqs.length > 0 && (
+                <article className="event-section fade-in" id="faq">
+                  <p className="eyebrow">{evento.faq.eyebrow}</p>
+                  <h2>{evento.faq.h2}</h2>
+                  <div className="faq-list">
+                    <FaqEvento itens={evento.faq.faqs} />
+                  </div>
+                </article>
+              )}
 
               {/* 5.12 CTA FINAL (sem id) */}
-              <article
-                className="event-section fade-in"
-                style={{ textAlign: "center", paddingTop: "var(--space-6)" }}
-              >
-                <p className="eyebrow gold">{evento.ctaFinal.eyebrowGold}</p>
-                <h2 style={{ maxWidth: "720px", margin: "0 auto var(--space-3)" }}>
-                  {evento.ctaFinal.h2}
-                </h2>
-                <p
-                  style={{
-                    maxWidth: "640px",
-                    margin: "0 auto var(--space-4)",
-                  }}
+              {(evento.ctaFinal.h2.trim() !== "" ||
+                evento.ctaFinal.paragrafo.trim() !== "" ||
+                evento.ctaFinal.ctas.length > 0) && (
+                <article
+                  className="event-section fade-in"
+                  style={{ textAlign: "center", paddingTop: "var(--space-6)" }}
                 >
-                  {evento.ctaFinal.paragrafo}
-                </p>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "14px",
-                    justifyContent: "center",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {evento.ctaFinal.ctas.map((cta, i) => (
-                    <a
-                      key={i}
-                      className={cta.classe}
-                      href={cta.href}
-                      data-cms-link={cta.cmsLink}
-                    >
-                      {cta.texto}
-                      {cta.arrow && <span className="btn-arrow"> →</span>}
-                    </a>
-                  ))}
-                </div>
-              </article>
+                  <p className="eyebrow gold">{evento.ctaFinal.eyebrowGold}</p>
+                  <h2 style={{ maxWidth: "720px", margin: "0 auto var(--space-3)" }}>
+                    {evento.ctaFinal.h2}
+                  </h2>
+                  <p
+                    style={{
+                      maxWidth: "640px",
+                      margin: "0 auto var(--space-4)",
+                    }}
+                  >
+                    {evento.ctaFinal.paragrafo}
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "14px",
+                      justifyContent: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {evento.ctaFinal.ctas.map((cta, i) => (
+                      <a
+                        key={i}
+                        className={cta.classe}
+                        href={cta.href}
+                        data-cms-link={cta.cmsLink}
+                      >
+                        {cta.texto}
+                        {cta.arrow && <span className="btn-arrow"> →</span>}
+                      </a>
+                    ))}
+                  </div>
+                </article>
+              )}
             </div>
 
             {/* SIDEBAR */}
@@ -430,6 +460,7 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
       </section>
 
       {/* 6. RELATED EVENTS */}
+      {evento.relatedEvents.cards.length > 0 && (
       <section
         className="related-events-section"
         aria-label={`Outros eventos da vertical ${
@@ -530,6 +561,7 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
           </div>
         </div>
       </section>
+      )}
     </main>
   );
 }
