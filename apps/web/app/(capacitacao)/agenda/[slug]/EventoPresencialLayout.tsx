@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 
-import type { EventoPresencial } from "./conteudoEventos";
+import type { EventoHibrido, EventoPresencial } from "./conteudoEventos";
 import { CountdownSidebar } from "./CountdownSidebar";
 import { EventoSubnav } from "./EventoSubnav";
 import { FaqEvento } from "./FaqEvento";
@@ -14,7 +14,7 @@ import { FaqEvento } from "./FaqEvento";
  * Header/Footer/InteracoesScroll vêm de (capacitacao)/layout.tsx já existente.
  */
 interface EventoPresencialLayoutProps {
-  evento: EventoPresencial;
+  evento: EventoPresencial | EventoHibrido;
 }
 
 export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) {
