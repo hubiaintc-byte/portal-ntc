@@ -101,6 +101,13 @@ export default buildConfig({
       collections: {
         media: {
           prefix: "media",
+          // disableLocalStorage: os arquivos vivem SÓ no Supabase Storage,
+          // não há cópia em apps/cms/media/. Sem isto, o admin tenta servir
+          // as variantes do disco local (que não existem) e responde 500
+          // em GET /api/media/file/X-400x460.png — embora o upload ao
+          // Supabase tenha sido bem-sucedido. Com isto, admin e front usam
+          // a URL pública via generateFileURL.
+          disableLocalStorage: true,
           // disablePayloadAccessControl: o Payload deixa de servir
           // /api/media/file/X e o front consome a URL pública do
           // Supabase Storage direto. O bucket ntc-portal-media é
