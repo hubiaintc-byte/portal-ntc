@@ -30,7 +30,7 @@ export const Eventos: CollectionConfig = {
   },
   versions: { drafts: true, maxPerDoc: 50 },
   hooks: {
-    afterChange: [revalidatePage(["/agenda", "/eventos/:slug"])],
+    afterChange: [revalidatePage(["/agenda", "/agenda/:slug"])],
   },
   fields: [
     {
