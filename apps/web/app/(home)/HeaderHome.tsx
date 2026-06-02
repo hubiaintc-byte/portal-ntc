@@ -352,10 +352,10 @@ export function HeaderHome() {
                 <h4>Agenda e formatos</h4>
                 <ul className="mega-list">
                   <li>
-                    <a href="/agenda">
+                    <Link href="/agenda">
                       <strong>Agenda Geral NTC</strong>
                       <span>Todos os eventos abertos no calendário</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a href="#eventos-abertos">
@@ -472,7 +472,7 @@ export function HeaderHome() {
             Capacitação
           </button>
           <div className={`drawer-sub ${subDrawerAberto["capacitacao-mobile"] ? "is-open" : ""}`}>
-            <a href="/agenda"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></a>
+            <Link href="/agenda"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></Link>
             <a href="#eventos-abertos"><strong>Eventos online</strong><span>Ao vivo + replay</span></a>
             <a href="#eventos-abertos"><strong>Eventos presenciais</strong><span>Capitais estratégicas</span></a>
             <a href="#eventos-abertos"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></a>
