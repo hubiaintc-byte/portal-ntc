@@ -20,6 +20,17 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.supabase.co" },
     ],
   },
+  async redirects() {
+    return [
+      {
+        // CTAs dos programas apontam para /contato/proposta?programa=...
+        // Rota não existe; cai em /contato preservando a query (307).
+        source: "/contato/proposta",
+        destination: "/contato",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

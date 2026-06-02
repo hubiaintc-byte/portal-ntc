@@ -42,6 +42,21 @@ const TAB_HASH_MAP: Record<string, TabId> = {
   "#tab-equipe": "equipe",
   "#tab-imprensa": "imprensa",
 };
+// Modalidades vindas dos CTAs de programa → value do <select name="modalidade">.
+// O select tem incompany-presencial/online/hibrido; o link manda só "incompany".
+const MODALIDADE_LINK_PARA_SELECT: Record<string, string> = {
+  incompany: "incompany-presencial",
+  "sob-medida": "sob-medida",
+  trilha: "trilha",
+};
+
+// Assuntos vindos dos CTAs → texto funcional pré-preenchido no contexto.
+const ASSUNTO_LINK_PARA_TEXTO: Record<string, string> = {
+  folder: "Gostaria de receber o folder do programa.",
+  detalhes: "Gostaria de receber mais detalhes sobre o programa.",
+  inscricao: "Tenho interesse em inscrição para este programa.",
+};
+
 const HEADER_OFFSET = 88;
 const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ACCEPTED_BULK_EXT = ["xlsx", "xls", "csv"] as const;
@@ -157,6 +172,23 @@ export function RoteadorFormularios() {
     // TODO: analytics quando dataLayer estiver configurado
   }, []);
 
+  const prefillSelectPorId = useCallback((id: string, value: string) => {
+    const el = document.getElementById(id);
+    if (!(el instanceof HTMLSelectElement)) return;
+    const has = Array.from(el.options).some((o) => o.value === value);
+    if (!has) return;
+    el.value = value;
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    const wrap = el.closest<HTMLElement>(".form-field");
+    if (wrap) {
+      wrap.style.transition = "box-shadow 320ms";
+      wrap.style.boxShadow = "0 0 0 3px rgba(184, 149, 46, 0.18)";
+      setTimeout(() => {
+        wrap.style.boxShadow = "";
+      }, 1400);
+    }
+  }, []);
+
   const ativarTab = useCallback(
     (id: TabId, options?: { scroll?: boolean; prefillVerticalKey?: string }) => {
       setTabAtiva(id);
@@ -202,14 +234,40 @@ export function RoteadorFormularios() {
           }, 1800);
         }
         // TODO: analytics quando dataLayer estiver configurado
+      }
 
-        if (window.history?.replaceState) {
-          const clean = window.location.pathname + (window.location.hash || "");
-          window.history.replaceState(null, "", clean);
-        }
+      const programa = params.get("programa");
+      const modalidade = params.get("modalidade");
+      const assunto = params.get("assunto");
+
+      if (programa || modalidade || assunto) {
+        ativarTab("proposta", { scroll: true });
+
+        // setTimeout(0): o painel proposta só monta os campos após o setState da aba.
+        setTimeout(() => {
+          if (programa) {
+            prefillSelectPorId("prop-programa", programa.toUpperCase());
+          }
+          if (modalidade) {
+            const value = MODALIDADE_LINK_PARA_SELECT[modalidade];
+            if (value) prefillSelectPorId("prop-modalidade", value);
+          }
+          if (assunto) {
+            const texto = ASSUNTO_LINK_PARA_TEXTO[assunto];
+            const ctx = document.getElementById("prop-contexto");
+            if (texto && ctx instanceof HTMLTextAreaElement && !ctx.value.trim()) {
+              ctx.value = texto;
+            }
+          }
+        }, 0);
+      }
+
+      if (window.history?.replaceState) {
+        const clean = window.location.pathname + (window.location.hash || "");
+        window.history.replaceState(null, "", clean);
       }
     }
-  }, [ativarTab]);
+  }, [ativarTab, prefillSelectPorId]);
 
   /* ── Effect: handler global para <a href^="#tab-"> ── */
   useEffect(() => {

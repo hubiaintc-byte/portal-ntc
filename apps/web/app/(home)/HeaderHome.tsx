@@ -310,25 +310,25 @@ export function HeaderHome() {
                 <h4>Modelos de contratação</h4>
                 <ul className="mega-list">
                   <li>
-                    <Link href="/solucoes#in-company">
+                    <Link href="/solucoes#modalidades">
                       <strong>Soluções in company</strong>
                       <span>Programa entregue exclusivamente à instituição</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/solucoes#turmas-fechadas">
+                    <Link href="/solucoes#modalidades">
                       <strong>Turmas fechadas</strong>
                       <span>Edição operacional dedicada à equipe contratante</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/solucoes#sob-medida">
+                    <Link href="/solucoes#modalidades">
                       <strong>Soluções sob medida</strong>
                       <span>Customização profunda de ementas, módulos e formato</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/solucoes#trilhas">
+                    <Link href="/solucoes#modalidades">
                       <strong>Trilhas e jornadas</strong>
                       <span>Sequências formativas curadas para necessidades específicas</span>
                     </Link>
@@ -352,10 +352,10 @@ export function HeaderHome() {
                 <h4>Agenda e formatos</h4>
                 <ul className="mega-list">
                   <li>
-                    <a href="#capacitacao">
+                    <Link href="/agenda">
                       <strong>Agenda Geral NTC</strong>
                       <span>Todos os eventos abertos no calendário</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a href="#eventos-abertos">
@@ -472,7 +472,7 @@ export function HeaderHome() {
             Capacitação
           </button>
           <div className={`drawer-sub ${subDrawerAberto["capacitacao-mobile"] ? "is-open" : ""}`}>
-            <a href="#capacitacao"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></a>
+            <Link href="/agenda"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></Link>
             <a href="#eventos-abertos"><strong>Eventos online</strong><span>Ao vivo + replay</span></a>
             <a href="#eventos-abertos"><strong>Eventos presenciais</strong><span>Capitais estratégicas</span></a>
             <a href="#eventos-abertos"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></a>
@@ -502,7 +502,7 @@ export function HeaderHome() {
               <strong>NTC Saúde</strong>
               <span>3 programas estratégicos</span>
             </Link>
-            <Link href="/solucoes#in-company"><strong>Soluções in company</strong><span>Turmas fechadas e sob medida</span></Link>
+            <Link href="/solucoes#modalidades"><strong>Soluções in company</strong><span>Turmas fechadas e sob medida</span></Link>
             <Link href="/solucoes#contratacao-institucional"><strong>Contratação institucional</strong><span>Atendimento a órgãos públicos</span></Link>
           </div>
 
