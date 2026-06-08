@@ -2607,36 +2607,3 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 
 /* --- Token de acento EDUTEC (se ainda não definido no :root) --- */
 :root { --acento-edutec: #1F5060; }
-
-/* --- Aliases de countdown: CountdownSidebar usa .sidebar-* ; protótipo define .sb-* . --- */
-.sidebar-countdown {
-  background: var(--pergaminho); border-top: 1px solid var(--prata-30);
-  padding: var(--space-3); text-align: center;
-}
-.sidebar-cd-label {
-  font-family: var(--font-cond); font-weight: 600; font-size: 10.5px;
-  letter-spacing: 1.6px; text-transform: uppercase; color: var(--prata);
-  margin-bottom: 6px;
-}
-.sidebar-cd-date {
-  font-family: var(--font-serif); font-style: italic; font-weight: 500;
-  font-size: 16px; color: var(--tinta); margin-bottom: 10px;
-}
-.sidebar-cd-counter {
-  display: flex; justify-content: center; gap: 10px;
-  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.3px;
-  text-transform: uppercase; color: var(--grafite);
-}
-.sidebar-cd-counter .item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.sidebar-cd-counter .num {
-  font-family: var(--font-serif); font-weight: 700; font-size: 22px;
-  color: var(--event-accent, var(--oxford)); line-height: 1; letter-spacing: -0.5px;
-}
-.sidebar-cd-counter .lbl {
-  font-family: var(--font-cond); font-size: 9.5px; letter-spacing: 1.4px;
-  text-transform: uppercase; color: var(--prata);
-}
-.sidebar-cd-text {
-  font-family: var(--font-sans); font-size: 13px; color: var(--grafite); line-height: 1.45;
-}
-.sidebar-cd-text strong { color: var(--event-accent, var(--oxford)); font-weight: 600; }
