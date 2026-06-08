@@ -908,8 +908,350 @@ const eventoProsusBrasilia: EventoPresencial = {
   },
 };
 
+// ----------------- Evento: EDUTEC Módulo 01 2026 (online) -----------------
+// Porta do protótipo feito/04_Pagina_Evento_EDUTEC_M01_Online_v2.html (estrutura
+// e dados) + textos longos do folder PDF (bios, 29 questões). Fotos: usuário sobe depois.
+
+const eventoEdutecM01: EventoOnline = {
+  slug: "edutec-m01-2026",
+  titulo: "Cultura Digital, Educação Midiática e Transformação da Educação",
+  subtitulo:
+    "Fundamentos, repertórios e práticas para consolidar uma pedagogia crítica, conectada e institucionalmente alinhada à cultura digital contemporânea.",
+  formato: "online",
+  dataEvento: "27 de maio de 2026",
+  area: "edu",
+
+  // Campos de EventoBase não usados pelo layout online (vazios):
+  crumb: [
+    { texto: "Grupo NTC", href: "/", cmsLink: "home" },
+    { texto: "Capacitação", href: "/capacitacao", cmsLink: "agenda-completa" },
+    { texto: "Eventos online", href: "/capacitacao/agenda", cmsLink: "eventos-online" },
+    { texto: "Seminário EDUTEC · Cultura Digital", current: true },
+  ],
+  hero: { tags: [], h1: "", sub: "", programBinding: { texto: "", href: "", nomePrograma: "" }, ctas: [] },
+  metas: [],
+  navLinks: [
+    { texto: "Visão geral", href: "#visao-geral", isActive: true },
+    { texto: "Público", href: "#publico" },
+    { texto: "Programação", href: "#programacao" },
+    { texto: "O que você aprenderá", href: "#questoes" },
+    { texto: "Palestrantes", href: "#palestrantes" },
+    { texto: "EventOn", href: "#eventon" },
+    { texto: "Investimento", href: "#investimento" },
+    { texto: "Regras", href: "#regras" },
+    { texto: "FAQ", href: "#faq" },
+  ],
+  visaoGeral: { eyebrow: "", h2: "", lede: "", paragrafos: [] },
+  publico: { eyebrow: "", h2: "", intro: "", chips: [] },
+  objetivos: { eyebrow: "", h2: "", objetivos: [] },
+  conteudoProgramatico: { eyebrow: "", h2: "", intro: "", itens: [] },
+  programacao: { eyebrow: "", h2: "", intro: "", dias: [] },
+  palestrantes: { eyebrow: "", h2: "", intro: "", palestrantes: [], nota: "" },
+  diferenciais: { eyebrow: "", h2: "", diferenciais: [] },
+  replayCert: { eyebrow: "", h2: "", cards: [] },
+  investimento: { eyebrow: "", h2: "", rules: [] },
+  faq: {
+    eyebrow: "Perguntas frequentes",
+    h2: "FAQ",
+    faqs: [
+      { id: "edutec-m01-faq-1", pergunta: "Como funciona o acesso ao EventON NTC?", respostaHtml: "Após a confirmação da inscrição, você recebe por e-mail um link de acesso individual com login e senha. O acesso é feito direto pelo navegador, sem necessidade de download de aplicativo." },
+      { id: "edutec-m01-faq-2", pergunta: "Por quanto tempo terei acesso ao replay?", respostaHtml: "O replay fica disponível por 7 dias após a realização do evento, na Área do Participante. Acesso protegido por login institucional individual." },
+      { id: "edutec-m01-faq-3", pergunta: "Como recebo o certificado?", respostaHtml: "O certificado é emitido automaticamente até 7 dias após o término do evento, mediante presença mínima de 75% das atividades. Pode ser baixado pela Área do Participante e validado publicamente via código QR." },
+      { id: "edutec-m01-faq-4", pergunta: "Posso inscrever minha equipe ou rede?", respostaHtml: "Sim. Equipes de 3 a 10 participantes recebem desconto institucional. Acima disso, oferecemos contratação institucional dedicada com nota fiscal direta para o órgão. Solicite proposta para grupo no botão lateral." },
+      { id: "edutec-m01-faq-5", pergunta: "A inscrição inclui materiais?", respostaHtml: "Sim. Cadernos digitais editoriais NTC com conteúdo programático, leituras complementares e templates aplicáveis são enviados por e-mail e disponibilizados na plataforma." },
+      { id: "edutec-m01-faq-6", pergunta: "Como contratar uma turma fechada para minha instituição?", respostaHtml: "A NTC desenvolve turmas fechadas in company para secretarias, autarquias e órgãos públicos, com conteúdo entregue na sede da instituição ou em formato online dedicado. Solicite proposta institucional pelo botão lateral." },
+      { id: "edutec-m01-faq-7", pergunta: "É possível compor a trilha completa EDUTEC?", respostaHtml: "Sim. Este Módulo 01 é a abertura da trilha EDUTEC — Programa Estratégico de Educação Digital. A trilha completa pode ser contratada para sua rede com condições institucionais. Consulte a equipe comercial." },
+    ],
+  },
+  ctaFinal: { eyebrowGold: "", h2: "", paragrafo: "", ctas: [] },
+  sidebar: {
+    coverImg: "", status: "", tituloCard: "", rows: [],
+    includes: { titulo: "", items: [] },
+    countdown: { label: "", dateText: "", deadline: "2026-05-20T23:59:59-03:00", tipo: "numerico" },
+    acoes: [], share: { label: "", links: [] },
+  },
+  relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
+  agendaIcs: {
+    titulo: "Seminário EDUTEC · Cultura Digital, Educação Midiática e Transformação da Educação",
+    descricao: "Seminário On-Line ao Vivo do programa EDUTEC · Grupo NTC. Acesso pela plataforma EventON NTC.",
+    location: "Plataforma EventON NTC · Online",
+    startISO: "20260527T080000",
+    endISO: "20260527T180000",
+    filename: "EDUTEC-M01-2026-mai.ics",
+  },
+
+  // ---- Seções evt-* (consumidas pelo EventoOnlineLayout) ----
+  heroOnline: {
+    tags: [
+      { texto: "Inscrições abertas", classe: "evt-hero-status" },
+      { texto: "Seminário Online ao Vivo", classe: "evt-hero-format" },
+      { texto: "NTC Educação", classe: "evt-hero-vert" },
+    ],
+    h1Html: "Cultura Digital, Educação Midiática e <em>Transformação</em> da Educação",
+    sub: "Fundamentos, repertórios e práticas para consolidar uma pedagogia crítica, conectada e institucionalmente alinhada à cultura digital contemporânea.",
+    programBinding: {
+      texto: "Integra o programa",
+      href: "/programas/edutec",
+      cmsLink: "programa-EDUTEC",
+      nomePrograma: "EDUTEC — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino",
+    },
+    ctas: [
+      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-mai", classe: "btn btn--gold", arrow: true },
+      { texto: "Baixar folder", href: "#", cmsLink: "folder-EDUTEC-M01", classe: "btn btn--ghost-light" },
+      { texto: "Inscrever equipe ou grupo", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026#tab-equipe", cmsLink: "proposta-grupo-EDUTEC-M01", classe: "btn btn--ghost-light" },
+    ],
+  },
+
+  metasOnline: [
+    { label: "Quando", value: "27 · Maio", valueSub: "2026 · Quarta-feira" },
+    { label: "Modalidade", value: "Ao vivo", valueSub: "+ replay por 7 dias" },
+    { label: "Carga horária", value: "8 horas", valueSub: "Manhã (4h) + Tarde (4h)" },
+    { label: "Plataforma", value: "EventON NTC", valueSub: "Acesso individual" },
+    { label: "Investimento", value: "Sob consulta", valueSub: "Equipes e órgãos" },
+  ],
+
+  visaoGeralOnline: {
+    eyebrow: "Visão geral",
+    h2Html: "Uma agenda institucional para uma <em>educação digital crítica</em>, conectada e contemporânea.",
+    lede: "Este seminário aborda a cultura digital e a educação midiática como dimensões estruturantes da formação contemporânea, reconhecendo que a escola pública está diante de um ambiente social profundamente marcado por telas, plataformas, algoritmos e novas linguagens de participação.",
+    paragrafosHtml: [
+      "<strong>Formar estudantes para apenas utilizar tecnologia é insuficiente</strong>: é necessário desenvolver leitura crítica, autoria, responsabilidade, discernimento e capacidade de participação qualificada no ecossistema informacional.",
+      "A proposta apoia redes públicas e instituições educacionais na consolidação de práticas pedagógicas mais inovadoras, intencionais e conectadas aos desafios do presente. Ao articular fundamentos conceituais, curadoria pedagógica, educação midiática e estratégias de transformação digital, oferece repertório para que gestores, coordenadores e professores compreendam a tecnologia como linguagem, ambiente cultural e instrumento pedagógico a serviço da aprendizagem.",
+    ],
+    moduleBindingHtml: "Este seminário corresponde ao <strong>Módulo 01 da trilha EDUTEC</strong> — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino. Pode ser contratado de forma independente ou integrar a trilha completa.",
+    razoesTituloHtml: "Seis razões para <em>participar</em> deste seminário",
+    razoes: [
+      { num: "01", titulo: "Sua rede precisa de uma agenda institucional para a cultura digital", descricao: "Frente à presença massiva de telas, plataformas e algoritmos, a escola pública precisa de uma resposta institucional coerente — este módulo organiza essa agenda." },
+      { num: "02", titulo: "Tema conduzido por especialistas de referência nacional", descricao: "Roberta Aquino (Unicamp · ISTE), Mariana Ochs (EducaMídia · USP) e Karla Priscilla (Google Innovator) — três das principais referências brasileiras em cultura digital aplicada à educação." },
+      { num: "03", titulo: "Combina fundamentação e oficinas aplicadas", descricao: "Não é teoria abstrata: o módulo entrega oficinas com critérios de curadoria, instrumentos de avaliação de recursos digitais e diretrizes de transformação institucional." },
+      { num: "04", titulo: "Trilha EDUTEC com flexibilidade contratual", descricao: "Pode ser contratado como módulo independente ou compor a trilha completa EDUTEC — adequando-se ao planejamento e ao orçamento da rede ou instituição." },
+      { num: "05", titulo: "Experiência acontece na plataforma EventON NTC", descricao: "Ambiente virtual institucional do Instituto NTC, com transmissão ao vivo, alta definição, suporte técnico dedicado e replay garantido — sem necessidade de download." },
+      { num: "06", titulo: "Certificação institucional do Instituto NTC do Brasil", descricao: "Certificação válida como atualização profissional, mediante 75% de presença — emitida pela referência institucional em capacitação para o setor público brasileiro." },
+    ],
+  },
+
+  publicoOnline: {
+    eyebrow: "Para quem",
+    h2: "Público-alvo",
+    intro: "O seminário é dimensionado para profissionais que atuam na construção da agenda digital das redes públicas:",
+    chips: [
+      "Secretários e dirigentes de educação",
+      "Equipes técnicas e gestores escolares",
+      "Coordenadores pedagógicos",
+      "Professores e formadores de educadores",
+      "Profissionais de educação digital, currículo e mídias",
+      "Gestores de inovação pedagógica",
+    ],
+    objetivoTitulo: "Objetivo",
+    objetivoTexto: "Compreender os fundamentos do letramento digital e da educação midiática, fortalecer práticas pedagógicas críticas e apoiar redes na formação de estudantes mais autônomos, críticos e responsáveis no uso de mídias e tecnologias — integrando competências digitais ao currículo e às práticas pedagógicas da rede.",
+    destaquesTitulo: "Destaques formativos",
+    destaques: [
+      { num: "01", html: "<strong>Fundamentos da cultura digital</strong> e seus impactos sobre educação, comunicação e aprendizagem." },
+      { num: "02", html: "<strong>Educação midiática</strong> e competências do século 21 para o ensino básico." },
+      { num: "03", html: "<strong>Curadoria pedagógica</strong> de recursos digitais com critérios de qualidade e intencionalidade." },
+      { num: "04", html: "<strong>Letramento crítico, autoria e cidadania digital</strong> integrados ao currículo." },
+      { num: "05", html: "<strong>Transformação digital institucional</strong> da visão estratégica à execução prática." },
+    ],
+  },
+
+  programacaoOnline: {
+    eyebrow: "Cronograma",
+    h2: "Programação detalhada",
+    intro: "Quatro sessões aplicadas, oito horas de imersão ao vivo combinando palestra, oficinas e síntese pedagógica final.",
+    headDayHtml: "27 de <em>Maio</em> · Quarta-feira",
+    headMeta: "08h00 às 18h00 · 8 horas · EventON NTC",
+    nodes: [
+      { time: "08h00 – 10h00", ttag: "Palestra · 01", num: "I", titulo: "Cultura digital e os novos paradigmas da educação contemporânea", speakerLineHtml: "com <em>Roberta Aquino</em> · Doutora em Ciências (Unicamp) · Educadora ISTE", bullets: ["Fundamentos da cultura digital e seus impactos sobre educação, comunicação e aprendizagem.", "Transformações nas formas de produzir, acessar e compartilhar informações.", "O papel da escola diante da conectividade, da multiplicidade de fontes e da sociedade em rede."] },
+      { time: "10h00 – 12h00", ttag: "Oficina · 01", num: "II", titulo: "Aprendizagem no século 21: a importância da educação midiática", speakerLineHtml: "com <em>Mariana Ochs</em> · Coordenadora EducaMídia · Instituto Palavra Aberta", bullets: ["Competências essenciais para uso crítico, ético e intencional de mídias e tecnologias.", "Análise de conteúdos, plataformas e discursos no ambiente digital.", "Caminhos para integrar essas competências ao currículo da rede."] },
+      { time: "14h00 – 16h00", ttag: "Oficina · 02", num: "III", titulo: "Curadoria pedagógica de recursos digitais: critérios, qualidade e intencionalidade", speakerLineHtml: "com <em>Karla Priscilla</em> · Mestranda em Tecnologias Emergentes · Google Innovator", bullets: ["Desenvolvimento da competência de busca e seleção crítica de recursos educacionais.", "Avaliação de recursos educacionais e aderência ao contexto pedagógico.", "Uso de recursos digitais para ampliar a participação e a expressão dos estudantes."] },
+      { time: "16h00 – 18h00", ttag: "Oficina · 03", num: "IV", titulo: "Transformação digital na educação: da visão à implementação", speakerLineHtml: "com <em>Roberta Aquino</em> · Especialista em transformação digital institucional", bullets: ["Prioridades institucionais para implementação do tema em escolas e sistemas de ensino.", "Articulação entre currículo, formação e cultura institucional.", "Possibilidades de projetos integradores, trilhas e ações formativas."] },
+    ],
+  },
+
+  questoesOnline: {
+    eyebrow: "O que você aprenderá",
+    h2: "As questões essenciais que serão respondidas nas quatro sessões",
+    intro: "Vinte e nove perguntas-guia organizadas por sessão, do fundamento conceitual à implementação institucional.",
+    grupos: [
+      { sessao: "Sessão · 01", titulo: "Cultura digital e os novos paradigmas da educação contemporânea", palestrante: "com Roberta Aquino · 08h00 – 10h00", questoes: [
+        { numero: "01", pergunta: "O que é cultura digital e como ela transforma a relação entre escola, conhecimento e sociedade?" },
+        { numero: "02", pergunta: "Como os algoritmos, plataformas e redes sociais redefinem o que significa aprender hoje?" },
+        { numero: "03", pergunta: "Quais são as principais mudanças cognitivas e comportamentais provocadas pela presença massiva de telas no cotidiano?" },
+        { numero: "04", pergunta: "De que forma a sociedade em rede altera os papéis tradicionais de professor, estudante e família na produção de conhecimento?" },
+        { numero: "05", pergunta: "Como a multiplicidade de fontes informacionais impacta a função pedagógica da escola pública?" },
+        { numero: "06", pergunta: "Que respostas institucionais a escola pública precisa desenvolver diante deste cenário?" },
+        { numero: "07", pergunta: "Como articular cultura digital com os fundamentos pedagógicos consolidados do currículo brasileiro?" },
+        { numero: "08", pergunta: "Quais práticas pedagógicas são compatíveis com a era da conectividade e quais precisam ser reformuladas?" },
+      ] },
+      { sessao: "Sessão · 02", titulo: "Aprendizagem no século 21: a importância da educação midiática", palestrante: "com Mariana Ochs · 10h00 – 12h00", questoes: [
+        { numero: "09", pergunta: "O que é educação midiática e por que ela é estrutural à formação contemporânea?" },
+        { numero: "10", pergunta: "Quais competências midiáticas devem ser desenvolvidas em cada etapa da educação básica?" },
+        { numero: "11", pergunta: "Como analisar criticamente conteúdos, plataformas e discursos no ambiente digital?" },
+        { numero: "12", pergunta: "Que critérios orientam a leitura crítica de notícias, imagens e narrativas em mídia?" },
+        { numero: "13", pergunta: "Como integrar educação midiática às áreas curriculares sem sobrecarregar o currículo da rede?" },
+        { numero: "14", pergunta: "De que forma a educação midiática combate desinformação, discursos de ódio e polarização?" },
+        { numero: "15", pergunta: "Quais práticas de produção midiática podem ser desenvolvidas em sala de aula com baixa infraestrutura?" },
+        { numero: "16", pergunta: "Como envolver famílias, escolas e a rede na agenda institucional de educação midiática?" },
+      ] },
+      { sessao: "Sessão · 03", titulo: "Curadoria pedagógica de recursos digitais", palestrante: "com Karla Priscilla · 14h00 – 16h00", questoes: [
+        { numero: "17", pergunta: "O que é curadoria pedagógica e por que ela é central no planejamento docente?" },
+        { numero: "18", pergunta: "Quais critérios devem orientar a busca, seleção e avaliação de recursos digitais?" },
+        { numero: "19", pergunta: "Como avaliar a qualidade pedagógica e a aderência ao contexto de uma plataforma ou conteúdo?" },
+        { numero: "20", pergunta: "Que ferramentas e referenciais apoiam a curadoria docente cotidiana?" },
+        { numero: "21", pergunta: "Como diferenciar recursos pedagógicos qualificados de conteúdos rasos ou puramente comerciais?" },
+        { numero: "22", pergunta: "De que forma a curadoria pode ampliar a participação e a expressão dos estudantes?" },
+        { numero: "23", pergunta: "Como organizar institucionalmente bancos de recursos digitais para a rede?" },
+      ] },
+      { sessao: "Sessão · 04", titulo: "Transformação digital na educação: da visão à implementação", palestrante: "com Roberta Aquino · 16h00 – 18h00", questoes: [
+        { numero: "24", pergunta: "O que diferencia transformação digital de mera digitalização de processos escolares?" },
+        { numero: "25", pergunta: "Quais são as prioridades institucionais para implementar a agenda digital na rede?" },
+        { numero: "26", pergunta: "Como articular currículo, formação docente e cultura institucional nessa transição?" },
+        { numero: "27", pergunta: "Que arquitetura de governança digital é adequada à escola pública brasileira?" },
+        { numero: "28", pergunta: "Como construir uma trilha pedagógica integradora ao longo da educação básica?" },
+        { numero: "29", pergunta: "Como sustentar a transformação digital diante de mudanças de gestão e ciclo político?" },
+      ] },
+    ],
+    naPratica: {
+      titulo: "Na prática · o que você levará do módulo para a sua rede",
+      itens: [
+        "Repertório conceitual ampliado sobre educação digital e midiática.",
+        "Diretrizes para integrar cultura digital ao currículo.",
+        "Caminhos para articular currículo, formação e governança.",
+        "Critérios institucionais para curadoria pedagógica de recursos.",
+        "Instrumentos para avaliar maturidade digital da rede.",
+        "Subsídios para projetos integradores e trilhas formativas.",
+      ],
+    },
+  },
+
+  palestrantesOnline: {
+    eyebrow: "Quem ensina",
+    h2Html: "Três especialistas de <em>referência nacional</em>",
+    intro: "Cultura digital, educação midiática e inovação pedagógica conduzidas por nomes consolidados no Brasil e na América Latina.",
+    palestrantes: [
+      { foto: "", roleTag: "Palestrante", nome: "Roberta Aquino", credentials: "Doutora em Ciências · Unicamp · Educadora ISTE · Google Innovator", bio: "Professora de pós-graduação, palestrante internacional e consultora educacional. Especialista em tecnologias educacionais, metodologias ativas e inovação. Doutora em Ciências pela Unicamp, Educadora Certificada ISTE, Google Innovator, Trainer e Coach. Mentora GEG para a América Latina. Canva Education Partner, Embaixadora de Genially, Wakelet, Wayground, Padlet e BookCreator." }, // TODO: foto sobe depois
+      { foto: "", roleTag: "Palestrante", nome: "Karla Priscilla", credentials: "Mestranda em Tecnologias Emergentes · Google Innovator · EducaMídia", bio: "Mestranda em Tecnologias Emergentes na Educação, pedagoga, consultora e palestrante. Google Champions, Innovator e Trainer. Educadora Maker e Facilitadora do EducaMídia. Atua como gestora de inovação e tecnologias educacionais e formadora de educadores em todo o Brasil. Embaixadora do Canva for Education, ClassDojo e plataforma Teachy." }, // TODO: foto sobe depois
+      { foto: "", roleTag: "Palestrante", nome: "Mariana Ochs", credentials: "Coordenadora EducaMídia · Instituto Palavra Aberta · USP", bio: "Designer, jornalista e especialista em cultura digital na educação. Coordenadora do EducaMídia, programa de educação midiática do Instituto Palavra Aberta. Pós-graduação em Letramento Digital pela Universidade de Rhode Island; pós-graduanda na USP, pesquisando letramento algorítmico. Coautora do Guia da Educação Midiática e do e-book Educação Midiática e Inteligência Artificial." }, // TODO: foto sobe depois
+    ],
+    nota: "Fotografias oficiais dos palestrantes serão sincronizadas a partir do folder do evento via CMS.",
+  },
+
+  eventonOnline: {
+    eyebrow: "Plataforma de acesso",
+    h2Html: "Como funciona no <em>EventON NTC</em>",
+    intro: "O seminário acontece na plataforma institucional do Instituto NTC do Brasil — ambiente virtual seguro com transmissão ao vivo, suporte dedicado e replay protegido.",
+    markNameHtml: "Event<em>ON</em>",
+    markTag: "Plataforma Institucional · NTC",
+    stats: [
+      { n: "5.000", l: "Participantes simultâneos" },
+      { n: "30 FPS", l: "Vídeo em alta definição" },
+      { n: "100%", l: "Acesso institucional" },
+    ],
+    feats: [
+      { iconeSvgInner: `<path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4Z"/>`, titulo: "Plataforma segura e escalável", descricao: "Alcance de até 5.000 participantes simultâneos, com estabilidade operacional e segurança institucional para eventos formais." },
+      { iconeSvgInner: `<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 22h8"/>`, titulo: "Alta definição", descricao: "Transmissão em 30 FPS, com vídeo e áudio de alta qualidade independente do dispositivo — desktop, laptop, tablet ou telefone." },
+      { iconeSvgInner: `<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>`, titulo: "Fácil e acessível", descricao: "Nenhum download é necessário. Acesso individual por login e senha, com interface simplificada e navegação institucional intuitiva." },
+      { iconeSvgInner: `<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/>`, titulo: "Interação ao vivo", descricao: "Faça perguntas, participe de pesquisas em tempo real e até apresente conteúdos em momentos previamente combinados com a coordenação." },
+      { iconeSvgInner: `<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>`, titulo: "Replay institucional · 7 dias", descricao: "Acesso ao replay integral do evento por 7 dias após a realização — para revisão, aprofundamento e referência institucional posterior." },
+      { iconeSvgInner: `<circle cx="12" cy="9" r="6"/><path d="M9 14.5V21l3-2 3 2v-6.5"/>`, titulo: "Certificação institucional", descricao: "Certificado válido como atualização profissional, mediante 75% de presença — emitido pelo Instituto NTC do Brasil." },
+    ],
+  },
+
+  investimentoOnline: {
+    eyebrow: "Investimento",
+    h2: "Investimento e condições",
+    intro: "Modalidades de contratação flexíveis para inscrição individual, equipes e instituições públicas.",
+    priceLabel: "Inscrição individual",
+    priceValueHtml: `<span class="cur">R$</span><span class="amt">Sob</span>`,
+    priceSub: "Consulta · Equipes / órgãos",
+    includesTitulo: "O que está incluído",
+    includes: [
+      "8 horas de imersão ao vivo no EventON NTC",
+      "Material editorial NTC (cadernos digitais)",
+      "Replay protegido por 7 dias após o evento",
+      "Certificado institucional validável",
+      "Suporte técnico dedicado",
+      "Acesso à Área do Participante",
+    ],
+    modes: [
+      { tag: "Individual", titulo: "Inscrição individual", descricao: "Profissional inscreve-se diretamente. Pagamento via PIX, boleto ou cartão de crédito (até 6× sem juros)." },
+      { tag: "Equipe", titulo: "Inscrição de equipe", descricao: "Grupos de 3 a 10 participantes da mesma instituição com desconto institucional. Pagamento centralizado." },
+      { tag: "Institucional", titulo: "Contratação institucional", descricao: "Para órgãos públicos, redes e secretarias. Emissão de nota fiscal direta, empenho institucional e turma fechada disponível.", featured: true },
+    ],
+  },
+
+  regrasOnline: {
+    eyebrow: "Política comercial",
+    h2: "Regras de participação",
+    rules: [
+      "Inscrições abertas até a data do evento ou enquanto houver vagas disponíveis.",
+      "Acesso individual por login e senha enviado em até 24h após confirmação da inscrição.",
+      "Cancelamento sem ônus até 7 dias antes do evento. Após esse prazo, valor pode ser convertido em crédito para outra edição.",
+      "Para órgãos públicos: emissão de nota fiscal direta no CNPJ, com aceite de empenho e demais modalidades de contratação previstas em lei.",
+      "Inscrição válida apenas para o e-mail informado no cadastro. Não é permitido compartilhamento de acesso.",
+      "Certificado emitido após o evento mediante presença mínima de 75% das atividades, validado por código QR.",
+      "Replay disponível por 7 dias após o evento na Área do Participante.",
+      "Material de apoio enviado por e-mail e disponibilizado na plataforma EventON NTC.",
+    ],
+  },
+
+  ctaFinalOnline: {
+    eyebrowGold: "Próximo passo",
+    h2Html: "Garanta sua participação no <em>Módulo 01 EDUTEC</em>.",
+    paragrafo: "Inscrições abertas. Vagas individuais e condição institucional para equipes e órgãos.",
+    ctas: [
+      { texto: "Inscrever-se agora", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-mai", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026#tab-equipe", cmsLink: "proposta-grupo-EDUTEC-M01", classe: "btn btn--secondary" },
+    ],
+  },
+
+  sidebarOnline: {
+    coverImg: "/img/fotos/_optimized/area-educacao.1920.webp",
+    status: "Inscrições abertas",
+    coverEventonHtml: "Acesso via <em>EventON</em>",
+    tituloTag: "Módulo 01 · Trilha EDUTEC",
+    rows: [
+      { label: "Quando", value: "27 · Mai · 2026" },
+      { label: "Modalidade", value: "Online ao vivo + replay" },
+      { label: "Carga horária", value: "8 horas" },
+      { label: "Plataforma", value: "EventON NTC" },
+      { label: "Investimento", value: "Sob consulta", price: true },
+    ],
+    includes: {
+      titulo: "O que está incluído",
+      items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Material editorial NTC", "Certificado institucional", "Suporte técnico dedicado", "Área do Participante"],
+    },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 20 de Maio de 2026", deadline: "2026-05-20T23:59:59-03:00", tipo: "numerico" },
+    acoes: [
+      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-mai", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026#tab-equipe", cmsLink: "inscricao-equipe-EDUTEC-M01", classe: "btn btn--secondary" },
+    ],
+    share: { label: "Compartilhar:", links: [
+      { texto: "WhatsApp", href: "#", cmsLink: "share-whatsapp" },
+      { texto: "E-mail", href: "#", cmsLink: "share-email" },
+      { texto: "LinkedIn", href: "#", cmsLink: "share-linkedin" },
+    ] },
+  },
+
+  relatedOnline: {
+    eyebrowGold: "Trilha EDUTEC · Próximos módulos",
+    h2: "Continue a jornada de educação digital",
+    introHtml: "Outros módulos da trilha <strong>EDUTEC</strong> e eventos da <strong>NTC Educação</strong> com inscrições antecipadas.",
+    cards: [
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "range", daysStart: "22", dash: "–", daysEnd: "23", monYr: "Mai · 2026" }, program: "Seminário · NTC Educação", titulo: "Alfabetização de Alta Performance: estratégias para recomposição", programBinding: "PEAR", metaHtml: "Online · 16h · 2 dias <strong>R$ 1.490</strong>", cta: { texto: "Inscrever-se", href: "#contato", cmsLink: "inscricao-PEAR-2026-mai", classe: "es-cta" } },
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "single", day: "24", monYr: "Jun · 2026" }, program: "Seminário · NTC Educação", titulo: "Módulo 02 EDUTEC: IA, Currículo e Aprendizagem", programBinding: "EDUTEC", metaHtml: "Online · 8h · 1 dia <strong>Sob consulta</strong>", cta: { texto: "Saiba mais", href: "#contato", cmsLink: "inscricao-EDUTEC-M02-2026-jun", classe: "es-cta" } },
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "single", day: "25", monYr: "Jun · 2026" }, program: "Curso Executivo · NTC Educação", titulo: "Coordenação pedagógica orientada a resultados", programBinding: "PROGE", metaHtml: "Online · 20h · 3 dias <strong>R$ 1.690</strong>", cta: { texto: "Inscrever-se", href: "#contato", cmsLink: "inscricao-PROGE-2026-jun", classe: "es-cta" } },
+    ],
+    footerCtas: [
+      { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
+      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+    ],
+  },
+};
+
 // ----------------- Record exportado -----------------
 
 export const EVENTOS_AGENDA: Record<string, Evento> = {
   "prosus-brasilia": eventoProsusBrasilia,
+  "edutec-m01-2026": eventoEdutecM01,
 };
