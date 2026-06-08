@@ -980,7 +980,7 @@ const eventoEdutecM01: EventoOnline = {
         foto: "", // TODO: foto sobe depois
         role: "Palestrante",
         nome: "Karla Priscilla",
-        credenciais: "Mestranda em Tecnologias Emergentes · Google Innovator · EducaMídia. Pedagoga, consultora e palestrante. Especialista em Educação Digital e Metodologias Ativas. Google Champions, Innovator e Google Trainer, Educadora Maker e Facilitadora do EducaMídia. Atua como gestora de inovação e tecnologias educacionais em uma rede de educação e como formadora de educadores em todo o Brasil. Realiza a coordenação pedagógica de projetos e mentorias, com a missão de impactar positivamente a vida pessoal e profissional de cada participante, no presencial e no virtual. Embaixadora do Canva for Education, ClassDojo e da plataforma Teachy.",
+        credenciais: "Mestranda em Tecnologias Emergentes · Google Innovator · EducaMídia. Mestranda em Tecnologias Emergentes na Educação, pedagoga, consultora e palestrante. Especialista em Educação Digital e Metodologias Ativas. Google Champions, Innovator e Google Trainer, Educadora Maker e Facilitadora do EducaMídia. Atua como gestora de inovação e tecnologias educacionais em uma rede de educação e como formadora de educadores em todo o Brasil. Realiza a coordenação pedagógica de projetos e mentorias, com a missão de impactar positivamente a vida pessoal e profissional de cada participante, no presencial e no virtual. Embaixadora do Canva for Education, ClassDojo e da plataforma Teachy.",
       },
       {
         foto: "", // TODO: foto sobe depois
@@ -1022,7 +1022,7 @@ const eventoEdutecM01: EventoOnline = {
       "Para inscrições institucionais em grupo, a Contratante poderá encaminhar relação consolidada de participantes, preferencialmente em planilha, para cadastramento conjunto e liberação dos acessos individuais, preferencialmente até 2 dias úteis antes do evento.",
       "Para efetivação das inscrições, deverão ser informados os dados dos participantes: nome completo, e-mail funcional ou institucional, telefone/WhatsApp e órgão de vinculação.",
       "O cancelamento e/ou a substituição de inscrição deverá ser solicitado por escrito, pelo e-mail eventosonline@institutontc.com.br ou WhatsApp (63) 98444-4040, até 2 dias úteis antes da realização do evento.",
-      "A ausência, o não acesso, o acesso parcial ou o não uso do replay dentro do prazo não implicam reembolso, cancelamento automático ou isenção de pagamento, desde que os meios de acesso tenham sido regularmente disponibilizados pelo Instituto NTC.",
+      "A ausência, o não acesso, o acesso parcial, o não uso do replay dentro do prazo ou o não cumprimento dos critérios mínimos de presença não implicam reembolso, cancelamento automático ou isenção de pagamento, desde que os meios de acesso tenham sido regularmente disponibilizados pelo Instituto NTC — que poderá aceitar, a seu critério, a conversão do valor pago em crédito para inscrição em futuros eventos.",
       "Órgãos públicos poderão formalizar a contratação mediante Nota de Empenho, Ordem de Serviço, Autorização de Fornecimento ou instrumento contratual equivalente, com posterior pagamento.",
     ],
     precoDestaque: { valor: "R$ 1.470,00", legenda: "Valor por inscrição individual · evento on-line ao vivo de 8 horas" },
@@ -1032,14 +1032,14 @@ const eventoEdutecM01: EventoOnline = {
         "Apostila digital específica do módulo-evento",
         "Certificado digital emitido pelo Instituto NTC do Brasil",
         "Acesso individual ao ambiente EventON NTC",
-        "Replay integral pelo período informado",
+        "Replay integral pelo período informado no folder",
         "Suporte técnico para acesso ao ambiente virtual",
       ],
     },
     modalidades: [
       { rotulo: "Modalidade · 01", titulo: "Inscrição Individual", descricao: "Indicada para participantes avulsos, profissionais independentes, empresas, entidades privadas ou inscrições pontuais realizadas por órgãos e instituições." },
-      { rotulo: "Modalidade · 02", titulo: "Grupos Institucionais", descricao: "Órgãos públicos, secretarias, redes de ensino, entidades e instituições interessadas na inscrição de múltiplos participantes poderão solicitar condição comercial diferenciada, conforme quantidade de inscritos, perfil institucional da demanda e forma de contratação." },
-      { rotulo: "Modalidade · 03 · Estratégica", titulo: "Grandes Grupos e Turmas Fechadas", descricao: "Para demandas ampliadas, redes públicas, secretarias, consórcios, instituições ou grupos estratégicos, o Instituto NTC poderá apresentar proposta personalizada — contemplando condições por escala, política de cortesias institucionais, suporte operacional, período de replay e eventual estruturação de turma exclusiva." },
+      { rotulo: "Modalidade · 02", titulo: "Grupos Institucionais", descricao: "Órgãos públicos, secretarias, redes de ensino, entidades e instituições interessadas na inscrição de múltiplos participantes poderão solicitar condição comercial diferenciada, conforme quantidade de inscritos, perfil institucional da demanda, forma de contratação e disponibilidade operacional." },
+      { rotulo: "Modalidade · 03 · Estratégica", titulo: "Grandes Grupos e Turmas Fechadas", descricao: "Para demandas ampliadas, redes públicas, secretarias, consórcios, instituições ou grupos estratégicos, o Instituto NTC poderá apresentar proposta personalizada — contemplando condições diferenciadas por escala, política de cortesias institucionais, suporte operacional, período de replay e eventual estruturação de turma exclusiva." },
     ],
   },
 
