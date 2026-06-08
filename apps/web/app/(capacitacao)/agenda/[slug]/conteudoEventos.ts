@@ -186,6 +186,52 @@ export interface SecaoDiferenciais {
   diferenciais: Diferencial[];
 }
 
+// --- Seções exclusivas de evento online (folder EDUTEC M01) ---
+
+export interface PlataformaStat {
+  numero: string;
+  label: string;
+}
+
+export interface PlataformaCard {
+  titulo: string;
+  descricao: string;
+}
+
+export interface SecaoPlataforma {
+  eyebrow: string;
+  h2: string;
+  lede: string;
+  stats: PlataformaStat[];
+  cards: PlataformaCard[];
+}
+
+export interface QuestaoFormativa {
+  numero: string;
+  pergunta: string;
+}
+
+export interface GrupoQuestoes {
+  sessao: string;
+  titulo: string;
+  palestrante: string;
+  questoes: QuestaoFormativa[];
+}
+
+export interface SecaoQuestoes {
+  eyebrow: string;
+  h2: string;
+  intro: string;
+  grupos: GrupoQuestoes[];
+  naPratica: { titulo: string; itens: string[] };
+}
+
+export interface ModalidadeContratacao {
+  rotulo: string;
+  titulo: string;
+  descricao: string;
+}
+
 export interface SecaoLocal {
   eyebrow: string;
   h2: string;
@@ -210,6 +256,9 @@ export interface SecaoInvestimento {
   h2: string;
   h2Id?: string;
   rules: string[];
+  precoDestaque?: { valor: string; legenda: string };
+  inclui?: { titulo: string; items: string[] };
+  modalidades?: ModalidadeContratacao[];
 }
 
 export interface SecaoFaq {
@@ -281,6 +330,8 @@ export interface EventoHibrido extends EventoBase {
 
 export interface EventoOnline extends EventoBase {
   formato: "online";
+  plataforma?: SecaoPlataforma;
+  questoes?: SecaoQuestoes;
 }
 
 export type Evento = EventoPresencial | EventoHibrido | EventoOnline;
