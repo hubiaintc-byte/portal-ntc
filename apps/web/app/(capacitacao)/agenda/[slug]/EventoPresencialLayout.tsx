@@ -501,6 +501,11 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                       </span>
                       <span className="mon-yr">{card.date.monYr}</span>
                     </div>
+                  ) : card.date.tipo === "single" ? (
+                    <div className="es-date single">
+                      <span className="day">{card.date.day}</span>
+                      <span className="mon-yr">{card.date.monYr}</span>
+                    </div>
                   ) : (
                     <div className="es-date multi">
                       <span className="count">

@@ -89,7 +89,8 @@ export interface ItemFaqEvento {
 
 export type RelatedEventDate =
   | { tipo: "range"; daysStart: string; dash: string; daysEnd: string; monYr: string }
-  | { tipo: "multi"; count: string; number: string; period: string };
+  | { tipo: "multi"; count: string; number: string; period: string }
+  | { tipo: "single"; day: string; monYr: string };
 
 export interface RelatedEventCard {
   area: AreaVertical;
@@ -233,6 +234,150 @@ export interface SecaoRelatedEvents {
   footerCtas: LinkInterno[];
 }
 
+// ----------------- Seções do evento ONLINE (porta evt-* do protótipo EDUTEC M01) -----------------
+
+export interface HeroOnlineTag {
+  texto: string;
+  classe: "evt-hero-status" | "evt-hero-format" | "evt-hero-vert";
+}
+export interface HeroOnline {
+  tags: HeroOnlineTag[];
+  h1Html: string;            // pode conter <em>
+  sub: string;
+  programBinding: { texto: string; href: string; cmsLink?: string; nomePrograma: string };
+  ctas: LinkInterno[];
+}
+
+export interface MetaOnline { label: string; value: string; valueSub: string }
+
+export interface WhyCard { num: string; titulo: string; descricao: string }
+
+export interface VisaoGeralOnline {
+  eyebrow: string;
+  h2Html: string;            // pode conter <em>
+  lede: string;
+  paragrafosHtml: string[];  // podem conter <strong>
+  moduleBindingHtml: string; // contém <strong>
+  razoesTituloHtml: string;  // "Seis razões para <em>participar</em>..."
+  razoes: WhyCard[];         // 6
+}
+
+export interface HighlightItem { num: string; html: string }  // html contém <strong>
+
+export interface PublicoOnline {
+  eyebrow: string;
+  h2: string;
+  intro: string;
+  chips: string[];
+  objetivoTitulo: string;
+  objetivoTexto: string;
+  destaquesTitulo: string;
+  destaques: HighlightItem[];  // 5
+}
+
+export interface ScheduleNode {
+  time: string;
+  ttag: string;              // "Palestra · 01"
+  num: string;               // "I".."IV"
+  titulo: string;
+  speakerLineHtml: string;   // "com <em>Roberta Aquino</em> · ..."
+  bullets: string[];
+}
+export interface ProgramacaoOnline {
+  eyebrow: string;
+  h2: string;
+  intro: string;
+  headDayHtml: string;       // "27 de <em>Maio</em> · Quarta-feira"
+  headMeta: string;          // "08h00 às 18h00 · 8 horas · EventON NTC" (sep via render)
+  nodes: ScheduleNode[];     // 4
+}
+
+export interface GrupoQuestoes {
+  sessao: string;
+  titulo: string;
+  palestrante: string;
+  questoes: Array<{ numero: string; pergunta: string }>;
+}
+export interface QuestoesOnline {
+  eyebrow: string;
+  h2: string;
+  intro: string;
+  grupos: GrupoQuestoes[];   // 4 sessões, 29 questões
+  naPratica: { titulo: string; itens: string[] };
+}
+
+export interface PalestranteOnline {
+  foto: string;
+  roleTag: string;
+  nome: string;
+  credentials: string;
+  bio: string;
+}
+export interface PalestrantesOnline {
+  eyebrow: string;
+  h2Html: string;            // "Três especialistas de <em>referência nacional</em>"
+  intro: string;
+  palestrantes: PalestranteOnline[];  // 3
+  nota: string;
+}
+
+export interface EventonFeat {
+  iconeSvgInner: string;     // innerHTML do <svg> (paths/rects) — render via dangerouslySetInnerHTML
+  titulo: string;
+  descricao: string;
+}
+export interface EventonOnline {
+  eyebrow: string;
+  h2Html: string;            // "Como funciona no <em>EventON NTC</em>"
+  intro: string;
+  markNameHtml: string;      // "Event<em>ON</em>"
+  markTag: string;           // "Plataforma Institucional · NTC"
+  stats: Array<{ n: string; l: string }>;  // 5.000 / 30 FPS / 100%
+  feats: EventonFeat[];      // 6
+}
+
+export interface InvestMode { tag: string; titulo: string; descricao: string; featured?: boolean }
+export interface InvestimentoOnline {
+  eyebrow: string;
+  h2: string;
+  intro: string;
+  priceLabel: string;        // "Inscrição individual"
+  priceValueHtml: string;    // "<span class=\"cur\">R$</span><span class=\"amt\">Sob</span>"
+  priceSub: string;          // "Consulta · Equipes / órgãos"
+  includesTitulo: string;
+  includes: string[];        // 6
+  modes: InvestMode[];       // 3
+}
+
+export interface RegrasOnline { eyebrow: string; h2: string; rules: string[] }  // 8
+
+export interface CtaFinalOnline {
+  eyebrowGold: string;
+  h2Html: string;            // contém <em>
+  paragrafo: string;
+  ctas: LinkInterno[];
+}
+
+export interface SidebarOnline {
+  coverImg: string;
+  status: string;
+  coverEventonHtml: string;  // "Acesso via <em>EventON</em>"
+  tituloTag: string;         // "Módulo 01 · Trilha EDUTEC"
+  rows: Array<{ label: string; value: string; price?: boolean }>;
+  includes: { titulo: string; items: string[] };
+  countdown: { label: string; dateText: string; deadline: string; tipo: "numerico" | "textual" };
+  acoes: LinkInterno[];
+  share: { label: string; links: LinkInterno[] };
+}
+
+export interface RelatedOnline {
+  eyebrowGold: string;
+  h2: string;
+  introHtml: string;
+  cards: RelatedEventCard[];
+  footerCtas: LinkInterno[];
+}
+
 // ----------------- Evento Base + variantes discriminadas -----------------
 
 export interface EventoBase {
@@ -281,6 +426,19 @@ export interface EventoHibrido extends EventoBase {
 
 export interface EventoOnline extends EventoBase {
   formato: "online";
+  heroOnline?: HeroOnline;
+  metasOnline?: MetaOnline[];
+  visaoGeralOnline?: VisaoGeralOnline;
+  publicoOnline?: PublicoOnline;
+  programacaoOnline?: ProgramacaoOnline;
+  questoesOnline?: QuestoesOnline;
+  palestrantesOnline?: PalestrantesOnline;
+  eventonOnline?: EventonOnline;
+  investimentoOnline?: InvestimentoOnline;
+  regrasOnline?: RegrasOnline;
+  ctaFinalOnline?: CtaFinalOnline;
+  sidebarOnline?: SidebarOnline;
+  relatedOnline?: RelatedOnline;
 }
 
 export type Evento = EventoPresencial | EventoHibrido | EventoOnline;
