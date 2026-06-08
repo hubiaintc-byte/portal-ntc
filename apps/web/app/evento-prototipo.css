@@ -2004,3 +2004,203 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 }
 .sidebar-cd-text strong { color: var(--event-accent, var(--oxford)); font-weight: 600; }
 
+/* ===================================================================
+   EVENTO ONLINE — Plataforma EventON + Questões formativas
+   (folder EDUTEC Módulo 01; sem protótipo HTML — estilo .event-section)
+   =================================================================== */
+
+/* --- Plataforma EventON --- */
+.eventon-platform-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin: var(--space-4) 0 var(--space-5);
+  padding: var(--space-4) 0;
+  border-top: 1px solid rgba(17, 54, 94, 0.12);
+  border-bottom: 1px solid rgba(17, 54, 94, 0.12);
+}
+.eventon-stat { text-align: center; }
+.eventon-stat-num {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 40px;
+  font-weight: 600;
+  color: var(--oxford);
+  line-height: 1;
+}
+.eventon-stat-label {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-cond);
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--prata);
+}
+.eventon-platform-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+.eventon-platform-card {
+  border: 1px solid rgba(17, 54, 94, 0.12);
+  border-radius: 0;
+  padding: var(--space-4);
+  background: var(--pergaminho-40, #faf7f1);
+}
+.eventon-platform-card h4 {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  color: var(--oxford);
+  margin: 0 0 8px;
+}
+.eventon-platform-card p {
+  font-size: 14.5px;
+  color: var(--grafite);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* --- Questões formativas --- */
+.event-questoes-grupo { margin-top: var(--space-5); }
+.event-questoes-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--oxford);
+  margin-bottom: var(--space-3);
+}
+.event-questoes-sessao {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--dourado);
+  font-weight: 600;
+}
+.event-questoes-titulo {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--oxford);
+  margin: 0;
+  flex: 1 1 260px;
+}
+.event-questoes-palestrante {
+  font-size: 13px;
+  color: var(--prata);
+}
+.event-questoes-item {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(17, 54, 94, 0.08);
+}
+.event-questoes-num {
+  font-family: var(--font-cond);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dourado);
+  min-width: 28px;
+}
+.event-questoes-pergunta {
+  font-size: 15.5px;
+  color: var(--grafite);
+  line-height: 1.5;
+}
+.event-questoes-pratica {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--dourado);
+  border-radius: 0;
+  background: var(--pergaminho-40, #faf7f1);
+}
+.event-questoes-pratica h4 {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--dourado);
+  margin: 0 0 12px;
+}
+.event-questoes-pratica ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px var(--space-4);
+}
+.event-questoes-pratica li {
+  font-size: 14.5px;
+  color: var(--grafite);
+  line-height: 1.5;
+  padding-left: 18px;
+  position: relative;
+}
+.event-questoes-pratica li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--dourado);
+}
+
+/* --- Investimento online: preço + modalidades --- */
+.event-invest-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: var(--space-3) 0 var(--space-2);
+}
+.event-invest-price strong {
+  font-family: var(--font-serif);
+  font-size: 44px;
+  font-weight: 600;
+  color: var(--oxford);
+  line-height: 1;
+}
+.event-invest-price span {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--prata);
+}
+.event-invest-modalidades {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+.event-invest-modalidade {
+  border: 1px solid rgba(17, 54, 94, 0.12);
+  border-radius: 0;
+  padding: var(--space-4);
+}
+.event-invest-modalidade .rotulo {
+  font-family: var(--font-cond);
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--dourado);
+}
+.event-invest-modalidade h4 {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  color: var(--oxford);
+  margin: 8px 0;
+}
+.event-invest-modalidade p {
+  font-size: 14px;
+  color: var(--grafite);
+  line-height: 1.55;
+  margin: 0;
+}
+
+@media (max-width: 820px) {
+  .eventon-platform-grid,
+  .event-invest-modalidades,
+  .event-questoes-pratica ul { grid-template-columns: 1fr; }
+}
+
