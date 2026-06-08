@@ -10,8 +10,13 @@ function vertAttr(vertical: string | null): string | undefined {
   return undefined;
 }
 
+interface TelaPalestrantesProps {
+  palestrantes: PalestranteCmsResumo[];
+  onAbrir: (id: string) => void;
+}
+
 /** Listagem de palestrantes/especialistas — dados reais do banco (leitura). */
-export function TelaPalestrantes({ palestrantes }: { palestrantes: PalestranteCmsResumo[] }) {
+export function TelaPalestrantes({ palestrantes, onAbrir }: TelaPalestrantesProps) {
   const comFoto = palestrantes.filter((p) => p.temFoto).length;
 
   return (
@@ -68,7 +73,20 @@ export function TelaPalestrantes({ palestrantes }: { palestrantes: PalestranteCm
           </thead>
           <tbody>
             {palestrantes.map((p) => (
-              <tr key={p.id}>
+              <tr
+                key={p.id}
+                className="pcms-linha-click"
+                tabIndex={0}
+                role="button"
+                aria-label={`Abrir palestrante ${p.nome}`}
+                onClick={() => onAbrir(p.id)}
+                onKeyDown={(ev) => {
+                  if (ev.key === "Enter" || ev.key === " ") {
+                    ev.preventDefault();
+                    onAbrir(p.id);
+                  }
+                }}
+              >
                 <td>
                   <div className="pcms-cel-nome">
                     <span className="pcms-avatar" data-vertical={vertAttr(p.vertical)} aria-hidden="true">

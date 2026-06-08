@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
-import type { EventoCmsResumo, PalestranteCmsResumo } from "@/lib/cms/prototipoCms";
+import type {
+  EventoCmsDetalhe,
+  EventoCmsResumo,
+  PalestranteCmsDetalhe,
+  PalestranteCmsResumo,
+} from "@/lib/cms/prototipoCms";
 
+import { carregarEvento, carregarPalestrante } from "./acoes";
 import { TelaDashboard } from "./TelaDashboard";
 import { TelaPalestrantes } from "./TelaPalestrantes";
 import { TelaEventos } from "./TelaEventos";
 import { TelaConfiguracoes } from "./TelaConfiguracoes";
+import { DetalheEvento } from "./DetalheEvento";
+import { DetalhePalestrante } from "./DetalhePalestrante";
 
 /**
  * Casco do protótipo de CMS Soberana (sidebar Oxford + topbar + conteúdo).
@@ -79,6 +87,30 @@ const CRUMB: Record<TelaId, string> = {
 
 export function ShellCms({ eventos, palestrantes, erroLeitura }: ShellCmsProps) {
   const [tela, setTela] = useState<TelaId>("dashboard");
+  const [eventoDet, setEventoDet] = useState<EventoCmsDetalhe | null>(null);
+  const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
+  const [carregando, iniciarCarga] = useTransition();
+
+  function abrirEvento(id: string) {
+    iniciarCarga(async () => {
+      const det = await carregarEvento(id);
+      if (det) setEventoDet(det);
+    });
+  }
+
+  function abrirPalestrante(id: string) {
+    iniciarCarga(async () => {
+      const det = await carregarPalestrante(id);
+      if (det) setPalestranteDet(det);
+    });
+  }
+
+  // Trocar de tela pela sidebar sempre fecha qualquer detalhe aberto.
+  function irPara(id: TelaId) {
+    setEventoDet(null);
+    setPalestranteDet(null);
+    setTela(id);
+  }
 
   function renderItem(item: ItemNav) {
     return (
@@ -87,13 +119,15 @@ export function ShellCms({ eventos, palestrantes, erroLeitura }: ShellCmsProps) 
         type="button"
         className={`pcms-nav__item${tela === item.id ? " pcms-nav__item--ativo" : ""}`}
         aria-current={tela === item.id ? "page" : undefined}
-        onClick={() => setTela(item.id)}
+        onClick={() => irPara(item.id)}
       >
         {item.icone}
         {item.rotulo}
       </button>
     );
   }
+
+  const detalheAberto = eventoDet ?? palestranteDet;
 
   return (
     <div className="pcms-root">
@@ -159,17 +193,31 @@ export function ShellCms({ eventos, palestrantes, erroLeitura }: ShellCmsProps) 
           </label>
         </header>
 
-        <main className="pcms-content">
-          {tela === "dashboard" && (
-            <TelaDashboard
-              eventos={eventos}
-              palestrantes={palestrantes}
-              erroLeitura={erroLeitura}
-            />
+        <main className="pcms-content" aria-busy={carregando}>
+          {carregando && <div className="pcms-carregando">Carregando…</div>}
+
+          {eventoDet ? (
+            <DetalheEvento evento={eventoDet} onVoltar={() => setEventoDet(null)} />
+          ) : palestranteDet ? (
+            <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
+          ) : (
+            !detalheAberto && (
+              <>
+                {tela === "dashboard" && (
+                  <TelaDashboard
+                    eventos={eventos}
+                    palestrantes={palestrantes}
+                    erroLeitura={erroLeitura}
+                  />
+                )}
+                {tela === "palestrantes" && (
+                  <TelaPalestrantes palestrantes={palestrantes} onAbrir={abrirPalestrante} />
+                )}
+                {tela === "eventos" && <TelaEventos eventos={eventos} onAbrir={abrirEvento} />}
+                {tela === "config" && <TelaConfiguracoes />}
+              </>
+            )
           )}
-          {tela === "palestrantes" && <TelaPalestrantes palestrantes={palestrantes} />}
-          {tela === "eventos" && <TelaEventos eventos={eventos} />}
-          {tela === "config" && <TelaConfiguracoes />}
         </main>
       </div>
     </div>

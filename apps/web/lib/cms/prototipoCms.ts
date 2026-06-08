@@ -1,6 +1,7 @@
 import "server-only";
 
 import { obterPayload } from "@/lib/payloadClient";
+import { lexicalToHtml } from "@/lib/cms/lexical";
 
 /**
  * Leitura de dados reais para o protótipo de CMS Soberana (/prototipo-cms).
@@ -34,6 +35,36 @@ export interface PalestranteCmsResumo {
   instituicao: string;
   vertical: string | null;
   temFoto: boolean;
+}
+
+// ---- Tipos de detalhe (tela cheia, somente leitura) --------------------
+
+export interface EventoCmsDetalhe extends EventoCmsResumo {
+  eyebrow: string | null;
+  area: string | null;
+  cargaHoraria: string | null;
+  capaUrl: string | null;
+  resumo: string | null;
+  /** HTML já convertido do Lexical (lib/cms/lexical.ts). */
+  publicoAlvoHtml: string;
+  objetivosHtml: string;
+  conteudoProgramaticoHtml: string;
+  valor: string | null;
+  inscricaoAberta: boolean;
+  linkInscricao: string | null;
+  palestrantes: { id: string; nome: string; iniciais: string; titulacao: string }[];
+  faq: { pergunta: string; respostaHtml: string }[];
+}
+
+export interface PalestranteCmsDetalhe extends PalestranteCmsResumo {
+  cargoAtual: string | null;
+  fotoUrl: string | null;
+  curriculoCurtoHtml: string;
+  curriculoCompletoHtml: string;
+  linkLattes: string | null;
+  linkLinkedin: string | null;
+  linhasAtuacao: string[];
+  tipo: string | null;
 }
 
 const FMT_DATA = new Intl.DateTimeFormat("pt-BR", {
@@ -144,4 +175,144 @@ export async function listarPalestrantesCms(): Promise<PalestranteCmsResumo[]> {
       temFoto: typeof doc.foto === "object" && doc.foto !== null,
     };
   });
+}
+
+// ============================================================
+// Detalhe (somente leitura, depth: 2 para resolver relações)
+// ============================================================
+
+/** URL de um upload de Media resolvido (depth>=1); "" se não resolvido. */
+function urlDeMidia(m: unknown): string | null {
+  if (typeof m === "object" && m !== null) {
+    const url = (m as { url?: string }).url;
+    return url ?? null;
+  }
+  return null;
+}
+
+/** Nome de uma relação resolvida (ex. area, programa) por uma chave preferida. */
+function nomeDeRelacao(rel: unknown, chave: "nome" | "sigla" | "titulo" = "nome"): string | null {
+  if (typeof rel === "object" && rel !== null) {
+    const obj = rel as Record<string, unknown>;
+    const v = obj[chave] ?? obj.nome ?? obj.titulo;
+    return typeof v === "string" ? v : null;
+  }
+  return null;
+}
+
+export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | null> {
+  const payload = await obterPayload();
+  const doc = (await payload
+    .findByID({ collection: "eventos", id, depth: 2, draft: true })
+    .catch(() => null)) as Record<string, unknown> | null;
+  if (!doc) return null;
+
+  const d = doc as unknown as {
+    id: string | number;
+    nome?: string;
+    eyebrow?: string;
+    dataInicio?: string | null;
+    modalidade?: string;
+    local?: unknown;
+    programa?: unknown;
+    area?: unknown;
+    cargaHoraria?: string;
+    imagemCapa?: unknown;
+    resumo?: string;
+    publicoAlvo?: unknown;
+    objetivos?: unknown;
+    conteudoProgramatico?: unknown;
+    valor?: string;
+    inscricaoAberta?: boolean;
+    linkInscricaoExterna?: string;
+    palestrantes?: unknown[];
+    faq?: { pergunta?: string; resposta?: unknown }[];
+    _status?: string;
+  };
+
+  const modalidade = d.modalidade ?? "";
+  const palestrantes = (d.palestrantes ?? [])
+    .filter((p): p is Record<string, unknown> => typeof p === "object" && p !== null)
+    .map((p) => {
+      const nome = (p.nome as string) ?? "(sem nome)";
+      return {
+        id: String(p.id),
+        nome,
+        iniciais: iniciaisDe(nome),
+        titulacao: (p.titulacao as string) ?? "—",
+      };
+    });
+
+  return {
+    id: String(d.id),
+    titulo: d.nome ?? "(sem título)",
+    eyebrow: d.eyebrow ?? null,
+    programa: nomeDeRelacao(d.programa, "sigla"),
+    area: nomeDeRelacao(d.area),
+    data: d.dataInicio ? FMT_DATA.format(new Date(d.dataInicio)) : "—",
+    local: montarLocal(d.local, modalidade),
+    modalidade: modalidade ? modalidade.charAt(0).toUpperCase() + modalidade.slice(1) : "—",
+    cargaHoraria: d.cargaHoraria ?? null,
+    capaUrl: urlDeMidia(d.imagemCapa),
+    resumo: d.resumo ?? null,
+    publicoAlvoHtml: lexicalToHtml(d.publicoAlvo),
+    objetivosHtml: lexicalToHtml(d.objetivos),
+    conteudoProgramaticoHtml: lexicalToHtml(d.conteudoProgramatico),
+    valor: d.valor ?? null,
+    inscricaoAberta: Boolean(d.inscricaoAberta),
+    linkInscricao: d.linkInscricaoExterna ?? null,
+    palestrantes,
+    faq: (d.faq ?? [])
+      .filter((f) => f?.pergunta)
+      .map((f) => ({ pergunta: f.pergunta as string, respostaHtml: lexicalToHtml(f.resposta) })),
+    status: statusEvento(d),
+  };
+}
+
+export async function obterPalestranteCms(id: string): Promise<PalestranteCmsDetalhe | null> {
+  const payload = await obterPayload();
+  const doc = (await payload
+    .findByID({ collection: "especialistas", id, depth: 2, draft: true })
+    .catch(() => null)) as Record<string, unknown> | null;
+  if (!doc) return null;
+
+  const d = doc as unknown as {
+    id: string | number;
+    nome?: string;
+    titulacao?: string;
+    instituicao?: string;
+    cargoAtual?: string;
+    vertical?: string | null;
+    tipo?: string;
+    foto?: unknown;
+    curriculoCurto?: unknown;
+    curriculoCompleto?: unknown;
+    linkLattes?: string;
+    linkLinkedin?: string;
+    linhasAtuacao?: unknown[];
+  };
+
+  const nome = d.nome ?? "(sem nome)";
+  const fotoUrl = urlDeMidia(d.foto);
+  const linhasAtuacao = (d.linhasAtuacao ?? [])
+    .map((a) => nomeDeRelacao(a))
+    .filter((s): s is string => Boolean(s));
+
+  return {
+    id: String(d.id),
+    nome,
+    iniciais: iniciaisDe(nome),
+    titulacao: d.titulacao ?? "—",
+    instituicao: d.instituicao ?? "—",
+    cargoAtual: d.cargoAtual ?? null,
+    vertical: d.vertical ?? null,
+    tipo: d.tipo ?? null,
+    temFoto: Boolean(fotoUrl),
+    fotoUrl,
+    curriculoCurtoHtml: lexicalToHtml(d.curriculoCurto),
+    curriculoCompletoHtml: lexicalToHtml(d.curriculoCompleto),
+    linkLattes: d.linkLattes ?? null,
+    linkLinkedin: d.linkLinkedin ?? null,
+    linhasAtuacao,
+  };
 }

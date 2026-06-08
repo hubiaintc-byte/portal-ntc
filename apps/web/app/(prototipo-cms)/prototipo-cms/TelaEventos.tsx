@@ -6,8 +6,13 @@ const ROTULO_STATUS: Record<EventoCmsResumo["status"], string> = {
   agendado: "Agendado",
 };
 
+interface TelaEventosProps {
+  eventos: EventoCmsResumo[];
+  onAbrir: (id: string) => void;
+}
+
 /** Listagem de eventos — dados reais do banco (somente leitura). */
-export function TelaEventos({ eventos }: { eventos: EventoCmsResumo[] }) {
+export function TelaEventos({ eventos, onAbrir }: TelaEventosProps) {
   return (
     <>
       <div className="pcms-pagehead">
@@ -63,7 +68,20 @@ export function TelaEventos({ eventos }: { eventos: EventoCmsResumo[] }) {
           </thead>
           <tbody>
             {eventos.map((e) => (
-              <tr key={e.id}>
+              <tr
+                key={e.id}
+                className="pcms-linha-click"
+                tabIndex={0}
+                role="button"
+                aria-label={`Abrir evento ${e.titulo}`}
+                onClick={() => onAbrir(e.id)}
+                onKeyDown={(ev) => {
+                  if (ev.key === "Enter" || ev.key === " ") {
+                    ev.preventDefault();
+                    onAbrir(e.id);
+                  }
+                }}
+              >
                 <td>
                   <div className="pcms-cel-nome">
                     <span>
