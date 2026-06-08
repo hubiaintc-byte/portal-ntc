@@ -62,6 +62,10 @@ export default buildConfig({
         Logo: "@/components/admin/LogoNTC#LogoNTC",
         Icon: "@/components/admin/IconNTC#IconNTC",
       },
+      // Injeta as fontes Soberana auto-hospedadas (Cormorant + Barlow) via
+      // next/font, substituindo o @import do Google que ficava em custom.scss
+      // (CLAUDE.md §3/§11 — auto-hospedadas, sem ping externo).
+      providers: ["@/components/admin/FonteProvider#FonteProvider"],
     },
   },
   i18n: {

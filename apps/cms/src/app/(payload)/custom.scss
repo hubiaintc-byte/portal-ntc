@@ -11,7 +11,10 @@
  * sobre as nossas, independentemente da especificidade do seletor.
  * ========================================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Barlow:wght@300;400;500;600;700&display=swap");
+/* As fontes Cormorant + Barlow são auto-hospedadas via next/font e injetadas
+ * pelo FonteProvider (payload.config.ts → admin.components.providers), que
+ * expõe --font-titulo (Cormorant) e --font-corpo (Barlow). Sem @import do
+ * Google — sem ping externo em runtime (CLAUDE.md §3/§11). */
 
 @layer payload {
   /* Paleta Soberana — fonte literal: packages/ui/src/tokens.ts */
@@ -101,6 +104,7 @@
 
   body {
     font-family:
+      var(--font-corpo),
       "Barlow",
       system-ui,
       -apple-system,
@@ -120,6 +124,7 @@
   h1.payload__page-title,
   .template-default h1 {
     font-family:
+      var(--font-titulo),
       "Cormorant Garamond",
       Georgia,
       "Times New Roman",
@@ -191,13 +196,31 @@
     font-weight: 600;
   }
 
-  /* Sidebar — labels de grupos ("Sistema", "Editorial", "Comercial") em
-     Grafite forte com weight Barlow Medium. O default do Payload usa
-     theme-elevation-400 (cinza médio claro) que fica apagado em fundo Osso. */
+  /* ========================================================================
+   * Sidebar marcante — fundo Oxford Escuro, texto Pergaminho (CLAUDE.md §3:
+   * Oxford dominante 60%). A nav é a única superfície escura do painel; o
+   * resto permanece claro (Osso/Pergaminho), criando o contraste editorial.
+   * Acento ativo/hover em Dourado cerimonial. Contraste Pergaminho (#F4EFE6)
+   * sobre Oxford Escuro (#0B2545) ≈ 12:1 — WCAG AAA (§10).
+   * ====================================================================== */
+  .nav,
+  .nav__wrap,
+  .nav__scroll {
+    background-color: var(--color-oxford-escuro);
+  }
+
+  /* Header da nav (logo) e controles — sobre Oxford, divisores sutis claros. */
+  .nav__header,
+  .nav__controls {
+    border-color: rgba(244, 239, 230, 0.14);
+  }
+
+  /* Labels de grupos ("Sistema", "Editorial", "Comercial") — Pergaminho
+     levemente esmaecido, weight Barlow Medium, caixa-alta editorial. */
   .nav-group__toggle,
   .nav-group__label,
   button.nav-group__toggle {
-    color: var(--color-grafite);
+    color: rgba(244, 239, 230, 0.72);
     font-weight: 600;
     font-size: 0.75rem;
     letter-spacing: 0.04em;
@@ -206,23 +229,64 @@
 
   .nav-group__toggle:hover,
   .nav-group__toggle:focus-visible {
-    color: var(--color-oxford-escuro);
+    color: var(--color-dourado);
   }
 
-  /* Links da sidebar (coleções) — Grafite no estado normal, Oxford no active. */
-  .nav__link,
-  a.nav__link {
-    color: var(--color-grafite);
+  .nav-group__indicator {
+    color: rgba(244, 239, 230, 0.72);
   }
 
-  .nav__link:hover {
-    color: var(--color-oxford-escuro);
+  /* Links da sidebar (coleções/globais) — Pergaminho, hover Dourado,
+     active com barra Dourada e peso reforçado.
+
+     Por que mirar TODOS os descendentes de `.nav` e usar `!important`:
+     o link de coleção do Payload NÃO declara `color` próprio (elements/Nav
+     não define cor no `<a>`), então herda do texto base — que aqui é Grafite,
+     ficando ilegível sobre o Oxford. Como é herança (não uma regra direta na
+     layer payload-default), mirar `.nav nav a` na nossa layer não sobrescreve
+     o valor herdado de forma confiável entre versões. Forçamos a cor em todo
+     elemento textual dentro de `.nav` para garantir o contraste Pergaminho. */
+  .nav a,
+  .nav a span,
+  .nav .nav__link,
+  .nav .nav-group__content a {
+    color: var(--color-pergaminho) !important;
   }
 
-  .nav__link--active,
-  .nav__link[aria-current="page"] {
-    color: var(--color-oxford-escuro);
+  .nav a:hover,
+  .nav a:hover span,
+  .nav a:focus-visible,
+  .nav a:focus-visible span {
+    color: var(--color-dourado) !important;
+  }
+
+  /* Item ativo — a classe real do Payload é `.active` no próprio `<a>`. */
+  .nav a.active,
+  .nav a.active span,
+  .nav .nav__link--active {
+    color: var(--color-dourado) !important;
     font-weight: 600;
+    box-shadow: inset 3px 0 0 var(--color-dourado);
+  }
+
+  /* Barra indicadora nativa do item ativo (.nav__link-indicator) usa
+     --theme-text por padrão; sobre Oxford ela precisa ser Dourada cheia.
+     `!important` + opacity:1 para vencer herança e qualquer esmaecimento. */
+  .nav .nav__link-indicator,
+  .nav__link-indicator {
+    background: var(--color-dourado) !important;
+    opacity: 1 !important;
+  }
+
+  /* Logout e demais ações da nav herdam o Pergaminho. */
+  .nav__log-out,
+  .nav__log-out a,
+  .nav__label {
+    color: var(--color-pergaminho);
+  }
+
+  .nav__log-out:hover {
+    color: var(--color-dourado);
   }
 
   /* Botões "pill" (Create New, Columns, Filters, etc.) — Pergaminho com
