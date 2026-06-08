@@ -22,6 +22,8 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
 
   return (
     <main id="main" className="event-page" data-evento="EDUTEC-M01">
+      {/* data-evento é a CHAVE do acento cromático no CSS (.event-page[data-evento='EDUTEC-M01']),
+          não o slug (edutec-m01-2026). Manter literal para o acento #1F5060 aplicar. */}
       {/* BREADCRUMB */}
       <nav className="breadcrumb" aria-label="Trilha de navegação">
         <div className="container">
@@ -200,6 +202,7 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
                         {g.questoes.map((q, j) => (
                           <div key={j} className="highlight-item">
                             <span className="h-num">{q.numero}</span>
+                            {/* questões renderizam em peso 400 — mais leve que os destaques (.h-text é 500) */}
                             <span className="h-text" style={{ fontWeight: 400 }}>{q.pergunta}</span>
                           </div>
                         ))}
