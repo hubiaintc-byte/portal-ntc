@@ -5,6 +5,7 @@ import { fetchEvento } from "@/lib/cms/eventos";
 
 import { EVENTOS_AGENDA } from "./conteudoEventos";
 import { EventoPresencialLayout } from "./EventoPresencialLayout";
+import { EventoOnlineLayout } from "./EventoOnlineLayout";
 
 export const revalidate = 3600;
 
@@ -46,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
  * evento.formato ("presencial" | "hibrido" | "online").
  *
  * Presencial e híbrido compartilham EventoPresencialLayout (ambos têm `local`).
- * Slugs online caem em notFound() até que EventoOnlineLayout seja portado.
+ * Online usa EventoOnlineLayout (estrutura evt-* do protótipo EDUTEC).
  */
 export default async function EventoPage({ params }: PageProps) {
   const { slug } = await params;
@@ -64,7 +65,6 @@ export default async function EventoPage({ params }: PageProps) {
     case "hibrido":
       return <EventoPresencialLayout evento={evento} />;
     case "online":
-      // TODO: implementar EventoOnlineLayout em sessões futuras
-      notFound();
+      return <EventoOnlineLayout evento={evento} />;
   }
 }
