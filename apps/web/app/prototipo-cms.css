@@ -1,0 +1,682 @@
+/* ==========================================================================
+ * Protótipo CMS Soberana 2026 — Portal Grupo NTC
+ *
+ * PROTÓTIPO VISUAL throwaway (rota /prototipo-cms). Não toca o Payload nem o
+ * admin real. Demonstra como ficaria um CMS próprio com a identidade do site:
+ * Oxford dominante, Pergaminho, Dourado cerimonial, Cormorant + Barlow, logo
+ * NTC. Segue CLAUDE.md §3 (paleta 60·15·10·5, border-radius 0 em estruturas,
+ * ícones lineares funcionais).
+ *
+ * Escopo das classes prefixado `pcms-` para não colidir com o CSS das outras
+ * páginas portadas importadas no mesmo root layout.
+ * ========================================================================== */
+
+.pcms-root {
+  /* Tokens Soberana — espelho de packages/ui/src/tokens.ts */
+  --pcms-oxford: #11365e;
+  --pcms-oxford-escuro: #0b2545;
+  --pcms-oxford-claro: #1e4e8c;
+  --pcms-cardeal: #8e2b27;
+  --pcms-oliva: #5c6b3b;
+  --pcms-dourado: #b5995a;
+  --pcms-pergaminho: #f4efe6;
+  --pcms-osso: #fbf8f2;
+  --pcms-grafite: #2b2b2b;
+  --pcms-grafite-suave: #5a5a5a;
+  --pcms-linha: #d9d2c4;
+  --pcms-erro: #9a1b1b;
+  --pcms-sucesso: #3f6b3f;
+
+  --pcms-sidebar-w: 256px;
+
+  display: grid;
+  grid-template-columns: var(--pcms-sidebar-w) 1fr;
+  min-height: 100vh;
+  background: var(--pcms-osso);
+  color: var(--pcms-grafite);
+  font-family: var(--font-corpo), "Barlow", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Sidebar Oxford ==================================================== */
+.pcms-sidebar {
+  background: var(--pcms-oxford-escuro);
+  color: var(--pcms-pergaminho);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid rgba(244, 239, 230, 0.1);
+}
+
+.pcms-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 22px 20px;
+  border-bottom: 1px solid rgba(244, 239, 230, 0.12);
+}
+
+.pcms-sidebar__logo {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.pcms-sidebar__wordmark {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.pcms-sidebar__wordmark strong {
+  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--pcms-pergaminho);
+}
+
+.pcms-sidebar__wordmark span {
+  font-family: var(--font-corpo-cond), var(--font-corpo), "Barlow", sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pcms-dourado);
+  margin-top: 3px;
+}
+
+.pcms-nav {
+  padding: 18px 14px;
+  flex-grow: 1;
+}
+
+.pcms-nav__group {
+  margin-bottom: 22px;
+}
+
+.pcms-nav__label {
+  font-family: var(--font-corpo-cond), var(--font-corpo), "Barlow", sans-serif;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.55);
+  padding: 0 10px;
+  margin-bottom: 8px;
+}
+
+.pcms-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--pcms-pergaminho);
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 9px 10px;
+  border-radius: 0;
+  position: relative;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.pcms-nav__item:hover {
+  color: var(--pcms-dourado);
+  background: rgba(244, 239, 230, 0.04);
+}
+
+.pcms-nav__item--ativo {
+  color: var(--pcms-dourado);
+  font-weight: 600;
+  background: rgba(181, 153, 90, 0.1);
+  box-shadow: inset 3px 0 0 var(--pcms-dourado);
+}
+
+.pcms-nav__item:focus-visible {
+  outline: 2px solid var(--pcms-dourado);
+  outline-offset: -2px;
+}
+
+.pcms-nav__ico {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.pcms-sidebar__foot {
+  padding: 16px 22px;
+  border-top: 1px solid rgba(244, 239, 230, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.pcms-avatar-mini {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--pcms-oxford-claro);
+  color: var(--pcms-pergaminho);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.pcms-sidebar__foot div {
+  line-height: 1.2;
+}
+.pcms-sidebar__foot strong {
+  display: block;
+  font-size: 0.84rem;
+  color: var(--pcms-pergaminho);
+  font-weight: 500;
+}
+.pcms-sidebar__foot span {
+  font-size: 0.72rem;
+  color: rgba(244, 239, 230, 0.55);
+}
+
+/* ===== Área principal =================================================== */
+.pcms-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pcms-topbar {
+  height: 68px;
+  background: var(--pcms-osso);
+  border-bottom: 1px solid var(--pcms-linha);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.pcms-topbar__crumb {
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pcms-grafite-suave);
+}
+.pcms-topbar__crumb b {
+  color: var(--pcms-oxford);
+  font-weight: 600;
+}
+
+.pcms-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  padding: 8px 13px;
+  width: 280px;
+  color: var(--pcms-grafite-suave);
+}
+.pcms-search input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.86rem;
+  color: var(--pcms-grafite);
+  width: 100%;
+}
+.pcms-search svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--pcms-grafite-suave);
+  stroke-width: 1.5;
+  fill: none;
+  flex-shrink: 0;
+}
+
+.pcms-content {
+  padding: 36px;
+  flex-grow: 1;
+}
+
+/* ===== Cabeçalho de tela ================================================ */
+.pcms-pagehead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 20px;
+}
+.pcms-pagehead__eyebrow {
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pcms-dourado);
+  margin-bottom: 6px;
+}
+.pcms-pagehead h1 {
+  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
+  font-size: 2.1rem;
+  font-weight: 600;
+  color: var(--pcms-oxford);
+  line-height: 1.1;
+  margin: 0;
+}
+.pcms-pagehead p {
+  color: var(--pcms-grafite-suave);
+  font-size: 0.92rem;
+  margin: 6px 0 0;
+}
+
+/* ===== Botões =========================================================== */
+.pcms-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 500;
+  padding: 10px 18px;
+  border: 1px solid var(--pcms-oxford);
+  background: var(--pcms-oxford);
+  color: var(--pcms-osso);
+  cursor: pointer;
+  border-radius: 0;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.pcms-btn:hover {
+  background: var(--pcms-oxford-escuro);
+}
+.pcms-btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  fill: none;
+}
+.pcms-btn--ghost {
+  background: transparent;
+  color: var(--pcms-oxford);
+}
+.pcms-btn--ghost:hover {
+  background: var(--pcms-pergaminho);
+}
+
+/* ===== Dashboard ======================================================== */
+.pcms-metricas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 30px;
+}
+.pcms-metrica {
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  border-top: 3px solid var(--pcms-oxford);
+  padding: 20px 22px;
+}
+.pcms-metrica[data-vertical="gestao-publica"] {
+  border-top-color: var(--pcms-cardeal);
+}
+.pcms-metrica[data-vertical="saude"] {
+  border-top-color: var(--pcms-oliva);
+}
+.pcms-metrica[data-vertical="educacao"] {
+  border-top-color: var(--pcms-dourado);
+}
+.pcms-metrica__valor {
+  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
+  font-size: 2.6rem;
+  font-weight: 600;
+  color: var(--pcms-oxford);
+  line-height: 1;
+}
+.pcms-metrica__rotulo {
+  font-size: 0.86rem;
+  color: var(--pcms-grafite);
+  margin-top: 6px;
+  font-weight: 500;
+}
+.pcms-metrica__delta {
+  font-size: 0.76rem;
+  color: var(--pcms-grafite-suave);
+  margin-top: 4px;
+}
+
+.pcms-painel {
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+}
+.pcms-painel__head {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--pcms-pergaminho);
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pcms-dourado);
+  font-weight: 600;
+}
+.pcms-atividade {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--pcms-pergaminho);
+  font-size: 0.9rem;
+}
+.pcms-atividade:last-child {
+  border-bottom: 0;
+}
+.pcms-atividade__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pcms-dourado);
+  flex-shrink: 0;
+  transform: translateY(-2px);
+}
+.pcms-atividade__txt {
+  flex-grow: 1;
+  color: var(--pcms-grafite-suave);
+}
+.pcms-atividade__txt b {
+  color: var(--pcms-oxford);
+  font-weight: 600;
+}
+.pcms-atividade__meta {
+  color: var(--pcms-grafite-suave);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+/* ===== Tabela / listagem =============================================== */
+.pcms-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.pcms-filtros {
+  display: flex;
+  gap: 8px;
+}
+.pcms-chip {
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  padding: 7px 14px;
+  border: 1px solid var(--pcms-linha);
+  background: #fff;
+  color: var(--pcms-grafite-suave);
+  cursor: pointer;
+  border-radius: 999px;
+}
+.pcms-chip--ativo {
+  background: var(--pcms-oxford);
+  color: var(--pcms-osso);
+  border-color: var(--pcms-oxford);
+}
+
+.pcms-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  font-size: 0.9rem;
+}
+.pcms-tabela thead th {
+  text-align: left;
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pcms-grafite-suave);
+  font-weight: 600;
+  background: var(--pcms-pergaminho);
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--pcms-linha);
+}
+.pcms-tabela tbody td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--pcms-pergaminho);
+  color: var(--pcms-grafite);
+  vertical-align: middle;
+}
+.pcms-tabela tbody tr:last-child td {
+  border-bottom: 0;
+}
+.pcms-tabela tbody tr:hover {
+  background: var(--pcms-osso);
+}
+.pcms-cel-nome {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pcms-cel-nome strong {
+  color: var(--pcms-oxford);
+  font-weight: 600;
+}
+.pcms-cel-nome small {
+  display: block;
+  color: var(--pcms-grafite-suave);
+  font-size: 0.76rem;
+  margin-top: 1px;
+}
+.pcms-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+  background: var(--pcms-oxford);
+}
+.pcms-avatar[data-vertical="gestao-publica"] {
+  background: var(--pcms-cardeal);
+}
+.pcms-avatar[data-vertical="saude"] {
+  background: var(--pcms-oliva);
+}
+.pcms-avatar[data-vertical="educacao"] {
+  background: var(--pcms-oxford-claro);
+}
+
+/* Selos de status — pílulas (arredondamento permitido p/ selos, §3) */
+.pcms-selo {
+  display: inline-block;
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+.pcms-selo--publicado {
+  background: rgba(63, 107, 63, 0.14);
+  color: var(--pcms-sucesso);
+}
+.pcms-selo--rascunho {
+  background: rgba(181, 153, 90, 0.16);
+  color: #8a6d2f;
+}
+.pcms-selo--agendado {
+  background: rgba(30, 78, 140, 0.12);
+  color: var(--pcms-oxford-claro);
+}
+.pcms-selo-vert {
+  font-size: 0.82rem;
+  color: var(--pcms-grafite-suave);
+}
+
+.pcms-modalidade {
+  font-size: 0.82rem;
+  color: var(--pcms-grafite-suave);
+}
+
+/* ===== Configurações =================================================== */
+.pcms-config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+.pcms-config-card {
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  padding: 24px;
+}
+.pcms-config-card h3 {
+  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--pcms-oxford);
+  margin: 0 0 4px;
+}
+.pcms-config-card > p {
+  color: var(--pcms-grafite-suave);
+  font-size: 0.86rem;
+  margin: 0 0 18px;
+}
+.pcms-field {
+  margin-bottom: 14px;
+}
+.pcms-field label {
+  display: block;
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pcms-grafite-suave);
+  margin-bottom: 6px;
+}
+.pcms-field input,
+.pcms-field select {
+  width: 100%;
+  border: 1px solid var(--pcms-linha);
+  background: var(--pcms-osso);
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--pcms-grafite);
+  border-radius: 0;
+}
+.pcms-field input:focus,
+.pcms-field select:focus {
+  outline: 2px solid var(--pcms-oxford);
+  outline-offset: -1px;
+}
+.pcms-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--pcms-pergaminho);
+}
+.pcms-toggle-row:last-child {
+  border-bottom: 0;
+}
+.pcms-toggle-row span {
+  font-size: 0.88rem;
+}
+.pcms-toggle-row small {
+  display: block;
+  color: var(--pcms-grafite-suave);
+  font-size: 0.76rem;
+}
+.pcms-switch {
+  width: 42px;
+  height: 23px;
+  border-radius: 999px;
+  background: var(--pcms-linha);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+.pcms-switch--on {
+  background: var(--pcms-sucesso);
+}
+.pcms-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.15s ease;
+}
+.pcms-switch--on::after {
+  transform: translateX(19px);
+}
+
+/* Estado vazio / sem registros */
+.pcms-vazio {
+  background: #fff;
+  border: 1px dashed var(--pcms-linha);
+  padding: 32px;
+  text-align: center;
+  color: var(--pcms-grafite-suave);
+  font-size: 0.92rem;
+}
+
+.pcms-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pcms-aviso {
+  margin-top: 30px;
+  padding: 14px 20px;
+  background: var(--pcms-pergaminho);
+  border-left: 3px solid var(--pcms-dourado);
+  font-size: 0.84rem;
+  color: var(--pcms-grafite-suave);
+}
+.pcms-aviso b {
+  color: var(--pcms-oxford);
+}
+
+/* ===== Responsivo leve ================================================= */
+@media (max-width: 1100px) {
+  .pcms-metricas {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .pcms-config-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 820px) {
+  .pcms-root {
+    grid-template-columns: 1fr;
+  }
+  .pcms-sidebar {
+    position: static;
+    height: auto;
+  }
+}
