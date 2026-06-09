@@ -36,56 +36,14 @@
 
 ---
 
-### Task 1: `derivarDatasEvento.ts` (função pura, com teste)
+### Task 1: `derivarDatasEvento.ts` (função pura)
 
 **Files:**
 - Create: `apps/web/lib/cms/derivarDatasEvento.ts`
-- Create: `apps/web/lib/cms/derivarDatasEvento.test.ts`
 
-- [ ] **Step 1: Teste primeiro**
+> **Nota:** o repo NÃO tem vitest instalado nem testes (apesar do CLAUDE.md citar). NÃO instalar dependência de teste. A validação desta função pura é feita por um script Node inline (Step 3), cobrindo os mesmos casos. Sem scope creep.
 
-Criar `apps/web/lib/cms/derivarDatasEvento.test.ts`:
-
-```ts
-import { describe, expect, it } from "vitest";
-
-import { derivarDatasEvento } from "./derivarDatasEvento";
-
-describe("derivarDatasEvento", () => {
-  it("deriva formatos pt-BR para 15 de junho de 2026 (segunda)", () => {
-    const d = derivarDatasEvento("2026-06-15");
-    expect(d.metaValue).toBe("15 · Junho");
-    expect(d.metaSub).toBe("2026 · Segunda-feira");
-    expect(d.timelineDiaHtml).toBe("15 de <em>Junho</em> · Segunda-feira");
-    expect(d.sidebarValue).toBe("15 · Jun · 2026");
-    expect(d.dataEvento).toBe("15 de junho de 2026");
-    expect(d.deadlineISO).toBe("2026-06-15T23:59:59-03:00");
-    expect(d.countdownDateText).toBe("Até 15 de Junho de 2026");
-    expect(d.icsStart).toBe("20260615T080000");
-    expect(d.icsEnd).toBe("20260615T180000");
-  });
-
-  it("aceita ISO com hora e ignora o horário (usa 08h-18h fixos)", () => {
-    const d = derivarDatasEvento("2026-06-15T09:30:00-03:00");
-    expect(d.icsStart).toBe("20260615T080000");
-    expect(d.metaValue).toBe("15 · Junho");
-  });
-
-  it("formata dezembro e domingo corretamente", () => {
-    const d = derivarDatasEvento("2026-12-06"); // domingo
-    expect(d.metaValue).toBe("06 · Dezembro");
-    expect(d.metaSub).toBe("2026 · Domingo");
-    expect(d.sidebarValue).toBe("06 · Dez · 2026");
-  });
-});
-```
-
-- [ ] **Step 2: Rodar o teste — falha (função não existe)**
-
-Run: `pnpm --filter @ntc/web exec vitest run lib/cms/derivarDatasEvento.test.ts`
-Expected: FAIL (módulo não encontrado).
-
-- [ ] **Step 3: Implementar**
+- [ ] **Step 1: Implementar**
 
 Criar `apps/web/lib/cms/derivarDatasEvento.ts`:
 
@@ -156,17 +114,30 @@ export function derivarDatasEvento(iso: string): DatasDerivadasEvento {
 }
 ```
 
-- [ ] **Step 4: Rodar o teste — passa**
-
-Run: `pnpm --filter @ntc/web exec vitest run lib/cms/derivarDatasEvento.test.ts`
-Expected: PASS (3 testes).
-
-> Nota: `dataEvento` usa `diaNum` sem zero à esquerda ("15 de junho"), enquanto os demais usam `dia2` ("15 ·"). Confere com o estático atual (`"15 de junho de 2026"`). Para dia <10, `dataEvento` fica "6 de dezembro" e meta "06 · Dezembro" — coerente com o padrão do projeto.
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 2: Validar com script Node inline (sem vitest)**
 
 ```bash
-git add apps/web/lib/cms/derivarDatasEvento.ts apps/web/lib/cms/derivarDatasEvento.test.ts
+cd /Users/joao/Documents/portal-ntc
+pnpm --filter @ntc/web exec tsx -e '
+import { derivarDatasEvento } from "./lib/cms/derivarDatasEvento.ts";
+const a = derivarDatasEvento("2026-06-15");
+const ok1 = a.metaValue==="15 · Junho" && a.metaSub==="2026 · Segunda-feira" && a.timelineDiaHtml==="15 de <em>Junho</em> · Segunda-feira" && a.sidebarValue==="15 · Jun · 2026" && a.dataEvento==="15 de junho de 2026" && a.deadlineISO==="2026-06-15T23:59:59-03:00" && a.countdownDateText==="Até 15 de Junho de 2026" && a.icsStart==="20260615T080000" && a.icsEnd==="20260615T180000";
+const b = derivarDatasEvento("2026-12-06");
+const ok2 = b.metaValue==="06 · Dezembro" && b.metaSub==="2026 · Domingo" && b.sidebarValue==="06 · Dez · 2026";
+const c = derivarDatasEvento("2026-06-15T09:30:00-03:00");
+const ok3 = c.icsStart==="20260615T080000" && c.metaValue==="15 · Junho";
+console.log(ok1&&ok2&&ok3 ? "PASS" : "FAIL", {ok1,ok2,ok3});
+process.exit(ok1&&ok2&&ok3?0:1);
+'
+```
+Expected: `PASS`. Se `tsx` não existir no web, usar `npx tsx` ou compilar via `pnpm --filter @ntc/web exec node --import tsx ...`. Se nenhum runner TS estiver disponível, validar com um require após `tsc` pontual — mas tsx costuma vir com Next. Garantir saída `PASS` antes de commitar.
+
+> Nota: `dataEvento` usa `diaNum` sem zero à esquerda ("15 de junho"); os demais usam `dia2` ("15 ·"). Confere com o estático atual. Para dia <10, `dataEvento` = "6 de dezembro", meta = "06 · Dezembro".
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add apps/web/lib/cms/derivarDatasEvento.ts
 git commit -m "$(cat <<'EOF'
 feat(cms): adiciona derivarDatasEvento (ISO -> formatos pt-BR do evento)
 
@@ -650,8 +621,8 @@ EOF
 
 - [ ] **Step 1: Suite de qualidade**
 
-Run: `pnpm typecheck && pnpm lint && pnpm --filter @ntc/web exec vitest run lib/cms/derivarDatasEvento.test.ts`
-Expected: typecheck/lint PASS; 3 testes PASS.
+Run: `pnpm typecheck && pnpm lint`
+Expected: typecheck/lint PASS. (A função de datas já foi validada por script inline na Task 1.)
 
 - [ ] **Step 2: Build**
 
