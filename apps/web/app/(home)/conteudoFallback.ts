@@ -213,7 +213,7 @@ export const FALLBACK_HOME = {
           "Recomposição da aprendizagem, currículo e formação docente em escala. Programa estruturado para secretarias de educação, redes municipais e estaduais que buscam resultados sustentáveis.",
         ctas: [
           { rotulo: "Conhecer programa", href: "#programas", variante: "gold" as const },
-          { rotulo: "Ver módulos abertos", href: "#capacitacao", variante: "ghost-light" as const },
+          { rotulo: "Ver módulos abertos", href: "/agenda", variante: "ghost-light" as const },
         ],
       },
       {
@@ -335,7 +335,7 @@ export const FALLBACK_HOME = {
     eyebrow: "Também em destaque",
     titulo: "Outros eventos abertos no período",
     ctaRotulo: "Ver agenda completa",
-    ctaHref: "#capacitacao",
+    ctaHref: "/agenda",
   },
 
   eventosSecundarios: [
@@ -378,7 +378,7 @@ export const FALLBACK_HOME = {
   ] satisfies EventoCardSecundario[],
 
   eventosFooter: {
-    ctaPrincipal: { rotulo: "Ver agenda completa", href: "#capacitacao" },
+    ctaPrincipal: { rotulo: "Ver agenda completa", href: "/agenda" },
     ctaSecundario: { rotulo: "Solicitar proposta para minha instituição", href: "#contratacao" },
   },
 
@@ -396,7 +396,7 @@ export const FALLBACK_HOME = {
       "Inscrições abertas",
       "Próximas turmas",
     ],
-    cta: { rotulo: "Ver agenda completa", href: "#capacitacao" },
+    cta: { rotulo: "Ver agenda completa", href: "/agenda" },
   },
 
   introCurta: {
@@ -478,8 +478,8 @@ export const FALLBACK_HOME = {
       tituloLong:
         "PEAR — Programa Estratégico de Alfabetização de Alta Performance e Recomposição da Aprendizagem",
       corLink: "padrao",
-      ctaConhecer: { rotulo: "Conhecer programa", href: "#programas" },
-      ctaSecundario: { rotulo: "Ver módulo aberto", href: "#eventos-abertos" },
+      ctaConhecer: { rotulo: "Conhecer programa", href: "/programas/pear" },
+      ctaSecundario: { rotulo: "Ver módulo aberto", href: "/agenda" },
     },
     {
       area: "gov",
@@ -493,8 +493,8 @@ export const FALLBACK_HOME = {
       tituloLong:
         "AGIP — Programa Avançado de Governança, Integridade e Performance nas Contratações Públicas",
       corLink: "crimson",
-      ctaConhecer: { rotulo: "Conhecer programa", href: "#programas" },
-      ctaSecundario: { rotulo: "Ver módulo aberto", href: "#eventos-abertos" },
+      ctaConhecer: { rotulo: "Conhecer programa", href: "/programas/agip" },
+      ctaSecundario: { rotulo: "Ver módulo aberto", href: "/agenda" },
     },
     {
       area: "sau",
@@ -508,8 +508,8 @@ export const FALLBACK_HOME = {
       tituloLong:
         "PROSUS+ — Programa Estratégico de Governança, Financiamento e Performance no SUS",
       corLink: "olive",
-      ctaConhecer: { rotulo: "Conhecer programa", href: "#programas" },
-      ctaSecundario: { rotulo: "Ver módulo aberto", href: "#eventos-abertos" },
+      ctaConhecer: { rotulo: "Conhecer programa", href: "/programas/prosus" },
+      ctaSecundario: { rotulo: "Ver módulo aberto", href: "/agenda" },
     },
     {
       area: "edu",
@@ -523,8 +523,8 @@ export const FALLBACK_HOME = {
       tituloLong:
         "EDUTEC — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino",
       corLink: "padrao",
-      ctaConhecer: { rotulo: "Conhecer programa", href: "#programas" },
-      ctaSecundario: { rotulo: "Ver módulo aberto", href: "#eventos-abertos" },
+      ctaConhecer: { rotulo: "Conhecer programa", href: "/programas/edutec" },
+      ctaSecundario: { rotulo: "Ver módulo aberto", href: "/agenda" },
     },
     {
       area: "edu",
@@ -538,8 +538,8 @@ export const FALLBACK_HOME = {
       tituloLong:
         "PROGE — Programa Estratégico de Gestão Escolar, Coordenação Pedagógica e Resultados",
       corLink: "padrao",
-      ctaConhecer: { rotulo: "Conhecer programa", href: "#programas" },
-      ctaSecundario: { rotulo: "Solicitar proposta", href: "#contratacao" },
+      ctaConhecer: { rotulo: "Conhecer programa", href: "/programas/proge" },
+      ctaSecundario: { rotulo: "Solicitar proposta", href: "/contato" },
     },
     {
       area: "gov",
@@ -552,8 +552,8 @@ export const FALLBACK_HOME = {
       flagModuloAberto: false,
       tituloLong: "LIDERA — Liderança, Direção Estratégica e Resultados na Administração",
       corLink: "crimson",
-      ctaConhecer: { rotulo: "Conhecer programa", href: "#programas" },
-      ctaSecundario: { rotulo: "Solicitar proposta", href: "#contratacao" },
+      ctaConhecer: { rotulo: "Conhecer programa", href: "/programas/lidera" },
+      ctaSecundario: { rotulo: "Solicitar proposta", href: "/contato" },
     },
   ] satisfies ProgramaEvidencia[],
 
