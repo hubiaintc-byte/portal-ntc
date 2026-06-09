@@ -125,7 +125,12 @@ export default async function HomePage() {
                   <div className="event-cover-overlay" />
                   <div className="event-cover-meta">
                     <div className={`event-date-block ${evt.data.variante}`}>
-                      {evt.data.variante === "range" ? (
+                      {evt.data.variante === "single" ? (
+                        <>
+                          <span className="day">{evt.data.dia}</span>
+                          <span className="mon-yr">{evt.data.monYr}</span>
+                        </>
+                      ) : evt.data.variante === "range" ? (
                         <>
                           <span className="days">
                             {evt.data.diasInicio}
@@ -217,7 +222,12 @@ export default async function HomePage() {
                     />
                     <div className="es-cover-overlay" />
                     <div className={`es-date ${evt.data.variante}`}>
-                      {evt.data.variante === "range" ? (
+                      {evt.data.variante === "single" ? (
+                        <>
+                          <span className="day">{evt.data.dia}</span>
+                          <span className="mon-yr">{evt.data.monYr}</span>
+                        </>
+                      ) : evt.data.variante === "range" ? (
                         <>
                           <span className="days">
                             {evt.data.diasInicio}

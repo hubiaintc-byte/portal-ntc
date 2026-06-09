@@ -44,7 +44,8 @@ export interface EventoCard {
   statusTag: { rotulo: string; tipo: "open" | "last" };
   imagemSrc: string;
   data: {
-    variante: "range" | "multi";
+    variante: "single" | "range" | "multi";
+    dia?: string;
     diasInicio?: string;
     diasFim?: string;
     monYr?: string;
@@ -70,7 +71,8 @@ export interface EventoCardSecundario {
   area: VerticalSlide;
   imagemSrc: string;
   data: {
-    variante: "range" | "multi";
+    variante: "single" | "range" | "multi";
+    dia?: string;
     diasInicio?: string;
     diasFim?: string;
     monYr?: string;

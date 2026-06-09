@@ -32,9 +32,8 @@ export function paraCardHomePrincipal(e: Evento): EventoCard | null {
     statusTag: { rotulo: "Inscrições abertas", tipo: "open" },
     imagemSrc: c.imagemUrl,
     data: {
-      variante: "range",
-      diasInicio: c.diaDataBloco,
-      diasFim: c.diaDataBloco,
+      variante: "single",
+      dia: c.diaDataBloco,
       monYr: c.mesAnoDataBloco,
     },
     modalidade: { texto: c.modalidadeLabel },
@@ -66,9 +65,8 @@ export function paraCardHomeSecundario(e: Evento): EventoCardSecundario | null {
     area: e.area,
     imagemSrc: c.imagemUrl,
     data: {
-      variante: "range",
-      diasInicio: c.diaDataBloco,
-      diasFim: c.diaDataBloco,
+      variante: "single",
+      dia: c.diaDataBloco,
       monYr: c.mesAnoDataBloco,
     },
     programa: `${c.formatoLabel} · ${areaLabel(e.area)}`,

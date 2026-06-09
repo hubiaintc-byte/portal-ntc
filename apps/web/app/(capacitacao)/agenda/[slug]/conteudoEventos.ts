@@ -1206,8 +1206,8 @@ const eventoEdutecM01: EventoOnline = {
     h2: "Investimento e condições",
     intro: "Modalidades de contratação flexíveis para inscrição individual, equipes e instituições públicas.",
     priceLabel: "Inscrição individual",
-    priceValueHtml: `<span class="cur">R$</span><span class="amt">Sob</span>`,
-    priceSub: "Consulta · Equipes / órgãos",
+    priceValueHtml: `<span class="cur">R$</span><span class="amt">1.470</span>`,
+    priceSub: "por inscrição individual · evento on-line ao vivo de 8 horas",
     includesTitulo: "O que está incluído",
     includes: [
       "8 horas de imersão ao vivo no EventON NTC",
