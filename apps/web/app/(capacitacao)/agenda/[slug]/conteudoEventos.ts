@@ -381,6 +381,29 @@ export interface RelatedOnline {
 
 // ----------------- Evento Base + variantes discriminadas -----------------
 
+// Metadados de listagem (cards da Home e da Agenda). Opcional: eventos sem
+// `card` não entram nas listagens. O adapter (lib/eventos/adaptarParaCard.ts)
+// deriva o resto (slug, titulo, area) do próprio evento.
+export interface CardEvento {
+  programaSlug: "EDUTEC" | "PROGE";
+  formatoCard: "seminario" | "oficina" | "curso";
+  cidade: string; // "" para online
+  valorReais: number;
+  deadlineIso: string; // "2026-06-15"
+  keywords: string;
+  flags: string[];
+  imagemUrl: string;
+  modalidadeLabel: string; // "Online ao vivo + replay"
+  formatoLabel: string; // "Seminário"
+  coordenacaoNomes: string;
+  metaEssenciais: [string, string]; // ["8h · 1 dia", "Plataforma EventOn"]
+  precoIndividualLabel: string; // "R$ 1.470"
+  precoEquipesLabel: string; // "Sob consulta"
+  destaqueHome: boolean;
+  diaDataBloco: string; // "15"
+  mesAnoDataBloco: string; // "Jun · 2026"
+}
+
 export interface EventoBase {
   slug: string;
   titulo: string;
@@ -388,6 +411,7 @@ export interface EventoBase {
   formato: FormatoEvento;
   dataEvento: string;
   area: AreaVertical;
+  card?: CardEvento;
   crumb: CrumbItemEvento[];
   hero: HeroEvento;
   metas: EventoMeta[];
@@ -921,6 +945,25 @@ const eventoEdutecM01: EventoOnline = {
   formato: "online",
   dataEvento: "15 de junho de 2026",
   area: "edu",
+  card: {
+    programaSlug: "EDUTEC",
+    formatoCard: "seminario",
+    cidade: "",
+    valorReais: 1470,
+    deadlineIso: "2026-06-15",
+    keywords: "cultura digital educacao midiatica transformacao fluencia letramento",
+    flags: ["destaque_editorial"],
+    imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
+    modalidadeLabel: "Online ao vivo + replay",
+    formatoLabel: "Seminário",
+    coordenacaoNomes: "NTC Educação · Roberta Aquino, Karla Priscilla e Mariana Ochs",
+    metaEssenciais: ["8h · 1 dia", "Plataforma EventOn"],
+    precoIndividualLabel: "R$ 1.470",
+    precoEquipesLabel: "Sob consulta",
+    destaqueHome: true,
+    diaDataBloco: "15",
+    mesAnoDataBloco: "Jun · 2026",
+  },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
   crumb: [
@@ -1258,6 +1301,25 @@ const eventoEdutecM02: EventoOnline = {
   formato: "online",
   dataEvento: "16 de junho de 2026",
   area: "edu",
+  card: {
+    programaSlug: "EDUTEC",
+    formatoCard: "seminario",
+    cidade: "",
+    valorReais: 1470,
+    deadlineIso: "2026-06-16",
+    keywords: "fluencia digital docente praticas pedagogicas inovadoras tecnologia",
+    flags: ["destaque_editorial"],
+    imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
+    modalidadeLabel: "Online ao vivo + replay",
+    formatoLabel: "Seminário",
+    coordenacaoNomes: "NTC Educação · Roberta Aquino, Rebecca Rios e Bruno Reis",
+    metaEssenciais: ["8h · 1 dia", "Plataforma EventOn"],
+    precoIndividualLabel: "R$ 1.470",
+    precoEquipesLabel: "Sob consulta",
+    destaqueHome: true,
+    diaDataBloco: "16",
+    mesAnoDataBloco: "Jun · 2026",
+  },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
   crumb: [
@@ -1595,6 +1657,25 @@ const eventoEdutecM04: EventoOnline = {
   formato: "online",
   dataEvento: "17 de junho de 2026",
   area: "edu",
+  card: {
+    programaSlug: "EDUTEC",
+    formatoCard: "seminario",
+    cidade: "",
+    valorReais: 1470,
+    deadlineIso: "2026-06-17",
+    keywords: "curriculo computacao bncc pensamento computacional pratica pedagogica",
+    flags: ["destaque_editorial"],
+    imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
+    modalidadeLabel: "Online ao vivo + replay",
+    formatoLabel: "Seminário",
+    coordenacaoNomes: "NTC Educação · Débora Garofalo, Roberta Aquino e Karla Priscilla",
+    metaEssenciais: ["8h · 1 dia", "Plataforma EventOn"],
+    precoIndividualLabel: "R$ 1.470",
+    precoEquipesLabel: "Sob consulta",
+    destaqueHome: true,
+    diaDataBloco: "17",
+    mesAnoDataBloco: "Jun · 2026",
+  },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
   crumb: [
@@ -1919,6 +2000,25 @@ const eventoProgeM01: EventoOnline = {
   formato: "online",
   dataEvento: "22 de junho de 2026",
   area: "edu",
+  card: {
+    programaSlug: "PROGE",
+    formatoCard: "seminario",
+    cidade: "",
+    valorReais: 1470,
+    deadlineIso: "2026-06-22",
+    keywords: "gestao escolar resultados recursos governanca democratica direcao",
+    flags: ["destaque_editorial"],
+    imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
+    modalidadeLabel: "Online ao vivo + replay",
+    formatoLabel: "Seminário",
+    coordenacaoNomes: "NTC Educação · Pedro Lino, Marialba Glória, Maria Sílvia Bacila e Marli Regina Fernandes",
+    metaEssenciais: ["8h · 1 dia", "Plataforma EventOn"],
+    precoIndividualLabel: "R$ 1.470",
+    precoEquipesLabel: "Sob consulta",
+    destaqueHome: false,
+    diaDataBloco: "22",
+    mesAnoDataBloco: "Jun · 2026",
+  },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
   crumb: [
@@ -2258,6 +2358,25 @@ const eventoProgeM03: EventoOnline = {
   formato: "online",
   dataEvento: "23 de junho de 2026",
   area: "edu",
+  card: {
+    programaSlug: "PROGE",
+    formatoCard: "seminario",
+    cidade: "",
+    valorReais: 1470,
+    deadlineIso: "2026-06-23",
+    keywords: "coordenacao pedagogica mentoria recomposicao gestao aprendizagem",
+    flags: ["destaque_editorial"],
+    imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
+    modalidadeLabel: "Online ao vivo + replay",
+    formatoLabel: "Seminário",
+    coordenacaoNomes: "NTC Educação · Andréa Patapoff, Maria Sílvia Bacila, Vasco Moretto e Maria Inês Fini",
+    metaEssenciais: ["8h · 1 dia", "Plataforma EventOn"],
+    precoIndividualLabel: "R$ 1.470",
+    precoEquipesLabel: "Sob consulta",
+    destaqueHome: false,
+    diaDataBloco: "23",
+    mesAnoDataBloco: "Jun · 2026",
+  },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
   crumb: [
@@ -2596,3 +2715,13 @@ export const EVENTOS_AGENDA: Record<string, Evento> = {
   "proge-m01-2026": eventoProgeM01,
   "proge-m03-2026": eventoProgeM03,
 };
+
+// Ordem curada dos eventos que aparecem nas listagens (Home + Agenda).
+// Exclui PROSUS (mantido só como rota /agenda/prosus-brasilia, fora das listas).
+export const EVENTOS_LISTAGEM = [
+  "edutec-m01-2026",
+  "edutec-m02-2026",
+  "edutec-m04-2026",
+  "proge-m01-2026",
+  "proge-m03-2026",
+] as const;
