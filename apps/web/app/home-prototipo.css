@@ -1397,7 +1397,8 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 /* Background com parallax visível (controlado via --parallax-y) */
 .hero-slide-bg {
   position: absolute; inset: -40px 0 -120px 0; z-index: 0;
-  background-size: cover; background-position: var(--focal, 50% 50%);
+  width: 100%; height: calc(100% + 160px);
+  object-fit: cover; object-position: var(--focal, 50% 40%);
   filter: saturate(85%) contrast(1.05);
   transform: scale(1.04) translateY(var(--parallax-y, 0));
   transition: transform 900ms cubic-bezier(0.4, 0, 0.2, 1);
