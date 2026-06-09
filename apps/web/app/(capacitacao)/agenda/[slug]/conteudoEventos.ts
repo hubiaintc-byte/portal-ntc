@@ -1250,9 +1250,347 @@ const eventoEdutecM01: EventoOnline = {
   },
 };
 
+const eventoEdutecM02: EventoOnline = {
+  slug: "edutec-m02-2026",
+  titulo: "Fluência Digital Docente e Práticas Pedagógicas Inovadoras",
+  subtitulo:
+    "Formação prática e contemporânea para qualificar o uso pedagógico das tecnologias e ampliar o repertório metodológico dos educadores.",
+  formato: "online",
+  dataEvento: "16 de junho de 2026",
+  area: "edu",
+
+  // Campos de EventoBase não usados pelo layout online (vazios):
+  crumb: [
+    { texto: "Grupo NTC", href: "/", cmsLink: "home" },
+    { texto: "Capacitação", href: "/capacitacao", cmsLink: "agenda-completa" },
+    { texto: "Eventos online", href: "/capacitacao/agenda", cmsLink: "eventos-online" },
+    { texto: "Seminário EDUTEC · Fluência Digital Docente", current: true },
+  ],
+  hero: { tags: [], h1: "", sub: "", programBinding: { texto: "", href: "", nomePrograma: "" }, ctas: [] },
+  metas: [],
+  navLinks: [
+    { texto: "Visão geral", href: "#visao-geral", isActive: true },
+    { texto: "Público", href: "#publico" },
+    { texto: "Programação", href: "#programacao" },
+    { texto: "O que você aprenderá", href: "#questoes" },
+    { texto: "Palestrantes", href: "#palestrantes" },
+    { texto: "EventOn", href: "#eventon" },
+    { texto: "Investimento", href: "#investimento" },
+    { texto: "Regras", href: "#regras" },
+    { texto: "FAQ", href: "#faq" },
+  ],
+  visaoGeral: { eyebrow: "", h2: "", lede: "", paragrafos: [] },
+  publico: { eyebrow: "", h2: "", intro: "", chips: [] },
+  objetivos: { eyebrow: "", h2: "", objetivos: [] },
+  conteudoProgramatico: { eyebrow: "", h2: "", intro: "", itens: [] },
+  programacao: { eyebrow: "", h2: "", intro: "", dias: [] },
+  palestrantes: { eyebrow: "", h2: "", intro: "", palestrantes: [], nota: "" },
+  diferenciais: { eyebrow: "", h2: "", diferenciais: [] },
+  replayCert: { eyebrow: "", h2: "", cards: [] },
+  investimento: { eyebrow: "", h2: "", rules: [] },
+  faq: {
+    eyebrow: "Perguntas frequentes",
+    h2: "FAQ",
+    faqs: [
+      { id: "edutec-m02-faq-1", pergunta: "Como funciona o acesso ao EventON NTC?", respostaHtml: "Após a confirmação da inscrição, você recebe por e-mail um link de acesso individual com login e senha. O acesso é feito direto pelo navegador, sem necessidade de download de aplicativo." },
+      { id: "edutec-m02-faq-2", pergunta: "Por quanto tempo terei acesso ao replay?", respostaHtml: "O replay fica disponível por 7 dias após a realização do evento, na Área do Participante. Acesso protegido por login institucional individual." },
+      { id: "edutec-m02-faq-3", pergunta: "Como recebo o certificado?", respostaHtml: "O certificado é emitido automaticamente até 7 dias após o término do evento, mediante presença mínima de 75% das atividades. Pode ser baixado pela Área do Participante e validado publicamente via código QR." },
+      { id: "edutec-m02-faq-4", pergunta: "Posso inscrever minha equipe ou rede?", respostaHtml: "Sim. Equipes e órgãos públicos poderão solicitar condição comercial diferenciada conforme quantidade de inscritos, perfil institucional e forma de contratação. Solicite proposta pelo botão lateral." },
+      { id: "edutec-m02-faq-5", pergunta: "A inscrição inclui materiais?", respostaHtml: "Sim. A inscrição inclui apostila digital específica do módulo-evento, certificado digital e acesso ao replay. Materiais enviados por e-mail e disponibilizados na plataforma EventON NTC." },
+      { id: "edutec-m02-faq-6", pergunta: "Como contratar uma turma fechada para minha instituição?", respostaHtml: "A NTC desenvolve turmas fechadas para secretarias, autarquias e órgãos públicos. O Instituto NTC poderá apresentar proposta personalizada com condições diferenciadas por escala, suporte operacional e replay. Solicite proposta institucional pelo botão lateral." },
+      { id: "edutec-m02-faq-7", pergunta: "É possível compor a trilha completa EDUTEC?", respostaHtml: "Sim. Este Módulo 02 pode ser contratado de forma independente ou integrar a trilha EDUTEC — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino. Consulte a equipe comercial." },
+    ],
+  },
+  ctaFinal: { eyebrowGold: "", h2: "", paragrafo: "", ctas: [] },
+  sidebar: {
+    coverImg: "", status: "", tituloCard: "", rows: [],
+    includes: { titulo: "", items: [] },
+    countdown: { label: "", dateText: "", deadline: "2026-06-16T23:59:59-03:00", tipo: "numerico" },
+    acoes: [], share: { label: "", links: [] },
+  },
+  relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
+  agendaIcs: {
+    titulo: "Seminário EDUTEC · Fluência Digital Docente e Práticas Pedagógicas Inovadoras",
+    descricao: "Seminário On-Line ao Vivo do programa EDUTEC · Grupo NTC. Acesso pela plataforma EventON NTC.",
+    location: "Plataforma EventON NTC · Online",
+    startISO: "20260616T080000",
+    endISO: "20260616T180000",
+    filename: "EDUTEC-M02-2026-jun.ics",
+  },
+
+  // ---- Seções evt-* (consumidas pelo EventoOnlineLayout) ----
+  heroOnline: {
+    tags: [
+      { texto: "Inscrições abertas", classe: "evt-hero-status" },
+      { texto: "Seminário Online ao Vivo", classe: "evt-hero-format" },
+      { texto: "NTC Educação", classe: "evt-hero-vert" },
+    ],
+    h1Html: "Fluência Digital Docente e <em>Práticas Pedagógicas</em> Inovadoras",
+    sub: "Formação prática e contemporânea para qualificar o uso pedagógico das tecnologias e ampliar o repertório metodológico dos educadores.",
+    programBinding: {
+      texto: "Integra o programa",
+      href: "/programas/edutec",
+      cmsLink: "programa-EDUTEC",
+      nomePrograma: "EDUTEC — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino",
+    },
+    ctas: [
+      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+02&evento_url=/agenda/edutec-m02-2026", cmsLink: "inscricao-EDUTEC-M02-2026-jun", classe: "btn btn--gold", arrow: true },
+      { texto: "Baixar folder", href: "#", cmsLink: "folder-EDUTEC-M02", classe: "btn btn--ghost-light" },
+      { texto: "Inscrever equipe ou grupo", href: "/contato?evento=EDUTEC+M%C3%B3dulo+02&evento_url=/agenda/edutec-m02-2026#tab-equipe", cmsLink: "proposta-grupo-EDUTEC-M02", classe: "btn btn--ghost-light" },
+    ],
+  },
+
+  metasOnline: [
+    { label: "Quando", value: "16 · Junho", valueSub: "2026 · Terça-feira" },
+    { label: "Modalidade", value: "Ao vivo", valueSub: "+ replay por 7 dias" },
+    { label: "Carga horária", value: "8 horas", valueSub: "Manhã (4h) + Tarde (4h)" },
+    { label: "Plataforma", value: "EventON NTC", valueSub: "Acesso individual" },
+    { label: "Investimento", value: "R$ 1.470", valueSub: "por inscrito · individual" },
+  ],
+
+  visaoGeralOnline: {
+    eyebrow: "Visão geral",
+    h2Html: "Uma agenda institucional para uma <em>educação digital</em> crítica, conectada e contemporânea.",
+    lede: "A fluência digital docente tornou-se uma competência central para o ensino contemporâneo e para a capacidade das redes públicas de transformar tecnologia em aprendizagem efetiva.",
+    paragrafosHtml: [
+      "Mais do que dominar ferramentas, o professor precisa compreender quando, como e por que utilizar recursos digitais, articulando objetivos de aprendizagem, metodologias, avaliação, autoria, acessibilidade e engajamento dos estudantes.",
+      "Este evento foi estruturado para fortalecer a segurança técnica e pedagógica dos educadores, ampliando repertórios para planejar, produzir, adaptar, selecionar e aplicar recursos digitais com intencionalidade. A formação combina referenciais de competência, autoavaliação, curadoria, produção de materiais, gamificação e estratégias de verificação da aprendizagem, sempre conectando inovação à rotina real da sala de aula.",
+      "No contexto da trilha EDUTEC, o módulo contribui para que secretarias, escolas e equipes formadoras avancem da simples adoção de plataformas para uma prática docente mais consistente, criativa e orientada a resultados.",
+    ],
+    moduleBindingHtml: "Este seminário corresponde ao <strong>Módulo 02 da trilha EDUTEC</strong> — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino. Pode ser contratado de forma independente ou integrar a trilha completa.",
+    razoesTituloHtml: "Seis razões para <em>participar</em> deste seminário",
+    razoes: [
+      { num: "01", titulo: "Porque a fluência digital virou competência central da docência contemporânea", descricao: "Não basta dominar ferramentas — é preciso compreender quando, como e por que usar recursos digitais com intencionalidade pedagógica." },
+      { num: "02", titulo: "Porque palestrantes de referência conduzem o módulo", descricao: "Roberta Aquino (Unicamp · ISTE), Rebecca Rios (Diretora Pedagógica do Quizizz) e Bruno Reis (Google Trainer · EducaMídia) — três especialistas em formação docente." },
+      { num: "03", titulo: "Porque a abordagem combina conceito e oficinas práticas", descricao: "Autoavaliação CIEB, produção no Canva, banco de recursos como YouTube Edu, simulações PhET, e gamificação com Wayground — aplicáveis à rotina escolar." },
+      { num: "04", titulo: "Porque integra tecnologia, currículo e engajamento dos estudantes", descricao: "Estratégias replicáveis de imediato em diferentes etapas, componentes curriculares e contextos de rede." },
+      { num: "05", titulo: "Porque a experiência acontece na plataforma EventON NTC", descricao: "Ambiente virtual institucional do Instituto NTC, com transmissão ao vivo, alta definição, suporte técnico dedicado e replay garantido." },
+      { num: "06", titulo: "Porque você recebe certificação institucional do Instituto NTC do Brasil", descricao: "Certificação válida como atualização profissional, mediante 75% de presença — emitida pela referência institucional em capacitação." },
+    ],
+  },
+
+  publicoOnline: {
+    eyebrow: "Para quem",
+    h2: "Público-alvo",
+    intro: "O seminário é dimensionado para professores, gestores e equipes pedagógicas que atuam nas redes públicas de ensino:",
+    chips: [
+      "Professores da Educação Infantil, Ensino Fundamental e Médio",
+      "Coordenadores pedagógicos",
+      "Formadores de educadores",
+      "Equipes pedagógicas",
+      "Gestores escolares",
+      "Profissionais de tecnologia educacional",
+    ],
+    objetivoTitulo: "Objetivo",
+    objetivoTexto: "Desenvolver a fluência digital de docentes e equipes pedagógicas, promovendo o uso pedagogicamente qualificado de ferramentas digitais, integrando tecnologia, planejamento pedagógico e metodologias ativas, e fortalecendo práticas inovadoras, participativas e centradas na aprendizagem.",
+    destaquesTitulo: "Destaques formativos",
+    destaques: [
+      { num: "01", html: "<strong>Autoavaliação e referenciais de competência digital</strong> (descritores CIEB)." },
+      { num: "02", html: "<strong>Intencionalidade pedagógica</strong> na integração tecnológica ao currículo." },
+      { num: "03", html: "<strong>Produção e curadoria de conteúdos e recursos digitais</strong> autorais." },
+      { num: "04", html: "<strong>Adaptação e diversificação de formatos</strong> com Canva." },
+      { num: "05", html: "<strong>Gamificação e verificação de aprendizagem</strong> com Wayground." },
+    ],
+  },
+
+  programacaoOnline: {
+    eyebrow: "Cronograma",
+    h2: "Programação detalhada",
+    intro: "Quatro sessões aplicadas, oito horas de imersão ao vivo.",
+    headDayHtml: "16 de <em>Junho</em> · Terça-feira",
+    headMeta: "08h00 às 18h00 · 8 horas · EventON NTC",
+    nodes: [
+      { time: "08h00 – 09h00", ttag: "Palestra · 01", num: "I", titulo: "Descritores e autoavaliação de competências digitais", speakerLineHtml: "com <em>Roberta Aquino</em> · Doutora em Ciências · Unicamp · Google Innovator", bullets: ["Descritores de competências digitais para professores do CIEB.", "Ferramenta de autoavaliação nas dimensões pedagógica, curricular e organizacional.", "Níveis de proficiência (Exposição, Uso, Inovação) e áreas de competência."] },
+      { time: "09h00 – 10h00", ttag: "Palestra · 02", num: "II", titulo: "Intencionalidade pedagógica e integração tecnológica", speakerLineHtml: "com <em>Rebecca Rios</em> · Diretora Pedagógica · Quizizz · Google Trainer", bullets: ["Tecnologia como apoio ao planejamento e à organização docente.", "Alinhamento entre recursos digitais, objetivos de aprendizagem e currículo.", "Seleção de ferramentas conforme a finalidade pedagógica."] },
+      { time: "10h00 – 12h00", ttag: "Oficina · 01", num: "III", titulo: "Produção de materiais e recursos pedagógicos digitais", speakerLineHtml: "com <em>Bruno Reis</em> · Google Innovator · EducaMídia", bullets: ["Bancos de recursos como YouTube Edu e Arts and Culture.", "Simulações para matemática e ciências com PhET.", "Mediação docente em práticas mais dinâmicas e interativas."] },
+      { time: "14h00 – 16h00", ttag: "Oficina · 02", num: "IV", titulo: "Conteúdos digitais: adaptação e criação de recursos", speakerLineHtml: "com <em>Roberta Aquino</em> · Canva Education Partner · Canva Trainer", bullets: ["Exploração das possibilidades do Canva para autoria pedagógica.", "Busca e adaptação de conteúdos prontos com qualidade pedagógica.", "Diversificação de formatos em sala de aula."] },
+      { time: "16h00 – 18h00", ttag: "Oficina · 03", num: "V", titulo: "Gamificação e verificação de aprendizagem com Wayground", speakerLineHtml: "com <em>Bruno Reis</em> · Multiplicador EducaMídia", bullets: ["Potencial da gamificação em sala de aula.", "Busca, curadoria e criação de recursos no Wayground.", "Formas de interação e atribuição."] },
+    ],
+  },
+
+  questoesOnline: {
+    eyebrow: "O que você aprenderá",
+    h2: "As questões essenciais que serão respondidas nas sessões",
+    intro: "Vinte e seis perguntas-guia organizadas por sessão, do fundamento conceitual às oficinas aplicadas.",
+    grupos: [
+      { sessao: "Sessão · 01", titulo: "Descritores e autoavaliação de competências digitais", palestrante: "com Roberta Aquino · 08h00 – 09h00", questoes: [
+        { numero: "01", pergunta: "Quais são os descritores de competências digitais para professores propostos pelo CIEB?" },
+        { numero: "02", pergunta: "Como aplicar a ferramenta de autoavaliação nas dimensões pedagógica, curricular e organizacional?" },
+        { numero: "03", pergunta: "Quais são os três níveis de proficiência (Exposição · Uso · Inovação) e como identificar o nível atual?" },
+        { numero: "04", pergunta: "Como mapear áreas de competência: pedagógica, cidadania digital e desenvolvimento profissional?" },
+      ] },
+      { sessao: "Sessão · 02", titulo: "Intencionalidade e integração tecnológica", palestrante: "com Rebecca Rios · 09h00 – 10h00", questoes: [
+        { numero: "05", pergunta: "Como utilizar a tecnologia como apoio ao planejamento docente?" },
+        { numero: "06", pergunta: "Que critérios alinham recursos digitais, objetivos de aprendizagem e currículo?" },
+        { numero: "07", pergunta: "Como desenhar experiências de ensino mais significativas e participativas?" },
+        { numero: "08", pergunta: "Como selecionar ferramentas conforme a finalidade pedagógica?" },
+        { numero: "09", pergunta: "Como integrar planejamento, metodologia e avaliação no uso de tecnologia?" },
+      ] },
+      { sessao: "Sessão · 03", titulo: "Produção de materiais e recursos digitais", palestrante: "com Bruno Reis · 10h00 – 12h00", questoes: [
+        { numero: "10", pergunta: "Como explorar bancos como YouTube Edu e Arts and Culture?" },
+        { numero: "11", pergunta: "Como utilizar simulações do PhET para matemática e ciências?" },
+        { numero: "12", pergunta: "Quais exemplos práticos de atividades com apoio tecnológico funcionam em sala?" },
+        { numero: "13", pergunta: "Como qualificar a mediação docente em práticas dinâmicas?" },
+      ] },
+      { sessao: "Sessão · 04", titulo: "Curadoria pedagógica de recursos digitais", palestrante: "com Roberta Aquino · 14h00 – 16h00", questoes: [
+        { numero: "17", pergunta: "O que é curadoria pedagógica e por que ela é central no planejamento docente?" },
+        { numero: "18", pergunta: "Quais critérios devem orientar a busca, seleção e avaliação de recursos digitais?" },
+        { numero: "19", pergunta: "Como avaliar a qualidade pedagógica e a aderência ao contexto de uma plataforma ou conteúdo?" },
+        { numero: "20", pergunta: "Que ferramentas e referenciais apoiam a curadoria docente cotidiana?" },
+        { numero: "21", pergunta: "Como diferenciar recursos pedagógicos qualificados de conteúdos rasos ou puramente comerciais?" },
+        { numero: "22", pergunta: "De que forma a curadoria pode ampliar a participação e a expressão dos estudantes?" },
+        { numero: "23", pergunta: "Como organizar institucionalmente bancos de recursos digitais para a rede?" },
+      ] },
+      { sessao: "Sessão · 05", titulo: "Transformação digital na educação: da visão à implementação", palestrante: "com Roberta Aquino · 16h00 – 18h00", questoes: [
+        { numero: "24", pergunta: "O que diferencia transformação digital de mera digitalização de processos escolares?" },
+        { numero: "25", pergunta: "Quais são as prioridades institucionais para implementar a agenda digital na rede?" },
+        { numero: "26", pergunta: "Como articular currículo, formação docente e cultura institucional nessa transição?" },
+        { numero: "27", pergunta: "Que arquitetura de governança digital é adequada à escola pública brasileira?" },
+        { numero: "28", pergunta: "Como construir uma trilha pedagógica integradora ao longo da educação básica?" },
+        { numero: "29", pergunta: "Como sustentar a transformação digital diante de mudanças de gestão e ciclo político?" },
+      ] },
+    ],
+    naPratica: {
+      titulo: "Na prática · o que você levará do módulo para a sua rede",
+      itens: [
+        "Repertório conceitual ampliado sobre educação digital e midiática.",
+        "Diretrizes para integrar cultura digital ao currículo.",
+        "Caminhos para articular currículo, formação e governança.",
+        "Critérios institucionais para curadoria pedagógica de recursos.",
+        "Instrumentos para avaliar maturidade digital da rede.",
+        "Subsídios para projetos integradores e trilhas formativas.",
+      ],
+    },
+  },
+
+  palestrantesOnline: {
+    eyebrow: "Quem ensina",
+    h2Html: "Três especialistas de <em>referência nacional</em>",
+    intro: "Cultura digital, educação midiática e inovação pedagógica em fluência digital docente.",
+    palestrantes: [
+      { foto: "", roleTag: "Palestrante", nome: "Roberta Aquino", credentials: "Doutora em Ciências · Unicamp · Educadora ISTE · Google Innovator", bio: "Professora de pós-graduação, palestrante internacional e consultora educacional, capacita professores e instituições a prosperarem na era digital. Especialista em tecnologias educacionais, metodologias ativas e inovação. Doutora em Ciências pela Unicamp, com duas especializações em TI e MBA em Marketing pela ESPM. Educadora Certificada ISTE, Google Innovator, Trainer e Coach, Líder do GEG CDMX e Mentora GEG para a América Latina. Canva Education Partner, Trainer, Canvassador e Edu Canva Creator. Embaixadora de Genially, Wakelet, Wayground, MagicSchool, Padlet e BookCreator. Brasileira radicada no México desde 2018." }, // TODO: foto sobe depois
+      { foto: "", roleTag: "Palestrante", nome: "Rebecca Rios", credentials: "Diretora Pedagógica · Quizizz · Google Trainer · CliftonStrengths", bio: "Diretora Pedagógica do Quizizz, plataforma global de aprendizagem ativa utilizada por milhões de educadores e estudantes ao redor do mundo. Com mais de 15 anos de experiência em educação bilíngue, inovação educacional e tecnologia, atua na interseção entre pedagogia e design de experiências de aprendizagem envolventes e eficazes. Liderou iniciativas de formação docente, desenvolvimento de currículos digitais e implementação de metodologias ativas em diferentes contextos. É Google Trainer desde 2019 e líder certificada em CliftonStrengths pela Gallup." }, // TODO: foto sobe depois
+      { foto: "", roleTag: "Palestrante", nome: "Bruno Reis", credentials: "Google Innovator · Trainer · Coach · Multiplicador EducaMídia", bio: "Licenciado em História, especialista em Aprendizagem Cooperativa e Tecnologia Educacional na Educação Básica, em Gestão Escolar e em Aprendizagem Ativa e Tecnologias Educacionais. É Google Innovator, Google Trainer, Google Coach, Multiplicador EducaMídia e Educador Maker, com atuação em formação docente e desenvolvimento de práticas pedagógicas inovadoras para a educação básica." }, // TODO: foto sobe depois
+    ],
+    nota: "Fotografias oficiais dos palestrantes serão sincronizadas a partir do folder do evento via CMS.",
+  },
+
+  eventonOnline: {
+    eyebrow: "Plataforma de acesso",
+    h2Html: "Como funciona no <em>EventON NTC</em>",
+    intro: "O seminário acontece na plataforma institucional do Instituto NTC do Brasil — ambiente virtual seguro com transmissão ao vivo, suporte dedicado e replay protegido.",
+    markNameHtml: "Event<em>ON</em>",
+    markTag: "Plataforma Institucional · NTC",
+    stats: [
+      { n: "5.000", l: "Participantes simultâneos" },
+      { n: "30 FPS", l: "Vídeo em alta definição" },
+      { n: "100%", l: "Acesso institucional" },
+    ],
+    feats: [
+      { iconeSvgInner: `<path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4Z"/>`, titulo: "Plataforma segura e escalável", descricao: "Alcance de até 5.000 participantes simultâneos, com estabilidade operacional e segurança institucional para eventos formais." },
+      { iconeSvgInner: `<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 22h8"/>`, titulo: "Alta definição", descricao: "Transmissão em 30 FPS, com vídeo e áudio de alta qualidade independente do dispositivo — desktop, laptop, tablet ou telefone." },
+      { iconeSvgInner: `<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>`, titulo: "Fácil e acessível", descricao: "Nenhum download é necessário. Acesso individual por login e senha, com interface simplificada e navegação institucional intuitiva." },
+      { iconeSvgInner: `<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/>`, titulo: "Interação ao vivo", descricao: "Faça perguntas, participe de pesquisas em tempo real e até apresente conteúdos em momentos previamente combinados com a coordenação." },
+      { iconeSvgInner: `<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>`, titulo: "Replay institucional · 7 dias", descricao: "Acesso ao replay integral do evento por 7 dias após a realização — para revisão, aprofundamento e referência institucional posterior." },
+      { iconeSvgInner: `<circle cx="12" cy="9" r="6"/><path d="M9 14.5V21l3-2 3 2v-6.5"/>`, titulo: "Certificação institucional", descricao: "Certificado válido como atualização profissional, mediante 75% de presença — emitido pelo Instituto NTC do Brasil." },
+    ],
+  },
+
+  investimentoOnline: {
+    eyebrow: "Investimento",
+    h2: "Investimento e condições",
+    intro: "Modalidades de contratação flexíveis para inscrição individual, equipes e instituições públicas.",
+    priceLabel: "Inscrição individual",
+    priceValueHtml: `<span class="cur">R$</span><span class="amt">1.470</span>`,
+    priceSub: "por inscrição individual · evento on-line ao vivo de 8 horas",
+    includesTitulo: "O que está incluído",
+    includes: [
+      "Apostila digital específica do módulo-evento",
+      "Certificado digital emitido pelo Instituto NTC do Brasil",
+      "Acesso individual ao ambiente EventON NTC",
+      "Replay integral pelo período informado no folder",
+      "Suporte técnico para acesso ao ambiente virtual",
+    ],
+    modes: [
+      { tag: "Individual", titulo: "Inscrição individual", descricao: "Indicada para participantes avulsos, profissionais independentes, empresas, entidades privadas ou inscrições pontuais realizadas por órgãos e instituições." },
+      { tag: "Grupo", titulo: "Grupos institucionais", descricao: "Órgãos públicos, secretarias, redes de ensino, entidades e instituições interessadas na inscrição de múltiplos participantes poderão solicitar condição comercial diferenciada." },
+      { tag: "Institucional", titulo: "Grandes grupos e turmas fechadas", descricao: "Para demandas ampliadas, redes públicas, secretarias, consórcios ou grupos estratégicos, o Instituto NTC poderá apresentar proposta personalizada com condições diferenciadas.", featured: true },
+    ],
+  },
+
+  regrasOnline: {
+    eyebrow: "Política comercial",
+    h2: "Regras de participação",
+    rules: [
+      "O cancelamento e/ou a substituição de inscrição deverá ser solicitado por escrito, pelo e-mail eventosonline@institutontc.com.br ou WhatsApp (63) 98444-4040, até 2 dias úteis antes da realização do evento.",
+      "A substituição deverá indicar os dados completos do novo participante — nome completo, e-mail funcional ou institucional, telefone/WhatsApp e órgão de vinculação — para liberação do acesso individual.",
+      "A inscrição contratada garante a disponibilização do acesso ao evento on-line ao vivo, ao ambiente EventON NTC, ao material digital, ao suporte técnico e ao replay pelo período informado neste folder.",
+      "A ausência, o não acesso, o acesso parcial, o não uso do replay dentro do prazo ou o não cumprimento dos critérios mínimos de presença não implicam reembolso, cancelamento automático ou isenção de pagamento, desde que os meios de acesso tenham sido regularmente disponibilizados pelo Instituto NTC.",
+      "Para inscrições institucionais em grupo, a Contratante poderá encaminhar relação consolidada de participantes, preferencialmente em planilha, para cadastramento conjunto e liberação dos acessos individuais.",
+      "A relação deverá ser enviada preferencialmente até 2 dias úteis antes do evento, a fim de viabilizar o cadastro, o envio dos acessos e o suporte operacional.",
+      "Os inscritos poderão acessar o replay pelo período informado neste folder, observadas as regras de acesso individual e vedado o compartilhamento de login, senha, som, imagem, gravação ou reprodução por qualquer meio.",
+      "A certificação será emitida somente após o encerramento do prazo de replay, exclusivamente aos participantes que cumprirem os critérios mínimos de presença e registro no ambiente.",
+    ],
+  },
+
+  ctaFinalOnline: {
+    eyebrowGold: "Próximo passo",
+    h2Html: "Garanta sua participação no <em>Módulo 02 EDUTEC</em>.",
+    paragrafo: "Inscrições abertas. Vagas individuais e condição institucional para equipes e órgãos.",
+    ctas: [
+      { texto: "Inscrever-se agora", href: "/contato?evento=EDUTEC+M%C3%B3dulo+02&evento_url=/agenda/edutec-m02-2026", cmsLink: "inscricao-EDUTEC-M02-2026-jun", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+02&evento_url=/agenda/edutec-m02-2026#tab-equipe", cmsLink: "proposta-grupo-EDUTEC-M02", classe: "btn btn--secondary" },
+    ],
+  },
+
+  sidebarOnline: {
+    coverImg: "/img/fotos/_optimized/area-educacao.1920.webp",
+    status: "Inscrições abertas",
+    coverEventonHtml: "Acesso via <em>EventON</em>",
+    tituloTag: "Módulo 02 · Trilha EDUTEC",
+    rows: [
+      { label: "Quando", value: "16 · Jun · 2026" },
+      { label: "Modalidade", value: "Online ao vivo + replay" },
+      { label: "Carga horária", value: "8 horas" },
+      { label: "Plataforma", value: "EventON NTC" },
+      { label: "Investimento", value: "R$ 1.470", price: true },
+    ],
+    includes: {
+      titulo: "O que está incluído",
+      items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Apostila digital do módulo", "Certificado institucional", "Suporte técnico dedicado", "Acesso ao ambiente EventON NTC"],
+    },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 16 de Junho de 2026", deadline: "2026-06-16T23:59:59-03:00", tipo: "numerico" },
+    acoes: [
+      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+02&evento_url=/agenda/edutec-m02-2026", cmsLink: "inscricao-EDUTEC-M02-2026-jun", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+02&evento_url=/agenda/edutec-m02-2026#tab-equipe", cmsLink: "inscricao-equipe-EDUTEC-M02", classe: "btn btn--secondary" },
+    ],
+    share: { label: "Compartilhar:", links: [
+      { texto: "WhatsApp", href: "#", cmsLink: "share-whatsapp" },
+      { texto: "E-mail", href: "#", cmsLink: "share-email" },
+      { texto: "LinkedIn", href: "#", cmsLink: "share-linkedin" },
+    ] },
+  },
+
+  relatedOnline: {
+    eyebrowGold: "Trilha EDUTEC · Próximos módulos",
+    h2: "Continue a jornada de educação digital",
+    introHtml: "Outros módulos da trilha <strong>EDUTEC</strong> e eventos da <strong>NTC Educação</strong> com inscrições antecipadas.",
+    cards: [
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "range", daysStart: "22", dash: "–", daysEnd: "23", monYr: "Mai · 2026" }, program: "Seminário · NTC Educação", titulo: "Alfabetização de Alta Performance: estratégias para recomposição", programBinding: "PEAR", metaHtml: "Online · 16h · 2 dias <strong>R$ 1.490</strong>", cta: { texto: "Inscrever-se", href: "#contato", cmsLink: "inscricao-PEAR-2026-mai", classe: "es-cta" } },
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "single", day: "24", monYr: "Jun · 2026" }, program: "Seminário · NTC Educação", titulo: "Módulo 02 EDUTEC: IA, Currículo e Aprendizagem", programBinding: "EDUTEC", metaHtml: "Online · 8h · 1 dia <strong>Sob consulta</strong>", cta: { texto: "Saiba mais", href: "#contato", cmsLink: "inscricao-EDUTEC-M02-2026-jun", classe: "es-cta" } },
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "single", day: "25", monYr: "Jun · 2026" }, program: "Curso Executivo · NTC Educação", titulo: "Coordenação pedagógica orientada a resultados", programBinding: "PROGE", metaHtml: "Online · 20h · 3 dias <strong>R$ 1.690</strong>", cta: { texto: "Inscrever-se", href: "#contato", cmsLink: "inscricao-PROGE-2026-jun", classe: "es-cta" } },
+    ],
+    footerCtas: [
+      { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
+      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+    ],
+  },
+};
+
 // ----------------- Record exportado -----------------
 
 export const EVENTOS_AGENDA: Record<string, Evento> = {
   "prosus-brasilia": eventoProsusBrasilia,
   "edutec-m01-2026": eventoEdutecM01,
+  "edutec-m02-2026": eventoEdutecM02,
 };
