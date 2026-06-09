@@ -13,7 +13,7 @@ O erro caro: **portar a partir do PDF + um protótipo de OUTRO evento**, em vez 
 
 **Regra de ouro (memory `feedback_prototipo_dedicado_em_feito`):** a fonte de verdade é o **protótipo HTML dedicado**, não o PDF. O PDF dá os TEXTOS; o protótipo dá o DESIGN e a ORDEM das seções e os DADOS factuais (data, preço).
 
-## Fluxo (7 passos)
+## Fluxo (8 passos)
 
 ### 1. Ler o PDF inteiro
 `pdftotext -layout "<arquivo>.pdf" -`. Se faltar `pdftotext`: `brew install poppler` (com OK do usuário). Para layout visual, leitura por páginas via Read.
@@ -46,11 +46,21 @@ Em `apps/web/app/(capacitacao)/agenda/[slug]/` já existem e são genéricos:
 
 Os 4 client components já usam classes `evt-*` — costumam ser **reaproveitáveis sem mudança**.
 
-### 6. Cadastrar como evento ESTÁTICO (não CMS)
-Adicionar `eventoXxx: EventoOnline|EventoPresencial|EventoHibrido` em `conteudoEventos.ts` + registrar em `EVENTOS_AGENDA["slug"]`. **Não** mexer no CMS (memory `feedback_cms_apenas_quando_pedido`) salvo pedido explícito. Conteúdo do PDF sem lugar no protótipo → seção extra no MESMO estilo (não inventar design; ex.: "questões formativas" do EDUTEC).
+### 6. Cadastrar o CONTEÚDO como evento ESTÁTICO
+Adicionar `eventoXxx: EventoOnline|EventoPresencial|EventoHibrido` em `conteudoEventos.ts` + registrar em `EVENTOS_AGENDA["slug"]`. O conteúdo da página vem SEMPRE do estático (textos validados); o CMS é índice + override de capa/data/folder (passo 7). Conteúdo do PDF sem lugar no protótipo → seção extra no MESMO estilo (não inventar design; ex.: "questões formativas" do EDUTEC).
 
-### 7. Validar + checkpoint visual humano
-`pnpm typecheck && pnpm lint && pnpm build`. `pnpm --filter @ntc/web exec next dev --port 3000` (NÃO `pnpm dev`). Curl `/agenda/<slug>` = 200; conferir que outro evento (ex. `prosus-brasilia`) não regrediu. **Validação visual é humana** contra o protótipo (memory `feedback_validacao_visual`).
+### 7. Criar o REGISTRO no CMS (sempre, via seed idempotente)
+Todo evento portado ganha um registro na coleção `eventos` do Payload — para listar no admin/índice e permitir editar **capa, data e folder PDF** (override por slug). É um seed programático idempotente, espelho de `apps/cms/src/seed/seedEventoEdutecM01.ts`:
+- `payload.find({collection:"eventos", where:{slug:{equals}}})` → update se existe, create senão.
+- Campos: `slug`, `nome`, `eyebrow`, `area` (resolver por sigla — **área de educação = `"educacao"`, NÃO `"edu"`**; ver `AREA_SIGLAS` em `apps/cms/src/shared/types.ts`), `programa` (resolver por `sigla`), `imagemCapa` (required → resolver uma media existente por filename, ex. `area-educacao`), `dataInicio` (ISO), `modalidade` (online/presencial/hibrido), `cargaHoraria`, `resumo`, `inscricaoAberta`.
+- Adicionar script em `apps/cms/package.json` e raiz `package.json` (`payload:seed:<slug>`), espelhando `payload:seed:edutec`.
+- Rodar: `pnpm payload:seed:<slug>` (sobe Payload efêmero, aplica schema se mudou, cria registro). Rodar 2× confirma idempotência ("atualizado").
+- **Schema push:** se você adicionou campo novo à coleção, o push é automático ao subir o Payload. Antes, checar `lsof -ti tcp:3001` — se a sessão CMS está rodando, há risco de colisão de schema ([[feedback_db_push_paralelo]]); rodar mesmo assim falha limpo, não corrompe.
+
+> O conteúdo da página NÃO vem do CMS. `page.tsx`: se há estático online para o slug, ELE é a fonte e `buscarOverride` sobrescreve só capa/data/folder. NÃO deixar o `fetchEvento`/`adaptarEvento` completo "ganhar" do estático — ele devolve um EventoOnline sem as seções `*Online` e a página renderiza vazia. Ver [[project_infra_evento_agenda]].
+
+### 8. Validar + checkpoint visual humano
+`pnpm typecheck && pnpm lint && pnpm --filter @ntc/web build` (buildar SÓ o web isola de erros do `@ntc/cms` causados por sessão CMS paralela). `pnpm --filter @ntc/web exec next dev --port 3000` (NÃO `pnpm dev`; 1ª req pode levar ~3min por schema pull). Curl `/agenda/<slug>` = 200; conferir que outro evento (ex. `prosus-brasilia`) não regrediu, e que a capa do CMS aparece no hero/sidebar (URL `storage/v1/object/public`). **Validação visual é humana** contra o protótipo (memory `feedback_validacao_visual`).
 
 ## Decisões que SEMPRE pergunto ao usuário
 
@@ -67,9 +77,11 @@ Escrever spec em `docs/superpowers/specs/` (template em `portar-prototipo/spec-t
 - "Vou portar a partir do folder + o protótipo do outro evento" → ache o protótipo DESTE evento primeiro.
 - "Não achei protótipo dedicado, vou usar o genérico" → pergunte ao usuário.
 - "A data/preço do PDF deve valer" → confirme; protótipo costuma ser mais novo.
-- "Vou cadastrar no CMS" → só se pedido; padrão é estático.
+- "O conteúdo da página vem do CMS" → NÃO. Conteúdo = estático; CMS = índice + override de capa/data/folder.
+- "Pulo o registro no CMS" → NÃO. Todo evento portado ganha registro no CMS (passo 7), via seed idempotente.
+- "Área de educação é sigla `edu`" → é `educacao` (ver `AREA_SIGLAS`); `edu` quebra o enum no seed.
 - "Modalidade é óbvia" → confirme pela presença/ausência de endereço e EventON.
 
 ## Memórias aplicáveis
 
-[[feedback_prototipo_dedicado_em_feito]] · [[feedback_porta_html_fidelidade]] · [[feedback_cms_apenas_quando_pedido]] · [[feedback_validacao_visual]] · [[feedback_css_url_absoluto]] · [[project_porta_html]] · [[feedback_build_pega_a_rota_interna]]
+[[feedback_prototipo_dedicado_em_feito]] · [[feedback_porta_html_fidelidade]] · [[project_infra_evento_agenda]] · [[feedback_validacao_visual]] · [[feedback_css_url_absoluto]] · [[project_porta_html]] · [[feedback_build_pega_a_rota_interna]] · [[feedback_db_push_paralelo]] · [[feedback_autonomia_total_execucao]]
