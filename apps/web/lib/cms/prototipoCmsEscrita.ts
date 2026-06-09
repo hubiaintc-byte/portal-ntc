@@ -134,10 +134,11 @@ export async function despublicarEvento(id: string): Promise<ResultadoEscrita> {
  * de eventos. Usado para tirar do ar quem ainda está com foto genérica, sem
  * precisar deletar o cadastro.
  *
- * A coleção tem drafts habilitados e 47 dos 63 especialistas estão em
- * rascunho. draft:true preserva o estado de publicação (não publica um
- * rascunho sem querer só por alternar a visibilidade) — alinhado com o
- * padrão de salvarCamposEvento.
+ * O site lê o REGISTRO PUBLICADO do especialista (find/findGlobal sem
+ * draft:true). A coleção tem drafts habilitados, então gravar com draft:true
+ * deixaria o flag só na versão de rascunho — e o site nunca o veria. Por isso
+ * grava no registro principal SEM draft:true, mas reenviando o `_status`
+ * atual para NÃO publicar sem querer um especialista que está em rascunho.
  */
 export async function definirOcultarPalestrante(
   id: string,
@@ -145,11 +146,19 @@ export async function definirOcultarPalestrante(
 ): Promise<ResultadoEscrita> {
   try {
     const payload = await obterPayload();
+    // Lê o estado de publicação atual para preservá-lo na escrita.
+    const atual = (await payload.findByID({
+      collection: "especialistas",
+      id,
+      draft: true,
+      overrideAccess: true,
+    })) as { _status?: "draft" | "published" | null };
+    const status = atual._status === "published" ? "published" : "draft";
+
     await payload.update({
       collection: "especialistas",
       id,
-      data: { ocultarDoSite: oculto },
-      draft: true,
+      data: { ocultarDoSite: oculto, _status: status },
       overrideAccess: true,
     });
     return { ok: true };
