@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
 
+import { buscarOverride } from "@/lib/cms/overrideEventoOnline";
 import { paraCartaoAgenda } from "@/lib/eventos/adaptarParaCard";
 
 import {
@@ -17,13 +18,30 @@ import {
 import { PipelineAgenda } from "./PipelineAgenda";
 import { StickyMobileCTA } from "./StickyMobileCTA";
 
-// Eventos reais (EVENTOS_AGENDA via adapter) substituem o array mockado.
-const eventosAgenda: CartaoEvento[] = EVENTOS_LISTAGEM.map(
-  (slug) => EVENTOS_AGENDA[slug],
-)
-  .filter((e): e is NonNullable<typeof e> => Boolean(e))
-  .map((e, i) => paraCartaoAgenda(e, i + 1))
-  .filter((c): c is CartaoEvento => Boolean(c));
+type EventoReal = NonNullable<(typeof EVENTOS_AGENDA)[keyof typeof EVENTOS_AGENDA]>;
+
+/**
+ * Sobrescreve a capa estática de cada evento (`card.imagemUrl`) pela capa do
+ * CMS quando houver, casando por slug via `buscarOverride` — mesma lógica da
+ * Home (`aplicarCapaCms`), para que os cards da agenda exibam a mesma capa.
+ * Falha do CMS → mantém a capa estática.
+ */
+async function aplicarCapaCms(eventos: EventoReal[]): Promise<EventoReal[]> {
+  return Promise.all(
+    eventos.map(async (e) => {
+      if (!e.slug || !e.card) return e;
+      try {
+        const ovr = await buscarOverride(e.slug);
+        if (ovr?.coverUrl) {
+          return { ...e, card: { ...e.card, imagemUrl: ovr.coverUrl } };
+        }
+      } catch {
+        // CMS fora do ar → capa estática (fallback silencioso).
+      }
+      return e;
+    }),
+  );
+}
 
 export const revalidate = 3600;
 
@@ -46,7 +64,16 @@ export const metadata: Metadata = {
  *
  * Header/Footer/InteracoesScroll vêm do layout do route group (capacitacao).
  */
-export default function AgendaPage() {
+export default async function AgendaPage() {
+  // Eventos reais (EVENTOS_AGENDA via adapter) substituem o array mockado.
+  const eventosBase = EVENTOS_LISTAGEM.map((slug) => EVENTOS_AGENDA[slug]).filter(
+    (e): e is EventoReal => Boolean(e),
+  );
+  const eventosReais = await aplicarCapaCms(eventosBase);
+  const eventosAgenda: CartaoEvento[] = eventosReais
+    .map((e, i) => paraCartaoAgenda(e, i + 1))
+    .filter((c): c is CartaoEvento => Boolean(c));
+
   return (
     <main id="main">
       {/* 1. BREADCRUMB */}
