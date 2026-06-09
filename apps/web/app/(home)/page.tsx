@@ -8,6 +8,7 @@ import {
   paraCardHomePrincipal,
   paraCardHomeSecundario,
 } from "@/lib/eventos/adaptarParaCard";
+import { buscarOverride } from "@/lib/cms/overrideEventoOnline";
 
 import { SliderHero, type SlidePremium } from "./SliderHero";
 import { FALLBACK_HOME } from "./conteudoFallback";
@@ -39,21 +40,47 @@ export const metadata: Metadata = {
 
 const f = FALLBACK_HOME;
 
-// Eventos reais (EVENTOS_AGENDA via adapter) substituem os mockados.
-// Grandes = card.destaqueHome (EDUTEC M01/M02/M04); menores = os demais (PROGE).
-const eventosReais = EVENTOS_LISTAGEM.map((slug) => EVENTOS_AGENDA[slug]).filter(
-  (e): e is NonNullable<typeof e> => Boolean(e),
-);
-const eventosPrincipais = eventosReais
-  .filter((e) => e.card?.destaqueHome)
-  .map(paraCardHomePrincipal)
-  .filter((c): c is NonNullable<typeof c> => Boolean(c));
-const eventosSecundarios = eventosReais
-  .filter((e) => !e.card?.destaqueHome)
-  .map(paraCardHomeSecundario)
-  .filter((c): c is NonNullable<typeof c> => Boolean(c));
+type EventoReal = NonNullable<(typeof EVENTOS_AGENDA)[keyof typeof EVENTOS_AGENDA]>;
 
-export default function HomePage() {
+/**
+ * Sobrescreve a capa estática de cada evento (`card.imagemUrl`) pela capa do
+ * CMS quando houver, casando por slug via `buscarOverride` (mesma fonte da
+ * página /agenda/[slug]). Falha do CMS → mantém a capa estática. Só a capa é
+ * sobrescrita aqui; o resto do card permanece do conteúdo aprovado.
+ */
+async function aplicarCapaCms(eventos: EventoReal[]): Promise<EventoReal[]> {
+  return Promise.all(
+    eventos.map(async (e) => {
+      if (!e.slug || !e.card) return e;
+      try {
+        const ovr = await buscarOverride(e.slug);
+        if (ovr?.coverUrl) {
+          return { ...e, card: { ...e.card, imagemUrl: ovr.coverUrl } };
+        }
+      } catch {
+        // CMS fora do ar → capa estática (fallback silencioso).
+      }
+      return e;
+    }),
+  );
+}
+
+export default async function HomePage() {
+  // Eventos reais (EVENTOS_AGENDA via adapter) substituem os mockados.
+  // Grandes = card.destaqueHome (EDUTEC M01/M02/M04); menores = os demais (PROGE).
+  const eventosBase = EVENTOS_LISTAGEM.map((slug) => EVENTOS_AGENDA[slug]).filter(
+    (e): e is EventoReal => Boolean(e),
+  );
+  const eventosReais = await aplicarCapaCms(eventosBase);
+  const eventosPrincipais = eventosReais
+    .filter((e) => e.card?.destaqueHome)
+    .map(paraCardHomePrincipal)
+    .filter((c): c is NonNullable<typeof c> => Boolean(c));
+  const eventosSecundarios = eventosReais
+    .filter((e) => !e.card?.destaqueHome)
+    .map(paraCardHomeSecundario)
+    .filter((c): c is NonNullable<typeof c> => Boolean(c));
+
   return (
     <main id="main">
       <SliderHero slides={f.slider.slides as SlidePremium[]} intervaloMs={f.slider.intervaloMs} />
