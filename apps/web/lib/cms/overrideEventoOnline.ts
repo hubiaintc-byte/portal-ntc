@@ -75,7 +75,13 @@ async function buscarFotosPalestrantes(
       overrideAccess: true,
     });
     const mapa: Record<string, string> = {};
-    for (const esp of res.docs as Array<{ nome?: string; foto?: UploadComUrl }>) {
+    for (const esp of res.docs as Array<{
+      nome?: string;
+      foto?: UploadComUrl;
+      ocultarDoSite?: boolean | null;
+    }>) {
+      // Oculto no CMS → não injeta foto; o palestrante volta ao estático.
+      if (esp.ocultarDoSite) continue;
       const url = urlDoUpload(esp.foto);
       if (esp.nome && url) {
         mapa[normalizarNome(esp.nome)] = url;

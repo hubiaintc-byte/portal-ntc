@@ -151,6 +151,15 @@ function adaptarCards(g: CorpoDocenteGlobal): CardsAdaptados {
       continue;
     }
 
+    // Especialista marcado como oculto no CMS (ex.: ainda com foto genérica)
+    // não entra na grade nem nos featured.
+    if (esp.ocultarDoSite) {
+      console.warn(
+        `[cms/corpoDocente] especialista '${esp.nome}' oculto do site — card omitido.`,
+      );
+      continue;
+    }
+
     if (card.formato === "featured") {
       featured.push(adaptarCardFeatured(card, esp));
     } else {

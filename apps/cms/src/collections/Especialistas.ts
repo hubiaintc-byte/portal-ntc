@@ -58,6 +58,17 @@ export const Especialistas: CollectionConfig = {
       admin: { description: "Proporção 20:23 — conforme skill ntc-palestrantes." },
     },
     {
+      name: "ocultarDoSite",
+      type: "checkbox",
+      defaultValue: false,
+      label: "Ocultar do site",
+      admin: {
+        position: "sidebar",
+        description:
+          "Quando marcado, o especialista não aparece em nenhuma página pública (Corpo Docente e palestrantes de eventos). Use para quem ainda está com foto genérica.",
+      },
+    },
+    {
       name: "titulacao",
       type: "select",
       options: TITULACAO_DOCENTE.map((t) => ({ label: t, value: t })),
