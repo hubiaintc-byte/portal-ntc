@@ -244,6 +244,7 @@ export interface HeroOnline {
   tags: HeroOnlineTag[];
   h1Html: string;            // pode conter <em>
   sub: string;
+  bgUrl?: string;            // capa do hero; sobrescrita pelo override do CMS
   programBinding: { texto: string; href: string; cmsLink?: string; nomePrograma: string };
   ctas: LinkInterno[];
 }

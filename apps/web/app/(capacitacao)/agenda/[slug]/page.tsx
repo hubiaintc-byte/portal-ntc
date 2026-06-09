@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { fetchEvento } from "@/lib/cms/eventos";
+import { aplicarOverrideOnline, buscarOverride } from "@/lib/cms/overrideEventoOnline";
 
 import { EVENTOS_AGENDA } from "./conteudoEventos";
 import { EventoPresencialLayout } from "./EventoPresencialLayout";
@@ -64,7 +65,10 @@ export default async function EventoPage({ params }: PageProps) {
     case "presencial":
     case "hibrido":
       return <EventoPresencialLayout evento={evento} />;
-    case "online":
-      return <EventoOnlineLayout evento={evento} />;
+    case "online": {
+      const ovr = await buscarOverride(slug);
+      const eventoFinal = ovr ? aplicarOverrideOnline(evento, ovr) : evento;
+      return <EventoOnlineLayout evento={eventoFinal} />;
+    }
   }
 }

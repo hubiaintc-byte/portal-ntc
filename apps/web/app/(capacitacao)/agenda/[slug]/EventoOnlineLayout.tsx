@@ -47,7 +47,9 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
         <section className="evt-hero" aria-label={`${evento.titulo} ${evento.dataEvento}`}>
           <div
             className="evt-hero-bg"
-            style={{ backgroundImage: "url('/img/fotos/_optimized/area-educacao.1920.webp')" }}
+            style={{
+              backgroundImage: `url('${hero.bgUrl ?? "/img/fotos/_optimized/area-educacao.1920.webp"}')`,
+            }}
             aria-hidden="true"
           />
           <div className="container evt-hero-content fade-in">
@@ -65,11 +67,17 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
               </strong>
             </div>
             <div className="evt-hero-ctas">
-              {hero.ctas.map((cta, i) => (
-                <a key={i} className={cta.classe} href={cta.href} data-cms-link={cta.cmsLink}>
-                  {cta.texto}{cta.arrow && <span className="btn-arrow"> →</span>}
-                </a>
-              ))}
+              {hero.ctas
+                .filter((cta) => {
+                  // CTA "Baixar folder" só aparece quando há PDF real (href != placeholder).
+                  const ehFolder = /folder/i.test(cta.cmsLink ?? "");
+                  return !ehFolder || (cta.href !== "#" && cta.href !== "");
+                })
+                .map((cta, i) => (
+                  <a key={i} className={cta.classe} href={cta.href} data-cms-link={cta.cmsLink}>
+                    {cta.texto}{cta.arrow && <span className="btn-arrow"> →</span>}
+                  </a>
+                ))}
             </div>
           </div>
         </section>
