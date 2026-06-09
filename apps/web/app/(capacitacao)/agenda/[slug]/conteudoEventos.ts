@@ -287,7 +287,7 @@ export interface ProgramacaoOnline {
   eyebrow: string;
   h2: string;
   intro: string;
-  headDayHtml: string;       // "27 de <em>Maio</em> · Quarta-feira"
+  headDayHtml: string;       // "15 de <em>Junho</em> · Segunda-feira"
   headMeta: string;          // "08h00 às 18h00 · 8 horas · EventON NTC" (sep via render)
   nodes: ScheduleNode[];     // 4
 }
@@ -918,7 +918,7 @@ const eventoEdutecM01: EventoOnline = {
   subtitulo:
     "Fundamentos, repertórios e práticas para consolidar uma pedagogia crítica, conectada e institucionalmente alinhada à cultura digital contemporânea.",
   formato: "online",
-  dataEvento: "27 de maio de 2026",
+  dataEvento: "15 de junho de 2026",
   area: "edu",
 
   // Campos de EventoBase não usados pelo layout online (vazios):
@@ -967,7 +967,7 @@ const eventoEdutecM01: EventoOnline = {
   sidebar: {
     coverImg: "", status: "", tituloCard: "", rows: [],
     includes: { titulo: "", items: [] },
-    countdown: { label: "", dateText: "", deadline: "2026-05-20T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "", dateText: "", deadline: "2026-06-15T23:59:59-03:00", tipo: "numerico" },
     acoes: [], share: { label: "", links: [] },
   },
   relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
@@ -975,9 +975,9 @@ const eventoEdutecM01: EventoOnline = {
     titulo: "Seminário EDUTEC · Cultura Digital, Educação Midiática e Transformação da Educação",
     descricao: "Seminário On-Line ao Vivo do programa EDUTEC · Grupo NTC. Acesso pela plataforma EventON NTC.",
     location: "Plataforma EventON NTC · Online",
-    startISO: "20260527T080000",
-    endISO: "20260527T180000",
-    filename: "EDUTEC-M01-2026-mai.ics",
+    startISO: "20260615T080000",
+    endISO: "20260615T180000",
+    filename: "EDUTEC-M01-2026-jun.ics",
   },
 
   // ---- Seções evt-* (consumidas pelo EventoOnlineLayout) ----
@@ -996,14 +996,14 @@ const eventoEdutecM01: EventoOnline = {
       nomePrograma: "EDUTEC — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino",
     },
     ctas: [
-      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-mai", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-jun", classe: "btn btn--gold", arrow: true },
       { texto: "Baixar folder", href: "#", cmsLink: "folder-EDUTEC-M01", classe: "btn btn--ghost-light" },
       { texto: "Inscrever equipe ou grupo", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026#tab-equipe", cmsLink: "proposta-grupo-EDUTEC-M01", classe: "btn btn--ghost-light" },
     ],
   },
 
   metasOnline: [
-    { label: "Quando", value: "27 · Maio", valueSub: "2026 · Quarta-feira" },
+    { label: "Quando", value: "15 · Junho", valueSub: "2026 · Segunda-feira" },
     { label: "Modalidade", value: "Ao vivo", valueSub: "+ replay por 7 dias" },
     { label: "Carga horária", value: "8 horas", valueSub: "Manhã (4h) + Tarde (4h)" },
     { label: "Plataforma", value: "EventON NTC", valueSub: "Acesso individual" },
@@ -1058,7 +1058,7 @@ const eventoEdutecM01: EventoOnline = {
     eyebrow: "Cronograma",
     h2: "Programação detalhada",
     intro: "Quatro sessões aplicadas, oito horas de imersão ao vivo combinando palestra, oficinas e síntese pedagógica final.",
-    headDayHtml: "27 de <em>Maio</em> · Quarta-feira",
+    headDayHtml: "15 de <em>Junho</em> · Segunda-feira",
     headMeta: "08h00 às 18h00 · 8 horas · EventON NTC",
     nodes: [
       { time: "08h00 – 10h00", ttag: "Palestra · 01", num: "I", titulo: "Cultura digital e os novos paradigmas da educação contemporânea", speakerLineHtml: "com <em>Roberta Aquino</em> · Doutora em Ciências (Unicamp) · Educadora ISTE", bullets: ["Fundamentos da cultura digital e seus impactos sobre educação, comunicação e aprendizagem.", "Transformações nas formas de produzir, acessar e compartilhar informações.", "O papel da escola diante da conectividade, da multiplicidade de fontes e da sociedade em rede."] },
@@ -1200,7 +1200,7 @@ const eventoEdutecM01: EventoOnline = {
     h2Html: "Garanta sua participação no <em>Módulo 01 EDUTEC</em>.",
     paragrafo: "Inscrições abertas. Vagas individuais e condição institucional para equipes e órgãos.",
     ctas: [
-      { texto: "Inscrever-se agora", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-mai", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever-se agora", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-jun", classe: "btn btn--gold", arrow: true },
       { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026#tab-equipe", cmsLink: "proposta-grupo-EDUTEC-M01", classe: "btn btn--secondary" },
     ],
   },
@@ -1211,7 +1211,7 @@ const eventoEdutecM01: EventoOnline = {
     coverEventonHtml: "Acesso via <em>EventON</em>",
     tituloTag: "Módulo 01 · Trilha EDUTEC",
     rows: [
-      { label: "Quando", value: "27 · Mai · 2026" },
+      { label: "Quando", value: "15 · Jun · 2026" },
       { label: "Modalidade", value: "Online ao vivo + replay" },
       { label: "Carga horária", value: "8 horas" },
       { label: "Plataforma", value: "EventON NTC" },
@@ -1221,9 +1221,9 @@ const eventoEdutecM01: EventoOnline = {
       titulo: "O que está incluído",
       items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Material editorial NTC", "Certificado institucional", "Suporte técnico dedicado", "Área do Participante"],
     },
-    countdown: { label: "Prazo de inscrição", dateText: "Até 20 de Maio de 2026", deadline: "2026-05-20T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 15 de Junho de 2026", deadline: "2026-06-15T23:59:59-03:00", tipo: "numerico" },
     acoes: [
-      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-mai", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-jun", classe: "btn btn--gold", arrow: true },
       { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026#tab-equipe", cmsLink: "inscricao-equipe-EDUTEC-M01", classe: "btn btn--secondary" },
     ],
     share: { label: "Compartilhar:", links: [
