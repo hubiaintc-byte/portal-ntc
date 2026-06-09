@@ -403,6 +403,10 @@ export interface Especialista {
    * Proporção 20:23 — conforme skill ntc-palestrantes.
    */
   foto: number | Media;
+  /**
+   * Quando marcado, o especialista não aparece em nenhuma página pública (Corpo Docente e palestrantes de eventos). Use para quem ainda está com foto genérica. A mudança só reflete no site após publicar.
+   */
+  ocultarDoSite?: boolean | null;
   titulacao: 'doutorado' | 'pos-doutorado' | 'mestrado' | 'especializacao' | 'graduacao';
   instituicao: string;
   cargoAtual?: string | null;
