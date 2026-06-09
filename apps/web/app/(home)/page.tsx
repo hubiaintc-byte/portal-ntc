@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
 
+import {
+  EVENTOS_AGENDA,
+  EVENTOS_LISTAGEM,
+} from "@/app/(capacitacao)/agenda/[slug]/conteudoEventos";
+import {
+  paraCardHomePrincipal,
+  paraCardHomeSecundario,
+} from "@/lib/eventos/adaptarParaCard";
+
 import { SliderHero, type SlidePremium } from "./SliderHero";
 import { FALLBACK_HOME } from "./conteudoFallback";
 
@@ -30,6 +39,20 @@ export const metadata: Metadata = {
 
 const f = FALLBACK_HOME;
 
+// Eventos reais (EVENTOS_AGENDA via adapter) substituem os mockados.
+// Grandes = card.destaqueHome (EDUTEC M01/M02/M04); menores = os demais (PROGE).
+const eventosReais = EVENTOS_LISTAGEM.map((slug) => EVENTOS_AGENDA[slug]).filter(
+  (e): e is NonNullable<typeof e> => Boolean(e),
+);
+const eventosPrincipais = eventosReais
+  .filter((e) => e.card?.destaqueHome)
+  .map(paraCardHomePrincipal)
+  .filter((c): c is NonNullable<typeof c> => Boolean(c));
+const eventosSecundarios = eventosReais
+  .filter((e) => !e.card?.destaqueHome)
+  .map(paraCardHomeSecundario)
+  .filter((c): c is NonNullable<typeof c> => Boolean(c));
+
 export default function HomePage() {
   return (
     <main id="main">
@@ -54,7 +77,7 @@ export default function HomePage() {
           </div>
 
           <div className="events-grid fade-in">
-            {f.eventosPrincipais.map((evt, idx) => (
+            {eventosPrincipais.map((evt, idx) => (
               <article
                 key={idx}
                 className={`event-card ${evt.destaque ? "is-featured" : ""}`}
@@ -157,7 +180,7 @@ export default function HomePage() {
             </div>
 
             <div className="events-secondary-grid">
-              {f.eventosSecundarios.map((evt, idx) => (
+              {eventosSecundarios.map((evt, idx) => (
                 <article key={idx} className="event-secondary-card" data-area={evt.area}>
                   <div className="es-cover">
                     <div

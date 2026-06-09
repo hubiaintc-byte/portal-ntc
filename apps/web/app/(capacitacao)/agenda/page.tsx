@@ -1,15 +1,29 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
 
+import { paraCartaoAgenda } from "@/lib/eventos/adaptarParaCard";
+
+import {
+  EVENTOS_AGENDA,
+  EVENTOS_LISTAGEM,
+} from "./[slug]/conteudoEventos";
 import {
   BREADCRUMB_AGENDA,
+  type CartaoEvento,
   CTAS_INTERMEDIARIOS,
-  EVENTOS,
   HERO_AGENDA,
   RODAPE_CONTEXTUAL,
 } from "./conteudoAgenda";
 import { PipelineAgenda } from "./PipelineAgenda";
 import { StickyMobileCTA } from "./StickyMobileCTA";
+
+// Eventos reais (EVENTOS_AGENDA via adapter) substituem o array mockado.
+const eventosAgenda: CartaoEvento[] = EVENTOS_LISTAGEM.map(
+  (slug) => EVENTOS_AGENDA[slug],
+)
+  .filter((e): e is NonNullable<typeof e> => Boolean(e))
+  .map((e, i) => paraCartaoAgenda(e, i + 1))
+  .filter((c): c is CartaoEvento => Boolean(c));
 
 export const revalidate = 3600;
 
@@ -91,7 +105,7 @@ export default function AgendaPage() {
       </section>
 
       {/* 3. PIPELINE (tabs + filterbar + grid + paginação) */}
-      <PipelineAgenda eventos={EVENTOS} />
+      <PipelineAgenda eventos={eventosAgenda} />
 
       {/* 4. CTAs INTERMEDIÁRIOS */}
       <div className="agenda-intercta fade-in">
