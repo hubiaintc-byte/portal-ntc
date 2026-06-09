@@ -1587,10 +1587,335 @@ const eventoEdutecM02: EventoOnline = {
   },
 };
 
+const eventoEdutecM04: EventoOnline = {
+  slug: "edutec-m04-2026",
+  titulo: "Currículo e Computação: Integrando a BNCC à Prática Pedagógica",
+  subtitulo:
+    "Fundamentos, diretrizes curriculares e estratégias de implementação para integrar computação e pensamento computacional à formação dos estudantes.",
+  formato: "online",
+  dataEvento: "17 de junho de 2026",
+  area: "edu",
+
+  // Campos de EventoBase não usados pelo layout online (vazios):
+  crumb: [
+    { texto: "Grupo NTC", href: "/", cmsLink: "home" },
+    { texto: "Capacitação", href: "/capacitacao", cmsLink: "agenda-completa" },
+    { texto: "Eventos online", href: "/capacitacao/agenda", cmsLink: "eventos-online" },
+    { texto: "Seminário EDUTEC · Currículo e Computação", current: true },
+  ],
+  hero: { tags: [], h1: "", sub: "", programBinding: { texto: "", href: "", nomePrograma: "" }, ctas: [] },
+  metas: [],
+  navLinks: [
+    { texto: "Visão geral", href: "#visao-geral", isActive: true },
+    { texto: "Público", href: "#publico" },
+    { texto: "Programação", href: "#programacao" },
+    { texto: "O que você aprenderá", href: "#questoes" },
+    { texto: "Palestrantes", href: "#palestrantes" },
+    { texto: "EventOn", href: "#eventon" },
+    { texto: "Investimento", href: "#investimento" },
+    { texto: "Regras", href: "#regras" },
+    { texto: "FAQ", href: "#faq" },
+  ],
+  visaoGeral: { eyebrow: "", h2: "", lede: "", paragrafos: [] },
+  publico: { eyebrow: "", h2: "", intro: "", chips: [] },
+  objetivos: { eyebrow: "", h2: "", objetivos: [] },
+  conteudoProgramatico: { eyebrow: "", h2: "", intro: "", itens: [] },
+  programacao: { eyebrow: "", h2: "", intro: "", dias: [] },
+  palestrantes: { eyebrow: "", h2: "", intro: "", palestrantes: [], nota: "" },
+  diferenciais: { eyebrow: "", h2: "", diferenciais: [] },
+  replayCert: { eyebrow: "", h2: "", cards: [] },
+  investimento: { eyebrow: "", h2: "", rules: [] },
+  faq: {
+    eyebrow: "Perguntas frequentes",
+    h2: "FAQ",
+    faqs: [
+      { id: "edutec-m04-faq-1", pergunta: "Como funciona o acesso ao EventON NTC?", respostaHtml: "Após a confirmação da inscrição, você recebe por e-mail um link de acesso individual com login e senha. O acesso é feito direto pelo navegador, sem necessidade de download de aplicativo." },
+      { id: "edutec-m04-faq-2", pergunta: "Por quanto tempo terei acesso ao replay?", respostaHtml: "O replay fica disponível por 7 dias após a realização do evento, na Área do Participante. Acesso protegido por login institucional individual." },
+      { id: "edutec-m04-faq-3", pergunta: "Como recebo o certificado?", respostaHtml: "O certificado é emitido automaticamente até 7 dias após o término do evento, mediante presença mínima de 75% das atividades. Pode ser baixado pela Área do Participante e validado publicamente via código QR." },
+      { id: "edutec-m04-faq-4", pergunta: "Posso inscrever minha equipe ou rede?", respostaHtml: "Sim. Equipes e órgãos públicos poderão solicitar condição comercial diferenciada conforme quantidade de inscritos, perfil institucional e forma de contratação. Solicite proposta pelo botão lateral." },
+      { id: "edutec-m04-faq-5", pergunta: "A inscrição inclui materiais?", respostaHtml: "Sim. A inscrição inclui apostila digital específica do módulo-evento, certificado digital e acesso ao replay. Materiais enviados por e-mail e disponibilizados na plataforma EventON NTC." },
+      { id: "edutec-m04-faq-6", pergunta: "Como contratar uma turma fechada para minha instituição?", respostaHtml: "A NTC desenvolve turmas fechadas para secretarias, autarquias e órgãos públicos. O Instituto NTC poderá apresentar proposta personalizada com condições diferenciadas por escala, suporte operacional e replay. Solicite proposta institucional pelo botão lateral." },
+      { id: "edutec-m04-faq-7", pergunta: "É possível compor a trilha completa EDUTEC?", respostaHtml: "Sim. Este Módulo 04 pode ser contratado de forma independente ou integrar a trilha EDUTEC — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino. Consulte a equipe comercial." },
+    ],
+  },
+  ctaFinal: { eyebrowGold: "", h2: "", paragrafo: "", ctas: [] },
+  sidebar: {
+    coverImg: "", status: "", tituloCard: "", rows: [],
+    includes: { titulo: "", items: [] },
+    countdown: { label: "", dateText: "", deadline: "2026-06-17T23:59:59-03:00", tipo: "numerico" },
+    acoes: [], share: { label: "", links: [] },
+  },
+  relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
+  agendaIcs: {
+    titulo: "Seminário EDUTEC · Currículo e Computação: Integrando a BNCC à Prática Pedagógica",
+    descricao: "Seminário On-Line ao Vivo do programa EDUTEC · Grupo NTC. Acesso pela plataforma EventON NTC.",
+    location: "Plataforma EventON NTC · Online",
+    startISO: "20260617T080000",
+    endISO: "20260617T180000",
+    filename: "EDUTEC-M04-2026-jun.ics",
+  },
+
+  // ---- Seções evt-* (consumidas pelo EventoOnlineLayout) ----
+  heroOnline: {
+    tags: [
+      { texto: "Inscrições abertas", classe: "evt-hero-status" },
+      { texto: "Seminário Online ao Vivo", classe: "evt-hero-format" },
+      { texto: "NTC Educação", classe: "evt-hero-vert" },
+    ],
+    h1Html: "Currículo e Computação: Integrando a <em>BNCC</em> à Prática Pedagógica",
+    sub: "Fundamentos, diretrizes curriculares e estratégias de implementação para integrar computação e pensamento computacional à formação dos estudantes.",
+    programBinding: {
+      texto: "Integra o programa",
+      href: "/programas/edutec",
+      cmsLink: "programa-EDUTEC",
+      nomePrograma: "EDUTEC — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino",
+    },
+    ctas: [
+      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+04&evento_url=/agenda/edutec-m04-2026", cmsLink: "inscricao-EDUTEC-M04-2026-jun", classe: "btn btn--gold", arrow: true },
+      { texto: "Baixar folder", href: "#", cmsLink: "folder-EDUTEC-M04", classe: "btn btn--ghost-light" },
+      { texto: "Inscrever equipe ou grupo", href: "/contato?evento=EDUTEC+M%C3%B3dulo+04&evento_url=/agenda/edutec-m04-2026#tab-equipe", cmsLink: "proposta-grupo-EDUTEC-M04", classe: "btn btn--ghost-light" },
+    ],
+  },
+
+  metasOnline: [
+    { label: "Quando", value: "17 · Junho", valueSub: "2026 · Quarta-feira" },
+    { label: "Modalidade", value: "Ao vivo", valueSub: "+ replay por 7 dias" },
+    { label: "Carga horária", value: "8 horas", valueSub: "Manhã (4h) + Tarde (4h)" },
+    { label: "Plataforma", value: "EventON NTC", valueSub: "Acesso individual" },
+    { label: "Investimento", value: "R$ 1.470", valueSub: "por inscrito · individual" },
+  ],
+
+  visaoGeralOnline: {
+    eyebrow: "Visão geral",
+    h2Html: "Uma agenda institucional para uma educação digital <em>crítica</em>, conectada e contemporânea.",
+    lede: "A escola pública está diante de um ambiente social profundamente marcado por telas, plataformas, algoritmos e novas linguagens de participação — formar para apenas utilizar tecnologia é insuficiente.",
+    paragrafosHtml: [
+      "Este módulo explora a computação na educação básica como uma dimensão curricular estratégica, articulada à BNCC, à Política Nacional de Educação Digital e às novas competências exigidas para a formação dos estudantes. O avanço da cultura digital torna indispensável que redes e escolas compreendam a computação não apenas como uso de computadores, mas como campo de conhecimento que envolve pensamento computacional, resolução de problemas, lógica, algoritmos, cultura digital e compreensão crítica do mundo tecnológico.",
+      "A proposta apoia equipes técnicas, gestores escolares, coordenadores e professores na transposição desse tema para o currículo e para a prática pedagógica. Por meio de fundamentos, análise normativa, exemplos aplicáveis, metodologias desplugadas e oficinas práticas, o módulo oferece caminhos para que a rede organize implementação gradual, coerente e viável.",
+      "Inserido no EDUTEC, este módulo contribui para transformar a agenda de computação em planejamento curricular, formação docente e prática de sala de aula, conectando diretrizes nacionais, intencionalidade pedagógica e estratégias de implementação.",
+    ],
+    moduleBindingHtml: "Este seminário corresponde ao <strong>Módulo 04 da trilha EDUTEC</strong> — Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino. Pode ser contratado de forma independente ou integrar a trilha completa.",
+    razoesTituloHtml: "Seis razões para <em>participar</em> deste seminário",
+    razoes: [
+      { num: "01", titulo: "Porque a computação ganhou centralidade na agenda curricular brasileira", descricao: "BNCC Computação e a Lei 14.533/2023 exigem que redes traduzam o tema em planejamento e prática — este módulo entrega o repertório institucional para essa transição." },
+      { num: "02", titulo: "Porque palestrantes de referência conduzem o módulo", descricao: "Roberta Aquino (Unicamp · ISTE), Karla Priscilla (EducaMídia · Google Innovator) e Débora Garofalo (uma das maiores referências brasileiras em computação na educação básica)." },
+      { num: "03", titulo: "Porque combina marco regulatório com prática desplugada", descricao: "Análise normativa + Laboratório de Pensamento Computacional + estratégias de integração curricular — aplicáveis a diferentes níveis de infraestrutura." },
+      { num: "04", titulo: "Porque integra a perspectiva técnica e pedagógica", descricao: "Conecta equipes curriculares, gestores e professores em uma única agenda institucional de implementação gradual." },
+      { num: "05", titulo: "Porque a experiência acontece na plataforma EventON NTC", descricao: "Ambiente virtual institucional do Instituto NTC, com transmissão ao vivo, alta definição, suporte técnico dedicado e replay garantido." },
+      { num: "06", titulo: "Porque você recebe certificação institucional do Instituto NTC do Brasil", descricao: "Certificação válida como atualização profissional, mediante 75% de presença — referência em capacitação para o setor público." },
+    ],
+  },
+
+  publicoOnline: {
+    eyebrow: "Para quem",
+    h2: "Público-alvo",
+    intro: "O seminário é dimensionado para gestores, equipes técnicas curriculares e educadores que atuam nas redes públicas de ensino:",
+    chips: [
+      "Secretários e dirigentes de educação",
+      "Equipes técnicas curriculares",
+      "Gestores escolares",
+      "Coordenadores pedagógicos",
+      "Professores",
+      "Formadores de educadores",
+      "Profissionais de inovação curricular",
+    ],
+    objetivoTitulo: "Objetivo",
+    objetivoTexto: "Compreender fundamentos da computação na educação básica e do pensamento computacional; explorar relações entre computação, currículo, BNCC e competências contemporâneas; apoiar redes e escolas na definição de caminhos de implementação; e fortalecer práticas que integrem computação com sentido pedagógico e viabilidade.",
+    destaquesTitulo: "Destaques formativos",
+    destaques: [
+      { num: "01", html: "<strong>Marco regulatório e BNCC Computação</strong> aplicados à educação básica." },
+      { num: "02", html: "<strong>Pensamento computacional e computação desplugada</strong> com sucata." },
+      { num: "03", html: "<strong>Laboratório de práticas</strong> com decomposição, padrões e algoritmos." },
+      { num: "04", html: "<strong>Integração curricular</strong> transversal e interdisciplinar." },
+      { num: "05", html: "<strong>Cultura digital e ferramentas</strong> para apoiar a aula." },
+      { num: "06", html: "<strong>Lei nº 14.533/2023 e implementação curricular</strong> nas redes públicas." },
+      { num: "07", html: "<strong>Diagnóstico de maturidade</strong> e priorização institucional." },
+    ],
+  },
+
+  programacaoOnline: {
+    eyebrow: "Cronograma",
+    h2: "Programação detalhada",
+    intro: "Quatro sessões aplicadas, oito horas de imersão ao vivo.",
+    headDayHtml: "17 de <em>Junho</em> · Quarta-feira",
+    headMeta: "08h00 às 18h00 · 8 horas · EventON NTC",
+    nodes: [
+      { time: "08h00 – 09h00", ttag: "Palestra · 01", num: "I", titulo: "Computação desplugada", speakerLineHtml: "com <em>Débora Garofalo</em> · Referência em computação na educação básica", bullets: ["Decifrando a computação na educação básica.", "Relações entre lógica, resolução de problemas e aprendizagem.", "A computação como linguagem, área de conhecimento e prática formativa.", "Estratégias para implementação da computação desplugada e com sucata."] },
+      { time: "09h00 – 10h00", ttag: "Palestra · 02", num: "II", titulo: "Computação na educação básica e a Lei 14.533/2023", speakerLineHtml: "com <em>Roberta Aquino</em> · Doutora em Ciências · Unicamp · ISTE", bullets: ["Conexões entre computação, competências gerais e currículo.", "Possibilidades de inserção em componentes e projetos integradores.", "Caminhos curriculares e organizacionais para redes públicas.", "Planejamento gradual e sustentável de implementação."] },
+      { time: "10h00 – 12h00", ttag: "Oficina · 01", num: "III", titulo: "Laboratório de pensamento computacional", speakerLineHtml: "com <em>Débora Garofalo</em> · Cultura Maker · BNCC Computação", bullets: ["Decomposição e compreensão do pensamento computacional.", "Propostas didáticas para diferentes etapas da educação básica.", "Atividades com e sem uso intensivo de dispositivos.", "Integração entre computação, resolução de problemas e criatividade."] },
+      { time: "14h00 – 16h00", ttag: "Oficina · 02", num: "IV", titulo: "Cultura digital e ferramentas para apoiar sua incorporação em aula", speakerLineHtml: "com <em>Karla Priscilla</em> · EducaMídia · Google Innovator", bullets: ["Aprofundamento do conhecimento sobre cultura digital.", "Estratégias para abordar a temática em sala de aula.", "Abordagem transdisciplinar da cultura digital.", "Ferramentas para apoiar a implantação."] },
+      { time: "16h00 – 18h00", ttag: "Oficina · 03", num: "V", titulo: "Integrando a computação no currículo escolar", speakerLineHtml: "com <em>Roberta Aquino</em> · Especialista em transformação curricular digital", bullets: ["Diagnóstico de maturidade e priorização de ações.", "Formação de professores e apoio às escolas.", "Articulação entre currículo, tecnologia e gestão.", "Monitoramento de avanços e sustentabilidade institucional."] },
+    ],
+  },
+
+  questoesOnline: {
+    eyebrow: "O que você aprenderá",
+    h2: "As questões essenciais que serão respondidas nas sessões",
+    intro: "Treze perguntas-guia organizadas por sessão, do fundamento conceitual ao laboratório prático.",
+    grupos: [
+      { sessao: "Sessão · 01", titulo: "Computação desplugada", palestrante: "com Débora Garofalo · 08h00 – 09h00", questoes: [
+        { numero: "01", pergunta: "O que é computação na educação básica além do uso de computadores?" },
+        { numero: "02", pergunta: "Quais são as relações entre lógica, resolução de problemas e aprendizagem?" },
+        { numero: "03", pergunta: "Como tratar a computação como linguagem, área de conhecimento e prática formativa?" },
+        { numero: "04", pergunta: "Que estratégias viabilizam a implementação desplugada e com sucata?" },
+      ] },
+      { sessao: "Sessão · 02", titulo: "BNCC e Lei 14.533/2023 na rede", palestrante: "com Roberta Aquino · 09h00 – 10h00", questoes: [
+        { numero: "05", pergunta: "Como conectar computação, competências gerais e currículo?" },
+        { numero: "06", pergunta: "Quais possibilidades de inserção em componentes e projetos integradores?" },
+        { numero: "07", pergunta: "Quais caminhos curriculares e organizacionais funcionam em redes públicas?" },
+        { numero: "08", pergunta: "Como planejar implementação gradual e sustentável?" },
+        { numero: "09", pergunta: "Qual o papel da gestão e das equipes técnicas no processo?" },
+      ] },
+      { sessao: "Sessão · 03", titulo: "Laboratório de pensamento computacional", palestrante: "com Débora Garofalo · 10h00 – 12h00", questoes: [
+        { numero: "10", pergunta: "Como decompor o pensamento computacional em práticas didáticas?" },
+        { numero: "11", pergunta: "Quais propostas funcionam para diferentes etapas da educação básica?" },
+        { numero: "12", pergunta: "Como integrar atividades com e sem uso intensivo de dispositivos?" },
+        { numero: "13", pergunta: "Como articular computação, resolução de problemas e criatividade?" },
+      ] },
+      // Questões 14, 15 e 16 ausentes no PDF original (gap de numeração entre as páginas 08 e 09)
+    ],
+    naPratica: {
+      titulo: "Na prática · o que você levará do módulo para a sua rede",
+      itens: [
+        "Repertório conceitual ampliado sobre educação digital e midiática.",
+        "Diretrizes para integrar cultura digital ao currículo.",
+        "Caminhos para articular currículo, formação e governança.",
+        "Critérios institucionais para curadoria pedagógica de recursos.",
+        "Instrumentos para avaliar maturidade digital da rede.",
+        "Subsídios para projetos integradores e trilhas formativas.",
+      ],
+    },
+  },
+
+  palestrantesOnline: {
+    eyebrow: "Quem ensina",
+    h2Html: "Três especialistas de <em>referência nacional</em>",
+    intro: "Cultura digital, computação na educação básica e inovação pedagógica.",
+    palestrantes: [
+      { foto: "", roleTag: "Palestrante", nome: "Débora Garofalo", credentials: "Referência em Computação na Educação Básica · Cultura Maker · BNCC", bio: "Uma das maiores referências brasileiras em computação na educação básica e cultura maker. Atuou na construção e implementação de políticas públicas de computação curricular, com forte foco em pensamento computacional, robótica educacional, sustentabilidade e inclusão digital. Reconhecida nacional e internacionalmente por projetos premiados que articulam tecnologia, currículo e protagonismo estudantil em redes públicas de ensino." }, // TODO: foto sobe depois
+      { foto: "", roleTag: "Palestrante", nome: "Roberta Aquino", credentials: "Doutora em Ciências · Unicamp · Educadora ISTE · Google Innovator", bio: "Professora de pós-graduação, palestrante internacional e consultora educacional, capacita professores e instituições a prosperarem na era digital. Especialista em tecnologias educacionais, metodologias ativas e inovação. Doutora em Ciências pela Unicamp, com duas especializações em TI e MBA em Marketing pela ESPM. Educadora Certificada ISTE, Google Innovator, Trainer e Coach, Líder do GEG CDMX e Mentora GEG para a América Latina. Canva Education Partner, Trainer, Canvassador e Edu Canva Creator. Embaixadora de Genially, Wakelet, Wayground, MagicSchool, Padlet e BookCreator. Brasileira radicada no México desde 2018." }, // TODO: foto sobe depois
+      { foto: "", roleTag: "Palestrante", nome: "Karla Priscilla", credentials: "Mestranda em Tecnologias Emergentes · Google Innovator · EducaMídia", bio: "Mestranda em Tecnologias Emergentes na Educação, pedagoga, consultora e palestrante. Especialista em Educação Digital e Metodologias Ativas. Google Champions, Innovator e Google Trainer, Educadora Maker e Facilitadora do EducaMídia. Atua como gestora de inovação e tecnologias educacionais em uma rede de educação e como formadora de educadores em todo o Brasil. Realiza a coordenação pedagógica de projetos e mentorias, com a missão de impactar positivamente a vida pessoal e profissional de cada participante. Embaixadora do Canva for Education, ClassDojo e da plataforma Teachy." }, // TODO: foto sobe depois
+    ],
+    nota: "Fotografias oficiais dos palestrantes serão sincronizadas a partir do folder do evento via CMS.",
+  },
+
+  eventonOnline: {
+    eyebrow: "Plataforma de acesso",
+    h2Html: "Como funciona no <em>EventON NTC</em>",
+    intro: "O seminário acontece na plataforma institucional do Instituto NTC do Brasil — ambiente virtual seguro com transmissão ao vivo, suporte dedicado e replay protegido.",
+    markNameHtml: "Event<em>ON</em>",
+    markTag: "Plataforma Institucional · NTC",
+    stats: [
+      { n: "5.000", l: "Participantes simultâneos" },
+      { n: "30 FPS", l: "Vídeo em alta definição" },
+      { n: "100%", l: "Acesso institucional" },
+    ],
+    feats: [
+      { iconeSvgInner: `<path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4Z"/>`, titulo: "Plataforma segura e escalável", descricao: "Alcance de até 5.000 participantes simultâneos, com estabilidade operacional e segurança institucional para eventos formais." },
+      { iconeSvgInner: `<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 22h8"/>`, titulo: "Alta definição", descricao: "Transmissão em 30 FPS, com vídeo e áudio de alta qualidade independente do dispositivo — desktop, laptop, tablet ou telefone." },
+      { iconeSvgInner: `<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>`, titulo: "Fácil e acessível", descricao: "Nenhum download é necessário. Acesso individual por login e senha, com interface simplificada e navegação institucional intuitiva." },
+      { iconeSvgInner: `<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/>`, titulo: "Interação ao vivo", descricao: "Faça perguntas, participe de pesquisas em tempo real e até apresente conteúdos em momentos previamente combinados com a coordenação." },
+      { iconeSvgInner: `<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>`, titulo: "Replay institucional · 7 dias", descricao: "Acesso ao replay integral do evento por 7 dias após a realização — para revisão, aprofundamento e referência institucional posterior." },
+      { iconeSvgInner: `<circle cx="12" cy="9" r="6"/><path d="M9 14.5V21l3-2 3 2v-6.5"/>`, titulo: "Certificação institucional", descricao: "Certificado válido como atualização profissional, mediante 75% de presença — emitido pelo Instituto NTC do Brasil." },
+    ],
+  },
+
+  investimentoOnline: {
+    eyebrow: "Investimento",
+    h2: "Investimento e condições",
+    intro: "Modalidades de contratação flexíveis para inscrição individual, equipes e instituições públicas.",
+    priceLabel: "Inscrição individual",
+    priceValueHtml: `<span class="cur">R$</span><span class="amt">1.470</span>`,
+    priceSub: "por inscrição individual · evento on-line ao vivo de 8 horas",
+    includesTitulo: "O que está incluído",
+    includes: [
+      "Apostila digital específica do módulo-evento",
+      "Certificado digital emitido pelo Instituto NTC do Brasil",
+      "Acesso individual ao ambiente EventON NTC",
+      "Replay integral pelo período informado no folder",
+      "Suporte técnico para acesso ao ambiente virtual",
+    ],
+    modes: [
+      { tag: "Individual", titulo: "Inscrição individual", descricao: "Indicada para participantes avulsos, profissionais independentes, empresas, entidades privadas ou inscrições pontuais realizadas por órgãos e instituições." },
+      { tag: "Grupo", titulo: "Grupos institucionais", descricao: "Órgãos públicos, secretarias, redes de ensino, entidades e instituições interessadas na inscrição de múltiplos participantes poderão solicitar condição comercial diferenciada." },
+      { tag: "Institucional", titulo: "Grandes grupos e turmas fechadas", descricao: "Para demandas ampliadas, redes públicas, secretarias, consórcios ou grupos estratégicos, o Instituto NTC poderá apresentar proposta personalizada com condições diferenciadas.", featured: true },
+    ],
+  },
+
+  regrasOnline: {
+    eyebrow: "Política comercial",
+    h2: "Regras de participação",
+    rules: [
+      "O cancelamento e/ou a substituição de inscrição deverá ser solicitado por escrito, pelo e-mail eventosonline@institutontc.com.br ou WhatsApp (63) 98444-4040, até 2 dias úteis antes da realização do evento.",
+      "A substituição deverá indicar os dados completos do novo participante — nome completo, e-mail funcional ou institucional, telefone/WhatsApp e órgão de vinculação — para liberação do acesso individual.",
+      "A inscrição contratada garante a disponibilização do acesso ao evento on-line ao vivo, ao ambiente EventON NTC, ao material digital, ao suporte técnico e ao replay pelo período informado neste folder.",
+      "A ausência, o não acesso, o acesso parcial, o não uso do replay dentro do prazo ou o não cumprimento dos critérios mínimos de presença não implicam reembolso, cancelamento automático ou isenção de pagamento, desde que os meios de acesso tenham sido regularmente disponibilizados pelo Instituto NTC.",
+      "Para inscrições institucionais em grupo, a Contratante poderá encaminhar relação consolidada de participantes, preferencialmente em planilha, para cadastramento conjunto e liberação dos acessos individuais.",
+      "A relação deverá ser enviada preferencialmente até 2 dias úteis antes do evento, a fim de viabilizar o cadastro, o envio dos acessos e o suporte operacional.",
+      "Os inscritos poderão acessar o replay pelo período informado neste folder, observadas as regras de acesso individual e vedado o compartilhamento de login, senha, som, imagem, gravação ou reprodução por qualquer meio.",
+      "A certificação será emitida somente após o encerramento do prazo de replay, exclusivamente aos participantes que cumprirem os critérios mínimos de presença e registro no ambiente.",
+    ],
+  },
+
+  ctaFinalOnline: {
+    eyebrowGold: "Próximo passo",
+    h2Html: "Garanta sua participação no <em>Módulo 04 EDUTEC</em>.",
+    paragrafo: "Inscrições abertas. Vagas individuais e condição institucional para equipes e órgãos.",
+    ctas: [
+      { texto: "Inscrever-se agora", href: "/contato?evento=EDUTEC+M%C3%B3dulo+04&evento_url=/agenda/edutec-m04-2026", cmsLink: "inscricao-EDUTEC-M04-2026-jun", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+04&evento_url=/agenda/edutec-m04-2026#tab-equipe", cmsLink: "proposta-grupo-EDUTEC-M04", classe: "btn btn--secondary" },
+    ],
+  },
+
+  sidebarOnline: {
+    coverImg: "/img/fotos/_optimized/area-educacao.1920.webp",
+    status: "Inscrições abertas",
+    coverEventonHtml: "Acesso via <em>EventON</em>",
+    tituloTag: "Módulo 04 · Trilha EDUTEC",
+    rows: [
+      { label: "Quando", value: "17 · Jun · 2026" },
+      { label: "Modalidade", value: "Online ao vivo + replay" },
+      { label: "Carga horária", value: "8 horas" },
+      { label: "Plataforma", value: "EventON NTC" },
+      { label: "Investimento", value: "R$ 1.470", price: true },
+    ],
+    includes: {
+      titulo: "O que está incluído",
+      items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Apostila digital do módulo", "Certificado institucional", "Suporte técnico dedicado", "Acesso ao ambiente EventON NTC"],
+    },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 17 de Junho de 2026", deadline: "2026-06-17T23:59:59-03:00", tipo: "numerico" },
+    acoes: [
+      { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+04&evento_url=/agenda/edutec-m04-2026", cmsLink: "inscricao-EDUTEC-M04-2026-jun", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+04&evento_url=/agenda/edutec-m04-2026#tab-equipe", cmsLink: "inscricao-equipe-EDUTEC-M04", classe: "btn btn--secondary" },
+    ],
+    share: { label: "Compartilhar:", links: [
+      { texto: "WhatsApp", href: "#", cmsLink: "share-whatsapp" },
+      { texto: "E-mail", href: "#", cmsLink: "share-email" },
+      { texto: "LinkedIn", href: "#", cmsLink: "share-linkedin" },
+    ] },
+  },
+
+  relatedOnline: {
+    eyebrowGold: "Trilha EDUTEC · Próximos módulos",
+    h2: "Continue a jornada de educação digital",
+    introHtml: "Outros módulos da trilha <strong>EDUTEC</strong> e eventos da <strong>NTC Educação</strong> com inscrições antecipadas.",
+    cards: [
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "range", daysStart: "22", dash: "–", daysEnd: "23", monYr: "Mai · 2026" }, program: "Seminário · NTC Educação", titulo: "Alfabetização de Alta Performance: estratégias para recomposição", programBinding: "PEAR", metaHtml: "Online · 16h · 2 dias <strong>R$ 1.490</strong>", cta: { texto: "Inscrever-se", href: "#contato", cmsLink: "inscricao-PEAR-2026-mai", classe: "es-cta" } },
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "single", day: "24", monYr: "Jun · 2026" }, program: "Seminário · NTC Educação", titulo: "Módulo 02 EDUTEC: IA, Currículo e Aprendizagem", programBinding: "EDUTEC", metaHtml: "Online · 8h · 1 dia <strong>Sob consulta</strong>", cta: { texto: "Saiba mais", href: "#contato", cmsLink: "inscricao-EDUTEC-M02-2026-jun", classe: "es-cta" } },
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "single", day: "25", monYr: "Jun · 2026" }, program: "Curso Executivo · NTC Educação", titulo: "Coordenação pedagógica orientada a resultados", programBinding: "PROGE", metaHtml: "Online · 20h · 3 dias <strong>R$ 1.690</strong>", cta: { texto: "Inscrever-se", href: "#contato", cmsLink: "inscricao-PROGE-2026-jun", classe: "es-cta" } },
+    ],
+    footerCtas: [
+      { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
+      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+    ],
+  },
+};
+
 // ----------------- Record exportado -----------------
 
 export const EVENTOS_AGENDA: Record<string, Evento> = {
   "prosus-brasilia": eventoProsusBrasilia,
   "edutec-m01-2026": eventoEdutecM01,
   "edutec-m02-2026": eventoEdutecM02,
+  "edutec-m04-2026": eventoEdutecM04,
 };
