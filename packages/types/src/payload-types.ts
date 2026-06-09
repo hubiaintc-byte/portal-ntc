@@ -623,6 +623,10 @@ export interface Evento {
     | null;
   inscricaoAberta?: boolean | null;
   /**
+   * PDF do folder do evento. Quando preenchido, o botão 'Baixar folder' da página passa a baixar este arquivo.
+   */
+  folderPdf?: (number | null) | Media;
+  /**
    * URL da plataforma terceira de inscrição (v1).
    */
   linkInscricaoExterna?: string | null;
@@ -1185,6 +1189,7 @@ export interface EventosSelect<T extends boolean = true> {
         id?: T;
       };
   inscricaoAberta?: T;
+  folderPdf?: T;
   linkInscricaoExterna?: T;
   plataformaTerceira?: T;
   valor?: T;

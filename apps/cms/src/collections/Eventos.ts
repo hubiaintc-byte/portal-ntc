@@ -141,6 +141,16 @@ export const Eventos: CollectionConfig = {
           fields: [
             { name: "inscricaoAberta", type: "checkbox", defaultValue: true },
             {
+              name: "folderPdf",
+              type: "upload",
+              relationTo: "media",
+              required: false,
+              admin: {
+                description:
+                  "PDF do folder do evento. Quando preenchido, o botão 'Baixar folder' da página passa a baixar este arquivo.",
+              },
+            },
+            {
               name: "linkInscricaoExterna",
               type: "text",
               admin: {

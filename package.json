@@ -22,6 +22,7 @@
     "payload:seed": "pnpm --filter @ntc/cms payload:seed",
     "payload:seed:imagens-home": "pnpm --filter @ntc/cms payload:seed:imagens-home",
     "payload:seed:home-v3": "pnpm --filter @ntc/cms payload:seed:home-v3",
+    "payload:seed:edutec": "pnpm --filter @ntc/cms payload:seed:edutec",
     "fotos:especialistas": "pnpm --filter @ntc/cms fotos:especialistas",
     "revalidar": "node scripts/revalidar.mjs",
     "revalidar:corpo-docente": "node scripts/revalidar.mjs /o-grupo/corpo-docente",
