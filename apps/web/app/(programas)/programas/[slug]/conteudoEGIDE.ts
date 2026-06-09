@@ -22,8 +22,8 @@ export const EGIDE: ConteudoPrograma = {
     tituloHtml: `Programa de Governança Digital, IA Educacional e Cultura de <em>Dados</em> nas Redes Públicas`,
     sub: "Capacitação executiva para secretarias e equipes de educação na arquitetura institucional da transformação digital — articulando governança de dados pedagógicos, inteligência artificial aplicada à aprendizagem, plataformas educacionais públicas e protocolos de proteção, ética e equidade digital nas redes estaduais e municipais.",
     ctas: [
-      { rotulo: "Solicitar proposta", href: "/contato/proposta?programa=egide", variante: "gold" },
-      { rotulo: "Solicitar folder",   href: "/contato/proposta?programa=egide&assunto=folder", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta", href: "/contato?programa=egide", variante: "gold" },
+      { rotulo: "Solicitar folder",   href: "/contato?programa=egide&assunto=folder", variante: "ghost-light" },
     ],
   },
   metaBar: [
@@ -444,7 +444,7 @@ export const EGIDE: ConteudoPrograma = {
     <span class="tag">Trilha completa · Recomendado</span>
     <h4>Os 8 módulos · 64 horas</h4>
     <p>Acesso integral à arquitetura formativa do EGIDE — dados pedagógicos, interoperabilidade, IA educacional, IA generativa aplicada, plataformas, formação digital docente, LGPD educacional e construção da matriz institucional. Certificação consolidada da trilha.</p>
-    <a class="cta" href="/contato/proposta?programa=egide&modalidade=trilha">Solicitar proposta da trilha →</a>
+    <a class="cta" href="/contato?programa=egide&modalidade=trilha">Solicitar proposta da trilha →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Módulo avulso</span>
@@ -456,13 +456,13 @@ export const EGIDE: ConteudoPrograma = {
     <span class="tag">In company</span>
     <h4>Turma fechada para a secretaria</h4>
     <p>Programa entregue exclusivamente à secretaria estadual ou municipal de educação, em formato presencial, online ou híbrido. Conteúdo customizável para a maturidade digital da rede e o perfil das equipes executivas.</p>
-    <a class="cta" href="/contato/proposta?programa=egide&modalidade=incompany">Solicitar proposta in company →</a>
+    <a class="cta" href="/contato?programa=egide&modalidade=incompany">Solicitar proposta in company →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Sob medida</span>
     <h4>Customização profunda</h4>
     <p>Customização avançada da trilha — ementas, módulos, cargas horárias, formato e linguagem ajustados a uma necessidade institucional específica. Inclui consultoria de adaptação institucional.</p>
-    <a class="cta" href="/contato/proposta?programa=egide&modalidade=sob-medida">Solicitar proposta sob medida →</a>
+    <a class="cta" href="/contato?programa=egide&modalidade=sob-medida">Solicitar proposta sob medida →</a>
   </article>
 </div>`,
   },
@@ -516,7 +516,7 @@ export const EGIDE: ConteudoPrograma = {
     microcopy: "A composição da agenda do EGIDE é atualizada conforme a edição, o perfil da turma e a demanda institucional. O programa pode ser cursado como trilha completa, módulos avulsos, turmas in company para secretarias de educação ou solução sob medida.",
     bottomCtas: [
       { rotulo: "Ver agenda completa do EGIDE", href: "/agenda?programa=egide", primario: true },
-      { rotulo: "Solicitar inscrição institucional", href: "/contato/proposta?programa=egide&assunto=inscricao", primario: false },
+      { rotulo: "Solicitar inscrição institucional", href: "/contato?programa=egide&assunto=inscricao", primario: false },
     ],
   },
   faq: {

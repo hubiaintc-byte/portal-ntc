@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 import type { DetalhamentoItem } from "./conteudoIndex";
 
@@ -45,12 +46,12 @@ export function ModulosAcordeao({ itens, slug }: ModulosAcordeaoProps) {
                   </ul>
                 ) : null}
                 {item.ctaInscricao ? (
-                  <a
-                    href={`/contato/proposta?programa=${slug}&modulo=${item.numero}`}
+                  <Link
+                    href={`/contato?programa=${slug}&modulo=${item.numero}`}
                     className="open-module-cta"
                   >
                     Ver módulo aberto · próxima turma →
-                  </a>
+                  </Link>
                 ) : null}
               </div>
             </div>

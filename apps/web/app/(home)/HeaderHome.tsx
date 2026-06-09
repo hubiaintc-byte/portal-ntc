@@ -146,7 +146,7 @@ export function HeaderHome() {
           </nav>
 
           <div className="header-cta">
-            <Link className="btn btn--secondary btn--mini" href="/contato">
+            <Link className="btn btn--secondary btn--mini" href="/contato?assunto=proposta">
               Solicitar proposta
             </Link>
             <a className="btn btn--participant btn--mini" href="#eventon">
@@ -514,7 +514,7 @@ export function HeaderHome() {
           </Link>
         </nav>
         <div className="drawer-cta">
-          <Link className="btn btn--gold" href="/contato">
+          <Link className="btn btn--gold" href="/contato?assunto=proposta">
             Solicitar proposta
           </Link>
           <a className="btn btn--participant" href="#eventon">

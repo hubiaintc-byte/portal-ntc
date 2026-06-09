@@ -22,8 +22,8 @@ export const PINEI: ConteudoPrograma = {
     tituloHtml: `Programa de Inovação na <em>Educação Infantil</em>`,
     sub: "Capacitação executiva para secretarias e coordenadorias da primeira infância — articulando ciência do desenvolvimento, currículo da BNCC da Educação Infantil, brincar como linguagem, formação de equipes pedagógicas e articulação com famílias, saúde e assistência em creches e pré-escolas da rede pública.",
     ctas: [
-      { rotulo: "Solicitar proposta", href: "/contato/proposta?programa=pinei", variante: "gold" },
-      { rotulo: "Solicitar folder",   href: "/contato/proposta?programa=pinei&assunto=folder", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta", href: "/contato?programa=pinei", variante: "gold" },
+      { rotulo: "Solicitar folder",   href: "/contato?programa=pinei&assunto=folder", variante: "ghost-light" },
     ],
   },
   metaBar: [
@@ -404,7 +404,7 @@ export const PINEI: ConteudoPrograma = {
     <span class="tag">Trilha completa · Recomendado</span>
     <h4>Os 6 módulos · 48 horas</h4>
     <p>Acesso integral à arquitetura formativa do PINEI — marco legal e BNCC infantil, currículo, brincar, formação de equipes, articulação com famílias e construção da matriz institucional. Certificação consolidada da trilha.</p>
-    <a class="cta" href="/contato/proposta?programa=pinei&modalidade=trilha">Solicitar proposta da trilha →</a>
+    <a class="cta" href="/contato?programa=pinei&modalidade=trilha">Solicitar proposta da trilha →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Módulo avulso</span>
@@ -416,13 +416,13 @@ export const PINEI: ConteudoPrograma = {
     <span class="tag">In company</span>
     <h4>Turma fechada para a secretaria municipal</h4>
     <p>Programa entregue exclusivamente à secretaria municipal de educação, em formato presencial, online ou híbrido. Conteúdo customizável para a realidade da rede e o perfil das equipes da Educação Infantil.</p>
-    <a class="cta" href="/contato/proposta?programa=pinei&modalidade=incompany">Solicitar proposta in company →</a>
+    <a class="cta" href="/contato?programa=pinei&modalidade=incompany">Solicitar proposta in company →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Sob medida</span>
     <h4>Customização profunda</h4>
     <p>Customização avançada da trilha — ementas, módulos, cargas horárias, formato e linguagem ajustados a uma necessidade institucional específica. Inclui consultoria de adaptação institucional.</p>
-    <a class="cta" href="/contato/proposta?programa=pinei&modalidade=sob-medida">Solicitar proposta sob medida →</a>
+    <a class="cta" href="/contato?programa=pinei&modalidade=sob-medida">Solicitar proposta sob medida →</a>
   </article>
 </div>`,
   },
@@ -476,7 +476,7 @@ export const PINEI: ConteudoPrograma = {
     microcopy: "A composição da agenda do PINEI é atualizada conforme a edição, o perfil da turma e a demanda institucional. O programa pode ser cursado como trilha completa, módulos avulsos, turmas in company para secretarias municipais ou solução sob medida.",
     bottomCtas: [
       { rotulo: "Ver agenda completa do PINEI", href: "/agenda?programa=pinei", primario: true },
-      { rotulo: "Solicitar inscrição institucional", href: "/contato/proposta?programa=pinei&assunto=inscricao", primario: false },
+      { rotulo: "Solicitar inscrição institucional", href: "/contato?programa=pinei&assunto=inscricao", primario: false },
     ],
   },
   faq: {

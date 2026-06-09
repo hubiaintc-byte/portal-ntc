@@ -22,8 +22,8 @@ export const SIGA: ConteudoPrograma = {
     tituloHtml: `Programa de Soluções Inteligentes de <em>Governança e Administração</em>`,
     sub: "Capacitação executiva para gestores administrativos, equipes de planejamento, processos, governança digital e controle interno — articulando boa administração pública, modernização operacional, governança de dados e cultura de performance institucional.",
     ctas: [
-      { rotulo: "Solicitar proposta", href: "/contato/proposta?programa=siga", variante: "gold" },
-      { rotulo: "Solicitar folder",   href: "/contato/proposta?programa=siga&assunto=folder", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta", href: "/contato?programa=siga", variante: "gold" },
+      { rotulo: "Solicitar folder",   href: "/contato?programa=siga&assunto=folder", variante: "ghost-light" },
     ],
   },
   metaBar: [
@@ -446,7 +446,7 @@ export const SIGA: ConteudoPrograma = {
     <span class="tag">Trilha completa · Recomendado</span>
     <h4>Os 8 módulos · 64 horas</h4>
     <p>Acesso integral à arquitetura formativa do SIGA — boa administração, planejamento e orçamento, processos, governança de dados, controle interno, transformação digital, indicadores e construção da matriz institucional. Certificação consolidada da trilha.</p>
-    <a class="cta" href="/contato/proposta?programa=siga&modalidade=trilha">Solicitar proposta da trilha →</a>
+    <a class="cta" href="/contato?programa=siga&modalidade=trilha">Solicitar proposta da trilha →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Módulo avulso</span>
@@ -458,13 +458,13 @@ export const SIGA: ConteudoPrograma = {
     <span class="tag">In company</span>
     <h4>Turma fechada para a instituição</h4>
     <p>Programa entregue exclusivamente à instituição contratante (secretaria, autarquia, fundação, órgão público), em formato presencial, online ou híbrido. Conteúdo customizável para a realidade administrativa e o perfil das áreas-meio.</p>
-    <a class="cta" href="/contato/proposta?programa=siga&modalidade=incompany">Solicitar proposta in company →</a>
+    <a class="cta" href="/contato?programa=siga&modalidade=incompany">Solicitar proposta in company →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Sob medida</span>
     <h4>Customização profunda</h4>
     <p>Customização avançada da trilha — ementas, módulos, cargas horárias, formato e linguagem ajustados a uma necessidade institucional específica. Inclui consultoria de adaptação institucional.</p>
-    <a class="cta" href="/contato/proposta?programa=siga&modalidade=sob-medida">Solicitar proposta sob medida →</a>
+    <a class="cta" href="/contato?programa=siga&modalidade=sob-medida">Solicitar proposta sob medida →</a>
   </article>
 </div>`,
   },
@@ -518,7 +518,7 @@ export const SIGA: ConteudoPrograma = {
     microcopy: "A composição da agenda do SIGA é atualizada conforme a edição, o perfil da turma e a demanda institucional. O programa pode ser cursado como trilha completa, módulos avulsos, turmas in company para órgãos públicos ou solução sob medida.",
     bottomCtas: [
       { rotulo: "Ver agenda completa do SIGA", href: "/agenda?programa=siga", primario: true },
-      { rotulo: "Solicitar inscrição institucional", href: "/contato/proposta?programa=siga&assunto=inscricao", primario: false },
+      { rotulo: "Solicitar inscrição institucional", href: "/contato?programa=siga&assunto=inscricao", primario: false },
     ],
   },
   faq: {

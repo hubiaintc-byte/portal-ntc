@@ -58,8 +58,8 @@ export function FooterHome() {
             <h5>Atendimento</h5>
             <ul>
               <li><a href="#eventos-abertos">Eventos com inscrições abertas</a></li>
-              <li><a href="#contratacao">Solicitar proposta</a></li>
-              <li><a href="#contratacao">Inscrever equipe</a></li>
+              <li><Link href="/contato?assunto=proposta">Solicitar proposta</Link></li>
+              <li><Link href="/contato">Inscrever equipe</Link></li>
               <li><Link href="/contato">Atendimento comercial</Link></li>
               <li><a href="#eventon">Suporte ao participante</a></li>
               <li><a href="#eventon">Área do Participante</a></li>

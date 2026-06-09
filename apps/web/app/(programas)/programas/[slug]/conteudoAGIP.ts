@@ -22,8 +22,8 @@ export const AGIP: ConteudoPrograma = {
     tituloHtml: `Programa Avançado de Governança, Integridade e Performance nas <em>Contratações Públicas</em>`,
     sub: "Capacitação executiva avançada para a aplicação madura da Lei 14.133, articulando integridade institucional, governança de riscos e performance contratual baseada em indicadores.",
     ctas: [
-      { rotulo: "Solicitar proposta", href: "/contato/proposta?programa=agip", variante: "gold" },
-      { rotulo: "Solicitar folder",   href: "/contato/proposta?programa=agip&assunto=folder", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta", href: "/contato?programa=agip", variante: "gold" },
+      { rotulo: "Solicitar folder",   href: "/contato?programa=agip&assunto=folder", variante: "ghost-light" },
     ],
   },
   metaBar: [
@@ -444,7 +444,7 @@ export const AGIP: ConteudoPrograma = {
     <span class="tag">Trilha completa · Recomendado</span>
     <h4>Os 8 módulos · 64 horas</h4>
     <p>Acesso integral à arquitetura formativa do AGIP — fundamentos jurídicos, governança, integridade, performance e construção da matriz institucional. Certificação consolidada da trilha.</p>
-    <a class="cta" href="/contato/proposta?programa=agip&modalidade=trilha">Solicitar proposta da trilha →</a>
+    <a class="cta" href="/contato?programa=agip&modalidade=trilha">Solicitar proposta da trilha →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Módulo avulso</span>
@@ -456,13 +456,13 @@ export const AGIP: ConteudoPrograma = {
     <span class="tag">In company</span>
     <h4>Turma fechada para a instituição</h4>
     <p>Programa entregue exclusivamente à instituição contratante (secretaria, autarquia, fundação, órgão público), em formato presencial, online ou híbrido. Conteúdo customizável para a realidade institucional.</p>
-    <a class="cta" href="/contato/proposta?programa=agip&modalidade=incompany">Solicitar proposta in company →</a>
+    <a class="cta" href="/contato?programa=agip&modalidade=incompany">Solicitar proposta in company →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Sob medida</span>
     <h4>Customização profunda</h4>
     <p>Customização avançada da trilha — ementas, módulos, cargas horárias, formato e linguagem ajustados a uma necessidade institucional específica. Inclui consultoria de adaptação institucional.</p>
-    <a class="cta" href="/contato/proposta?programa=agip&modalidade=sob-medida">Solicitar proposta sob medida →</a>
+    <a class="cta" href="/contato?programa=agip&modalidade=sob-medida">Solicitar proposta sob medida →</a>
   </article>
 </div>`,
   },
@@ -516,7 +516,7 @@ export const AGIP: ConteudoPrograma = {
     microcopy: "A composição da agenda do AGIP é atualizada conforme a edição e a demanda institucional. O programa pode ser cursado como trilha completa, módulos avulsos, turmas in company para órgãos públicos ou solução sob medida.",
     bottomCtas: [
       { rotulo: "Ver agenda completa do AGIP", href: "/agenda?programa=agip", primario: true },
-      { rotulo: "Solicitar inscrição institucional", href: "/contato/proposta?programa=agip&assunto=inscricao", primario: false },
+      { rotulo: "Solicitar inscrição institucional", href: "/contato?programa=agip&assunto=inscricao", primario: false },
     ],
   },
   faq: {

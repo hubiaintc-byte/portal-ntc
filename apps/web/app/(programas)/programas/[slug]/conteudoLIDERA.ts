@@ -22,8 +22,8 @@ export const LIDERA: ConteudoPrograma = {
     tituloHtml: `Programa de Liderança, Direção Estratégica e Resultados na <em>Administração Pública</em>`,
     sub: "Capacitação executiva para gestores, secretários e lideranças com responsabilidade direta sobre a direção institucional — articulando liderança pública contemporânea, decisão estratégica baseada em evidências e cultura de performance verificável.",
     ctas: [
-      { rotulo: "Solicitar proposta", href: "/contato/proposta?programa=lidera", variante: "gold" },
-      { rotulo: "Solicitar folder",   href: "/contato/proposta?programa=lidera&assunto=folder", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta", href: "/contato?programa=lidera", variante: "gold" },
+      { rotulo: "Solicitar folder",   href: "/contato?programa=lidera&assunto=folder", variante: "ghost-light" },
     ],
   },
   metaBar: [
@@ -444,7 +444,7 @@ export const LIDERA: ConteudoPrograma = {
     <span class="tag">Trilha completa · Recomendado</span>
     <h4>Os 8 módulos · 64 horas</h4>
     <p>Acesso integral à arquitetura formativa do LIDERA — liderança pública, direção estratégica, decisão por evidências, gestão de pessoas, performance, comunicação, gestão de crises e construção da matriz institucional. Certificação consolidada da trilha.</p>
-    <a class="cta" href="/contato/proposta?programa=lidera&modalidade=trilha">Solicitar proposta da trilha →</a>
+    <a class="cta" href="/contato?programa=lidera&modalidade=trilha">Solicitar proposta da trilha →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Módulo avulso</span>
@@ -456,13 +456,13 @@ export const LIDERA: ConteudoPrograma = {
     <span class="tag">In company</span>
     <h4>Turma fechada para a instituição</h4>
     <p>Programa entregue exclusivamente à instituição contratante (secretaria, autarquia, fundação, órgão público), em formato presencial, online ou híbrido. Conteúdo customizável para a realidade institucional e o perfil dos quadros de direção.</p>
-    <a class="cta" href="/contato/proposta?programa=lidera&modalidade=incompany">Solicitar proposta in company →</a>
+    <a class="cta" href="/contato?programa=lidera&modalidade=incompany">Solicitar proposta in company →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Sob medida</span>
     <h4>Customização profunda</h4>
     <p>Customização avançada da trilha — ementas, módulos, cargas horárias, formato e linguagem ajustados a uma necessidade institucional específica. Inclui consultoria de adaptação institucional.</p>
-    <a class="cta" href="/contato/proposta?programa=lidera&modalidade=sob-medida">Solicitar proposta sob medida →</a>
+    <a class="cta" href="/contato?programa=lidera&modalidade=sob-medida">Solicitar proposta sob medida →</a>
   </article>
 </div>`,
   },
@@ -516,7 +516,7 @@ export const LIDERA: ConteudoPrograma = {
     microcopy: "A composição da agenda do LIDERA é atualizada conforme a edição, o perfil da turma e a demanda institucional. O programa pode ser cursado como trilha completa, módulos avulsos, turmas in company para órgãos públicos ou solução sob medida.",
     bottomCtas: [
       { rotulo: "Ver agenda completa do LIDERA", href: "/agenda?programa=lidera", primario: true },
-      { rotulo: "Solicitar inscrição institucional", href: "/contato/proposta?programa=lidera&assunto=inscricao", primario: false },
+      { rotulo: "Solicitar inscrição institucional", href: "/contato?programa=lidera&assunto=inscricao", primario: false },
     ],
   },
   faq: {

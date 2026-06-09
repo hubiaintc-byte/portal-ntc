@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 import type { NavAnchor } from "./conteudoIndex";
 
@@ -78,18 +79,18 @@ export function NavBarAncoras({ anchors, slug }: Props) {
           })}
         </div>
         <div className="prog-nav-actions">
-          <a
+          <Link
             className="prog-nav-action primary"
-            href={`/contato/proposta?programa=${slug}`}
+            href={`/contato?programa=${slug}`}
           >
             Solicitar proposta
-          </a>
-          <a
+          </Link>
+          <Link
             className="prog-nav-action"
-            href={`/contato/proposta?programa=${slug}&assunto=folder`}
+            href={`/contato?programa=${slug}&assunto=folder`}
           >
             Solicitar folder
-          </a>
+          </Link>
         </div>
       </div>
     </nav>

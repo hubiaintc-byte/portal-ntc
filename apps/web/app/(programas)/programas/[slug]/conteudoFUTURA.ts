@@ -22,8 +22,8 @@ export const FUTURA: ConteudoPrograma = {
     tituloHtml: `Programa de Educação para o <em>Futuro</em>`,
     sub: "Capacitação executiva para secretarias estaduais e coordenadorias de ensino médio — articulando implementação do Novo Ensino Médio, itinerários formativos, projeto de vida, mundo do trabalho e empregabilidade juvenil nas redes públicas brasileiras.",
     ctas: [
-      { rotulo: "Solicitar proposta", href: "/contato/proposta?programa=futura", variante: "gold" },
-      { rotulo: "Solicitar folder",   href: "/contato/proposta?programa=futura&assunto=folder", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta", href: "/contato?programa=futura", variante: "gold" },
+      { rotulo: "Solicitar folder",   href: "/contato?programa=futura&assunto=folder", variante: "ghost-light" },
     ],
   },
   metaBar: [
@@ -364,7 +364,7 @@ export const FUTURA: ConteudoPrograma = {
     <span class="tag">Trilha completa · Recomendado</span>
     <h4>Os 4 módulos · 32 horas</h4>
     <p>Acesso integral à arquitetura formativa do FUTURA — Novo Ensino Médio, itinerários e projeto de vida, mundo do trabalho e construção da matriz institucional. Certificação consolidada da trilha, em formato enxuto e executivo.</p>
-    <a class="cta" href="/contato/proposta?programa=futura&modalidade=trilha">Solicitar proposta da trilha →</a>
+    <a class="cta" href="/contato?programa=futura&modalidade=trilha">Solicitar proposta da trilha →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Módulo avulso</span>
@@ -376,13 +376,13 @@ export const FUTURA: ConteudoPrograma = {
     <span class="tag">In company</span>
     <h4>Turma fechada para a secretaria estadual</h4>
     <p>Programa entregue exclusivamente à secretaria estadual de educação, em formato presencial, online ou híbrido. Conteúdo customizável para a realidade institucional da rede e o perfil das equipes do ensino médio.</p>
-    <a class="cta" href="/contato/proposta?programa=futura&modalidade=incompany">Solicitar proposta in company →</a>
+    <a class="cta" href="/contato?programa=futura&modalidade=incompany">Solicitar proposta in company →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Sob medida</span>
     <h4>Customização profunda</h4>
     <p>Customização avançada da trilha — ementas, módulos, cargas horárias, formato e linguagem ajustados a uma necessidade institucional específica. Inclui consultoria de adaptação institucional.</p>
-    <a class="cta" href="/contato/proposta?programa=futura&modalidade=sob-medida">Solicitar proposta sob medida →</a>
+    <a class="cta" href="/contato?programa=futura&modalidade=sob-medida">Solicitar proposta sob medida →</a>
   </article>
 </div>`,
   },
@@ -436,7 +436,7 @@ export const FUTURA: ConteudoPrograma = {
     microcopy: "A composição da agenda do FUTURA é atualizada conforme a edição, o perfil da turma e a demanda institucional. O programa pode ser cursado como trilha completa, módulos avulsos, turmas in company para secretarias estaduais ou solução sob medida.",
     bottomCtas: [
       { rotulo: "Ver agenda completa do FUTURA", href: "/agenda?programa=futura", primario: true },
-      { rotulo: "Solicitar inscrição institucional", href: "/contato/proposta?programa=futura&assunto=inscricao", primario: false },
+      { rotulo: "Solicitar inscrição institucional", href: "/contato?programa=futura&assunto=inscricao", primario: false },
     ],
   },
   faq: {

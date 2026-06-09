@@ -22,8 +22,8 @@ export const SIGS: ConteudoPrograma = {
     tituloHtml: `Sistema Integrado de Gestão em <em>Saúde Pública</em>`,
     sub: "Capacitação executiva para a governança integrada do Sistema Único de Saúde — articulando planejamento regional, pactuação interfederativa, financiamento, indicadores de rede e gestão estratégica das secretarias estaduais e municipais.",
     ctas: [
-      { rotulo: "Solicitar proposta", href: "/contato/proposta?programa=sigs", variante: "gold" },
-      { rotulo: "Solicitar folder",   href: "/contato/proposta?programa=sigs&assunto=folder", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta", href: "/contato?programa=sigs", variante: "gold" },
+      { rotulo: "Solicitar folder",   href: "/contato?programa=sigs&assunto=folder", variante: "ghost-light" },
     ],
   },
   metaBar: [
@@ -444,7 +444,7 @@ export const SIGS: ConteudoPrograma = {
     <span class="tag">Trilha completa · Recomendado</span>
     <h4>Os 8 módulos · 64 horas</h4>
     <p>Acesso integral à arquitetura formativa do SIGS — marco do SUS, planejamento regional, pactuação interfederativa, financiamento, indicadores, regulação, direção estratégica e construção da matriz institucional. Certificação consolidada da trilha.</p>
-    <a class="cta" href="/contato/proposta?programa=sigs&modalidade=trilha">Solicitar proposta da trilha →</a>
+    <a class="cta" href="/contato?programa=sigs&modalidade=trilha">Solicitar proposta da trilha →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Módulo avulso</span>
@@ -456,13 +456,13 @@ export const SIGS: ConteudoPrograma = {
     <span class="tag">In company</span>
     <h4>Turma fechada para a secretaria</h4>
     <p>Programa entregue exclusivamente à secretaria estadual ou municipal de saúde, em formato presencial, online ou híbrido. Conteúdo customizável para a realidade institucional e o perfil dos quadros executivos do SUS.</p>
-    <a class="cta" href="/contato/proposta?programa=sigs&modalidade=incompany">Solicitar proposta in company →</a>
+    <a class="cta" href="/contato?programa=sigs&modalidade=incompany">Solicitar proposta in company →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Sob medida</span>
     <h4>Customização profunda</h4>
     <p>Customização avançada da trilha — ementas, módulos, cargas horárias, formato e linguagem ajustados a uma necessidade institucional específica. Inclui consultoria de adaptação institucional.</p>
-    <a class="cta" href="/contato/proposta?programa=sigs&modalidade=sob-medida">Solicitar proposta sob medida →</a>
+    <a class="cta" href="/contato?programa=sigs&modalidade=sob-medida">Solicitar proposta sob medida →</a>
   </article>
 </div>`,
   },
@@ -516,7 +516,7 @@ export const SIGS: ConteudoPrograma = {
     microcopy: "A composição da agenda do SIGS é atualizada conforme a edição, o perfil da turma e a demanda institucional. O programa pode ser cursado como trilha completa, módulos avulsos, turmas in company para secretarias do SUS ou solução sob medida.",
     bottomCtas: [
       { rotulo: "Ver agenda completa do SIGS", href: "/agenda?programa=sigs", primario: true },
-      { rotulo: "Solicitar inscrição institucional", href: "/contato/proposta?programa=sigs&assunto=inscricao", primario: false },
+      { rotulo: "Solicitar inscrição institucional", href: "/contato?programa=sigs&assunto=inscricao", primario: false },
     ],
   },
   faq: {

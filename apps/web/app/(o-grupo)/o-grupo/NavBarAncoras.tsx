@@ -81,14 +81,13 @@ export function NavBarAncoras() {
           ))}
         </div>
         <div className="grupo-nav-actions">
-          <button
-            type="button"
+          <Link
             className="grupo-nav-action primary"
-            onClick={() => rolarPara("cta-final")}
+            href="/contato?assunto=proposta"
             data-cms-link="proposta-institucional"
           >
             Solicitar proposta
-          </button>
+          </Link>
           <Link
             className="grupo-nav-action"
             href="/#contato"

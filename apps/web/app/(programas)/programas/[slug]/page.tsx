@@ -466,12 +466,12 @@ export default async function ProgramaPage({ params }: Props) {
                             </div>
                           </div>
                           <div className="pef-actions">
-                            <a className="btn btn--gold" href={`/contato/proposta?programa=${p.slug}`}>
+                            <Link className="btn btn--gold" href={`/contato?programa=${p.slug}`}>
                               {f.ctaPrimario} <span className="btn-arrow">→</span>
-                            </a>
-                            <a className="btn btn--secondary" href={`/contato/proposta?programa=${p.slug}&assunto=detalhes`}>
+                            </Link>
+                            <Link className="btn btn--secondary" href={`/contato?programa=${p.slug}&assunto=detalhes`}>
                               {f.ctaSecundario}
-                            </a>
+                            </Link>
                           </div>
                         </article>
                       );
@@ -510,12 +510,12 @@ export default async function ProgramaPage({ params }: Props) {
                                   className="pem-meta"
                                   dangerouslySetInnerHTML={{ __html: mini.metaHtml }}
                                 />
-                                <a
+                                <Link
                                   className="pem-cta"
-                                  href={`/contato/proposta?programa=${p.slug}&assunto=inscricao`}
+                                  href={`/contato?programa=${p.slug}&assunto=inscricao`}
                                 >
                                   {mini.ctaRotulo}
-                                </a>
+                                </Link>
                               </div>
                             </article>
                           );
@@ -567,12 +567,12 @@ export default async function ProgramaPage({ params }: Props) {
                     {p.ctaFinal.corpo}
                   </p>
                   <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
-                    <a className="btn btn--gold" href={`/contato/proposta?programa=${p.slug}`}>
+                    <Link className="btn btn--gold" href={`/contato?programa=${p.slug}`}>
                       Solicitar proposta institucional <span className="btn-arrow">→</span>
-                    </a>
-                    <a className="btn btn--secondary" href={`/contato/proposta?programa=${p.slug}&assunto=folder`}>
+                    </Link>
+                    <Link className="btn btn--secondary" href={`/contato?programa=${p.slug}&assunto=folder`}>
                       Solicitar folder do programa
-                    </a>
+                    </Link>
                     <a className="btn btn--secondary" href="#modulos-abertos">
                       Ver módulos abertos
                     </a>
@@ -614,12 +614,12 @@ export default async function ProgramaPage({ params }: Props) {
                     </ul>
                   </div>
                   <div className="prog-sb-actions">
-                    <a className="btn btn--gold" href={`/contato/proposta?programa=${p.slug}`}>
+                    <Link className="btn btn--gold" href={`/contato?programa=${p.slug}`}>
                       Solicitar proposta <span className="btn-arrow">→</span>
-                    </a>
-                    <a className="btn btn--secondary" href={`/contato/proposta?programa=${p.slug}&assunto=folder`}>
+                    </Link>
+                    <Link className="btn btn--secondary" href={`/contato?programa=${p.slug}&assunto=folder`}>
                       Solicitar folder do programa
-                    </a>
+                    </Link>
                     <a className="link-arrow" href="#modulos-abertos">
                       Ver módulos abertos
                     </a>

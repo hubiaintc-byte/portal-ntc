@@ -232,10 +232,10 @@ export default function MapaDoSitePage() {
                     <span className="sitemap-col-num">Atendimento</span>
                     <h3>Contato <small>Canais oficiais</small></h3>
                     <ul>
-                      <li><a href="#"><strong>Contato</strong><span>Atendimento institucional</span></a>{/* rota /contato não portada */}</li>
-                      <li><a href="#"><strong>Solicitar proposta</strong><span>Formulário de proposta institucional</span></a>{/* rota /contato#tab-proposta não portada */}</li>
-                      <li><a href="#"><strong>Inscrever equipe</strong><span>Inscrição em grupo institucional</span></a>{/* rota /contato#tab-equipe não portada */}</li>
-                      <li><a href="#"><strong>Atendimento comercial</strong><span>Equipe comercial dedicada</span></a>{/* rota /contato#tab-atendimento não portada */}</li>
+                      <li><Link href="/contato"><strong>Contato</strong><span>Atendimento institucional</span></Link></li>
+                      <li><Link href="/contato?assunto=proposta"><strong>Solicitar proposta</strong><span>Formulário de proposta institucional</span></Link></li>
+                      <li><Link href="/contato?assunto=equipe"><strong>Inscrever equipe</strong><span>Inscrição em grupo institucional</span></Link></li>
+                      <li><Link href="/contato"><strong>Atendimento comercial</strong><span>Equipe comercial dedicada</span></Link></li>
                     </ul>
                   </div>
                 </div>

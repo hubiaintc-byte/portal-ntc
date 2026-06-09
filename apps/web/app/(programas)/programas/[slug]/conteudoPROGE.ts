@@ -22,8 +22,8 @@ export const PROGE: ConteudoPrograma = {
     tituloHtml: `Programa de Gestão Escolar, Coordenação Pedagógica e <em>Direção de Alta Performance</em>`,
     sub: "Capacitação executiva para diretores, coordenadores e equipes pedagógicas das escolas públicas brasileiras — articulando direção escolar contemporânea, coordenação pedagógica qualificada, gestão democrática, projeto político-pedagógico e cultura institucional de alta performance.",
     ctas: [
-      { rotulo: "Solicitar proposta", href: "/contato/proposta?programa=proge", variante: "gold" },
-      { rotulo: "Solicitar folder",   href: "/contato/proposta?programa=proge&assunto=folder", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta", href: "/contato?programa=proge", variante: "gold" },
+      { rotulo: "Solicitar folder",   href: "/contato?programa=proge&assunto=folder", variante: "ghost-light" },
     ],
   },
   metaBar: [
@@ -444,7 +444,7 @@ export const PROGE: ConteudoPrograma = {
     <span class="tag">Trilha completa · Recomendado</span>
     <h4>Os 8 módulos · 64 horas</h4>
     <p>Acesso integral à arquitetura formativa do PROGE — direção escolar contemporânea, liderança pedagógica, coordenação, supervisão, gestão democrática, PPP, autonomia escolar e construção da matriz institucional. Certificação consolidada da trilha.</p>
-    <a class="cta" href="/contato/proposta?programa=proge&modalidade=trilha">Solicitar proposta da trilha →</a>
+    <a class="cta" href="/contato?programa=proge&modalidade=trilha">Solicitar proposta da trilha →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Módulo avulso</span>
@@ -456,13 +456,13 @@ export const PROGE: ConteudoPrograma = {
     <span class="tag">In company</span>
     <h4>Turma fechada para escola, secretaria ou rede</h4>
     <p>Programa entregue exclusivamente à instituição contratante — escola, secretaria estadual ou municipal de educação, em formato presencial, online ou híbrido. Conteúdo customizável para a realidade da rede e o perfil dos profissionais.</p>
-    <a class="cta" href="/contato/proposta?programa=proge&modalidade=incompany">Solicitar proposta in company →</a>
+    <a class="cta" href="/contato?programa=proge&modalidade=incompany">Solicitar proposta in company →</a>
   </article>
   <article class="mode-card-prog">
     <span class="tag">Sob medida</span>
     <h4>Customização profunda</h4>
     <p>Customização avançada da trilha — ementas, módulos, cargas horárias, formato e linguagem ajustados a uma necessidade institucional específica. Inclui consultoria de adaptação institucional.</p>
-    <a class="cta" href="/contato/proposta?programa=proge&modalidade=sob-medida">Solicitar proposta sob medida →</a>
+    <a class="cta" href="/contato?programa=proge&modalidade=sob-medida">Solicitar proposta sob medida →</a>
   </article>
 </div>`,
   },
@@ -516,7 +516,7 @@ export const PROGE: ConteudoPrograma = {
     microcopy: "A composição da agenda do PROGE é atualizada conforme a edição, o perfil da turma e a demanda institucional. O programa pode ser cursado como trilha completa, módulos avulsos, turmas in company para escolas e secretarias ou solução sob medida.",
     bottomCtas: [
       { rotulo: "Ver agenda completa do PROGE", href: "/agenda?programa=proge", primario: true },
-      { rotulo: "Solicitar inscrição institucional", href: "/contato/proposta?programa=proge&assunto=inscricao", primario: false },
+      { rotulo: "Solicitar inscrição institucional", href: "/contato?programa=proge&assunto=inscricao", primario: false },
     ],
   },
   faq: {
