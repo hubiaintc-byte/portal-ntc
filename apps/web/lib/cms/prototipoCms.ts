@@ -288,6 +288,19 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
   };
 }
 
+/** Ids dos eventos atualmente em destaque na Home (Global home). */
+export async function obterEventosHomeIds(): Promise<string[]> {
+  const payload = await obterPayload();
+  const home = (await payload
+    .findGlobal({ slug: "home", depth: 0, draft: true })
+    .catch(() => null)) as { eventosAgendaDestaque?: unknown[] } | null;
+  const lista = home?.eventosAgendaDestaque ?? [];
+  return lista
+    .map((e) => (typeof e === "object" && e !== null ? (e as { id?: unknown }).id : e))
+    .filter((v): v is string | number => v !== null && v !== undefined)
+    .map((v) => String(v));
+}
+
 export async function obterPalestranteCms(id: string): Promise<PalestranteCmsDetalhe | null> {
   const payload = await obterPayload();
   const doc = (await payload

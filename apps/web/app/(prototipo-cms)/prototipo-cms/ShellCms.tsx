@@ -11,6 +11,7 @@ import type {
 
 import { carregarEvento, carregarPalestrante } from "./acoes";
 import { TelaDashboard } from "./TelaDashboard";
+import { TelaHome } from "./TelaHome";
 import { TelaPalestrantes } from "./TelaPalestrantes";
 import { TelaEventos } from "./TelaEventos";
 import { TelaConfiguracoes } from "./TelaConfiguracoes";
@@ -27,10 +28,11 @@ import { DetalhePalestrante } from "./DetalhePalestrante";
 interface ShellCmsProps {
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
+  eventosHomeIds: string[];
   erroLeitura: boolean;
 }
 
-type TelaId = "dashboard" | "palestrantes" | "eventos" | "config";
+type TelaId = "dashboard" | "palestrantes" | "eventos" | "home" | "config";
 
 interface ItemNav {
   id: TelaId;
@@ -62,6 +64,13 @@ const Ico = {
       <path d="M3.5 9.5h17M8 3v4M16 3v4" />
     </svg>
   ),
+  home: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 11 12 4l8 7" />
+      <path d="M6 10v10h12V10" />
+      <path d="M10 20v-6h4v6" />
+    </svg>
+  ),
   config: (
     <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
@@ -74,6 +83,7 @@ const NAV_PRINCIPAL: ItemNav[] = [
   { id: "dashboard", rotulo: "Painel", icone: Ico.painel },
   { id: "palestrantes", rotulo: "Palestrantes", icone: Ico.palestrantes },
   { id: "eventos", rotulo: "Eventos", icone: Ico.eventos },
+  { id: "home", rotulo: "Home", icone: Ico.home },
 ];
 
 const NAV_SISTEMA: ItemNav[] = [{ id: "config", rotulo: "Configurações", icone: Ico.config }];
@@ -82,10 +92,11 @@ const CRUMB: Record<TelaId, string> = {
   dashboard: "Painel",
   palestrantes: "Editorial · Palestrantes",
   eventos: "Editorial · Eventos",
+  home: "Editorial · Home",
   config: "Sistema · Configurações",
 };
 
-export function ShellCms({ eventos, palestrantes, erroLeitura }: ShellCmsProps) {
+export function ShellCms({ eventos, palestrantes, eventosHomeIds, erroLeitura }: ShellCmsProps) {
   const [tela, setTela] = useState<TelaId>("dashboard");
   const [eventoDet, setEventoDet] = useState<EventoCmsDetalhe | null>(null);
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
@@ -197,7 +208,11 @@ export function ShellCms({ eventos, palestrantes, erroLeitura }: ShellCmsProps) 
           {carregando && <div className="pcms-carregando">Carregando…</div>}
 
           {eventoDet ? (
-            <DetalheEvento evento={eventoDet} onVoltar={() => setEventoDet(null)} />
+            <DetalheEvento
+              evento={eventoDet}
+              palestrantesDisponiveis={palestrantes}
+              onVoltar={() => setEventoDet(null)}
+            />
           ) : palestranteDet ? (
             <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
           ) : (
@@ -214,6 +229,9 @@ export function ShellCms({ eventos, palestrantes, erroLeitura }: ShellCmsProps) 
                   <TelaPalestrantes palestrantes={palestrantes} onAbrir={abrirPalestrante} />
                 )}
                 {tela === "eventos" && <TelaEventos eventos={eventos} onAbrir={abrirEvento} />}
+                {tela === "home" && (
+                  <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />
+                )}
                 {tela === "config" && <TelaConfiguracoes />}
               </>
             )

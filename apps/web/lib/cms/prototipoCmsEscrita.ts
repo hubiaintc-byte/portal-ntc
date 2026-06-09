@@ -49,6 +49,86 @@ export async function salvarCamposEvento(
 }
 
 /**
+ * Publica o evento: promove o rascunho atual a publicado (_status: published,
+ * sem draft:true). Faz a versão editada/com capa nova ir ao ar no site.
+ */
+export async function publicarEvento(id: string): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "eventos",
+      id,
+      data: { _status: "published" },
+      overrideAccess: true,
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao publicar." };
+  }
+}
+
+/**
+ * Vincula a lista de palestrantes (ids de especialistas) ao evento. Substitui
+ * a lista atual do campo `palestrantes`. draft:true mantém o estado de
+ * publicação (não força publish).
+ */
+export async function vincularPalestrantesEvento(
+  id: string,
+  idsEspecialistas: string[],
+): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    // O campo `palestrantes` é relação por id numérico; converte os ids string.
+    const ids = idsEspecialistas.map((s) => Number(s)).filter((n) => !Number.isNaN(n));
+    await payload.update({
+      collection: "eventos",
+      id,
+      data: { palestrantes: ids },
+      draft: true,
+      overrideAccess: true,
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao vincular palestrantes." };
+  }
+}
+
+/**
+ * Define os eventos em destaque na Home (Global home → eventosAgendaDestaque).
+ * Recebe ids string; converte para number (relação por id).
+ */
+export async function salvarEventosHome(idsEventos: string[]): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    const ids = idsEventos.map((s) => Number(s)).filter((n) => !Number.isNaN(n));
+    await payload.updateGlobal({
+      slug: "home",
+      data: { eventosAgendaDestaque: ids },
+      overrideAccess: true,
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao salvar eventos da Home." };
+  }
+}
+
+/** Despublica o evento (volta a rascunho): some do site público. */
+export async function despublicarEvento(id: string): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "eventos",
+      id,
+      data: { _status: "draft" },
+      overrideAccess: true,
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao despublicar." };
+  }
+}
+
+/**
  * Recebe um File do client (via FormData), cria um registro Media pela Local
  * API (gera variantes + sobe ao Supabase Storage) e aponta o campo do evento
  * (`imagemCapa` ou `folderPdf`) para a nova Media.

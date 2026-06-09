@@ -2,10 +2,11 @@
 
 import { useState, useTransition } from "react";
 
-import type { EventoCmsDetalhe } from "@/lib/cms/prototipoCms";
+import type { EventoCmsDetalhe, PalestranteCmsResumo } from "@/lib/cms/prototipoCms";
 
-import { salvarEvento } from "./acoes";
+import { alternarPublicacaoEvento, salvarEvento } from "./acoes";
 import { CampoUpload } from "./CampoUpload";
+import { SeletorPalestrantes } from "./SeletorPalestrantes";
 
 const ROTULO_STATUS: Record<EventoCmsDetalhe["status"], string> = {
   publicado: "Publicado",
@@ -15,13 +16,19 @@ const ROTULO_STATUS: Record<EventoCmsDetalhe["status"], string> = {
 
 interface DetalheEventoProps {
   evento: EventoCmsDetalhe;
+  palestrantesDisponiveis: PalestranteCmsResumo[];
   onVoltar: () => void;
 }
 
 /** Tela cheia de detalhe de um evento — leitura + edição de campos via CMS. */
-export function DetalheEvento({ evento: eventoInicial, onVoltar }: DetalheEventoProps) {
+export function DetalheEvento({
+  evento: eventoInicial,
+  palestrantesDisponiveis,
+  onVoltar,
+}: DetalheEventoProps) {
   const [evento, setEvento] = useState(eventoInicial);
   const [editando, setEditando] = useState(false);
+  const [gerenciandoPalestrantes, setGerenciandoPalestrantes] = useState(false);
   const [salvando, iniciarSalvar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
 
@@ -55,6 +62,19 @@ export function DetalheEvento({ evento: eventoInicial, onVoltar }: DetalheEvento
     });
   }
 
+  function alternarPublicacao() {
+    const publicar = evento.status !== "publicado";
+    setErro(null);
+    iniciarSalvar(async () => {
+      const { resultado, evento: atualizado } = await alternarPublicacaoEvento(evento.id, publicar);
+      if (resultado.ok && atualizado) {
+        setEvento(atualizado);
+      } else {
+        setErro(resultado.erro ?? "Não foi possível alterar a publicação.");
+      }
+    });
+  }
+
   return (
     <>
       <button type="button" className="pcms-breadcrumb" onClick={onVoltar}>
@@ -79,9 +99,19 @@ export function DetalheEvento({ evento: eventoInicial, onVoltar }: DetalheEvento
             {ROTULO_STATUS[evento.status]}
           </span>
           {!editando && (
-            <button type="button" className="pcms-btn pcms-btn--ghost" onClick={abrirEdicao}>
-              Editar
-            </button>
+            <>
+              <button type="button" className="pcms-btn pcms-btn--ghost" onClick={abrirEdicao}>
+                Editar
+              </button>
+              <button
+                type="button"
+                className="pcms-btn"
+                onClick={alternarPublicacao}
+                disabled={salvando}
+              >
+                {evento.status === "publicado" ? "Despublicar" : "Publicar"}
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -236,11 +266,30 @@ export function DetalheEvento({ evento: eventoInicial, onVoltar }: DetalheEvento
             </div>
           </div>
 
-          {evento.palestrantes.length > 0 && (
-            <div className="pcms-det-card">
-              <div className="pcms-det-card__head">Palestrantes</div>
-              <div className="pcms-det-card__body">
-                {evento.palestrantes.map((p) => (
+          <div className="pcms-det-card">
+            <div className="pcms-det-card__head pcms-det-card__head--acao">
+              Palestrantes
+              {!gerenciandoPalestrantes && (
+                <button
+                  type="button"
+                  className="pcms-link-acao"
+                  onClick={() => setGerenciandoPalestrantes(true)}
+                >
+                  Gerenciar
+                </button>
+              )}
+            </div>
+            <div className="pcms-det-card__body">
+              {gerenciandoPalestrantes ? (
+                <SeletorPalestrantes
+                  eventoId={evento.id}
+                  vinculadosIds={evento.palestrantes.map((p) => p.id)}
+                  disponiveis={palestrantesDisponiveis}
+                  onAtualizado={setEvento}
+                  onFechar={() => setGerenciandoPalestrantes(false)}
+                />
+              ) : evento.palestrantes.length > 0 ? (
+                evento.palestrantes.map((p) => (
                   <div key={p.id} className="pcms-det-pessoa">
                     <span className="pcms-avatar" aria-hidden="true">
                       {p.iniciais}
@@ -250,10 +299,12 @@ export function DetalheEvento({ evento: eventoInicial, onVoltar }: DetalheEvento
                       <small>{p.titulacao}</small>
                     </span>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <p className="pcms-seletor__vazio">Nenhum palestrante vinculado.</p>
+              )}
             </div>
-          )}
+          </div>
         </aside>
       </div>
     </>

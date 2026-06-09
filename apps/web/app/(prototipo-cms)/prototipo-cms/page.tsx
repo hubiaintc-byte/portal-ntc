@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import {
   listarEventosCms,
   listarPalestrantesCms,
+  obterEventosHomeIds,
   type EventoCmsResumo,
   type PalestranteCmsResumo,
 } from "@/lib/cms/prototipoCms";
@@ -29,16 +30,25 @@ export const dynamic = "force-dynamic";
 export default async function PrototipoCmsPage() {
   let eventos: EventoCmsResumo[] = [];
   let palestrantes: PalestranteCmsResumo[] = [];
+  let eventosHomeIds: string[] = [];
   let erroLeitura = false;
 
   try {
-    [eventos, palestrantes] = await Promise.all([
+    [eventos, palestrantes, eventosHomeIds] = await Promise.all([
       listarEventosCms(),
       listarPalestrantesCms(),
+      obterEventosHomeIds(),
     ]);
   } catch {
     erroLeitura = true;
   }
 
-  return <ShellCms eventos={eventos} palestrantes={palestrantes} erroLeitura={erroLeitura} />;
+  return (
+    <ShellCms
+      eventos={eventos}
+      palestrantes={palestrantes}
+      eventosHomeIds={eventosHomeIds}
+      erroLeitura={erroLeitura}
+    />
+  );
 }

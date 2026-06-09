@@ -9,8 +9,12 @@ import {
   type PalestranteCmsDetalhe,
 } from "@/lib/cms/prototipoCms";
 import {
+  despublicarEvento,
   enviarMidiaEvento,
+  publicarEvento,
   salvarCamposEvento,
+  salvarEventosHome,
+  vincularPalestrantesEvento,
   type ResultadoEscrita,
 } from "@/lib/cms/prototipoCmsEscrita";
 
@@ -57,4 +61,33 @@ export async function enviarMidia(
   if (resultado.ok) revalidatePath("/prototipo-cms");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
   return { resultado, evento };
+}
+
+/** Publica ou despublica o evento e devolve o detalhe atualizado. */
+export async function alternarPublicacaoEvento(
+  id: string,
+  publicar: boolean,
+): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
+  const resultado = publicar ? await publicarEvento(id) : await despublicarEvento(id);
+  if (resultado.ok) revalidatePath("/prototipo-cms");
+  const evento = resultado.ok ? await obterEventoCms(id) : null;
+  return { resultado, evento };
+}
+
+/** Vincula os palestrantes (ids) ao evento e devolve o detalhe atualizado. */
+export async function salvarPalestrantesEvento(
+  id: string,
+  idsEspecialistas: string[],
+): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
+  const resultado = await vincularPalestrantesEvento(id, idsEspecialistas);
+  if (resultado.ok) revalidatePath("/prototipo-cms");
+  const evento = resultado.ok ? await obterEventoCms(id) : null;
+  return { resultado, evento };
+}
+
+/** Salva os eventos em destaque na Home. */
+export async function salvarEventosDestaqueHome(idsEventos: string[]): Promise<ResultadoEscrita> {
+  const resultado = await salvarEventosHome(idsEventos);
+  if (resultado.ok) revalidatePath("/prototipo-cms");
+  return resultado;
 }
