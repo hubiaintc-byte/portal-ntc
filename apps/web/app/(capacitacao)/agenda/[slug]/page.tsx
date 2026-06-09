@@ -53,11 +53,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function EventoPage({ params }: PageProps) {
   const { slug } = await params;
 
+  // Quando há evento ESTÁTICO para o slug, ele é a fonte de conteúdo (textos
+  // validados na porta); o CMS apenas sobrescreve capa/data/folder (override).
+  // Slugs sem estático caem no fluxo CMS completo (fetchEvento/adaptarEvento).
+  const estatico = EVENTOS_AGENDA[slug];
+
+  if (estatico?.formato === "online") {
+    const ovr = await buscarOverride(slug);
+    const eventoFinal = ovr ? aplicarOverrideOnline(estatico, ovr) : estatico;
+    return <EventoOnlineLayout evento={eventoFinal} />;
+  }
+
   const evento =
+    estatico ??
     (await fetchEvento(slug).catch((err) => {
       console.error("[agenda] fetch CMS falhou, usando fallback:", err);
       return null;
-    })) ?? EVENTOS_AGENDA[slug];
+    }));
 
   if (!evento) notFound();
 
@@ -65,10 +77,7 @@ export default async function EventoPage({ params }: PageProps) {
     case "presencial":
     case "hibrido":
       return <EventoPresencialLayout evento={evento} />;
-    case "online": {
-      const ovr = await buscarOverride(slug);
-      const eventoFinal = ovr ? aplicarOverrideOnline(evento, ovr) : evento;
-      return <EventoOnlineLayout evento={eventoFinal} />;
-    }
+    case "online":
+      return <EventoOnlineLayout evento={evento} />;
   }
 }
