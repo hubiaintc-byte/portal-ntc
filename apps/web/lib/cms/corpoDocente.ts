@@ -135,11 +135,12 @@ interface CardsAdaptados {
 function adaptarCards(g: CorpoDocenteGlobal): CardsAdaptados {
   const featured: CardFeatured[] = [];
   const experts: CardExpert[] = [];
-  const axis: CardAxis[] = [];
 
   for (const card of g.cards ?? []) {
     if (card.formato === "axis") {
-      axis.push(adaptarCardAxis(card));
+      // Cards de eixo "Frente 0X · Saúde" foram removidos do Corpo Docente
+      // (não são palestrantes). Ignorados aqui como blindagem caso reapareçam
+      // no Global por uma republicação. A grade exibe apenas pessoas reais.
       continue;
     }
 
@@ -167,7 +168,8 @@ function adaptarCards(g: CorpoDocenteGlobal): CardsAdaptados {
     }
   }
 
-  return { CARDS_FEATURED: featured, CARDS_EXPERTS: experts, CARDS_AXIS_SAUDE: axis };
+  // CARDS_AXIS_SAUDE sempre vazio: cards de eixo foram removidos do Corpo Docente.
+  return { CARDS_FEATURED: featured, CARDS_EXPERTS: experts, CARDS_AXIS_SAUDE: [] };
 }
 
 function adaptarCardFeatured(card: CardCMS, esp: Especialista): CardFeatured {
@@ -205,30 +207,6 @@ function adaptarCardExpert(card: CardCMS, esp: Especialista): CardExpert {
     sufixoPrograma: card.sufixoPrograma ?? undefined,
     ctaHref: card.ctaHref ?? "#",
     ctaRotulo: card.ctaRotulo ?? CTA_ROTULO_DEFAULT,
-  };
-}
-
-function adaptarCardAxis(card: CardCMS): CardAxis {
-  return {
-    vertical: "saude",
-    area: card.area ?? "",
-    tipo: "pesquisador",
-    frente: "",
-    programas: card.programasStrongAxis ?? "",
-    formacao: "doutorado",
-    atuacao: "universidade",
-    cmsLink: "",
-    nome: card.tituloAxis ?? "",
-    iconeSvgInner: card.iconeSvgInner ?? "",
-    axisTag: card.axisTag ?? "",
-    titulo: card.tituloAxis ?? "",
-    credencial: card.credencialAxis ?? "",
-    programasTexto: card.programasTextoAxis ?? "",
-    programasStrong: card.programasStrongAxis ?? "",
-    ctaHref: card.ctaHref ?? "#",
-    ctaRotulo: card.ctaRotulo ?? CTA_ROTULO_DEFAULT,
-    styleAccent: card.styleAccent ?? "",
-    styleAccentDark: card.styleAccentDark ?? "",
   };
 }
 
