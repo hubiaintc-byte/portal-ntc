@@ -14,6 +14,8 @@ interface OverrideEvento {
   coverUrl?: string;
   dataInicioISO?: string;
   folderUrl?: string;
+  /** Mapa nome-normalizado → URL da foto, vindo da coleção `especialistas`. */
+  fotosPalestrantes?: Record<string, string>;
 }
 
 type UploadComUrl = { url?: string | null } | string | number | null | undefined;
@@ -21,6 +23,11 @@ type UploadComUrl = { url?: string | null } | string | number | null | undefined
 function urlDoUpload(v: UploadComUrl): string | undefined {
   if (v && typeof v === "object" && "url" in v && v.url) return v.url;
   return undefined;
+}
+
+/** Normaliza nome para casar palestrante do estático com especialista do CMS. */
+function normalizarNome(nome: string): string {
+  return nome.trim().toLowerCase();
 }
 
 export async function buscarOverride(slug: string): Promise<OverrideEvento | null> {
@@ -41,10 +48,43 @@ export async function buscarOverride(slug: string): Promise<OverrideEvento | nul
       coverUrl: urlDoUpload(doc.imagemCapa),
       dataInicioISO: doc.dataInicio,
       folderUrl: urlDoUpload(doc.folderPdf),
+      fotosPalestrantes: await buscarFotosPalestrantes(payload),
     };
   } catch (err) {
     console.error("[agenda] buscarOverride falhou, usando estático:", err);
     return null;
+  }
+}
+
+type PayloadCliente = Awaited<ReturnType<typeof obterPayload>>;
+
+/**
+ * Mapa nome-normalizado → URL da foto de cada especialista cadastrado com foto.
+ * Lido via Local API (a URL do Storage é derivada em runtime; não persiste em
+ * coluna). Usado pelo override online para casar palestrantes do estático com
+ * fotos reais do CMS por nome. Falha → mapa vazio (estático intacto).
+ */
+async function buscarFotosPalestrantes(
+  payload: PayloadCliente,
+): Promise<Record<string, string>> {
+  try {
+    const res = await payload.find({
+      collection: "especialistas",
+      limit: 500,
+      depth: 1,
+      overrideAccess: true,
+    });
+    const mapa: Record<string, string> = {};
+    for (const esp of res.docs as Array<{ nome?: string; foto?: UploadComUrl }>) {
+      const url = urlDoUpload(esp.foto);
+      if (esp.nome && url) {
+        mapa[normalizarNome(esp.nome)] = url;
+      }
+    }
+    return mapa;
+  } catch (err) {
+    console.error("[agenda] buscarFotosPalestrantes falhou:", err);
+    return {};
   }
 }
 
@@ -109,6 +149,24 @@ export function aplicarOverrideOnline(
         ctas: e.heroOnline.ctas.map((c) =>
           /folder/i.test(c.cmsLink ?? "") ? { ...c, href: folderUrl } : c,
         ),
+      },
+    };
+  }
+
+  // 4) Fotos dos palestrantes → casa por nome com especialistas do CMS.
+  //    Preenche só quando o estático está sem foto e há match (não sobrescreve
+  //    foto já definida na porta).
+  const fotos = ovr.fotosPalestrantes;
+  if (fotos && e.palestrantesOnline) {
+    e = {
+      ...e,
+      palestrantesOnline: {
+        ...e.palestrantesOnline,
+        palestrantes: e.palestrantesOnline.palestrantes.map((p) => {
+          if (p.foto) return p;
+          const url = fotos[normalizarNome(p.nome)];
+          return url ? { ...p, foto: url } : p;
+        }),
       },
     };
   }
