@@ -35,6 +35,10 @@ export interface PalestranteCmsResumo {
   instituicao: string;
   vertical: string | null;
   temFoto: boolean;
+  /** URL da foto vinculada (miniatura na listagem), ou null se sem foto. */
+  fotoUrl: string | null;
+  /** true → especialista não aparece em nenhuma página pública do site. */
+  ocultarDoSite: boolean;
 }
 
 // ---- Tipos de detalhe (tela cheia, somente leitura) --------------------
@@ -64,7 +68,6 @@ export interface EventoCmsDetalhe extends EventoCmsResumo {
 
 export interface PalestranteCmsDetalhe extends PalestranteCmsResumo {
   cargoAtual: string | null;
-  fotoUrl: string | null;
   curriculoCurtoHtml: string;
   curriculoCompletoHtml: string;
   linkLattes: string | null;
@@ -169,8 +172,10 @@ export async function listarPalestrantesCms(): Promise<PalestranteCmsResumo[]> {
       instituicao?: string;
       vertical?: string | null;
       foto?: unknown;
+      ocultarDoSite?: boolean | null;
     };
     const nome = doc.nome ?? "(sem nome)";
+    const fotoUrl = urlDeMidia(doc.foto);
     return {
       id: String(doc.id),
       nome,
@@ -178,7 +183,9 @@ export async function listarPalestrantesCms(): Promise<PalestranteCmsResumo[]> {
       titulacao: doc.titulacao ?? "—",
       instituicao: doc.instituicao ?? "—",
       vertical: doc.vertical ?? null,
-      temFoto: typeof doc.foto === "object" && doc.foto !== null,
+      temFoto: Boolean(fotoUrl),
+      fotoUrl,
+      ocultarDoSite: Boolean(doc.ocultarDoSite),
     };
   });
 }
@@ -317,6 +324,7 @@ export async function obterPalestranteCms(id: string): Promise<PalestranteCmsDet
     vertical?: string | null;
     tipo?: string;
     foto?: unknown;
+    ocultarDoSite?: boolean | null;
     curriculoCurto?: unknown;
     curriculoCompleto?: unknown;
     linkLattes?: string;
@@ -341,6 +349,7 @@ export async function obterPalestranteCms(id: string): Promise<PalestranteCmsDet
     tipo: d.tipo ?? null,
     temFoto: Boolean(fotoUrl),
     fotoUrl,
+    ocultarDoSite: Boolean(d.ocultarDoSite),
     curriculoCurtoHtml: lexicalToHtml(d.curriculoCurto),
     curriculoCompletoHtml: lexicalToHtml(d.curriculoCompleto),
     linkLattes: d.linkLattes ?? null,

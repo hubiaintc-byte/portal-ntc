@@ -9,6 +9,7 @@ import {
   type PalestranteCmsDetalhe,
 } from "@/lib/cms/prototipoCms";
 import {
+  definirOcultarPalestrante,
   despublicarEvento,
   enviarMidiaEvento,
   publicarEvento,
@@ -90,4 +91,18 @@ export async function salvarEventosDestaqueHome(idsEventos: string[]): Promise<R
   const resultado = await salvarEventosHome(idsEventos);
   if (resultado.ok) revalidatePath("/prototipo-cms");
   return resultado;
+}
+
+/**
+ * Mostra/oculta um palestrante no site público e devolve o detalhe atualizado.
+ * O afterChange da coleção Especialistas revalida o Corpo Docente sozinho.
+ */
+export async function alternarOcultarPalestrante(
+  id: string,
+  oculto: boolean,
+): Promise<{ resultado: ResultadoEscrita; palestrante: PalestranteCmsDetalhe | null }> {
+  const resultado = await definirOcultarPalestrante(id, oculto);
+  if (resultado.ok) revalidatePath("/prototipo-cms");
+  const palestrante = resultado.ok ? await obterPalestranteCms(id) : null;
+  return { resultado, palestrante };
 }

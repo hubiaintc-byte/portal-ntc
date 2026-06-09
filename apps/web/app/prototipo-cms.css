@@ -534,6 +534,33 @@
   color: var(--pcms-grafite-suave);
 }
 
+/* Miniatura da foto real na listagem (substitui o avatar de iniciais). */
+.pcms-avatar--foto {
+  object-fit: cover;
+  object-position: top center;
+  background: var(--pcms-pergaminho);
+}
+
+/* Selo "Oculto do site" — palestrante fora das páginas públicas. */
+.pcms-selo--oculto {
+  background: rgba(154, 27, 27, 0.12);
+  color: var(--pcms-erro);
+}
+
+/* Coluna de status: empilha selos (foto + oculto) sem encostar. */
+.pcms-cel-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Mensagem de erro inline em painéis de edição. */
+.pcms-erro {
+  color: var(--pcms-erro);
+  font-size: 0.8rem;
+  margin: 10px 0 0;
+}
+
 .pcms-modalidade {
   font-size: 0.82rem;
   color: var(--pcms-grafite-suave);
@@ -616,6 +643,18 @@
   position: relative;
   flex-shrink: 0;
   transition: background 0.15s ease;
+  /* Vira <button> no detalhe do palestrante: zera estilo nativo. */
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.pcms-switch:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.pcms-switch:focus-visible {
+  outline: 2px solid var(--pcms-oxford);
+  outline-offset: 2px;
 }
 .pcms-switch--on {
   background: var(--pcms-sucesso);

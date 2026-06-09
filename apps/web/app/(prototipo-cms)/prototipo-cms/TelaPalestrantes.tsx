@@ -18,6 +18,7 @@ interface TelaPalestrantesProps {
 /** Listagem de palestrantes/especialistas — dados reais do banco (leitura). */
 export function TelaPalestrantes({ palestrantes, onAbrir }: TelaPalestrantesProps) {
   const comFoto = palestrantes.filter((p) => p.temFoto).length;
+  const ocultos = palestrantes.filter((p) => p.ocultarDoSite).length;
 
   return (
     <>
@@ -28,7 +29,8 @@ export function TelaPalestrantes({ palestrantes, onAbrir }: TelaPalestrantesProp
           <p>
             {palestrantes.length === 0
               ? "Nenhum especialista cadastrado ainda."
-              : `${palestrantes.length} especialistas — ${comFoto} com foto vinculada.`}
+              : `${palestrantes.length} especialistas — ${comFoto} com foto vinculada` +
+                (ocultos > 0 ? ` · ${ocultos} oculto${ocultos > 1 ? "s" : ""} do site.` : ".")}
           </p>
         </div>
         <button type="button" className="pcms-btn" disabled title="Protótipo de leitura">
@@ -89,9 +91,23 @@ export function TelaPalestrantes({ palestrantes, onAbrir }: TelaPalestrantesProp
               >
                 <td>
                   <div className="pcms-cel-nome">
-                    <span className="pcms-avatar" data-vertical={vertAttr(p.vertical)} aria-hidden="true">
-                      {p.iniciais}
-                    </span>
+                    {p.fotoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        className="pcms-avatar pcms-avatar--foto"
+                        src={p.fotoUrl}
+                        alt={`Foto de ${p.nome}`}
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span
+                        className="pcms-avatar"
+                        data-vertical={vertAttr(p.vertical)}
+                        aria-hidden="true"
+                      >
+                        {p.iniciais}
+                      </span>
+                    )}
                     <span>
                       <strong>{p.nome}</strong>
                       <small>{p.titulacao}</small>
@@ -103,9 +119,14 @@ export function TelaPalestrantes({ palestrantes, onAbrir }: TelaPalestrantesProp
                   <span className="pcms-selo-vert">{p.vertical ?? "—"}</span>
                 </td>
                 <td>
-                  <span className={`pcms-selo pcms-selo--${p.temFoto ? "publicado" : "rascunho"}`}>
-                    {p.temFoto ? "Vinculada" : "Pendente"}
-                  </span>
+                  <div className="pcms-cel-status">
+                    <span className={`pcms-selo pcms-selo--${p.temFoto ? "publicado" : "rascunho"}`}>
+                      {p.temFoto ? "Vinculada" : "Pendente"}
+                    </span>
+                    {p.ocultarDoSite && (
+                      <span className="pcms-selo pcms-selo--oculto">Oculto do site</span>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

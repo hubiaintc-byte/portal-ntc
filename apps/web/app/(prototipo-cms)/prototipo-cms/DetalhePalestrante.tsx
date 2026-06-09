@@ -1,4 +1,10 @@
+"use client";
+
+import { useState, useTransition } from "react";
+
 import type { PalestranteCmsDetalhe } from "@/lib/cms/prototipoCms";
+
+import { alternarOcultarPalestrante } from "./acoes";
 
 function vertAttr(vertical: string | null): string | undefined {
   if (!vertical) return undefined;
@@ -14,8 +20,25 @@ interface DetalhePalestranteProps {
   onVoltar: () => void;
 }
 
-/** Tela cheia de detalhe de um palestrante — somente leitura. */
-export function DetalhePalestrante({ palestrante: p, onVoltar }: DetalhePalestranteProps) {
+/** Tela cheia de detalhe de um palestrante — leitura + controle de visibilidade. */
+export function DetalhePalestrante({ palestrante: inicial, onVoltar }: DetalhePalestranteProps) {
+  const [p, setP] = useState(inicial);
+  const [salvando, iniciarSalvar] = useTransition();
+  const [erro, setErro] = useState<string | null>(null);
+
+  function alternarVisibilidade() {
+    const oculto = !p.ocultarDoSite;
+    setErro(null);
+    iniciarSalvar(async () => {
+      const { resultado, palestrante } = await alternarOcultarPalestrante(p.id, oculto);
+      if (resultado.ok && palestrante) {
+        setP(palestrante);
+      } else {
+        setErro(resultado.erro ?? "Não foi possível atualizar a visibilidade.");
+      }
+    });
+  }
+
   return (
     <>
       <button type="button" className="pcms-breadcrumb" onClick={onVoltar}>
@@ -41,6 +64,7 @@ export function DetalhePalestrante({ palestrante: p, onVoltar }: DetalhePalestra
             {[p.cargoAtual, p.instituicao].filter(Boolean).join(" · ")}
           </p>
           {p.vertical && <span className="pcms-selo-vert">{p.vertical}</span>}
+          {p.ocultarDoSite && <span className="pcms-selo pcms-selo--oculto">Oculto do site</span>}
         </div>
       </div>
 
@@ -64,6 +88,32 @@ export function DetalhePalestrante({ palestrante: p, onVoltar }: DetalhePalestra
         </div>
 
         <aside className="pcms-det-aside">
+          <div className="pcms-det-card">
+            <div className="pcms-det-card__head">Visibilidade no site</div>
+            <div className="pcms-det-card__body">
+              <div className="pcms-toggle-row">
+                <span>
+                  Ocultar do site
+                  <small>
+                    {p.ocultarDoSite
+                      ? "Não aparece no Corpo Docente nem como palestrante de eventos."
+                      : "Aparece normalmente nas páginas públicas."}
+                  </small>
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={p.ocultarDoSite}
+                  aria-label="Ocultar do site"
+                  className={`pcms-switch${p.ocultarDoSite ? " pcms-switch--on" : ""}`}
+                  onClick={alternarVisibilidade}
+                  disabled={salvando}
+                />
+              </div>
+              {erro && <p className="pcms-erro">{erro}</p>}
+            </div>
+          </div>
+
           {p.linhasAtuacao.length > 0 && (
             <div className="pcms-det-card">
               <div className="pcms-det-card__head">Linhas de atuação</div>

@@ -129,6 +129,36 @@ export async function despublicarEvento(id: string): Promise<ResultadoEscrita> {
 }
 
 /**
+ * Define se um especialista fica oculto do site público (campo
+ * `ocultarDoSite`). Oculto → não aparece no Corpo Docente nem como palestrante
+ * de eventos. Usado para tirar do ar quem ainda está com foto genérica, sem
+ * precisar deletar o cadastro.
+ *
+ * A coleção tem drafts habilitados e 47 dos 63 especialistas estão em
+ * rascunho. draft:true preserva o estado de publicação (não publica um
+ * rascunho sem querer só por alternar a visibilidade) — alinhado com o
+ * padrão de salvarCamposEvento.
+ */
+export async function definirOcultarPalestrante(
+  id: string,
+  oculto: boolean,
+): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "especialistas",
+      id,
+      data: { ocultarDoSite: oculto },
+      draft: true,
+      overrideAccess: true,
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao atualizar visibilidade." };
+  }
+}
+
+/**
  * Recebe um File do client (via FormData), cria um registro Media pela Local
  * API (gera variantes + sobe ao Supabase Storage) e aponta o campo do evento
  * (`imagemCapa` ou `folderPdf`) para a nova Media.
