@@ -1,4 +1,11 @@
+"use client";
+
+import { useState, useTransition } from "react";
+
 import type { EventoCmsDetalhe } from "@/lib/cms/prototipoCms";
+
+import { salvarEvento } from "./acoes";
+import { CampoUpload } from "./CampoUpload";
 
 const ROTULO_STATUS: Record<EventoCmsDetalhe["status"], string> = {
   publicado: "Publicado",
@@ -11,8 +18,43 @@ interface DetalheEventoProps {
   onVoltar: () => void;
 }
 
-/** Tela cheia de detalhe de um evento — somente leitura, layout documento. */
-export function DetalheEvento({ evento, onVoltar }: DetalheEventoProps) {
+/** Tela cheia de detalhe de um evento — leitura + edição de campos via CMS. */
+export function DetalheEvento({ evento: eventoInicial, onVoltar }: DetalheEventoProps) {
+  const [evento, setEvento] = useState(eventoInicial);
+  const [editando, setEditando] = useState(false);
+  const [salvando, iniciarSalvar] = useTransition();
+  const [erro, setErro] = useState<string | null>(null);
+
+  // Rascunho de edição dos campos de texto.
+  const [nome, setNome] = useState(evento.titulo);
+  const [dataInicio, setDataInicio] = useState(evento.dataInicioISO ?? "");
+  const [resumo, setResumo] = useState(evento.resumo ?? "");
+
+  function abrirEdicao() {
+    setNome(evento.titulo);
+    setDataInicio(evento.dataInicioISO ?? "");
+    setResumo(evento.resumo ?? "");
+    setErro(null);
+    setEditando(true);
+  }
+
+  function salvar() {
+    setErro(null);
+    iniciarSalvar(async () => {
+      const { resultado, evento: atualizado } = await salvarEvento(evento.id, {
+        nome,
+        dataInicio,
+        resumo,
+      });
+      if (resultado.ok && atualizado) {
+        setEvento(atualizado);
+        setEditando(false);
+      } else {
+        setErro(resultado.erro ?? "Não foi possível salvar.");
+      }
+    });
+  }
+
   return (
     <>
       <button type="button" className="pcms-breadcrumb" onClick={onVoltar}>
@@ -32,10 +74,60 @@ export function DetalheEvento({ evento, onVoltar }: DetalheEventoProps) {
           {evento.eyebrow && <p className="pcms-pagehead__eyebrow">{evento.eyebrow}</p>}
           <h1>{evento.titulo}</h1>
         </div>
-        <span className={`pcms-selo pcms-selo--${evento.status}`}>
-          {ROTULO_STATUS[evento.status]}
-        </span>
+        <div className="pcms-det-head__acoes">
+          <span className={`pcms-selo pcms-selo--${evento.status}`}>
+            {ROTULO_STATUS[evento.status]}
+          </span>
+          {!editando && (
+            <button type="button" className="pcms-btn pcms-btn--ghost" onClick={abrirEdicao}>
+              Editar
+            </button>
+          )}
+        </div>
       </div>
+
+      {editando && (
+        <section className="pcms-editor">
+          <div className="pcms-editor__head">Editar campos</div>
+          <div className="pcms-field">
+            <label htmlFor="ed-nome">Nome do evento</label>
+            <input id="ed-nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} />
+          </div>
+          <div className="pcms-field">
+            <label htmlFor="ed-data">Data de início</label>
+            <input
+              id="ed-data"
+              type="date"
+              value={dataInicio}
+              onChange={(e) => setDataInicio(e.target.value)}
+            />
+          </div>
+          <div className="pcms-field">
+            <label htmlFor="ed-resumo">Resumo</label>
+            <textarea
+              id="ed-resumo"
+              rows={3}
+              maxLength={280}
+              value={resumo}
+              onChange={(e) => setResumo(e.target.value)}
+            />
+          </div>
+          {erro && <p className="pcms-upload__erro">{erro}</p>}
+          <div className="pcms-editor__acoes">
+            <button type="button" className="pcms-btn" onClick={salvar} disabled={salvando}>
+              {salvando ? "Salvando…" : "Salvar alterações"}
+            </button>
+            <button
+              type="button"
+              className="pcms-btn pcms-btn--ghost"
+              onClick={() => setEditando(false)}
+              disabled={salvando}
+            >
+              Cancelar
+            </button>
+          </div>
+        </section>
+      )}
 
       <div className="pcms-det-meta">
         <div>
@@ -108,6 +200,28 @@ export function DetalheEvento({ evento, onVoltar }: DetalheEventoProps) {
 
         <aside className="pcms-det-aside">
           <div className="pcms-det-card">
+            <div className="pcms-det-card__head">Mídia</div>
+            <div className="pcms-det-card__body">
+              <CampoUpload
+                eventoId={evento.id}
+                campo="imagemCapa"
+                rotulo="Capa do evento"
+                accept="image/*"
+                atual={evento.capaNome ?? "Sem capa"}
+                onAtualizado={setEvento}
+              />
+              <CampoUpload
+                eventoId={evento.id}
+                campo="folderPdf"
+                rotulo="Folder (PDF)"
+                accept="application/pdf"
+                atual={evento.folderPdfNome ?? "Sem folder"}
+                onAtualizado={setEvento}
+              />
+            </div>
+          </div>
+
+          <div className="pcms-det-card">
             <div className="pcms-det-card__head">Inscrição</div>
             <div className="pcms-det-card__body">
               <p>
@@ -118,9 +232,7 @@ export function DetalheEvento({ evento, onVoltar }: DetalheEventoProps) {
                 <span className="pcms-det-meta__rot">Status</span>
                 {evento.inscricaoAberta ? "Aberta" : "Encerrada"}
               </p>
-              {evento.linkInscricao && (
-                <p className="pcms-det-link">{evento.linkInscricao}</p>
-              )}
+              {evento.linkInscricao && <p className="pcms-det-link">{evento.linkInscricao}</p>}
             </div>
           </div>
 

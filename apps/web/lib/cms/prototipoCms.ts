@@ -44,6 +44,12 @@ export interface EventoCmsDetalhe extends EventoCmsResumo {
   area: string | null;
   cargaHoraria: string | null;
   capaUrl: string | null;
+  /** Capa: nome de exibição (filename da Media) para o painel de edição. */
+  capaNome: string | null;
+  /** Folder PDF: nome de exibição, ou null se não houver. */
+  folderPdfNome: string | null;
+  /** Data de início em ISO (yyyy-mm-dd) para o input type=date do editor. */
+  dataInicioISO: string | null;
   resumo: string | null;
   /** HTML já convertido do Lexical (lib/cms/lexical.ts). */
   publicoAlvoHtml: string;
@@ -190,6 +196,15 @@ function urlDeMidia(m: unknown): string | null {
   return null;
 }
 
+/** Nome de exibição de uma Media resolvida (filename), ou null. */
+function nomeDeMidia(m: unknown): string | null {
+  if (typeof m === "object" && m !== null) {
+    const obj = m as { filename?: string; alt?: string };
+    return obj.filename ?? obj.alt ?? null;
+  }
+  return null;
+}
+
 /** Nome de uma relação resolvida (ex. area, programa) por uma chave preferida. */
 function nomeDeRelacao(rel: unknown, chave: "nome" | "sigla" | "titulo" = "nome"): string | null {
   if (typeof rel === "object" && rel !== null) {
@@ -218,6 +233,7 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
     area?: unknown;
     cargaHoraria?: string;
     imagemCapa?: unknown;
+    folderPdf?: unknown;
     resumo?: string;
     publicoAlvo?: unknown;
     objetivos?: unknown;
@@ -254,6 +270,9 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
     modalidade: modalidade ? modalidade.charAt(0).toUpperCase() + modalidade.slice(1) : "—",
     cargaHoraria: d.cargaHoraria ?? null,
     capaUrl: urlDeMidia(d.imagemCapa),
+    capaNome: nomeDeMidia(d.imagemCapa),
+    folderPdfNome: nomeDeMidia(d.folderPdf),
+    dataInicioISO: d.dataInicio ? new Date(d.dataInicio).toISOString().slice(0, 10) : null,
     resumo: d.resumo ?? null,
     publicoAlvoHtml: lexicalToHtml(d.publicoAlvo),
     objetivosHtml: lexicalToHtml(d.objetivos),

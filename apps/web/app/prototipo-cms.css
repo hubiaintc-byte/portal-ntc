@@ -945,3 +945,70 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== Edição e upload (CMS de escrita) ================================= */
+.pcms-det-head__acoes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.pcms-editor {
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  border-left: 3px solid var(--pcms-dourado);
+  padding: 22px 24px;
+  margin-bottom: 28px;
+}
+.pcms-editor__head {
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pcms-dourado);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.pcms-editor textarea {
+  width: 100%;
+  border: 1px solid var(--pcms-linha);
+  background: var(--pcms-osso);
+  padding: 9px 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--pcms-grafite);
+  border-radius: 0;
+  resize: vertical;
+  line-height: 1.5;
+}
+.pcms-editor textarea:focus {
+  outline: 2px solid var(--pcms-oxford);
+  outline-offset: -1px;
+}
+.pcms-editor__acoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.pcms-upload {
+  margin-bottom: 18px;
+}
+.pcms-upload:last-child {
+  margin-bottom: 0;
+}
+.pcms-upload__atual {
+  font-size: 0.84rem;
+  color: var(--pcms-grafite);
+  margin: 0 0 8px;
+  word-break: break-word;
+}
+.pcms-upload__input {
+  display: none;
+}
+.pcms-upload__erro {
+  color: var(--pcms-erro);
+  font-size: 0.8rem;
+  margin: 8px 0 0;
+}
