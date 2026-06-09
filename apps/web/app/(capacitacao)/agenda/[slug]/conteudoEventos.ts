@@ -2246,6 +2246,346 @@ const eventoProgeM01: EventoOnline = {
   },
 };
 
+// ----------------- Evento: PROGE Módulo 03 2026 (online) -----------------
+// Fonte: folder PDF "Módulo 03 PROGE · Coordenação Pedagógica Estratégica" (2026).
+// Textos literais do PDF. Fotos: usuário sobe depois.
+
+const eventoProgeM03: EventoOnline = {
+  slug: "proge-m03-2026",
+  titulo: "Coordenação Pedagógica Estratégica: Mentoria, Recomposição e Gestão da Aprendizagem",
+  subtitulo:
+    "Coordenação pedagógica forte para apoiar professores, recompor aprendizagens e qualificar a gestão pedagógica da escola.",
+  formato: "online",
+  dataEvento: "23 de junho de 2026",
+  area: "edu",
+
+  // Campos de EventoBase não usados pelo layout online (vazios):
+  crumb: [
+    { texto: "Grupo NTC", href: "/", cmsLink: "home" },
+    { texto: "Capacitação", href: "/capacitacao", cmsLink: "agenda-completa" },
+    { texto: "Eventos online", href: "/capacitacao/agenda", cmsLink: "eventos-online" },
+    { texto: "Seminário PROGE · Coordenação Pedagógica Estratégica", current: true },
+  ],
+  hero: { tags: [], h1: "", sub: "", programBinding: { texto: "", href: "", nomePrograma: "" }, ctas: [] },
+  metas: [],
+  navLinks: [
+    { texto: "Visão geral", href: "#visao-geral", isActive: true },
+    { texto: "Público", href: "#publico" },
+    { texto: "Programação", href: "#programacao" },
+    { texto: "O que você aprenderá", href: "#questoes" },
+    { texto: "Palestrantes", href: "#palestrantes" },
+    { texto: "EventOn", href: "#eventon" },
+    { texto: "Investimento", href: "#investimento" },
+    { texto: "Regras", href: "#regras" },
+    { texto: "FAQ", href: "#faq" },
+  ],
+  visaoGeral: { eyebrow: "", h2: "", lede: "", paragrafos: [] },
+  publico: { eyebrow: "", h2: "", intro: "", chips: [] },
+  objetivos: { eyebrow: "", h2: "", objetivos: [] },
+  conteudoProgramatico: { eyebrow: "", h2: "", intro: "", itens: [] },
+  programacao: { eyebrow: "", h2: "", intro: "", dias: [] },
+  palestrantes: { eyebrow: "", h2: "", intro: "", palestrantes: [], nota: "" },
+  diferenciais: { eyebrow: "", h2: "", diferenciais: [] },
+  replayCert: { eyebrow: "", h2: "", cards: [] },
+  investimento: { eyebrow: "", h2: "", rules: [] },
+  faq: {
+    eyebrow: "Perguntas frequentes",
+    h2: "FAQ",
+    faqs: [
+      { id: "proge-m03-faq-1", pergunta: "Como funciona o acesso ao EventON NTC?", respostaHtml: "Após a confirmação da inscrição, você recebe por e-mail um link de acesso individual com login e senha. O acesso é feito direto pelo navegador, sem necessidade de download de aplicativo." },
+      { id: "proge-m03-faq-2", pergunta: "Por quanto tempo terei acesso ao replay?", respostaHtml: "O replay fica disponível por 7 dias após a realização do evento, na Área do Participante. Acesso protegido por login institucional individual." },
+      { id: "proge-m03-faq-3", pergunta: "Como recebo o certificado?", respostaHtml: "O certificado é emitido automaticamente até 7 dias após o término do evento, mediante presença mínima de 75% das atividades. Pode ser baixado pela Área do Participante e validado publicamente via código QR." },
+      { id: "proge-m03-faq-4", pergunta: "Posso inscrever minha equipe ou rede?", respostaHtml: "Sim. Equipes e órgãos públicos poderão solicitar condição comercial diferenciada conforme quantidade de inscritos, perfil institucional e forma de contratação. Solicite proposta pelo botão lateral." },
+      { id: "proge-m03-faq-5", pergunta: "A inscrição inclui materiais?", respostaHtml: "Sim. A inscrição inclui apostila digital específica do módulo-evento, certificado digital e acesso ao replay. Materiais enviados por e-mail e disponibilizados na plataforma EventON NTC." },
+      { id: "proge-m03-faq-6", pergunta: "Como contratar uma turma fechada para minha instituição?", respostaHtml: "A NTC desenvolve turmas fechadas para secretarias, autarquias e órgãos públicos. O Instituto NTC poderá apresentar proposta personalizada com condições diferenciadas por escala, suporte operacional e replay. Solicite proposta institucional pelo botão lateral." },
+      { id: "proge-m03-faq-7", pergunta: "É possível compor a trilha completa PROGE?", respostaHtml: "Sim. Este Módulo 03 pode ser contratado de forma independente ou integrar a trilha PROGE — Programa Estratégico de Gestão Escolar, Coordenação Pedagógica e Direção de Alta Performance. Consulte a equipe comercial." },
+    ],
+  },
+  ctaFinal: { eyebrowGold: "", h2: "", paragrafo: "", ctas: [] },
+  sidebar: {
+    coverImg: "", status: "", tituloCard: "", rows: [],
+    includes: { titulo: "", items: [] },
+    countdown: { label: "", dateText: "", deadline: "2026-06-23T23:59:59-03:00", tipo: "numerico" },
+    acoes: [], share: { label: "", links: [] },
+  },
+  relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
+  agendaIcs: {
+    titulo: "Seminário PROGE · Coordenação Pedagógica Estratégica: Mentoria, Recomposição e Gestão da Aprendizagem",
+    descricao: "Seminário On-Line ao Vivo do programa PROGE · Grupo NTC. Acesso pela plataforma EventON NTC.",
+    location: "Plataforma EventON NTC · Online",
+    startISO: "20260623T080000",
+    endISO: "20260623T180000",
+    filename: "PROGE-M03-2026-jun.ics",
+  },
+
+  // ---- Seções evt-* (consumidas pelo EventoOnlineLayout) ----
+  heroOnline: {
+    tags: [
+      { texto: "Inscrições abertas", classe: "evt-hero-status" },
+      { texto: "Seminário Online ao Vivo", classe: "evt-hero-format" },
+      { texto: "NTC Educação", classe: "evt-hero-vert" },
+    ],
+    h1Html: "Coordenação Pedagógica <em>Estratégica</em>: Mentoria, Recomposição e Gestão da Aprendizagem",
+    sub: "Coordenação pedagógica forte para apoiar professores, recompor aprendizagens e qualificar a gestão pedagógica da escola.",
+    programBinding: {
+      texto: "Integra o programa",
+      href: "/programas/proge",
+      cmsLink: "programa-PROGE",
+      nomePrograma: "PROGE — Programa Estratégico de Gestão Escolar, Coordenação Pedagógica e Direção de Alta Performance",
+    },
+    ctas: [
+      { texto: "Inscrever-se", href: "/contato?evento=PROGE+M%C3%B3dulo+03&evento_url=/agenda/proge-m03-2026", cmsLink: "inscricao-PROGE-M03-2026-jun", classe: "btn btn--gold", arrow: true },
+      { texto: "Baixar folder", href: "#", cmsLink: "folder-PROGE-M03", classe: "btn btn--ghost-light" },
+      { texto: "Inscrever equipe ou grupo", href: "/contato?evento=PROGE+M%C3%B3dulo+03&evento_url=/agenda/proge-m03-2026#tab-equipe", cmsLink: "proposta-grupo-PROGE-M03", classe: "btn btn--ghost-light" },
+    ],
+  },
+
+  metasOnline: [
+    { label: "Quando", value: "23 · Junho", valueSub: "2026 · Terça-feira" },
+    { label: "Modalidade", value: "Ao vivo", valueSub: "+ replay por 7 dias" },
+    { label: "Carga horária", value: "8 horas", valueSub: "Manhã (4h) + Tarde (4h)" },
+    { label: "Plataforma", value: "EventON NTC", valueSub: "Acesso individual" },
+    { label: "Investimento", value: "R$ 1.470", valueSub: "por inscrito · individual" },
+  ],
+
+  visaoGeralOnline: {
+    eyebrow: "Seminário · NTC Educação",
+    h2Html: "Uma agenda institucional para a melhoria da <em>escola pública</em>.",
+    lede: "A coordenação pedagógica é uma das funções mais decisivas para transformar prioridades curriculares, evidências de aprendizagem e necessidades docentes em práticas reais de sala de aula.",
+    paragrafosHtml: [
+      "Em muitas redes, porém, essa função ainda é tensionada por demandas administrativas, excesso de urgências e baixa sistematização do acompanhamento pedagógico.",
+      "O evento fortalece a coordenação pedagógica como liderança intermediária, responsável por apoiar o professor, organizar a formação em serviço, acompanhar planejamento e práticas de ensino, utilizar evidências de aprendizagem e estruturar ações de recomposição. A formação combina mentoria docente, análise de dados, planejamento pedagógico e cultura colaborativa.",
+      "No PROGE, este módulo sustenta a conexão entre gestão escolar, currículo, avaliação e aprendizagem, qualificando o trabalho pedagógico cotidiano e ampliando a capacidade das escolas de promover intervenções consistentes.",
+    ],
+    moduleBindingHtml: "Este seminário corresponde ao <strong>Módulo 03 da trilha PROGE</strong> — Programa Estratégico de Gestão Escolar, Coordenação Pedagógica e Direção de Alta Performance. Pode ser contratado de forma independente ou integrar a trilha completa.",
+    razoesTituloHtml: "Seis razões para <em>participar</em> deste módulo",
+    razoes: [
+      { num: "01", titulo: "Fortalecer a coordenação pedagógica como liderança pedagógica da escola", descricao: "Tópico essencial da agenda institucional do módulo, com aplicação direta à realidade da rede." },
+      { num: "02", titulo: "Aprimorar práticas de mentoria, acompanhamento docente e devolutiva formativa", descricao: "Tópico essencial da agenda institucional do módulo, com aplicação direta à realidade da rede." },
+      { num: "03", titulo: "Organizar formação em serviço conectada a necessidades reais de aprendizagem", descricao: "Tópico essencial da agenda institucional do módulo, com aplicação direta à realidade da rede." },
+      { num: "04", titulo: "Estruturar estratégias de recomposição e apoio pedagógico diferenciado", descricao: "Tópico essencial da agenda institucional do módulo, com aplicação direta à realidade da rede." },
+      { num: "05", titulo: "Integração entre mentoria docente, evidências, recomposição e formação em serviço", descricao: "Tópico essencial da agenda institucional do módulo, com aplicação direta à realidade da rede." },
+      { num: "06", titulo: "Aplicabilidade direta para coordenadores pedagógicos e equipes escolares", descricao: "Tópico essencial da agenda institucional do módulo, com aplicação direta à realidade da rede." },
+    ],
+  },
+
+  publicoOnline: {
+    eyebrow: "Para quem",
+    h2: "Público-alvo",
+    intro: "O seminário é dimensionado para profissionais que atuam na coordenação pedagógica e na gestão das redes públicas de ensino:",
+    chips: [
+      "Secretários estaduais e municipais de educação",
+      "Dirigentes e equipes técnicas das secretarias de educação",
+      "Diretores escolares, vice-diretores e lideranças de unidade",
+      "Coordenadores pedagógicos, supervisores, orientadores e articuladores pedagógicos",
+      "Formadores de professores e equipes responsáveis por recomposição da aprendizagem",
+    ],
+    objetivoTitulo: "Objetivo",
+    objetivoTexto: "Qualificar a coordenação pedagógica para atuar como núcleo de acompanhamento docente, formação em serviço, monitoramento da aprendizagem e recomposição das aprendizagens essenciais.",
+    destaquesTitulo: "Destaques formativos",
+    destaques: [
+      { num: "01", html: "<strong>O novo papel da coordenação pedagógica</strong> — coordenação como liderança intermediária." },
+      { num: "02", html: "<strong>Mentoria docente</strong> — observação de práticas, devolutiva formativa e planejamento em contexto." },
+      { num: "03", html: "<strong>Evidências e recomposição</strong> — matrizes de referência, diagnóstico de defasagens e trilhas de aprendizagem." },
+      { num: "04", html: "<strong>Cultura colaborativa</strong> — comunidades de aprendizagem e formação em serviço." },
+      { num: "05", html: "<strong>Aplicabilidade direta</strong> à direção escolar, coordenação pedagógica e gestão de redes." },
+    ],
+  },
+
+  programacaoOnline: {
+    eyebrow: "Cronograma",
+    h2: "Programação detalhada",
+    intro: "Cinco etapas executivas, oito horas de imersão ao vivo.",
+    headDayHtml: "23 de <em>Junho</em> · Terça-feira",
+    headMeta: "08h00 às 18h00 · 8 horas · EventON NTC",
+    nodes: [
+      { time: "08h00 – 09h00", ttag: "Abertura · Institucional", num: "I", titulo: "Coordenação Pedagógica Estratégica — eixo estratégico do PROGE", speakerLineHtml: "com <em>Andréa Patapoff</em> · Doutora em Educação · Coordenação Pedagógica", bullets: ["Transformações recentes na gestão escolar e novos papéis da direção.", "Novas exigências das redes públicas contemporâneas.", "A escola como unidade de execução da política educacional."] },
+      { time: "09h00 – 11h00", ttag: "Bloco · 01", num: "II", titulo: "O novo papel da coordenação pedagógica", speakerLineHtml: "com <em>Andréa Patapoff</em> · Doutora em Educação · Coordenação Pedagógica", bullets: ["Coordenação como liderança intermediária.", "Gestão pedagógica e foco na aprendizagem."] },
+      { time: "11h00 – 12h00", ttag: "Bloco · 02", num: "III", titulo: "Mentoria docente e acompanhamento qualificado", speakerLineHtml: "com <em>Maria Sílvia Bacila</em> · Doutora em Educação · PUCPR · Ex-Sec. Mun. Educação Curitiba", bullets: ["Observação de práticas.", "Devolutiva formativa.", "Planejamento em contexto."] },
+      { time: "14h00 – 16h00", ttag: "Bloco · 03", num: "IV", titulo: "Evidências e recomposição das aprendizagens", speakerLineHtml: "com <em>Vasco Moretto</em> · Doutor em Educação · Avaliação da Aprendizagem", bullets: ["Matrizes de referência.", "Diagnóstico de defasagens.", "Trilhas de aprendizagem."] },
+      { time: "16h00 – 18h00", ttag: "Bloco · 04", num: "V", titulo: "Cultura colaborativa e desenvolvimento profissional", speakerLineHtml: "com <em>Maria Inês Fini</em> · Doutora em Psicologia da Educação · Ex-Pres. Inep", bullets: ["Comunidades de aprendizagem.", "Formação em serviço.", "Rotinas pedagógicas."] },
+    ],
+  },
+
+  questoesOnline: {
+    eyebrow: "O que você aprenderá",
+    h2: "As questões essenciais que serão respondidas nas quatro sessões",
+    intro: "Vinte e nove perguntas-guia organizadas por sessão, do fundamento conceitual à implementação institucional.",
+    grupos: [
+      { sessao: "Sessão · 01", titulo: "O novo papel da coordenação pedagógica", palestrante: "com Andréa Patapoff · 09h00 – 11h00", questoes: [
+        { numero: "01", pergunta: "O que significa O novo papel da coordenação pedagógica aplicado à realidade da escola pública contemporânea?" },
+        { numero: "02", pergunta: "Como esse tema se traduz em prática institucional da direção e da coordenação escolar?" },
+        { numero: "03", pergunta: "De que forma coordenação como liderança intermediária sustenta resultados consistentes na escola pública?" },
+        { numero: "04", pergunta: "Como articular Gestão pedagógica com as demais dimensões da rotina escolar?" },
+        { numero: "05", pergunta: "Quais práticas de gestão fortalecem a coerência institucional nessa frente?" },
+        { numero: "06", pergunta: "Como sustentar essa agenda diante de mudanças de gestão e ciclo político?" },
+      ] },
+      { sessao: "Sessão · 02", titulo: "Mentoria docente e acompanhamento qualificado", palestrante: "com Maria Sílvia Bacila · 11h00 – 12h00", questoes: [
+        { numero: "07", pergunta: "O que significa Mentoria docente aplicado à realidade da escola pública contemporânea?" },
+        { numero: "08", pergunta: "Como esse tema se traduz em prática institucional da direção e da coordenação escolar?" },
+        { numero: "09", pergunta: "De que forma observação de práticas sustenta resultados consistentes na escola pública?" },
+        { numero: "10", pergunta: "De que forma devolutiva formativa sustenta resultados consistentes na escola pública?" },
+        { numero: "11", pergunta: "De que forma planejamento em contexto sustenta resultados consistentes na escola pública?" },
+        { numero: "12", pergunta: "Quais práticas de gestão fortalecem a coerência institucional nessa frente?" },
+        { numero: "13", pergunta: "Como sustentar essa agenda diante de mudanças de gestão e ciclo político?" },
+      ] },
+      // Questões 14, 15 e 16 ausentes no PDF original (gap de numeração entre as páginas 08 e 09 do folder)
+      { sessao: "Sessão · 03", titulo: "Evidências e recomposição das aprendizagens", palestrante: "com Vasco Moretto · 14h00 – 16h00", questoes: [
+        { numero: "17", pergunta: "O que significa Evidências aplicado à realidade da escola pública contemporânea?" },
+        { numero: "18", pergunta: "Como esse tema se traduz em prática institucional da direção e da coordenação escolar?" },
+        { numero: "19", pergunta: "De que forma matrizes de referência sustenta resultados consistentes na escola pública?" },
+        { numero: "20", pergunta: "De que forma diagnóstico de defasagens sustenta resultados consistentes na escola pública?" },
+        { numero: "21", pergunta: "De que forma trilhas de aprendizagem sustenta resultados consistentes na escola pública?" },
+        { numero: "22", pergunta: "Quais práticas de gestão fortalecem a coerência institucional nessa frente?" },
+        { numero: "23", pergunta: "Como sustentar essa agenda diante de mudanças de gestão e ciclo político?" },
+      ] },
+      { sessao: "Sessão · 04", titulo: "Cultura colaborativa e desenvolvimento profissional", palestrante: "com Maria Inês Fini · 16h00 – 18h00", questoes: [
+        { numero: "24", pergunta: "O que significa Cultura colaborativa aplicado à realidade da escola pública contemporânea?" },
+        { numero: "25", pergunta: "Como esse tema se traduz em prática institucional da direção e da coordenação escolar?" },
+        { numero: "26", pergunta: "De que forma comunidades de aprendizagem sustenta resultados consistentes na escola pública?" },
+        { numero: "27", pergunta: "De que forma formação em serviço sustenta resultados consistentes na escola pública?" },
+        { numero: "28", pergunta: "De que forma rotinas pedagógicas sustenta resultados consistentes na escola pública?" },
+        { numero: "29", pergunta: "Quais práticas de gestão fortalecem a coerência institucional nessa frente?" },
+      ] },
+    ],
+    naPratica: {
+      titulo: "Na prática · o que você levará do módulo para a sua rede",
+      itens: [
+        "Repertório executivo ampliado sobre coordenação pedagógica estratégica.",
+        "Diretrizes para leitura crítica de indicadores e aplicação à rotina escolar.",
+        "Caminhos para articular prioridades pedagógicas e resultados de aprendizagem.",
+        "Critérios institucionais para construção e revisão de instrumentos de gestão.",
+        "Modelo de plano de ação articulado a metas e acompanhamento contínuo.",
+        "Subsídios para mobilizar equipe, comunidade escolar e rede.",
+      ],
+    },
+  },
+
+  palestrantesOnline: {
+    eyebrow: "Quem ensina",
+    h2Html: "Quatro especialistas de <em>referência nacional</em>",
+    intro: "Gestão escolar, governança educacional e direção pública.",
+    palestrantes: [
+      { foto: "", roleTag: "Palestrante", nome: "Andréa Patapoff", credentials: "Doutora em Educação · Coordenação Pedagógica", bio: "Pedagoga, mestre e doutora em Psicologia Educacional pela Unicamp. Atua em formação de professores, currículo, primeira infância, desenvolvimento infantil e assessoramento técnico a redes públicas." }, // TODO: foto sobe depois
+      { foto: "", roleTag: "Palestrante", nome: "Maria Sílvia Bacila", credentials: "Doutora em Educação · PUCPR · Ex-Sec. Mun. Educação Curitiba", bio: "Doutora em Educação pela PUCPR, com sólida trajetória em gestão educacional e currículo. Foi secretária municipal de Educação de Curitiba e exerceu função executiva pedagógica em São Paulo." }, // TODO: foto sobe depois
+      { foto: "", roleTag: "Palestrante", nome: "Vasco Moretto", credentials: "Doutor em Educação · Avaliação da Aprendizagem", bio: "Mestre em Didática das Ciências pela Universidade Laval, licenciado em Física pela UnB e especialista em avaliação institucional. Consultor educacional com experiência em avaliação, currículo, didática e aprendizagem." }, // TODO: foto sobe depois
+      { foto: "", roleTag: "Palestrante", nome: "Maria Inês Fini", credentials: "Doutora em Psicologia da Educação · Ex-Pres. Inep", bio: "Pedagoga, doutora em Educação, professora e pesquisadora com destacada atuação em currículo, avaliação e políticas educacionais. Ex-presidente do Inep e referência nacional em avaliação educacional." }, // TODO: foto sobe depois
+    ],
+    nota: "Fotografias oficiais dos palestrantes serão sincronizadas a partir do folder do evento via CMS.",
+  },
+
+  eventonOnline: {
+    eyebrow: "Plataforma de acesso",
+    h2Html: "Como funciona no <em>EventON NTC</em>",
+    intro: "O seminário acontece na plataforma institucional do Instituto NTC do Brasil — ambiente virtual seguro com transmissão ao vivo, suporte dedicado e replay protegido.",
+    markNameHtml: "Event<em>ON</em>",
+    markTag: "Plataforma Institucional · NTC",
+    stats: [
+      { n: "5.000", l: "Participantes simultâneos" },
+      { n: "30 FPS", l: "Vídeo em alta definição" },
+      { n: "100%", l: "Acesso institucional" },
+    ],
+    feats: [
+      { iconeSvgInner: `<path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4Z"/>`, titulo: "Plataforma segura e escalável", descricao: "Alcance de até 5.000 participantes simultâneos, com estabilidade operacional e segurança institucional para eventos formais." },
+      { iconeSvgInner: `<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M8 22h8"/>`, titulo: "Alta definição", descricao: "Transmissão em 30 FPS, com vídeo e áudio de alta qualidade independente do dispositivo — desktop, laptop, tablet ou telefone." },
+      { iconeSvgInner: `<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>`, titulo: "Fácil e acessível", descricao: "Nenhum download é necessário. Acesso individual por login e senha, com interface simplificada e navegação institucional intuitiva." },
+      { iconeSvgInner: `<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z"/>`, titulo: "Interação ao vivo", descricao: "Faça perguntas, participe de pesquisas em tempo real e até apresente conteúdos em momentos previamente combinados com a coordenação." },
+      { iconeSvgInner: `<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>`, titulo: "Replay institucional · 7 dias", descricao: "Acesso ao replay integral do evento por 7 dias após a realização — para revisão, aprofundamento e referência institucional posterior." },
+      { iconeSvgInner: `<circle cx="12" cy="9" r="6"/><path d="M9 14.5V21l3-2 3 2v-6.5"/>`, titulo: "Certificação institucional", descricao: "Certificado válido como atualização profissional, mediante 75% de presença — emitido pelo Instituto NTC do Brasil." },
+    ],
+  },
+
+  investimentoOnline: {
+    eyebrow: "Investimento",
+    h2: "Investimento e condições",
+    intro: "Modalidades de contratação flexíveis para inscrição individual, equipes e instituições públicas.",
+    priceLabel: "Inscrição individual",
+    priceValueHtml: `<span class="cur">R$</span><span class="amt">1.470</span>`,
+    priceSub: "por inscrição individual · evento on-line ao vivo de 8 horas",
+    includesTitulo: "O que está incluído",
+    includes: [
+      "Apostila digital específica do módulo-evento",
+      "Certificado digital emitido pelo Instituto NTC do Brasil",
+      "Acesso individual ao ambiente EventON NTC",
+      "Replay integral pelo período informado no folder",
+      "Suporte técnico para acesso ao ambiente virtual",
+    ],
+    modes: [
+      { tag: "Individual", titulo: "Inscrição individual", descricao: "Indicada para participantes avulsos, profissionais independentes, empresas, entidades privadas ou inscrições pontuais realizadas por órgãos e instituições." },
+      { tag: "Grupo", titulo: "Grupos institucionais", descricao: "Órgãos públicos, secretarias, redes de ensino, entidades e instituições interessadas na inscrição de múltiplos participantes poderão solicitar condição comercial diferenciada, conforme quantidade de inscritos, perfil institucional da demanda, forma de contratação e disponibilidade operacional." },
+      { tag: "Institucional", titulo: "Grandes grupos e turmas fechadas", descricao: "Para demandas ampliadas, redes públicas, secretarias, consórcios, instituições ou grupos estratégicos, o Instituto NTC poderá apresentar proposta personalizada — contemplando condições diferenciadas por escala, política de cortesias institucionais, suporte operacional, período de replay e eventual estruturação de turma exclusiva.", featured: true },
+    ],
+  },
+
+  regrasOnline: {
+    eyebrow: "Política comercial",
+    h2: "Regras de participação",
+    rules: [
+      "O cancelamento e/ou a substituição de inscrição deverá ser solicitado por escrito, pelo e-mail eventosonline@institutontc.com.br ou WhatsApp (63) 98444-4040, até 2 dias úteis antes da realização do evento.",
+      "A substituição deverá indicar os dados completos do novo participante — nome completo, e-mail funcional ou institucional, telefone/WhatsApp e órgão de vinculação — para liberação do acesso individual.",
+      "A inscrição contratada garante a disponibilização do acesso ao evento on-line ao vivo, ao ambiente EventON NTC, ao material digital, ao suporte técnico e ao replay pelo período informado neste folder.",
+      "A ausência, o não acesso, o acesso parcial, o não uso do replay dentro do prazo ou o não cumprimento dos critérios mínimos de presença não implicam reembolso, cancelamento automático ou isenção de pagamento, desde que os meios de acesso tenham sido regularmente disponibilizados pelo Instituto NTC — que poderá aceitar, a seu critério, a conversão do valor pago em crédito para inscrição em futuros eventos.",
+      "Para inscrições institucionais em grupo, a Contratante poderá encaminhar relação consolidada de participantes, preferencialmente em planilha, para cadastramento conjunto e liberação dos acessos individuais.",
+      "A relação deverá ser enviada preferencialmente até 2 dias úteis antes do evento, a fim de viabilizar o cadastro, o envio dos acessos e o suporte operacional.",
+      "Os inscritos poderão acessar o replay pelo período informado neste folder, observadas as regras de acesso individual e vedado o compartilhamento de login, senha, som, imagem, gravação ou reprodução por qualquer meio.",
+      "A certificação será emitida somente após o encerramento do prazo de replay, exclusivamente aos participantes que cumprirem os critérios mínimos de presença e registro no ambiente.",
+    ],
+  },
+
+  ctaFinalOnline: {
+    eyebrowGold: "Próximo passo",
+    h2Html: "Garanta sua participação no <em>Módulo 03 PROGE</em>.",
+    paragrafo: "Inscrições abertas. Vagas individuais e condição institucional para equipes e órgãos.",
+    ctas: [
+      { texto: "Inscrever-se agora", href: "/contato?evento=PROGE+M%C3%B3dulo+03&evento_url=/agenda/proge-m03-2026", cmsLink: "inscricao-PROGE-M03-2026-jun", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=PROGE+M%C3%B3dulo+03&evento_url=/agenda/proge-m03-2026#tab-equipe", cmsLink: "proposta-grupo-PROGE-M03", classe: "btn btn--secondary" },
+    ],
+  },
+
+  sidebarOnline: {
+    coverImg: "/img/fotos/_optimized/area-educacao.1920.webp",
+    status: "Inscrições abertas",
+    coverEventonHtml: "Acesso via <em>EventON</em>",
+    tituloTag: "Módulo 03 · Trilha PROGE",
+    rows: [
+      { label: "Quando", value: "23 · Jun · 2026" },
+      { label: "Modalidade", value: "Online ao vivo + replay" },
+      { label: "Carga horária", value: "8 horas" },
+      { label: "Plataforma", value: "EventON NTC" },
+      { label: "Investimento", value: "R$ 1.470", price: true },
+    ],
+    includes: {
+      titulo: "O que está incluído",
+      items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Apostila digital do módulo", "Certificado institucional", "Suporte técnico dedicado", "Acesso ao ambiente EventON NTC"],
+    },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 23 de Junho de 2026", deadline: "2026-06-23T23:59:59-03:00", tipo: "numerico" },
+    acoes: [
+      { texto: "Inscrever-se", href: "/contato?evento=PROGE+M%C3%B3dulo+03&evento_url=/agenda/proge-m03-2026", cmsLink: "inscricao-PROGE-M03-2026-jun", classe: "btn btn--gold", arrow: true },
+      { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=PROGE+M%C3%B3dulo+03&evento_url=/agenda/proge-m03-2026#tab-equipe", cmsLink: "inscricao-equipe-PROGE-M03", classe: "btn btn--secondary" },
+    ],
+    share: { label: "Compartilhar:", links: [
+      { texto: "WhatsApp", href: "#", cmsLink: "share-whatsapp" },
+      { texto: "E-mail", href: "#", cmsLink: "share-email" },
+      { texto: "LinkedIn", href: "#", cmsLink: "share-linkedin" },
+    ] },
+  },
+
+  relatedOnline: {
+    eyebrowGold: "Trilha PROGE · Próximos módulos",
+    h2: "Continue a jornada de gestão escolar",
+    introHtml: "Outros módulos da trilha <strong>PROGE</strong> e eventos da <strong>NTC Educação</strong> com inscrições antecipadas.",
+    cards: [
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "single", day: "22", monYr: "Jun · 2026" }, program: "Seminário · NTC Educação", titulo: "Módulo 01 PROGE: Gestão Escolar em Transformação: Resultados, Recursos e Governança Democrática", programBinding: "PROGE", metaHtml: "Online · 8h · 1 dia <strong>R$ 1.470</strong>", cta: { texto: "Inscrever-se", href: "/agenda/proge-m01-2026", cmsLink: "inscricao-PROGE-M01-2026-jun", classe: "es-cta" } },
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "single", day: "16", monYr: "Jun · 2026" }, program: "Seminário · NTC Educação", titulo: "Módulo 02 EDUTEC: Fluência Digital Docente e Práticas Pedagógicas Inovadoras", programBinding: "EDUTEC", metaHtml: "Online · 8h · 1 dia <strong>R$ 1.470</strong>", cta: { texto: "Inscrever-se", href: "/agenda/edutec-m02-2026", cmsLink: "inscricao-EDUTEC-M02-2026-jun", classe: "es-cta" } },
+      { area: "edu", coverImg: "/img/fotos/_optimized/area-educacao.1920.webp", date: { tipo: "single", day: "17", monYr: "Jun · 2026" }, program: "Seminário · NTC Educação", titulo: "Módulo 04 EDUTEC: Currículo e Computação: Integrando a BNCC à Prática Pedagógica", programBinding: "EDUTEC", metaHtml: "Online · 8h · 1 dia <strong>R$ 1.470</strong>", cta: { texto: "Inscrever-se", href: "/agenda/edutec-m04-2026", cmsLink: "inscricao-EDUTEC-M04-2026-jun", classe: "es-cta" } },
+    ],
+    footerCtas: [
+      { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
+      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+    ],
+  },
+};
+
 // ----------------- Record exportado -----------------
 
 export const EVENTOS_AGENDA: Record<string, Evento> = {
@@ -2254,4 +2594,5 @@ export const EVENTOS_AGENDA: Record<string, Evento> = {
   "edutec-m02-2026": eventoEdutecM02,
   "edutec-m04-2026": eventoEdutecM04,
   "proge-m01-2026": eventoProgeM01,
+  "proge-m03-2026": eventoProgeM03,
 };
