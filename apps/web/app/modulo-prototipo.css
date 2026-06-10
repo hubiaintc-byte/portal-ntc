@@ -1534,7 +1534,12 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .evt-nav-action:hover { background: rgba(184, 149, 46, 0.10); color: var(--dourado-soft); }
 .evt-nav-action.primary { background: var(--dourado); color: var(--noite); }
 .evt-nav-action.primary:hover { background: var(--dourado-soft); color: var(--noite); }
-.evt-nav-action::before {
+/* O ::before só existe nas variantes act-* (módulos de programa), onde a
+   mask-image o transforma em ícone funcional. Sem a mask (páginas de evento),
+   ele renderizava um quadrado sólido ao lado do texto. */
+.evt-nav-action.act-inscrever::before,
+.evt-nav-action.act-folder::before,
+.evt-nav-action.act-agenda::before {
   content: ''; width: 14px; height: 14px;
   background: currentColor; mask-size: contain; mask-repeat: no-repeat; mask-position: center;
   -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center;
