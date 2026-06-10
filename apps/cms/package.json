@@ -21,6 +21,7 @@
     "payload:seed:home-v3": "pnpm payload run src/seed/seedHomeV3.ts",
     "payload:seed:edutec": "pnpm payload run src/seed/seedEventoEdutecM01.ts",
     "payload:seed:corpo-docente": "pnpm payload run src/seed/seedCorpoDocente.ts",
+    "payload:seed:folders": "pnpm payload run src/seed/seedFoldersEventos.ts",
     "fotos:especialistas": "pnpm payload run src/seed/vincularFotosEspecialistas.ts",
     "clean": "rm -rf .next .turbo node_modules"
   },
