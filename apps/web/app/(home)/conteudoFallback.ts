@@ -176,35 +176,39 @@ export const FALLBACK_HOME = {
         ],
         textlink: { rotulo: "Conhecer programas estratégicos", href: "#programas" },
       },
-      {
-        tipo: "evento",
-        vertical: "sau",
-        imagemSrc: `${SUPABASE_URL}/area-saude.png`,
-        eyebrow: "Evento em destaque · Inscrições abertas",
-        eventoPill: { texto: "05–07 Jun · Brasília · Presencial" },
-        titulo:
-          "Governança, financiamento e <accent>performance</accent> no SUS — Brasília 2026.",
-        subtitulo:
-          "Curso executivo presencial em Brasília · 05 a 07 de junho · 24 horas · com a coordenação científica do NTC Saúde e convidados especialistas em gestão do SUS, governança e financiamento.",
-        ctas: [
-          { rotulo: "Inscrever-se", href: "#eventos-abertos", variante: "gold" as const },
-          { rotulo: "Ver detalhes do evento", href: "#eventos-abertos", variante: "ghost-light" as const },
-        ],
-      },
-      {
-        tipo: "evento",
-        vertical: "gov",
-        imagemSrc: `${SUPABASE_URL}/area-gestao-publica.png`,
-        eyebrow: "NTC Gestão Pública · AGIP · São Paulo",
-        eventoPill: { texto: "18–20 Jun · São Paulo · Híbrido" },
-        titulo: "Integridade e performance nas <accent>contratações públicas</accent>.",
-        subtitulo:
-          "Seminário presencial em São Paulo · 18 a 20 de junho · 20 horas · ministros, juristas e autoridades em Lei 14.133/2021 compõem o painel do programa.",
-        ctas: [
-          { rotulo: "Conhecer evento", href: "#programas", variante: "gold" as const },
-          { rotulo: "Inscrever-se", href: "#eventos-abertos", variante: "ghost-light" as const },
-        ],
-      },
+      // OCULTADO 10/06/2026 — slide do evento PROSUS/SUS removido do hero a pedido do usuário.
+      // Mantido comentado para reativação futura.
+      // {
+      //   tipo: "evento",
+      //   vertical: "sau",
+      //   imagemSrc: `${SUPABASE_URL}/area-saude.png`,
+      //   eyebrow: "Evento em destaque · Inscrições abertas",
+      //   eventoPill: { texto: "05–07 Jun · Brasília · Presencial" },
+      //   titulo:
+      //     "Governança, financiamento e <accent>performance</accent> no SUS — Brasília 2026.",
+      //   subtitulo:
+      //     "Curso executivo presencial em Brasília · 05 a 07 de junho · 24 horas · com a coordenação científica do NTC Saúde e convidados especialistas em gestão do SUS, governança e financiamento.",
+      //   ctas: [
+      //     { rotulo: "Inscrever-se", href: "#eventos-abertos", variante: "gold" as const },
+      //     { rotulo: "Ver detalhes do evento", href: "#eventos-abertos", variante: "ghost-light" as const },
+      //   ],
+      // },
+      // OCULTADO 10/06/2026 — slide do evento AGIP/contratações removido do hero a pedido do usuário.
+      // Mantido comentado para reativação futura.
+      // {
+      //   tipo: "evento",
+      //   vertical: "gov",
+      //   imagemSrc: `${SUPABASE_URL}/area-gestao-publica.png`,
+      //   eyebrow: "NTC Gestão Pública · AGIP · São Paulo",
+      //   eventoPill: { texto: "18–20 Jun · São Paulo · Híbrido" },
+      //   titulo: "Integridade e performance nas <accent>contratações públicas</accent>.",
+      //   subtitulo:
+      //     "Seminário presencial em São Paulo · 18 a 20 de junho · 20 horas · ministros, juristas e autoridades em Lei 14.133/2021 compõem o painel do programa.",
+      //   ctas: [
+      //     { rotulo: "Conhecer evento", href: "#programas", variante: "gold" as const },
+      //     { rotulo: "Inscrever-se", href: "#eventos-abertos", variante: "ghost-light" as const },
+      //   ],
+      // },
       {
         tipo: "programa",
         vertical: "edu",
