@@ -171,6 +171,12 @@ export async function definirOcultarPalestrante(
  * Recebe um File do client (via FormData), cria um registro Media pela Local
  * API (gera variantes + sobe ao Supabase Storage) e aponta o campo do evento
  * (`imagemCapa` ou `folderPdf`) para a nova Media.
+ *
+ * O site lê o REGISTRO PUBLICADO do evento (overrideEventoOnline na main),
+ * então gravar com draft:true deixaria a mídia presa no rascunho e o botão
+ * "Baixar folder" nunca mudaria. Grava sem draft:true reenviando o `_status`
+ * atual — mesma regra de definirOcultarPalestrante. Atenção: num evento
+ * publicado com edições de texto pendentes no rascunho, elas vão ao ar junto.
  */
 export async function enviarMidiaEvento(
   id: string,
@@ -195,11 +201,19 @@ export async function enviarMidiaEvento(
       overrideAccess: true,
     });
 
+    // Preserva o estado de publicação atual (não publica evento em rascunho).
+    const atual = (await payload.findByID({
+      collection: "eventos",
+      id,
+      draft: true,
+      overrideAccess: true,
+    })) as { _status?: "draft" | "published" | null };
+    const status = atual._status === "published" ? "published" : "draft";
+
     await payload.update({
       collection: "eventos",
       id,
-      data: { [campo]: media.id },
-      draft: true,
+      data: { [campo]: media.id, _status: status },
       overrideAccess: true,
     });
 

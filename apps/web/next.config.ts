@@ -11,10 +11,11 @@ const nextConfig: NextConfig = {
   experimental: {
     typedRoutes: true,
     // Server Actions do protótipo CMS recebem uploads (capa, folder PDF). O
-    // default de 1 MB estoura com fotos de capa; 12 MB cobre imagens e PDFs
-    // de folder com folga. A coleção Media (Payload) valida o mimeType.
+    // default de 1 MB estoura com fotos de capa; os folders "Nova Data" de
+    // 2026 chegam a 14 MB, então 20 MB dá folga. A coleção Media (Payload)
+    // valida o mimeType.
     serverActions: {
-      bodySizeLimit: "12mb",
+      bodySizeLimit: "20mb",
     },
   },
   images: {
