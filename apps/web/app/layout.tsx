@@ -100,10 +100,6 @@ import "./evento-prototipo.css";
 // aqui só vão classes específicas (prefixos .evt-*, .sb-*, .sn-*, .es-*,
 // .eventon-*, .why-*, .highlight-*, .invest-*, .faq-*, .speaker-*).
 import "./modulo-prototipo.css";
-// CSS do protótipo de CMS Soberana (rota /prototipo-cms). PROTÓTIPO VISUAL
-// throwaway — não toca o Payload. Classes prefixadas `pcms-`, sem colisão
-// com as demais páginas portadas.
-import "./prototipo-cms.css";
 
 /**
  * Layout raiz mínimo: `<html>`, `<body>`, fontes auto-hospedadas
