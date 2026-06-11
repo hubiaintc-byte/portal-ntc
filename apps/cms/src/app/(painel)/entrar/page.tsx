@@ -7,7 +7,7 @@ import { FormLogin } from "./FormLogin";
 export const dynamic = "force-dynamic";
 
 /**
- * /entrar — login do CMS Soberano. Layout split institucional (opção B
+ * /entrar — login do Painel Admin. Layout split institucional (opção B
  * aprovada): painel Oxford com a assinatura da marca à esquerda, formulário
  * sobre osso à direita. Quem já tem sessão válida vai direto para /.
  */

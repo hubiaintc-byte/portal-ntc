@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 
-import type { EventoCmsDetalhe } from "@/lib/cms/prototipoCms";
+import type { EventoCmsDetalhe } from "@/lib/cms/painelCms";
 
 import { enviarMidia } from "./acoes";
 

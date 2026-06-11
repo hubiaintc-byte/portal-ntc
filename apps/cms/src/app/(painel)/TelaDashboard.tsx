@@ -1,4 +1,4 @@
-import type { EventoCmsResumo, PalestranteCmsResumo } from "@/lib/cms/prototipoCms";
+import type { EventoCmsResumo, PalestranteCmsResumo } from "@/lib/cms/painelCms";
 
 interface TelaDashboardProps {
   eventos: EventoCmsResumo[];
@@ -48,7 +48,7 @@ export function TelaDashboard({ eventos, palestrantes, erroLeitura }: TelaDashbo
 
       {erroLeitura && (
         <div className="pcms-vazio" style={{ marginBottom: 24 }}>
-          Não foi possível ler o banco agora. Verifique se o admin do Payload está no ar. O protótipo
+          Não foi possível ler o banco agora. Verifique a conexão com o banco de dados. O painel
           continua navegável.
         </div>
       )}

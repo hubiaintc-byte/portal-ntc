@@ -7,7 +7,7 @@ import type {
   EventoCmsResumo,
   PalestranteCmsDetalhe,
   PalestranteCmsResumo,
-} from "@/lib/cms/prototipoCms";
+} from "@/lib/cms/painelCms";
 
 import { carregarEvento, carregarPalestrante } from "./acoes";
 import { sair } from "./acoesAuth";
@@ -20,7 +20,7 @@ import { DetalheEvento } from "./DetalheEvento";
 import { DetalhePalestrante } from "./DetalhePalestrante";
 
 /**
- * Casco do protótipo de CMS Soberana (sidebar Oxford + topbar + conteúdo).
+ * Casco do Painel Admin (sidebar Oxford + topbar + conteúdo).
  *
  * Estado de navegação client-side; os DADOS são reais, lidos server-side na
  * page.tsx (Local API do Payload, somente leitura) e recebidos por props.

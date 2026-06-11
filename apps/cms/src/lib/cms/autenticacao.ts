@@ -6,8 +6,8 @@ import { redirect } from "next/navigation";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
- * Sessão do CMS Soberano — validada contra o JWT do Payload (collection
- * Users). O cookie é o mesmo do admin (/admin): uma sessão só para os dois.
+ * Sessão do Painel Admin — validada contra o JWT do Payload (collection
+ * Users), gravado pelo login /entrar no cookie payload-token.
  */
 
 export const COOKIE_SESSAO = "payload-token";

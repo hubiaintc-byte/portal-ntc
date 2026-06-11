@@ -3,7 +3,7 @@ import "server-only";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
- * Escrita de eventos para o protótipo de CMS Soberana — via Local API do
+ * Escrita de eventos para o Painel Admin — via Local API do
  * Payload (mesmo motor do admin). Edita campos de texto e faz upload de capa
  * e folder PDF, que passam pela coleção Media (variantes Sharp + Supabase
  * Storage + registro), preservando o serviço de upload existente.

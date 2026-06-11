@@ -105,9 +105,8 @@ export function TelaConfiguracoes() {
       </div>
 
       <p className="pcms-aviso">
-        <b>Protótipo visual.</b> Esta tela é apenas demonstrativa — nada aqui é salvo nem afeta o
-        admin real do Payload. Serve para avaliar a direção de um CMS próprio com a identidade
-        Soberana.
+        <b>Tela demonstrativa.</b> Nada aqui é salvo ainda — estas opções serão ligadas aos
+        poucos, conforme o painel evoluir.
       </p>
     </>
   );

@@ -24,8 +24,8 @@ export const Users: CollectionConfig = {
     group: "Sistema",
   },
   auth: {
-    // Sessões do CMS Soberano e do admin Payload valem 14 dias. O cookie do
-    // login Soberano é de sessão por padrão; "Manter sessão iniciada" o
+    // Sessões do Painel Admin valem 14 dias. O cookie do
+    // login é de sessão por padrão; "Manter sessão iniciada" o
     // persiste pelos 14 dias. Interim até a 2FA da Janela C (CLAUDE.md §17).
     tokenExpiration: 60 * 60 * 24 * 14,
   },

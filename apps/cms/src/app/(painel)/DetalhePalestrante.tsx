@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 
-import type { PalestranteCmsDetalhe } from "@/lib/cms/prototipoCms";
+import type { PalestranteCmsDetalhe } from "@/lib/cms/painelCms";
 
 import { alternarOcultarPalestrante } from "./acoes";
 

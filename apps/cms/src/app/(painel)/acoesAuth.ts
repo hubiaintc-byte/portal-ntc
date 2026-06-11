@@ -14,9 +14,9 @@ export interface EstadoLogin {
 
 /**
  * Server Action do formulário de login (/entrar). Autentica na collection
- * Users via Local API e grava o JWT no cookie httpOnly — o mesmo cookie que
- * o admin Payload usa. Falha retorna mensagem genérica (não revela qual
- * campo errou). O lockout de 5 tentativas é o default do Payload.
+ * Users via Local API e grava o JWT no cookie httpOnly (payload-token).
+ * Falha retorna mensagem genérica (não revela qual campo errou). O lockout
+ * de 5 tentativas é o default do Payload.
  */
 export async function entrar(
   _anterior: EstadoLogin | null,

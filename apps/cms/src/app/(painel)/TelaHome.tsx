@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 
-import type { EventoCmsResumo } from "@/lib/cms/prototipoCms";
+import type { EventoCmsResumo } from "@/lib/cms/painelCms";
 
 import { salvarEventosDestaqueHome } from "./acoes";
 

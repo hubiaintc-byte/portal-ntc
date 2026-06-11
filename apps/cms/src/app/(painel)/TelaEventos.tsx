@@ -1,4 +1,4 @@
-import type { EventoCmsResumo } from "@/lib/cms/prototipoCms";
+import type { EventoCmsResumo } from "@/lib/cms/painelCms";
 
 const ROTULO_STATUS: Record<EventoCmsResumo["status"], string> = {
   publicado: "Publicado",
@@ -25,7 +25,7 @@ export function TelaEventos({ eventos, onAbrir }: TelaEventosProps) {
               : `${eventos.length} ${eventos.length === 1 ? "evento" : "eventos"} no portal — rascunhos inclusos.`}
           </p>
         </div>
-        <button type="button" className="pcms-btn" disabled title="Protótipo de leitura">
+        <button type="button" className="pcms-btn" disabled title="Em breve">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 5v14M5 12h14" />
           </svg>
@@ -52,8 +52,7 @@ export function TelaEventos({ eventos, onAbrir }: TelaEventosProps) {
 
       {eventos.length === 0 ? (
         <div className="pcms-vazio">
-          Nenhum evento encontrado no banco. Cadastre eventos no admin do Payload — eles aparecem
-          aqui automaticamente.
+          Nenhum evento cadastrado ainda.
         </div>
       ) : (
         <table className="pcms-tabela">

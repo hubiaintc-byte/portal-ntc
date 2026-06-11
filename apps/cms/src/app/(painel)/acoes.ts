@@ -8,7 +8,7 @@ import {
   obterPalestranteCms,
   type EventoCmsDetalhe,
   type PalestranteCmsDetalhe,
-} from "@/lib/cms/prototipoCms";
+} from "@/lib/cms/painelCms";
 import {
   definirOcultarPalestrante,
   despublicarEvento,
@@ -18,10 +18,10 @@ import {
   salvarEventosHome,
   vincularPalestrantesEvento,
   type ResultadoEscrita,
-} from "@/lib/cms/prototipoCmsEscrita";
+} from "@/lib/cms/painelCmsEscrita";
 
 /**
- * Server Actions do CMS Soberano. Toda action valida a sessão (cookie
+ * Server Actions do Painel Admin. Toda action valida a sessão (cookie
  * payload-token) ANTES de tocar a Local API — Server Actions são endpoints
  * públicos; sem a guarda, qualquer um com a URL escreveria no banco.
  */

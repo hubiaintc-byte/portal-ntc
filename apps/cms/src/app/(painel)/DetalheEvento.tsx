@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 
-import type { EventoCmsDetalhe, PalestranteCmsResumo } from "@/lib/cms/prototipoCms";
+import type { EventoCmsDetalhe, PalestranteCmsResumo } from "@/lib/cms/painelCms";
 
 import { alternarPublicacaoEvento, salvarEvento } from "./acoes";
 import { CampoUpload } from "./CampoUpload";

@@ -4,7 +4,7 @@ import { obterPayload } from "@/lib/payloadClient";
 import { lexicalToHtml } from "@/lib/cms/lexical";
 
 /**
- * Leitura de dados reais para o protótipo de CMS Soberana (/prototipo-cms).
+ * Leitura de dados reais para o Painel Admin (rota /).
  *
  * SOMENTE LEITURA. Usa a Local API do Payload (mesma de payloadClient.ts) para
  * listar Eventos e Especialistas direto do Postgres, incluindo rascunhos —
@@ -12,7 +12,7 @@ import { lexicalToHtml } from "@/lib/cms/lexical";
  * toca uploads, não altera schema. server-only para nunca vazar ao browser.
  *
  * Mapeia o schema real (apps/cms/src/collections/Eventos.ts e
- * Especialistas.ts) para tipos enxutos que as telas do protótipo consomem.
+ * Especialistas.ts) para tipos enxutos que as telas do painel consomem.
  */
 
 export type StatusCms = "publicado" | "rascunho" | "agendado";

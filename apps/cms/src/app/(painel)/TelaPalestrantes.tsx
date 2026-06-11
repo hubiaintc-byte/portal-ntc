@@ -1,4 +1,4 @@
-import type { PalestranteCmsResumo } from "@/lib/cms/prototipoCms";
+import type { PalestranteCmsResumo } from "@/lib/cms/painelCms";
 
 /** Mapeia a vertical do especialista para o data-attr de cor do avatar. */
 function vertAttr(vertical: string | null): string | undefined {
@@ -33,7 +33,7 @@ export function TelaPalestrantes({ palestrantes, onAbrir }: TelaPalestrantesProp
                 (ocultos > 0 ? ` · ${ocultos} oculto${ocultos > 1 ? "s" : ""} do site.` : ".")}
           </p>
         </div>
-        <button type="button" className="pcms-btn" disabled title="Protótipo de leitura">
+        <button type="button" className="pcms-btn" disabled title="Em breve">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 5v14M5 12h14" />
           </svg>
@@ -60,8 +60,7 @@ export function TelaPalestrantes({ palestrantes, onAbrir }: TelaPalestrantesProp
 
       {palestrantes.length === 0 ? (
         <div className="pcms-vazio">
-          Nenhum especialista encontrado no banco. Cadastre palestrantes no admin do Payload — eles
-          aparecem aqui automaticamente.
+          Nenhum especialista cadastrado ainda.
         </div>
       ) : (
         <table className="pcms-tabela">

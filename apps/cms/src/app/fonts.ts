@@ -1,16 +1,15 @@
 import { Barlow, Cormorant_Garamond } from "next/font/google";
 
 /**
- * Fontes Soberana 2026 para o admin do Payload (CLAUDE.md §3, §11).
+ * Fontes Soberana 2026 para o Painel Admin (CLAUDE.md §3, §11).
  *
  * Espelho de apps/web/app/fonts.ts: Cormorant Garamond para títulos
  * editoriais, Barlow para corpo e interface. Auto-hospedadas via
  * next/font/google em build — sem ping para fonts.googleapis.com em
- * runtime (substitui o @import que existia em custom.scss).
+ * runtime.
  *
- * As classes .variable expõem --font-titulo e --font-corpo; são aplicadas
- * ao admin pelo FonteProvider (admin.components.providers), e as variáveis
- * herdam para todo o painel via custom.scss.
+ * As classes .variable expõem --font-titulo e --font-corpo, aplicadas no
+ * <html> pelo layout do route group (painel); o painel.css as consome.
  */
 
 export const cormorant = Cormorant_Garamond({

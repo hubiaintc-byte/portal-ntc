@@ -1,10 +1,9 @@
 /* ==========================================================================
- * Protótipo CMS Soberana 2026 — Portal Grupo NTC
+ * Painel Admin — Portal Grupo NTC
  *
- * PROTÓTIPO VISUAL throwaway (rota /prototipo-cms). Não toca o Payload nem o
- * admin real. Demonstra como ficaria um CMS próprio com a identidade do site:
- * Oxford dominante, Pergaminho, Dourado cerimonial, Cormorant + Barlow, logo
- * NTC. Segue CLAUDE.md §3 (paleta 60·15·10·5, border-radius 0 em estruturas,
+ * CMS próprio com a identidade visual do site (Soberana 2026): Oxford
+ * dominante, Pergaminho, Dourado cerimonial, Cormorant + Barlow, logo NTC.
+ * Segue CLAUDE.md §3 (paleta 60·15·10·5, border-radius 0 em estruturas,
  * ícones lineares funcionais).
  *
  * Escopo das classes prefixado `pcms-` para não colidir com o CSS das outras

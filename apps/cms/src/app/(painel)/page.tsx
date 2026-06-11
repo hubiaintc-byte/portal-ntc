@@ -5,23 +5,23 @@ import {
   obterEventosHomeIds,
   type EventoCmsResumo,
   type PalestranteCmsResumo,
-} from "@/lib/cms/prototipoCms";
+} from "@/lib/cms/painelCms";
 
 import { ShellCms } from "./ShellCms";
 
-// Sempre dinâmico: o protótipo mostra o estado atual do banco (rascunhos
+// Sempre dinâmico: o painel mostra o estado atual do banco (rascunhos
 // inclusos), então não cacheia. Leitura barata via Local API.
 export const dynamic = "force-dynamic";
 
 /**
- * Rota /prototipo-cms — protótipo de CMS Soberana ligado a DADOS REAIS.
+ * Rota / — Painel Admin ligado aos dados reais.
  *
- * Server Component: lê Eventos e Especialistas do Postgres (somente leitura,
- * via Local API do Payload) e passa para o casco client. Se o banco estiver
- * indisponível, cai para listas vazias — o protótipo continua navegável e a
- * tela mostra o estado "sem registros". Não escreve nada, não toca uploads.
+ * Server Component: lê Eventos e Especialistas do Postgres via Local API do
+ * Payload e passa para o casco client. Se o banco estiver indisponível, cai
+ * para listas vazias — o painel continua navegável e a tela mostra o estado
+ * "sem registros".
  */
-export default async function PrototipoCmsPage() {
+export default async function PainelPage() {
   const usuario = await exigirUsuarioCms();
 
   let eventos: EventoCmsResumo[] = [];
