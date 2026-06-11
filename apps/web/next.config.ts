@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["sharp", "payload", "@payloadcms/db-postgres", "@payloadcms/next"],
   experimental: {
     typedRoutes: true,
+    // Server Actions do protótipo CMS recebem uploads (capa, folder PDF). O
+    // default de 1 MB estoura com fotos de capa; os folders "Nova Data" de
+    // 2026 chegam a 14 MB, então 20 MB dá folga. A coleção Media (Payload)
+    // valida o mimeType.
+    serverActions: {
+      bodySizeLimit: "20mb",
+    },
   },
   images: {
     remotePatterns: [

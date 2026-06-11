@@ -62,3 +62,5 @@ img/
 apps/cms/src/seed/assets/*
 !apps/cms/src/seed/assets/.gitkeep
 !apps/cms/src/seed/assets/README.md
+# Brainstorming visual companion (superpowers)
+.superpowers/

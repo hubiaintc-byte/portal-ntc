@@ -404,7 +404,7 @@ export interface Especialista {
    */
   foto: number | Media;
   /**
-   * Quando marcado, o especialista não aparece em nenhuma página pública (Corpo Docente e palestrantes de eventos). Use para quem ainda está com foto genérica.
+   * Quando marcado, o especialista não aparece em nenhuma página pública (Corpo Docente e palestrantes de eventos). Use para quem ainda está com foto genérica. A mudança só reflete no site após publicar.
    */
   ocultarDoSite?: boolean | null;
   titulacao: 'doutorado' | 'pos-doutorado' | 'mestrado' | 'especializacao' | 'graduacao';
