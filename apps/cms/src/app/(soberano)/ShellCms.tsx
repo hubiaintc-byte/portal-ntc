@@ -10,6 +10,7 @@ import type {
 } from "@/lib/cms/prototipoCms";
 
 import { carregarEvento, carregarPalestrante } from "./acoes";
+import { sair } from "./acoesAuth";
 import { TelaDashboard } from "./TelaDashboard";
 import { TelaHome } from "./TelaHome";
 import { TelaPalestrantes } from "./TelaPalestrantes";
@@ -26,6 +27,8 @@ import { DetalhePalestrante } from "./DetalhePalestrante";
  */
 
 interface ShellCmsProps {
+  /** Usuário autenticado (rodapé da sidebar). */
+  usuario: { nome: string; email: string };
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
   eventosHomeIds: string[];
@@ -96,7 +99,21 @@ const CRUMB: Record<TelaId, string> = {
   config: "Sistema · Configurações",
 };
 
-export function ShellCms({ eventos, palestrantes, eventosHomeIds, erroLeitura }: ShellCmsProps) {
+/** Iniciais para o avatar da sidebar ("Maria Souza" → "MS"). */
+function iniciais(nome: string): string {
+  const partes = nome.trim().split(/\s+/);
+  const primeira = partes[0]?.[0] ?? "";
+  const ultima = partes.length > 1 ? (partes[partes.length - 1]?.[0] ?? "") : "";
+  return (primeira + ultima).toUpperCase() || "NT";
+}
+
+export function ShellCms({
+  usuario,
+  eventos,
+  palestrantes,
+  eventosHomeIds,
+  erroLeitura,
+}: ShellCmsProps) {
   const [tela, setTela] = useState<TelaId>("dashboard");
   const [eventoDet, setEventoDet] = useState<EventoCmsDetalhe | null>(null);
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
@@ -182,11 +199,20 @@ export function ShellCms({ eventos, palestrantes, eventosHomeIds, erroLeitura }:
         </nav>
 
         <div className="pcms-sidebar__foot">
-          <div className="pcms-avatar-mini">EN</div>
+          <div className="pcms-avatar-mini">{iniciais(usuario.nome)}</div>
           <div>
-            <strong>Equipe NTC</strong>
-            <span>contato@institutontc.com.br</span>
+            <strong>{usuario.nome}</strong>
+            <span>{usuario.email}</span>
           </div>
+          <form action={sair} className="pcms-sair__form">
+            <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 4H5v16h4" />
+                <path d="m14 8 4 4-4 4" />
+                <path d="M18 12H9" />
+              </svg>
+            </button>
+          </form>
         </div>
       </aside>
 

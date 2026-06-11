@@ -1467,3 +1467,56 @@
     padding: 36px 22px;
   }
 }
+
+/* ===== Sair (rodapé da sidebar) ========================================= */
+/* O e-mail é longo; com o botão Sair no rodapé, o div de texto encolhe
+ * com ellipsis em vez de empurrar o botão para fora. */
+.pcms-sidebar__foot > div:not(.pcms-avatar-mini) {
+  min-width: 0;
+}
+
+.pcms-sidebar__foot strong,
+.pcms-sidebar__foot span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.pcms-sair__form {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.pcms-sair {
+  background: none;
+  border: 1px solid rgba(244, 239, 230, 0.25);
+  border-radius: 0;
+  color: var(--pcms-pergaminho);
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.pcms-sair svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pcms-sair:hover {
+  border-color: var(--pcms-dourado);
+  color: var(--pcms-dourado);
+}
+
+.pcms-sair:focus-visible {
+  outline: 2px solid var(--pcms-dourado);
+  outline-offset: 2px;
+}

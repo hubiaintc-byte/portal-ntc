@@ -1,3 +1,4 @@
+import { exigirUsuarioCms } from "@/lib/cms/autenticacao";
 import {
   listarEventosCms,
   listarPalestrantesCms,
@@ -21,6 +22,8 @@ export const dynamic = "force-dynamic";
  * tela mostra o estado "sem registros". Não escreve nada, não toca uploads.
  */
 export default async function PrototipoCmsPage() {
+  const usuario = await exigirUsuarioCms();
+
   let eventos: EventoCmsResumo[] = [];
   let palestrantes: PalestranteCmsResumo[] = [];
   let eventosHomeIds: string[] = [];
@@ -38,6 +41,7 @@ export default async function PrototipoCmsPage() {
 
   return (
     <ShellCms
+      usuario={usuario}
       eventos={eventos}
       palestrantes={palestrantes}
       eventosHomeIds={eventosHomeIds}
