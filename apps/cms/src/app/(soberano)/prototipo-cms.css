@@ -1262,3 +1262,208 @@
   padding: 10px;
   margin: 0;
 }
+
+/* ===== Login (/entrar) — split institucional (opção B) ================== */
+/* Tokens repetidos: .pcms-login vive fora de .pcms-root (espelho do bloco
+ * de tokens do topo do arquivo). */
+.pcms-login {
+  --pcms-oxford: #11365e;
+  --pcms-oxford-escuro: #0b2545;
+  --pcms-dourado: #b5995a;
+  --pcms-pergaminho: #f4efe6;
+  --pcms-osso: #fbf8f2;
+  --pcms-grafite: #2b2b2b;
+  --pcms-grafite-suave: #5a5a5a;
+  --pcms-linha: #d9d2c4;
+  --pcms-erro: #9a1b1b;
+
+  display: grid;
+  grid-template-columns: 46% 54%;
+  min-height: 100vh;
+  background: var(--pcms-osso);
+  color: var(--pcms-grafite);
+  font-family: var(--font-corpo), "Barlow", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pcms-login__marca {
+  background: var(--pcms-oxford-escuro);
+  color: var(--pcms-pergaminho);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 44px;
+}
+
+.pcms-login__logo {
+  width: 56px;
+  height: 56px;
+}
+
+.pcms-login__lema {
+  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.18;
+  margin: 0;
+}
+
+.pcms-login__lema em {
+  color: var(--pcms-dourado);
+}
+
+.pcms-login__filete {
+  display: block;
+  width: 44px;
+  height: 1px;
+  background: var(--pcms-dourado);
+  margin: 22px 0;
+}
+
+.pcms-login__eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin: 0;
+}
+
+.pcms-login__rodape {
+  font-size: 0.72rem;
+  opacity: 0.45;
+  margin: 0;
+}
+
+.pcms-login__painel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+}
+
+.pcms-login__form {
+  width: min(380px, 100%);
+}
+
+.pcms-login__titulo {
+  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--pcms-oxford);
+  margin: 0 0 4px;
+}
+
+.pcms-login__subtitulo {
+  font-size: 0.9rem;
+  color: var(--pcms-grafite-suave);
+  margin: 0 0 28px;
+}
+
+.pcms-login__label {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pcms-grafite-suave);
+  margin: 0 0 6px;
+}
+
+.pcms-login__campo {
+  display: block;
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  border-radius: 0;
+  padding: 12px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--pcms-grafite);
+  margin-bottom: 18px;
+}
+
+.pcms-login__campo:focus-visible {
+  outline: 2px solid var(--pcms-oxford);
+  outline-offset: 1px;
+}
+
+.pcms-login__manter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--pcms-grafite-suave);
+  margin: 2px 0 22px;
+}
+
+.pcms-login__manter input {
+  accent-color: var(--pcms-oxford);
+}
+
+.pcms-login__erro {
+  background: rgba(154, 27, 27, 0.08);
+  border-left: 3px solid var(--pcms-erro);
+  color: var(--pcms-erro);
+  font-size: 0.85rem;
+  padding: 10px 12px;
+  margin: 0 0 18px;
+}
+
+.pcms-login__entrar {
+  width: 100%;
+  background: var(--pcms-oxford);
+  color: var(--pcms-pergaminho);
+  border: 0;
+  border-radius: 0;
+  padding: 14px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.pcms-login__entrar:hover {
+  background: var(--pcms-oxford-escuro);
+}
+
+.pcms-login__entrar:focus-visible {
+  outline: 2px solid var(--pcms-dourado);
+  outline-offset: 2px;
+}
+
+.pcms-login__entrar:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Mobile: painel Oxford vira cabeçalho compacto (logo + eyebrow). */
+@media (max-width: 768px) {
+  .pcms-login {
+    grid-template-columns: 1fr;
+    min-height: 100svh;
+  }
+
+  .pcms-login__marca {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 22px;
+  }
+
+  .pcms-login__logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pcms-login__lema,
+  .pcms-login__filete,
+  .pcms-login__rodape {
+    display: none;
+  }
+
+  .pcms-login__painel {
+    align-items: flex-start;
+    padding: 36px 22px;
+  }
+}
