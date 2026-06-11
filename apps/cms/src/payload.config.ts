@@ -44,29 +44,11 @@ const bucket = process.env.SUPABASE_BUCKET || "ntc-portal-media";
  */
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
+  // A UI do admin Payload foi removida — o painel próprio em / (route group
+  // (painel)) é o único admin. `user` continua definindo a collection de
+  // autenticação usada por payload.login()/payload.auth().
   admin: {
     user: Users.slug,
-    theme: "light",
-    meta: {
-      titleSuffix: " · Admin Grupo NTC",
-      icons: [
-        {
-          rel: "icon",
-          type: "image/svg+xml",
-          url: "/favicon.svg",
-        },
-      ],
-    },
-    components: {
-      graphics: {
-        Logo: "@/components/admin/LogoNTC#LogoNTC",
-        Icon: "@/components/admin/IconNTC#IconNTC",
-      },
-      // Injeta as fontes Soberana auto-hospedadas (Cormorant + Barlow) via
-      // next/font, substituindo o @import do Google que ficava em custom.scss
-      // (CLAUDE.md §3/§11 — auto-hospedadas, sem ping externo).
-      providers: ["@/components/admin/FonteProvider#FonteProvider"],
-    },
   },
   i18n: {
     fallbackLanguage: "pt",
