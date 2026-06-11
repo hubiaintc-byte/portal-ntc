@@ -47,32 +47,63 @@ const VIEWPORTS = [
 const flags = new Set(process.argv.slice(2));
 mkdirSync(SAIDA, { recursive: true });
 
-/** Coleta elementos que vazam horizontalmente do viewport. */
-async function coletarOfensores(page) {
-  return page.evaluate(() => {
-    const vw = window.innerWidth;
+/**
+ * Coleta elementos que vazam horizontalmente do viewport.
+ * Ignora falsos positivos: subtree de position:fixed (drawer off-canvas
+ * não gera scrollbar), filhos de containers com overflow-x próprio
+ * (auto/scroll/hidden/clip — o container já contém o vazamento) e o
+ * skip-link (escondido fora da tela de propósito). Deduplica cadeias
+ * pai→filho reportando só o elemento mais alto de cada vazamento.
+ */
+async function coletarOfensores(page, larguraConfigurada) {
+  return page.evaluate((vwConfig) => {
+    // Compara contra a largura CONFIGURADA do device: com isMobile o
+    // Chrome expande o layout viewport (innerWidth) para conter o
+    // overflow, o que esconderia exatamente o que procuramos.
+    const vw = vwConfig;
     const ofensores = [];
+    const flagrados = new Set();
+
+    const contextoSeguro = (el) => {
+      for (let n = el; n && n !== document.body; n = n.parentElement) {
+        const cs = getComputedStyle(n);
+        if (cs.position === "fixed") return true;
+        if (n !== el) {
+          const ox = cs.overflowX;
+          if (ox === "auto" || ox === "scroll" || ox === "hidden" || ox === "clip") return true;
+        }
+      }
+      return false;
+    };
+
     for (const el of document.querySelectorAll("body *")) {
       const rect = el.getBoundingClientRect();
       if (rect.width === 0 && rect.height === 0) continue;
-      if (rect.right > vw + 1 || rect.left < -1) {
-        const classes = el.className && typeof el.className === "string"
-          ? "." + el.className.trim().split(/\s+/).slice(0, 3).join(".")
-          : "";
-        ofensores.push({
-          seletor: el.tagName.toLowerCase() + (el.id ? "#" + el.id : "") + classes,
-          left: Math.round(rect.left),
-          right: Math.round(rect.right),
-          largura: Math.round(rect.width),
-        });
+      if (rect.right <= vw + 1 && rect.left >= -1) continue;
+      if (el.classList.contains("skip-link")) continue;
+      if (el.parentElement && flagrados.has(el.parentElement)) {
+        flagrados.add(el); // propaga para netos sem reportar de novo
+        continue;
       }
+      if (contextoSeguro(el)) continue;
+      flagrados.add(el);
+      const classes = el.className && typeof el.className === "string"
+        ? "." + el.className.trim().split(/\s+/).slice(0, 3).join(".")
+        : "";
+      ofensores.push({
+        seletor: el.tagName.toLowerCase() + (el.id ? "#" + el.id : "") + classes,
+        left: Math.round(rect.left),
+        right: Math.round(rect.right),
+        largura: Math.round(rect.width),
+      });
     }
     return {
       larguraDocumento: document.documentElement.scrollWidth,
       larguraViewport: vw,
+      vazamentoReal: document.documentElement.scrollWidth > vwConfig,
       ofensores: ofensores.slice(0, 40),
     };
-  });
+  }, larguraConfigurada);
 }
 
 /** Rola até o fim e verifica se algum .fade-in ficou invisível. */
@@ -116,14 +147,32 @@ for (const vp of VIEWPORTS) {
   const page = await contexto.newPage();
 
   for (const rota of ROTAS) {
-    await page.goto(BASE + rota, { waitUntil: "networkidle", timeout: 30000 });
+    // "load" + pausa curta: networkidle é flaky no dev server (HMR/polling).
+    // Compilação on-demand do dev server pode estourar o timeout — re-tenta
+    // e, se ainda falhar, registra e segue para a próxima rota.
+    let navegou = false;
+    for (let tentativa = 1; tentativa <= 3 && !navegou; tentativa++) {
+      try {
+        await page.goto(BASE + rota, { waitUntil: "load", timeout: 45000 });
+        navegou = true;
+      } catch {
+        if (tentativa === 3) {
+          console.log(`! ${vp.nome} ${rota} — navegação falhou após 3 tentativas, pulando`);
+        }
+      }
+    }
+    if (!navegou) {
+      relatorio.push({ viewport: vp.nome, rota, erro: "timeout de navegação" });
+      continue;
+    }
+    await page.waitForTimeout(600);
     const linha = { viewport: vp.nome, rota };
 
-    const overflow = await coletarOfensores(page);
+    const overflow = await coletarOfensores(page, vp.width);
     linha.overflow = overflow;
-    if (overflow.ofensores.length > 0) {
-      totalOfensores += overflow.ofensores.length;
-      console.log(`\n✗ ${vp.nome} ${rota} — doc ${overflow.larguraDocumento}px > viewport ${overflow.larguraViewport}px`);
+    if (overflow.vazamentoReal || overflow.ofensores.length > 0) {
+      totalOfensores += Math.max(overflow.ofensores.length, overflow.vazamentoReal ? 1 : 0);
+      console.log(`\n✗ ${vp.nome} ${rota} — doc ${overflow.larguraDocumento}px, viewport ${vp.width}px${overflow.vazamentoReal ? " (vazamento real)" : ""}`);
       for (const o of overflow.ofensores) {
         console.log(`   ${o.seletor}  left:${o.left} right:${o.right} largura:${o.largura}`);
       }
