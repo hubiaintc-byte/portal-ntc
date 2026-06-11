@@ -1887,7 +1887,12 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   border-left: 1px solid rgba(244, 241, 232, 0.12);
 }
 @media (max-width: 1099px) {
-  .evt-nav-actions { border-left: 0; border-top: 1px solid rgba(244, 241, 232, 0.12); }
+  .evt-nav-actions {
+    border-left: 0; border-top: 1px solid rgba(244, 241, 232, 0.12);
+    /* Ações com white-space: nowrap rolam horizontalmente (mesmo padrão
+       das âncoras) em vez de alargar a trilha 1fr além do viewport. */
+    overflow-x: auto; scrollbar-width: thin;
+  }
 }
 .evt-nav-action {
   display: inline-flex; align-items: center; gap: 8px;

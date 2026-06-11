@@ -295,3 +295,12 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .fade-in { opacity: 0; transform: translateY(12px); transition: opacity 800ms ease-out, transform 800ms ease-out; }
 .fade-in.is-visible { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } .fade-in { opacity: 1; transform: none; } }
+
+/* =============================================================
+   CORREÇÃO MOBILE · overflow horizontal (não altera desktop)
+   ============================================================= */
+@media (max-width: 599px) {
+  /* Tabelas legais (ex.: inventário de cookies) têm min-content maior que
+     o viewport estreito: viram bloco rolável horizontal, sem alargar a página. */
+  .legal-table { display: block; overflow-x: auto; scrollbar-width: thin; }
+}

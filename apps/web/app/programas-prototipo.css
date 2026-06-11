@@ -2726,3 +2726,12 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   padding: 8px 14px; border-radius: 22px;
 }
 
+
+/* =============================================================
+   CORREÇÃO MOBILE · overflow horizontal (não altera desktop)
+   ============================================================= */
+@media (max-width: 599px) {
+  /* A tabela de módulos tem min-content maior que o viewport estreito:
+     vira bloco rolável horizontal (padrão do projeto), sem alargar a página. */
+  .modules-table { display: block; overflow-x: auto; scrollbar-width: thin; }
+}

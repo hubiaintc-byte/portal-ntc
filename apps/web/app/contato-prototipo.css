@@ -936,3 +936,12 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .fade-in { opacity: 1; transform: none; }
 }
+
+/* =============================================================
+   CORREÇÃO MOBILE · overflow horizontal (não altera desktop)
+   ============================================================= */
+@media (max-width: 599px) {
+  /* E-mails longos (sem ponto de quebra natural) quebram em qualquer
+     caractere para não alargar a trilha 1fr além do viewport. */
+  .channel-body .value { overflow-wrap: anywhere; }
+}

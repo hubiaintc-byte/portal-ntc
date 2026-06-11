@@ -1,6 +1,16 @@
 @import "tailwindcss";
 
 /*
+ * O design system (@ntc/ui) vive fora de apps/web e é resolvido via
+ * symlink em node_modules, que o Tailwind 4 ignora na detecção
+ * automática de fontes. Sem este @source, as classes usadas pelos
+ * componentes do pacote (ex.: BannerCookies: fixed, flex-col, flex-wrap,
+ * gap-3) nunca são geradas e o banner renderiza quebrado, transbordando
+ * o viewport em todas as rotas no mobile.
+ */
+@source "../../../packages/ui/src";
+
+/*
  * Tokens Soberana 2026 mapeados para o sistema @theme do Tailwind 4.
  * Fonte: packages/ui/src/tokens.ts (espelho da Seção 2 do Inventário).
  *

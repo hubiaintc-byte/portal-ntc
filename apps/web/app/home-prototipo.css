@@ -232,9 +232,15 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   .nav-primary { display: none; }
   .header-cta .btn:not(.btn--participant) { display: none; }
   .mobile-toggle { display: block; }
+  /* O drawer mobile assume a navegação: o mega menu desktop sai do fluxo
+     para não gerar overflow horizontal (suas colunas vazam do viewport). */
+  .mega { display: none; }
 }
 @media (max-width: 599px) {
   .header-cta .btn--participant { display: none; }
+  /* Botões com rótulos longos quebram linha em telas estreitas em vez de
+     vazar do viewport (o .btn base usa white-space: nowrap no desktop). */
+  a.btn, button.btn { white-space: normal; }
 }
 
 /* =============================================================
