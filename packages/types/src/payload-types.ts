@@ -1238,6 +1238,7 @@ export interface EspecialistasSelect<T extends boolean = true> {
   nome?: T;
   slug?: T;
   foto?: T;
+  ocultarDoSite?: T;
   titulacao?: T;
   instituicao?: T;
   cargoAtual?: T;
