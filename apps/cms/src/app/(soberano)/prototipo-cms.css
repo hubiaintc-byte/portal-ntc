@@ -11,6 +11,12 @@
  * páginas portadas importadas no mesmo root layout.
  * ========================================================================== */
 
+/* O app cms não tem globals.css — sem isto o body fica com a margem default
+ * de 8px do user-agent e a página não preenche a janela. */
+body {
+  margin: 0;
+}
+
 .pcms-root {
   /* Tokens Soberana — espelho de packages/ui/src/tokens.ts */
   --pcms-oxford: #11365e;
@@ -1296,8 +1302,11 @@
 }
 
 .pcms-login__logo {
-  width: 56px;
-  height: 56px;
+  /* Lockup horizontal (viewBox 760×380) — sangra à esquerda para alinhar a
+   * barra do N com o texto do lema. */
+  width: 180px;
+  height: auto;
+  margin-left: -18px;
 }
 
 .pcms-login__lema {
@@ -1452,8 +1461,9 @@
   }
 
   .pcms-login__logo {
-    width: 40px;
-    height: 40px;
+    width: 120px;
+    height: auto;
+    margin-left: -12px;
   }
 
   .pcms-login__lema,

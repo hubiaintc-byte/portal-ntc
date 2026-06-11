@@ -6,7 +6,7 @@ import { barlow, cormorant } from "../fonts";
 import "./prototipo-cms.css";
 
 export const metadata: Metadata = {
-  title: "CMS Soberano · Grupo NTC",
+  title: "Painel Admin NTC · Grupo NTC",
   robots: { index: false, follow: false },
 };
 

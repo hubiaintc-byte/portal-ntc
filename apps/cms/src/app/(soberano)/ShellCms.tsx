@@ -183,7 +183,7 @@ export function ShellCms({
           </svg>
           <div className="pcms-sidebar__wordmark">
             <strong>Grupo NTC</strong>
-            <span>Painel Soberano</span>
+            <span>Painel Admin</span>
           </div>
         </div>
 
