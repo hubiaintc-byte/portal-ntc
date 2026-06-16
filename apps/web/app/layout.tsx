@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 import { BannerCookies } from "@ntc/ui";
 import { POLITICA_VERSAO_ATUAL } from "@ntc/lib";
 
@@ -167,6 +170,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
         </a>
         {children}
         <BannerCookies politicaVersao={POLITICA_VERSAO_ATUAL} />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
