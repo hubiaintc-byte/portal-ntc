@@ -30,6 +30,7 @@ import {
   type FormAsideConfig,
   type TabId,
 } from "./conteudoContato";
+import { enviarLead } from "./enviarLead";
 
 /* ============================================================
  * Constantes
@@ -107,7 +108,7 @@ function validarCampo(
   return ok;
 }
 
-type StatusKind = "idle" | "ok" | "error";
+type StatusKind = "idle" | "sending" | "ok" | "error";
 interface FormStatusState {
   kind: StatusKind;
   mensagem: string;
@@ -422,18 +423,35 @@ export function RoteadorFormularios() {
           return;
         }
 
-        // TODO: integrar endpoint após backend de contato pronto
-        void kind; // referência nominal ao parâmetro (endpoint será usado no fetch real)
-        setStatus({
-          kind: "ok",
-          mensagem: "Mensagem registrada · você receberá retorno em horário comercial.",
-        });
-        // TODO: analytics quando dataLayer estiver configurado
-        form.reset();
-        if (kind === "equipe") {
-          setBulkAtivo(false);
-          setNomeArquivoBulk("Selecionar arquivo .xlsx / .xls / .csv");
-        }
+        setStatus({ kind: "sending", mensagem: "Enviando…" });
+        void enviarLead(kind, form)
+          .then((res) => {
+            if (res.ok) {
+              setStatus({
+                kind: "ok",
+                mensagem:
+                  res.message ||
+                  "Mensagem registrada · você receberá retorno em horário comercial.",
+              });
+              form.reset();
+              if (kind === "equipe") {
+                setBulkAtivo(false);
+                setNomeArquivoBulk("Selecionar arquivo .xlsx / .xls / .csv");
+              }
+            } else {
+              setStatus({
+                kind: "error",
+                mensagem:
+                  res.message || "Não foi possível enviar agora. Tente novamente em instantes.",
+              });
+            }
+          })
+          .catch(() => {
+            setStatus({
+              kind: "error",
+              mensagem: "Falha de conexão. Verifique sua internet e tente novamente.",
+            });
+          });
       },
     [],
   );
@@ -706,6 +724,7 @@ function PainelAtendimento({ tabAtiva, status, onSubmit }: PainelAtendimentoProp
               type="submit"
               className="btn btn--primary"
               data-cms-link="enviar-atendimento"
+              disabled={status.kind === "sending"}
             >
               Enviar mensagem <span className="btn-arrow">→</span>
             </button>
@@ -939,7 +958,12 @@ function PainelProposta({
           </div>
 
           <div className="form-actions full">
-            <button type="submit" className="btn btn--gold" data-cms-link="enviar-proposta">
+            <button
+              type="submit"
+              className="btn btn--gold"
+              data-cms-link="enviar-proposta"
+              disabled={status.kind === "sending"}
+            >
               Enviar solicitação de proposta <span className="btn-arrow">→</span>
             </button>
             <FormStatus status={status} id="status-proposta" />
@@ -1233,7 +1257,12 @@ function PainelEquipe({
           </div>
 
           <div className="form-actions full">
-            <button type="submit" className="btn btn--primary" data-cms-link="enviar-equipe">
+            <button
+              type="submit"
+              className="btn btn--primary"
+              data-cms-link="enviar-equipe"
+              disabled={status.kind === "sending"}
+            >
               Solicitar inscrição da equipe <span className="btn-arrow">→</span>
             </button>
             <FormStatus status={status} id="status-equipe" />
@@ -1366,7 +1395,12 @@ function PainelImprensa({ tabAtiva, status, onSubmit }: PainelImprensaProps) {
           </div>
 
           <div className="form-actions full">
-            <button type="submit" className="btn btn--primary" data-cms-link="enviar-imprensa">
+            <button
+              type="submit"
+              className="btn btn--primary"
+              data-cms-link="enviar-imprensa"
+              disabled={status.kind === "sending"}
+            >
               Enviar pauta <span className="btn-arrow">→</span>
             </button>
             <FormStatus status={status} id="status-imprensa" />

@@ -54,7 +54,15 @@ export const schemaContato = z.object({
 export const schemaNewsletter = z.object({
   nome: z.string().min(2, "Nome muito curto"),
   email: z.string().email("E-mail inválido"),
-  areasInteresse: z.array(z.string()).min(1, "Selecione ao menos uma área"),
+  // Preferência editorial vinda do <select name="vertical"> em /conteudos:
+  // todas | educacao | gestao | saude | transversal. O handler resolve para
+  // IDs de `areas` quando há vertical específica; "todas"/"transversal" não
+  // mapeiam para uma única área e ficam só no registro (payloadBruto).
+  vertical: z.string().optional(),
+  // IDs de `areas` (relationship hasMany). Opcional: o front pode mandar a
+  // preferência via `vertical` em vez de IDs explícitos.
+  areasInteresse: z.array(z.string()).optional(),
+  instituicao: z.string().optional(),
   origem: origemFrontSchema,
   consentimentoLgpd,
 });

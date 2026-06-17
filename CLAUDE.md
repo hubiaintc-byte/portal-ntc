@@ -6,6 +6,7 @@
 
 ### Histórico de revisões
 
+- **v1.3 — 16/06/2026** — sessão de reativação dos formulários: adicionada §19 (Estado e backlog do CMS) com o que falta para o go-live. Formulários `/api/forms/*` reativados (handlers restaurados do commit `9402e85` + front ligado ao fetch real). Resend e anti-spam (hCaptcha/rate-limit) seguem como stub por decisão do PO.
 - **v1.2 — 19/05/2026** — sessão 3 (setup base do Payload): adiamento de 2FA para Janela C (item 8 de §17), `payload-types.ts` versionado em `packages/types/src` em vez de `apps/web/types` (alinha com §13).
 - **v1.1 — 19/05/2026** — migração de stack: Neon→Supabase Postgres SP, Cloudflare R2→Supabase Storage, RD Station removido (coleção `Lead` no Payload é fonte única). §15 reescrita; §17 atualizada. Detalhes em `docs/10_DAB §1.1`.
 - **v1.0 — 15/05/2026** — versão original Sprint F.
@@ -334,5 +335,33 @@ Não improvise. Não invente. Não interprete liberalmente.
 
 ---
 
+## 19. Estado e backlog do CMS (atualizado 16/06/2026)
+
+O CMS é um **Payload CMS 3** com **11 coleções + 4 globals** modeladas e um **Painel Admin próprio** (route group `apps/cms/src/app/(painel)/`, ex-"CMS Soberano") que é o único admin desde 11/06/2026 — o admin nativo do Payload foi removido. O painel está operacional para **ler, editar e publicar** o que já existe; **criar do zero** e os **formulários do site** ainda têm pendências.
+
+### 19.1. O que já funciona
+
+- **Modelagem completa**: Áreas, Programas, Módulos, Eventos, Especialistas, Conteúdos, Clientes, Leads, Media, Users, AuditLog + globals Home, Corpo Docente, O Grupo, Rodapé.
+- **Painel Admin**: Dashboard, Palestrantes, Eventos, curadoria da Home — todos com dados reais via Local API.
+- **Editar e publicar** eventos (nome, data, resumo, capa, folder PDF, palestrantes) e ocultar/exibir palestrantes do site.
+- **Fluxo rascunho → publicar → revalidar** funcionando, com o site atualizando via `/api/revalidate`.
+- **Upload de mídia** no Supabase Storage com variantes de imagem (Sharp).
+
+### 19.2. Backlog — o que falta para o go-live (em ordem de prioridade)
+
+1. **Formulários do site** *(em execução nesta sessão de 16/06)* — as 4 rotas `/api/forms/*` (proposta · contato · newsletter · candidatura) e o front estão sendo religados à coleção `Leads`. Antes desta sessão, as rotas devolviam 503 e o front mostrava sucesso falso (não capturava nada). **Bloqueador de go-live.**
+2. **2FA do admin (TOTP)** — login é só senha + JWT de 14 dias. 2FA nunca foi implementado (a tela de Configurações mostra o toggle, mas é UI sem persistência). Pendência da Janela C (§17.8). **Bloqueador de go-live.**
+3. **Criar conteúdo novo pelo painel** — botões "Novo evento" e "Novo palestrante" estão desabilitados ("Em breve"). Hoje só dá para editar o que já existe.
+4. **Notificação por e-mail de Lead (Resend)** — `aposCriarLead` só loga; não envia e-mail. O Lead fica salvo no painel. Ligar Resend (notificação interna + confirmação ao usuário) é sessão própria (precisa de `RESEND_API_KEY` e e-mails de destino confirmados).
+5. **Anti-spam real** — `verificarHcaptcha` e `checarRateLimit` são stubs controlados por flag (`HCAPTCHA_ENABLED`, `RATELIMIT_ENABLED`, ambos `false`). Implementar siteverify real + store de rate-limit (ex.: Upstash) antes do tráfego público.
+6. **Tela de Configurações** — demonstrativa, não persiste nada.
+7. **AuditLog** — coleção existe, mas nenhum hook escreve nela (sem rastro de quem alterou o quê).
+
+### 19.3. Regra ao mexer em formulários
+
+A infra de forms já existe e não deve ser reinventada (§5.1): schemas Zod em `packages/lib/src/forms/schemas.ts`, helpers de resposta em `apps/web/lib/respostaForm.ts`, `extrairOrigem`/`aposCriarLead`/`verificarHcaptcha`/`checarRateLimit` em `packages/lib/src/forms/`. Os handlers de referência estão preservados no commit `9402e85`. LGPD (§12) é obrigatório em todo submit: consentimento não pré-marcado, versão da política, timestamp e IP gravados no Lead.
+
+---
+
 **Fim das instruções permanentes.**
-*Portal Grupo NTC · CLAUDE.md · v1 · 15 de maio de 2026 · Instituto NTC do Brasil*
+*Portal Grupo NTC · CLAUDE.md · v1.3 · 16 de junho de 2026 · Instituto NTC do Brasil*
