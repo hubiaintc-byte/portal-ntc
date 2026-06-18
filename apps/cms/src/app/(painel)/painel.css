@@ -552,6 +552,28 @@ body {
   color: var(--pcms-erro);
 }
 
+/* Selos de status de Lead (LEAD_STATUS — triagem comercial). */
+.pcms-selo--novo {
+  background: rgba(30, 78, 140, 0.12);
+  color: var(--pcms-oxford-claro);
+}
+.pcms-selo--em-atendimento {
+  background: rgba(181, 153, 90, 0.16);
+  color: #8a6d2f;
+}
+.pcms-selo--qualificado {
+  background: rgba(181, 153, 90, 0.22);
+  color: #6f5520;
+}
+.pcms-selo--convertido {
+  background: rgba(63, 107, 63, 0.14);
+  color: var(--pcms-sucesso);
+}
+.pcms-selo--descartado {
+  background: rgba(45, 45, 45, 0.1);
+  color: var(--pcms-grafite-suave);
+}
+
 /* Coluna de status: empilha selos (foto + oculto) sem encostar. */
 .pcms-cel-status {
   display: flex;
@@ -1041,6 +1063,44 @@ body {
   word-break: break-all;
   color: var(--pcms-oxford-claro);
   font-size: 0.82rem;
+}
+.pcms-det-link a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* Lista de definições (rótulo → valor) — detalhe de Lead. */
+.pcms-deflist {
+  margin: 0;
+}
+.pcms-deflist__item {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--pcms-pergaminho);
+}
+.pcms-deflist__item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.pcms-deflist__item:first-child {
+  padding-top: 0;
+}
+.pcms-deflist dt {
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pcms-grafite-suave);
+  margin-bottom: 3px;
+}
+.pcms-deflist dd {
+  margin: 0;
+  color: var(--pcms-grafite);
+  line-height: 1.6;
+  white-space: pre-line;
+}
+/* No corpo dos cards laterais, a deflist fica logo abaixo de um selo. */
+.pcms-det-card__body .pcms-selo + .pcms-deflist {
+  margin-top: 12px;
 }
 .pcms-det-pessoa {
   display: flex;
