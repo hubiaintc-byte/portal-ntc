@@ -1,9 +1,11 @@
 import { exigirUsuarioCms } from "@/lib/cms/autenticacao";
 import {
   listarEventosCms,
+  listarLeadsCms,
   listarPalestrantesCms,
   obterEventosHomeIds,
   type EventoCmsResumo,
+  type LeadCmsResumo,
   type PalestranteCmsResumo,
 } from "@/lib/cms/painelCms";
 
@@ -26,16 +28,19 @@ export default async function PainelPage() {
 
   let eventos: EventoCmsResumo[] = [];
   let palestrantes: PalestranteCmsResumo[] = [];
+  let leads: LeadCmsResumo[] = [];
   let eventosHomeIds: string[] = [];
   let erroLeitura = false;
 
   try {
-    [eventos, palestrantes, eventosHomeIds] = await Promise.all([
+    [eventos, palestrantes, leads, eventosHomeIds] = await Promise.all([
       listarEventosCms(),
       listarPalestrantesCms(),
+      listarLeadsCms(),
       obterEventosHomeIds(),
     ]);
-  } catch {
+  } catch (e) {
+    console.error("[PainelPage] Erro ao ler banco:", e);
     erroLeitura = true;
   }
 
@@ -44,6 +49,7 @@ export default async function PainelPage() {
       usuario={usuario}
       eventos={eventos}
       palestrantes={palestrantes}
+      leads={leads}
       eventosHomeIds={eventosHomeIds}
       erroLeitura={erroLeitura}
     />

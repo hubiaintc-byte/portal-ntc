@@ -1,9 +1,12 @@
+import { useState } from "react";
+
 import type { EventoCmsResumo } from "@/lib/cms/painelCms";
+
+import { ModalImportarPdf } from "./ModalImportarPdf";
 
 const ROTULO_STATUS: Record<EventoCmsResumo["status"], string> = {
   publicado: "Publicado",
   rascunho: "Rascunho",
-  agendado: "Agendado",
 };
 
 interface TelaEventosProps {
@@ -13,6 +16,8 @@ interface TelaEventosProps {
 
 /** Listagem de eventos — dados reais do banco (somente leitura). */
 export function TelaEventos({ eventos, onAbrir }: TelaEventosProps) {
+  const [modalImportar, setModalImportar] = useState(false);
+
   return (
     <>
       <div className="pcms-pagehead">
@@ -25,13 +30,28 @@ export function TelaEventos({ eventos, onAbrir }: TelaEventosProps) {
               : `${eventos.length} ${eventos.length === 1 ? "evento" : "eventos"} no portal — rascunhos inclusos.`}
           </p>
         </div>
-        <button type="button" className="pcms-btn" disabled title="Em breve">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          Novo evento
-        </button>
+        <div className="pcms-pagehead__acoes">
+          <button
+            type="button"
+            className="pcms-btn pcms-btn--ghost"
+            onClick={() => setModalImportar(true)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 16V4M8 8l4-4 4 4" />
+              <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
+            </svg>
+            Importar PDF
+          </button>
+          <button type="button" className="pcms-btn" disabled title="Em breve">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Novo evento
+          </button>
+        </div>
       </div>
+
+      {modalImportar && <ModalImportarPdf onFechar={() => setModalImportar(false)} />}
 
       <div className="pcms-toolbar">
         <div className="pcms-filtros">

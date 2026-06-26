@@ -15,7 +15,20 @@ import { lexicalToHtml } from "@/lib/cms/lexical";
  * Especialistas.ts) para tipos enxutos que as telas do painel consomem.
  */
 
-export type StatusCms = "publicado" | "rascunho" | "agendado";
+export type StatusCms = "publicado" | "rascunho";
+
+/**
+ * Converte "YYYY-MM-DD" em Date no meio-dia local, evitando o shift de
+ * timezone que `new Date("YYYY-MM-DD")` causa (interpreta como UTC 00:00,
+ * o que em Brasília vira o dia anterior).
+ */
+function parseDateLocal(iso: string): Date {
+  // O banco retorna "YYYY-MM-DDTHH:mm:ss.sssZ" ou "YYYY-MM-DD".
+  // Extrai apenas os 10 primeiros caracteres para evitar shift de timezone UTC.
+  const ymd = iso.slice(0, 10); // "YYYY-MM-DD"
+  const [yStr, mStr, dStr] = ymd.split("-");
+  return new Date(Number(yStr ?? 2026), (Number(mStr ?? 1) - 1), Number(dStr ?? 1), 12, 0, 0);
+}
 
 export interface EventoCmsResumo {
   id: string;
@@ -66,6 +79,41 @@ export interface EventoCmsDetalhe extends EventoCmsResumo {
   faq: { pergunta: string; respostaHtml: string }[];
 }
 
+// ---- Leads (somente leitura, doc 11 §11) -------------------------------
+
+export type LeadTipoCms = "proposta" | "contato" | "newsletter" | "candidatura";
+
+export interface LeadCmsResumo {
+  id: string;
+  nome: string;
+  email: string;
+  instituicao: string;
+  tipo: LeadTipoCms;
+  status: string;
+  /** Data de entrada formatada pt-BR. */
+  data: string;
+  /** ISO de createdAt, para ordenação/uso futuro. */
+  dataISO: string;
+}
+
+export interface LeadCmsDetalhe extends LeadCmsResumo {
+  telefone: string | null;
+  cargo: string | null;
+  esfera: string | null;
+  observacoesInternas: string | null;
+  /** Pares rótulo→valor específicos do tipo (proposta/contato/newsletter/candidatura). */
+  detalhes: { rotulo: string; valor: string }[];
+  origem: { rotulo: string; valor: string }[];
+  consentimento: {
+    aceito: boolean;
+    timestamp: string | null;
+    politicaVersao: string | null;
+    ipSubmissao: string | null;
+  };
+  /** Currículo anexado (só candidatura), nome + URL, ou null. */
+  curriculo: { nome: string; url: string } | null;
+}
+
 export interface PalestranteCmsDetalhe extends PalestranteCmsResumo {
   cargoAtual: string | null;
   curriculoCurtoHtml: string;
@@ -83,6 +131,15 @@ const FMT_DATA = new Intl.DateTimeFormat("pt-BR", {
   timeZone: "America/Sao_Paulo",
 });
 
+const FMT_DATA_HORA = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "America/Sao_Paulo",
+});
+
 function iniciaisDe(nome: string): string {
   const partes = nome
     .replace(/^(Dr|Dra|Prof|Profa|Sr|Sra)\.?\s+/i, "")
@@ -93,19 +150,9 @@ function iniciaisDe(nome: string): string {
   return (primeira + ultima).toUpperCase();
 }
 
-/** Deriva o status legível: rascunho via _status do Payload; agendado se a data é futura. */
-function statusEvento(doc: { _status?: string; dataInicio?: string | null }): StatusCms {
-  if (doc._status !== "published") return "rascunho";
-  if (doc.dataInicio) {
-    const inicio = new Date(doc.dataInicio).getTime();
-    if (!Number.isNaN(inicio) && inicio > nowSeguro()) return "agendado";
-  }
-  return "publicado";
-}
-
-/** `Date.now()` não está disponível em alguns contextos de build; isola o uso. */
-function nowSeguro(): number {
-  return new Date().getTime();
+/** Deriva o status legível: publicado ou rascunho, conforme _status do Payload. */
+function statusEvento(doc: { _status?: string }): StatusCms {
+  return doc._status === "published" ? "publicado" : "rascunho";
 }
 
 function montarLocal(local: unknown, modalidade: string): string {
@@ -146,7 +193,7 @@ export async function listarEventosCms(): Promise<EventoCmsResumo[]> {
       id: String(doc.id),
       titulo: doc.nome ?? "(sem título)",
       programa,
-      data: doc.dataInicio ? FMT_DATA.format(new Date(doc.dataInicio)) : "—",
+      data: doc.dataInicio ? FMT_DATA.format(parseDateLocal(doc.dataInicio)) : "—",
       local: montarLocal(doc.local, modalidade),
       modalidade: modalidade ? modalidade.charAt(0).toUpperCase() + modalidade.slice(1) : "—",
       status: statusEvento(doc),
@@ -272,14 +319,14 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
     eyebrow: d.eyebrow ?? null,
     programa: nomeDeRelacao(d.programa, "sigla"),
     area: nomeDeRelacao(d.area),
-    data: d.dataInicio ? FMT_DATA.format(new Date(d.dataInicio)) : "—",
+    data: d.dataInicio ? FMT_DATA.format(parseDateLocal(d.dataInicio)) : "—",
     local: montarLocal(d.local, modalidade),
     modalidade: modalidade ? modalidade.charAt(0).toUpperCase() + modalidade.slice(1) : "—",
     cargaHoraria: d.cargaHoraria ?? null,
     capaUrl: urlDeMidia(d.imagemCapa),
     capaNome: nomeDeMidia(d.imagemCapa),
     folderPdfNome: nomeDeMidia(d.folderPdf),
-    dataInicioISO: d.dataInicio ? new Date(d.dataInicio).toISOString().slice(0, 10) : null,
+    dataInicioISO: d.dataInicio ? d.dataInicio.slice(0, 10) : null,
     resumo: d.resumo ?? null,
     publicoAlvoHtml: lexicalToHtml(d.publicoAlvo),
     objetivosHtml: lexicalToHtml(d.objetivos),
@@ -355,5 +402,181 @@ export async function obterPalestranteCms(id: string): Promise<PalestranteCmsDet
     linkLattes: d.linkLattes ?? null,
     linkLinkedin: d.linkLinkedin ?? null,
     linhasAtuacao,
+  };
+}
+
+// ============================================================
+// Leads (somente leitura — triagem comercial no painel)
+// ============================================================
+
+const TIPOS_VALIDOS: LeadTipoCms[] = ["proposta", "contato", "newsletter", "candidatura"];
+
+function normalizarTipo(t: unknown): LeadTipoCms {
+  return TIPOS_VALIDOS.includes(t as LeadTipoCms) ? (t as LeadTipoCms) : "contato";
+}
+
+/** Acrescenta um par rótulo→valor à lista quando o valor existe e não é vazio. */
+function adicionarPar(
+  lista: { rotulo: string; valor: string }[],
+  rotulo: string,
+  valor: unknown,
+): void {
+  if (valor === null || valor === undefined) return;
+  const s = typeof valor === "string" ? valor : String(valor);
+  if (s.trim() === "") return;
+  lista.push({ rotulo, valor: s });
+}
+
+/** Nomes de uma relação hasMany resolvida (ex. áreas de interesse), juntos por vírgula. */
+function nomesDeRelacoes(rels: unknown): string {
+  if (!Array.isArray(rels)) return "";
+  return rels
+    .map((r) => nomeDeRelacao(r))
+    .filter((s): s is string => Boolean(s))
+    .join(", ");
+}
+
+export async function listarLeadsCms(): Promise<LeadCmsResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "leads",
+    depth: 0,
+    limit: 300,
+    sort: "-createdAt",
+  });
+
+  return res.docs.map((d) => {
+    const doc = d as unknown as {
+      id: string | number;
+      nome?: string;
+      email?: string;
+      instituicao?: string;
+      tipo?: string;
+      status?: string;
+      createdAt?: string;
+    };
+    return {
+      id: String(doc.id),
+      nome: doc.nome ?? "—",
+      email: doc.email ?? "—",
+      instituicao: doc.instituicao || "—",
+      tipo: normalizarTipo(doc.tipo),
+      status: doc.status ?? "novo",
+      data: doc.createdAt ? FMT_DATA.format(new Date(doc.createdAt)) : "—",
+      dataISO: doc.createdAt ?? "",
+    };
+  });
+}
+
+export async function obterLeadCms(id: string): Promise<LeadCmsDetalhe | null> {
+  const payload = await obterPayload();
+  const doc = (await payload
+    .findByID({ collection: "leads", id, depth: 1 })
+    .catch(() => null)) as Record<string, unknown> | null;
+  if (!doc) return null;
+
+  const d = doc as unknown as {
+    id: string | number;
+    nome?: string;
+    email?: string;
+    telefone?: string;
+    cargo?: string;
+    instituicao?: string;
+    esfera?: string;
+    tipo?: string;
+    status?: string;
+    observacoesInternas?: string;
+    createdAt?: string;
+    detalhesProposta?: {
+      programa?: unknown;
+      modalidade?: string;
+      participantesEstimados?: number;
+      mensagem?: string;
+    };
+    detalhesContato?: { assunto?: string; mensagem?: string };
+    detalhesNewsletter?: { areasInteresse?: unknown };
+    detalhesCandidatura?: {
+      titulacao?: string;
+      linhasAtuacao?: unknown;
+      apresentacao?: string;
+      linkLattes?: string;
+      linkLinkedin?: string;
+      curriculo?: unknown;
+    };
+    origem?: Record<string, unknown>;
+    consentimentoLgpd?: {
+      aceito?: boolean;
+      timestamp?: string;
+      politicaVersao?: string;
+      ipSubmissao?: string;
+    };
+  };
+
+  const tipo = normalizarTipo(d.tipo);
+
+  const detalhes: { rotulo: string; valor: string }[] = [];
+  if (tipo === "proposta" && d.detalhesProposta) {
+    const p = d.detalhesProposta;
+    adicionarPar(detalhes, "Programa", nomeDeRelacao(p.programa, "sigla"));
+    adicionarPar(detalhes, "Modalidade", p.modalidade);
+    adicionarPar(detalhes, "Participantes estimados", p.participantesEstimados);
+    adicionarPar(detalhes, "Mensagem", p.mensagem);
+  } else if (tipo === "contato" && d.detalhesContato) {
+    adicionarPar(detalhes, "Assunto", d.detalhesContato.assunto);
+    adicionarPar(detalhes, "Mensagem", d.detalhesContato.mensagem);
+  } else if (tipo === "newsletter" && d.detalhesNewsletter) {
+    adicionarPar(detalhes, "Áreas de interesse", nomesDeRelacoes(d.detalhesNewsletter.areasInteresse));
+  } else if (tipo === "candidatura" && d.detalhesCandidatura) {
+    const c = d.detalhesCandidatura;
+    adicionarPar(detalhes, "Titulação", c.titulacao);
+    adicionarPar(detalhes, "Linhas de atuação", nomesDeRelacoes(c.linhasAtuacao));
+    adicionarPar(detalhes, "Apresentação", c.apresentacao);
+    adicionarPar(detalhes, "Lattes", c.linkLattes);
+    adicionarPar(detalhes, "LinkedIn", c.linkLinkedin);
+  }
+
+  const origem: { rotulo: string; valor: string }[] = [];
+  const og = d.origem ?? {};
+  adicionarPar(origem, "Página", og.paginaSubmissao);
+  adicionarPar(origem, "Referrer", og.referrer);
+  adicionarPar(origem, "utm_source", og.utmSource);
+  adicionarPar(origem, "utm_medium", og.utmMedium);
+  adicionarPar(origem, "utm_campaign", og.utmCampaign);
+  adicionarPar(origem, "utm_term", og.utmTerm);
+  adicionarPar(origem, "utm_content", og.utmContent);
+
+  const cv = d.detalhesCandidatura?.curriculo;
+  const curriculo =
+    typeof cv === "object" && cv !== null && (cv as { url?: string }).url
+      ? {
+          nome: nomeDeMidia(cv) ?? "Currículo",
+          url: (cv as { url: string }).url,
+        }
+      : null;
+
+  const cons = d.consentimentoLgpd ?? {};
+
+  return {
+    id: String(d.id),
+    nome: d.nome ?? "—",
+    email: d.email ?? "—",
+    instituicao: d.instituicao || "—",
+    tipo,
+    status: d.status ?? "novo",
+    data: d.createdAt ? FMT_DATA_HORA.format(new Date(d.createdAt)) : "—",
+    dataISO: d.createdAt ?? "",
+    telefone: d.telefone ?? null,
+    cargo: d.cargo ?? null,
+    esfera: d.esfera ?? null,
+    observacoesInternas: d.observacoesInternas ?? null,
+    detalhes,
+    origem,
+    consentimento: {
+      aceito: Boolean(cons.aceito),
+      timestamp: cons.timestamp ? FMT_DATA_HORA.format(new Date(cons.timestamp)) : null,
+      politicaVersao: cons.politicaVersao ?? null,
+      ipSubmissao: cons.ipSubmissao ?? null,
+    },
+    curriculo,
   };
 }

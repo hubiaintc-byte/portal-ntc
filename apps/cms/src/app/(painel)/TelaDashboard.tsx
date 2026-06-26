@@ -1,22 +1,28 @@
-import type { EventoCmsResumo, PalestranteCmsResumo } from "@/lib/cms/painelCms";
+import type {
+  EventoCmsResumo,
+  LeadCmsResumo,
+  PalestranteCmsResumo,
+} from "@/lib/cms/painelCms";
 
 interface TelaDashboardProps {
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
+  leads: LeadCmsResumo[];
   erroLeitura: boolean;
 }
 
 /** Tela inicial do CMS — métricas e atividade derivadas dos dados reais. */
-export function TelaDashboard({ eventos, palestrantes, erroLeitura }: TelaDashboardProps) {
+export function TelaDashboard({ eventos, palestrantes, leads, erroLeitura }: TelaDashboardProps) {
   const eventosPublicados = eventos.filter((e) => e.status === "publicado").length;
-  const eventosAgendados = eventos.filter((e) => e.status === "agendado").length;
+  const eventosRascunho = eventos.filter((e) => e.status === "rascunho").length;
   const palestrantesComFoto = palestrantes.filter((p) => p.temFoto).length;
+  const leadsNovos = leads.filter((l) => l.status === "novo").length;
 
   const metricas = [
     {
       rotulo: "Eventos no portal",
       valor: String(eventos.length),
-      delta: `${eventosPublicados} publicados · ${eventosAgendados} agendados`,
+      delta: `${eventosPublicados} publicados · ${eventosRascunho} rascunhos`,
       vertical: "gestao-publica" as const,
     },
     {
@@ -30,6 +36,15 @@ export function TelaDashboard({ eventos, palestrantes, erroLeitura }: TelaDashbo
       valor: String(palestrantes.length - palestrantesComFoto),
       delta: "especialistas sem foto",
       vertical: "educacao" as const,
+    },
+    {
+      rotulo: "Leads novos",
+      valor: String(leadsNovos),
+      delta:
+        leads.length === 0
+          ? "nenhum lead recebido"
+          : `de ${leads.length} ${leads.length === 1 ? "lead" : "leads"} no total`,
+      vertical: null,
     },
   ];
 
@@ -55,7 +70,7 @@ export function TelaDashboard({ eventos, palestrantes, erroLeitura }: TelaDashbo
 
       <div className="pcms-metricas">
         {metricas.map((m) => (
-          <div key={m.rotulo} className="pcms-metrica" data-vertical={m.vertical}>
+          <div key={m.rotulo} className="pcms-metrica" data-vertical={m.vertical ?? undefined}>
             <div className="pcms-metrica__valor">{m.valor}</div>
             <div className="pcms-metrica__rotulo">{m.rotulo}</div>
             <div className="pcms-metrica__delta">{m.delta}</div>
