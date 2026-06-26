@@ -222,3 +222,65 @@ export async function enviarMidiaEvento(
     return { ok: false, erro: e instanceof Error ? e.message : "Erro no upload." };
   }
 }
+
+export interface ResultadoImportacao extends ResultadoEscrita {
+  /** Id do rascunho de evento criado, para abrir no detalhe. */
+  eventoId?: string;
+  /** Nome provisório do rascunho (derivado do arquivo). */
+  nome?: string;
+}
+
+/** Tira ".pdf", troca separadores por espaço e capitaliza para um título legível. */
+function nomeProvisorioDePdf(nomeArquivo: string): string {
+  const base = nomeArquivo
+    .replace(/\.pdf$/i, "")
+    .replace(/[_·]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return base.length > 0 ? base : "Evento importado (rascunho)";
+}
+
+/**
+ * Cria um Evento EM RASCUNHO a partir do folder PDF: sobe o PDF para a Media e
+ * grava um evento `draft` com `folderPdf` vinculado e um nome provisório vindo
+ * do arquivo. Os demais campos (modalidade, datas, programação, palestrantes)
+ * ficam para a etapa de "porta do PDF" + revisão humana no detalhe.
+ *
+ * `versions.drafts: true` em Eventos faz o Payload relaxar os campos required
+ * quando `draft: true` — então o rascunho é criado sem capa/área/etc. `slug` é
+ * gerado pelo hook `autoSlug("nome")` da coleção.
+ */
+export async function criarEventoDePdf(arquivo: File): Promise<ResultadoImportacao> {
+  try {
+    const payload = await obterPayload();
+
+    const buffer = Buffer.from(await arquivo.arrayBuffer());
+    const media = await payload.create({
+      collection: "media",
+      data: { alt: arquivo.name },
+      file: {
+        data: buffer,
+        name: arquivo.name,
+        mimetype: arquivo.type,
+        size: arquivo.size,
+      },
+      overrideAccess: true,
+    });
+
+    const nome = nomeProvisorioDePdf(arquivo.name);
+    const evento = await payload.create({
+      collection: "eventos",
+      data: {
+        nome,
+        folderPdf: media.id,
+        _status: "draft",
+      },
+      draft: true,
+      overrideAccess: true,
+    });
+
+    return { ok: true, eventoId: String(evento.id), nome };
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao importar o PDF." };
+  }
+}

@@ -326,6 +326,103 @@ body {
   background: var(--pcms-pergaminho);
 }
 
+/* Grupo de ações no cabeçalho de tela (ex. Importar PDF + Novo evento). */
+.pcms-pagehead__acoes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ===== Modal ============================================================ */
+.pcms-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(17, 54, 94, 0.42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.pcms-modal {
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  border-top: 3px solid var(--pcms-oxford);
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+}
+.pcms-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px 16px;
+  border-bottom: 1px solid var(--pcms-pergaminho);
+}
+.pcms-modal__head h2 {
+  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: var(--pcms-oxford);
+  line-height: 1.1;
+  margin: 0;
+}
+.pcms-modal__fechar {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--pcms-grafite-suave);
+  line-height: 0;
+}
+.pcms-modal__fechar:hover {
+  color: var(--pcms-oxford);
+}
+.pcms-modal__fechar svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  fill: none;
+}
+.pcms-modal__body {
+  padding: 20px 26px;
+  overflow-y: auto;
+}
+.pcms-modal__desc {
+  color: var(--pcms-grafite);
+  line-height: 1.6;
+  font-size: 0.92rem;
+  margin: 0 0 18px;
+}
+.pcms-modal__ok p {
+  color: var(--pcms-grafite);
+  line-height: 1.6;
+  font-size: 0.92rem;
+  margin: 0 0 12px;
+}
+.pcms-modal__ok p:last-child {
+  margin-bottom: 0;
+}
+.pcms-modal__nome {
+  font-weight: 600;
+  color: var(--pcms-oxford) !important;
+  padding: 10px 14px;
+  background: var(--pcms-pergaminho);
+  border-left: 3px solid var(--pcms-dourado);
+}
+.pcms-modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 26px 22px;
+  border-top: 1px solid var(--pcms-pergaminho);
+}
+
 /* ===== Dashboard ======================================================== */
 .pcms-metricas {
   display: grid;

@@ -12,6 +12,7 @@ import {
   type PalestranteCmsDetalhe,
 } from "@/lib/cms/painelCms";
 import {
+  criarEventoDePdf,
   definirOcultarPalestrante,
   despublicarEvento,
   enviarMidiaEvento,
@@ -20,6 +21,7 @@ import {
   salvarEventosHome,
   vincularPalestrantesEvento,
   type ResultadoEscrita,
+  type ResultadoImportacao,
 } from "@/lib/cms/painelCmsEscrita";
 
 /**
@@ -101,6 +103,25 @@ export async function salvarPalestrantesEvento(
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
   return { resultado, evento };
+}
+
+/**
+ * Importa um folder PDF criando um Evento em rascunho com o PDF vinculado.
+ * O File chega no campo "arquivo" do FormData. Os campos restantes ficam para
+ * a porta do PDF + revisão no detalhe.
+ */
+export async function importarEventoPdf(formData: FormData): Promise<ResultadoImportacao> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  const arquivo = formData.get("arquivo");
+  if (!(arquivo instanceof File) || arquivo.size === 0) {
+    return { ok: false, erro: "Nenhum arquivo selecionado." };
+  }
+  if (arquivo.type !== "application/pdf" && !arquivo.name.toLowerCase().endsWith(".pdf")) {
+    return { ok: false, erro: "Envie um arquivo PDF." };
+  }
+  const resultado = await criarEventoDePdf(arquivo);
+  if (resultado.ok) revalidatePath("/");
+  return resultado;
 }
 
 /** Salva os eventos em destaque na Home. */
