@@ -943,14 +943,14 @@ const eventoEdutecM01: EventoOnline = {
   subtitulo:
     "Fundamentos, repertórios e práticas para consolidar uma pedagogia crítica, conectada e institucionalmente alinhada à cultura digital contemporânea.",
   formato: "online",
-  dataEvento: "15 de junho de 2026",
+  dataEvento: "3 de agosto de 2026",
   area: "edu",
   card: {
     programaSlug: "EDUTEC",
     formatoCard: "seminario",
     cidade: "",
     valorReais: 1470,
-    deadlineIso: "2026-06-15",
+    deadlineIso: "2026-08-03",
     keywords: "cultura digital educacao midiatica transformacao fluencia letramento",
     flags: ["destaque_editorial"],
     imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
@@ -961,8 +961,8 @@ const eventoEdutecM01: EventoOnline = {
     precoIndividualLabel: "R$ 1.470",
     precoEquipesLabel: "Sob consulta",
     destaqueHome: true,
-    diaDataBloco: "15",
-    mesAnoDataBloco: "Jun · 2026",
+    diaDataBloco: "03",
+    mesAnoDataBloco: "Ago · 2026",
   },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
@@ -1299,14 +1299,14 @@ const eventoEdutecM02: EventoOnline = {
   subtitulo:
     "Formação prática e contemporânea para qualificar o uso pedagógico das tecnologias e ampliar o repertório metodológico dos educadores.",
   formato: "online",
-  dataEvento: "16 de junho de 2026",
+  dataEvento: "6 de agosto de 2026",
   area: "edu",
   card: {
     programaSlug: "EDUTEC",
     formatoCard: "seminario",
     cidade: "",
     valorReais: 1470,
-    deadlineIso: "2026-06-16",
+    deadlineIso: "2026-08-06",
     keywords: "fluencia digital docente praticas pedagogicas inovadoras tecnologia",
     flags: ["destaque_editorial"],
     imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
@@ -1317,8 +1317,8 @@ const eventoEdutecM02: EventoOnline = {
     precoIndividualLabel: "R$ 1.470",
     precoEquipesLabel: "Sob consulta",
     destaqueHome: true,
-    diaDataBloco: "16",
-    mesAnoDataBloco: "Jun · 2026",
+    diaDataBloco: "06",
+    mesAnoDataBloco: "Ago · 2026",
   },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
@@ -1655,14 +1655,14 @@ const eventoEdutecM04: EventoOnline = {
   subtitulo:
     "Fundamentos, diretrizes curriculares e estratégias de implementação para integrar computação e pensamento computacional à formação dos estudantes.",
   formato: "online",
-  dataEvento: "17 de junho de 2026",
+  dataEvento: "7 de agosto de 2026",
   area: "edu",
   card: {
     programaSlug: "EDUTEC",
     formatoCard: "seminario",
     cidade: "",
     valorReais: 1470,
-    deadlineIso: "2026-06-17",
+    deadlineIso: "2026-08-07",
     keywords: "curriculo computacao bncc pensamento computacional pratica pedagogica",
     flags: ["destaque_editorial"],
     imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
@@ -1673,8 +1673,8 @@ const eventoEdutecM04: EventoOnline = {
     precoIndividualLabel: "R$ 1.470",
     precoEquipesLabel: "Sob consulta",
     destaqueHome: true,
-    diaDataBloco: "17",
-    mesAnoDataBloco: "Jun · 2026",
+    diaDataBloco: "07",
+    mesAnoDataBloco: "Ago · 2026",
   },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
@@ -1998,14 +1998,14 @@ const eventoProgeM01: EventoOnline = {
   subtitulo:
     "Liderança escolar, governança institucional e foco em resultados para fortalecer a escola pública contemporânea.",
   formato: "online",
-  dataEvento: "22 de junho de 2026",
+  dataEvento: "13 de agosto de 2026",
   area: "edu",
   card: {
     programaSlug: "PROGE",
     formatoCard: "seminario",
     cidade: "",
     valorReais: 1470,
-    deadlineIso: "2026-06-22",
+    deadlineIso: "2026-08-13",
     keywords: "gestao escolar resultados recursos governanca democratica direcao",
     flags: ["destaque_editorial"],
     imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
@@ -2016,8 +2016,8 @@ const eventoProgeM01: EventoOnline = {
     precoIndividualLabel: "R$ 1.470",
     precoEquipesLabel: "Sob consulta",
     destaqueHome: false,
-    diaDataBloco: "22",
-    mesAnoDataBloco: "Jun · 2026",
+    diaDataBloco: "13",
+    mesAnoDataBloco: "Ago · 2026",
   },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
@@ -2356,14 +2356,14 @@ const eventoProgeM03: EventoOnline = {
   subtitulo:
     "Coordenação pedagógica forte para apoiar professores, recompor aprendizagens e qualificar a gestão pedagógica da escola.",
   formato: "online",
-  dataEvento: "23 de junho de 2026",
+  dataEvento: "14 de agosto de 2026",
   area: "edu",
   card: {
     programaSlug: "PROGE",
     formatoCard: "seminario",
     cidade: "",
     valorReais: 1470,
-    deadlineIso: "2026-06-23",
+    deadlineIso: "2026-08-14",
     keywords: "coordenacao pedagogica mentoria recomposicao gestao aprendizagem",
     flags: ["destaque_editorial"],
     imagemUrl: "/img/fotos/_optimized/area-educacao-premium.1920.webp",
@@ -2374,8 +2374,8 @@ const eventoProgeM03: EventoOnline = {
     precoIndividualLabel: "R$ 1.470",
     precoEquipesLabel: "Sob consulta",
     destaqueHome: false,
-    diaDataBloco: "23",
-    mesAnoDataBloco: "Jun · 2026",
+    diaDataBloco: "14",
+    mesAnoDataBloco: "Ago · 2026",
   },
 
   // Campos de EventoBase não usados pelo layout online (vazios):
