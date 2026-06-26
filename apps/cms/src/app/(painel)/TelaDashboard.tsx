@@ -14,7 +14,7 @@ interface TelaDashboardProps {
 /** Tela inicial do CMS — métricas e atividade derivadas dos dados reais. */
 export function TelaDashboard({ eventos, palestrantes, leads, erroLeitura }: TelaDashboardProps) {
   const eventosPublicados = eventos.filter((e) => e.status === "publicado").length;
-  const eventosAgendados = eventos.filter((e) => e.status === "agendado").length;
+  const eventosRascunho = eventos.filter((e) => e.status === "rascunho").length;
   const palestrantesComFoto = palestrantes.filter((p) => p.temFoto).length;
   const leadsNovos = leads.filter((l) => l.status === "novo").length;
 
@@ -22,7 +22,7 @@ export function TelaDashboard({ eventos, palestrantes, leads, erroLeitura }: Tel
     {
       rotulo: "Eventos no portal",
       valor: String(eventos.length),
-      delta: `${eventosPublicados} publicados · ${eventosAgendados} agendados`,
+      delta: `${eventosPublicados} publicados · ${eventosRascunho} rascunhos`,
       vertical: "gestao-publica" as const,
     },
     {

@@ -11,7 +11,6 @@ import { SeletorPalestrantes } from "./SeletorPalestrantes";
 const ROTULO_STATUS: Record<EventoCmsDetalhe["status"], string> = {
   publicado: "Publicado",
   rascunho: "Rascunho",
-  agendado: "Agendado",
 };
 
 interface DetalheEventoProps {

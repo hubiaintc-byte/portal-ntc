@@ -15,7 +15,20 @@ import { lexicalToHtml } from "@/lib/cms/lexical";
  * Especialistas.ts) para tipos enxutos que as telas do painel consomem.
  */
 
-export type StatusCms = "publicado" | "rascunho" | "agendado";
+export type StatusCms = "publicado" | "rascunho";
+
+/**
+ * Converte "YYYY-MM-DD" em Date no meio-dia local, evitando o shift de
+ * timezone que `new Date("YYYY-MM-DD")` causa (interpreta como UTC 00:00,
+ * o que em Brasília vira o dia anterior).
+ */
+function parseDateLocal(iso: string): Date {
+  // O banco retorna "YYYY-MM-DDTHH:mm:ss.sssZ" ou "YYYY-MM-DD".
+  // Extrai apenas os 10 primeiros caracteres para evitar shift de timezone UTC.
+  const ymd = iso.slice(0, 10); // "YYYY-MM-DD"
+  const [yStr, mStr, dStr] = ymd.split("-");
+  return new Date(Number(yStr ?? 2026), (Number(mStr ?? 1) - 1), Number(dStr ?? 1), 12, 0, 0);
+}
 
 export interface EventoCmsResumo {
   id: string;
@@ -137,19 +150,9 @@ function iniciaisDe(nome: string): string {
   return (primeira + ultima).toUpperCase();
 }
 
-/** Deriva o status legível: rascunho via _status do Payload; agendado se a data é futura. */
-function statusEvento(doc: { _status?: string; dataInicio?: string | null }): StatusCms {
-  if (doc._status !== "published") return "rascunho";
-  if (doc.dataInicio) {
-    const inicio = new Date(doc.dataInicio).getTime();
-    if (!Number.isNaN(inicio) && inicio > nowSeguro()) return "agendado";
-  }
-  return "publicado";
-}
-
-/** `Date.now()` não está disponível em alguns contextos de build; isola o uso. */
-function nowSeguro(): number {
-  return new Date().getTime();
+/** Deriva o status legível: publicado ou rascunho, conforme _status do Payload. */
+function statusEvento(doc: { _status?: string }): StatusCms {
+  return doc._status === "published" ? "publicado" : "rascunho";
 }
 
 function montarLocal(local: unknown, modalidade: string): string {
@@ -190,7 +193,7 @@ export async function listarEventosCms(): Promise<EventoCmsResumo[]> {
       id: String(doc.id),
       titulo: doc.nome ?? "(sem título)",
       programa,
-      data: doc.dataInicio ? FMT_DATA.format(new Date(doc.dataInicio)) : "—",
+      data: doc.dataInicio ? FMT_DATA.format(parseDateLocal(doc.dataInicio)) : "—",
       local: montarLocal(doc.local, modalidade),
       modalidade: modalidade ? modalidade.charAt(0).toUpperCase() + modalidade.slice(1) : "—",
       status: statusEvento(doc),
@@ -316,14 +319,14 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
     eyebrow: d.eyebrow ?? null,
     programa: nomeDeRelacao(d.programa, "sigla"),
     area: nomeDeRelacao(d.area),
-    data: d.dataInicio ? FMT_DATA.format(new Date(d.dataInicio)) : "—",
+    data: d.dataInicio ? FMT_DATA.format(parseDateLocal(d.dataInicio)) : "—",
     local: montarLocal(d.local, modalidade),
     modalidade: modalidade ? modalidade.charAt(0).toUpperCase() + modalidade.slice(1) : "—",
     cargaHoraria: d.cargaHoraria ?? null,
     capaUrl: urlDeMidia(d.imagemCapa),
     capaNome: nomeDeMidia(d.imagemCapa),
     folderPdfNome: nomeDeMidia(d.folderPdf),
-    dataInicioISO: d.dataInicio ? new Date(d.dataInicio).toISOString().slice(0, 10) : null,
+    dataInicioISO: d.dataInicio ? d.dataInicio.slice(0, 10) : null,
     resumo: d.resumo ?? null,
     publicoAlvoHtml: lexicalToHtml(d.publicoAlvo),
     objetivosHtml: lexicalToHtml(d.objetivos),

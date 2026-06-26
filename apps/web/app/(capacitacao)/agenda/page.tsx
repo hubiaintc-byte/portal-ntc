@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
 
+import { derivarDatasEvento } from "@/lib/cms/derivarDatasEvento";
 import { buscarOverride } from "@/lib/cms/overrideEventoOnline";
 import { paraCartaoAgenda } from "@/lib/eventos/adaptarParaCard";
 
@@ -32,11 +33,23 @@ async function aplicarCapaCms(eventos: EventoReal[]): Promise<EventoReal[]> {
       if (!e.slug || !e.card) return e;
       try {
         const ovr = await buscarOverride(e.slug);
-        if (ovr?.coverUrl) {
-          return { ...e, card: { ...e.card, imagemUrl: ovr.coverUrl } };
+        if (!ovr) return e;
+        let card = e.card;
+        if (ovr.coverUrl) {
+          card = { ...card, imagemUrl: ovr.coverUrl };
         }
+        if (ovr.dataInicioISO) {
+          const d = derivarDatasEvento(ovr.dataInicioISO);
+          card = {
+            ...card,
+            diaDataBloco: d.metaValue.split(" · ")[0] ?? card.diaDataBloco,
+            mesAnoDataBloco: d.sidebarValue.split(" · ").slice(1).join(" · ") ?? card.mesAnoDataBloco,
+            deadlineIso: d.deadlineISO.slice(0, 10),
+          };
+        }
+        return { ...e, card };
       } catch {
-        // CMS fora do ar → capa estática (fallback silencioso).
+        // CMS fora do ar → estático intacto (fallback silencioso).
       }
       return e;
     }),

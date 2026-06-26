@@ -39,7 +39,8 @@ export default async function PainelPage() {
       listarLeadsCms(),
       obterEventosHomeIds(),
     ]);
-  } catch {
+  } catch (e) {
+    console.error("[PainelPage] Erro ao ler banco:", e);
     erroLeitura = true;
   }
 
