@@ -405,10 +405,10 @@ export function HeaderHome() {
                     </a>
                   </li>
                   <li>
-                    <a href="#docentes">
+                    <Link href="/o-grupo/corpo-docente">
                       <strong>Corpo Docente</strong>
                       <span>Curadoria científica e especialistas das 3 verticais</span>
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -478,7 +478,7 @@ export function HeaderHome() {
             <a href="#eventos-abertos"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></a>
             <a href="#eventon"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></a>
             <a href="#eventon"><strong>Área do Participante</strong><span>Materiais e certificados</span></a>
-            <a href="#docentes"><strong>Corpo Docente</strong><span>Curadoria científica das 3 verticais</span></a>
+            <Link href="/o-grupo/corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica das 3 verticais</span></Link>
           </div>
 
           <button

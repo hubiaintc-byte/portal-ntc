@@ -426,7 +426,7 @@ export const CARDS_FEATURED: CardFeatured[] = [
     metaAtuacao: "Atuação · <strong>Supremo Tribunal Federal</strong>",
     metaEixos: "Eixos relacionados · <strong>LIDERA · SIGA</strong>",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -450,7 +450,7 @@ export const CARDS_FEATURED: CardFeatured[] = [
       "Atuação · <strong>Tribunal de Contas da União · Presidência</strong>",
     metaEixos: "Eixos relacionados · <strong>SIGA · LIDERA · AGIP</strong>",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -475,7 +475,7 @@ export const CARDS_FEATURED: CardFeatured[] = [
     metaEixos:
       "Eixo relacionado · <strong>AGIP</strong> · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -500,7 +500,7 @@ export const CARDS_FEATURED: CardFeatured[] = [
     metaEixos:
       "Eixos relacionados · <strong>PROGE · PEAR · FUTURA · EDUTEC</strong>",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
 ];
@@ -530,7 +530,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "EDUTEC · PROGE",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -553,7 +553,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "PROGE · PEAR",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -576,7 +576,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "PROGE",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -599,7 +599,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "FUTURA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -623,7 +623,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "PROGE · FUTURA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -646,7 +646,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "PEAR",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -669,7 +669,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "PROGE · PEAR",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -692,7 +692,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "PROGE",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -715,7 +715,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "EDUTEC · EGIDE",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -738,7 +738,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "PINEI",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -761,7 +761,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "PROGE",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -784,7 +784,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "PEI · PROGE",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -807,7 +807,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "PEAR",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -830,7 +830,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "PROGE",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -853,7 +853,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "EDUTEC",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -876,7 +876,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "PROGIR · VIVAESCOLA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-edu#tab-proposta",
+      "/contato?categoria=curadoria-edu#tab-proposta",
     ctaRotulo: "Solicitar composição",
   },
 
@@ -903,7 +903,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "LIDERA · SIGA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -926,7 +926,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "LIDERA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -949,7 +949,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "LIDERA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -972,7 +972,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "LIDERA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -995,7 +995,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "LIDERA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1018,7 +1018,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "AGIP · SIGA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1041,7 +1041,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "LIDERA · SIGA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1064,7 +1064,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "SIGA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1087,7 +1087,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "SIGA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1110,7 +1110,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "SIGA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1133,7 +1133,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "SIGA · LIDERA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1156,7 +1156,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixo relacionado · ",
     programasStrong: "SIGA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1180,7 +1180,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "SIGA · AGIP",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1204,7 +1204,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasTexto: "Eixos relacionados · ",
     programasStrong: "LIDERA · SIGA",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-gov#tab-proposta",
+      "/contato?categoria=curadoria-gov#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
 
@@ -1233,7 +1233,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1258,7 +1258,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1283,7 +1283,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1307,7 +1307,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1331,7 +1331,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1356,7 +1356,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1380,7 +1380,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1404,7 +1404,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1428,7 +1428,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1452,7 +1452,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1476,7 +1476,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1500,7 +1500,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1524,7 +1524,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1548,7 +1548,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
   {
@@ -1572,7 +1572,7 @@ export const CARDS_EXPERTS: CardExpert[] = [
     programasStrong: "AGIP",
     sufixoPrograma: " · Núcleo Contratações",
     ctaHref:
-      "./12_Pagina_Contato_v1.html?categoria=curadoria-cp#tab-proposta",
+      "/contato?categoria=curadoria-cp#tab-proposta",
     ctaRotulo: "Consultar disponibilidade",
   },
 ];
@@ -1693,14 +1693,14 @@ export const CREDENCIAMENTO: {
     {
       rotulo: "Enviar cadastro de especialista",
       // TODO: rota /contato ainda não criada — converti href HTML
-      // (./12_Pagina_Contato_v1.html?categoria=credenciamento#tab-atendimento)
+      // (/contato?categoria=credenciamento#tab-atendimento)
       href: "/contato?categoria=credenciamento#tab-atendimento",
       variante: "gold",
     },
     {
       rotulo: "Conversar com a curadoria",
       // TODO: rota /contato ainda não criada — converti href HTML
-      // (./12_Pagina_Contato_v1.html#tab-atendimento)
+      // (/contato#tab-atendimento)
       href: "/contato#tab-atendimento",
       variante: "secondary",
     },
@@ -1832,14 +1832,14 @@ export const CTA_FINAL: {
   ctaPrincipal: {
     rotulo: "Solicitar composição docente para minha instituição",
     // TODO: rota /contato ainda não criada — converti href HTML
-    // (./12_Pagina_Contato_v1.html?categoria=composicao-docente#tab-proposta)
+    // (/contato?categoria=composicao-docente#tab-proposta)
     href: "/contato?categoria=composicao-docente#tab-proposta",
     variante: "gold",
   },
   ctaSecundario: {
     rotulo: "Agendar conversa com a curadoria",
     // TODO: rota /contato ainda não criada — converti href HTML
-    // (./12_Pagina_Contato_v1.html#tab-atendimento)
+    // (/contato#tab-atendimento)
     href: "/contato#tab-atendimento",
     variante: "ghost-light",
   },

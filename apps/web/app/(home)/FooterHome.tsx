@@ -35,7 +35,7 @@ export function FooterHome() {
               <li><a href="#capacitacao">Capacitação</a></li>
               <li><a href="#solucoes">Soluções</a></li>
               <li><Link href="/conteudos">Conteúdos</Link></li>
-              <li><a href="#docentes">Corpo Docente</a></li>
+              <li><Link href="/o-grupo/corpo-docente">Corpo Docente</Link></li>
               <li><a href="#eventon">EventOn</a></li>
               <li><Link href="/contato">Contato</Link></li>
             </ul>

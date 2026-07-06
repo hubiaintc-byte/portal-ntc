@@ -139,7 +139,7 @@ const EDUCACAO = {
     ctas: [
       { rotulo: "Conhecer os 9 programas", href: "#programas-edu", variante: "gold" },
       { rotulo: "Ver eventos abertos da área", href: "#eventos-edu", variante: "ghost-light" },
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "ghost-light" },
     ] satisfies CtaItem[],
   },
   metadados: [
@@ -159,7 +159,7 @@ const EDUCACAO = {
     { href: "#faq", label: "FAQ" },
   ] satisfies NavLink[],
   navActions: [
-    { rotulo: "Solicitar proposta", primary: true, href: "#contato" },
+    { rotulo: "Solicitar proposta", primary: true, href: "/contato?assunto=proposta" },
     { rotulo: "Baixar portfólio" },
   ] satisfies NavAction[],
   visaoGeral: {
@@ -206,7 +206,7 @@ const EDUCACAO = {
       { sigla: "FUTURA", imagemSrc: `${IMG}/area-educacao.1920.webp`, nome: "Programa Estratégico de Ensino Médio, Itinerários de Futuro, Empregabilidade e Educação para o Desenvolvimento", tagline: "Ensino médio com itinerários, empregabilidade e protagonismo juvenil.", meta: "4 módulos · 32h" },
     ] satisfies ProgramaCardItem[],
     ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/" },
-    ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "#contato" },
+    ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },
   // NTC Educação usa variante de curadoria com cards de pessoas (8 eixos formativos)
   autoridade: {
@@ -238,7 +238,7 @@ const EDUCACAO = {
       "A curadoria científica da NTC Educação é atualizada continuamente, com especialistas convidados conforme os programas, eixos temáticos e demandas institucionais de cada secretaria, rede ou instituição educacional.",
     ctas: [
       { rotulo: "Conhecer o corpo docente completo", href: "#contato", variante: "gold" },
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "secondary-vert" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "secondary-vert" },
     ] satisfies CtaItem[],
   },
   eventos: {
@@ -259,7 +259,7 @@ const EDUCACAO = {
     intro:
       "Além dos eventos abertos e dos programas com inscrição individual, a NTC Educação oferece soluções dedicadas para órgãos públicos — turmas fechadas, programas in company, trilhas customizadas e soluções sob medida.",
     ctas: [
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "gold" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "gold" },
       { rotulo: "Baixar portfólio da vertical", href: "#", variante: "ghost-light" },
     ] satisfies CtaItem[],
     items: [
@@ -297,7 +297,7 @@ const EDUCACAO = {
     tituloHtml: "Leve a <em>NTC Educação</em> para sua secretaria, rede ou instituição.",
     sub: "Solicite proposta institucional para os programas estratégicos de Educação · trilhas completas, módulos avulsos, in company ou solução sob medida.",
     ctas: [
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "gold" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "gold" },
       { rotulo: "Baixar portfólio da vertical", href: "#", variante: "ghost-light" },
       { rotulo: "Ver eventos abertos", href: "#eventos-edu", variante: "ghost-light" },
     ] satisfies CtaItem[],
@@ -321,7 +321,7 @@ const GESTAO_PUBLICA = {
     ctas: [
       { rotulo: "Conhecer os 3 programas", href: "#programas-gov", variante: "gold" },
       { rotulo: "Ver eventos abertos da área", href: "#eventos-gov", variante: "ghost-light" },
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "ghost-light" },
     ] satisfies CtaItem[],
   },
   metadados: [
@@ -341,7 +341,7 @@ const GESTAO_PUBLICA = {
     { href: "#faq", label: "FAQ" },
   ] satisfies NavLink[],
   navActions: [
-    { rotulo: "Solicitar proposta", primary: true, href: "#contato" },
+    { rotulo: "Solicitar proposta", primary: true, href: "/contato?assunto=proposta" },
     { rotulo: "Baixar portfólio" },
   ] satisfies NavAction[],
   visaoGeral: {
@@ -376,7 +376,7 @@ const GESTAO_PUBLICA = {
       { sigla: "SIGA", imagemSrc: `${IMG}/plenario-publico.1920.webp`, nome: "Sistema Integrado de Gestão da Administração Pública · Planejamento, Governança e Desempenho Institucional", tagline: "Modernização institucional aplicada — gestão integrada, processos, indicadores e cultura organizacional do setor público.", meta: "8 módulos · 64h" },
     ] satisfies ProgramaCardItem[],
     ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/" },
-    ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "#contato" },
+    ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },
   autoridade: {
     tipo: "experts-featured" as const,
@@ -411,7 +411,7 @@ const GESTAO_PUBLICA = {
       "A curadoria científica da NTC Gestão Pública é atualizada continuamente, com especialistas convidados conforme os programas, eixos temáticos e demandas institucionais de cada órgão público, autarquia ou entidade da administração.",
     ctas: [
       { rotulo: "Conhecer o corpo docente completo", href: "#contato", variante: "gold" },
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "secondary-vert" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "secondary-vert" },
     ] satisfies CtaItem[],
   },
   eventos: {
@@ -432,7 +432,7 @@ const GESTAO_PUBLICA = {
     intro:
       "Além dos eventos abertos e dos programas com inscrição individual, a NTC Gestão Pública oferece soluções dedicadas para a administração pública — turmas fechadas in company, trilhas customizadas, soluções sob medida e atendimento institucional especializado para União, estados, municípios, autarquias, fundações, agências reguladoras e empresas estatais.",
     ctas: [
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "gold" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "gold" },
       { rotulo: "Baixar portfólio da vertical", href: "#", variante: "ghost-light" },
     ] satisfies CtaItem[],
     items: [
@@ -470,7 +470,7 @@ const GESTAO_PUBLICA = {
     tituloHtml: "Leve a <em>NTC Gestão Pública</em> para seu órgão, autarquia ou instituição do setor público.",
     sub: "Solicite proposta institucional para os programas estratégicos da vertical · trilhas completas, módulos avulsos, in company ou solução sob medida — com aderência à Lei 14.133/2021 e à realidade institucional do órgão.",
     ctas: [
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "gold" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "gold" },
       { rotulo: "Baixar portfólio da vertical", href: "#", variante: "ghost-light" },
       { rotulo: "Ver eventos abertos", href: "#eventos-gov", variante: "ghost-light" },
     ] satisfies CtaItem[],
@@ -494,7 +494,7 @@ const SAUDE = {
     ctas: [
       { rotulo: "Conhecer os 3 programas", href: "#programas-sau", variante: "gold" },
       { rotulo: "Ver eventos abertos da área", href: "#eventos-sau", variante: "ghost-light" },
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "ghost-light" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "ghost-light" },
     ] satisfies CtaItem[],
   },
   metadados: [
@@ -514,7 +514,7 @@ const SAUDE = {
     { href: "#faq", label: "FAQ" },
   ] satisfies NavLink[],
   navActions: [
-    { rotulo: "Solicitar proposta", primary: true, href: "#contato" },
+    { rotulo: "Solicitar proposta", primary: true, href: "/contato?assunto=proposta" },
     { rotulo: "Baixar portfólio" },
   ] satisfies NavAction[],
   visaoGeral: {
@@ -549,7 +549,7 @@ const SAUDE = {
       { sigla: "PROSUS+", imagemSrc: `${IMG}/area-saude-premium2.1920.webp`, flagAberto: true, nome: "Programa Executivo de Liderança, Alta Gestão e Desenvolvimento Estratégico em Saúde Pública", tagline: "Formação executiva da alta liderança do SUS — visão sistêmica, capacidade decisória e desempenho institucional.", meta: "8 módulos · 64h" },
     ] satisfies ProgramaCardItem[],
     ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/" },
-    ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "#contato" },
+    ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },
   autoridade: {
     tipo: "axis" as const,
@@ -576,7 +576,7 @@ const SAUDE = {
     nota:
       "A curadoria técnica da NTC Saúde é atualizada de forma contínua, conforme a consolidação dos programas, temas prioritários e demandas institucionais vinculadas à gestão pública da saúde. Especialistas convidados integram a curadoria por eixo, conforme o escopo de cada órgão, rede ou instituição.",
     ctas: [
-      { rotulo: "Solicitar proposta para formação em saúde pública", href: "#contato", variante: "gold" },
+      { rotulo: "Solicitar proposta para formação em saúde pública", href: "/contato?assunto=proposta", variante: "gold" },
       { rotulo: "Receber atualizações da curadoria", href: "#contato", variante: "secondary-vert" },
     ] satisfies CtaItem[],
   },
@@ -598,7 +598,7 @@ const SAUDE = {
     intro:
       "Além dos eventos abertos e dos programas com inscrição individual, a NTC Saúde oferece soluções dedicadas a órgãos do SUS e instituições conveniadas — turmas fechadas in company, trilhas customizadas, soluções sob medida e atendimento institucional especializado para secretarias estaduais e municipais de saúde, hospitais públicos, fundações, consórcios intermunicipais e organizações sociais de saúde.",
     ctas: [
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "gold" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "gold" },
       { rotulo: "Baixar portfólio da vertical", href: "#", variante: "ghost-light" },
     ] satisfies CtaItem[],
     items: [
@@ -636,7 +636,7 @@ const SAUDE = {
     tituloHtml: "Leve a <em>NTC Saúde</em> para sua secretaria, hospital ou rede assistencial.",
     sub: "Solicite proposta institucional para os programas estratégicos da vertical · trilhas completas, módulos avulsos, in company ou solução sob medida — com aderência ao SUS, à pactuação local e à realidade epidemiológica da sua rede.",
     ctas: [
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "gold" },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "gold" },
       { rotulo: "Baixar portfólio da vertical", href: "#", variante: "ghost-light" },
       { rotulo: "Ver eventos abertos", href: "#eventos-sau", variante: "ghost-light" },
     ] satisfies CtaItem[],

@@ -764,7 +764,7 @@ const moduloEdutecM01: Modulo = {
     ],
     footerCtas: [
       { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
-      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+      { texto: "Solicitar proposta institucional", href: "/contato?assunto=proposta", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
     ],
   },
 

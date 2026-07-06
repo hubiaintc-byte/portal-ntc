@@ -916,7 +916,7 @@ const eventoProsusBrasilia: EventoPresencial = {
       },
       {
         texto: "Solicitar proposta institucional",
-        href: "/solucoes#contratacao-institucional",
+        href: "/contato?assunto=proposta",
         cmsLink: "proposta-institucional",
         classe: "btn btn--secondary",
       },
@@ -1288,7 +1288,7 @@ const eventoEdutecM01: EventoOnline = {
     ],
     footerCtas: [
       { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
-      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+      { texto: "Solicitar proposta institucional", href: "/contato?assunto=proposta", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
     ],
   },
 };
@@ -1644,7 +1644,7 @@ const eventoEdutecM02: EventoOnline = {
     ],
     footerCtas: [
       { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
-      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+      { texto: "Solicitar proposta institucional", href: "/contato?assunto=proposta", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
     ],
   },
 };
@@ -1987,7 +1987,7 @@ const eventoEdutecM04: EventoOnline = {
     ],
     footerCtas: [
       { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
-      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+      { texto: "Solicitar proposta institucional", href: "/contato?assunto=proposta", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
     ],
   },
 };
@@ -2341,7 +2341,7 @@ const eventoProgeM01: EventoOnline = {
     ],
     footerCtas: [
       { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
-      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+      { texto: "Solicitar proposta institucional", href: "/contato?assunto=proposta", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
     ],
   },
 };
@@ -2700,7 +2700,7 @@ const eventoProgeM03: EventoOnline = {
     ],
     footerCtas: [
       { texto: "Ver agenda completa", href: "/capacitacao", cmsLink: "agenda-completa", classe: "btn btn--primary", arrow: true },
-      { texto: "Solicitar proposta institucional", href: "/solucoes#contratacao-institucional", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
+      { texto: "Solicitar proposta institucional", href: "/contato?assunto=proposta", cmsLink: "proposta-institucional", classe: "btn btn--secondary" },
     ],
   },
 };

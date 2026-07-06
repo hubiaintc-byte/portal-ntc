@@ -172,7 +172,7 @@ export const FALLBACK_HOME = {
           "Programas estratégicos, módulos com inscrições abertas, eventos online e presenciais, trilhas formativas e soluções sob medida para órgãos públicos, redes de ensino, sistemas de saúde e instituições governamentais.",
         ctas: [
           { rotulo: "Ver eventos com inscrições abertas", href: "#eventos-abertos", variante: "gold" as const },
-          { rotulo: "Solicitar proposta institucional", href: "#contratacao", variante: "ghost-light" as const },
+          { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "ghost-light" as const },
         ],
         textlink: { rotulo: "Conhecer programas estratégicos", href: "#programas" },
       },
@@ -230,7 +230,7 @@ export const FALLBACK_HOME = {
         subtitulo:
           "Programas, jornadas e trilhas do portfólio NTC entregues exclusivamente à sua equipe, rede ou órgão público — com desenho, especialistas, formato e calendário alinhados aos objetivos da contratante.",
         ctas: [
-          { rotulo: "Solicitar proposta", href: "#contratacao", variante: "gold" as const },
+          { rotulo: "Solicitar proposta", href: "/contato?assunto=proposta", variante: "gold" as const },
           { rotulo: "Agendar apresentação", href: "#contato", variante: "ghost-light" as const },
         ],
       },
@@ -385,7 +385,7 @@ export const FALLBACK_HOME = {
 
   eventosFooter: {
     ctaPrincipal: { rotulo: "Ver agenda completa", href: "/agenda" },
-    ctaSecundario: { rotulo: "Solicitar proposta para minha instituição", href: "#contratacao" },
+    ctaSecundario: { rotulo: "Solicitar proposta para minha instituição", href: "/contato?assunto=proposta" },
   },
 
   agendaBand: {
@@ -440,7 +440,7 @@ export const FALLBACK_HOME = {
       tagline:
         "Soluções estruturadas para redes públicas de ensino — gestão escolar, alfabetização, educação inclusiva, tecnologia, currículo e primeira infância.",
       programasCount: "9",
-      linkProgramas: { rotulo: "Ver programas da área", href: "#programas" },
+      linkProgramas: { rotulo: "Ver programas da área", href: "/solucoes-estrategicas/educacao" },
       linkEventos: { rotulo: "Ver módulos e eventos abertos", href: "#eventos-abertos" },
     },
     {
@@ -453,7 +453,7 @@ export const FALLBACK_HOME = {
       tagline:
         "Capacitação executiva e técnica para a Administração Pública — liderança, contratações, governança, integridade e performance institucional.",
       programasCount: "3",
-      linkProgramas: { rotulo: "Ver programas da área", href: "#programas" },
+      linkProgramas: { rotulo: "Ver programas da área", href: "/solucoes-estrategicas/gestao-publica" },
       linkEventos: { rotulo: "Ver módulos e eventos abertos", href: "#eventos-abertos" },
     },
     {
@@ -466,7 +466,7 @@ export const FALLBACK_HOME = {
       tagline:
         "Inteligência institucional aplicada ao SUS — atenção primária, governança digital, financiamento e transformação dos sistemas públicos de saúde.",
       programasCount: "3",
-      linkProgramas: { rotulo: "Ver programas da área", href: "#programas" },
+      linkProgramas: { rotulo: "Ver programas da área", href: "/solucoes-estrategicas/saude" },
       linkEventos: { rotulo: "Ver módulos e eventos abertos", href: "#eventos-abertos" },
     },
   ] satisfies AreaCard[],
@@ -565,7 +565,7 @@ export const FALLBACK_HOME = {
 
   programasFooter: {
     ctaPrincipal: { rotulo: "Ver todos os 15 programas", href: "#programas" },
-    ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "#contratacao" },
+    ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },
 
   curadoria: {
@@ -574,7 +574,7 @@ export const FALLBACK_HOME = {
     subhead: "Juristas, gestores públicos, pesquisadores e autoridades técnicas.",
     contexto:
       "A curadoria científica do Grupo NTC reúne profissionais de referência nacional nas áreas de Educação, Gestão Pública, Contratações Públicas e Saúde. A composição docente é estruturada conforme o programa, o evento, a demanda institucional e os objetivos de cada contratante.",
-    ctaLink: { rotulo: "Corpo docente completo →", href: "#docentes" },
+    ctaLink: { rotulo: "Corpo docente completo →", href: "/o-grupo/corpo-docente" },
     vitrines: [
       {
         vertical: "gov",
@@ -588,7 +588,7 @@ export const FALLBACK_HOME = {
           "Referências em governança, integridade e performance",
         ],
         cta: "Conhecer curadoria",
-        href: "#docentes",
+        href: "/o-grupo/corpo-docente",
       },
       {
         vertical: "edu",
@@ -602,7 +602,7 @@ export const FALLBACK_HOME = {
           "Lideranças em transformação digital de redes públicas",
         ],
         cta: "Conhecer curadoria",
-        href: "#docentes",
+        href: "/o-grupo/corpo-docente",
       },
       {
         vertical: "sau",
@@ -616,14 +616,14 @@ export const FALLBACK_HOME = {
           "Autoridades em saúde digital, financiamento e dados",
         ],
         cta: "Conhecer curadoria",
-        href: "#docentes",
+        href: "/o-grupo/corpo-docente",
       },
     ] satisfies Vitrine[],
     rodape: {
       texto:
         "A curadoria científica do Grupo NTC é construída programa a programa, evento a evento, conforme a demanda institucional do cliente.",
       cta: "Conhecer corpo docente completo",
-      href: "#docentes",
+      href: "/o-grupo/corpo-docente",
     },
   },
 
@@ -647,7 +647,7 @@ export const FALLBACK_HOME = {
     imagemAlt: "Ambiente institucional do setor público",
     ctas: [
       { rotulo: "Conhecer soluções estratégicas", href: "#solucoes", variante: "primary" as const },
-      { rotulo: "Solicitar proposta", href: "#contratacao", variante: "secondary" as const },
+      { rotulo: "Solicitar proposta", href: "/contato?assunto=proposta", variante: "secondary" as const },
     ],
   },
 
@@ -736,7 +736,7 @@ export const FALLBACK_HOME = {
     descricao:
       "Além dos eventos abertos, o Grupo NTC desenvolve turmas fechadas, programas completos, módulos específicos, trilhas formativas e soluções sob medida para secretarias, autarquias, fundações, escolas de governo, redes públicas e órgãos governamentais.",
     ctas: [
-      { rotulo: "Solicitar proposta institucional", href: "#contato", variante: "gold" as const },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "gold" as const },
       { rotulo: "Inscrever minha equipe", href: "#contato", variante: "ghost-light" as const },
       { rotulo: "Agendar apresentação", href: "#contato", variante: "ghost-light" as const },
     ],
@@ -840,7 +840,7 @@ export const FALLBACK_HOME = {
       "Participe dos eventos abertos, inscreva sua equipe ou solicite uma proposta institucional para programas, módulos e soluções sob medida.",
     ctas: [
       { rotulo: "Ver eventos com inscrições abertas", href: "#eventos-abertos", variante: "gold" as const },
-      { rotulo: "Solicitar proposta institucional", href: "#contratacao", variante: "ghost-light" as const },
+      { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta", variante: "ghost-light" as const },
       { rotulo: "Falar com a equipe", href: "#contato", variante: "ghost-light" as const },
     ],
     tagline: "— Inteligência institucional. Impacto real. —",

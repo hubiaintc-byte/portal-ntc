@@ -36,7 +36,7 @@ export const CONTEUDO_OGRUPO = {
       },
       {
         rotulo: "Solicitar proposta institucional",
-        link: "#cta-final",
+        link: "/contato?assunto=proposta",
         variante: "ghost-light" as const,
       },
     ],
@@ -566,7 +566,7 @@ export const CONTEUDO_OGRUPO = {
     ctas: [
       {
         rotulo: "Solicitar proposta institucional",
-        link: "/#contato",
+        link: "/contato?assunto=proposta",
         variante: "dourado" as const,
       },
       {
