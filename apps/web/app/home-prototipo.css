@@ -45,8 +45,16 @@
   --prata-30:      rgba(168, 172, 182, 0.32);
   --prata-15:      rgba(168, 172, 182, 0.15);
 
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans:  'Barlow', system-ui, -apple-system, sans-serif;
+  /*
+   * As variáveis do next/font (--font-titulo / --font-corpo / --font-corpo-cond)
+   * vêm PRIMEIRO: cada uma já embute, como segundo termo, uma família de fallback
+   * com size-adjust/ascent calibrados pelo next/font para casar as métricas da
+   * web font. Usar o nome literal da família (ex.: 'Cormorant Garamond') aqui
+   * bypassa esse ajuste e causa o reflow do `display: swap` (CLS no hero
+   * desktop). Os literais ficam só como rede de segurança final.
+   */
+  --font-serif: var(--font-titulo), 'Cormorant Garamond', Georgia, serif;
+  --font-sans:  var(--font-corpo), 'Barlow', system-ui, -apple-system, sans-serif;
   --font-cond:  var(--font-corpo-cond), 'Barlow Condensed', 'Barlow', sans-serif;
 
   --space-1: 8px;  --space-2: 16px; --space-3: 24px; --space-4: 32px;
@@ -900,16 +908,18 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .area-card:hover .area-card-img { transform: scale(1.04); }
 .area-card-overlay {
   position: absolute; inset: 0; z-index: 1;
-  /* Educação · predominância Oxford */
-  background: linear-gradient(180deg, rgba(17, 54, 94, 0.55) 0%, rgba(11, 23, 38, 0.92) 100%);
+  /* Educação · predominância Oxford
+     Overlay mais leve — a flag da vertical carrega o contraste do eyebrow,
+     então a foto pode aparecer mais. Base ainda escura sob a tagline/meta. */
+  background: linear-gradient(180deg, rgba(11, 23, 38, 0.42) 0%, rgba(17, 54, 94, 0.55) 38%, rgba(11, 23, 38, 0.88) 100%);
 }
 .area-card[data-vert="gov"] .area-card-overlay {
   /* Gestão Pública · acento Cardeal */
-  background: linear-gradient(180deg, rgba(142, 42, 28, 0.55) 0%, rgba(11, 23, 38, 0.92) 100%);
+  background: linear-gradient(180deg, rgba(11, 23, 38, 0.42) 0%, rgba(142, 42, 28, 0.55) 38%, rgba(11, 23, 38, 0.88) 100%);
 }
 .area-card[data-vert="sau"] .area-card-overlay {
   /* Saúde · acento Oliva */
-  background: linear-gradient(180deg, rgba(74, 106, 31, 0.55) 0%, rgba(11, 23, 38, 0.92) 100%);
+  background: linear-gradient(180deg, rgba(11, 23, 38, 0.42) 0%, rgba(74, 106, 31, 0.55) 38%, rgba(11, 23, 38, 0.88) 100%);
 }
 
 .area-card-num {
@@ -917,11 +927,24 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   font-family: var(--font-serif); font-weight: 700; font-style: italic;
   font-size: 56px; color: rgba(184, 149, 46, 0.5); line-height: 1;
 }
-.area-card-content { position: relative; z-index: 2; }
-.area-vertical-tag {
-  font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.6px;
-  text-transform: uppercase; color: var(--dourado);
+.area-card-content {
+  position: relative; z-index: 2;
+  /* Sombra sutil dá lastro ao texto sobre trechos mais claros da imagem. */
+  text-shadow: 0 1px 8px rgba(11, 23, 38, 0.55);
 }
+/* Nome da vertical como flag/selo sólido — carrega o próprio contraste,
+   independente da foto ao fundo. Cor do selo = acento da vertical.
+   Escopado em `.area-cards` (grid exclusivo da home) para vencer as regras
+   `.area-vertical-tag` dos outros *-prototipo.css que carregam depois. */
+.area-cards .area-vertical-tag {
+  display: inline-block;
+  font-family: var(--font-cond); font-size: 11px; letter-spacing: 1.8px;
+  font-weight: 600; text-transform: uppercase; color: #fff;
+  background: var(--oxford); padding: 6px 12px; margin-bottom: 12px;
+  border-top: 2px solid var(--dourado);
+}
+.area-cards .area-card[data-vert="gov"] .area-vertical-tag { background: #8E2B27; }
+.area-cards .area-card[data-vert="sau"] .area-vertical-tag { background: #5C6B3B; }
 .area-card h3 {
   font-family: var(--font-serif); font-weight: 600;
   font-size: 38px; line-height: 1.05; color: var(--pergaminho);
@@ -936,11 +959,14 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   height: 1px; background: rgba(244, 241, 232, 0.2);
   margin: var(--space-3) 0;
 }
-.area-card-meta {
+/* Escopado em `.area-cards` (grid exclusivo da home) para vencer as regras
+   `.area-card-meta` dos outros *-prototipo.css que carregam depois. */
+.area-cards .area-card-meta {
   font-family: var(--font-cond); font-size: 12px; letter-spacing: 1.4px;
-  text-transform: uppercase; color: var(--pergaminho); margin-bottom: var(--space-3);
+  text-transform: uppercase; color: #fff; margin-bottom: var(--space-3);
+  text-shadow: 0 1px 6px rgba(11, 23, 38, 0.8);
 }
-.area-card-meta strong { font-family: var(--font-serif); color: var(--dourado); font-size: 22px; font-weight: 700; margin-right: 8px; }
+.area-cards .area-card-meta strong { font-family: var(--font-serif); color: var(--dourado-soft); font-size: 22px; font-weight: 700; margin-right: 8px; }
 .area-card-actions {
   display: flex; flex-direction: column; gap: 12px;
 }
@@ -1384,13 +1410,24 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
    ================================================================= */
 
 /* ---------- HERO SLIDER · base ---------- */
-.hero {
+/* Seletor com id #hero-slider: os CSS das outras páginas portadas
+   (evento/modulo/agenda/programas-prototipo.css) carregam DEPOIS deste
+   arquivo no layout raiz e redefinem `.hero` e `.hero h1` com a mesma
+   especificidade — o id garante que o slider da Home vença a cascata. */
+#hero-slider.hero {
   position: relative; min-height: clamp(620px, 88vh, 860px);
   background: var(--noite); color: var(--pergaminho);
   overflow: hidden; isolation: isolate;
   padding-bottom: 140px;
 }
-@media (max-width: 767px) { .hero { min-height: 0; padding-bottom: 200px; } }
+@media (max-width: 767px) {
+  #hero-slider.hero { min-height: 0; padding-bottom: 200px; }
+  /* No mobile o slide ATIVO entra no fluxo para dar altura real ao hero
+     (o protótipo colapsava em 200px e clipava CTAs via overflow:hidden;
+     no porte isso ficava mascarado pelo min-height vazado do CSS de
+     evento). O padding-bottom de 200px reserva controles + trust. */
+  #hero-slider .hero-slide.is-active { position: relative; width: 100%; }
+}
 
 .hero-slide {
   position: absolute; inset: 0;
@@ -1431,9 +1468,22 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .hero-slide[data-vertical="sau"]::before { background: linear-gradient(125deg, rgba(11, 23, 38, 0.92) 0%, rgba(58, 80, 32, 0.75) 55%, rgba(11, 23, 38, 0.55) 100%); }
 
 /* Conteúdo · grid de 12 colunas, texto sempre dentro de 760px */
-.hero-slide-content {
+/* Id no seletor: o elemento também tem a classe .container, e o
+   `.container { padding: 0 32px }` dos CSS das outras páginas portadas
+   (carregados depois) zerava o padding vertical desta regra. */
+#hero-slider .hero-slide-content {
   position: relative; z-index: 3; width: 100%;
-  padding: var(--space-7) 0 var(--space-5);
+  /* padding-bottom amplo reserva a faixa dos .hero-controls (bottom: 86px)
+     para que o conteúdo centralizado nunca encoste nas setas/contador.
+     Só as verticais: o padding horizontal (32/24/16px) segue do .container. */
+  padding-top: var(--space-7); padding-bottom: 96px;
+}
+@media (min-width: 768px) {
+  /* Os slides são absolutos (inset: 0) e centralizam o texto na altura
+     TOTAL do hero — a reserva de padding-bottom do .hero não os protege.
+     Controles ocupam 86–126px do rodapé; 160px de almofada garantem que
+     o slide mais alto (institucional, com textlink) nunca os alcance. */
+  #hero-slider .hero-slide-content { padding-bottom: 160px; }
 }
 .hero-slide-text { max-width: 760px; }
 .hero-slide .eyebrow {
@@ -1442,11 +1492,32 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   margin-bottom: var(--space-2); display: inline-flex; align-items: center; gap: 12px;
 }
 .hero-slide .eyebrow::before { content: ''; width: 30px; height: 1.5px; background: var(--dourado); }
-.hero-slide h1, .hero-slide .hero-slide-title {
+/* Id no seletor: vence o `.hero h1 { clamp(40px, 6.4vw, 82px) }` dos CSS
+   de evento/modulo/agenda/programas, que carregam depois na cascata. */
+#hero-slider .hero-slide h1, #hero-slider .hero-slide .hero-slide-title {
   font-family: var(--font-serif); font-weight: 600;
   font-size: clamp(36px, 5.4vw, 72px); line-height: 1.04;
   letter-spacing: -0.5px; color: var(--pergaminho);
   margin: var(--space-2) 0 var(--space-3);
+}
+/* Em viewports BAIXOS (ex.: 1366×768), o slide de título mais longo (3 linhas)
+   + lede + CTAs + a barra de controles não cabem na altura útil e os CTAs
+   encostavam nas setas/contador. A barra de controles é um único elemento
+   irmão dos slides (não dá para jogá-la no fluxo só via CSS), então reduzimos
+   o título APENAS quando a altura é curta — a tipografia do protótipo fica
+   100% intacta em telas de altura normal (> 800px). */
+/* Degrau intermediário: em 900px de altura útil (ex.: MacBook Air 1440×900)
+   o hero fica com ~792px e o título de 72px em 4 linhas + textlink não cabem
+   acima da faixa de controles. */
+@media (min-width: 768px) and (max-height: 900px) {
+  #hero-slider .hero-slide h1, #hero-slider .hero-slide .hero-slide-title {
+    font-size: clamp(30px, 3.8vw, 56px); line-height: 1.06;
+  }
+}
+@media (min-width: 768px) and (max-height: 800px) {
+  #hero-slider .hero-slide h1, #hero-slider .hero-slide .hero-slide-title {
+    font-size: clamp(30px, 3.4vw, 54px); line-height: 1.08;
+  }
 }
 .hero-slide h1 .accent,
 .hero-slide-title .accent { color: var(--dourado-soft); font-style: italic; font-weight: 500; }
@@ -1503,8 +1574,10 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .hero-arrow:hover { background: var(--dourado); color: var(--noite); border-color: var(--dourado); }
 .hero-arrow svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; }
 
-/* Faixa institucional no rodapé · preservada da v2.6 */
-.hero-trust {
+/* Faixa institucional no rodapé · preservada da v2.6.
+   Id no seletor: o CSS de evento/modulo/agenda/programas define
+   `.hero-trust { position: static }` no mobile e carregaria por cima. */
+#hero-slider .hero-trust {
   position: absolute; bottom: 28px; left: 32px; right: 32px; z-index: 4;
   display: flex; justify-content: space-between; align-items: center;
   gap: var(--space-4); font-family: var(--font-cond); font-size: 11px;
@@ -1515,7 +1588,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .hero-trust .verticals span::before { content: '— '; color: var(--dourado); }
 .hero-trust .scroll-hint::after { content: '↓'; margin-left: 8px; color: var(--dourado); }
 @media (max-width: 767px) {
-  .hero-trust { bottom: 24px; left: 20px; right: 20px; padding-top: 14px; flex-direction: column; align-items: flex-start; gap: 8px; }
+  #hero-slider .hero-trust { bottom: 24px; left: 20px; right: 20px; padding-top: 14px; flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
 /* ---------- KEN BURNS muito sutil (zoom 1.04 → 1.00, 12s) ---------- */
@@ -1586,6 +1659,12 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 /* ---------- CONTROLES ALINHADOS AO BLOCO DE TEXTO (mais editorial) ---------- */
 /* Sobrescreve o posicionamento absoluto anterior · agora flutuam ao lado dos CTAs no rodapé */
 .hero-controls {
+  /* bottom: 86px — valor do protótipo canônico. A faixa .hero-trust ocupa
+     o rodapé (bottom: 28px + ~37px de altura); com 86px os controles ficam
+     ACIMA dela, sem colisão. NÃO reduzir este valor: a colisão com os CTAs
+     que motivou uma redução anterior (86 → 32) era sintoma do vazamento de
+     `.hero h1 { 82px }` dos outros CSS de protótipo, já corrigido com o
+     seletor #hero-slider na tipografia do slide. */
   position: absolute; bottom: 86px;
   left: 0; right: 0;
   padding: 0 32px;
