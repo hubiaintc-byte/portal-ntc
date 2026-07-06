@@ -1427,6 +1427,12 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
      no porte isso ficava mascarado pelo min-height vazado do CSS de
      evento). O padding-bottom de 200px reserva controles + trust. */
   #hero-slider .hero-slide.is-active { position: relative; width: 100%; }
+  /* O slide relativo é 200px mais curto que o hero (reserva do rodapé):
+     foto e overlays precisam se estender por essa faixa, senão fica uma
+     banda lisa de --noite atrás dos controles/trust, com emenda visível. */
+  #hero-slider .hero-slide-bg { inset: -40px 0 -200px 0; height: calc(100% + 240px); }
+  #hero-slider .hero-slide::before,
+  #hero-slider .hero-slide::after { bottom: -200px; }
 }
 
 .hero-slide {
@@ -1484,6 +1490,12 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
      Controles ocupam 86–126px do rodapé; 160px de almofada garantem que
      o slide mais alto (institucional, com textlink) nunca os alcance. */
   #hero-slider .hero-slide-content { padding-bottom: 160px; }
+}
+@media (max-width: 767px) {
+  /* No mobile o slide relativo já reserva 200px de hero abaixo de si;
+     96px extras de almofada deixavam ~126px de foto vazia entre os CTAs
+     e os controles. */
+  #hero-slider .hero-slide-content { padding-bottom: 40px; }
 }
 .hero-slide-text { max-width: 760px; }
 .hero-slide .eyebrow {
