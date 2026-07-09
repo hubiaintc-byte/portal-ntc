@@ -1,7 +1,7 @@
 import "server-only";
 
 import { obterPayload } from "@/lib/payloadClient";
-import { lexicalToHtml } from "@/lib/cms/lexical";
+import { lexicalParaTexto, lexicalToHtml } from "@/lib/cms/lexical";
 
 /**
  * Leitura de dados reais para o Painel Admin (rota /).
@@ -77,6 +77,23 @@ export interface EventoCmsDetalhe extends EventoCmsResumo {
   linkInscricao: string | null;
   palestrantes: { id: string; nome: string; iniciais: string; titulacao: string }[];
   faq: { pergunta: string; respostaHtml: string }[];
+  // ---- valores brutos/planos para o modo de edição completa ----
+  /** Valor bruto do select ("online" | "presencial" | "hibrido"), ou null. */
+  modalidadeValor: string | null;
+  dataFimISO: string | null;
+  localNome: string | null;
+  localEndereco: string | null;
+  localCidade: string | null;
+  localEstado: string | null;
+  /** Textos planos dos richTexts (linhas; itens de lista com "- "). */
+  publicoAlvoTexto: string;
+  objetivosTexto: string;
+  conteudoProgramaticoTexto: string;
+  programacaoDetalhada: { horario: string; titulo: string; descricao: string }[];
+  diferenciais: { titulo: string; descricao: string }[];
+  faqEditavel: { pergunta: string; respostaTexto: string }[];
+  replayDisponivel: boolean;
+  prazoReplay: string | null;
 }
 
 // ---- Leads (somente leitura, doc 11 §11) -------------------------------
@@ -297,10 +314,21 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
     linkInscricaoExterna?: string;
     palestrantes?: unknown[];
     faq?: { pergunta?: string; resposta?: unknown }[];
+    dataFim?: string | null;
+    programacaoDetalhada?: { horario?: string; titulo?: string; descricao?: string }[];
+    diferenciais?: { titulo?: string; descricao?: string }[];
+    replayDisponivel?: boolean;
+    prazoReplay?: string;
     _status?: string;
   };
 
   const modalidade = d.modalidade ?? "";
+  const grupoLocal = (d.local ?? {}) as {
+    nomeLocal?: string;
+    endereco?: string;
+    cidade?: string;
+    estado?: string;
+  };
   const palestrantes = (d.palestrantes ?? [])
     .filter((p): p is Record<string, unknown> => typeof p === "object" && p !== null)
     .map((p) => {
@@ -339,6 +367,29 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
       .filter((f) => f?.pergunta)
       .map((f) => ({ pergunta: f.pergunta as string, respostaHtml: lexicalToHtml(f.resposta) })),
     status: statusEvento(d),
+    modalidadeValor: d.modalidade ?? null,
+    dataFimISO: d.dataFim ? d.dataFim.slice(0, 10) : null,
+    localNome: grupoLocal.nomeLocal ?? null,
+    localEndereco: grupoLocal.endereco ?? null,
+    localCidade: grupoLocal.cidade ?? null,
+    localEstado: grupoLocal.estado ?? null,
+    publicoAlvoTexto: lexicalParaTexto(d.publicoAlvo),
+    objetivosTexto: lexicalParaTexto(d.objetivos),
+    conteudoProgramaticoTexto: lexicalParaTexto(d.conteudoProgramatico),
+    programacaoDetalhada: (d.programacaoDetalhada ?? []).map((p) => ({
+      horario: p.horario ?? "",
+      titulo: p.titulo ?? "",
+      descricao: p.descricao ?? "",
+    })),
+    diferenciais: (d.diferenciais ?? []).map((df) => ({
+      titulo: df.titulo ?? "",
+      descricao: df.descricao ?? "",
+    })),
+    faqEditavel: (d.faq ?? [])
+      .filter((f) => f?.pergunta)
+      .map((f) => ({ pergunta: f.pergunta as string, respostaTexto: lexicalParaTexto(f.resposta) })),
+    replayDisponivel: Boolean(d.replayDisponivel),
+    prazoReplay: d.prazoReplay ?? null,
   };
 }
 
