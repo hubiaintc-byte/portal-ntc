@@ -1686,3 +1686,74 @@ body {
   outline: 2px solid var(--pcms-dourado);
   outline-offset: 2px;
 }
+
+/* ---- Edição completa do evento (revisão pós-importação de PDF) ---- */
+.pcms-editor__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0 18px;
+}
+.pcms-editor__head--sub {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--pcms-linha);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.pcms-editor__hint {
+  font-size: 0.78rem;
+  color: var(--pcms-cinza, #6b7280);
+  margin: 4px 0 14px;
+}
+.pcms-editor__linha {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.6fr) 1fr 1fr auto;
+  gap: 0 12px;
+  align-items: end;
+  border-bottom: 1px dashed var(--pcms-linha);
+  padding-bottom: 4px;
+  margin-bottom: 10px;
+}
+.pcms-editor__linha--faq {
+  grid-template-columns: 1fr 1.4fr auto;
+}
+.pcms-editor__linha .pcms-field {
+  margin-bottom: 8px;
+}
+.pcms-field--check label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+.pcms-field--check input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--pcms-oxford);
+}
+.pcms-link-acao--remover {
+  color: var(--pcms-cardeal, #8e2b27);
+  margin-bottom: 12px;
+}
+.pcms-modal__relatorio {
+  border: 1px solid var(--pcms-linha);
+  background: var(--pcms-osso);
+  padding: 12px 14px;
+  margin: 12px 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+.pcms-modal__relatorio p {
+  margin: 0 0 8px;
+}
+.pcms-modal__relatorio p:last-child {
+  margin-bottom: 0;
+}
+.pcms-det-lista {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.6;
+}

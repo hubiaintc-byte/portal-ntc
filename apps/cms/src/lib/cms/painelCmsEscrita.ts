@@ -1,6 +1,7 @@
 import "server-only";
 
 import { casarOuCriarPalestrantes } from "@/lib/importacaoPdf/casarOuCriarPalestrantes";
+import { textoParaLexical } from "@/lib/lexicalBuilders";
 import { extrairTextoPdf } from "@/lib/importacaoPdf/extrairTextoPdf";
 import { montarCamposEvento } from "@/lib/importacaoPdf/montarCamposEvento";
 import { parsearFolderEvento } from "@/lib/importacaoPdf/parsearFolderEvento";
@@ -21,15 +22,39 @@ export interface ResultadoEscrita {
   erro?: string;
 }
 
-export interface CamposTextoEvento {
+export interface CamposEventoCompletos {
   nome: string;
   dataInicio: string;
+  dataFim: string;
   resumo: string;
+  modalidade: string;
+  cargaHoraria: string;
+  valor: string;
+  linkInscricaoExterna: string;
+  localNome: string;
+  localEndereco: string;
+  localCidade: string;
+  localEstado: string;
+  replayDisponivel: boolean;
+  prazoReplay: string;
+  /** Textos planos do editor: linhas viram parágrafos, "- " vira lista. */
+  publicoAlvoTexto: string;
+  objetivosTexto: string;
+  conteudoProgramaticoTexto: string;
+  programacaoDetalhada: { horario: string; titulo: string; descricao: string }[];
+  diferenciais: { titulo: string; descricao: string }[];
+  faq: { pergunta: string; respostaTexto: string }[];
+}
+
+/** "" ⇒ null (limpa o campo no Payload em vez de gravar string vazia). */
+function ouNulo(valor: string): string | null {
+  const v = valor.trim();
+  return v.length > 0 ? v : null;
 }
 
 export async function salvarCamposEvento(
   id: string,
-  campos: CamposTextoEvento,
+  campos: CamposEventoCompletos,
 ): Promise<ResultadoEscrita> {
   try {
     const payload = await obterPayload();
@@ -39,7 +64,32 @@ export async function salvarCamposEvento(
       data: {
         nome: campos.nome,
         dataInicio: campos.dataInicio,
+        dataFim: ouNulo(campos.dataFim),
         resumo: campos.resumo,
+        ...(campos.modalidade ? { modalidade: campos.modalidade } : {}),
+        cargaHoraria: campos.cargaHoraria,
+        valor: ouNulo(campos.valor),
+        linkInscricaoExterna: ouNulo(campos.linkInscricaoExterna),
+        local: {
+          nomeLocal: ouNulo(campos.localNome),
+          endereco: ouNulo(campos.localEndereco),
+          cidade: ouNulo(campos.localCidade),
+          estado: ouNulo(campos.localEstado),
+        },
+        replayDisponivel: campos.replayDisponivel,
+        prazoReplay: ouNulo(campos.prazoReplay),
+        publicoAlvo: textoParaLexical(campos.publicoAlvoTexto),
+        objetivos: textoParaLexical(campos.objetivosTexto),
+        conteudoProgramatico: textoParaLexical(campos.conteudoProgramaticoTexto),
+        programacaoDetalhada: campos.programacaoDetalhada
+          .filter((p) => p.horario.trim().length > 0 && p.titulo.trim().length > 0)
+          .map((p) => ({ horario: p.horario, titulo: p.titulo, descricao: ouNulo(p.descricao) })),
+        diferenciais: campos.diferenciais
+          .filter((d) => d.titulo.trim().length > 0 || d.descricao.trim().length > 0)
+          .map((d) => ({ titulo: ouNulo(d.titulo), descricao: ouNulo(d.descricao) })),
+        faq: campos.faq
+          .filter((f) => f.pergunta.trim().length > 0)
+          .map((f) => ({ pergunta: f.pergunta, resposta: textoParaLexical(f.respostaTexto) })),
       },
       // draft: true mantém o documento no mesmo estado de publicação (rascunho
       // continua rascunho); não força publish.

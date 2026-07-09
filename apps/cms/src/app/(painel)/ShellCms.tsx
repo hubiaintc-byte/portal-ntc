@@ -131,14 +131,19 @@ export function ShellCms({
 }: ShellCmsProps) {
   const [tela, setTela] = useState<TelaId>("dashboard");
   const [eventoDet, setEventoDet] = useState<EventoCmsDetalhe | null>(null);
+  // true ⇒ o detalhe abre direto em edição (revisão pós-importação de PDF).
+  const [eventoEmEdicao, setEventoEmEdicao] = useState(false);
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
   const [leadDet, setLeadDet] = useState<LeadCmsDetalhe | null>(null);
   const [carregando, iniciarCarga] = useTransition();
 
-  function abrirEvento(id: string) {
+  function abrirEvento(id: string, emEdicao = false) {
     iniciarCarga(async () => {
       const det = await carregarEvento(id);
-      if (det) setEventoDet(det);
+      if (det) {
+        setEventoDet(det);
+        setEventoEmEdicao(emEdicao);
+      }
     });
   }
 
@@ -263,9 +268,14 @@ export function ShellCms({
 
           {eventoDet ? (
             <DetalheEvento
+              key={eventoDet.id}
               evento={eventoDet}
               palestrantesDisponiveis={palestrantes}
-              onVoltar={() => setEventoDet(null)}
+              edicaoInicial={eventoEmEdicao}
+              onVoltar={() => {
+                setEventoDet(null);
+                setEventoEmEdicao(false);
+              }}
             />
           ) : palestranteDet ? (
             <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
@@ -285,7 +295,13 @@ export function ShellCms({
                 {tela === "palestrantes" && (
                   <TelaPalestrantes palestrantes={palestrantes} onAbrir={abrirPalestrante} />
                 )}
-                {tela === "eventos" && <TelaEventos eventos={eventos} onAbrir={abrirEvento} />}
+                {tela === "eventos" && (
+                  <TelaEventos
+                    eventos={eventos}
+                    onAbrir={abrirEvento}
+                    onAbrirImportado={(id) => abrirEvento(id, true)}
+                  />
+                )}
                 {tela === "home" && (
                   <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />
                 )}

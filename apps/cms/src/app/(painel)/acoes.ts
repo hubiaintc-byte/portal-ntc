@@ -20,6 +20,7 @@ import {
   salvarCamposEvento,
   salvarEventosHome,
   vincularPalestrantesEvento,
+  type CamposEventoCompletos,
   type ResultadoEscrita,
   type ResultadoImportacao,
 } from "@/lib/cms/painelCmsEscrita";
@@ -49,10 +50,10 @@ export async function carregarLead(id: string): Promise<LeadCmsDetalhe | null> {
   return obterLeadCms(id);
 }
 
-/** Salva nome/data/resumo de um evento e retorna o detalhe atualizado. */
+/** Salva o conjunto completo de campos editáveis e retorna o detalhe atualizado. */
 export async function salvarEvento(
   id: string,
-  campos: { nome: string; dataInicio: string; resumo: string },
+  campos: CamposEventoCompletos,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
   if (!(await obterUsuarioCms())) return { resultado: RECUSADO, evento: null };
   const resultado = await salvarCamposEvento(id, campos);

@@ -12,10 +12,12 @@ const ROTULO_STATUS: Record<EventoCmsResumo["status"], string> = {
 interface TelaEventosProps {
   eventos: EventoCmsResumo[];
   onAbrir: (id: string) => void;
+  /** Abre o evento recém-importado direto em modo de edição (revisão). */
+  onAbrirImportado: (id: string) => void;
 }
 
 /** Listagem de eventos — dados reais do banco (somente leitura). */
-export function TelaEventos({ eventos, onAbrir }: TelaEventosProps) {
+export function TelaEventos({ eventos, onAbrir, onAbrirImportado }: TelaEventosProps) {
   const [modalImportar, setModalImportar] = useState(false);
 
   return (
@@ -51,7 +53,15 @@ export function TelaEventos({ eventos, onAbrir }: TelaEventosProps) {
         </div>
       </div>
 
-      {modalImportar && <ModalImportarPdf onFechar={() => setModalImportar(false)} />}
+      {modalImportar && (
+        <ModalImportarPdf
+          onFechar={() => setModalImportar(false)}
+          onImportado={(id) => {
+            setModalImportar(false);
+            onAbrirImportado(id);
+          }}
+        />
+      )}
 
       <div className="pcms-toolbar">
         <div className="pcms-filtros">
