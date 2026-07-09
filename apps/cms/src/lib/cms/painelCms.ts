@@ -389,7 +389,8 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
       .filter((f) => f?.pergunta)
       .map((f) => ({ pergunta: f.pergunta as string, respostaTexto: lexicalParaTexto(f.resposta) })),
     replayDisponivel: Boolean(d.replayDisponivel),
-    prazoReplay: d.prazoReplay ?? null,
+    // Campo date no schema — mantém só o ISO yyyy-mm-dd para o input type=date.
+    prazoReplay: d.prazoReplay ? d.prazoReplay.slice(0, 10) : null,
   };
 }
 

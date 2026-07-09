@@ -301,10 +301,10 @@ export function DetalheEvento({
               </label>
             </div>
             <div className="pcms-field">
-              <label htmlFor="ed-prazo-replay">Prazo do replay</label>
+              <label htmlFor="ed-prazo-replay">Replay disponível até</label>
               <input
                 id="ed-prazo-replay"
-                type="text"
+                type="date"
                 value={campos.prazoReplay}
                 onChange={(e) => mudar("prazoReplay", e.target.value)}
                 disabled={!campos.replayDisponivel}

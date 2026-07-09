@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { montarCamposEvento } from "./montarCamposEvento";
+import { derivarPrazoReplay, montarCamposEvento } from "./montarCamposEvento";
 import { parsearFolderEvento, type DadosFolderEvento } from "./parsearFolderEvento";
 
 function dadosDaFixture(slug: string): DadosFolderEvento {
@@ -43,7 +43,8 @@ describe("montarCamposEvento (edutec-m01)", () => {
     expect(data.dataInicio).toBe("2026-06-15");
     expect(data.valor).toBe("R$ 1.470");
     expect(data.replayDisponivel).toBe(true);
-    expect(data.prazoReplay).toBeTruthy();
+    // "Por até 7 dias após o evento" ⇒ data-limite = início + 7 dias (campo date).
+    expect(data.prazoReplay).toBe("2026-06-22");
     expect((data.local as { nomeLocal: string }).nomeLocal).toBe("EventON NTC");
     expect((data.resumo as string).length).toBeLessThanOrEqual(280);
   });
@@ -66,6 +67,20 @@ describe("montarCamposEvento (edutec-m01)", () => {
     expect(preenchidos).toContain("Programação detalhada");
     expect(vazios).toContain("FAQ");
     expect(vazios).toContain("Capa do evento");
+  });
+});
+
+describe("derivarPrazoReplay", () => {
+  it("soma N dias à data de início", () => {
+    expect(derivarPrazoReplay("Por até 7 dias Após a realização do evento", "2026-06-15")).toBe(
+      "2026-06-22",
+    );
+  });
+
+  it("sem número de dias ou sem data ⇒ null", () => {
+    expect(derivarPrazoReplay("replay disponível", "2026-06-15")).toBeNull();
+    expect(derivarPrazoReplay("Por até 7 dias", null)).toBeNull();
+    expect(derivarPrazoReplay(null, "2026-06-15")).toBeNull();
   });
 });
 

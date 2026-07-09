@@ -14,6 +14,20 @@ export interface CamposEventoImportado {
   vazios: string[];
 }
 
+/** "Por até 7 dias após…" + data de início ⇒ ISO da data-limite do replay. */
+export function derivarPrazoReplay(
+  prazoTexto: string | null,
+  dataInicioISO: string | null,
+): string | null {
+  if (!prazoTexto || !dataInicioISO) return null;
+  const m = prazoTexto.match(/(\d+)\s*dias?/i);
+  if (!m) return null;
+  const base = new Date(`${dataInicioISO}T12:00:00Z`);
+  if (Number.isNaN(base.getTime())) return null;
+  base.setUTCDate(base.getUTCDate() + Number(m[1]));
+  return base.toISOString().slice(0, 10);
+}
+
 export function montarCamposEvento(dados: DadosFolderEvento): CamposEventoImportado {
   const data: Record<string, unknown> = {};
   const preenchidos: string[] = [];
@@ -84,7 +98,10 @@ export function montarCamposEvento(dados: DadosFolderEvento): CamposEventoImport
 
   campo("Valor", "valor", dados.valor, Boolean(dados.valor));
   campo("Replay", "replayDisponivel", dados.replayDisponivel, dados.replayDisponivel);
-  if (dados.replayDisponivel && dados.prazoReplay) data.prazoReplay = dados.prazoReplay;
+  // prazoReplay é campo DATE no schema; o folder traz "Por até N dias após o
+  // evento" — deriva a data-limite somando N dias à data de início.
+  const prazoISO = derivarPrazoReplay(dados.prazoReplay, dados.dataInicioISO);
+  if (dados.replayDisponivel && prazoISO) data.prazoReplay = prazoISO;
 
   campo(
     "Local / plataforma",
