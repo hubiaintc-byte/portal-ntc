@@ -18,15 +18,15 @@ describe("paragrafosParaLexical", () => {
     const doc = paragrafosParaLexical(["Primeiro.", "", "  Segundo.  "]);
     const nos = filhos(doc);
     expect(nos).toHaveLength(2);
-    expect(nos[0].type).toBe("paragraph");
-    expect(nos[0].children?.[0].text).toBe("Primeiro.");
-    expect(nos[1].children?.[0].text).toBe("Segundo.");
+    expect(nos[0]?.type).toBe("paragraph");
+    expect(nos[0]?.children?.[0]?.text).toBe("Primeiro.");
+    expect(nos[1]?.children?.[0]?.text).toBe("Segundo.");
   });
 
   it("entrada vazia produz um parágrafo vazio (root nunca sem filhos)", () => {
     const nos = filhos(paragrafosParaLexical([]));
     expect(nos).toHaveLength(1);
-    expect(nos[0].type).toBe("paragraph");
+    expect(nos[0]?.type).toBe("paragraph");
   });
 });
 
@@ -36,9 +36,9 @@ describe("textoParaLexical", () => {
     const nos = filhos(doc);
     expect(nos.map((n) => n.type)).toEqual(["paragraph", "list", "paragraph"]);
     const lista = nos[1];
-    expect(lista.listType).toBe("bullet");
-    expect(lista.children).toHaveLength(2);
-    expect(lista.children?.[0].children?.[0].text).toBe("item um");
+    expect(lista?.listType).toBe("bullet");
+    expect(lista?.children).toHaveLength(2);
+    expect(lista?.children?.[0]?.children?.[0]?.text).toBe("item um");
   });
 });
 
@@ -50,7 +50,7 @@ describe("sessoesParaLexical", () => {
     ]);
     const nos = filhos(doc);
     expect(nos.map((n) => n.type)).toEqual(["heading", "list", "heading", "list"]);
-    expect(nos[0].children?.[0].text).toBe("Sessão 01");
-    expect(nos[3].children).toHaveLength(1);
+    expect(nos[0]?.children?.[0]?.text).toBe("Sessão 01");
+    expect(nos[3]?.children).toHaveLength(1);
   });
 });

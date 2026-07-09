@@ -58,7 +58,7 @@ describe("montarCamposEvento (edutec-m01)", () => {
   it("programação carrega o palestrante na descrição", () => {
     const programacao = data.programacaoDetalhada as { horario: string; descricao: string }[];
     expect(programacao).toHaveLength(4);
-    expect(programacao[0].descricao).toMatch(/^com Roberta Aquino/);
+    expect(programacao[0]?.descricao).toMatch(/^com Roberta Aquino/);
   });
 
   it("relatório separa preenchidos de vazios", () => {

@@ -1,5 +1,9 @@
 import "server-only";
 
+import { casarOuCriarPalestrantes } from "@/lib/importacaoPdf/casarOuCriarPalestrantes";
+import { extrairTextoPdf } from "@/lib/importacaoPdf/extrairTextoPdf";
+import { montarCamposEvento } from "@/lib/importacaoPdf/montarCamposEvento";
+import { parsearFolderEvento } from "@/lib/importacaoPdf/parsearFolderEvento";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
@@ -223,11 +227,23 @@ export async function enviarMidiaEvento(
   }
 }
 
+export interface RelatorioImportacao {
+  /** Rótulos dos campos preenchidos a partir do PDF. */
+  preenchidos: string[];
+  /** Rótulos dos campos que ficaram vazios para preenchimento manual. */
+  vazios: string[];
+  palestrantesVinculados: string[];
+  /** Especialistas criados agora (ocultos do site até revisão). */
+  palestrantesCriados: string[];
+  avisos: string[];
+}
+
 export interface ResultadoImportacao extends ResultadoEscrita {
   /** Id do rascunho de evento criado, para abrir no detalhe. */
   eventoId?: string;
-  /** Nome provisório do rascunho (derivado do arquivo). */
+  /** Nome do rascunho (extraído do PDF ou derivado do arquivo). */
   nome?: string;
+  relatorio?: RelatorioImportacao;
 }
 
 /** Tira ".pdf", troca separadores por espaço e capitaliza para um título legível. */
@@ -267,10 +283,77 @@ export async function criarEventoDePdf(arquivo: File): Promise<ResultadoImportac
       overrideAccess: true,
     });
 
-    const nome = nomeProvisorioDePdf(arquivo.name);
+    // Extração + parse do template. Qualquer falha aqui NÃO bloqueia a
+    // importação: cai no rascunho vazio de antes, com aviso no relatório.
+    const relatorio: RelatorioImportacao = {
+      preenchidos: [],
+      vazios: [],
+      palestrantesVinculados: [],
+      palestrantesCriados: [],
+      avisos: [],
+    };
+    let camposDoPdf: Record<string, unknown> = {};
+    let nome = nomeProvisorioDePdf(arquivo.name);
+    try {
+      const paginas = await extrairTextoPdf(new Uint8Array(buffer));
+      if (paginas.join("").trim().length === 0) {
+        relatorio.avisos.push(
+          "O PDF não tem camada de texto (provável digitalização) — preencha os campos manualmente.",
+        );
+      } else {
+        const dados = parsearFolderEvento(paginas);
+        const montagem = montarCamposEvento(dados);
+        camposDoPdf = montagem.data;
+        relatorio.preenchidos = montagem.preenchidos;
+        relatorio.vazios = montagem.vazios;
+        if (dados.nome) nome = dados.nome;
+
+        // Adapta a Local API à superfície mínima tipada (interface mockável).
+        const palestrantes = await casarOuCriarPalestrantes(
+          {
+            async find(args) {
+              const r = await payload.find({
+                collection: "especialistas",
+                limit: args.limit,
+                depth: 0,
+                overrideAccess: true,
+              });
+              return { docs: r.docs.map((d) => ({ id: d.id, nome: d.nome })) };
+            },
+            async create(args) {
+              // O objeto vem completo do casarOuCriarPalestrantes (campos
+              // obrigatórios da coleção); o cast pontual evita replicar o
+              // tipo gerado do Payload na interface mockável.
+              const r = await payload.create({
+                collection: "especialistas",
+                data: args.data as unknown as Parameters<typeof payload.create>[0]["data"],
+                overrideAccess: true,
+              });
+              return { id: r.id };
+            },
+          },
+          dados.palestrantes,
+        );
+        relatorio.palestrantesVinculados = palestrantes.vinculados;
+        relatorio.palestrantesCriados = palestrantes.criados;
+        if (palestrantes.pendentes.length > 0) {
+          relatorio.avisos.push(
+            `Não foi possível cadastrar: ${palestrantes.pendentes.join(", ")}. Vincule manualmente.`,
+          );
+        }
+        if (palestrantes.ids.length > 0) camposDoPdf.palestrantes = palestrantes.ids;
+      }
+    } catch (e) {
+      relatorio.avisos.push(
+        `A leitura automática do PDF falhou (${e instanceof Error ? e.message : "erro desconhecido"}) — o rascunho foi criado vazio.`,
+      );
+      camposDoPdf = {};
+    }
+
     const evento = await payload.create({
       collection: "eventos",
       data: {
+        ...camposDoPdf,
         nome,
         folderPdf: media.id,
         _status: "draft",
@@ -279,7 +362,7 @@ export async function criarEventoDePdf(arquivo: File): Promise<ResultadoImportac
       overrideAccess: true,
     });
 
-    return { ok: true, eventoId: String(evento.id), nome };
+    return { ok: true, eventoId: String(evento.id), nome, relatorio };
   } catch (e) {
     return { ok: false, erro: e instanceof Error ? e.message : "Erro ao importar o PDF." };
   }

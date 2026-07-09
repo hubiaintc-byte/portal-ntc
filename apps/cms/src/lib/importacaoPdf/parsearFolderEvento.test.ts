@@ -97,9 +97,9 @@ describe("programação, palestrantes, valor e replay (edutec-m01)", () => {
 
   it("programação com 4 sessões e horários", () => {
     expect(dados.programacao).toHaveLength(4);
-    expect(dados.programacao[0].horario).toBe("08h00 – 10h00");
-    expect(dados.programacao[0].titulo).toMatch(/Cultura digital e os novos paradigmas/);
-    expect(dados.programacao[0].nomePalestrante).toBe("Roberta Aquino");
+    expect(dados.programacao[0]?.horario).toBe("08h00 – 10h00");
+    expect(dados.programacao[0]?.titulo).toMatch(/Cultura digital e os novos paradigmas/);
+    expect(dados.programacao[0]?.nomePalestrante).toBe("Roberta Aquino");
   });
 
   it("palestrantes com nome, titulação e minicurrículo", () => {
@@ -107,8 +107,8 @@ describe("programação, palestrantes, valor e replay (edutec-m01)", () => {
     expect(dados.palestrantes.map((p) => p.nome).sort()).toEqual(
       ["Roberta Aquino", "Mariana Ochs", "Karla Priscilla"].sort(),
     );
-    expect(dados.palestrantes[0].linhaTitulacao).toContain("UNICAMP");
-    expect(dados.palestrantes[0].minicurriculo.length).toBeGreaterThan(100);
+    expect(dados.palestrantes[0]?.linhaTitulacao).toContain("UNICAMP");
+    expect(dados.palestrantes[0]?.minicurriculo.length).toBeGreaterThan(100);
   });
 
   it("valor, replay e plataforma", () => {
