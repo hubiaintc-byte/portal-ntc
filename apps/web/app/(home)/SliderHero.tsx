@@ -149,6 +149,10 @@ export function SliderHero({ slides, intervaloMs = 7000 }: SliderHeroProps) {
               src={slide.imagemSrc}
               alt={slide.imagemAlt ?? ""}
               aria-hidden="true"
+              // Slide 1 é o LCP da Home: baixa com prioridade máxima; os
+              // demais ficam lazy para não competir com ele na primeira dobra.
+              fetchPriority={idx === 0 ? "high" : "auto"}
+              loading={idx === 0 ? "eager" : "lazy"}
             />
             <div className="container hero-slide-content">
               <div className="hero-slide-text">

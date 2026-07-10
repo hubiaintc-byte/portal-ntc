@@ -329,7 +329,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 }
 .hero-bg {
   position: absolute; inset: 0; z-index: 0;
-  background-image: url('https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media/hero-principal.jpg');
+  background-image: url('/img/fotos/_optimized/hero-principal.1920.webp');
   background-size: cover; background-position: center 30%;
   filter: saturate(85%) contrast(1.05);
 }
@@ -1110,7 +1110,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
    EVENTON
    ============================================================= */
 .eventon { position: relative; overflow: hidden; background: var(--noite); color: var(--pergaminho); padding: var(--space-7) 0; }
-.eventon-bg { position: absolute; inset: 0; z-index: 0; background-image: url('https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media/eventon-estudio.png'); background-size: cover; background-position: right center; opacity: 0.20; filter: saturate(80%); }
+.eventon-bg { position: absolute; inset: 0; z-index: 0; background-image: url('/img/fotos/_optimized/eventon-estudio.1920.webp'); background-size: cover; background-position: right center; opacity: 0.20; filter: saturate(80%); }
 .eventon::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, var(--noite) 30%, rgba(11, 23, 38, 0.7) 100%); }
 .eventon-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--space-6); align-items: start; }
 @media (max-width: 899px) { .eventon-grid { grid-template-columns: 1fr; } }
@@ -1135,7 +1135,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
    CONTRATAÇÃO INSTITUCIONAL
    ============================================================= */
 .contracting { position: relative; overflow: hidden; padding: var(--space-7) 0; background: var(--oxford); color: var(--pergaminho); }
-.contracting-bg { position: absolute; inset: 0; z-index: 0; background-image: url('https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media/contratacao.png'); background-size: cover; background-position: center; opacity: 0.15; filter: saturate(80%); }
+.contracting-bg { position: absolute; inset: 0; z-index: 0; background-image: url('/img/fotos/_optimized/contratacao.1920.webp'); background-size: cover; background-position: center; opacity: 0.15; filter: saturate(80%); }
 .contracting::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(135deg, var(--oxford) 0%, rgba(17, 54, 94, 0.85) 60%, rgba(11, 23, 38, 0.9) 100%); }
 .contracting-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--space-6); align-items: center; }
 @media (max-width: 899px) { .contracting-grid { grid-template-columns: 1fr; } }
@@ -1720,7 +1720,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 }
 .experts-section--premium .experts-parallax {
   position: absolute; inset: -60px 0 -60px 0; z-index: 0;
-  background-image: url('https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media/plenario-publico.png');
+  background-image: url('/img/fotos/_optimized/plenario-publico.1920.webp');
   background-size: cover; background-position: center;
   opacity: 0.13; filter: grayscale(0.4) saturate(0.9);
   transform: translateY(var(--parallax-y, 0));
@@ -1831,9 +1831,9 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   transition: transform 900ms ease-out, filter 700ms ease-out;
 }
 .vitrine:hover .vitrine-img { transform: scale(1.04); filter: saturate(95%); }
-.vitrine[data-vertical="gov"] .vitrine-img { background-image: url('https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media/area-gestao-publica.png'); }
-.vitrine[data-vertical="edu"] .vitrine-img { background-image: url('https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media/area-educacao.jpg'); }
-.vitrine[data-vertical="sau"] .vitrine-img { background-image: url('https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media/area-saude.png'); }
+.vitrine[data-vertical="gov"] .vitrine-img { background-image: url('/img/fotos/_optimized/area-gestao-publica.1920.webp'); }
+.vitrine[data-vertical="edu"] .vitrine-img { background-image: url('/img/fotos/_optimized/area-educacao.1920.webp'); }
+.vitrine[data-vertical="sau"] .vitrine-img { background-image: url('/img/fotos/_optimized/area-saude.1920.webp'); }
 
 .vitrine::before {
   content: ''; position: absolute; inset: 0; z-index: 1;
@@ -1926,7 +1926,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .eventon-section--parallax { position: relative; overflow: hidden; }
 .eventon-section--parallax .eventon-parallax {
   position: absolute; inset: -60px 0 -60px 0; z-index: 0;
-  background-image: url('https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media/eventon-estudio.png');
+  background-image: url('/img/fotos/_optimized/eventon-estudio.1920.webp');
   background-size: cover; background-position: center;
   opacity: 0.18; filter: brightness(0.85) saturate(0.85);
   transform: translateY(var(--parallax-y, 0));
@@ -1942,7 +1942,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .contratacao-section--parallax { position: relative; overflow: hidden; }
 .contratacao-section--parallax .contratacao-parallax {
   position: absolute; inset: -60px 0 -60px 0; z-index: 0;
-  background-image: url('https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media/contratacao.png');
+  background-image: url('/img/fotos/_optimized/contratacao.1920.webp');
   background-size: cover; background-position: center;
   opacity: 0.22; filter: saturate(0.7);
   transform: translateY(var(--parallax-y, 0));
