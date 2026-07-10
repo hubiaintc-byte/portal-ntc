@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { authenticated } from "../access/authenticated";
 import { superAdmin, superAdminField } from "../access/superAdmin";
+import { emailRecuperacaoHtml } from "../lib/emailsCms";
 
 /**
  * Coleção Users — auth nativa do Payload, com perfis administrativos
@@ -28,6 +29,17 @@ export const Users: CollectionConfig = {
     // login é de sessão por padrão; "Manter sessão iniciada" o
     // persiste pelos 14 dias. Interim até a 2FA da Janela C (CLAUDE.md §17).
     tokenExpiration: 60 * 60 * 24 * 14,
+    forgotPassword: {
+      // 24h — validade única da coleção cobre o reset e o convite de
+      // boas-vindas (spec 2026-07-10 §3).
+      expiration: 1000 * 60 * 60 * 24,
+      generateEmailSubject: () => "Redefinição de senha — Painel Admin NTC",
+      generateEmailHTML: (args) =>
+        emailRecuperacaoHtml({
+          nome: (args?.user as { nome?: string } | undefined)?.nome ?? "",
+          token: args?.token ?? "",
+        }),
+    },
   },
   access: {
     read: authenticated,
