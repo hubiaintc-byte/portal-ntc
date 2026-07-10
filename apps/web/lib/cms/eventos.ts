@@ -47,7 +47,7 @@ import type {
   SidebarCard,
 } from "../../app/(capacitacao)/agenda/[slug]/conteudoEventos";
 
-import { lexicalToHtml } from "./lexical";
+import { lexicalParaBlocos, lexicalToHtml } from "./lexical";
 
 // ============================================================
 // Loader
@@ -139,30 +139,37 @@ function adaptarVisaoGeral(doc: EventoCMS): SecaoVisaoGeral {
 }
 
 function adaptarPublico(doc: EventoCMS): SecaoPublico {
+  // O layout renderiza intro/chips como texto escapado — usa a estrutura do
+  // documento (parágrafos → intro, itens de lista → chips), não HTML.
+  const blocos = lexicalParaBlocos(doc.publicoAlvo);
   return {
     eyebrow: "Para quem",
     h2: "Público-alvo",
-    intro: lexicalToHtml(doc.publicoAlvo),
-    chips: [],
+    intro: blocos.paragrafos.join(" "),
+    chips: blocos.itens.map((texto) => ({ texto })),
   };
 }
 
 function adaptarObjetivos(doc: EventoCMS): SecaoObjetivos {
-  const html = lexicalToHtml(doc.objetivos);
+  const blocos = lexicalParaBlocos(doc.objetivos);
+  const entradas = blocos.itens.length > 0 ? blocos.itens : blocos.paragrafos;
   return {
     eyebrow: "Objetivos",
     h2: "O que você desenvolve",
-    objetivos: html ? [{ texto: html }] : [],
+    objetivos: entradas.map((texto) => ({ texto })),
   };
 }
 
 function adaptarConteudoProgramatico(doc: EventoCMS): SecaoConteudoProgramatico {
-  const html = lexicalToHtml(doc.conteudoProgramatico);
+  const blocos = lexicalParaBlocos(doc.conteudoProgramatico);
   return {
     eyebrow: "Conteúdo",
     h2: "Conteúdo programático",
-    intro: html,
-    itens: [],
+    intro: blocos.paragrafos.join(" "),
+    itens: blocos.itens.map((texto, i) => ({
+      num: String(i + 1).padStart(2, "0"),
+      texto,
+    })),
   };
 }
 
