@@ -213,7 +213,9 @@ export function DetalheEvento({
                 onChange={(e) => mudar("modalidade", e.target.value)}
               >
                 {MODALIDADES.map((m) => (
-                  <option key={m.valor} value={m.valor}>
+                  // Modalidade é required no schema: a opção vazia é só
+                  // placeholder do import (não dá para "limpar" o campo).
+                  <option key={m.valor} value={m.valor} disabled={m.valor === ""}>
                     {m.rotulo}
                   </option>
                 ))}

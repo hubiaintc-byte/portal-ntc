@@ -16,7 +16,24 @@ export function lexicalToHtml(doc: unknown): string {
   if (!doc || typeof doc !== "object" || !("root" in doc)) return "";
   const root = (doc as { root?: { children?: unknown[] } }).root;
   if (!root?.children) return "";
-  return root.children.map(serializarNode).join("");
+  // Blocos (parágrafos, headings, itens de lista) separados por <br> — sem
+  // separador, documentos multi-bloco (import de PDF) viram texto colado.
+  return root.children
+    .map(blocoParaHtml)
+    .filter((b) => b.length > 0)
+    .join("<br>");
+}
+
+function blocoParaHtml(node: unknown): string {
+  if (!node || typeof node !== "object") return "";
+  const n = node as Record<string, unknown>;
+  if (n.type === "list" && Array.isArray(n.children)) {
+    return n.children
+      .map(serializarNode)
+      .filter((item) => item.length > 0)
+      .join("<br>");
+  }
+  return serializarNode(node);
 }
 
 function serializarNode(node: unknown): string {

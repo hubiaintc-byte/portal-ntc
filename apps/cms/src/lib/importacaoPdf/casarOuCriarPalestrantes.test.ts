@@ -49,6 +49,9 @@ describe("casarOuCriarPalestrantes", () => {
     expect(data.ocultarDoSite).toBe(true);
     expect(data.titulacao).toBe("doutorado");
     expect(data.instituicao).toBe("UNICAMP");
+    // draft:true relaxa a foto required da coleção — sem ele o create real
+    // falha validação e todo nome novo cai em pendentes.
+    expect(payload.create.mock.calls[0]?.[0]?.draft).toBe(true);
   });
 
   it("falha na criação vira pendente sem lançar", async () => {

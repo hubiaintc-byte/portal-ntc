@@ -13,6 +13,7 @@ import type { PalestranteFolder } from "./parsearFolderEvento";
 export interface PayloadPalestrantes {
   find(args: {
     collection: "especialistas";
+    /** 0 = sem limite (o adapter usa pagination:false). */
     limit: number;
     depth: 0;
     overrideAccess: true;
@@ -20,6 +21,8 @@ export interface PayloadPalestrantes {
   create(args: {
     collection: "especialistas";
     data: Record<string, unknown>;
+    /** Cria como rascunho: relaxa a foto required da coleção. */
+    draft: true;
     overrideAccess: true;
   }): Promise<{ id: string | number }>;
 }
@@ -71,7 +74,7 @@ export async function casarOuCriarPalestrantes(
 
   const existentes = await payload.find({
     collection: "especialistas",
-    limit: 500,
+    limit: 0,
     depth: 0,
     overrideAccess: true,
   });
@@ -98,6 +101,7 @@ export async function casarOuCriarPalestrantes(
           ),
           ocultarDoSite: true,
         },
+        draft: true,
         overrideAccess: true,
       });
       resultado.ids.push(criado.id);

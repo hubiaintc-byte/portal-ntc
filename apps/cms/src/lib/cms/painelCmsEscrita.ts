@@ -52,20 +52,50 @@ function ouNulo(valor: string): string | null {
   return v.length > 0 ? v : null;
 }
 
+/**
+ * Valida as linhas repetíveis antes do update: linha totalmente vazia é
+ * descartada, mas linha parcialmente preenchida sem os campos mínimos vira
+ * erro — filtrar em silêncio apagava conteúdo digitado sem aviso.
+ */
+function validarLinhas(campos: CamposEventoCompletos): string | null {
+  const progIncompleta = campos.programacaoDetalhada.findIndex(
+    (p) =>
+      [p.horario, p.titulo, p.descricao].some((v) => v.trim().length > 0) &&
+      (p.horario.trim().length === 0 || p.titulo.trim().length === 0),
+  );
+  if (progIncompleta >= 0) {
+    return `Programação detalhada: a sessão ${progIncompleta + 1} precisa de horário e título — complete ou remova a linha.`;
+  }
+  const faqIncompleta = campos.faq.findIndex(
+    (f) => f.respostaTexto.trim().length > 0 && f.pergunta.trim().length === 0,
+  );
+  if (faqIncompleta >= 0) {
+    return `Perguntas frequentes: a linha ${faqIncompleta + 1} tem resposta sem pergunta — complete ou remova a linha.`;
+  }
+  return null;
+}
+
 export async function salvarCamposEvento(
   id: string,
   campos: CamposEventoCompletos,
 ): Promise<ResultadoEscrita> {
   try {
+    const erroLinhas = validarLinhas(campos);
+    if (erroLinhas) return { ok: false, erro: erroLinhas };
+
     const payload = await obterPayload();
     await payload.update({
       collection: "eventos",
       id,
       data: {
         nome: campos.nome,
-        dataInicio: campos.dataInicio,
+        // Campo required no schema: import sem data parseada chega como "" e a
+        // chave é omitida (string vazia estoura no timestamptz do Postgres);
+        // o rascunho segue sem data até o editor preencher.
+        ...(campos.dataInicio.trim().length > 0 ? { dataInicio: campos.dataInicio } : {}),
         dataFim: ouNulo(campos.dataFim),
         resumo: campos.resumo,
+        // Também required: "" (placeholder "— selecionar —") não sobrescreve.
         ...(campos.modalidade ? { modalidade: campos.modalidade } : {}),
         cargaHoraria: campos.cargaHoraria,
         valor: ouNulo(campos.valor),
@@ -362,21 +392,35 @@ export async function criarEventoDePdf(arquivo: File): Promise<ResultadoImportac
         const palestrantes = await casarOuCriarPalestrantes(
           {
             async find(args) {
+              // pagination:false ⇒ todos os docs (o teto fixo criava
+              // duplicatas silenciosas ao passar de N especialistas); select
+              // busca só o nome — o casamento não precisa do doc inteiro.
               const r = await payload.find({
                 collection: "especialistas",
                 limit: args.limit,
+                pagination: false,
                 depth: 0,
+                select: { nome: true },
                 overrideAccess: true,
               });
-              return { docs: r.docs.map((d) => ({ id: d.id, nome: d.nome })) };
+              // Com select, o tipo projetado do Payload não estreita nome —
+              // narrowing explícito em vez de cast.
+              return {
+                docs: r.docs.map((d) => ({
+                  id: d.id,
+                  nome: typeof d.nome === "string" ? d.nome : "",
+                })),
+              };
             },
             async create(args) {
               // O objeto vem completo do casarOuCriarPalestrantes (campos
               // obrigatórios da coleção); o cast pontual evita replicar o
-              // tipo gerado do Payload na interface mockável.
+              // tipo gerado do Payload na interface mockável. draft:true é
+              // obrigatório: sem ele a foto required derruba toda criação.
               const r = await payload.create({
                 collection: "especialistas",
                 data: args.data as unknown as Parameters<typeof payload.create>[0]["data"],
+                draft: args.draft,
                 overrideAccess: true,
               });
               return { id: r.id };

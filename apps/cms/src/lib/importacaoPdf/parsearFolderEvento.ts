@@ -108,6 +108,20 @@ export function encontrarPagina(paginas: string[], chave: string): number {
   );
 }
 
+/**
+ * Índices de TODAS as páginas cujo topo contém a chave. Seções longas
+ * (programação, palestrantes) continuam em páginas seguintes repetindo o
+ * marcador no topo — ler só a primeira truncaria o resto em silêncio.
+ */
+export function encontrarPaginas(paginas: string[], chave: string): number[] {
+  const indices: number[] = [];
+  paginas.forEach((pagina, i) => {
+    const topo = pagina.split("\n").slice(0, 8);
+    if (topo.some((linha) => chaveDeLinha(linha).includes(chave))) indices.push(i);
+  });
+  return indices;
+}
+
 /** Linhas úteis da página: aparadas, sem vazias e sem o rodapé institucional. */
 function linhasDePagina(pagina: string): string[] {
   return pagina
@@ -339,93 +353,97 @@ function parsearSessoes(paginas: string[]): SessaoConteudoFolder[] {
 const HORARIO_RE = /^\d{2}h\d{2}\s*[–—-]\s*\d{2}h\d{2}$/;
 
 function parsearProgramacao(paginas: string[]): ItemProgramacaoFolder[] {
-  const idx = encontrarPagina(paginas, "PROGRAMACAODETALHADA");
-  if (idx < 0) return [];
-  const linhas = linhasDePagina(em(paginas, idx));
+  const indices = encontrarPaginas(paginas, "PROGRAMACAODETALHADA");
   const itens: ItemProgramacaoFolder[] = [];
-  let atual: ItemProgramacaoFolder | null = null;
-  let lendoTitulo = false;
-  const descricao: string[] = [];
 
-  function fecharItem() {
-    if (atual) {
-      atual.descricao = descricao.length > 0 ? descricao.join(" ").replace(/\s*·\s*/g, " · ") : null;
-      itens.push(atual);
-    }
-    descricao.length = 0;
-  }
+  for (const idx of indices) {
+    const linhas = linhasDePagina(em(paginas, idx));
+    let atual: ItemProgramacaoFolder | null = null;
+    let lendoTitulo = false;
+    const descricao: string[] = [];
 
-  for (const linha of linhas) {
-    if (HORARIO_RE.test(linha)) {
-      fecharItem();
-      atual = { horario: linha.replace(/\s+/g, " "), titulo: "", descricao: null, nomePalestrante: null };
-      lendoTitulo = true;
-      continue;
+    function fecharItem() {
+      if (atual) {
+        atual.descricao = descricao.length > 0 ? descricao.join(" ").replace(/\s*·\s*/g, " · ") : null;
+        itens.push(atual);
+      }
+      descricao.length = 0;
     }
-    if (!atual || ehLinhaMarcador(linha)) continue;
-    const com = linha.match(/^com\s+(.+)$/i);
-    if (com) {
-      lendoTitulo = false;
-      atual.nomePalestrante = ((com[1] ?? "").split("·")[0] ?? "").trim();
-      continue;
+
+    for (const linha of linhas) {
+      if (HORARIO_RE.test(linha)) {
+        fecharItem();
+        atual = { horario: linha.replace(/\s+/g, " "), titulo: "", descricao: null, nomePalestrante: null };
+        lendoTitulo = true;
+        continue;
+      }
+      if (!atual || ehLinhaMarcador(linha)) continue;
+      const com = linha.match(/^com\s+(.+)$/i);
+      if (com) {
+        lendoTitulo = false;
+        atual.nomePalestrante = ((com[1] ?? "").split("·")[0] ?? "").trim();
+        continue;
+      }
+      if (lendoTitulo) {
+        atual.titulo = atual.titulo.length > 0 ? `${atual.titulo} ${linha}` : linha;
+      } else if (linha !== "·") {
+        descricao.push(linha);
+      }
     }
-    if (lendoTitulo) {
-      atual.titulo = atual.titulo.length > 0 ? `${atual.titulo} ${linha}` : linha;
-    } else if (linha !== "·") {
-      descricao.push(linha);
-    }
+    fecharItem();
   }
-  fecharItem();
   return itens.filter((i) => i.titulo.length > 0);
 }
 
 function parsearPalestrantes(paginas: string[]): PalestranteFolder[] {
-  const idx = encontrarPagina(paginas, "CONHECANOSSOSPALESTRANTES");
-  if (idx < 0) return [];
-  const linhas = linhasDePagina(em(paginas, idx));
-
-  // Pula o marcador do topo e o subtítulo editorial (linhas até o primeiro
-  // candidato a nome: linha curta em caixa mista seguida de linha em caps).
+  const indices = encontrarPaginas(paginas, "CONHECANOSSOSPALESTRANTES");
   const palestrantes: PalestranteFolder[] = [];
-  let atual: PalestranteFolder | null = null;
-  let lendoTitulacao = false;
 
-  function ehNome(i: number): boolean {
-    const linha = em(linhas, i);
-    const proxima = i + 1 < linhas.length ? em(linhas, i + 1) : "";
-    return (
-      linha.length > 0 &&
-      !ehLinhaMarcador(linha) &&
-      !/[.:!?]$/.test(linha) &&
-      linha.split(/\s+/).length <= 6 &&
-      /^[A-ZÀ-Ü]/.test(linha) &&
-      proxima.length > 0 &&
-      ehLinhaMarcador(proxima)
-    );
-  }
+  for (const idx of indices) {
+    const linhas = linhasDePagina(em(paginas, idx));
 
-  for (let i = 0; i < linhas.length; i++) {
-    const linha = em(linhas, i);
-    if (ehNome(i)) {
-      atual = { nome: linha, linhaTitulacao: "", minicurriculo: "" };
-      palestrantes.push(atual);
-      lendoTitulacao = true;
-      continue;
+    // Pula o marcador do topo e o subtítulo editorial (linhas até o primeiro
+    // candidato a nome: linha curta em caixa mista seguida de linha em caps).
+    let atual: PalestranteFolder | null = null;
+    let lendoTitulacao = false;
+
+    function ehNome(i: number): boolean {
+      const linha = em(linhas, i);
+      const proxima = i + 1 < linhas.length ? em(linhas, i + 1) : "";
+      return (
+        linha.length > 0 &&
+        !ehLinhaMarcador(linha) &&
+        !/[.:!?]$/.test(linha) &&
+        linha.split(/\s+/).length <= 6 &&
+        /^[A-ZÀ-Ü]/.test(linha) &&
+        proxima.length > 0 &&
+        ehLinhaMarcador(proxima)
+      );
     }
-    if (!atual) continue;
-    if (ehLinhaMarcador(linha)) {
-      if (lendoTitulacao) {
-        const segmento = linha
-          .split("·")
-          .map((s) => s.replace(/\s/g, ""))
-          .join(" · ");
-        atual.linhaTitulacao =
-          atual.linhaTitulacao.length > 0 ? `${atual.linhaTitulacao} ${segmento}` : segmento;
+
+    for (let i = 0; i < linhas.length; i++) {
+      const linha = em(linhas, i);
+      if (ehNome(i)) {
+        atual = { nome: linha, linhaTitulacao: "", minicurriculo: "" };
+        palestrantes.push(atual);
+        lendoTitulacao = true;
+        continue;
       }
-      continue;
+      if (!atual) continue;
+      if (ehLinhaMarcador(linha)) {
+        if (lendoTitulacao) {
+          const segmento = linha
+            .split("·")
+            .map((s) => s.replace(/\s/g, ""))
+            .join(" · ");
+          atual.linhaTitulacao =
+            atual.linhaTitulacao.length > 0 ? `${atual.linhaTitulacao} ${segmento}` : segmento;
+        }
+        continue;
+      }
+      lendoTitulacao = false;
+      atual.minicurriculo = atual.minicurriculo.length > 0 ? `${atual.minicurriculo} ${linha}` : linha;
     }
-    lendoTitulacao = false;
-    atual.minicurriculo = atual.minicurriculo.length > 0 ? `${atual.minicurriculo} ${linha}` : linha;
   }
   return palestrantes;
 }

@@ -1703,7 +1703,7 @@ body {
 }
 .pcms-editor__hint {
   font-size: 0.78rem;
-  color: var(--pcms-cinza, #6b7280);
+  color: var(--pcms-grafite-suave);
   margin: 4px 0 14px;
 }
 .pcms-editor__linha {
