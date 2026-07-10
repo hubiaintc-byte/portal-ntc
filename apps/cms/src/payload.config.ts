@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { resendAdapter } from "@payloadcms/email-resend";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { en } from "@payloadcms/translations/languages/en";
@@ -42,8 +43,23 @@ const bucket = process.env.SUPABASE_BUCKET || "ntc-portal-media";
  * Cliente) e operacionais (Lead, AuditLog) + Globals (Home, Rodape) conforme
  * docs/11_Schema_Payload_CMS_v1.md §§4-14.
  */
+// EMAIL_REMETENTE no formato 'Nome <email@dominio>'. Sem RESEND_API_KEY o
+// Payload mantém o comportamento default (e-mail logado no console) — dev
+// continua testável e nada quebra em prod até a chave existir.
+const remetente = process.env.EMAIL_REMETENTE ?? "Painel NTC <nao-responda@institutontc.com.br>";
+const mRemetente = remetente.match(/^(.*)<([^>]+)>\s*$/);
+
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
+  ...(process.env.RESEND_API_KEY
+    ? {
+        email: resendAdapter({
+          apiKey: process.env.RESEND_API_KEY,
+          defaultFromAddress: mRemetente?.[2]?.trim() ?? remetente,
+          defaultFromName: mRemetente?.[1]?.trim() ?? "Painel NTC",
+        }),
+      }
+    : {}),
   // A UI do admin Payload foi removida — o painel próprio em / (route group
   // (painel)) é o único admin. `user` continua definindo a collection de
   // autenticação usada por payload.login()/payload.auth().
