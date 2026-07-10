@@ -439,7 +439,9 @@ export const CARDS_FEATURED: CardFeatured[] = [
     atuacao: "controle",
     cmsLink: "perfil-vital-do-rego",
     nome: "Min. Vital do Rêgo Filho",
-    imagemSrc: "/img/fotos/_optimized/autoridade-tcu.1920.webp",
+    // autoridade-tcu não existe em _optimized — usa a foto de plenário
+    // (mesma família dos demais cards de autoridade) até haver retrato oficial.
+    imagemSrc: "/img/fotos/_optimized/autoridade-contratacoes2.1920.webp",
     imagemAlt:
       "Min. Vital do Rêgo Filho · Presidente do Tribunal de Contas da União, controle externo e governança pública",
     axisBadge: "Gestão Pública · Controle e governança",

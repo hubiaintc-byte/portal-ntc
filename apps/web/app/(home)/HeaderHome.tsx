@@ -149,9 +149,9 @@ export function HeaderHome() {
             <Link className="btn btn--secondary btn--mini" href="/contato?assunto=proposta">
               Solicitar proposta
             </Link>
-            <a className="btn btn--participant btn--mini" href="#eventon">
+            <Link className="btn btn--participant btn--mini" href="/#eventon">
               Área do Participante
-            </a>
+            </Link>
             <button
               type="button"
               className="mobile-toggle"
@@ -358,22 +358,22 @@ export function HeaderHome() {
                     </Link>
                   </li>
                   <li>
-                    <a href="#eventos-abertos">
+                    <Link href="/#eventos-abertos">
                       <strong>Eventos online</strong>
                       <span>Transmissão ao vivo, replay e certificado</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#eventos-abertos">
+                    <Link href="/#eventos-abertos">
                       <strong>Eventos presenciais</strong>
                       <span>Encontros executivos em capitais estratégicas</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#eventos-abertos">
+                    <Link href="/#eventos-abertos">
                       <strong>Eventos híbridos</strong>
                       <span>Combinação de presença e plataforma digital</span>
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -381,28 +381,28 @@ export function HeaderHome() {
                 <h4>Plataforma e curadoria</h4>
                 <ul className="mega-list">
                   <li>
-                    <a href="#eventon">
+                    <Link href="/#eventon">
                       <strong>EventOn</strong>
                       <span>Plataforma de acesso, replay e certificado do Grupo NTC</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#eventon">
+                    <Link href="/#eventon">
                       <strong>Área do Participante</strong>
                       <span>Histórico de eventos, materiais e certificados</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#capacitacao">
+                    <Link href="/#capacitacao">
                       <strong>Próximas turmas</strong>
                       <span>Turmas em formação e inscrições antecipadas</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#capacitacao">
+                    <Link href="/#capacitacao">
                       <strong>Eventos passados</strong>
                       <span>Acervo de eventos realizados com replay disponível</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <Link href="/o-grupo/corpo-docente">
@@ -441,9 +441,9 @@ export function HeaderHome() {
           </button>
         </div>
         <nav className="drawer-nav" aria-label="Navegação móvel">
-          <a className="drawer-item" href="#sobre" onClick={() => setDrawerAberto(false)}>
+          <Link className="drawer-item" href="/#sobre" onClick={() => setDrawerAberto(false)}>
             Grupo NTC
-          </a>
+          </Link>
 
           <button
             type="button"
@@ -460,7 +460,7 @@ export function HeaderHome() {
             <Link href="/programas/agip"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></Link>
             <Link href="/programas/lidera"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></Link>
             <Link href="/programas/prosus"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></Link>
-            <a href="#programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></a>
+            <Link href="/#programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></Link>
           </div>
 
           <button
@@ -473,11 +473,11 @@ export function HeaderHome() {
           </button>
           <div className={`drawer-sub ${subDrawerAberto["capacitacao-mobile"] ? "is-open" : ""}`}>
             <Link href="/agenda"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></Link>
-            <a href="#eventos-abertos"><strong>Eventos online</strong><span>Ao vivo + replay</span></a>
-            <a href="#eventos-abertos"><strong>Eventos presenciais</strong><span>Capitais estratégicas</span></a>
-            <a href="#eventos-abertos"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></a>
-            <a href="#eventon"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></a>
-            <a href="#eventon"><strong>Área do Participante</strong><span>Materiais e certificados</span></a>
+            <Link href="/#eventos-abertos"><strong>Eventos online</strong><span>Ao vivo + replay</span></Link>
+            <Link href="/#eventos-abertos"><strong>Eventos presenciais</strong><span>Capitais estratégicas</span></Link>
+            <Link href="/#eventos-abertos"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></Link>
+            <Link href="/#eventon"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></Link>
+            <Link href="/#eventon"><strong>Área do Participante</strong><span>Materiais e certificados</span></Link>
             <Link href="/o-grupo/corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica das 3 verticais</span></Link>
           </div>
 
@@ -517,9 +517,9 @@ export function HeaderHome() {
           <Link className="btn btn--gold" href="/contato?assunto=proposta">
             Solicitar proposta
           </Link>
-          <a className="btn btn--participant" href="#eventon">
+          <Link className="btn btn--participant" href="/#eventon">
             Área do Participante
-          </a>
+          </Link>
         </div>
       </aside>
     </>

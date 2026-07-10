@@ -104,7 +104,7 @@ export default function MapaDoSitePage() {
                     <h3>Corpo Docente <small>Especialistas das 3 áreas</small></h3>
                     <ul>
                       <li><Link href="/o-grupo/corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica e especialistas</span></Link></li>
-                      <li><a href="#"><strong>Agenda Geral</strong><span>Próximos eventos abertos no calendário</span></a>{/* rota /agenda não portada */}</li>
+                      <li><Link href="/agenda"><strong>Agenda Geral</strong><span>Próximos eventos abertos no calendário</span></Link></li>
                     </ul>
                   </div>
                 </div>
@@ -193,18 +193,18 @@ export default function MapaDoSitePage() {
                     <span className="sitemap-col-num">Agenda e formatos</span>
                     <h3>Agenda <small>Eventos abertos · próximas turmas</small></h3>
                     <ul>
-                      <li><a href="#"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></a>{/* rota /agenda não portada */}</li>
-                      <li><a href="#"><strong>Evento · PROSUS+ · Brasília</strong><span>Página de evento · presencial</span></a>{/* rota /eventos/... não portada */}</li>
-                      <li><a href="#"><strong>Evento · EDUTEC · Online</strong><span>Página de evento · módulo online</span></a>{/* rota /eventos/... não portada */}</li>
-                      <li><a href="#"><strong>Evento · AGIP · Híbrido</strong><span>Página de evento · híbrido</span></a>{/* rota /eventos/... não portada */}</li>
+                      <li><Link href="/agenda"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></Link></li>
+                      <li><Link href="/agenda/prosus-brasilia"><strong>Evento · PROSUS+ · Brasília</strong><span>Página de evento · presencial</span></Link></li>
+                      <li><Link href="/agenda/edutec-m01-2026"><strong>Evento · EDUTEC · Online</strong><span>Página de evento · módulo online</span></Link></li>
+                      <li><Link href="/agenda"><strong>Evento · AGIP · Híbrido</strong><span>Página de evento · híbrido</span></Link>{/* página do AGIP híbrido ainda não portada — aponta para a agenda */}</li>
                     </ul>
                   </div>
                   <div className="sitemap-col">
                     <span className="sitemap-col-num">Plataforma EventOn</span>
                     <h3>EventOn <small>Ambiente digital institucional</small></h3>
                     <ul>
-                      <li><a href="#"><strong>EventOn</strong><span>Plataforma · recursos · suporte</span></a>{/* rota /eventon não portada */}</li>
-                      <li><a href="#"><strong>Área do Participante</strong><span>Hub logado do participante</span></a>{/* rota /area-do-participante não portada */}</li>
+                      <li><Link href="/o-grupo#eventon"><strong>EventOn</strong><span>Plataforma · recursos · suporte</span></Link></li>
+                      <li><Link href="/#eventon"><strong>Área do Participante</strong><span>Hub logado do participante</span></Link>{/* hub logado ainda não existe — aponta para a seção EventOn */}</li>
                       <li><Link href="/o-grupo/corpo-docente"><strong>Corpo Docente</strong><span>Curadoria das 3 áreas</span></Link></li>
                     </ul>
                   </div>
@@ -221,11 +221,11 @@ export default function MapaDoSitePage() {
                     <span className="sitemap-col-num">Modelos de contratação</span>
                     <h3>Soluções <small>Como o Grupo NTC contrata</small></h3>
                     <ul>
-                      <li><a href="#"><strong>Soluções</strong><span>Página comercial · 4 modalidades canon</span></a>{/* rota /solucoes não portada */}</li>
-                      <li><a href="#"><strong>In company</strong><span>Programa entregue à instituição</span></a>{/* rota /solucoes#in-company não portada */}</li>
-                      <li><a href="#"><strong>Turmas fechadas</strong><span>Edição operacional dedicada</span></a>{/* rota /solucoes#turmas-fechadas não portada */}</li>
-                      <li><a href="#"><strong>Sob medida</strong><span>Customização profunda</span></a>{/* rota /solucoes#sob-medida não portada */}</li>
-                      <li><a href="#"><strong>Contratação institucional</strong><span>Atendimento dedicado · órgãos públicos</span></a>{/* rota /solucoes#contratacao-institucional não portada */}</li>
+                      <li><Link href="/solucoes"><strong>Soluções</strong><span>Página comercial · 4 modalidades canon</span></Link></li>
+                      <li><Link href="/solucoes#modalidades"><strong>In company</strong><span>Programa entregue à instituição</span></Link></li>
+                      <li><Link href="/solucoes#modalidades"><strong>Turmas fechadas</strong><span>Edição operacional dedicada</span></Link></li>
+                      <li><Link href="/solucoes#modalidades"><strong>Sob medida</strong><span>Customização profunda</span></Link></li>
+                      <li><Link href="/solucoes#contratacao-institucional"><strong>Contratação institucional</strong><span>Atendimento dedicado · órgãos públicos</span></Link></li>
                     </ul>
                   </div>
                   <div className="sitemap-col">
@@ -281,7 +281,7 @@ export default function MapaDoSitePage() {
           <h2>Não encontrou o que procurava? <em>Fale direto com o time institucional.</em></h2>
           <p>O atendimento institucional do Grupo NTC está pronto para orientar sobre programas, eventos, contratação e suporte ao participante. A Agenda Geral concentra todos os eventos abertos com inscrição disponível.</p>
           <div className="legal-cta-final-actions">
-            <a className="btn btn--gold" href="#" data-cms-link="atendimento-institucional">Falar com o atendimento institucional →</a>{/* rota /contato não portada */}<a className="btn btn--ghost-light" href="#" data-cms-link="agenda-geral">Ver a Agenda Geral NTC</a>{/* rota /agenda não portada */}
+            <Link className="btn btn--gold" href="/contato" data-cms-link="atendimento-institucional">Falar com o atendimento institucional →</Link><Link className="btn btn--ghost-light" href="/agenda" data-cms-link="agenda-geral">Ver a Agenda Geral NTC</Link>
           </div>
         </div>
       </section>

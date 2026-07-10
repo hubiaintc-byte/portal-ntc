@@ -30,13 +30,13 @@ export function FooterHome() {
           <div className="footer-col">
             <h5>Navegação</h5>
             <ul>
-              <li><a href="#sobre">Grupo NTC</a></li>
-              <li><a href="#programas">Programas</a></li>
-              <li><a href="#capacitacao">Capacitação</a></li>
-              <li><a href="#solucoes">Soluções</a></li>
+              <li><Link href="/#sobre">Grupo NTC</Link></li>
+              <li><Link href="/#programas">Programas</Link></li>
+              <li><Link href="/#capacitacao">Capacitação</Link></li>
+              <li><Link href="/#solucoes">Soluções</Link></li>
               <li><Link href="/conteudos">Conteúdos</Link></li>
               <li><Link href="/o-grupo/corpo-docente">Corpo Docente</Link></li>
-              <li><a href="#eventon">EventOn</a></li>
+              <li><Link href="/#eventon">EventOn</Link></li>
               <li><Link href="/contato">Contato</Link></li>
             </ul>
           </div>
@@ -44,25 +44,25 @@ export function FooterHome() {
           <div className="footer-col">
             <h5>Verticais</h5>
             <ul>
-              <li><a href="#programas">NTC Educação</a></li>
-              <li><a href="#programas">NTC Gestão Pública</a></li>
-              <li><a href="#programas">NTC Saúde</a></li>
-              <li><a href="#contratacao">Soluções in company</a></li>
-              <li><a href="#contratacao">Turmas fechadas</a></li>
-              <li><a href="#contratacao">Soluções sob medida</a></li>
-              <li><a href="#contratacao">Contratação institucional</a></li>
+              <li><Link href="/#programas">NTC Educação</Link></li>
+              <li><Link href="/#programas">NTC Gestão Pública</Link></li>
+              <li><Link href="/#programas">NTC Saúde</Link></li>
+              <li><Link href="/#contratacao">Soluções in company</Link></li>
+              <li><Link href="/#contratacao">Turmas fechadas</Link></li>
+              <li><Link href="/#contratacao">Soluções sob medida</Link></li>
+              <li><Link href="/#contratacao">Contratação institucional</Link></li>
             </ul>
           </div>
 
           <div className="footer-col">
             <h5>Atendimento</h5>
             <ul>
-              <li><a href="#eventos-abertos">Eventos com inscrições abertas</a></li>
+              <li><Link href="/#eventos-abertos">Eventos com inscrições abertas</Link></li>
               <li><Link href="/contato?assunto=proposta">Solicitar proposta</Link></li>
               <li><Link href="/contato">Inscrever equipe</Link></li>
               <li><Link href="/contato">Atendimento comercial</Link></li>
-              <li><a href="#eventon">Suporte ao participante</a></li>
-              <li><a href="#eventon">Área do Participante</a></li>
+              <li><Link href="/#eventon">Suporte ao participante</Link></li>
+              <li><Link href="/#eventon">Área do Participante</Link></li>
               <li><Link href="/contato">WhatsApp · (63) 98444-4040</Link></li>
             </ul>
           </div>
