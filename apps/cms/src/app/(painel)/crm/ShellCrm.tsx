@@ -18,6 +18,9 @@ import { carregarClienteCrm, carregarOportunidadeCrm } from "../acoesCrm";
 import { DetalheLead } from "../DetalheLead";
 import { TelaLeads } from "../TelaLeads";
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
+import { DetalheCliente } from "./DetalheCliente";
+import { FormCliente } from "./FormCliente";
+import { TelaClientes } from "./TelaClientes";
 import { TelaPainelComercial } from "./TelaPainelComercial";
 
 interface ShellCrmProps {
@@ -110,14 +113,11 @@ export function ShellCrm({
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
   const [carregando, iniciarCarga] = useTransition();
 
-  // Consumidos pelas Tasks 10-12 (telas de Clientes/Contatos/Oportunidades);
+  // Consumidos pelas Tasks 11-12 (telas de Contatos/Oportunidades);
   // ainda sem uso nesta task — ShellCrm já recebe tudo para não precisar
   // recablear a rota depois.
-  void clientes;
   void contatos;
   void catalogo;
-  void usuarios;
-  void setFormAberto;
 
   function fecharTudo() {
     setClienteDet(null);
@@ -137,7 +137,6 @@ export function ShellCrm({
       if (det) setClienteDet(det);
     });
   }
-  void abrirCliente;
 
   function abrirOportunidade(id: string) {
     iniciarCarga(async () => {
@@ -168,10 +167,24 @@ export function ShellCrm({
       {/* Detalhes e formulários em tela cheia têm precedência sobre a tela ativa. */}
       {leadDet ? (
         <DetalheLead lead={leadDet} onVoltar={() => setLeadDet(null)} />
+      ) : formAberto?.entidade === "cliente" ? (
+        <FormCliente
+          inicial={formAberto.inicial}
+          usuarios={usuarios}
+          onSalvo={fecharTudo}
+          onCancelar={fecharTudo}
+        />
       ) : formAberto ? (
         <PlaceholderConstrucao onVoltar={fecharTudo} />
       ) : clienteDet ? (
-        <PlaceholderConstrucao onVoltar={fecharTudo} />
+        <DetalheCliente
+          cliente={clienteDet}
+          onVoltar={fecharTudo}
+          onEditar={() => setFormAberto({ entidade: "cliente", inicial: clienteDet })}
+          onAbrirOportunidade={abrirOportunidade}
+          onNovaOportunidade={() => setFormAberto({ entidade: "oportunidade", inicial: null })}
+          onNovoContato={() => setFormAberto({ entidade: "contato", inicial: null })}
+        />
       ) : oportunidadeDet ? (
         <PlaceholderConstrucao onVoltar={fecharTudo} />
       ) : (
@@ -186,7 +199,13 @@ export function ShellCrm({
             />
           )}
           {tela === "leads" && <TelaLeads leads={leads} onAbrir={abrirLead} />}
-          {tela === "clientes" && <PlaceholderConstrucao />}
+          {tela === "clientes" && (
+            <TelaClientes
+              clientes={clientes}
+              onAbrir={abrirCliente}
+              onNovo={() => setFormAberto({ entidade: "cliente", inicial: null })}
+            />
+          )}
           {tela === "contatos" && <PlaceholderConstrucao />}
           {tela === "oportunidades" && <PlaceholderConstrucao />}
         </>
@@ -195,7 +214,7 @@ export function ShellCrm({
   );
 }
 
-/** Temporário — substituído pelas telas reais nas Tasks 10-12. */
+/** Temporário — substituído pelas telas reais de Contatos/Oportunidades nas Tasks 11-12. */
 function PlaceholderConstrucao({ onVoltar }: { onVoltar?: () => void }) {
   return (
     <div className="pcms-pagehead">
