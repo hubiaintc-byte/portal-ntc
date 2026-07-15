@@ -1757,3 +1757,67 @@ body {
   padding-left: 18px;
   line-height: 1.6;
 }
+
+/* =====================================================================
+   Seletor de módulo (Site | CRM) — extensão Fase A do portal unificado
+   ===================================================================== */
+.pcms-modulos {
+  display: flex;
+  margin: 0 22px 18px;
+  border: 1px solid rgba(244, 239, 230, 0.28);
+}
+.pcms-modulos__opcao {
+  flex: 1;
+  padding: 8px 0 7px;
+  text-align: center;
+  font-family: var(--font-corpo-cond, var(--font-corpo)), "Barlow", sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 230, 0.68);
+  text-decoration: none;
+}
+.pcms-modulos__opcao + .pcms-modulos__opcao {
+  border-left: 1px solid rgba(244, 239, 230, 0.28);
+}
+.pcms-modulos__opcao--ativa {
+  background: rgba(181, 153, 90, 0.16);
+  color: var(--pcms-dourado);
+  box-shadow: inset 0 -2px 0 var(--pcms-dourado);
+}
+.pcms-modulos__opcao:focus-visible {
+  outline: 2px solid var(--pcms-dourado);
+  outline-offset: -2px;
+}
+
+/* Selos semânticos (padrão trazido do CRM, re-tokenizado Soberana) */
+.pcms-selo--ok {
+  background: rgba(63, 107, 63, 0.12);
+  color: var(--pcms-sucesso);
+}
+.pcms-selo--atencao {
+  background: rgba(181, 153, 90, 0.18);
+  color: #7a6330;
+}
+.pcms-selo--erro {
+  background: rgba(154, 27, 27, 0.1);
+  color: var(--pcms-erro);
+}
+.pcms-selo--info {
+  background: rgba(30, 78, 140, 0.1);
+  color: var(--pcms-oxford-claro);
+}
+
+/* Aviso inline de formulário (sucesso/erro de Server Action) */
+.pcms-form-aviso {
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  border-left: 3px solid var(--pcms-sucesso);
+  background: rgba(63, 107, 63, 0.08);
+  color: var(--pcms-grafite);
+}
+.pcms-form-aviso--erro {
+  border-left-color: var(--pcms-erro);
+  background: rgba(154, 27, 27, 0.06);
+}

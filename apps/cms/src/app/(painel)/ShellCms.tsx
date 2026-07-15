@@ -12,7 +12,7 @@ import type {
 } from "@/lib/cms/painelCms";
 
 import { carregarEvento, carregarLead, carregarPalestrante } from "./acoes";
-import { sair } from "./acoesAuth";
+import { ShellPainel, type GrupoNav } from "./shell/ShellPainel";
 import { TelaDashboard } from "./TelaDashboard";
 import { TelaHome } from "./TelaHome";
 import { TelaPalestrantes } from "./TelaPalestrantes";
@@ -113,14 +113,6 @@ const CRUMB: Record<TelaId, string> = {
   config: "Sistema · Configurações",
 };
 
-/** Iniciais para o avatar da sidebar ("Maria Souza" → "MS"). */
-function iniciais(nome: string): string {
-  const partes = nome.trim().split(/\s+/);
-  const primeira = partes[0]?.[0] ?? "";
-  const ultima = partes.length > 1 ? (partes[partes.length - 1]?.[0] ?? "") : "";
-  return (primeira + ultima).toUpperCase() || "NT";
-}
-
 export function ShellCms({
   usuario,
   eventos,
@@ -169,149 +161,66 @@ export function ShellCms({
     setTela(id);
   }
 
-  function renderItem(item: ItemNav) {
-    return (
-      <button
-        key={item.id}
-        type="button"
-        className={`pcms-nav__item${tela === item.id ? " pcms-nav__item--ativo" : ""}`}
-        aria-current={tela === item.id ? "page" : undefined}
-        onClick={() => irPara(item.id)}
-      >
-        {item.icone}
-        {item.rotulo}
-      </button>
-    );
-  }
-
   const detalheAberto = eventoDet ?? palestranteDet ?? leadDet;
 
+  const grupos: GrupoNav[] = [
+    { rotulo: "Editorial", itens: NAV_PRINCIPAL },
+    { rotulo: "Comercial", itens: NAV_COMERCIAL },
+    { rotulo: "Sistema", itens: NAV_SISTEMA },
+  ];
+
   return (
-    <div className="pcms-root">
-      <aside className="pcms-sidebar">
-        <div className="pcms-sidebar__brand">
-          {/* Logo NTC simplificado para a sidebar escura (lockup vertical). */}
-          <svg
-            className="pcms-sidebar__logo"
-            viewBox="0 0 80 80"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect x="6" y="20" width="14" height="40" rx="2" fill="#B5995A" />
-            <text
-              x="44"
-              y="54"
-              textAnchor="middle"
-              fontFamily="Georgia, serif"
-              fontSize="34"
-              fontWeight="600"
-              fill="#F4EFE6"
-            >
-              N
-            </text>
-          </svg>
-          <div className="pcms-sidebar__wordmark">
-            <strong>Grupo NTC</strong>
-            <span>Painel Admin</span>
-          </div>
-        </div>
-
-        <nav className="pcms-nav" aria-label="Navegação principal do CMS">
-          <div className="pcms-nav__group">
-            <p className="pcms-nav__label">Editorial</p>
-            {NAV_PRINCIPAL.map(renderItem)}
-          </div>
-          <div className="pcms-nav__group">
-            <p className="pcms-nav__label">Comercial</p>
-            {NAV_COMERCIAL.map(renderItem)}
-          </div>
-          <div className="pcms-nav__group">
-            <p className="pcms-nav__label">Sistema</p>
-            {NAV_SISTEMA.map(renderItem)}
-          </div>
-        </nav>
-
-        <div className="pcms-sidebar__foot">
-          <div className="pcms-avatar-mini">{iniciais(usuario.nome)}</div>
-          <div>
-            <strong>{usuario.nome}</strong>
-            <span>{usuario.email}</span>
-          </div>
-          <form action={sair} className="pcms-sair__form">
-            <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M9 4H5v16h4" />
-                <path d="m14 8 4 4-4 4" />
-                <path d="M18 12H9" />
-              </svg>
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      <div className="pcms-main">
-        <header className="pcms-topbar">
-          <div className="pcms-topbar__crumb">
-            Grupo NTC · <b>{CRUMB[tela]}</b>
-          </div>
-          <label className="pcms-search">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-            <input type="search" placeholder="Buscar no portal…" aria-label="Buscar" />
-          </label>
-        </header>
-
-        <main className="pcms-content" aria-busy={carregando}>
-          {carregando && <div className="pcms-carregando">Carregando…</div>}
-
-          {eventoDet ? (
-            <DetalheEvento
-              key={eventoDet.id}
-              evento={eventoDet}
-              palestrantesDisponiveis={palestrantes}
-              edicaoInicial={eventoEmEdicao}
-              onVoltar={() => {
-                setEventoDet(null);
-                setEventoEmEdicao(false);
-              }}
-            />
-          ) : palestranteDet ? (
-            <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
-          ) : leadDet ? (
-            <DetalheLead lead={leadDet} onVoltar={() => setLeadDet(null)} />
-          ) : (
-            !detalheAberto && (
-              <>
-                {tela === "dashboard" && (
-                  <TelaDashboard
-                    eventos={eventos}
-                    palestrantes={palestrantes}
-                    leads={leads}
-                    erroLeitura={erroLeitura}
-                  />
-                )}
-                {tela === "palestrantes" && (
-                  <TelaPalestrantes palestrantes={palestrantes} onAbrir={abrirPalestrante} />
-                )}
-                {tela === "eventos" && (
-                  <TelaEventos
-                    eventos={eventos}
-                    onAbrir={abrirEvento}
-                    onAbrirImportado={(id) => abrirEvento(id, true)}
-                  />
-                )}
-                {tela === "home" && (
-                  <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />
-                )}
-                {tela === "leads" && <TelaLeads leads={leads} onAbrir={abrirLead} />}
-                {tela === "config" && <TelaConfiguracoes />}
-              </>
-            )
-          )}
-        </main>
-      </div>
-    </div>
+    <ShellPainel
+      modulo="site"
+      usuario={usuario}
+      grupos={grupos}
+      telaAtiva={tela}
+      onIrPara={(id) => irPara(id as TelaId)}
+      breadcrumb={CRUMB[tela]}
+      carregando={carregando}
+    >
+      {eventoDet ? (
+        <DetalheEvento
+          key={eventoDet.id}
+          evento={eventoDet}
+          palestrantesDisponiveis={palestrantes}
+          edicaoInicial={eventoEmEdicao}
+          onVoltar={() => {
+            setEventoDet(null);
+            setEventoEmEdicao(false);
+          }}
+        />
+      ) : palestranteDet ? (
+        <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
+      ) : leadDet ? (
+        <DetalheLead lead={leadDet} onVoltar={() => setLeadDet(null)} />
+      ) : (
+        !detalheAberto && (
+          <>
+            {tela === "dashboard" && (
+              <TelaDashboard
+                eventos={eventos}
+                palestrantes={palestrantes}
+                leads={leads}
+                erroLeitura={erroLeitura}
+              />
+            )}
+            {tela === "palestrantes" && (
+              <TelaPalestrantes palestrantes={palestrantes} onAbrir={abrirPalestrante} />
+            )}
+            {tela === "eventos" && (
+              <TelaEventos
+                eventos={eventos}
+                onAbrir={abrirEvento}
+                onAbrirImportado={(id) => abrirEvento(id, true)}
+              />
+            )}
+            {tela === "home" && <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />}
+            {tela === "leads" && <TelaLeads leads={leads} onAbrir={abrirLead} />}
+            {tela === "config" && <TelaConfiguracoes />}
+          </>
+        )
+      )}
+    </ShellPainel>
   );
 }
