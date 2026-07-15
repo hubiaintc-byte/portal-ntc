@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { RequiredDataFromCollectionSlug } from "payload";
+
 import { casarOuCriarPalestrantes } from "@/lib/importacaoPdf/casarOuCriarPalestrantes";
 import { textoParaLexical } from "@/lib/lexicalBuilders";
 import { extrairTextoPdf } from "@/lib/importacaoPdf/extrairTextoPdf";
@@ -84,6 +86,14 @@ export async function salvarCamposEvento(
     if (erroLinhas) return { ok: false, erro: erroLinhas };
 
     const payload = await obterPayload();
+    // Os builders de lexicalBuilders.ts tipam `children` como `unknown[]`
+    // (nós heterogêneos: parágrafo/heading/lista); o Payload aceita qualquer
+    // array de nós JSON em runtime (validação é do editor Lexical
+    // configurado na coleção, não deste shape estreito de TS) — cast pontual
+    // nos três campos richText e no array de FAQ que os contém.
+    type EventoRichText = RequiredDataFromCollectionSlug<"eventos">["publicoAlvo"];
+    type EventoFaq = RequiredDataFromCollectionSlug<"eventos">["faq"];
+    type EventoModalidade = RequiredDataFromCollectionSlug<"eventos">["modalidade"];
     await payload.update({
       collection: "eventos",
       id,
@@ -96,7 +106,11 @@ export async function salvarCamposEvento(
         dataFim: ouNulo(campos.dataFim),
         resumo: campos.resumo,
         // Também required: "" (placeholder "— selecionar —") não sobrescreve.
-        ...(campos.modalidade ? { modalidade: campos.modalidade } : {}),
+        // O <select> do formulário só oferece as opções válidas da coleção
+        // (online/presencial/hibrido) — cast reflete essa garantia da UI.
+        ...(campos.modalidade
+          ? { modalidade: campos.modalidade as EventoModalidade }
+          : {}),
         cargaHoraria: campos.cargaHoraria,
         valor: ouNulo(campos.valor),
         linkInscricaoExterna: ouNulo(campos.linkInscricaoExterna),
@@ -108,9 +122,9 @@ export async function salvarCamposEvento(
         },
         replayDisponivel: campos.replayDisponivel,
         prazoReplay: ouNulo(campos.prazoReplay),
-        publicoAlvo: textoParaLexical(campos.publicoAlvoTexto),
-        objetivos: textoParaLexical(campos.objetivosTexto),
-        conteudoProgramatico: textoParaLexical(campos.conteudoProgramaticoTexto),
+        publicoAlvo: textoParaLexical(campos.publicoAlvoTexto) as EventoRichText,
+        objetivos: textoParaLexical(campos.objetivosTexto) as EventoRichText,
+        conteudoProgramatico: textoParaLexical(campos.conteudoProgramaticoTexto) as EventoRichText,
         programacaoDetalhada: campos.programacaoDetalhada
           .filter((p) => p.horario.trim().length > 0 && p.titulo.trim().length > 0)
           .map((p) => ({ horario: p.horario, titulo: p.titulo, descricao: ouNulo(p.descricao) })),
@@ -119,7 +133,7 @@ export async function salvarCamposEvento(
           .map((d) => ({ titulo: ouNulo(d.titulo), descricao: ouNulo(d.descricao) })),
         faq: campos.faq
           .filter((f) => f.pergunta.trim().length > 0)
-          .map((f) => ({ pergunta: f.pergunta, resposta: textoParaLexical(f.respostaTexto) })),
+          .map((f) => ({ pergunta: f.pergunta, resposta: textoParaLexical(f.respostaTexto) })) as EventoFaq,
       },
       // draft: true mantém o documento no mesmo estado de publicação (rascunho
       // continua rascunho); não força publish.
@@ -417,9 +431,12 @@ export async function criarEventoDePdf(arquivo: File): Promise<ResultadoImportac
               // obrigatórios da coleção); o cast pontual evita replicar o
               // tipo gerado do Payload na interface mockável. draft:true é
               // obrigatório: sem ele a foto required derruba toda criação.
+              // Fixado no slug literal "especialistas" (em vez de extrair de
+              // Parameters<typeof payload.create>) para que o tipo narrow
+              // para Especialista, não para a união de todas as coleções.
               const r = await payload.create({
                 collection: "especialistas",
-                data: args.data as unknown as Parameters<typeof payload.create>[0]["data"],
+                data: args.data as unknown as RequiredDataFromCollectionSlug<"especialistas">,
                 draft: args.draft,
                 overrideAccess: true,
               });
@@ -446,12 +463,19 @@ export async function criarEventoDePdf(arquivo: File): Promise<ResultadoImportac
 
     const evento = await payload.create({
       collection: "eventos",
+      // `camposDoPdf` é Record<string, unknown> (vindo do parser do PDF,
+      // campos variáveis) e o rascunho é criado propositalmente sem
+      // slug/area/dataInicio/modalidade — ver comentário da função acima:
+      // `versions.drafts: true` na coleção faz o Payload relaxar os campos
+      // required quando `draft: true`, então o cast reflete uma garantia de
+      // runtime que o tipo gerado (pensado para o registro completo) não
+      // expressa.
       data: {
         ...camposDoPdf,
         nome,
         folderPdf: media.id,
         _status: "draft",
-      },
+      } as RequiredDataFromCollectionSlug<"eventos">,
       draft: true,
       overrideAccess: true,
     });
