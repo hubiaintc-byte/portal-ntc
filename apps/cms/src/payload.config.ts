@@ -100,10 +100,10 @@ export default buildConfig({
     schemaOutputFile: path.resolve(dirname, "generated-schema.graphql"),
   },
   db: postgresAdapter({
-    // push desabilitado: o dev-mode do drizzle re-puxa o schema do banco
-    // remoto a cada request do Next (segundos por página) e um push
-    // acidental pode descartar dados. Migrações de schema são manuais.
-    push: false,
+    // push desabilitado por padrão (dev-mode do drizzle re-puxa o schema a cada
+    // request e um push acidental pode descartar dados). Sincronização de schema
+    // é manual e pontual: PAYLOAD_DB_PUSH=1 pnpm payload:push:schema.
+    push: process.env.PAYLOAD_DB_PUSH === "1",
     pool: {
       connectionString: process.env.DATABASE_URI || "",
     },
