@@ -12,13 +12,16 @@ import sharp from "sharp";
 
 import { Areas } from "./collections/Areas";
 import { AuditLog } from "./collections/AuditLog";
+import { ClientesCrm } from "./collections/ClientesCrm";
 import { Clientes } from "./collections/Clientes";
+import { ContatosCrm } from "./collections/ContatosCrm";
 import { Conteudos } from "./collections/Conteudos";
 import { Especialistas } from "./collections/Especialistas";
 import { Eventos } from "./collections/Eventos";
 import { Leads } from "./collections/Leads";
 import { Media } from "./collections/Media";
 import { Modulos } from "./collections/Modulos";
+import { Oportunidades } from "./collections/Oportunidades";
 import { Programas } from "./collections/Programas";
 import { Users } from "./collections/Users";
 import { CorpoDocente } from "./globals/CorpoDocente";
@@ -81,6 +84,9 @@ export default buildConfig({
     Conteudos,
     Clientes,
     Leads,
+    ClientesCrm,
+    ContatosCrm,
+    Oportunidades,
     AuditLog,
   ],
   globals: [Home, OGrupo, CorpoDocente, Rodape],
