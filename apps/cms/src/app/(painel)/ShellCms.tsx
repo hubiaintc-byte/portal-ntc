@@ -5,22 +5,19 @@ import { useState, useTransition } from "react";
 import type {
   EventoCmsDetalhe,
   EventoCmsResumo,
-  LeadCmsDetalhe,
   LeadCmsResumo,
   PalestranteCmsDetalhe,
   PalestranteCmsResumo,
 } from "@/lib/cms/painelCms";
 
-import { carregarEvento, carregarLead, carregarPalestrante } from "./acoes";
+import { carregarEvento, carregarPalestrante } from "./acoes";
 import { ShellPainel, type GrupoNav } from "./shell/ShellPainel";
 import { TelaDashboard } from "./TelaDashboard";
 import { TelaHome } from "./TelaHome";
 import { TelaPalestrantes } from "./TelaPalestrantes";
 import { TelaEventos } from "./TelaEventos";
-import { TelaLeads } from "./TelaLeads";
 import { TelaConfiguracoes } from "./TelaConfiguracoes";
 import { DetalheEvento } from "./DetalheEvento";
-import { DetalheLead } from "./DetalheLead";
 import { DetalhePalestrante } from "./DetalhePalestrante";
 
 /**
@@ -40,7 +37,7 @@ interface ShellCmsProps {
   erroLeitura: boolean;
 }
 
-type TelaId = "dashboard" | "palestrantes" | "eventos" | "home" | "leads" | "config";
+type TelaId = "dashboard" | "palestrantes" | "eventos" | "home" | "config";
 
 interface ItemNav {
   id: TelaId;
@@ -79,12 +76,6 @@ const Ico = {
       <path d="M10 20v-6h4v6" />
     </svg>
   ),
-  leads: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="3" y="5" width="18" height="14" />
-      <path d="m3 7 9 6 9-6" />
-    </svg>
-  ),
   config: (
     <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
@@ -100,8 +91,6 @@ const NAV_PRINCIPAL: ItemNav[] = [
   { id: "home", rotulo: "Home", icone: Ico.home },
 ];
 
-const NAV_COMERCIAL: ItemNav[] = [{ id: "leads", rotulo: "Leads", icone: Ico.leads }];
-
 const NAV_SISTEMA: ItemNav[] = [{ id: "config", rotulo: "Configurações", icone: Ico.config }];
 
 const CRUMB: Record<TelaId, string> = {
@@ -109,7 +98,6 @@ const CRUMB: Record<TelaId, string> = {
   palestrantes: "Editorial · Palestrantes",
   eventos: "Editorial · Eventos",
   home: "Editorial · Home",
-  leads: "Comercial · Leads",
   config: "Sistema · Configurações",
 };
 
@@ -126,7 +114,6 @@ export function ShellCms({
   // true ⇒ o detalhe abre direto em edição (revisão pós-importação de PDF).
   const [eventoEmEdicao, setEventoEmEdicao] = useState(false);
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
-  const [leadDet, setLeadDet] = useState<LeadCmsDetalhe | null>(null);
   const [carregando, iniciarCarga] = useTransition();
 
   function abrirEvento(id: string, emEdicao = false) {
@@ -146,26 +133,17 @@ export function ShellCms({
     });
   }
 
-  function abrirLead(id: string) {
-    iniciarCarga(async () => {
-      const det = await carregarLead(id);
-      if (det) setLeadDet(det);
-    });
-  }
-
   // Trocar de tela pela sidebar sempre fecha qualquer detalhe aberto.
   function irPara(id: TelaId) {
     setEventoDet(null);
     setPalestranteDet(null);
-    setLeadDet(null);
     setTela(id);
   }
 
-  const detalheAberto = eventoDet ?? palestranteDet ?? leadDet;
+  const detalheAberto = eventoDet ?? palestranteDet;
 
   const grupos: GrupoNav[] = [
     { rotulo: "Editorial", itens: NAV_PRINCIPAL },
-    { rotulo: "Comercial", itens: NAV_COMERCIAL },
     { rotulo: "Sistema", itens: NAV_SISTEMA },
   ];
 
@@ -192,8 +170,6 @@ export function ShellCms({
         />
       ) : palestranteDet ? (
         <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
-      ) : leadDet ? (
-        <DetalheLead lead={leadDet} onVoltar={() => setLeadDet(null)} />
       ) : (
         !detalheAberto && (
           <>
@@ -216,7 +192,6 @@ export function ShellCms({
               />
             )}
             {tela === "home" && <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />}
-            {tela === "leads" && <TelaLeads leads={leads} onAbrir={abrirLead} />}
             {tela === "config" && <TelaConfiguracoes />}
           </>
         )
