@@ -145,12 +145,10 @@ export async function atualizarClienteCrm(
   }
 }
 
-function dadosContato(dados: DadosContatoCrm): ContatoCrmData {
+function dadosContato(dados: DadosContatoCrm, clienteId: number): ContatoCrmData {
   return {
     nome: dados.nome.trim(),
-    // Required (validado antes de chamar o montador); Number() nunca é NaN
-    // aqui porque a UI só oferece ids reais do <select> de clientes.
-    cliente: Number(dados.cliente),
+    cliente: clienteId,
     cargo: ouNulo(dados.cargo),
     setor: ouNulo(dados.setor),
     email: ouNulo(dados.email),
@@ -161,11 +159,13 @@ function dadosContato(dados: DadosContatoCrm): ContatoCrmData {
 }
 
 export async function criarContatoCrm(dados: DadosContatoCrm): Promise<ResultadoEscrita> {
-  if (dados.nome.trim() === "" || dados.cliente === "")
-    return { ok: false, erro: "Informe nome e cliente." };
+  if (dados.nome.trim() === "") return { ok: false, erro: "Informe nome e cliente." };
+  // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
+  const clienteId = idOuNulo(dados.cliente);
+  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
   try {
     const payload = await obterPayload();
-    await payload.create({ collection: "contatos-crm", data: dadosContato(dados) });
+    await payload.create({ collection: "contatos-crm", data: dadosContato(dados, clienteId) });
     return { ok: true };
   } catch (e) {
     console.error("[criarContatoCrm]", e);
@@ -177,11 +177,12 @@ export async function atualizarContatoCrm(
   id: string,
   dados: DadosContatoCrm,
 ): Promise<ResultadoEscrita> {
-  if (dados.nome.trim() === "" || dados.cliente === "")
-    return { ok: false, erro: "Informe nome e cliente." };
+  if (dados.nome.trim() === "") return { ok: false, erro: "Informe nome e cliente." };
+  const clienteId = idOuNulo(dados.cliente);
+  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
   try {
     const payload = await obterPayload();
-    await payload.update({ collection: "contatos-crm", id, data: dadosContato(dados) });
+    await payload.update({ collection: "contatos-crm", id, data: dadosContato(dados, clienteId) });
     return { ok: true };
   } catch (e) {
     console.error("[atualizarContatoCrm]", e);
@@ -189,10 +190,12 @@ export async function atualizarContatoCrm(
   }
 }
 
-function dadosOportunidade(dados: DadosOportunidade): Omit<OportunidadeData, "codigo"> {
+function dadosOportunidade(
+  dados: DadosOportunidade,
+  clienteId: number,
+): Omit<OportunidadeData, "codigo"> {
   return {
-    // Required (validado antes de chamar o montador) — mesma garantia de dadosContato.
-    cliente: Number(dados.cliente),
+    cliente: clienteId,
     programa: idOuNulo(dados.programa),
     modulos: idsLista(dados.modulos),
     eventos: idsLista(dados.eventos),
@@ -213,7 +216,9 @@ function dadosOportunidade(dados: DadosOportunidade): Omit<OportunidadeData, "co
 }
 
 export async function criarOportunidade(dados: DadosOportunidade): Promise<ResultadoEscrita> {
-  if (dados.cliente === "") return { ok: false, erro: "Selecione o cliente." };
+  // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
+  const clienteId = idOuNulo(dados.cliente);
+  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
   try {
     const payload = await obterPayload();
     const ano = new Date().getFullYear();
@@ -224,7 +229,7 @@ export async function criarOportunidade(dados: DadosOportunidade): Promise<Resul
     const codigo = gerarCodigoOportunidade(ano, existentes.totalDocs + 1);
     await payload.create({
       collection: "oportunidades",
-      data: { codigo, ...dadosOportunidade(dados) },
+      data: { codigo, ...dadosOportunidade(dados, clienteId) },
     });
     return { ok: true };
   } catch (e) {
@@ -237,10 +242,15 @@ export async function atualizarOportunidade(
   id: string,
   dados: DadosOportunidade,
 ): Promise<ResultadoEscrita> {
-  if (dados.cliente === "") return { ok: false, erro: "Selecione o cliente." };
+  const clienteId = idOuNulo(dados.cliente);
+  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
   try {
     const payload = await obterPayload();
-    await payload.update({ collection: "oportunidades", id, data: dadosOportunidade(dados) });
+    await payload.update({
+      collection: "oportunidades",
+      id,
+      data: dadosOportunidade(dados, clienteId),
+    });
     return { ok: true };
   } catch (e) {
     console.error("[atualizarOportunidade]", e);
