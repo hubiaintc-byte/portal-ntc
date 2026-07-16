@@ -9,8 +9,10 @@ import type { LeadTipo } from "../tipos";
  * rota (Lead nunca se perde) — falha de rede loga `console.error` e a
  * função resolve normalmente.
  *
- * Sem `RESEND_API_KEY` ou sem `LEADS_EMAIL_DESTINO` o comportamento cai
- * para o log estruturado original (placeholder), sem chamar `fetch`.
+ * Sem `RESEND_API_KEY` o comportamento cai para o log estruturado
+ * original (placeholder), sem chamar `fetch`. Com a chave presente, o
+ * destino (`LEADS_EMAIL_DESTINO`) tem default `contato@institutontc.com.br`
+ * (Global Constraints do plano — já documentado em `.env.example`).
  *
  * Chama a API REST do Resend diretamente via `fetch` — sem SDK — para
  * manter `@ntc/lib` livre de dependências extras (o adapter de e-mail do
@@ -23,6 +25,7 @@ export interface LeadCriado {
 }
 
 const REMETENTE_PADRAO = "Painel NTC <nao-responda@institutontc.com.br>";
+const DESTINO_PADRAO = "contato@institutontc.com.br";
 const URL_RESEND = "https://api.resend.com/emails";
 
 function logLeadCriado(tipo: LeadTipo, lead: LeadCriado): void {
@@ -35,13 +38,27 @@ function logLeadCriado(tipo: LeadTipo, lead: LeadCriado): void {
   });
 }
 
+/**
+ * Escapa caracteres especiais de HTML antes de interpolar input livre
+ * (nome/e-mail vindos de formulários públicos) no corpo do e-mail —
+ * evita injeção de HTML no cliente de e-mail de quem recebe a notificação.
+ */
+function escaparHtml(valor: string): string {
+  return valor
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function notificacaoLeadHtml(tipo: LeadTipo, lead: LeadCriado): string {
   return `<!doctype html><html lang="pt-BR"><body style="font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
-  <p>Novo lead recebido pelo site (${tipo}).</p>
+  <p>Novo lead recebido pelo site (${escaparHtml(tipo)}).</p>
   <ul>
-    <li><strong>Nome:</strong> ${lead.nome}</li>
-    <li><strong>E-mail:</strong> ${lead.email}</li>
-    <li><strong>ID:</strong> ${lead.id}</li>
+    <li><strong>Nome:</strong> ${escaparHtml(lead.nome)}</li>
+    <li><strong>E-mail:</strong> ${escaparHtml(lead.email)}</li>
+    <li><strong>ID:</strong> ${escaparHtml(String(lead.id))}</li>
   </ul>
 </body></html>`;
 }
@@ -56,13 +73,13 @@ export async function aposCriarLeadCom(
   lead: LeadCriado,
 ): Promise<void> {
   const chaveResend = process.env.RESEND_API_KEY;
-  const destino = process.env.LEADS_EMAIL_DESTINO;
 
-  if (!chaveResend || !destino) {
+  if (!chaveResend) {
     logLeadCriado(tipo, lead);
     return;
   }
 
+  const destino = process.env.LEADS_EMAIL_DESTINO ?? DESTINO_PADRAO;
   const remetente = process.env.EMAIL_REMETENTE ?? REMETENTE_PADRAO;
 
   try {

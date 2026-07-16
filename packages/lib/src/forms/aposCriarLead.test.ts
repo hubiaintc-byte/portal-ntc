@@ -20,16 +20,16 @@ describe("aposCriarLeadCom", () => {
     infoSpy.mockRestore();
   });
 
-  it("sem LEADS_EMAIL_DESTINO não chama fetch mesmo com RESEND_API_KEY setada", async () => {
+  it("com RESEND_API_KEY setada e LEADS_EMAIL_DESTINO ausente, chama fetch com o destino padrão", async () => {
     vi.stubEnv("RESEND_API_KEY", "re_teste_123");
-    const infoSpy = vi.spyOn(console, "info").mockImplementation(() => undefined);
-    const fetchMock = vi.fn();
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200 } as Response);
 
     await aposCriarLeadCom(fetchMock, "contato", leadExemplo);
 
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(infoSpy).toHaveBeenCalled();
-    infoSpy.mockRestore();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(init.body as string) as { to: string };
+    expect(body.to).toBe("contato@institutontc.com.br");
   });
 
   it("com envs setadas chama a URL do Resend com Authorization Bearer e body contendo o e-mail do lead", async () => {
@@ -83,5 +83,30 @@ describe("aposCriarLeadCom", () => {
 
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+
+  it("escapa HTML no nome e no e-mail do lead dentro do body do e-mail", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_teste_123");
+    vi.stubEnv("LEADS_EMAIL_DESTINO", "leads@institutontc.com.br");
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200 } as Response);
+    const leadMalicioso = {
+      id: 2,
+      email: "atacante@exemplo.br",
+      nome: '<img src=x onerror=alert(1)> & "Fulano" \'Malicioso\'',
+    };
+
+    await aposCriarLeadCom(fetchMock, "contato", leadMalicioso);
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(init.body as string) as { html: string; subject: string };
+
+    expect(body.html).not.toContain("<img src=x onerror=alert(1)>");
+    expect(body.html).toContain("&lt;img src=x onerror=alert(1)&gt;");
+    expect(body.html).toContain("&amp;");
+    expect(body.html).toContain("&quot;Fulano&quot;");
+    expect(body.html).toContain("&#39;Malicioso&#39;");
+
+    // O subject mantém o formato literal do brief — não é renderizado como HTML.
+    expect(body.subject).toBe(`Novo lead (contato): ${leadMalicioso.nome}`);
   });
 });
