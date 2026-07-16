@@ -49,3 +49,15 @@ export async function exigirUsuarioCms(): Promise<UsuarioCms> {
   if (!usuario) redirect("/entrar");
   return usuario;
 }
+
+/**
+ * Guarda de página mais restrita: exige sessão E perfil "super-admin" —
+ * usada na tela de gestão de usuários. Sem sessão ou perfil insuficiente,
+ * redireciona para "/" (evita revelar a existência da rota a quem não pode
+ * acessá-la).
+ */
+export async function exigirSuperAdmin(): Promise<UsuarioCms> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario || usuario.perfil !== "super-admin") redirect("/");
+  return usuario;
+}

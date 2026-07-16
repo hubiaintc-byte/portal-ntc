@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { RequiredDataFromCollectionSlug } from "payload";
 
 import { obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
@@ -24,6 +25,15 @@ import {
   type ResultadoEscrita,
   type ResultadoImportacao,
 } from "@/lib/cms/painelCmsEscrita";
+import {
+  criarUsuario,
+  editarUsuario,
+  listarUsuarios,
+  removerUsuario,
+  type PayloadUsuarios,
+  type UsuarioCmsResumo,
+} from "@/lib/cms/painelCmsUsuarios";
+import { obterPayload } from "@/lib/payloadClient";
 
 /**
  * Server Actions do Painel Admin. Toda action valida a sessão (cookie
@@ -146,4 +156,92 @@ export async function alternarOcultarPalestrante(
   if (resultado.ok) revalidatePath("/");
   const palestrante = resultado.ok ? await obterPalestranteCms(id) : null;
   return { resultado, palestrante };
+}
+
+/**
+ * Server Actions da gestão de usuários (tela "Usuários"). Guarda MAIS
+ * restrita que as demais: exige perfil "super-admin", não apenas sessão
+ * válida — só super-admins criam/editam/removem contas administrativas.
+ */
+
+const RECUSADO_SUPER_ADMIN: ResultadoEscrita = {
+  ok: false,
+  erro: "Você não tem permissão para esta ação.",
+};
+
+/**
+ * Adapta o Payload real (Local API) à superfície mínima mockável
+ * PayloadUsuarios. `data: Record<string, unknown>` na interface (para
+ * permitir mock nos testes) não corresponde ao tipo gerado da collection —
+ * cast pontual, mesmo padrão de painelCmsEscrita.ts (criarEventoDePdf).
+ */
+async function obterPayloadUsuarios(): Promise<PayloadUsuarios> {
+  const payload = await obterPayload();
+  return {
+    find: (args) => payload.find(args),
+    create: (args) =>
+      payload.create({
+        collection: "users",
+        data: args.data as RequiredDataFromCollectionSlug<"users">,
+        overrideAccess: args.overrideAccess,
+      }),
+    update: (args) =>
+      payload.update({
+        collection: "users",
+        id: args.id,
+        data: args.data as RequiredDataFromCollectionSlug<"users">,
+        overrideAccess: args.overrideAccess,
+      }),
+    delete: (args) => payload.delete(args),
+    forgotPassword: (args) => payload.forgotPassword(args),
+    sendEmail: (args) => payload.sendEmail(args),
+  };
+}
+
+export async function carregarUsuarios(): Promise<UsuarioCmsResumo[]> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario || usuario.perfil !== "super-admin") return [];
+  return listarUsuarios(await obterPayloadUsuarios());
+}
+
+export async function criarUsuarioCms(dados: {
+  nome: string;
+  email: string;
+  perfil: string;
+}): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioCmsResumo[] }> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario || usuario.perfil !== "super-admin") {
+    return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
+  }
+  const p = await obterPayloadUsuarios();
+  const resultado = await criarUsuario(p, dados);
+  const usuarios = await listarUsuarios(p);
+  return { resultado, usuarios };
+}
+
+export async function editarUsuarioCms(
+  id: string,
+  dados: { nome: string; perfil: string },
+): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioCmsResumo[] }> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario || usuario.perfil !== "super-admin") {
+    return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
+  }
+  const p = await obterPayloadUsuarios();
+  const resultado = await editarUsuario(p, id, dados);
+  const usuarios = await listarUsuarios(p);
+  return { resultado, usuarios };
+}
+
+export async function removerUsuarioCms(
+  id: string,
+): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioCmsResumo[] }> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario || usuario.perfil !== "super-admin") {
+    return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
+  }
+  const p = await obterPayloadUsuarios();
+  const resultado = await removerUsuario(p, id, usuario.id);
+  const usuarios = await listarUsuarios(p);
+  return { resultado, usuarios };
 }
