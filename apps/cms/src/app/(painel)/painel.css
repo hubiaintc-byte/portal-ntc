@@ -713,6 +713,14 @@ body {
   font-size: 0.86rem;
   margin: 0 0 18px;
 }
+/* Card com seção real (persiste de fato) — mesmo idiom do pcms-metrica. */
+.pcms-config-card--ativa {
+  border-top: 3px solid var(--pcms-dourado);
+}
+.pcms-config-card h3 .pcms-selo {
+  margin-left: 10px;
+  vertical-align: middle;
+}
 .pcms-field {
   margin-bottom: 14px;
 }

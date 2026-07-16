@@ -39,6 +39,7 @@ interface CampoSenhaProps {
   obrigatorio?: boolean;
   minimo?: number;
   curto?: boolean;
+  desabilitado?: boolean;
 }
 
 export function CampoSenha({
@@ -49,6 +50,7 @@ export function CampoSenha({
   obrigatorio,
   minimo,
   curto,
+  desabilitado,
 }: CampoSenhaProps) {
   const id = useId();
   return (
@@ -61,6 +63,7 @@ export function CampoSenha({
         value={valor}
         required={obrigatorio}
         minLength={minimo}
+        disabled={desabilitado}
         onChange={(e) => onMudar(e.target.value)}
       />
     </div>

@@ -28,6 +28,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
 
   function enviar(e: React.FormEvent) {
     e.preventDefault();
+    if (salvando) return;
     setErro(null);
     setSucesso(null);
     iniciarSalvar(async () => {
@@ -62,11 +63,13 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
       </div>
 
       <div className="pcms-config-grid">
-        <section className="pcms-config-card">
-          <h3>Minha conta</h3>
+        <section className="pcms-config-card pcms-config-card--ativa">
+          <h3>
+            Minha conta
+            <span className="pcms-selo pcms-selo--ok">Funcional</span>
+          </h3>
           <p>
-            Trocar a senha de <strong>{usuario.email}</strong>. <b>Esta seção é real</b> — a senha é
-            alterada de imediato.
+            Trocar a senha de <strong>{usuario.email}</strong> — a senha é alterada de imediato.
           </p>
           <form ref={formRef} onSubmit={enviar}>
             <AvisoForm erro={erro} />
@@ -81,6 +84,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
               onMudar={setSenhaAtual}
               autoComplete="current-password"
               obrigatorio
+              desabilitado={salvando}
             />
             <CampoSenha
               rotulo="Nova senha"
@@ -89,6 +93,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
               autoComplete="new-password"
               obrigatorio
               minimo={SENHA_MINIMO}
+              desabilitado={salvando}
             />
             <CampoSenha
               rotulo="Confirmar nova senha"
@@ -97,6 +102,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
               autoComplete="new-password"
               obrigatorio
               minimo={SENHA_MINIMO}
+              desabilitado={salvando}
             />
             <p className="pcms-editor__hint">Mínimo de {SENHA_MINIMO} caracteres.</p>
             <button type="submit" className="pcms-btn" disabled={salvando}>
@@ -106,7 +112,10 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
         </section>
 
         <section className="pcms-config-card">
-          <h3>Identidade do portal</h3>
+          <h3>
+            Identidade do portal
+            <span className="pcms-selo pcms-selo--atencao">Demonstrativo</span>
+          </h3>
           <p>Como o Grupo NTC se apresenta nas páginas públicas.</p>
           <div className="pcms-field">
             <label htmlFor="cfg-nome">Nome institucional</label>
@@ -123,7 +132,10 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
         </section>
 
         <section className="pcms-config-card">
-          <h3>E-mail transacional</h3>
+          <h3>
+            E-mail transacional
+            <span className="pcms-selo pcms-selo--atencao">Demonstrativo</span>
+          </h3>
           <p>Notificações de leads e confirmações de formulário (Resend).</p>
           <div className="pcms-field">
             <label htmlFor="cfg-remetente">Remetente</label>
@@ -143,7 +155,10 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
         </section>
 
         <section className="pcms-config-card">
-          <h3>Segurança e acesso</h3>
+          <h3>
+            Segurança e acesso
+            <span className="pcms-selo pcms-selo--atencao">Demonstrativo</span>
+          </h3>
           <p>Defesas do painel administrativo.</p>
           <div className="pcms-toggle-row">
             <span>
@@ -169,7 +184,10 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
         </section>
 
         <section className="pcms-config-card">
-          <h3>Integrações</h3>
+          <h3>
+            Integrações
+            <span className="pcms-selo pcms-selo--atencao">Demonstrativo</span>
+          </h3>
           <p>Serviços conectados ao portal.</p>
           <div className="pcms-toggle-row">
             <span>
