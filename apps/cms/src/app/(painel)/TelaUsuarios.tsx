@@ -161,6 +161,7 @@ export function TelaUsuarios({
           titulo={modo === "novo" ? "Novo usuário" : `Editar · ${editando?.nome}`}
           salvando={salvando}
           onCancelar={fechar}
+          eyebrow="Sistema"
         />
         <AvisoForm erro={erro} />
         {aviso && (

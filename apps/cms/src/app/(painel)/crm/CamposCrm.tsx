@@ -172,13 +172,14 @@ interface BarraFormProps {
   titulo: string;
   salvando: boolean;
   onCancelar: () => void;
+  eyebrow?: string;
 }
 
-export function BarraForm({ titulo, salvando, onCancelar }: BarraFormProps) {
+export function BarraForm({ titulo, salvando, onCancelar, eyebrow = "Comercial" }: BarraFormProps) {
   return (
     <div className="pcms-pagehead">
       <div>
-        <p className="pcms-pagehead__eyebrow">Comercial</p>
+        <p className="pcms-pagehead__eyebrow">{eyebrow}</p>
         <h1>{titulo}</h1>
       </div>
       <div className="pcms-pagehead__acoes">
