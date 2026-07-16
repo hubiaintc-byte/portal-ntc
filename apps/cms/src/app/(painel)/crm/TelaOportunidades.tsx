@@ -71,7 +71,7 @@ export function TelaOportunidades({ oportunidades, onAbrir, onNovo }: TelaOportu
                     {rotuloDeLista(STATUS_OPORTUNIDADE, o.status)}
                   </span>
                 </td>
-                <td>{o.followupISO ?? "—"}</td>
+                <td>{o.followupISO?.split("-").reverse().join("/") ?? "—"}</td>
               </tr>
             ))}
           </tbody>
