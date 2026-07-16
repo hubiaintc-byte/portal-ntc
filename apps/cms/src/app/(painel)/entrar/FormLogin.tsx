@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 
 import { entrar, type EstadoLogin } from "../acoesAuth";
@@ -51,6 +52,10 @@ export function FormLogin() {
       <button type="submit" className="pcms-login__entrar" disabled={enviando}>
         {enviando ? "Entrando…" : "Entrar"}
       </button>
+
+      <p className="pcms-login__voltar">
+        <Link href="/entrar/recuperar">Esqueci minha senha</Link>
+      </p>
     </form>
   );
 }

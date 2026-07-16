@@ -1,0 +1,33 @@
+import { redirect } from "next/navigation";
+
+import { obterUsuarioCms } from "@/lib/cms/autenticacao";
+
+import { FormRecuperar } from "./FormRecuperar";
+
+export const dynamic = "force-dynamic";
+
+/** /entrar/recuperar — pede o e-mail e dispara o link de redefinição. */
+export default async function RecuperarPage() {
+  if (await obterUsuarioCms()) redirect("/");
+
+  return (
+    <main className="pcms-login">
+      <section className="pcms-login__marca" aria-hidden="true">
+        <img src="/logo-ntc.svg" alt="" className="pcms-login__logo" />
+        <div>
+          <p className="pcms-login__lema">
+            Inteligência institucional.
+            <br />
+            <em>Impacto real.</em>
+          </p>
+          <span className="pcms-login__filete" />
+          <p className="pcms-login__eyebrow">Portal Grupo NTC · Painel Admin</p>
+        </div>
+        <p className="pcms-login__rodape">Instituto NTC do Brasil · 2026</p>
+      </section>
+      <section className="pcms-login__painel">
+        <FormRecuperar />
+      </section>
+    </main>
+  );
+}
