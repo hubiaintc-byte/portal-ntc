@@ -228,7 +228,7 @@ export function ShellCms({
               />
             )}
             {tela === "home" && <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />}
-            {tela === "config" && <TelaConfiguracoes />}
+            {tela === "config" && <TelaConfiguracoes usuario={usuario} />}
             {tela === "usuarios" && ehSuperAdmin && (
               <TelaUsuarios
                 usuarios={usuarios}

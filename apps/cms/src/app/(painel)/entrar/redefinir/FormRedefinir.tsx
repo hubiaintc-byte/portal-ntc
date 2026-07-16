@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { SENHA_MINIMO } from "@/lib/validarNovaSenha";
+
 import { redefinirSenha, type EstadoLogin } from "../../acoesAuth";
 
 interface FormRedefinirProps {
@@ -25,8 +27,8 @@ export function FormRedefinir({ token, boasVindas }: FormRedefinirProps) {
       </h1>
       <p className="pcms-login__subtitulo">
         {boasVindas
-          ? "Escolha a senha do seu acesso ao Painel Admin (mínimo de 12 caracteres)."
-          : "Escolha uma senha nova com pelo menos 12 caracteres."}
+          ? `Escolha a senha do seu acesso ao Painel Admin (mínimo de ${SENHA_MINIMO} caracteres).`
+          : `Escolha uma senha nova com pelo menos ${SENHA_MINIMO} caracteres.`}
       </p>
 
       <input type="hidden" name="token" value={token} />
@@ -40,7 +42,7 @@ export function FormRedefinir({ token, boasVindas }: FormRedefinirProps) {
         type="password"
         className="pcms-login__campo"
         autoComplete="new-password"
-        minLength={12}
+        minLength={SENHA_MINIMO}
         required
       />
 
@@ -53,7 +55,7 @@ export function FormRedefinir({ token, boasVindas }: FormRedefinirProps) {
         type="password"
         className="pcms-login__campo"
         autoComplete="new-password"
-        minLength={12}
+        minLength={SENHA_MINIMO}
         required
       />
 

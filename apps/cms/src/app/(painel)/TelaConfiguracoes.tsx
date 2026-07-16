@@ -1,5 +1,53 @@
-/** Tela de configurações — puramente visual (sem persistência). */
-export function TelaConfiguracoes() {
+"use client";
+
+import { useRef, useState, useTransition } from "react";
+
+import { SENHA_MINIMO } from "@/lib/validarNovaSenha";
+
+import { trocarMinhaSenha } from "./acoesAuth";
+import { AvisoForm, CampoSenha } from "./crm/CamposCrm";
+
+interface TelaConfiguracoesProps {
+  /** Usuário logado — usado só para exibir o e-mail da conta na seção real. */
+  usuario: { nome: string; email: string };
+}
+
+/**
+ * Tela de configurações. A seção "Minha conta" é REAL (troca a própria
+ * senha via Server Action). O restante da tela segue demonstrativo — nada
+ * mais aqui é salvo ainda.
+ */
+export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
+  const [senhaAtual, setSenhaAtual] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmacao, setConfirmacao] = useState("");
+  const [erro, setErro] = useState<string | null>(null);
+  const [sucesso, setSucesso] = useState<string | null>(null);
+  const [salvando, iniciarSalvar] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  function enviar(e: React.FormEvent) {
+    e.preventDefault();
+    setErro(null);
+    setSucesso(null);
+    iniciarSalvar(async () => {
+      const fd = new FormData();
+      fd.set("senhaAtual", senhaAtual);
+      fd.set("senha", senha);
+      fd.set("confirmacao", confirmacao);
+      const resultado = await trocarMinhaSenha(null, fd);
+      if (resultado.ok) {
+        setSenhaAtual("");
+        setSenha("");
+        setConfirmacao("");
+        setSucesso(resultado.ok);
+        formRef.current?.reset();
+      } else {
+        setErro(resultado.erro ?? "Não foi possível alterar a senha.");
+      }
+    });
+  }
+
   return (
     <>
       <div className="pcms-pagehead">
@@ -8,12 +56,55 @@ export function TelaConfiguracoes() {
           <h1>Configurações</h1>
           <p>Identidade do portal, e-mail transacional e integrações.</p>
         </div>
-        <button type="button" className="pcms-btn">
+        <button type="button" className="pcms-btn" disabled>
           Salvar alterações
         </button>
       </div>
 
       <div className="pcms-config-grid">
+        <section className="pcms-config-card">
+          <h3>Minha conta</h3>
+          <p>
+            Trocar a senha de <strong>{usuario.email}</strong>. <b>Esta seção é real</b> — a senha é
+            alterada de imediato.
+          </p>
+          <form ref={formRef} onSubmit={enviar}>
+            <AvisoForm erro={erro} />
+            {sucesso && (
+              <p className="pcms-form-aviso" role="status">
+                {sucesso}
+              </p>
+            )}
+            <CampoSenha
+              rotulo="Senha atual"
+              valor={senhaAtual}
+              onMudar={setSenhaAtual}
+              autoComplete="current-password"
+              obrigatorio
+            />
+            <CampoSenha
+              rotulo="Nova senha"
+              valor={senha}
+              onMudar={setSenha}
+              autoComplete="new-password"
+              obrigatorio
+              minimo={SENHA_MINIMO}
+            />
+            <CampoSenha
+              rotulo="Confirmar nova senha"
+              valor={confirmacao}
+              onMudar={setConfirmacao}
+              autoComplete="new-password"
+              obrigatorio
+              minimo={SENHA_MINIMO}
+            />
+            <p className="pcms-editor__hint">Mínimo de {SENHA_MINIMO} caracteres.</p>
+            <button type="submit" className="pcms-btn" disabled={salvando}>
+              {salvando ? "Salvando…" : "Alterar senha"}
+            </button>
+          </form>
+        </section>
+
         <section className="pcms-config-card">
           <h3>Identidade do portal</h3>
           <p>Como o Grupo NTC se apresenta nas páginas públicas.</p>
@@ -105,8 +196,8 @@ export function TelaConfiguracoes() {
       </div>
 
       <p className="pcms-aviso">
-        <b>Tela demonstrativa.</b> Nada aqui é salvo ainda — estas opções serão ligadas aos
-        poucos, conforme o painel evoluir.
+        <b>Tela parcialmente demonstrativa.</b> Só a seção &ldquo;Minha conta&rdquo; salva de fato. As
+        demais opções serão ligadas aos poucos, conforme o painel evoluir.
       </p>
     </>
   );

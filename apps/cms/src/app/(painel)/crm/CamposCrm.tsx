@@ -31,6 +31,42 @@ export function CampoTexto({ rotulo, valor, onMudar, tipo = "text", obrigatorio,
   );
 }
 
+interface CampoSenhaProps {
+  rotulo: string;
+  valor: string;
+  onMudar: (v: string) => void;
+  autoComplete: "current-password" | "new-password";
+  obrigatorio?: boolean;
+  minimo?: number;
+  curto?: boolean;
+}
+
+export function CampoSenha({
+  rotulo,
+  valor,
+  onMudar,
+  autoComplete,
+  obrigatorio,
+  minimo,
+  curto,
+}: CampoSenhaProps) {
+  const id = useId();
+  return (
+    <div className={`pcms-field${curto ? " pcms-field--curto" : ""}`}>
+      <label htmlFor={id}>{rotulo}</label>
+      <input
+        id={id}
+        type="password"
+        autoComplete={autoComplete}
+        value={valor}
+        required={obrigatorio}
+        minLength={minimo}
+        onChange={(e) => onMudar(e.target.value)}
+      />
+    </div>
+  );
+}
+
 interface CampoSelectProps {
   rotulo: string;
   valor: string;
