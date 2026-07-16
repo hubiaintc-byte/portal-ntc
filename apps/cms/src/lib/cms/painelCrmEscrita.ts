@@ -86,6 +86,26 @@ export function gerarCodigoOportunidade(ano: number, sequencia: number): string 
   return `OPO-${ano}-${String(sequencia).padStart(3, "0")}`;
 }
 
+/**
+ * Deriva a próxima sequência a partir do maior sufixo numérico já usado no
+ * ano, em vez de contar quantos registros existem — o importador legado
+ * preserva códigos verbatim e pode pular números, deixando o conjunto
+ * esparso (ex.: OPO-2026-001 e OPO-2026-005 sem 002-004). Contar registros
+ * geraria um código já existente e a unique constraint rejeitaria o save.
+ */
+export function proximaSequencia(codigos: string[], ano: number): number {
+  const prefixo = `OPO-${ano}-`;
+  let maiorSufixo = 0;
+  for (const codigo of codigos) {
+    if (!codigo.startsWith(prefixo)) continue;
+    const sufixo = Number(codigo.slice(prefixo.length));
+    if (Number.isInteger(sufixo) && sufixo > maiorSufixo) {
+      maiorSufixo = sufixo;
+    }
+  }
+  return maiorSufixo + 1;
+}
+
 const ERRO_GENERICO = "Não foi possível salvar. Tente novamente.";
 
 // Os campos abaixo são `select` na coleção (uniões literais geradas pelo
@@ -222,11 +242,15 @@ export async function criarOportunidade(dados: DadosOportunidade): Promise<Resul
   try {
     const payload = await obterPayload();
     const ano = new Date().getFullYear();
-    const existentes = await payload.count({
+    const existentes = await payload.find({
       collection: "oportunidades",
       where: { codigo: { like: `OPO-${ano}-` } },
+      limit: 1000,
+      depth: 0,
+      select: { codigo: true },
     });
-    const codigo = gerarCodigoOportunidade(ano, existentes.totalDocs + 1);
+    const codigos = existentes.docs.map((doc) => doc.codigo).filter((c): c is string => Boolean(c));
+    const codigo = gerarCodigoOportunidade(ano, proximaSequencia(codigos, ano));
     await payload.create({
       collection: "oportunidades",
       data: { codigo, ...dadosOportunidade(dados, clienteId) },
