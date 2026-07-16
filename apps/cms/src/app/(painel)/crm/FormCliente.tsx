@@ -77,8 +77,9 @@ export function FormCliente({ inicial, usuarios, onSalvo, onCancelar }: FormClie
         onCancelar={onCancelar}
       />
       <AvisoForm erro={erro} />
-      <div className="pcms-det-grid">
-        <CampoTexto rotulo="Órgão" valor={dados.orgao} onMudar={m("orgao")} obrigatorio />
+      {/* Campos largos fora do grid, como nome/resumo no editor de evento. */}
+      <CampoTexto rotulo="Órgão" valor={dados.orgao} onMudar={m("orgao")} obrigatorio />
+      <div className="pcms-editor__grid">
         <CampoTexto rotulo="Sigla" valor={dados.sigla} onMudar={m("sigla")} curto />
         <CampoSelect rotulo="Tipo" valor={dados.tipo} onMudar={m("tipo")} opcoes={TIPOS_INSTITUICAO} />
         <CampoTexto rotulo="Município" valor={dados.municipio} onMudar={m("municipio")} />
@@ -99,8 +100,8 @@ export function FormCliente({ inicial, usuarios, onSalvo, onCancelar }: FormClie
           opcoes={usuarios.map((u) => ({ label: u.nome, value: u.id }))}
         />
         <CampoTexto rotulo="Próxima ação" valor={dados.proximaAcao} onMudar={m("proximaAcao")} />
-        <CampoArea rotulo="Observações" valor={dados.observacoes} onMudar={m("observacoes")} />
       </div>
+      <CampoArea rotulo="Observações" valor={dados.observacoes} onMudar={m("observacoes")} />
     </form>
   );
 }
