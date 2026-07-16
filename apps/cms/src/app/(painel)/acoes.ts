@@ -31,7 +31,8 @@ import {
   listarUsuarios,
   removerUsuario,
   type PayloadUsuarios,
-  type UsuarioCmsResumo,
+  type ResultadoUsuarios,
+  type UsuarioGestaoResumo,
 } from "@/lib/cms/painelCmsUsuarios";
 import { obterPayload } from "@/lib/payloadClient";
 
@@ -198,7 +199,7 @@ async function obterPayloadUsuarios(): Promise<PayloadUsuarios> {
   };
 }
 
-export async function carregarUsuarios(): Promise<UsuarioCmsResumo[]> {
+export async function carregarUsuarios(): Promise<UsuarioGestaoResumo[]> {
   const usuario = await obterUsuarioCms();
   if (!usuario || usuario.perfil !== "super-admin") return [];
   return listarUsuarios(await obterPayloadUsuarios());
@@ -208,7 +209,7 @@ export async function criarUsuarioCms(dados: {
   nome: string;
   email: string;
   perfil: string;
-}): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioCmsResumo[] }> {
+}): Promise<{ resultado: ResultadoUsuarios; usuarios: UsuarioGestaoResumo[] }> {
   const usuario = await obterUsuarioCms();
   if (!usuario || usuario.perfil !== "super-admin") {
     return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
@@ -222,7 +223,7 @@ export async function criarUsuarioCms(dados: {
 export async function editarUsuarioCms(
   id: string,
   dados: { nome: string; perfil: string },
-): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioCmsResumo[] }> {
+): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioGestaoResumo[] }> {
   const usuario = await obterUsuarioCms();
   if (!usuario || usuario.perfil !== "super-admin") {
     return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
@@ -235,7 +236,7 @@ export async function editarUsuarioCms(
 
 export async function removerUsuarioCms(
   id: string,
-): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioCmsResumo[] }> {
+): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioGestaoResumo[] }> {
   const usuario = await obterUsuarioCms();
   if (!usuario || usuario.perfil !== "super-admin") {
     return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };

@@ -7,6 +7,7 @@ import {
   listarUsuarios,
   removerUsuario,
   type PayloadUsuarios,
+  type UsuarioGestaoResumo,
 } from "./painelCmsUsuarios";
 
 function mockPayload(
@@ -48,7 +49,7 @@ describe("listarUsuarios", () => {
     const payload = mockPayload([
       { id: 1, nome: "Ana", email: "ana@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
     ]);
-    const r = await listarUsuarios(payload);
+    const r: UsuarioGestaoResumo[] = await listarUsuarios(payload);
     expect(r).toEqual([
       { id: "1", nome: "Ana", email: "ana@ntc.org", perfil: "super-admin", atualizadoEm: "2026-07-01T00:00:00.000Z" },
     ]);
@@ -92,20 +93,36 @@ describe("criarUsuario", () => {
     expect(payload.forgotPassword).not.toHaveBeenCalled();
   });
 
-  it("falha apenas no envio do e-mail ainda retorna ok (usuário já existe no banco)", async () => {
+  it("falha apenas no envio do e-mail retorna ok com aviso (usuário já existe no banco)", async () => {
     const payload = mockPayload([]);
     payload.sendEmail.mockRejectedValue(new Error("Resend fora do ar"));
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const r = await criarUsuario(payload, dados);
     expect(r.ok).toBe(true);
+    expect(r.aviso).toBe('Usuário criado, mas o e-mail de convite falhou — use "Reenviar convite".');
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
+  });
+
+  it("sucesso completo não traz aviso", async () => {
+    const payload = mockPayload([]);
+    const r = await criarUsuario(payload, dados);
+    expect(r).toEqual({ ok: true });
+  });
+
+  it("perfil inválido é recusado antes de tocar o Payload", async () => {
+    const payload = mockPayload([]);
+    const r = await criarUsuario(payload, { ...dados, perfil: "hacker" });
+    expect(r).toEqual({ ok: false, erro: "Perfil inválido." });
+    expect(payload.create).not.toHaveBeenCalled();
   });
 });
 
 describe("editarUsuario", () => {
   it("atualiza nome e perfil", async () => {
-    const payload = mockPayload([]);
+    const payload = mockPayload([
+      { id: 5, nome: "Carla", email: "c@ntc.org", perfil: "editor-institucional", updatedAt: "2026-07-01T00:00:00.000Z" },
+    ]);
     const r = await editarUsuario(payload, "5", { nome: "Carla", perfil: "editor-eventos" });
     expect(r.ok).toBe(true);
     expect(payload.update).toHaveBeenCalledWith({
@@ -114,6 +131,46 @@ describe("editarUsuario", () => {
       data: { nome: "Carla", perfil: "editor-eventos" },
       overrideAccess: true,
     });
+  });
+
+  it("perfil inválido é recusado antes de tocar o Payload", async () => {
+    const payload = mockPayload([]);
+    const r = await editarUsuario(payload, "5", { nome: "Carla", perfil: "root" });
+    expect(r).toEqual({ ok: false, erro: "Perfil inválido." });
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+
+  it("bloqueia rebaixar o último super-admin", async () => {
+    const payload = mockPayload([
+      { id: 2, nome: "Único", email: "unico@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
+    ]);
+    const r = await editarUsuario(payload, "2", { nome: "Único", perfil: "editor-eventos" });
+    expect(r).toEqual({ ok: false, erro: "Não é possível rebaixar o último super-administrador." });
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+
+  it("rebaixa super-admin quando há outro", async () => {
+    const payload = mockPayload([
+      { id: 2, nome: "A", email: "a@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 3, nome: "B", email: "b@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
+    ]);
+    const r = await editarUsuario(payload, "2", { nome: "A", perfil: "editor-eventos" });
+    expect(r.ok).toBe(true);
+    expect(payload.update).toHaveBeenCalledWith({
+      collection: "users",
+      id: "2",
+      data: { nome: "A", perfil: "editor-eventos" },
+      overrideAccess: true,
+    });
+  });
+
+  it("manter o último super-admin como super-admin segue permitido", async () => {
+    const payload = mockPayload([
+      { id: 2, nome: "Único", email: "unico@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
+    ]);
+    const r = await editarUsuario(payload, "2", { nome: "Renomeado", perfil: "super-admin" });
+    expect(r.ok).toBe(true);
+    expect(payload.update).toHaveBeenCalled();
   });
 });
 

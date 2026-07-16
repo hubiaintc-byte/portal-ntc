@@ -21,13 +21,35 @@ import type { ResultadoEscrita } from "./painelCmsEscrita";
  * super-admin pode reenviar depois via "esqueci a senha").
  */
 
-export interface UsuarioCmsResumo {
+export interface UsuarioGestaoResumo {
   id: string;
   nome: string;
   email: string;
   perfil: string;
   atualizadoEm: string;
 }
+
+/**
+ * Resultado das escritas da gestão de usuários: como ResultadoEscrita, mas
+ * com `aviso` para sucesso parcial (usuário criado, convite não enviado).
+ */
+export interface ResultadoUsuarios extends ResultadoEscrita {
+  aviso?: string;
+}
+
+/**
+ * Perfis válidos — espelho das options do campo `perfil` em
+ * apps/cms/src/collections/Users.ts (fonte canônica; ao mudar lá, mudar aqui).
+ */
+const PERFIS_VALIDOS = [
+  "super-admin",
+  "editor-institucional",
+  "editor-eventos",
+  "atendimento-comercial",
+] as const;
+
+const perfilValido = (perfil: string): boolean =>
+  (PERFIS_VALIDOS as readonly string[]).includes(perfil);
 
 /** Superfície mínima da Local API usada aqui — permite mock nos testes. */
 export interface PayloadUsuarios {
@@ -74,7 +96,7 @@ export function gerarSenhaAleatoria(): string {
 
 const ERRO_GENERICO = "Não foi possível salvar. Tente novamente.";
 
-export async function listarUsuarios(p: PayloadUsuarios): Promise<UsuarioCmsResumo[]> {
+export async function listarUsuarios(p: PayloadUsuarios): Promise<UsuarioGestaoResumo[]> {
   const res = await p.find({
     collection: "users",
     limit: 200,
@@ -94,10 +116,11 @@ export async function listarUsuarios(p: PayloadUsuarios): Promise<UsuarioCmsResu
 export async function criarUsuario(
   p: PayloadUsuarios,
   dados: { nome: string; email: string; perfil: string },
-): Promise<ResultadoEscrita> {
+): Promise<ResultadoUsuarios> {
   if (dados.nome.trim() === "" || dados.email.trim() === "") {
     return { ok: false, erro: "Informe nome e e-mail." };
   }
+  if (!perfilValido(dados.perfil)) return { ok: false, erro: "Perfil inválido." };
 
   try {
     await p.create({
@@ -135,6 +158,10 @@ export async function criarUsuario(
     });
   } catch (e) {
     console.error("[criarUsuario] convite por e-mail falhou", e);
+    return {
+      ok: true,
+      aviso: 'Usuário criado, mas o e-mail de convite falhou — use "Reenviar convite".',
+    };
   }
 
   return { ok: true };
@@ -146,7 +173,26 @@ export async function editarUsuario(
   dados: { nome: string; perfil: string },
 ): Promise<ResultadoEscrita> {
   if (dados.nome.trim() === "") return { ok: false, erro: "Informe o nome." };
+  if (!perfilValido(dados.perfil)) return { ok: false, erro: "Perfil inválido." };
   try {
+    // Rebaixar o último super-admin deixaria o painel sem quem gerencie
+    // usuários — mesma classe de lockout que a guarda de removerUsuario evita.
+    if (dados.perfil !== "super-admin") {
+      const todos = await p.find({
+        collection: "users",
+        limit: 200,
+        depth: 0,
+        sort: "nome",
+        overrideAccess: true,
+      });
+      const alvo = todos.docs.find((u) => String(u.id) === id);
+      if (alvo?.perfil === "super-admin") {
+        const superAdmins = todos.docs.filter((u) => u.perfil === "super-admin");
+        if (superAdmins.length <= 1) {
+          return { ok: false, erro: "Não é possível rebaixar o último super-administrador." };
+        }
+      }
+    }
     await p.update({
       collection: "users",
       id,
