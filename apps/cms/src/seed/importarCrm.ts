@@ -68,7 +68,12 @@ const existentes: ExistentesNoBanco = {
       { id: String(m.id), comercialVazio: !m.comercial?.tituloComercial && !m.comercial?.valor },
     ]),
   ),
-  eventosPorNome: new Map(eventos.docs.map((e) => [slugDeRotulo(e.nome), String(e.id)])),
+  eventosPorNome: new Map(
+    eventos.docs.map((e) => [
+      slugDeRotulo(e.nome),
+      { id: String(e.id), comercialVazio: !e.comercial?.codigo && !e.comercial?.valor },
+    ]),
+  ),
   clientesPorChave: new Map(
     clientes.docs.map((c) => [`${slugDeRotulo(c.orgao)}#${c.uf ?? ""}`, String(c.id)]),
   ),
@@ -118,18 +123,20 @@ for (const item of plano.criarClientes) {
   idPorClienteLegado.set(item.idLegado, String(doc.id));
 }
 
-/** Resolve o marcador `{ clienteLegadoId }` (cliente criado nesta mesma rodada) para o id numérico recém-criado. */
-const resolverClienteId = (
-  cliente: string | { clienteLegadoId: string },
-  clienteLegadoId: string,
-): number | null => {
+/**
+ * Resolve o marcador `{ clienteLegadoId }` (cliente criado nesta mesma rodada)
+ * para o id numérico recém-criado. O marcador carrega o idLegado CANÔNICO
+ * (primeiro registro da chave natural, em caso de duplicados no lote) — usar
+ * sempre o id do marcador, não o do registro de origem.
+ */
+const resolverClienteId = (cliente: string | { clienteLegadoId: string }): number | null => {
   if (typeof cliente === "string") return paraIdPayload(cliente); // já era id do banco
-  const novo = idPorClienteLegado.get(clienteLegadoId);
+  const novo = idPorClienteLegado.get(cliente.clienteLegadoId);
   return novo ? paraIdPayload(novo) : null;
 };
 
 for (const item of plano.criarContatos) {
-  const clienteId = resolverClienteId(item.data.cliente, item.clienteLegadoId);
+  const clienteId = resolverClienteId(item.data.cliente);
   if (clienteId === null) continue;
   await payload.create({
     collection: "contatos-crm",
@@ -147,7 +154,7 @@ for (const item of plano.criarContatos) {
 }
 
 for (const item of plano.criarOportunidades) {
-  const clienteId = resolverClienteId(item.data.cliente, item.clienteLegadoId);
+  const clienteId = resolverClienteId(item.data.cliente);
   if (clienteId === null) continue;
   await payload.create({
     collection: "oportunidades",

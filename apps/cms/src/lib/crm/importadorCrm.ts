@@ -41,8 +41,8 @@ export interface ExistentesNoBanco {
   programasPorSigla: Map<string, string>;
   /** `${programaId}#${numero}` → { id, comercialVazio } */
   modulosPorChave: Map<string, { id: string; comercialVazio: boolean }>;
-  /** slugDeRotulo(nome) → payload id */
-  eventosPorNome: Map<string, string>;
+  /** slugDeRotulo(nome) → { id, comercialVazio } */
+  eventosPorNome: Map<string, { id: string; comercialVazio: boolean }>;
   /** `${slugDeRotulo(orgao)}#${uf}` → payload id */
   clientesPorChave: Map<string, string>;
   /** `${clientePayloadId}#${slugDeRotulo(nome)}` */
@@ -221,10 +221,12 @@ export function planejarImportacao(
     if (!email) return null;
     const idPayload = existentes.usuariosPorEmail.get(email.toLowerCase());
     if (idPayload) return idPayload;
-    const chaveAviso = `${contexto}:${email.toLowerCase()}`;
+    // Aviso deduplicado por E-MAIL (não por registro): com dezenas de
+    // registros do mesmo responsável, um único aviso basta.
+    const chaveAviso = email.toLowerCase();
     if (!avisosResponsavelEmitidos.has(chaveAviso)) {
       avisosResponsavelEmitidos.add(chaveAviso);
-      avisos.push(`${contexto}: responsável com e-mail "${email}" não encontrado entre os usuários do Payload — gravado como null.`);
+      avisos.push(`${contexto}: responsável com e-mail "${email}" não encontrado entre os usuários do Payload — gravado como null (idem nos demais registros com este e-mail).`);
     }
     return null;
   }
@@ -273,12 +275,12 @@ export function planejarImportacao(
         avisos.push(`${contexto}: produto legado "${idLegado}" sem nome — ref omitida.`);
         continue;
       }
-      const idPayload = existentes.eventosPorNome.get(slugDeRotulo(nome));
-      if (!idPayload) {
+      const casado = existentes.eventosPorNome.get(slugDeRotulo(nome));
+      if (!casado) {
         avisos.push(`${contexto}: produto "${nome}" sem evento correspondente no catálogo — ref omitida (evento não é criado automaticamente).`);
         continue;
       }
-      resolvidos.push(idPayload);
+      resolvidos.push(casado.id);
     }
     return resolvidos;
   }
@@ -286,16 +288,21 @@ export function planejarImportacao(
   // =====================================================================
   // 1) Clientes
   // =====================================================================
+  /** Contador exato de registros de entrada pulados (sem ação de criação). */
+  let ignorados = 0;
   const criarClientes: PlanoImportacao["criarClientes"] = [];
   /** id legado do cliente → chave natural (para casar contatos/oportunidades mesmo quando o cliente é novo nesta rodada). */
   const chavePorClienteLegadoId = new Map<string, string>();
   /** id legado do cliente → id Payload, quando o cliente já existe no banco. */
   const idPayloadPorClienteLegadoId = new Map<string, string>();
+  /** Chaves naturais já enfileiradas NESTE lote — dedup de duplicados dentro do próprio export. */
+  const chavesClientesNoLote = new Set<string>();
 
   for (const registro of clientesLegados) {
     const orgao = texto(registro, "orgao");
     if (!orgao) {
       avisos.push(`Cliente legado "${registro.id}" sem "orgao" — ignorado.`);
+      ignorados += 1;
       continue;
     }
     const uf = ufValidada(texto(registro, "uf"), avisos, `Cliente "${orgao}"`);
@@ -305,8 +312,18 @@ export function planejarImportacao(
     const idExistente = existentes.clientesPorChave.get(chave);
     if (idExistente) {
       idPayloadPorClienteLegadoId.set(registro.id, idExistente);
+      ignorados += 1;
       continue; // Regra 1: idempotente — já existe, não cria de novo.
     }
+    if (chavesClientesNoLote.has(chave)) {
+      // Dedup no próprio lote: segundo registro com a mesma chave natural
+      // (ex. linha duplicada no export) não entra — contatos/oportunidades
+      // dele resolvem via marcador para o primeiro (mesma chave).
+      avisos.push(`Cliente legado "${registro.id}" ("${orgao}", chave "${chave}") duplicado no lote — ignorado (primeiro registro com esta chave prevalece).`);
+      ignorados += 1;
+      continue;
+    }
+    chavesClientesNoLote.add(chave);
 
     const contexto = `Cliente "${orgao}"`;
     const data: DadosClienteCrm = {
@@ -329,38 +346,63 @@ export function planejarImportacao(
     criarClientes.push({ chave, idLegado: registro.id, data });
   }
 
-  /** Resolve a ref `cliente` de um contato/oportunidade: id do banco se existente, marcador se criado nesta rodada. */
+  /**
+   * Resolve a ref `cliente` de um contato/oportunidade: id do banco se
+   * existente, marcador se criado nesta rodada. A resolução é pela CHAVE
+   * natural, de modo que refs a um cliente deduplicado no lote apontem para o
+   * registro canônico (o primeiro enfileirado) — o marcador carrega o
+   * idLegado CANÔNICO, que é o que o executor mapeia após o create.
+   */
   function resolverRefCliente(clienteLegadoId: string | null): string | MarcadorClienteLegado | null {
     if (!clienteLegadoId) return null;
     const idExistente = idPayloadPorClienteLegadoId.get(clienteLegadoId);
     if (idExistente) return idExistente;
     const chave = chavePorClienteLegadoId.get(clienteLegadoId);
     if (!chave) return null; // cliente legado inexistente no export
-    const foiCriadoNestaRodada = criarClientes.some((c) => c.idLegado === clienteLegadoId);
-    return foiCriadoNestaRodada ? { clienteLegadoId } : null;
+    const criado = criarClientes.find((c) => c.chave === chave);
+    return criado ? { clienteLegadoId: criado.idLegado } : null;
   }
 
   // =====================================================================
   // 2) Contatos
   // =====================================================================
   const criarContatos: PlanoImportacao["criarContatos"] = [];
+  /** Chaves de contato já enfileiradas NESTE lote (cobre clientes novos, que não estão em contatosPorChave). */
+  const contatosNoLote = new Set<string>();
   for (const registro of contatosLegados) {
     const nome = texto(registro, "nome");
     const clienteLegadoId = texto(registro, "cliente");
     if (!nome || !clienteLegadoId) {
       avisos.push(`Contato legado "${registro.id}" sem nome ou cliente — ignorado.`);
+      ignorados += 1;
       continue;
     }
     const refCliente = resolverRefCliente(clienteLegadoId);
     if (!refCliente) {
       avisos.push(`Contato "${nome}": cliente legado "${clienteLegadoId}" não resolvido — contato ignorado.`);
+      ignorados += 1;
       continue;
     }
 
     if (typeof refCliente === "string") {
       const chaveContato = `${refCliente}#${slugDeRotulo(nome)}`;
-      if (existentes.contatosPorChave.has(chaveContato)) continue; // Regra 1: idempotente.
+      if (existentes.contatosPorChave.has(chaveContato)) {
+        ignorados += 1;
+        continue; // Regra 1: idempotente.
+      }
     }
+    // Dedup no próprio lote — chave canônica: id do banco (cliente existente)
+    // ou idLegado canônico do marcador (cliente criado nesta rodada).
+    const chaveLote =
+      typeof refCliente === "string"
+        ? `${refCliente}#${slugDeRotulo(nome)}`
+        : `${refCliente.clienteLegadoId}#${slugDeRotulo(nome)}`;
+    if (contatosNoLote.has(chaveLote)) {
+      avisos.push(`Contato legado "${registro.id}" ("${nome}") duplicado no lote — ignorado (primeiro registro com esta chave prevalece).`);
+      ignorados += 1;
+      continue;
+    }
+    contatosNoLote.add(chaveLote);
 
     const data: DadosContatoCrm = {
       nome,
@@ -379,21 +421,34 @@ export function planejarImportacao(
   // 3) Oportunidades
   // =====================================================================
   const criarOportunidades: PlanoImportacao["criarOportunidades"] = [];
+  /** Códigos já enfileirados NESTE lote — dedup de código repetido dentro do export. */
+  const codigosNoLote = new Set<string>();
   for (const registro of oportunidadesLegadas) {
     const codigo = texto(registro, "codigo");
     const clienteLegadoId = texto(registro, "cliente");
     if (!codigo || !clienteLegadoId) {
       avisos.push(`Oportunidade legada "${registro.id}" sem código ou cliente — ignorada.`);
+      ignorados += 1;
       continue;
     }
-    if (existentes.oportunidadesPorCodigo.has(codigo)) continue; // Regra 1: idempotente.
+    if (existentes.oportunidadesPorCodigo.has(codigo)) {
+      ignorados += 1;
+      continue; // Regra 1: idempotente.
+    }
+    if (codigosNoLote.has(codigo)) {
+      avisos.push(`Oportunidade legada "${registro.id}" (código "${codigo}") duplicada no lote — ignorada (primeiro registro com este código prevalece).`);
+      ignorados += 1;
+      continue;
+    }
 
     const refCliente = resolverRefCliente(clienteLegadoId);
     if (!refCliente) {
       // Regra 5: ref não resolvida em `cliente` ⇒ pula a oportunidade com aviso.
       avisos.push(`Oportunidade "${codigo}": cliente legado "${clienteLegadoId}" não resolvido — oportunidade ignorada.`);
+      ignorados += 1;
       continue;
     }
+    codigosNoLote.add(codigo);
 
     const contexto = `Oportunidade "${codigo}"`;
     const programaLegadoId = texto(registro, "programa");
@@ -451,33 +506,30 @@ export function planejarImportacao(
   }
 
   // =====================================================================
-  // 5) Produtos → Eventos — atualização comercial (regra 2, sempre atualiza)
+  // 5) Produtos → Eventos — atualização comercial (regra 2: só se o grupo
+  // estiver vazio, mesmo guard dos módulos — não sobrescreve dado editado)
   // =====================================================================
   const atualizarEventos: PlanoImportacao["atualizarEventos"] = [];
   for (const registro of produtosLegados) {
     const nome = texto(registro, "nome");
     if (!nome) continue;
-    const idPayload = existentes.eventosPorNome.get(slugDeRotulo(nome));
-    if (!idPayload) {
+    const casado = existentes.eventosPorNome.get(slugDeRotulo(nome));
+    if (!casado) {
       avisos.push(`Produto "${nome}" sem evento correspondente no catálogo — evento não é criado automaticamente (campos editoriais obrigatórios).`);
       continue;
     }
+    if (!casado.comercialVazio) {
+      avisos.push(`Evento correspondente ao produto "${nome}" já possui dados comerciais — mantido (não sobrescrito).`);
+      continue;
+    }
     atualizarEventos.push({
-      id: idPayload,
+      id: casado.id,
       comercial: {
         codigo: texto(registro, "codigo"),
         valor: numero(registro, "valor"),
       },
     });
   }
-
-  // "ignorados" conta registros de entrada (clientes/contatos/oportunidades)
-  // que não geraram ação de criação — já existiam no banco (idempotência,
-  // regra 1) ou tiveram refs não resolvidas / dados incompletos (regra 5),
-  // casos que já emitiram aviso acima.
-  const totalEntrada = clientesLegados.length + contatosLegados.length + oportunidadesLegadas.length;
-  const totalCriado = criarClientes.length + criarContatos.length + criarOportunidades.length;
-  const ignorados = Math.max(0, totalEntrada - totalCriado - idPayloadPorClienteLegadoId.size);
 
   return {
     criarClientes,

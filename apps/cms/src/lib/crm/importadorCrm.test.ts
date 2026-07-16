@@ -32,7 +32,7 @@ const dados: ExportCrmLegado = {
 const existentes: ExistentesNoBanco = {
   programasPorSigla: new Map([["edutec", "10"]]),
   modulosPorChave: new Map([["10#1", { id: "20", comercialVazio: true }]]),
-  eventosPorNome: new Map([["seminario-edutec", "30"]]),
+  eventosPorNome: new Map([["seminario-edutec", { id: "30", comercialVazio: true }]]),
   clientesPorChave: new Map(),
   contatosPorChave: new Set(),
   oportunidadesPorCodigo: new Set(),
@@ -76,5 +76,82 @@ describe("planejarImportacao", () => {
     const plano = planejarImportacao(dados, semCatalogo);
     expect(plano.avisos.length).toBeGreaterThan(0);
     expect(plano.criarOportunidades[0]?.data.programa).toBeNull();
+  });
+
+  it("deduplica cliente com a mesma chave natural dentro do lote (1 criado + aviso)", () => {
+    const comDuplicado: ExportCrmLegado = {
+      ...dados,
+      tabelas: {
+        ...dados.tabelas,
+        clientes: [
+          ...(dados.tabelas?.clientes ?? []),
+          { id: "CLI-099", orgao: "SEDUC Tocantins", uf: "TO", status: "Prospect" },
+        ],
+      },
+    };
+    const plano = planejarImportacao(comDuplicado, existentes);
+    expect(plano.criarClientes).toHaveLength(1);
+    expect(plano.criarClientes[0]?.idLegado).toBe("CLI-001");
+    expect(plano.avisos.some((a) => a.includes("CLI-099") && a.includes("duplicado no lote"))).toBe(true);
+    expect(plano.resumo.ignorados).toBe(1);
+  });
+
+  it("deduplica contato de cliente novo dentro do lote (1 criado)", () => {
+    const comDuplicado: ExportCrmLegado = {
+      ...dados,
+      tabelas: {
+        ...dados.tabelas,
+        contatos: [
+          ...(dados.tabelas?.contatos ?? []),
+          { id: "CON-099", nome: "Maria Silva", cliente: "CLI-001", cargo: "Assessora" },
+        ],
+      },
+    };
+    const plano = planejarImportacao(comDuplicado, existentes);
+    expect(plano.criarContatos).toHaveLength(1);
+    expect(plano.criarContatos[0]?.idLegado).toBe("CON-001");
+    expect(plano.avisos.some((a) => a.includes("CON-099") && a.includes("duplicado no lote"))).toBe(true);
+  });
+
+  it("emite o aviso de responsável não resolvido UMA vez para vários registros com o mesmo e-mail", () => {
+    const semUsuarios: ExistentesNoBanco = { ...existentes, usuariosPorEmail: new Map() };
+    const comDoisRegistros: ExportCrmLegado = {
+      ...dados,
+      tabelas: {
+        ...dados.tabelas,
+        clientes: [
+          ...(dados.tabelas?.clientes ?? []),
+          { id: "CLI-002", orgao: "SEDUC Pará", uf: "PA", status: "Prospect", responsavel: "USR-003" },
+        ],
+      },
+    };
+    const plano = planejarImportacao(comDoisRegistros, semUsuarios);
+    const avisosResponsavel = plano.avisos.filter((a) =>
+      a.includes('responsável com e-mail "comercial1@institutontc.com.br" não encontrado'),
+    );
+    expect(avisosResponsavel).toHaveLength(1);
+    expect(plano.criarClientes.every((c) => c.data.responsavel === null)).toBe(true);
+  });
+
+  it("não sobrescreve comercial de evento já preenchido (aviso + atualizarEventos vazio)", () => {
+    const eventoPreenchido: ExistentesNoBanco = {
+      ...existentes,
+      eventosPorNome: new Map([["seminario-edutec", { id: "30", comercialVazio: false }]]),
+    };
+    const plano = planejarImportacao(dados, eventoPreenchido);
+    expect(plano.atualizarEventos).toHaveLength(0);
+    expect(plano.avisos.some((a) => a.includes('"Seminário EDUTEC"') && a.includes("já possui dados comerciais"))).toBe(true);
+    // O evento ainda resolve como ref da oportunidade (guard vale só para a atualização comercial).
+    expect(plano.criarOportunidades[0]?.data.eventos).toEqual(["30"]);
+  });
+
+  it("pula oportunidade com cliente não resolvido, com aviso nomeando o código", () => {
+    const semCliente: ExportCrmLegado = {
+      ...dados,
+      tabelas: { ...dados.tabelas, clientes: [] },
+    };
+    const plano = planejarImportacao(semCliente, existentes);
+    expect(plano.criarOportunidades).toHaveLength(0);
+    expect(plano.avisos.some((a) => a.includes('Oportunidade "OPO-2026-001"') && a.includes("não resolvido"))).toBe(true);
   });
 });
