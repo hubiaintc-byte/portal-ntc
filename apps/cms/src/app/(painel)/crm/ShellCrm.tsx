@@ -20,7 +20,9 @@ import { TelaLeads } from "../TelaLeads";
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { DetalheCliente } from "./DetalheCliente";
 import { FormCliente } from "./FormCliente";
+import { FormContato } from "./FormContato";
 import { TelaClientes } from "./TelaClientes";
+import { TelaContatos } from "./TelaContatos";
 import { TelaPainelComercial } from "./TelaPainelComercial";
 
 interface ShellCrmProps {
@@ -113,10 +115,8 @@ export function ShellCrm({
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
   const [carregando, iniciarCarga] = useTransition();
 
-  // Consumidos pelas Tasks 11-12 (telas de Contatos/Oportunidades);
-  // ainda sem uso nesta task — ShellCrm já recebe tudo para não precisar
-  // recablear a rota depois.
-  void contatos;
+  // Consumido pela Task 12 (tela de Oportunidades); ainda sem uso nesta task —
+  // ShellCrm já recebe tudo para não precisar recablear a rota depois.
   void catalogo;
 
   function fecharTudo() {
@@ -174,6 +174,14 @@ export function ShellCrm({
           onSalvo={fecharTudo}
           onCancelar={fecharTudo}
         />
+      ) : formAberto?.entidade === "contato" ? (
+        <FormContato
+          inicial={formAberto.inicial}
+          clientes={clientes}
+          clientePreSelecionado={clienteDet?.id}
+          onSalvo={fecharTudo}
+          onCancelar={fecharTudo}
+        />
       ) : formAberto ? (
         <PlaceholderConstrucao onVoltar={fecharTudo} />
       ) : clienteDet ? (
@@ -206,7 +214,13 @@ export function ShellCrm({
               onNovo={() => setFormAberto({ entidade: "cliente", inicial: null })}
             />
           )}
-          {tela === "contatos" && <PlaceholderConstrucao />}
+          {tela === "contatos" && (
+            <TelaContatos
+              contatos={contatos}
+              onEditar={(c) => setFormAberto({ entidade: "contato", inicial: c })}
+              onNovo={() => setFormAberto({ entidade: "contato", inicial: null })}
+            />
+          )}
           {tela === "oportunidades" && <PlaceholderConstrucao />}
         </>
       )}
@@ -214,7 +228,7 @@ export function ShellCrm({
   );
 }
 
-/** Temporário — substituído pelas telas reais de Contatos/Oportunidades nas Tasks 11-12. */
+/** Temporário — substituído pela tela real de Oportunidades na Task 12 (e pelo form/detalhe de Cliente/Oportunidade em construção). */
 function PlaceholderConstrucao({ onVoltar }: { onVoltar?: () => void }) {
   return (
     <div className="pcms-pagehead">
