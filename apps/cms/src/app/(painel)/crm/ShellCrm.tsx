@@ -19,10 +19,13 @@ import { DetalheLead } from "../DetalheLead";
 import { TelaLeads } from "../TelaLeads";
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { DetalheCliente } from "./DetalheCliente";
+import { DetalheOportunidade } from "./DetalheOportunidade";
 import { FormCliente } from "./FormCliente";
 import { FormContato } from "./FormContato";
+import { FormOportunidade } from "./FormOportunidade";
 import { TelaClientes } from "./TelaClientes";
 import { TelaContatos } from "./TelaContatos";
+import { TelaOportunidades } from "./TelaOportunidades";
 import { TelaPainelComercial } from "./TelaPainelComercial";
 
 interface ShellCrmProps {
@@ -115,10 +118,6 @@ export function ShellCrm({
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
   const [carregando, iniciarCarga] = useTransition();
 
-  // Consumido pela Task 12 (tela de Oportunidades); ainda sem uso nesta task —
-  // ShellCrm já recebe tudo para não precisar recablear a rota depois.
-  void catalogo;
-
   function fecharTudo() {
     setClienteDet(null);
     setOportunidadeDet(null);
@@ -182,8 +181,16 @@ export function ShellCrm({
           onSalvo={fecharTudo}
           onCancelar={fecharTudo}
         />
-      ) : formAberto ? (
-        <PlaceholderConstrucao onVoltar={fecharTudo} />
+      ) : formAberto?.entidade === "oportunidade" ? (
+        <FormOportunidade
+          inicial={formAberto.inicial}
+          clientes={clientes}
+          catalogo={catalogo}
+          usuarios={usuarios}
+          clientePreSelecionado={clienteDet?.id}
+          onSalvo={fecharTudo}
+          onCancelar={fecharTudo}
+        />
       ) : clienteDet ? (
         <DetalheCliente
           cliente={clienteDet}
@@ -194,7 +201,11 @@ export function ShellCrm({
           onNovoContato={() => setFormAberto({ entidade: "contato", inicial: null })}
         />
       ) : oportunidadeDet ? (
-        <PlaceholderConstrucao onVoltar={fecharTudo} />
+        <DetalheOportunidade
+          oportunidade={oportunidadeDet}
+          onVoltar={fecharTudo}
+          onEditar={() => setFormAberto({ entidade: "oportunidade", inicial: oportunidadeDet })}
+        />
       ) : (
         <>
           {tela === "painel" && (
@@ -221,23 +232,15 @@ export function ShellCrm({
               onNovo={() => setFormAberto({ entidade: "contato", inicial: null })}
             />
           )}
-          {tela === "oportunidades" && <PlaceholderConstrucao />}
+          {tela === "oportunidades" && (
+            <TelaOportunidades
+              oportunidades={oportunidades}
+              onAbrir={abrirOportunidade}
+              onNovo={() => setFormAberto({ entidade: "oportunidade", inicial: null })}
+            />
+          )}
         </>
       )}
     </ShellPainel>
-  );
-}
-
-/** Temporário — substituído pela tela real de Oportunidades na Task 12 (e pelo form/detalhe de Cliente/Oportunidade em construção). */
-function PlaceholderConstrucao({ onVoltar }: { onVoltar?: () => void }) {
-  return (
-    <div className="pcms-pagehead">
-      <h1>Em construção</h1>
-      {onVoltar && (
-        <button type="button" className="pcms-btn pcms-btn--ghost" onClick={onVoltar}>
-          Voltar
-        </button>
-      )}
-    </div>
   );
 }
