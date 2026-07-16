@@ -83,7 +83,7 @@ export async function aposCriarLeadCom(
   const remetente = process.env.EMAIL_REMETENTE ?? REMETENTE_PADRAO;
 
   try {
-    await fetchFn(URL_RESEND, {
+    const res = await fetchFn(URL_RESEND, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${chaveResend}`,
@@ -96,6 +96,14 @@ export async function aposCriarLeadCom(
         html: notificacaoLeadHtml(tipo, lead),
       }),
     });
+
+    if (!res.ok) {
+      const corpo = await res.text().catch(() => "[corpo indisponível]");
+      console.error("[lead.criado] Resend respondeu com erro", {
+        status: res.status,
+        corpo,
+      });
+    }
   } catch (erro) {
     console.error("[lead.criado] falha ao notificar via Resend", erro);
   }

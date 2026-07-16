@@ -85,6 +85,25 @@ describe("aposCriarLeadCom", () => {
     errorSpy.mockRestore();
   });
 
+  it("resposta 4xx/5xx do Resend não lança e loga console.error com status e corpo", async () => {
+    vi.stubEnv("RESEND_API_KEY", "re_teste_123");
+    vi.stubEnv("LEADS_EMAIL_DESTINO", "leads@institutontc.com.br");
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 422,
+      text: () => Promise.resolve('{"message":"domínio não verificado"}'),
+    } as Response);
+
+    await expect(aposCriarLeadCom(fetchMock, "contato", leadExemplo)).resolves.toBeUndefined();
+
+    expect(errorSpy).toHaveBeenCalled();
+    const [, chamada] = errorSpy.mock.calls[0] as [string, { status: number; corpo: string }];
+    expect(chamada.status).toBe(422);
+    expect(chamada.corpo).toContain("domínio não verificado");
+    errorSpy.mockRestore();
+  });
+
   it("escapa HTML no nome e no e-mail do lead dentro do body do e-mail", async () => {
     vi.stubEnv("RESEND_API_KEY", "re_teste_123");
     vi.stubEnv("LEADS_EMAIL_DESTINO", "leads@institutontc.com.br");
