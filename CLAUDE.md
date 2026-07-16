@@ -6,6 +6,7 @@
 
 ### Histórico de revisões
 
+- **v1.4 — 16/07/2026** — Fase A do portal admin unificado: módulo CRM na rota `/crm` (seletor Site|CRM na sidebar, casco compartilhado `ShellPainel`), coleções `clientes-crm`/`contatos-crm`/`oportunidades`, grupo `comercial` em modulos/eventos, importador `crm:importar`. §19 atualizada. Spec/plano em `docs/superpowers/` (2026-07-15).
 - **v1.3 — 16/06/2026** — sessão de reativação dos formulários: adicionada §19 (Estado e backlog do CMS) com o que falta para o go-live. Formulários `/api/forms/*` reativados (handlers restaurados do commit `9402e85` + front ligado ao fetch real). Resend e anti-spam (hCaptcha/rate-limit) seguem como stub por decisão do PO.
 - **v1.2 — 19/05/2026** — sessão 3 (setup base do Payload): adiamento de 2FA para Janela C (item 8 de §17), `payload-types.ts` versionado em `packages/types/src` em vez de `apps/web/types` (alinha com §13).
 - **v1.1 — 19/05/2026** — migração de stack: Neon→Supabase Postgres SP, Cloudflare R2→Supabase Storage, RD Station removido (coleção `Lead` no Payload é fonte única). §15 reescrita; §17 atualizada. Detalhes em `docs/10_DAB §1.1`.
@@ -346,12 +347,13 @@ O CMS é um **Payload CMS 3** com **11 coleções + 4 globals** modeladas e um *
 - **Editar e publicar** eventos (nome, data, resumo, capa, folder PDF, palestrantes) e ocultar/exibir palestrantes do site.
 - **Fluxo rascunho → publicar → revalidar** funcionando, com o site atualizando via `/api/revalidate`.
 - **Upload de mídia** no Supabase Storage com variantes de imagem (Sharp).
+- **Módulo CRM** (desde 16/07/2026, Fase A): rota `/crm` no mesmo painel, com seletor **Site | CRM** no topo da sidebar (casco compartilhado `ShellPainel`). Painel Comercial (KPIs + follow-ups), Leads (migrado do módulo Site), Clientes, Contatos e Oportunidades — com **criar e editar** de verdade (primeiro fluxo de criação do painel). Coleções `clientes-crm`, `contatos-crm`, `oportunidades`; catálogo único (oportunidades apontam para `programas`/`modulos`/`eventos`, que ganharam grupo `comercial`). Importador do CRM legado: `CRM_JSON=/caminho.json CRM_DRY_RUN=1 pnpm crm:importar` (idempotente; sem dry-run grava). Sincronização de schema controlada: `pnpm payload:push:schema` (nunca com dev paralelo). Fases B (Propostas), C (Financeiro) e D (permissões por módulo) pendentes — spec em `docs/superpowers/specs/2026-07-15-portal-admin-unificado-crm-design.md`.
 
 ### 19.2. Backlog — o que falta para o go-live (em ordem de prioridade)
 
 1. **Formulários do site** *(em execução nesta sessão de 16/06)* — as 4 rotas `/api/forms/*` (proposta · contato · newsletter · candidatura) e o front estão sendo religados à coleção `Leads`. Antes desta sessão, as rotas devolviam 503 e o front mostrava sucesso falso (não capturava nada). **Bloqueador de go-live.**
 2. **2FA do admin (TOTP)** — login é só senha + JWT de 14 dias. 2FA nunca foi implementado (a tela de Configurações mostra o toggle, mas é UI sem persistência). Pendência da Janela C (§17.8). **Bloqueador de go-live.**
-3. **Criar conteúdo novo pelo painel** — botões "Novo evento" e "Novo palestrante" estão desabilitados ("Em breve"). Hoje só dá para editar o que já existe.
+3. **Criar conteúdo novo pelo painel** — botões "Novo evento" e "Novo palestrante" estão desabilitados ("Em breve"). Hoje só dá para editar o que já existe. *(O padrão de formulário de criação nasceu no módulo CRM em 16/07 — `FormCliente`/`FormOportunidade` + `CamposCrm` — e pode ser replicado aqui.)*
 4. **Notificação por e-mail de Lead (Resend)** — `aposCriarLead` só loga; não envia e-mail. O Lead fica salvo no painel. Ligar Resend (notificação interna + confirmação ao usuário) é sessão própria (precisa de `RESEND_API_KEY` e e-mails de destino confirmados).
 5. **Anti-spam real** — `verificarHcaptcha` e `checarRateLimit` são stubs controlados por flag (`HCAPTCHA_ENABLED`, `RATELIMIT_ENABLED`, ambos `false`). Implementar siteverify real + store de rate-limit (ex.: Upstash) antes do tráfego público.
 6. **Tela de Configurações** — demonstrativa, não persiste nada.
