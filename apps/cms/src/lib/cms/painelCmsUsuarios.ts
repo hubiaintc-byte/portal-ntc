@@ -167,6 +167,40 @@ export async function criarUsuario(
   return { ok: true };
 }
 
+/**
+ * Reenvia o convite de definição de senha (mesmo fluxo de `criarUsuario`,
+ * sem recriar o usuário) — usado quando o e-mail original falhou ou o
+ * usuário perdeu o link.
+ */
+export async function reenviarConvite(p: PayloadUsuarios, id: string): Promise<ResultadoEscrita> {
+  const res = await p.find({
+    collection: "users",
+    limit: 200,
+    depth: 0,
+    sort: "nome",
+    overrideAccess: true,
+  });
+  const alvo = res.docs.find((u) => String(u.id) === id);
+  if (!alvo) return { ok: false, erro: "Usuário não encontrado." };
+
+  try {
+    const token = await p.forgotPassword({
+      collection: "users",
+      data: { email: alvo.email },
+      disableEmail: true,
+    });
+    await p.sendEmail({
+      to: alvo.email,
+      subject: "Bem-vindo(a) ao Painel Admin NTC",
+      html: emailBoasVindasHtml({ nome: alvo.nome, token: token ?? "" }),
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[reenviarConvite]", e);
+    return { ok: false, erro: "Não foi possível reenviar o convite. Tente novamente." };
+  }
+}
+
 export async function editarUsuario(
   p: PayloadUsuarios,
   id: string,

@@ -5,6 +5,7 @@ import {
   editarUsuario,
   gerarSenhaAleatoria,
   listarUsuarios,
+  reenviarConvite,
   removerUsuario,
   type PayloadUsuarios,
   type UsuarioGestaoResumo,
@@ -171,6 +172,43 @@ describe("editarUsuario", () => {
     const r = await editarUsuario(payload, "2", { nome: "Renomeado", perfil: "super-admin" });
     expect(r.ok).toBe(true);
     expect(payload.update).toHaveBeenCalled();
+  });
+});
+
+describe("reenviarConvite", () => {
+  it("dispara forgotPassword e envia e-mail com o token para o usuário alvo", async () => {
+    const payload = mockPayload([
+      { id: 7, nome: "Dora", email: "dora@ntc.org", perfil: "editor-eventos", updatedAt: "2026-07-01T00:00:00.000Z" },
+    ]);
+    const r = await reenviarConvite(payload, "7");
+    expect(r).toEqual({ ok: true });
+    expect(payload.forgotPassword).toHaveBeenCalledWith({
+      collection: "users",
+      data: { email: "dora@ntc.org" },
+      disableEmail: true,
+    });
+    const envio = payload.sendEmail.mock.calls[0]?.[0] as { to: string; html: string };
+    expect(envio.to).toBe("dora@ntc.org");
+    expect(envio.html).toContain("token-abc");
+  });
+
+  it("usuário inexistente gera erro claro", async () => {
+    const payload = mockPayload([]);
+    const r = await reenviarConvite(payload, "999");
+    expect(r).toEqual({ ok: false, erro: "Usuário não encontrado." });
+    expect(payload.forgotPassword).not.toHaveBeenCalled();
+  });
+
+  it("falha no envio retorna erro sem lançar", async () => {
+    const payload = mockPayload([
+      { id: 7, nome: "Dora", email: "dora@ntc.org", perfil: "editor-eventos", updatedAt: "2026-07-01T00:00:00.000Z" },
+    ]);
+    payload.sendEmail.mockRejectedValue(new Error("Resend fora do ar"));
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const r = await reenviarConvite(payload, "7");
+    expect(r.ok).toBe(false);
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 });
 

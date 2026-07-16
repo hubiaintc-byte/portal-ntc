@@ -10,13 +10,16 @@ import type {
   PalestranteCmsResumo,
 } from "@/lib/cms/painelCms";
 
-import { carregarEvento, carregarPalestrante } from "./acoes";
+import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
+
+import { carregarEvento, carregarPalestrante, carregarUsuarios } from "./acoes";
 import { ShellPainel, type GrupoNav } from "./shell/ShellPainel";
 import { TelaDashboard } from "./TelaDashboard";
 import { TelaHome } from "./TelaHome";
 import { TelaPalestrantes } from "./TelaPalestrantes";
 import { TelaEventos } from "./TelaEventos";
 import { TelaConfiguracoes } from "./TelaConfiguracoes";
+import { TelaUsuarios } from "./TelaUsuarios";
 import { DetalheEvento } from "./DetalheEvento";
 import { DetalhePalestrante } from "./DetalhePalestrante";
 
@@ -28,8 +31,8 @@ import { DetalhePalestrante } from "./DetalhePalestrante";
  */
 
 interface ShellCmsProps {
-  /** Usuário autenticado (rodapé da sidebar). */
-  usuario: { nome: string; email: string };
+  /** Usuário autenticado (rodapé da sidebar + guarda do item "Usuários"). */
+  usuario: { nome: string; email: string; perfil: string; id: string };
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
   leads: LeadCmsResumo[];
@@ -37,7 +40,7 @@ interface ShellCmsProps {
   erroLeitura: boolean;
 }
 
-type TelaId = "dashboard" | "palestrantes" | "eventos" | "home" | "config";
+type TelaId = "dashboard" | "palestrantes" | "eventos" | "home" | "config" | "usuarios";
 
 interface ItemNav {
   id: TelaId;
@@ -82,6 +85,14 @@ const Ico = {
       <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" />
     </svg>
   ),
+  usuarios: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="8.5" cy="7.5" r="3" />
+      <path d="M2.5 19.5c0-3.1 2.4-5.5 6-5.5s6 2.4 6 5.5" />
+      <circle cx="17" cy="8.5" r="2.4" />
+      <path d="M15.8 14.3c2.6.4 4.7 2.3 4.7 5.2" />
+    </svg>
+  ),
 };
 
 const NAV_PRINCIPAL: ItemNav[] = [
@@ -91,14 +102,13 @@ const NAV_PRINCIPAL: ItemNav[] = [
   { id: "home", rotulo: "Home", icone: Ico.home },
 ];
 
-const NAV_SISTEMA: ItemNav[] = [{ id: "config", rotulo: "Configurações", icone: Ico.config }];
-
 const CRUMB: Record<TelaId, string> = {
   dashboard: "Painel",
   palestrantes: "Editorial · Palestrantes",
   eventos: "Editorial · Eventos",
   home: "Editorial · Home",
   config: "Sistema · Configurações",
+  usuarios: "Sistema · Usuários",
 };
 
 export function ShellCms({
@@ -115,6 +125,24 @@ export function ShellCms({
   const [eventoEmEdicao, setEventoEmEdicao] = useState(false);
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
   const [carregando, iniciarCarga] = useTransition();
+
+  const ehSuperAdmin = usuario.perfil === "super-admin";
+
+  // Lista de usuários NUNCA vem no payload inicial da page.tsx (evitaria
+  // enviar dados de gestão de usuários a quem não é super-admin) — carrega
+  // sob demanda quando a tela "Usuários" é aberta pela primeira vez.
+  const [usuarios, setUsuarios] = useState<UsuarioGestaoResumo[]>([]);
+  const [usuariosCarregados, setUsuariosCarregados] = useState(false);
+  const [carregandoUsuarios, iniciarCargaUsuarios] = useTransition();
+
+  function abrirUsuarios() {
+    if (usuariosCarregados) return;
+    iniciarCargaUsuarios(async () => {
+      const lista = await carregarUsuarios();
+      setUsuarios(lista);
+      setUsuariosCarregados(true);
+    });
+  }
 
   function abrirEvento(id: string, emEdicao = false) {
     iniciarCarga(async () => {
@@ -138,13 +166,21 @@ export function ShellCms({
     setEventoDet(null);
     setPalestranteDet(null);
     setTela(id);
+    if (id === "usuarios") abrirUsuarios();
   }
 
   const detalheAberto = eventoDet ?? palestranteDet;
 
+  const navSistema: ItemNav[] = ehSuperAdmin
+    ? [
+        { id: "config", rotulo: "Configurações", icone: Ico.config },
+        { id: "usuarios", rotulo: "Usuários", icone: Ico.usuarios },
+      ]
+    : [{ id: "config", rotulo: "Configurações", icone: Ico.config }];
+
   const grupos: GrupoNav[] = [
     { rotulo: "Editorial", itens: NAV_PRINCIPAL },
-    { rotulo: "Sistema", itens: NAV_SISTEMA },
+    { rotulo: "Sistema", itens: navSistema },
   ];
 
   return (
@@ -193,6 +229,17 @@ export function ShellCms({
             )}
             {tela === "home" && <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />}
             {tela === "config" && <TelaConfiguracoes />}
+            {tela === "usuarios" && ehSuperAdmin && (
+              <TelaUsuarios
+                usuarios={usuarios}
+                usuarioAtualId={usuario.id}
+                carregando={carregandoUsuarios}
+                onUsuariosAtualizados={(lista) => {
+                  setUsuarios(lista);
+                  setUsuariosCarregados(true);
+                }}
+              />
+            )}
           </>
         )
       )}

@@ -29,6 +29,7 @@ import {
   criarUsuario,
   editarUsuario,
   listarUsuarios,
+  reenviarConvite,
   removerUsuario,
   type PayloadUsuarios,
   type ResultadoUsuarios,
@@ -245,4 +246,16 @@ export async function removerUsuarioCms(
   const resultado = await removerUsuario(p, id, usuario.id);
   const usuarios = await listarUsuarios(p);
   return { resultado, usuarios };
+}
+
+/**
+ * Reenvia o convite de definição de senha (mesmo fluxo de criarUsuarioCms,
+ * sem recriar o usuário) — aponta para o aviso "Reenviar convite" da T4
+ * quando o e-mail original falhou, ou para um usuário que perdeu o link.
+ */
+export async function reenviarConviteUsuarioCms(id: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario || usuario.perfil !== "super-admin") return RECUSADO_SUPER_ADMIN;
+  const p = await obterPayloadUsuarios();
+  return reenviarConvite(p, id);
 }
