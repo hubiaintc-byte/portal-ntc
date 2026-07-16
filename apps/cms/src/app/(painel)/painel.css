@@ -1581,6 +1581,36 @@ body {
   margin: 0 0 18px;
 }
 
+.pcms-login__ok {
+  background: rgba(63, 107, 63, 0.08);
+  border-left: 3px solid var(--pcms-sucesso);
+  color: var(--pcms-sucesso);
+  font-size: 0.85rem;
+  padding: 10px 12px;
+  margin: 0 0 18px;
+  border-radius: 0;
+}
+
+.pcms-login__voltar {
+  margin: 16px 0 0;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.pcms-login__voltar a {
+  color: var(--pcms-oxford);
+  text-decoration: none;
+}
+
+.pcms-login__voltar a:hover {
+  text-decoration: underline;
+}
+
+.pcms-login__voltar a:focus-visible {
+  outline: 2px solid var(--pcms-dourado);
+  outline-offset: 2px;
+}
+
 .pcms-login__entrar {
   width: 100%;
   background: var(--pcms-oxford);
