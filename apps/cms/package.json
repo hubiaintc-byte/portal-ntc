@@ -27,6 +27,7 @@
     "payload:seed:folders": "pnpm payload run src/seed/seedFoldersEventos.ts",
     "fotos:especialistas": "pnpm payload run src/seed/vincularFotosEspecialistas.ts",
     "crm:importar": "pnpm payload run src/seed/importarCrm.ts",
+    "senha:admin": "pnpm payload run src/seed/trocarSenhaAdmin.ts",
     "clean": "rm -rf .next .turbo node_modules"
   },
   "dependencies": {
