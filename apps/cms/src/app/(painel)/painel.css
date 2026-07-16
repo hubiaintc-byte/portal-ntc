@@ -1446,6 +1446,7 @@ body {
   --pcms-grafite-suave: #5a5a5a;
   --pcms-linha: #d9d2c4;
   --pcms-erro: #9a1b1b;
+  --pcms-sucesso: #3f6b3f;
 
   display: grid;
   grid-template-columns: 46% 54%;
