@@ -48,6 +48,15 @@ export function followupsProximos(
     .sort((a, b) => (a.followupISO ?? "").localeCompare(b.followupISO ?? ""));
 }
 
+/** Todas as oportunidades abertas com follow-up marcado, mais próximas primeiro. */
+export function todosFollowups(
+  oportunidades: OportunidadeCrmResumo[],
+): OportunidadeCrmResumo[] {
+  return oportunidades
+    .filter((o) => aberta(o) && o.followupISO !== null)
+    .sort((a, b) => (a.followupISO ?? "").localeCompare(b.followupISO ?? ""));
+}
+
 export function formatarMoedaBRL(valor: number): string {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",

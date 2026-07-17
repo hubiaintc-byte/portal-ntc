@@ -8,6 +8,7 @@ import {
   formatarMoedaBRL,
   abertasPorStatus,
   funilOportunidades,
+  todosFollowups,
 } from "./kpisComercial";
 
 const opp = (extra: Partial<OportunidadeCrmResumo>): OportunidadeCrmResumo => ({
@@ -59,6 +60,22 @@ describe("formatarMoedaBRL", () => {
     const resultado = formatarMoedaBRL(140_000).replace(/\s/g, " ");
     const esperado = "R$ 140.000";
     expect(resultado).toBe(esperado);
+  });
+});
+
+describe("todosFollowups", () => {
+  it("retorna abertas com followup, ordem ascendente, sem limite de 7 dias, excluindo fechadas", () => {
+    const ops = [
+      opp({ status: "em-negociacao", followupISO: "2026-09-01" }),
+      opp({ status: "em-qualificacao", followupISO: "2026-07-20" }),
+      opp({ status: "em-negociacao", followupISO: null }),      // sem followup: fora
+      opp({ status: "contratada", followupISO: "2026-07-25" }), // fechada: fora
+    ];
+    expect(todosFollowups(ops).map((o) => o.followupISO)).toEqual(["2026-07-20", "2026-09-01"]);
+  });
+
+  it("lista vazia devolve vazio", () => {
+    expect(todosFollowups([])).toEqual([]);
   });
 });
 
