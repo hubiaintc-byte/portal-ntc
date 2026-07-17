@@ -1,4 +1,4 @@
-import { STATUS_OPORTUNIDADE_FECHADA } from "@ntc/lib";
+import { STATUS_OPORTUNIDADE, STATUS_OPORTUNIDADE_FECHADA } from "@ntc/lib";
 
 import type { LeadCmsResumo } from "./painelCms";
 import type { OportunidadeCrmResumo } from "./painelCrm";
@@ -54,4 +54,36 @@ export function formatarMoedaBRL(valor: number): string {
     currency: "BRL",
     maximumFractionDigits: 0,
   }).format(valor);
+}
+
+export interface FaixaStatusOportunidade {
+  status: string;
+  rotulo: string;
+  quantidade: number;
+}
+
+const STATUS_ABERTOS = STATUS_OPORTUNIDADE.filter(
+  (s) => !STATUS_OPORTUNIDADE_FECHADA.includes(s.value),
+);
+
+function contarPorStatus(oportunidades: OportunidadeCrmResumo[]): FaixaStatusOportunidade[] {
+  return STATUS_ABERTOS.map((s) => ({
+    status: s.value,
+    rotulo: s.label,
+    quantidade: oportunidades.filter((o) => o.status === s.value).length,
+  }));
+}
+
+/** Abertas por status na ordem fixa da lista, omitindo status zerados. */
+export function abertasPorStatus(
+  oportunidades: OportunidadeCrmResumo[],
+): FaixaStatusOportunidade[] {
+  return contarPorStatus(oportunidades).filter((f) => f.quantidade > 0);
+}
+
+/** Funil completo: todos os status abertos na ordem, incluindo zerados. */
+export function funilOportunidades(
+  oportunidades: OportunidadeCrmResumo[],
+): FaixaStatusOportunidade[] {
+  return contarPorStatus(oportunidades);
 }

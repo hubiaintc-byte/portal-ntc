@@ -2,7 +2,13 @@ import { describe, expect, it } from "vitest";
 
 import type { LeadCmsResumo } from "./painelCms";
 import type { OportunidadeCrmResumo } from "./painelCrm";
-import { calcularKpisComercial, followupsProximos, formatarMoedaBRL } from "./kpisComercial";
+import {
+  calcularKpisComercial,
+  followupsProximos,
+  formatarMoedaBRL,
+  abertasPorStatus,
+  funilOportunidades,
+} from "./kpisComercial";
 
 const opp = (extra: Partial<OportunidadeCrmResumo>): OportunidadeCrmResumo => ({
   id: "1", codigo: "OPO-1", clienteId: "1", clienteNome: "SEDUC-TO", programaSigla: "EDUTEC",
@@ -53,5 +59,38 @@ describe("formatarMoedaBRL", () => {
     const resultado = formatarMoedaBRL(140_000).replace(/\s/g, " ");
     const esperado = "R$ 140.000";
     expect(resultado).toBe(esperado);
+  });
+});
+
+describe("abertasPorStatus / funilOportunidades", () => {
+  const ops = [
+    opp({ status: "em-negociacao" }),
+    opp({ status: "em-qualificacao" }),
+    opp({ id: "2", codigo: "OPO-2", status: "em-negociacao" }),
+    opp({ id: "3", codigo: "OPO-3", status: "contratada" }),
+  ];
+
+  it("conta abertas por status na ordem fixa da lista, omitindo zerados", () => {
+    expect(abertasPorStatus(ops)).toEqual([
+      { status: "em-qualificacao", rotulo: "Em qualificação", quantidade: 1 },
+      { status: "em-negociacao", rotulo: "Em negociação", quantidade: 2 },
+    ]);
+  });
+
+  it("funil traz todos os status abertos, incluindo zerados, na ordem do funil", () => {
+    const funil = funilOportunidades(ops);
+    expect(funil.map((f) => f.status)).toEqual([
+      "em-qualificacao",
+      "apresentacao-institucional",
+      "proposta-enviada",
+      "em-negociacao",
+      "aprovada",
+    ]);
+    expect(funil.find((f) => f.status === "proposta-enviada")?.quantidade).toBe(0);
+  });
+
+  it("com lista vazia, abertasPorStatus é vazio e funil é todo zerado", () => {
+    expect(abertasPorStatus([])).toEqual([]);
+    expect(funilOportunidades([]).every((f) => f.quantidade === 0)).toBe(true);
   });
 });
