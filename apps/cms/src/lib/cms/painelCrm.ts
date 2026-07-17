@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { ClienteCrm, ContatoCrm, Oportunidade } from "@ntc/types";
+import type { ClienteCrm, ContatoCrm, Evento, Modulo, Oportunidade, Programa } from "@ntc/types";
 
 import { obterPayload } from "@/lib/payloadClient";
 
@@ -87,6 +87,31 @@ export interface CatalogoCrm {
 export interface UsuarioCmsResumo {
   id: string;
   nome: string;
+}
+
+export interface ProgramaCrmResumo {
+  id: string;
+  sigla: string;
+  nome: string;
+  area: string | null;
+}
+
+export interface ModuloCrmResumo {
+  id: string;
+  numero: number;
+  titulo: string;
+  tituloComercial: string | null;
+  programaSigla: string | null;
+  valor: number | null;
+  replay: string | null;
+  certificacao: string | null;
+}
+
+export interface ProdutoCrmResumo {
+  id: string;
+  nome: string;
+  codigo: string | null;
+  valor: number | null;
 }
 
 /** Relationship do Payload: extrai id como string, populado ou não. */
@@ -252,4 +277,41 @@ export async function listarUsuariosCms(): Promise<UsuarioCmsResumo[]> {
   const payload = await obterPayload();
   const res = await payload.find({ collection: "users", depth: 0, limit: 100, sort: "nome" });
   return res.docs.map((u) => ({ id: String(u.id), nome: u.nome ?? u.email }));
+}
+
+export async function listarProgramasCrm(): Promise<ProgramaCrmResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({ collection: "programas", depth: 1, limit: 100, draft: true, sort: "sigla" });
+  return res.docs.map((p: Programa) => ({
+    id: String(p.id),
+    sigla: p.sigla ?? "",
+    nome: p.nomeCompleto ?? "",
+    area: campoRel(p.area, "nome"),
+  }));
+}
+
+export async function listarModulosCrm(): Promise<ModuloCrmResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({ collection: "modulos", depth: 1, limit: 500, draft: true, sort: "numero" });
+  return res.docs.map((m: Modulo) => ({
+    id: String(m.id),
+    numero: m.numero,
+    titulo: m.titulo,
+    tituloComercial: m.comercial?.tituloComercial ?? null,
+    programaSigla: campoRel(m.programa, "sigla"),
+    valor: m.comercial?.valor ?? null,
+    replay: m.comercial?.replay ?? null,
+    certificacao: m.comercial?.certificacao ?? null,
+  }));
+}
+
+export async function listarProdutosCrm(): Promise<ProdutoCrmResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({ collection: "eventos", depth: 0, limit: 500, draft: true, sort: "nome" });
+  return res.docs.map((e: Evento) => ({
+    id: String(e.id),
+    nome: e.nome,
+    codigo: e.comercial?.codigo ?? null,
+    valor: e.comercial?.valor ?? null,
+  }));
 }
