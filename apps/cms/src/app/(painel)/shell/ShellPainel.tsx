@@ -18,7 +18,7 @@ export interface GrupoNav {
 
 interface ShellPainelProps {
   modulo: ModuloPainel;
-  usuario: { nome: string; email: string };
+  usuario: { nome: string; email: string; perfil: string };
   grupos: GrupoNav[];
   telaAtiva: string;
   onIrPara: (id: string) => void;
@@ -64,6 +64,24 @@ export function ShellPainel({
 
         <SeletorModulo modulo={modulo} />
 
+        <div className="pcms-sidebar__usuario">
+          <div className="pcms-avatar-mini">{iniciais(usuario.nome)}</div>
+          <div className="pcms-sidebar__usuario-info">
+            <strong>{usuario.nome}</strong>
+            <span className="pcms-sidebar__perfil">{usuario.perfil.replace(/-/g, " ")}</span>
+          </div>
+          <form action={sair} className="pcms-sair__form">
+            <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 4H5v16h4" />
+                <path d="m14 8 4 4-4 4" />
+                <path d="M18 12H9" />
+              </svg>
+              Sair
+            </button>
+          </form>
+        </div>
+
         <nav className="pcms-nav" aria-label="Navegação principal do painel">
           {grupos.map((grupo) => (
             <div key={grupo.rotulo} className="pcms-nav__group">
@@ -83,23 +101,6 @@ export function ShellPainel({
             </div>
           ))}
         </nav>
-
-        <div className="pcms-sidebar__foot">
-          <div className="pcms-avatar-mini">{iniciais(usuario.nome)}</div>
-          <div>
-            <strong>{usuario.nome}</strong>
-            <span>{usuario.email}</span>
-          </div>
-          <form action={sair} className="pcms-sair__form">
-            <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M9 4H5v16h4" />
-                <path d="m14 8 4 4-4 4" />
-                <path d="M18 12H9" />
-              </svg>
-            </button>
-          </form>
-        </div>
       </aside>
 
       <div className="pcms-main">

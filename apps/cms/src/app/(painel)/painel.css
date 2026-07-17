@@ -261,12 +261,36 @@ body {
   fill: none;
 }
 
-.pcms-sidebar__foot {
-  padding: 16px 22px;
-  border-top: 1px solid rgba(244, 239, 230, 0.12);
+.pcms-sidebar__usuario {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
+  margin: 0 16px 16px;
+  padding: 10px 12px;
+  background: rgba(244, 239, 230, 0.06);
+  border-radius: var(--pcms-radius);
+}
+
+.pcms-sidebar__usuario-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.pcms-sidebar__usuario-info strong {
+  display: block;
+  font-size: 13px;
+  color: var(--pcms-pergaminho);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pcms-sidebar__perfil {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pcms-dourado);
 }
 
 .pcms-avatar-mini {
@@ -281,20 +305,6 @@ body {
   font-size: 0.78rem;
   font-weight: 600;
   flex-shrink: 0;
-}
-
-.pcms-sidebar__foot div {
-  line-height: 1.2;
-}
-.pcms-sidebar__foot strong {
-  display: block;
-  font-size: 0.84rem;
-  color: var(--pcms-pergaminho);
-  font-weight: 500;
-}
-.pcms-sidebar__foot span {
-  font-size: 0.72rem;
-  color: rgba(244, 239, 230, 0.55);
 }
 
 /* ===== Área principal =================================================== */
@@ -1794,36 +1804,23 @@ body {
   }
 }
 
-/* ===== Sair (rodapé da sidebar) ========================================= */
-/* O e-mail é longo; com o botão Sair no rodapé, o div de texto encolhe
- * com ellipsis em vez de empurrar o botão para fora. */
-.pcms-sidebar__foot > div:not(.pcms-avatar-mini) {
-  min-width: 0;
-}
-
-.pcms-sidebar__foot strong,
-.pcms-sidebar__foot span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-}
-
+/* ===== Sair (bloco do usuário na sidebar) =============================== */
 .pcms-sair__form {
   margin-left: auto;
   flex-shrink: 0;
 }
 
 .pcms-sair {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
   background: none;
   border: 1px solid rgba(244, 239, 230, 0.25);
   border-radius: 0;
   color: var(--pcms-pergaminho);
-  width: 32px;
   height: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0 10px;
   cursor: pointer;
 }
 

@@ -29,7 +29,7 @@ import { TelaOportunidades } from "./TelaOportunidades";
 import { TelaPainelComercial } from "./TelaPainelComercial";
 
 interface ShellCrmProps {
-  usuario: { nome: string; email: string };
+  usuario: { nome: string; email: string; perfil: string };
   clientes: ClienteCrmResumo[];
   contatos: ContatoCrmResumo[];
   oportunidades: OportunidadeCrmResumo[];
