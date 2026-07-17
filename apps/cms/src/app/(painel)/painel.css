@@ -3,8 +3,10 @@
  *
  * CMS próprio com a identidade visual do site (Soberana 2026): Oxford
  * dominante, Pergaminho, Dourado cerimonial, Cormorant + Barlow, logo NTC.
- * Segue CLAUDE.md §3 (paleta 60·15·10·5, border-radius 0 em estruturas,
- * ícones lineares funcionais).
+ * Paleta 60·15·10·5 e ícones lineares do CLAUDE.md §3; desde 17/07/2026 o
+ * painel usa cantos arredondados e sombras (idiom do CRM legado — exceção
+ * registrada no spec 2026-07-17, decisão do PO). Não reverter os radius
+ * para 0.
  *
  * Escopo das classes prefixado `pcms-` para não colidir com o CSS das outras
  * páginas portadas importadas no mesmo root layout.
@@ -464,6 +466,9 @@ body {
   background: #fff;
   border: 1px solid var(--pcms-linha);
   border-top: 3px solid var(--pcms-oxford);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
+  overflow: hidden;
   width: 100%;
   max-width: 520px;
   max-height: calc(100vh - 48px);
@@ -689,6 +694,8 @@ body {
 .pcms-painel {
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
 }
 .pcms-painel__head {
   padding: 16px 22px;
@@ -1153,7 +1160,7 @@ body {
   background: #fff;
   color: var(--pcms-oxford);
   cursor: pointer;
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
@@ -1527,6 +1534,8 @@ body {
   background: #fff;
   border: 1px solid var(--pcms-linha);
   border-left: 3px solid var(--pcms-dourado);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
   padding: 22px 24px;
   margin-bottom: 28px;
 }
@@ -1547,7 +1556,7 @@ body {
   font-family: inherit;
   font-size: 0.9rem;
   color: var(--pcms-grafite);
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   resize: vertical;
   line-height: 1.5;
 }
@@ -1613,7 +1622,7 @@ body {
   font-family: inherit;
   font-size: 0.86rem;
   color: var(--pcms-grafite);
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   margin-bottom: 10px;
 }
 .pcms-seletor__busca:focus {
@@ -1825,7 +1834,7 @@ body {
   font-size: 0.85rem;
   padding: 10px 12px;
   margin: 0 0 18px;
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
 }
 
 .pcms-login__voltar {
@@ -1853,7 +1862,7 @@ body {
   background: var(--pcms-oxford);
   color: var(--pcms-pergaminho);
   border: 0;
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   padding: 14px;
   font: inherit;
   font-size: 0.8rem;
@@ -1922,7 +1931,7 @@ body {
   font-size: 11px;
   background: none;
   border: 1px solid rgba(244, 239, 230, 0.25);
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   color: var(--pcms-pergaminho);
   height: 32px;
   padding: 0 10px;
