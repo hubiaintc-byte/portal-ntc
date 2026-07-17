@@ -43,3 +43,17 @@ export { aposCriarLead, type LeadCriado } from "./forms/aposCriarLead";
 export { verificarHcaptcha } from "./forms/hcaptcha";
 
 export { checarRateLimit, type ResultadoRateLimit } from "./forms/rateLimit";
+
+// CRM — listas controladas da Fase A
+export {
+  slugDeRotulo,
+  type OpcaoLista,
+  UFS,
+  AREAS_CRM,
+  ESFERAS_CRM,
+  TIPOS_INSTITUICAO,
+  ORIGENS_CRM,
+  STATUS_CLIENTE_CRM,
+  STATUS_OPORTUNIDADE,
+  STATUS_OPORTUNIDADE_FECHADA,
+} from "./crm/listas";

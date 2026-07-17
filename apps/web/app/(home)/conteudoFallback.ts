@@ -13,8 +13,9 @@
  * livremente (CLAUDE.md §5.3).
  */
 
-const SUPABASE_URL =
-  "https://irekejunwknguzdfszyi.supabase.co/storage/v1/object/public/ntc-portal-media/media";
+// Fotos locais otimizadas (webp 1920) — os originais do bucket Supabase têm
+// 2-3 MB cada; as variantes em public/img/fotos/_optimized são ~25x menores.
+const SUPABASE_URL = "/img/fotos/_optimized";
 
 // =============================================================
 // Tipos
@@ -164,7 +165,7 @@ export const FALLBACK_HOME = {
     slides: [
       {
         tipo: "institucional",
-        imagemSrc: `${SUPABASE_URL}/hero-principal.jpg`,
+        imagemSrc: `${SUPABASE_URL}/hero-principal.1920.webp`,
         eyebrow: "Grupo NTC · Núcleo de Tecnologia e Conhecimento",
         titulo:
           "O novo padrão da formação <accent>institucional</accent> para a Administração Pública brasileira.",
@@ -181,7 +182,7 @@ export const FALLBACK_HOME = {
       // {
       //   tipo: "evento",
       //   vertical: "sau",
-      //   imagemSrc: `${SUPABASE_URL}/area-saude.png`,
+      //   imagemSrc: `${SUPABASE_URL}/area-saude.1920.webp`,
       //   eyebrow: "Evento em destaque · Inscrições abertas",
       //   eventoPill: { texto: "05–07 Jun · Brasília · Presencial" },
       //   titulo:
@@ -198,7 +199,7 @@ export const FALLBACK_HOME = {
       // {
       //   tipo: "evento",
       //   vertical: "gov",
-      //   imagemSrc: `${SUPABASE_URL}/area-gestao-publica.png`,
+      //   imagemSrc: `${SUPABASE_URL}/area-gestao-publica.1920.webp`,
       //   eyebrow: "NTC Gestão Pública · AGIP · São Paulo",
       //   eventoPill: { texto: "18–20 Jun · São Paulo · Híbrido" },
       //   titulo: "Integridade e performance nas <accent>contratações públicas</accent>.",
@@ -212,7 +213,7 @@ export const FALLBACK_HOME = {
       {
         tipo: "programa",
         vertical: "edu",
-        imagemSrc: `${SUPABASE_URL}/area-educacao.jpg`,
+        imagemSrc: `${SUPABASE_URL}/area-educacao.1920.webp`,
         eyebrow: "NTC Educação · PEAR · Programa Estratégico",
         titulo: "Alfabetização de <accent>Alta Performance</accent> para redes públicas.",
         subtitulo:
@@ -224,7 +225,7 @@ export const FALLBACK_HOME = {
       },
       {
         tipo: "solucao",
-        imagemSrc: `${SUPABASE_URL}/contratacao.png`,
+        imagemSrc: `${SUPABASE_URL}/contratacao.1920.webp`,
         eyebrow: "Soluções institucionais · In company · Turmas fechadas",
         titulo: "Capacitações <accent>sob medida</accent> para a sua instituição.",
         subtitulo:
@@ -236,7 +237,7 @@ export const FALLBACK_HOME = {
       },
       {
         tipo: "eventon",
-        imagemSrc: `${SUPABASE_URL}/eventon-estudio.png`,
+        imagemSrc: `${SUPABASE_URL}/eventon-estudio.1920.webp`,
         eyebrow: "EventOn · Plataforma própria · Infraestrutura digital",
         titulo:
           "Transmissão ao vivo, replay, certificado e <accent>suporte</accent> em uma única plataforma.",
@@ -267,7 +268,7 @@ export const FALLBACK_HOME = {
       area: "sau",
       destaque: true,
       statusTag: { rotulo: "Últimas vagas", tipo: "last" },
-      imagemSrc: `${SUPABASE_URL}/area-saude.png`,
+      imagemSrc: `${SUPABASE_URL}/area-saude.1920.webp`,
       data: { variante: "range", diasInicio: "05", diasFim: "07", monYr: "Jun · 2026" },
       modalidade: { texto: "Presencial · Brasília", classe: "presencial" },
       programLink: "Seminário · NTC Saúde",
@@ -290,7 +291,7 @@ export const FALLBACK_HOME = {
     {
       area: "edu",
       statusTag: { rotulo: "Inscrições abertas", tipo: "open" },
-      imagemSrc: `${SUPABASE_URL}/area-educacao.jpg`,
+      imagemSrc: `${SUPABASE_URL}/area-educacao.1920.webp`,
       data: { variante: "range", diasInicio: "22", diasFim: "23", monYr: "Mai · 2026" },
       modalidade: { texto: "Online ao vivo + replay" },
       programLink: "Seminário · NTC Educação",
@@ -314,7 +315,7 @@ export const FALLBACK_HOME = {
     {
       area: "gov",
       statusTag: { rotulo: "Inscrições abertas", tipo: "open" },
-      imagemSrc: `${SUPABASE_URL}/area-gestao-publica.png`,
+      imagemSrc: `${SUPABASE_URL}/area-gestao-publica.1920.webp`,
       data: { variante: "multi", encontros: "4 encontros", periodo: "Jun – Jul · 2026" },
       modalidade: { texto: "Híbrido · SP", classe: "hibrido" },
       programLink: "Oficina · NTC Gestão Pública",
@@ -347,7 +348,7 @@ export const FALLBACK_HOME = {
   eventosSecundarios: [
     {
       area: "gov",
-      imagemSrc: `${SUPABASE_URL}/area-gestao-publica.png`,
+      imagemSrc: `${SUPABASE_URL}/area-gestao-publica.1920.webp`,
       data: { variante: "range", diasInicio: "28", diasFim: "29", monYr: "Mai · 2026" },
       programa: "Curso Executivo · NTC Gestão Pública",
       titulo: "Liderança e direção estratégica para secretários e diretores",
@@ -359,7 +360,7 @@ export const FALLBACK_HOME = {
     },
     {
       area: "edu",
-      imagemSrc: `${SUPABASE_URL}/area-educacao.jpg`,
+      imagemSrc: `${SUPABASE_URL}/area-educacao.1920.webp`,
       data: { variante: "multi", encontros: "3 encontros", periodo: "Jun · 2026" },
       programa: "Jornada · NTC Educação",
       titulo: "Tecnologias e IA aplicadas à gestão escolar pública",
@@ -371,7 +372,7 @@ export const FALLBACK_HOME = {
     },
     {
       area: "sau",
-      imagemSrc: `${SUPABASE_URL}/area-saude.png`,
+      imagemSrc: `${SUPABASE_URL}/area-saude.1920.webp`,
       data: { variante: "range", diasInicio: "02", diasFim: "03", monYr: "Jul · 2026" },
       programa: "Simpósio · NTC Saúde",
       titulo: "Alta performance na atenção primária e redes de cuidado",
@@ -433,7 +434,7 @@ export const FALLBACK_HOME = {
     {
       vert: "edu",
       num: "01",
-      imagemSrc: `${SUPABASE_URL}/area-educacao.jpg`,
+      imagemSrc: `${SUPABASE_URL}/area-educacao.1920.webp`,
       verticalTag: "NTC Educação",
       tituloLinha1: "Educação",
       tituloLinha2: "com excelência.",
@@ -446,7 +447,7 @@ export const FALLBACK_HOME = {
     {
       vert: "gov",
       num: "02",
-      imagemSrc: `${SUPABASE_URL}/area-gestao-publica.png`,
+      imagemSrc: `${SUPABASE_URL}/area-gestao-publica.1920.webp`,
       verticalTag: "NTC Gestão Pública",
       tituloLinha1: "Governança",
       tituloLinha2: "com transformação.",
@@ -459,7 +460,7 @@ export const FALLBACK_HOME = {
     {
       vert: "sau",
       num: "03",
-      imagemSrc: `${SUPABASE_URL}/area-saude.png`,
+      imagemSrc: `${SUPABASE_URL}/area-saude.1920.webp`,
       verticalTag: "NTC Saúde",
       tituloLinha1: "Saúde",
       tituloLinha2: "com qualidade.",
@@ -643,7 +644,7 @@ export const FALLBACK_HOME = {
       "Projetos institucionais",
       "Soluções sob medida",
     ],
-    imagemSrc: `${SUPABASE_URL}/solucoes-lab.png`,
+    imagemSrc: `${SUPABASE_URL}/solucoes-lab.1920.webp`,
     imagemAlt: "Ambiente institucional do setor público",
     ctas: [
       { rotulo: "Conhecer soluções estratégicas", href: "#solucoes", variante: "primary" as const },
@@ -658,7 +659,7 @@ export const FALLBACK_HOME = {
       "O Grupo NTC opera com forte presença em capitais estratégicas e simultaneamente sustenta uma plataforma digital própria de transmissão e replay.",
     cards: [
       {
-        imagemSrc: `${SUPABASE_URL}/eventon-estudio.png`,
+        imagemSrc: `${SUPABASE_URL}/eventon-estudio.1920.webp`,
         eyebrow: "Modalidade",
         titulo: "Eventos online",
         lista: [
@@ -672,7 +673,7 @@ export const FALLBACK_HOME = {
         ctaHref: "#eventos-abertos",
       },
       {
-        imagemSrc: `${SUPABASE_URL}/plenario-publico.png`,
+        imagemSrc: `${SUPABASE_URL}/plenario-publico.1920.webp`,
         eyebrow: "Modalidade",
         titulo: "Eventos presenciais",
         lista: [

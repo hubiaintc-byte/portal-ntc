@@ -4,6 +4,10 @@ import { HeaderHome } from "../(home)/HeaderHome";
 import { FooterHome } from "../(home)/FooterHome";
 import { InteracoesScroll } from "../(home)/InteracoesScroll";
 
+// CSS literal das páginas deste route group (ex-root layout — ver
+// comentário em app/layout.tsx). Ordem preservada da importação original.
+import "../conteudos-prototipo.css";
+
 /**
  * Layout das páginas do guarda-chuva Conteúdos:
  *   /conteudos        (porta de 28_Pagina_Conteudos_v1.html)

@@ -21,6 +21,9 @@ export interface Config {
     conteudos: Conteudo;
     clientes: Cliente;
     leads: Lead;
+    'clientes-crm': ClienteCrm;
+    'contatos-crm': ContatoCrm;
+    oportunidades: Oportunidade;
     'audit-log': AuditLog;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -38,6 +41,9 @@ export interface Config {
     conteudos: ConteudosSelect<false> | ConteudosSelect<true>;
     clientes: ClientesSelect<false> | ClientesSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
+    'clientes-crm': ClientesCrmSelect<false> | ClientesCrmSelect<true>;
+    'contatos-crm': ContatosCrmSelect<false> | ContatosCrmSelect<true>;
+    oportunidades: OportunidadesSelect<false> | OportunidadesSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -534,6 +540,18 @@ export interface Modulo {
    * Eventos abertos que derivam deste módulo.
    */
   eventosVinculados?: (number | Evento)[] | null;
+  /**
+   * Usado pelo módulo CRM do painel; o site ignora este grupo.
+   */
+  comercial?: {
+    tituloComercial?: string | null;
+    /**
+     * Valor de referência (R$).
+     */
+    valor?: number | null;
+    replay?: string | null;
+    certificacao?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -696,6 +714,19 @@ export interface Evento {
      */
     imagemOg?: (number | null) | Media;
   };
+  /**
+   * Usado pelo módulo CRM do painel; o site ignora este grupo.
+   */
+  comercial?: {
+    /**
+     * Código comercial do produto (CRM legado).
+     */
+    codigo?: string | null;
+    /**
+     * Valor de referência (R$).
+     */
+    valor?: number | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -842,6 +873,230 @@ export interface Lead {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clientes-crm".
+ */
+export interface ClienteCrm {
+  id: number;
+  orgao: string;
+  sigla?: string | null;
+  tipo?:
+    | (
+        | 'secretaria-federal'
+        | 'secretaria-estadual'
+        | 'secretaria-municipal'
+        | 'autarquia'
+        | 'fundacao'
+        | 'tribunal'
+        | 'camara'
+        | 'assembleia'
+        | 'consorcio'
+        | 'escola-de-governo'
+        | 'outro'
+      )
+    | null;
+  municipio?: string | null;
+  uf?:
+    | (
+        | 'AC'
+        | 'AL'
+        | 'AM'
+        | 'AP'
+        | 'BA'
+        | 'CE'
+        | 'DF'
+        | 'ES'
+        | 'GO'
+        | 'MA'
+        | 'MG'
+        | 'MS'
+        | 'MT'
+        | 'PA'
+        | 'PB'
+        | 'PE'
+        | 'PI'
+        | 'PR'
+        | 'RJ'
+        | 'RN'
+        | 'RO'
+        | 'RR'
+        | 'RS'
+        | 'SC'
+        | 'SE'
+        | 'SP'
+        | 'TO'
+      )
+    | null;
+  esfera?:
+    | (
+        | 'municipal'
+        | 'estadual'
+        | 'federal'
+        | 'consorcio'
+        | 'autarquia'
+        | 'fundacao'
+        | 'escola-de-governo'
+        | 'tribunal'
+        | 'camara'
+        | 'assembleia'
+        | 'outros'
+      )
+    | null;
+  area?:
+    | (
+        | 'educacao'
+        | 'gestao-publica'
+        | 'governanca'
+        | 'licitacoes-e-contratos'
+        | 'inovacao'
+        | 'saude'
+        | 'assistencia-social'
+        | 'controle-interno'
+        | 'juridico'
+        | 'alta-gestao'
+      )
+    | null;
+  cnpj?: string | null;
+  dirigente?: string | null;
+  cargoDirigente?: string | null;
+  email?: string | null;
+  origem?:
+    | (
+        | 'indicacao'
+        | 'indicacao-institucional'
+        | 'evento'
+        | 'prospeccao-ativa'
+        | 'cliente-recorrente'
+        | 'continuidade-de-relacionamento'
+        | 'inbound'
+        | 'eventon'
+        | 'outros'
+      )
+    | null;
+  /**
+   * Potencial estimado de contratação (R$).
+   */
+  potencial?: number | null;
+  status?:
+    | ('prospect' | 'em-qualificacao' | 'em-negociacao' | 'cliente-ativo' | 'cliente-inativo' | 'encerrado')
+    | null;
+  responsavel?: (number | null) | User;
+  proximaAcao?: string | null;
+  observacoes?: string | null;
+  /**
+   * Instituição correspondente na vitrine do site, se houver.
+   */
+  clienteSite?: (number | null) | Cliente;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contatos-crm".
+ */
+export interface ContatoCrm {
+  id: number;
+  nome: string;
+  cliente: number | ClienteCrm;
+  cargo?: string | null;
+  setor?: string | null;
+  email?: string | null;
+  whatsapp?: string | null;
+  principal?: boolean | null;
+  decisor?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oportunidades".
+ */
+export interface Oportunidade {
+  id: number;
+  codigo: string;
+  cliente: number | ClienteCrm;
+  programa?: (number | null) | Programa;
+  modulos?: (number | Modulo)[] | null;
+  eventos?: (number | Evento)[] | null;
+  uf?:
+    | (
+        | 'AC'
+        | 'AL'
+        | 'AM'
+        | 'AP'
+        | 'BA'
+        | 'CE'
+        | 'DF'
+        | 'ES'
+        | 'GO'
+        | 'MA'
+        | 'MG'
+        | 'MS'
+        | 'MT'
+        | 'PA'
+        | 'PB'
+        | 'PE'
+        | 'PI'
+        | 'PR'
+        | 'RJ'
+        | 'RN'
+        | 'RO'
+        | 'RR'
+        | 'RS'
+        | 'SC'
+        | 'SE'
+        | 'SP'
+        | 'TO'
+      )
+    | null;
+  origem?:
+    | (
+        | 'indicacao'
+        | 'indicacao-institucional'
+        | 'evento'
+        | 'prospeccao-ativa'
+        | 'cliente-recorrente'
+        | 'continuidade-de-relacionamento'
+        | 'inbound'
+        | 'eventon'
+        | 'outros'
+      )
+    | null;
+  /**
+   * Quantidade estimada de participantes.
+   */
+  quantidade?: number | null;
+  modalidade?: string | null;
+  /**
+   * Valor estimado (R$).
+   */
+  valor?: number | null;
+  probabilidade?: number | null;
+  status?:
+    | (
+        | 'em-qualificacao'
+        | 'apresentacao-institucional'
+        | 'proposta-enviada'
+        | 'em-negociacao'
+        | 'aprovada'
+        | 'contratada'
+        | 'perdida'
+        | 'cancelada'
+      )
+    | null;
+  dataAbertura?: string | null;
+  dataPrevFechamento?: string | null;
+  proximaAcao?: string | null;
+  /**
+   * Data do próximo follow-up.
+   */
+  followup?: string | null;
+  responsavel?: (number | null) | User;
+  observacoes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-log".
  */
 export interface AuditLog {
@@ -910,6 +1165,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'leads';
         value: number | Lead;
+      } | null)
+    | ({
+        relationTo: 'clientes-crm';
+        value: number | ClienteCrm;
+      } | null)
+    | ({
+        relationTo: 'contatos-crm';
+        value: number | ContatoCrm;
+      } | null)
+    | ({
+        relationTo: 'oportunidades';
+        value: number | Oportunidade;
       } | null)
     | ({
         relationTo: 'audit-log';
@@ -1145,6 +1412,14 @@ export interface ModulosSelect<T extends boolean = true> {
   ementa?: T;
   cargaHoraria?: T;
   eventosVinculados?: T;
+  comercial?:
+    | T
+    | {
+        tituloComercial?: T;
+        valor?: T;
+        replay?: T;
+        certificacao?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1225,6 +1500,12 @@ export interface EventosSelect<T extends boolean = true> {
         tituloSeo?: T;
         descricaoSeo?: T;
         imagemOg?: T;
+      };
+  comercial?:
+    | T
+    | {
+        codigo?: T;
+        valor?: T;
       };
   updatedAt?: T;
   createdAt?: T;
@@ -1371,6 +1652,74 @@ export interface LeadsSelect<T extends boolean = true> {
         ipSubmissao?: T;
       };
   payloadBruto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clientes-crm_select".
+ */
+export interface ClientesCrmSelect<T extends boolean = true> {
+  orgao?: T;
+  sigla?: T;
+  tipo?: T;
+  municipio?: T;
+  uf?: T;
+  esfera?: T;
+  area?: T;
+  cnpj?: T;
+  dirigente?: T;
+  cargoDirigente?: T;
+  email?: T;
+  origem?: T;
+  potencial?: T;
+  status?: T;
+  responsavel?: T;
+  proximaAcao?: T;
+  observacoes?: T;
+  clienteSite?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contatos-crm_select".
+ */
+export interface ContatosCrmSelect<T extends boolean = true> {
+  nome?: T;
+  cliente?: T;
+  cargo?: T;
+  setor?: T;
+  email?: T;
+  whatsapp?: T;
+  principal?: T;
+  decisor?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oportunidades_select".
+ */
+export interface OportunidadesSelect<T extends boolean = true> {
+  codigo?: T;
+  cliente?: T;
+  programa?: T;
+  modulos?: T;
+  eventos?: T;
+  uf?: T;
+  origem?: T;
+  quantidade?: T;
+  modalidade?: T;
+  valor?: T;
+  probabilidade?: T;
+  status?: T;
+  dataAbertura?: T;
+  dataPrevFechamento?: T;
+  proximaAcao?: T;
+  followup?: T;
+  responsavel?: T;
+  observacoes?: T;
   updatedAt?: T;
   createdAt?: T;
 }

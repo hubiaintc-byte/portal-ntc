@@ -40,5 +40,17 @@ export const Modulos: CollectionConfig = {
       hasMany: true,
       admin: { description: "Eventos abertos que derivam deste módulo." },
     },
+    {
+      name: "comercial",
+      type: "group",
+      label: "Dados comerciais (CRM)",
+      admin: { description: "Usado pelo módulo CRM do painel; o site ignora este grupo." },
+      fields: [
+        { name: "tituloComercial", type: "text" },
+        { name: "valor", type: "number", min: 0, admin: { description: "Valor de referência (R$)." } },
+        { name: "replay", type: "text" },
+        { name: "certificacao", type: "text" },
+      ],
+    },
   ],
 };

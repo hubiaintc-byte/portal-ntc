@@ -20,8 +20,6 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "picsum.photos" },
-      { protocol: "https", hostname: "fastly.picsum.photos" },
       // Supabase Storage público (qualquer projeto *.supabase.co/storage/v1/object/public/*).
       // O bucket é resolvido em runtime pelo generateFileURL do storage-s3.
       { protocol: "https", hostname: "*.supabase.co" },

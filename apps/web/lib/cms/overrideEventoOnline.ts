@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import type { EventoOnline } from "@/app/(capacitacao)/agenda/[slug]/conteudoEventos";
 
 import { obterPayload } from "../payloadClient";
@@ -48,7 +50,7 @@ export async function buscarOverride(slug: string): Promise<OverrideEvento | nul
       coverUrl: urlDoUpload(doc.imagemCapa),
       dataInicioISO: doc.dataInicio,
       folderUrl: urlDoUpload(doc.folderPdf),
-      fotosPalestrantes: await buscarFotosPalestrantes(payload),
+      fotosPalestrantes: await buscarFotosPalestrantes(),
     };
   } catch (err) {
     console.error("[agenda] buscarOverride falhou, usando estático:", err);
@@ -56,22 +58,24 @@ export async function buscarOverride(slug: string): Promise<OverrideEvento | nul
   }
 }
 
-type PayloadCliente = Awaited<ReturnType<typeof obterPayload>>;
-
 /**
  * Mapa nome-normalizado → URL da foto de cada especialista cadastrado com foto.
  * Lido via Local API (a URL do Storage é derivada em runtime; não persiste em
  * coluna). Usado pelo override online para casar palestrantes do estático com
  * fotos reais do CMS por nome. Falha → mapa vazio (estático intacto).
+ *
+ * cache() do React: home/agenda chamam buscarOverride uma vez POR evento; sem
+ * o cache, cada revalidação fazia N varreduras completas de especialistas.
+ * select limita as colunas — o mapa só precisa de nome/foto/ocultarDoSite.
  */
-async function buscarFotosPalestrantes(
-  payload: PayloadCliente,
-): Promise<Record<string, string>> {
+const buscarFotosPalestrantes = cache(async (): Promise<Record<string, string>> => {
   try {
+    const payload = await obterPayload();
     const res = await payload.find({
       collection: "especialistas",
       limit: 500,
       depth: 1,
+      select: { nome: true, foto: true, ocultarDoSite: true },
       overrideAccess: true,
     });
     const mapa: Record<string, string> = {};
@@ -92,7 +96,7 @@ async function buscarFotosPalestrantes(
     console.error("[agenda] buscarFotosPalestrantes falhou:", err);
     return {};
   }
-}
+});
 
 export function aplicarOverrideOnline(
   evento: EventoOnline,

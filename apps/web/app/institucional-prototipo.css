@@ -303,4 +303,8 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   /* Tabelas legais (ex.: inventário de cookies) têm min-content maior que
      o viewport estreito: viram bloco rolável horizontal, sem alargar a página. */
   .legal-table { display: block; overflow-x: auto; scrollbar-width: thin; }
+  /* Sem isto, o min-content da tabela propaga pelos itens do .legal-grid
+     (min-width: auto) e alarga a trilha 1fr além do viewport — a rolagem
+     da tabela acima só funciona com a trilha contida. */
+  .legal-grid > * { min-width: 0; }
 }

@@ -179,7 +179,11 @@ export default async function VerticalPage({ params }: Props) {
 
             <div className="programs-grid-vert fade-in">
               {v.programas.cards.map((p) => (
-                <a key={p.sigla} className="program-card-vert" href="#">
+                <Link
+                  key={p.sigla}
+                  className="program-card-vert"
+                  href={`/programas/${p.sigla.toLowerCase()}`}
+                >
                   <div className="pc-cover">
                     <div
                       className="pc-cover-img"
@@ -197,7 +201,7 @@ export default async function VerticalPage({ params }: Props) {
                       <span className="pc-cta">Conhecer →</span>
                     </div>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
 

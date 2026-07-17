@@ -248,5 +248,15 @@ export const Eventos: CollectionConfig = {
       hooks: { beforeChange: [autoSlug("nome")] },
     },
     ...seoFields,
+    {
+      name: "comercial",
+      type: "group",
+      label: "Dados comerciais (CRM)",
+      admin: { description: "Usado pelo módulo CRM do painel; o site ignora este grupo." },
+      fields: [
+        { name: "codigo", type: "text", admin: { description: "Código comercial do produto (CRM legado)." } },
+        { name: "valor", type: "number", min: 0, admin: { description: "Valor de referência (R$)." } },
+      ],
+    },
   ],
 };

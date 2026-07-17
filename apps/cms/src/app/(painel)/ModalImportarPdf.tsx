@@ -2,28 +2,31 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 
+import type { RelatorioImportacao } from "@/lib/cms/painelCmsEscrita";
+
 import { importarEventoPdf } from "./acoes";
 
 interface ModalImportarPdfProps {
   onFechar: () => void;
+  /** Abre o rascunho recém-criado no detalhe, em modo de edição (revisão). */
+  onImportado: (eventoId: string) => void;
 }
 
 type Estado =
   | { fase: "selecao" }
   | { fase: "enviando" }
-  | { fase: "sucesso"; nome: string }
+  | { fase: "sucesso"; nome: string; eventoId: string | null; relatorio: RelatorioImportacao | null }
   | { fase: "erro"; mensagem: string };
 
 /**
  * Modal de importação de folder PDF de evento.
  *
- * Sobe o PDF e cria um Evento EM RASCUNHO com o folder vinculado (Server Action
- * importarEventoPdf). A extração dos demais campos (modalidade, datas,
- * programação, palestrantes) é a etapa de "porta do PDF" feita à parte; o
- * rascunho criado aqui é onde esses dados serão preenchidos e revisados antes
- * de publicar.
+ * Sobe o PDF, extrai o texto e cria um Evento EM RASCUNHO com os campos
+ * preenchidos pelo parser de template (importarEventoPdf) e os palestrantes
+ * vinculados (criados ocultos quando não existem). A fase de sucesso mostra o
+ * relatório da extração e leva à tela de revisão editável antes de publicar.
  */
-export function ModalImportarPdf({ onFechar }: ModalImportarPdfProps) {
+export function ModalImportarPdf({ onFechar, onImportado }: ModalImportarPdfProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [estado, setEstado] = useState<Estado>({ fase: "selecao" });
   const [nomeArquivo, setNomeArquivo] = useState<string | null>(null);
@@ -57,7 +60,12 @@ export function ModalImportarPdf({ onFechar }: ModalImportarPdfProps) {
     iniciar(async () => {
       const r = await importarEventoPdf(fd);
       if (r.ok) {
-        setEstado({ fase: "sucesso", nome: r.nome ?? file.name });
+        setEstado({
+          fase: "sucesso",
+          nome: r.nome ?? file.name,
+          eventoId: r.eventoId ?? null,
+          relatorio: r.relatorio ?? null,
+        });
       } else {
         setEstado({ fase: "erro", mensagem: r.erro ?? "Falha na importação." });
       }
@@ -96,14 +104,42 @@ export function ModalImportarPdf({ onFechar }: ModalImportarPdfProps) {
           {estado.fase === "sucesso" ? (
             <div className="pcms-modal__ok">
               <p>
-                <strong>PDF recebido.</strong> Foi criado um rascunho de evento:
+                <strong>PDF importado.</strong> Foi criado um rascunho de evento:
               </p>
               <p className="pcms-modal__nome">{estado.nome}</p>
-              <p>
-                Agora peça ao Claude para portar este folder — ele lê o PDF, detecta a
-                modalidade e preenche os campos do rascunho. Depois é só revisar no detalhe
-                do evento e publicar.
-              </p>
+              {estado.relatorio && (
+                <div className="pcms-modal__relatorio">
+                  {estado.relatorio.preenchidos.length > 0 && (
+                    <p>
+                      <strong>{estado.relatorio.preenchidos.length} campos preenchidos</strong> a
+                      partir do PDF: {estado.relatorio.preenchidos.join(", ")}.
+                    </p>
+                  )}
+                  {estado.relatorio.vazios.length > 0 && (
+                    <p>
+                      <strong>Para completar na revisão:</strong>{" "}
+                      {estado.relatorio.vazios.join(", ")}.
+                    </p>
+                  )}
+                  {estado.relatorio.palestrantesVinculados.length > 0 && (
+                    <p>
+                      Palestrantes vinculados: {estado.relatorio.palestrantesVinculados.join(", ")}.
+                    </p>
+                  )}
+                  {estado.relatorio.palestrantesCriados.length > 0 && (
+                    <p>
+                      Cadastrados agora (ocultos do site até revisão):{" "}
+                      {estado.relatorio.palestrantesCriados.join(", ")}.
+                    </p>
+                  )}
+                  {estado.relatorio.avisos.map((aviso, i) => (
+                    <p key={i} className="pcms-upload__erro">
+                      {aviso}
+                    </p>
+                  ))}
+                </div>
+              )}
+              <p>Revise os campos, ajuste o que precisar e publique.</p>
             </div>
           ) : (
             <>
@@ -137,9 +173,20 @@ export function ModalImportarPdf({ onFechar }: ModalImportarPdfProps) {
 
         <div className="pcms-modal__foot">
           {estado.fase === "sucesso" ? (
-            <button type="button" className="pcms-btn" onClick={onFechar}>
-              Concluir
-            </button>
+            <>
+              <button type="button" className="pcms-btn pcms-btn--ghost" onClick={onFechar}>
+                Concluir
+              </button>
+              {estado.eventoId && (
+                <button
+                  type="button"
+                  className="pcms-btn"
+                  onClick={() => onImportado(estado.eventoId as string)}
+                >
+                  Revisar evento
+                </button>
+              )}
+            </>
           ) : (
             <>
               <button

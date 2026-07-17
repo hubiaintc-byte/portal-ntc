@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import {
   EVENTOS_AGENDA,
@@ -363,9 +364,9 @@ export default async function HomePage() {
                     <strong>{area.programasCount}</strong> Programas estratégicos
                   </p>
                   <div className="area-card-actions">
-                    <a className="link-arrow light" href={area.linkProgramas.href}>
+                    <Link className="link-arrow light" href={area.linkProgramas.href}>
                       {area.linkProgramas.rotulo}
-                    </a>
+                    </Link>
                     <a className="link-arrow light" href={area.linkEventos.href}>
                       {area.linkEventos.rotulo}
                     </a>
@@ -452,14 +453,14 @@ export default async function HomePage() {
               <p className="curadoria-selo-subhead">{f.curadoria.subhead}</p>
               <p className="curadoria-selo-context">{f.curadoria.contexto}</p>
             </div>
-            <a className="curadoria-selo-link" href={f.curadoria.ctaLink.href}>
+            <Link className="curadoria-selo-link" href={f.curadoria.ctaLink.href}>
               {f.curadoria.ctaLink.rotulo}
-            </a>
+            </Link>
           </header>
 
           <div className="curadoria-grid fade-in" role="list">
             {f.curadoria.vitrines.map((v) => (
-              <a
+              <Link
                 key={v.vertical}
                 className="vitrine"
                 data-vertical={v.vertical}
@@ -482,16 +483,16 @@ export default async function HomePage() {
                   </ul>
                   <span className="vitrine-cta">{v.cta}</span>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
 
           <div className="curadoria-cta-final fade-in">
             <p className="curadoria-cta-final-text">{f.curadoria.rodape.texto}</p>
-            <a href={f.curadoria.rodape.href}>
+            <Link href={f.curadoria.rodape.href}>
               {f.curadoria.rodape.cta}
               <span className="arrow">→</span>
-            </a>
+            </Link>
           </div>
         </div>
       </section>

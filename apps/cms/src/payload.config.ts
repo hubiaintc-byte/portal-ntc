@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { resendAdapter } from "@payloadcms/email-resend";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { en } from "@payloadcms/translations/languages/en";
@@ -11,13 +12,16 @@ import sharp from "sharp";
 
 import { Areas } from "./collections/Areas";
 import { AuditLog } from "./collections/AuditLog";
+import { ClientesCrm } from "./collections/ClientesCrm";
 import { Clientes } from "./collections/Clientes";
+import { ContatosCrm } from "./collections/ContatosCrm";
 import { Conteudos } from "./collections/Conteudos";
 import { Especialistas } from "./collections/Especialistas";
 import { Eventos } from "./collections/Eventos";
 import { Leads } from "./collections/Leads";
 import { Media } from "./collections/Media";
 import { Modulos } from "./collections/Modulos";
+import { Oportunidades } from "./collections/Oportunidades";
 import { Programas } from "./collections/Programas";
 import { Users } from "./collections/Users";
 import { CorpoDocente } from "./globals/CorpoDocente";
@@ -42,8 +46,23 @@ const bucket = process.env.SUPABASE_BUCKET || "ntc-portal-media";
  * Cliente) e operacionais (Lead, AuditLog) + Globals (Home, Rodape) conforme
  * docs/11_Schema_Payload_CMS_v1.md §§4-14.
  */
+// EMAIL_REMETENTE no formato 'Nome <email@dominio>'. Sem RESEND_API_KEY o
+// Payload mantém o comportamento default (e-mail logado no console) — dev
+// continua testável e nada quebra em prod até a chave existir.
+const remetente = process.env.EMAIL_REMETENTE ?? "Painel NTC <nao-responda@institutontc.com.br>";
+const mRemetente = remetente.match(/^(.*)<([^>]+)>\s*$/);
+
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
+  ...(process.env.RESEND_API_KEY
+    ? {
+        email: resendAdapter({
+          apiKey: process.env.RESEND_API_KEY,
+          defaultFromAddress: mRemetente?.[2]?.trim() ?? remetente,
+          defaultFromName: mRemetente?.[1]?.trim() ?? "Painel NTC",
+        }),
+      }
+    : {}),
   // A UI do admin Payload foi removida — o painel próprio em / (route group
   // (painel)) é o único admin. `user` continua definindo a collection de
   // autenticação usada por payload.login()/payload.auth().
@@ -65,6 +84,9 @@ export default buildConfig({
     Conteudos,
     Clientes,
     Leads,
+    ClientesCrm,
+    ContatosCrm,
+    Oportunidades,
     AuditLog,
   ],
   globals: [Home, OGrupo, CorpoDocente, Rodape],
@@ -78,10 +100,10 @@ export default buildConfig({
     schemaOutputFile: path.resolve(dirname, "generated-schema.graphql"),
   },
   db: postgresAdapter({
-    // push desabilitado: o dev-mode do drizzle re-puxa o schema do banco
-    // remoto a cada request do Next (segundos por página) e um push
-    // acidental pode descartar dados. Migrações de schema são manuais.
-    push: false,
+    // push desabilitado por padrão (dev-mode do drizzle re-puxa o schema a cada
+    // request e um push acidental pode descartar dados). Sincronização de schema
+    // é manual e pontual: PAYLOAD_DB_PUSH=1 pnpm payload:push:schema.
+    push: process.env.PAYLOAD_DB_PUSH === "1",
     pool: {
       connectionString: process.env.DATABASE_URI || "",
     },

@@ -5,22 +5,22 @@ import { useState, useTransition } from "react";
 import type {
   EventoCmsDetalhe,
   EventoCmsResumo,
-  LeadCmsDetalhe,
   LeadCmsResumo,
   PalestranteCmsDetalhe,
   PalestranteCmsResumo,
 } from "@/lib/cms/painelCms";
 
-import { carregarEvento, carregarLead, carregarPalestrante } from "./acoes";
-import { sair } from "./acoesAuth";
+import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
+
+import { carregarEvento, carregarPalestrante, carregarUsuarios } from "./acoes";
+import { ShellPainel, type GrupoNav } from "./shell/ShellPainel";
 import { TelaDashboard } from "./TelaDashboard";
 import { TelaHome } from "./TelaHome";
 import { TelaPalestrantes } from "./TelaPalestrantes";
 import { TelaEventos } from "./TelaEventos";
-import { TelaLeads } from "./TelaLeads";
 import { TelaConfiguracoes } from "./TelaConfiguracoes";
+import { TelaUsuarios } from "./TelaUsuarios";
 import { DetalheEvento } from "./DetalheEvento";
-import { DetalheLead } from "./DetalheLead";
 import { DetalhePalestrante } from "./DetalhePalestrante";
 
 /**
@@ -31,8 +31,8 @@ import { DetalhePalestrante } from "./DetalhePalestrante";
  */
 
 interface ShellCmsProps {
-  /** Usuário autenticado (rodapé da sidebar). */
-  usuario: { nome: string; email: string };
+  /** Usuário autenticado (rodapé da sidebar + guarda do item "Usuários"). */
+  usuario: { nome: string; email: string; perfil: string; id: string };
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
   leads: LeadCmsResumo[];
@@ -40,7 +40,7 @@ interface ShellCmsProps {
   erroLeitura: boolean;
 }
 
-type TelaId = "dashboard" | "palestrantes" | "eventos" | "home" | "leads" | "config";
+type TelaId = "dashboard" | "palestrantes" | "eventos" | "home" | "config" | "usuarios";
 
 interface ItemNav {
   id: TelaId;
@@ -79,16 +79,18 @@ const Ico = {
       <path d="M10 20v-6h4v6" />
     </svg>
   ),
-  leads: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="3" y="5" width="18" height="14" />
-      <path d="m3 7 9 6 9-6" />
-    </svg>
-  ),
   config: (
     <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
       <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" />
+    </svg>
+  ),
+  usuarios: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="8.5" cy="7.5" r="3" />
+      <path d="M2.5 19.5c0-3.1 2.4-5.5 6-5.5s6 2.4 6 5.5" />
+      <circle cx="17" cy="8.5" r="2.4" />
+      <path d="M15.8 14.3c2.6.4 4.7 2.3 4.7 5.2" />
     </svg>
   ),
 };
@@ -100,26 +102,14 @@ const NAV_PRINCIPAL: ItemNav[] = [
   { id: "home", rotulo: "Home", icone: Ico.home },
 ];
 
-const NAV_COMERCIAL: ItemNav[] = [{ id: "leads", rotulo: "Leads", icone: Ico.leads }];
-
-const NAV_SISTEMA: ItemNav[] = [{ id: "config", rotulo: "Configurações", icone: Ico.config }];
-
 const CRUMB: Record<TelaId, string> = {
   dashboard: "Painel",
   palestrantes: "Editorial · Palestrantes",
   eventos: "Editorial · Eventos",
   home: "Editorial · Home",
-  leads: "Comercial · Leads",
   config: "Sistema · Configurações",
+  usuarios: "Sistema · Usuários",
 };
-
-/** Iniciais para o avatar da sidebar ("Maria Souza" → "MS"). */
-function iniciais(nome: string): string {
-  const partes = nome.trim().split(/\s+/);
-  const primeira = partes[0]?.[0] ?? "";
-  const ultima = partes.length > 1 ? (partes[partes.length - 1]?.[0] ?? "") : "";
-  return (primeira + ultima).toUpperCase() || "NT";
-}
 
 export function ShellCms({
   usuario,
@@ -131,14 +121,36 @@ export function ShellCms({
 }: ShellCmsProps) {
   const [tela, setTela] = useState<TelaId>("dashboard");
   const [eventoDet, setEventoDet] = useState<EventoCmsDetalhe | null>(null);
+  // true ⇒ o detalhe abre direto em edição (revisão pós-importação de PDF).
+  const [eventoEmEdicao, setEventoEmEdicao] = useState(false);
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
-  const [leadDet, setLeadDet] = useState<LeadCmsDetalhe | null>(null);
   const [carregando, iniciarCarga] = useTransition();
 
-  function abrirEvento(id: string) {
+  const ehSuperAdmin = usuario.perfil === "super-admin";
+
+  // Lista de usuários NUNCA vem no payload inicial da page.tsx (evitaria
+  // enviar dados de gestão de usuários a quem não é super-admin) — carrega
+  // sob demanda quando a tela "Usuários" é aberta pela primeira vez.
+  const [usuarios, setUsuarios] = useState<UsuarioGestaoResumo[]>([]);
+  const [usuariosCarregados, setUsuariosCarregados] = useState(false);
+  const [carregandoUsuarios, iniciarCargaUsuarios] = useTransition();
+
+  function abrirUsuarios() {
+    if (usuariosCarregados) return;
+    iniciarCargaUsuarios(async () => {
+      const lista = await carregarUsuarios();
+      setUsuarios(lista);
+      setUsuariosCarregados(true);
+    });
+  }
+
+  function abrirEvento(id: string, emEdicao = false) {
     iniciarCarga(async () => {
       const det = await carregarEvento(id);
-      if (det) setEventoDet(det);
+      if (det) {
+        setEventoDet(det);
+        setEventoEmEdicao(emEdicao);
+      }
     });
   }
 
@@ -149,153 +161,88 @@ export function ShellCms({
     });
   }
 
-  function abrirLead(id: string) {
-    iniciarCarga(async () => {
-      const det = await carregarLead(id);
-      if (det) setLeadDet(det);
-    });
-  }
-
   // Trocar de tela pela sidebar sempre fecha qualquer detalhe aberto.
   function irPara(id: TelaId) {
     setEventoDet(null);
     setPalestranteDet(null);
-    setLeadDet(null);
     setTela(id);
+    if (id === "usuarios") abrirUsuarios();
   }
 
-  function renderItem(item: ItemNav) {
-    return (
-      <button
-        key={item.id}
-        type="button"
-        className={`pcms-nav__item${tela === item.id ? " pcms-nav__item--ativo" : ""}`}
-        aria-current={tela === item.id ? "page" : undefined}
-        onClick={() => irPara(item.id)}
-      >
-        {item.icone}
-        {item.rotulo}
-      </button>
-    );
-  }
+  const detalheAberto = eventoDet ?? palestranteDet;
 
-  const detalheAberto = eventoDet ?? palestranteDet ?? leadDet;
+  const navSistema: ItemNav[] = ehSuperAdmin
+    ? [
+        { id: "config", rotulo: "Configurações", icone: Ico.config },
+        { id: "usuarios", rotulo: "Usuários", icone: Ico.usuarios },
+      ]
+    : [{ id: "config", rotulo: "Configurações", icone: Ico.config }];
+
+  const grupos: GrupoNav[] = [
+    { rotulo: "Editorial", itens: NAV_PRINCIPAL },
+    { rotulo: "Sistema", itens: navSistema },
+  ];
 
   return (
-    <div className="pcms-root">
-      <aside className="pcms-sidebar">
-        <div className="pcms-sidebar__brand">
-          {/* Logo NTC simplificado para a sidebar escura (lockup vertical). */}
-          <svg
-            className="pcms-sidebar__logo"
-            viewBox="0 0 80 80"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect x="6" y="20" width="14" height="40" rx="2" fill="#B5995A" />
-            <text
-              x="44"
-              y="54"
-              textAnchor="middle"
-              fontFamily="Georgia, serif"
-              fontSize="34"
-              fontWeight="600"
-              fill="#F4EFE6"
-            >
-              N
-            </text>
-          </svg>
-          <div className="pcms-sidebar__wordmark">
-            <strong>Grupo NTC</strong>
-            <span>Painel Admin</span>
-          </div>
-        </div>
-
-        <nav className="pcms-nav" aria-label="Navegação principal do CMS">
-          <div className="pcms-nav__group">
-            <p className="pcms-nav__label">Editorial</p>
-            {NAV_PRINCIPAL.map(renderItem)}
-          </div>
-          <div className="pcms-nav__group">
-            <p className="pcms-nav__label">Comercial</p>
-            {NAV_COMERCIAL.map(renderItem)}
-          </div>
-          <div className="pcms-nav__group">
-            <p className="pcms-nav__label">Sistema</p>
-            {NAV_SISTEMA.map(renderItem)}
-          </div>
-        </nav>
-
-        <div className="pcms-sidebar__foot">
-          <div className="pcms-avatar-mini">{iniciais(usuario.nome)}</div>
-          <div>
-            <strong>{usuario.nome}</strong>
-            <span>{usuario.email}</span>
-          </div>
-          <form action={sair} className="pcms-sair__form">
-            <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M9 4H5v16h4" />
-                <path d="m14 8 4 4-4 4" />
-                <path d="M18 12H9" />
-              </svg>
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      <div className="pcms-main">
-        <header className="pcms-topbar">
-          <div className="pcms-topbar__crumb">
-            Grupo NTC · <b>{CRUMB[tela]}</b>
-          </div>
-          <label className="pcms-search">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-            <input type="search" placeholder="Buscar no portal…" aria-label="Buscar" />
-          </label>
-        </header>
-
-        <main className="pcms-content" aria-busy={carregando}>
-          {carregando && <div className="pcms-carregando">Carregando…</div>}
-
-          {eventoDet ? (
-            <DetalheEvento
-              evento={eventoDet}
-              palestrantesDisponiveis={palestrantes}
-              onVoltar={() => setEventoDet(null)}
-            />
-          ) : palestranteDet ? (
-            <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
-          ) : leadDet ? (
-            <DetalheLead lead={leadDet} onVoltar={() => setLeadDet(null)} />
-          ) : (
-            !detalheAberto && (
-              <>
-                {tela === "dashboard" && (
-                  <TelaDashboard
-                    eventos={eventos}
-                    palestrantes={palestrantes}
-                    leads={leads}
-                    erroLeitura={erroLeitura}
-                  />
-                )}
-                {tela === "palestrantes" && (
-                  <TelaPalestrantes palestrantes={palestrantes} onAbrir={abrirPalestrante} />
-                )}
-                {tela === "eventos" && <TelaEventos eventos={eventos} onAbrir={abrirEvento} />}
-                {tela === "home" && (
-                  <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />
-                )}
-                {tela === "leads" && <TelaLeads leads={leads} onAbrir={abrirLead} />}
-                {tela === "config" && <TelaConfiguracoes />}
-              </>
-            )
-          )}
-        </main>
-      </div>
-    </div>
+    <ShellPainel
+      modulo="site"
+      usuario={usuario}
+      grupos={grupos}
+      telaAtiva={tela}
+      onIrPara={(id) => irPara(id as TelaId)}
+      breadcrumb={CRUMB[tela]}
+      carregando={carregando}
+    >
+      {eventoDet ? (
+        <DetalheEvento
+          key={eventoDet.id}
+          evento={eventoDet}
+          palestrantesDisponiveis={palestrantes}
+          edicaoInicial={eventoEmEdicao}
+          onVoltar={() => {
+            setEventoDet(null);
+            setEventoEmEdicao(false);
+          }}
+        />
+      ) : palestranteDet ? (
+        <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
+      ) : (
+        !detalheAberto && (
+          <>
+            {tela === "dashboard" && (
+              <TelaDashboard
+                eventos={eventos}
+                palestrantes={palestrantes}
+                leads={leads}
+                erroLeitura={erroLeitura}
+              />
+            )}
+            {tela === "palestrantes" && (
+              <TelaPalestrantes palestrantes={palestrantes} onAbrir={abrirPalestrante} />
+            )}
+            {tela === "eventos" && (
+              <TelaEventos
+                eventos={eventos}
+                onAbrir={abrirEvento}
+                onAbrirImportado={(id) => abrirEvento(id, true)}
+              />
+            )}
+            {tela === "home" && <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />}
+            {tela === "config" && <TelaConfiguracoes usuario={usuario} />}
+            {tela === "usuarios" && ehSuperAdmin && (
+              <TelaUsuarios
+                usuarios={usuarios}
+                usuarioAtualId={usuario.id}
+                carregando={carregandoUsuarios}
+                onUsuariosAtualizados={(lista) => {
+                  setUsuarios(lista);
+                  setUsuariosCarregados(true);
+                }}
+              />
+            )}
+          </>
+        )
+      )}
+    </ShellPainel>
   );
 }

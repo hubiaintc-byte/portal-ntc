@@ -1,5 +1,12 @@
 import "server-only";
 
+import type { RequiredDataFromCollectionSlug } from "payload";
+
+import { casarOuCriarPalestrantes } from "@/lib/importacaoPdf/casarOuCriarPalestrantes";
+import { textoParaLexical } from "@/lib/lexicalBuilders";
+import { extrairTextoPdf } from "@/lib/importacaoPdf/extrairTextoPdf";
+import { montarCamposEvento } from "@/lib/importacaoPdf/montarCamposEvento";
+import { parsearFolderEvento } from "@/lib/importacaoPdf/parsearFolderEvento";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
@@ -17,25 +24,116 @@ export interface ResultadoEscrita {
   erro?: string;
 }
 
-export interface CamposTextoEvento {
+export interface CamposEventoCompletos {
   nome: string;
   dataInicio: string;
+  dataFim: string;
   resumo: string;
+  modalidade: string;
+  cargaHoraria: string;
+  valor: string;
+  linkInscricaoExterna: string;
+  localNome: string;
+  localEndereco: string;
+  localCidade: string;
+  localEstado: string;
+  replayDisponivel: boolean;
+  prazoReplay: string;
+  /** Textos planos do editor: linhas viram parágrafos, "- " vira lista. */
+  publicoAlvoTexto: string;
+  objetivosTexto: string;
+  conteudoProgramaticoTexto: string;
+  programacaoDetalhada: { horario: string; titulo: string; descricao: string }[];
+  diferenciais: { titulo: string; descricao: string }[];
+  faq: { pergunta: string; respostaTexto: string }[];
+}
+
+/** "" ⇒ null (limpa o campo no Payload em vez de gravar string vazia). */
+function ouNulo(valor: string): string | null {
+  const v = valor.trim();
+  return v.length > 0 ? v : null;
+}
+
+/**
+ * Valida as linhas repetíveis antes do update: linha totalmente vazia é
+ * descartada, mas linha parcialmente preenchida sem os campos mínimos vira
+ * erro — filtrar em silêncio apagava conteúdo digitado sem aviso.
+ */
+function validarLinhas(campos: CamposEventoCompletos): string | null {
+  const progIncompleta = campos.programacaoDetalhada.findIndex(
+    (p) =>
+      [p.horario, p.titulo, p.descricao].some((v) => v.trim().length > 0) &&
+      (p.horario.trim().length === 0 || p.titulo.trim().length === 0),
+  );
+  if (progIncompleta >= 0) {
+    return `Programação detalhada: a sessão ${progIncompleta + 1} precisa de horário e título — complete ou remova a linha.`;
+  }
+  const faqIncompleta = campos.faq.findIndex(
+    (f) => f.respostaTexto.trim().length > 0 && f.pergunta.trim().length === 0,
+  );
+  if (faqIncompleta >= 0) {
+    return `Perguntas frequentes: a linha ${faqIncompleta + 1} tem resposta sem pergunta — complete ou remova a linha.`;
+  }
+  return null;
 }
 
 export async function salvarCamposEvento(
   id: string,
-  campos: CamposTextoEvento,
+  campos: CamposEventoCompletos,
 ): Promise<ResultadoEscrita> {
   try {
+    const erroLinhas = validarLinhas(campos);
+    if (erroLinhas) return { ok: false, erro: erroLinhas };
+
     const payload = await obterPayload();
+    // Os builders de lexicalBuilders.ts tipam `children` como `unknown[]`
+    // (nós heterogêneos: parágrafo/heading/lista); o Payload aceita qualquer
+    // array de nós JSON em runtime (validação é do editor Lexical
+    // configurado na coleção, não deste shape estreito de TS) — cast pontual
+    // nos três campos richText e no array de FAQ que os contém.
+    type EventoRichText = RequiredDataFromCollectionSlug<"eventos">["publicoAlvo"];
+    type EventoFaq = RequiredDataFromCollectionSlug<"eventos">["faq"];
+    type EventoModalidade = RequiredDataFromCollectionSlug<"eventos">["modalidade"];
     await payload.update({
       collection: "eventos",
       id,
       data: {
         nome: campos.nome,
-        dataInicio: campos.dataInicio,
+        // Campo required no schema: import sem data parseada chega como "" e a
+        // chave é omitida (string vazia estoura no timestamptz do Postgres);
+        // o rascunho segue sem data até o editor preencher.
+        ...(campos.dataInicio.trim().length > 0 ? { dataInicio: campos.dataInicio } : {}),
+        dataFim: ouNulo(campos.dataFim),
         resumo: campos.resumo,
+        // Também required: "" (placeholder "— selecionar —") não sobrescreve.
+        // O <select> do formulário só oferece as opções válidas da coleção
+        // (online/presencial/hibrido) — cast reflete essa garantia da UI.
+        ...(campos.modalidade
+          ? { modalidade: campos.modalidade as EventoModalidade }
+          : {}),
+        cargaHoraria: campos.cargaHoraria,
+        valor: ouNulo(campos.valor),
+        linkInscricaoExterna: ouNulo(campos.linkInscricaoExterna),
+        local: {
+          nomeLocal: ouNulo(campos.localNome),
+          endereco: ouNulo(campos.localEndereco),
+          cidade: ouNulo(campos.localCidade),
+          estado: ouNulo(campos.localEstado),
+        },
+        replayDisponivel: campos.replayDisponivel,
+        prazoReplay: ouNulo(campos.prazoReplay),
+        publicoAlvo: textoParaLexical(campos.publicoAlvoTexto) as EventoRichText,
+        objetivos: textoParaLexical(campos.objetivosTexto) as EventoRichText,
+        conteudoProgramatico: textoParaLexical(campos.conteudoProgramaticoTexto) as EventoRichText,
+        programacaoDetalhada: campos.programacaoDetalhada
+          .filter((p) => p.horario.trim().length > 0 && p.titulo.trim().length > 0)
+          .map((p) => ({ horario: p.horario, titulo: p.titulo, descricao: ouNulo(p.descricao) })),
+        diferenciais: campos.diferenciais
+          .filter((d) => d.titulo.trim().length > 0 || d.descricao.trim().length > 0)
+          .map((d) => ({ titulo: ouNulo(d.titulo), descricao: ouNulo(d.descricao) })),
+        faq: campos.faq
+          .filter((f) => f.pergunta.trim().length > 0)
+          .map((f) => ({ pergunta: f.pergunta, resposta: textoParaLexical(f.respostaTexto) })) as EventoFaq,
       },
       // draft: true mantém o documento no mesmo estado de publicação (rascunho
       // continua rascunho); não força publish.
@@ -223,11 +321,23 @@ export async function enviarMidiaEvento(
   }
 }
 
+export interface RelatorioImportacao {
+  /** Rótulos dos campos preenchidos a partir do PDF. */
+  preenchidos: string[];
+  /** Rótulos dos campos que ficaram vazios para preenchimento manual. */
+  vazios: string[];
+  palestrantesVinculados: string[];
+  /** Especialistas criados agora (ocultos do site até revisão). */
+  palestrantesCriados: string[];
+  avisos: string[];
+}
+
 export interface ResultadoImportacao extends ResultadoEscrita {
   /** Id do rascunho de evento criado, para abrir no detalhe. */
   eventoId?: string;
-  /** Nome provisório do rascunho (derivado do arquivo). */
+  /** Nome do rascunho (extraído do PDF ou derivado do arquivo). */
   nome?: string;
+  relatorio?: RelatorioImportacao;
 }
 
 /** Tira ".pdf", troca separadores por espaço e capitaliza para um título legível. */
@@ -267,19 +377,110 @@ export async function criarEventoDePdf(arquivo: File): Promise<ResultadoImportac
       overrideAccess: true,
     });
 
-    const nome = nomeProvisorioDePdf(arquivo.name);
+    // Extração + parse do template. Qualquer falha aqui NÃO bloqueia a
+    // importação: cai no rascunho vazio de antes, com aviso no relatório.
+    const relatorio: RelatorioImportacao = {
+      preenchidos: [],
+      vazios: [],
+      palestrantesVinculados: [],
+      palestrantesCriados: [],
+      avisos: [],
+    };
+    let camposDoPdf: Record<string, unknown> = {};
+    let nome = nomeProvisorioDePdf(arquivo.name);
+    try {
+      const paginas = await extrairTextoPdf(new Uint8Array(buffer));
+      if (paginas.join("").trim().length === 0) {
+        relatorio.avisos.push(
+          "O PDF não tem camada de texto (provável digitalização) — preencha os campos manualmente.",
+        );
+      } else {
+        const dados = parsearFolderEvento(paginas);
+        const montagem = montarCamposEvento(dados);
+        camposDoPdf = montagem.data;
+        relatorio.preenchidos = montagem.preenchidos;
+        relatorio.vazios = montagem.vazios;
+        if (dados.nome) nome = dados.nome;
+
+        // Adapta a Local API à superfície mínima tipada (interface mockável).
+        const palestrantes = await casarOuCriarPalestrantes(
+          {
+            async find(args) {
+              // pagination:false ⇒ todos os docs (o teto fixo criava
+              // duplicatas silenciosas ao passar de N especialistas); select
+              // busca só o nome — o casamento não precisa do doc inteiro.
+              const r = await payload.find({
+                collection: "especialistas",
+                limit: args.limit,
+                pagination: false,
+                depth: 0,
+                select: { nome: true },
+                overrideAccess: true,
+              });
+              // Com select, o tipo projetado do Payload não estreita nome —
+              // narrowing explícito em vez de cast.
+              return {
+                docs: r.docs.map((d) => ({
+                  id: d.id,
+                  nome: typeof d.nome === "string" ? d.nome : "",
+                })),
+              };
+            },
+            async create(args) {
+              // O objeto vem completo do casarOuCriarPalestrantes (campos
+              // obrigatórios da coleção); o cast pontual evita replicar o
+              // tipo gerado do Payload na interface mockável. draft:true é
+              // obrigatório: sem ele a foto required derruba toda criação.
+              // Fixado no slug literal "especialistas" (em vez de extrair de
+              // Parameters<typeof payload.create>) para que o tipo narrow
+              // para Especialista, não para a união de todas as coleções.
+              const r = await payload.create({
+                collection: "especialistas",
+                data: args.data as unknown as RequiredDataFromCollectionSlug<"especialistas">,
+                draft: args.draft,
+                overrideAccess: true,
+              });
+              return { id: r.id };
+            },
+          },
+          dados.palestrantes,
+        );
+        relatorio.palestrantesVinculados = palestrantes.vinculados;
+        relatorio.palestrantesCriados = palestrantes.criados;
+        if (palestrantes.pendentes.length > 0) {
+          relatorio.avisos.push(
+            `Não foi possível cadastrar: ${palestrantes.pendentes.join(", ")}. Vincule manualmente.`,
+          );
+        }
+        if (palestrantes.ids.length > 0) camposDoPdf.palestrantes = palestrantes.ids;
+      }
+    } catch (e) {
+      relatorio.avisos.push(
+        `A leitura automática do PDF falhou (${e instanceof Error ? e.message : "erro desconhecido"}) — o rascunho foi criado vazio.`,
+      );
+      camposDoPdf = {};
+    }
+
     const evento = await payload.create({
       collection: "eventos",
+      // `camposDoPdf` é Record<string, unknown> (vindo do parser do PDF,
+      // campos variáveis) e o rascunho é criado propositalmente sem
+      // slug/area/dataInicio/modalidade — ver comentário da função acima:
+      // `versions.drafts: true` na coleção faz o Payload relaxar os campos
+      // required quando `draft: true`, então o cast reflete uma garantia de
+      // runtime que o tipo gerado (pensado para o registro completo) não
+      // expressa.
       data: {
+        ...camposDoPdf,
         nome,
         folderPdf: media.id,
         _status: "draft",
-      },
+      } as RequiredDataFromCollectionSlug<"eventos">,
       draft: true,
       overrideAccess: true,
     });
 
-    return { ok: true, eventoId: String(evento.id), nome };
+    return { ok: true, eventoId: String(evento.id), nome, relatorio };
   } catch (e) {
     return { ok: false, erro: e instanceof Error ? e.message : "Erro ao importar o PDF." };
   }

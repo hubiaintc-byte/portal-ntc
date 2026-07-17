@@ -4,6 +4,10 @@ import { HeaderHome } from "../(home)/HeaderHome";
 import { FooterHome } from "../(home)/FooterHome";
 import { InteracoesScroll } from "../(home)/InteracoesScroll";
 
+// CSS literal das páginas deste route group (ex-root layout — ver
+// comentário em app/layout.tsx). Ordem preservada da importação original.
+import "../solucoes-prototipo.css";
+
 /**
  * Layout das páginas do guarda-chuva Soluções:
  *   /solucoes        (porta de 26_Pagina_Solucoes_v1.html)

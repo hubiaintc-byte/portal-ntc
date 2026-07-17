@@ -1887,12 +1887,13 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   border-left: 1px solid rgba(244, 241, 232, 0.12);
 }
 @media (max-width: 1099px) {
-  .evt-nav-actions {
-    border-left: 0; border-top: 1px solid rgba(244, 241, 232, 0.12);
-    /* Ações com white-space: nowrap rolam horizontalmente (mesmo padrão
-       das âncoras) em vez de alargar a trilha 1fr além do viewport. */
-    overflow-x: auto; scrollbar-width: thin;
-  }
+  .evt-nav-actions { border-left: 0; border-top: 1px solid rgba(244, 241, 232, 0.12); }
+}
+@media (max-width: 599px) {
+  /* Ações com white-space: nowrap quebram para a linha seguinte em vez de
+     alargar a trilha 1fr além do viewport. (Não usar overflow-x: auto aqui:
+     o clipping esconderia o dropdown "Adicionar à agenda".) */
+  .evt-nav-actions { flex-wrap: wrap; }
 }
 .evt-nav-action {
   display: inline-flex; align-items: center; gap: 8px;

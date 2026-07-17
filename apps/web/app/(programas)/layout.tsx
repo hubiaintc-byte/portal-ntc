@@ -4,6 +4,11 @@ import { HeaderHome } from "../(home)/HeaderHome";
 import { FooterHome } from "../(home)/FooterHome";
 import { InteracoesScroll } from "../(home)/InteracoesScroll";
 
+// CSS literal das páginas deste route group (ex-root layout — ver
+// comentário em app/layout.tsx). Ordem preservada da importação original.
+import "../programas-prototipo.css";
+import "../modulo-prototipo.css";
+
 /**
  * Layout das páginas individuais de programa (/programas/[slug]).
  *

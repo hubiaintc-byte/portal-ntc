@@ -3,8 +3,10 @@
  *
  * CMS próprio com a identidade visual do site (Soberana 2026): Oxford
  * dominante, Pergaminho, Dourado cerimonial, Cormorant + Barlow, logo NTC.
- * Segue CLAUDE.md §3 (paleta 60·15·10·5, border-radius 0 em estruturas,
- * ícones lineares funcionais).
+ * Paleta 60·15·10·5 e ícones lineares do CLAUDE.md §3; desde 17/07/2026 o
+ * painel usa cantos arredondados e sombras (idiom do CRM legado — exceção
+ * registrada no spec 2026-07-17, decisão do PO). Não reverter os radius
+ * para 0.
  *
  * Escopo das classes prefixado `pcms-` para não colidir com o CSS das outras
  * páginas portadas importadas no mesmo root layout.
@@ -22,6 +24,9 @@ body {
   --pcms-oxford-escuro: #0b2545;
   --pcms-oxford-claro: #1e4e8c;
   --pcms-cardeal: #8e2b27;
+  --pcms-radius: 8px;
+  --pcms-radius-controle: 6px;
+  --pcms-sombra: 0 1px 2px rgba(17, 54, 94, 0.06), 0 4px 14px rgba(17, 54, 94, 0.08);
   --pcms-oliva: #5c6b3b;
   --pcms-dourado: #b5995a;
   --pcms-pergaminho: #f4efe6;
@@ -58,39 +63,131 @@ body {
 
 .pcms-sidebar__brand {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 24px 22px 20px;
-  border-bottom: 1px solid rgba(244, 239, 230, 0.12);
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 16px 14px;
 }
 
 .pcms-sidebar__logo {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 64px;
 }
 
-.pcms-sidebar__wordmark {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.05;
-}
-
-.pcms-sidebar__wordmark strong {
-  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--pcms-pergaminho);
-}
-
-.pcms-sidebar__wordmark span {
-  font-family: var(--font-corpo-cond), var(--font-corpo), "Barlow", sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
+.pcms-sidebar__painel-rotulo {
+  font-size: 10px;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--pcms-dourado);
-  margin-top: 3px;
+  padding-left: 2px;
+}
+
+.pcms-seletor-modulo {
+  position: relative;
+  margin: 0 16px 18px;
+}
+
+.pcms-seletor-modulo__botao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  background: rgba(244, 239, 230, 0.08);
+  border: 1px solid rgba(244, 239, 230, 0.2);
+  border-radius: var(--pcms-radius-controle);
+  color: var(--pcms-pergaminho);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.pcms-seletor-modulo__botao:hover {
+  background: rgba(244, 239, 230, 0.14);
+}
+
+.pcms-seletor-modulo__botao:focus-visible {
+  outline: 2px solid var(--pcms-dourado);
+  outline-offset: 2px;
+}
+
+.pcms-seletor-modulo__textos {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pcms-seletor-modulo__modulo {
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pcms-seletor-modulo__desc {
+  font-size: 11px;
+  color: rgba(244, 239, 230, 0.65);
+}
+
+.pcms-seletor-modulo__seta {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.pcms-seletor-modulo__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
+  padding: 4px;
+}
+
+.pcms-seletor-modulo__opcao {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 8px 10px;
+  border-radius: var(--pcms-radius-controle);
+  color: var(--pcms-grafite);
+  text-decoration: none;
+}
+
+.pcms-seletor-modulo__opcao .pcms-seletor-modulo__modulo {
+  color: var(--pcms-oxford);
+}
+
+.pcms-seletor-modulo__opcao .pcms-seletor-modulo__desc {
+  color: var(--pcms-grafite-suave);
+  grid-column: 1;
+}
+
+.pcms-seletor-modulo__opcao:hover {
+  background: var(--pcms-osso);
+}
+
+.pcms-seletor-modulo__opcao:focus-visible {
+  outline: 2px solid var(--pcms-oxford);
+  outline-offset: -2px;
+}
+
+.pcms-seletor-modulo__opcao--ativa .pcms-seletor-modulo__modulo {
+  color: var(--pcms-dourado);
+}
+
+.pcms-seletor-modulo__check {
+  width: 16px;
+  height: 16px;
+  color: var(--pcms-dourado);
+  grid-row: span 2;
 }
 
 .pcms-nav {
@@ -126,7 +223,8 @@ body {
   font-family: inherit;
   font-size: 0.9rem;
   padding: 9px 10px;
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
+  margin: 0 10px 2px;
   position: relative;
   transition:
     color 0.15s ease,
@@ -141,8 +239,7 @@ body {
 .pcms-nav__item--ativo {
   color: var(--pcms-dourado);
   font-weight: 600;
-  background: rgba(181, 153, 90, 0.1);
-  box-shadow: inset 3px 0 0 var(--pcms-dourado);
+  background: rgba(244, 239, 230, 0.12);
 }
 
 .pcms-nav__item:focus-visible {
@@ -159,12 +256,37 @@ body {
   fill: none;
 }
 
-.pcms-sidebar__foot {
-  padding: 16px 22px;
-  border-top: 1px solid rgba(244, 239, 230, 0.12);
+/* Rodapé da sidebar: o nav acima tem flex-grow, então o bloco desce sozinho. */
+.pcms-sidebar__usuario {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
+  margin: auto 16px 16px;
+  padding: 12px;
+  background: rgba(244, 239, 230, 0.06);
+  border-radius: var(--pcms-radius);
+}
+
+.pcms-sidebar__usuario-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.pcms-sidebar__usuario-info strong {
+  display: block;
+  font-size: 13px;
+  color: var(--pcms-pergaminho);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pcms-sidebar__perfil {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--pcms-dourado);
 }
 
 .pcms-avatar-mini {
@@ -179,20 +301,6 @@ body {
   font-size: 0.78rem;
   font-weight: 600;
   flex-shrink: 0;
-}
-
-.pcms-sidebar__foot div {
-  line-height: 1.2;
-}
-.pcms-sidebar__foot strong {
-  display: block;
-  font-size: 0.84rem;
-  color: var(--pcms-pergaminho);
-  font-weight: 500;
-}
-.pcms-sidebar__foot span {
-  font-size: 0.72rem;
-  color: rgba(244, 239, 230, 0.55);
 }
 
 /* ===== Área principal =================================================== */
@@ -233,12 +341,14 @@ body {
   gap: 9px;
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius-controle);
   padding: 8px 13px;
   width: 280px;
   color: var(--pcms-grafite-suave);
 }
 .pcms-search input {
   border: 0;
+  border-radius: var(--pcms-radius-controle);
   outline: 0;
   background: transparent;
   font-family: inherit;
@@ -299,17 +409,17 @@ body {
   font-size: 0.86rem;
   font-weight: 500;
   padding: 10px 18px;
-  border: 1px solid var(--pcms-oxford);
-  background: var(--pcms-oxford);
-  color: var(--pcms-osso);
+  border: 1px solid var(--pcms-dourado);
+  background: var(--pcms-dourado);
+  color: var(--pcms-oxford-escuro);
   cursor: pointer;
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   transition:
     background 0.15s ease,
     color 0.15s ease;
 }
-.pcms-btn:hover {
-  background: var(--pcms-oxford-escuro);
+.pcms-btn:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 999px rgba(17, 54, 94, 0.08);
 }
 .pcms-btn svg {
   width: 15px;
@@ -321,6 +431,7 @@ body {
 .pcms-btn--ghost {
   background: transparent;
   color: var(--pcms-oxford);
+  border-radius: var(--pcms-radius-controle);
 }
 .pcms-btn--ghost:hover {
   background: var(--pcms-pergaminho);
@@ -349,6 +460,9 @@ body {
   background: #fff;
   border: 1px solid var(--pcms-linha);
   border-top: 3px solid var(--pcms-oxford);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
+  overflow: hidden;
   width: 100%;
   max-width: 520px;
   max-height: calc(100vh - 48px);
@@ -433,17 +547,19 @@ body {
 .pcms-metrica {
   background: #fff;
   border: 1px solid var(--pcms-linha);
-  border-top: 3px solid var(--pcms-oxford);
+  border-left: 3px solid var(--pcms-oxford);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
   padding: 20px 22px;
 }
 .pcms-metrica[data-vertical="gestao-publica"] {
-  border-top-color: var(--pcms-cardeal);
+  border-left-color: var(--pcms-cardeal);
 }
 .pcms-metrica[data-vertical="saude"] {
-  border-top-color: var(--pcms-oliva);
+  border-left-color: var(--pcms-oliva);
 }
 .pcms-metrica[data-vertical="educacao"] {
-  border-top-color: var(--pcms-dourado);
+  border-left-color: var(--pcms-dourado);
 }
 .pcms-metrica__valor {
   font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
@@ -464,9 +580,116 @@ body {
   margin-top: 4px;
 }
 
+.pcms-graficos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  margin: 18px 0 26px;
+}
+
+@media (max-width: 980px) {
+  .pcms-graficos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pcms-chart-box {
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
+  padding: 16px 18px;
+}
+
+.pcms-chart-box h2 {
+  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
+  font-size: 17px;
+  color: var(--pcms-oxford);
+  margin: 0 0 12px;
+}
+
+.pcms-grafico--donut {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.pcms-grafico--donut svg {
+  width: 150px;
+  height: 150px;
+  flex: none;
+}
+
+.pcms-grafico__total {
+  font-size: 22px;
+  font-weight: 600;
+  fill: var(--pcms-oxford);
+}
+
+.pcms-grafico__total-rotulo {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--pcms-grafite-suave);
+}
+
+.pcms-grafico__legenda {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--pcms-grafite);
+}
+
+.pcms-grafico__legenda li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pcms-grafico__legenda b {
+  margin-left: auto;
+  color: var(--pcms-oxford);
+}
+
+.pcms-grafico__cor {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(43, 43, 43, 0.2);
+  flex: none;
+}
+
+.pcms-grafico--funil {
+  width: 100%;
+  height: auto;
+}
+
+.pcms-grafico__eixo {
+  font-size: 10.5px;
+  fill: var(--pcms-grafite-suave);
+}
+
+.pcms-grafico__valor {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--pcms-oxford);
+}
+
+.pcms-grafico__vazio {
+  color: var(--pcms-grafite-suave);
+  font-size: 13px;
+  margin: 8px 0;
+}
+
 .pcms-painel {
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
 }
 .pcms-painel__head {
   padding: 16px 22px;
@@ -545,6 +768,9 @@ body {
   border-collapse: collapse;
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
+  overflow: hidden;
   font-size: 0.9rem;
 }
 .pcms-tabela thead th {
@@ -699,6 +925,8 @@ body {
 .pcms-config-card {
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
   padding: 24px;
 }
 .pcms-config-card h3 {
@@ -713,6 +941,14 @@ body {
   font-size: 0.86rem;
   margin: 0 0 18px;
 }
+/* Card com seção real (persiste de fato) — mesmo idiom do pcms-metrica. */
+.pcms-config-card--ativa {
+  border-top: 3px solid var(--pcms-dourado);
+}
+.pcms-config-card h3 .pcms-selo {
+  margin-left: 10px;
+  vertical-align: middle;
+}
 .pcms-field {
   margin-bottom: 14px;
 }
@@ -726,7 +962,8 @@ body {
   margin-bottom: 6px;
 }
 .pcms-field input,
-.pcms-field select {
+.pcms-field select,
+.pcms-field textarea {
   width: 100%;
   border: 1px solid var(--pcms-linha);
   background: var(--pcms-osso);
@@ -734,10 +971,11 @@ body {
   font-family: inherit;
   font-size: 0.88rem;
   color: var(--pcms-grafite);
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
 }
 .pcms-field input:focus,
-.pcms-field select:focus {
+.pcms-field select:focus,
+.pcms-field textarea:focus {
   outline: 2px solid var(--pcms-oxford);
   outline-offset: -1px;
 }
@@ -802,6 +1040,7 @@ body {
 .pcms-vazio {
   background: #fff;
   border: 1px dashed var(--pcms-linha);
+  border-radius: var(--pcms-radius);
   padding: 32px;
   text-align: center;
   color: var(--pcms-grafite-suave);
@@ -915,7 +1154,7 @@ body {
   background: #fff;
   color: var(--pcms-oxford);
   cursor: pointer;
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
@@ -950,6 +1189,7 @@ body {
 .pcms-btn--mini {
   padding: 6px 14px;
   font-size: 0.8rem;
+  border-radius: var(--pcms-radius-controle);
 }
 
 /* ===== Responsivo leve ================================================= */
@@ -1134,6 +1374,8 @@ body {
 .pcms-det-card {
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
   margin-bottom: 18px;
 }
 .pcms-det-card__head {
@@ -1286,6 +1528,8 @@ body {
   background: #fff;
   border: 1px solid var(--pcms-linha);
   border-left: 3px solid var(--pcms-dourado);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
   padding: 22px 24px;
   margin-bottom: 28px;
 }
@@ -1306,7 +1550,7 @@ body {
   font-family: inherit;
   font-size: 0.9rem;
   color: var(--pcms-grafite);
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   resize: vertical;
   line-height: 1.5;
 }
@@ -1372,7 +1616,7 @@ body {
   font-family: inherit;
   font-size: 0.86rem;
   color: var(--pcms-grafite);
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   margin-bottom: 10px;
 }
 .pcms-seletor__busca:focus {
@@ -1438,6 +1682,10 @@ body {
   --pcms-grafite-suave: #5a5a5a;
   --pcms-linha: #d9d2c4;
   --pcms-erro: #9a1b1b;
+  --pcms-sucesso: #3f6b3f;
+  --pcms-radius: 8px;
+  --pcms-radius-controle: 6px;
+  --pcms-sombra: 0 1px 2px rgba(17, 54, 94, 0.06), 0 4px 14px rgba(17, 54, 94, 0.08);
 
   display: grid;
   grid-template-columns: 46% 54%;
@@ -1538,7 +1786,7 @@ body {
   width: 100%;
   background: #fff;
   border: 1px solid var(--pcms-linha);
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   padding: 12px;
   font: inherit;
   font-size: 0.95rem;
@@ -1573,12 +1821,42 @@ body {
   margin: 0 0 18px;
 }
 
+.pcms-login__ok {
+  background: rgba(63, 107, 63, 0.08);
+  border-left: 3px solid var(--pcms-sucesso);
+  color: var(--pcms-sucesso);
+  font-size: 0.85rem;
+  padding: 10px 12px;
+  margin: 0 0 18px;
+  border-radius: var(--pcms-radius-controle);
+}
+
+.pcms-login__voltar {
+  margin: 16px 0 0;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.pcms-login__voltar a {
+  color: var(--pcms-oxford);
+  text-decoration: none;
+}
+
+.pcms-login__voltar a:hover {
+  text-decoration: underline;
+}
+
+.pcms-login__voltar a:focus-visible {
+  outline: 2px solid var(--pcms-dourado);
+  outline-offset: 2px;
+}
+
 .pcms-login__entrar {
   width: 100%;
   background: var(--pcms-oxford);
   color: var(--pcms-pergaminho);
   border: 0;
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   padding: 14px;
   font: inherit;
   font-size: 0.8rem;
@@ -1634,36 +1912,23 @@ body {
   }
 }
 
-/* ===== Sair (rodapé da sidebar) ========================================= */
-/* O e-mail é longo; com o botão Sair no rodapé, o div de texto encolhe
- * com ellipsis em vez de empurrar o botão para fora. */
-.pcms-sidebar__foot > div:not(.pcms-avatar-mini) {
-  min-width: 0;
-}
-
-.pcms-sidebar__foot strong,
-.pcms-sidebar__foot span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
-}
-
+/* ===== Sair (bloco do usuário na sidebar) =============================== */
 .pcms-sair__form {
   margin-left: auto;
   flex-shrink: 0;
 }
 
 .pcms-sair {
-  background: none;
-  border: 1px solid rgba(244, 239, 230, 0.25);
-  border-radius: 0;
-  color: var(--pcms-pergaminho);
-  width: 32px;
-  height: 32px;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 5px;
+  font-size: 11px;
+  background: none;
+  border: 1px solid rgba(244, 239, 230, 0.25);
+  border-radius: var(--pcms-radius-controle);
+  color: var(--pcms-pergaminho);
+  height: 32px;
+  padding: 0 10px;
   cursor: pointer;
 }
 
@@ -1685,4 +1950,106 @@ body {
 .pcms-sair:focus-visible {
   outline: 2px solid var(--pcms-dourado);
   outline-offset: 2px;
+}
+
+/* ---- Edição completa do evento (revisão pós-importação de PDF) ---- */
+.pcms-editor__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0 18px;
+}
+.pcms-editor__head--sub {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--pcms-linha);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.pcms-editor__hint {
+  font-size: 0.78rem;
+  color: var(--pcms-grafite-suave);
+  margin: 4px 0 14px;
+}
+.pcms-editor__linha {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.6fr) 1fr 1fr auto;
+  gap: 0 12px;
+  align-items: end;
+  border-bottom: 1px dashed var(--pcms-linha);
+  padding-bottom: 4px;
+  margin-bottom: 10px;
+}
+.pcms-editor__linha--faq {
+  grid-template-columns: 1fr 1.4fr auto;
+}
+.pcms-editor__linha .pcms-field {
+  margin-bottom: 8px;
+}
+.pcms-field--check label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+.pcms-field--check input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--pcms-oxford);
+}
+.pcms-link-acao--remover {
+  color: var(--pcms-cardeal, #8e2b27);
+  margin-bottom: 12px;
+}
+.pcms-modal__relatorio {
+  border: 1px solid var(--pcms-linha);
+  background: var(--pcms-osso);
+  padding: 12px 14px;
+  margin: 12px 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+.pcms-modal__relatorio p {
+  margin: 0 0 8px;
+}
+.pcms-modal__relatorio p:last-child {
+  margin-bottom: 0;
+}
+.pcms-det-lista {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.6;
+}
+
+/* Selos semânticos (padrão trazido do CRM, re-tokenizado Soberana) */
+.pcms-selo--ok {
+  background: rgba(63, 107, 63, 0.12);
+  color: var(--pcms-sucesso);
+}
+.pcms-selo--atencao {
+  background: rgba(181, 153, 90, 0.18);
+  color: #7a6330;
+}
+.pcms-selo--erro {
+  background: rgba(154, 27, 27, 0.1);
+  color: var(--pcms-erro);
+}
+.pcms-selo--info {
+  background: rgba(30, 78, 140, 0.1);
+  color: var(--pcms-oxford-claro);
+}
+
+/* Aviso inline de formulário (sucesso/erro de Server Action) */
+.pcms-form-aviso {
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  border-left: 3px solid var(--pcms-sucesso);
+  background: rgba(63, 107, 63, 0.08);
+  color: var(--pcms-grafite);
+}
+.pcms-form-aviso--erro {
+  border-left-color: var(--pcms-erro);
+  background: rgba(154, 27, 27, 0.06);
 }
