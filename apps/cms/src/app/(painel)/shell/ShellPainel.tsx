@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-
 import { sair } from "../acoesAuth";
+import { SeletorModulo } from "./SeletorModulo";
 
 export type ModuloPainel = "site" | "crm";
 
@@ -27,11 +26,6 @@ interface ShellPainelProps {
   carregando: boolean;
   children: React.ReactNode;
 }
-
-const MODULOS: { id: ModuloPainel; rotulo: string; href: string }[] = [
-  { id: "site", rotulo: "Site", href: "/" },
-  { id: "crm", rotulo: "CRM", href: "/crm" },
-];
 
 /** Iniciais para o avatar da sidebar ("Maria Souza" → "MS"). */
 function iniciais(nome: string): string {
@@ -60,44 +54,15 @@ export function ShellPainel({
     <div className="pcms-root">
       <aside className="pcms-sidebar">
         <div className="pcms-sidebar__brand">
-          {/* Logo NTC simplificado para a sidebar escura (lockup vertical). */}
-          <svg
-            className="pcms-sidebar__logo"
-            viewBox="0 0 80 80"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect x="6" y="20" width="14" height="40" rx="2" fill="#B5995A" />
-            <text
-              x="44"
-              y="54"
-              textAnchor="middle"
-              fontFamily="Georgia, serif"
-              fontSize="34"
-              fontWeight="600"
-              fill="#F4EFE6"
-            >
-              N
-            </text>
-          </svg>
-          <div className="pcms-sidebar__wordmark">
-            <strong>Grupo NTC</strong>
-            <span>Painel Admin</span>
-          </div>
+          <span className="pcms-sidebar__placa">
+            {/* Logo institucional completa; a placa clara garante contraste da barra Oxford. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-ntc.svg" alt="Grupo NTC" className="pcms-sidebar__logo" />
+          </span>
+          <span className="pcms-sidebar__painel-rotulo">Painel Admin</span>
         </div>
 
-        <div className="pcms-modulos" role="navigation" aria-label="Módulos do portal">
-          {MODULOS.map((m) => (
-            <Link
-              key={m.id}
-              href={m.href}
-              className={`pcms-modulos__opcao${modulo === m.id ? " pcms-modulos__opcao--ativa" : ""}`}
-              aria-current={modulo === m.id ? "page" : undefined}
-            >
-              {m.rotulo}
-            </Link>
-          ))}
-        </div>
+        <SeletorModulo modulo={modulo} />
 
         <nav className="pcms-nav" aria-label="Navegação principal do painel">
           {grupos.map((grupo) => (

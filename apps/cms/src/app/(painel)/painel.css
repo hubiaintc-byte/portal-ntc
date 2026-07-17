@@ -61,39 +61,138 @@ body {
 
 .pcms-sidebar__brand {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 24px 22px 20px;
-  border-bottom: 1px solid rgba(244, 239, 230, 0.12);
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 16px 14px;
+}
+
+.pcms-sidebar__placa {
+  display: block;
+  background: var(--pcms-pergaminho);
+  border-radius: var(--pcms-radius);
+  padding: 10px 14px;
 }
 
 .pcms-sidebar__logo {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 56px;
 }
 
-.pcms-sidebar__wordmark {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.05;
-}
-
-.pcms-sidebar__wordmark strong {
-  font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--pcms-pergaminho);
-}
-
-.pcms-sidebar__wordmark span {
-  font-family: var(--font-corpo-cond), var(--font-corpo), "Barlow", sans-serif;
-  font-size: 0.62rem;
-  letter-spacing: 0.18em;
+.pcms-sidebar__painel-rotulo {
+  font-size: 10px;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--pcms-dourado);
-  margin-top: 3px;
+  padding-left: 2px;
+}
+
+.pcms-seletor {
+  position: relative;
+  margin: 0 16px 18px;
+}
+
+.pcms-seletor__botao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  background: rgba(244, 239, 230, 0.08);
+  border: 1px solid rgba(244, 239, 230, 0.2);
+  border-radius: var(--pcms-radius-controle);
+  color: var(--pcms-pergaminho);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.pcms-seletor__botao:hover {
+  background: rgba(244, 239, 230, 0.14);
+}
+
+.pcms-seletor__botao:focus-visible {
+  outline: 2px solid var(--pcms-dourado);
+  outline-offset: 2px;
+}
+
+.pcms-seletor__textos {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pcms-seletor__modulo {
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pcms-seletor__desc {
+  font-size: 11px;
+  color: rgba(244, 239, 230, 0.65);
+}
+
+.pcms-seletor__seta {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.pcms-seletor__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
+  padding: 4px;
+}
+
+.pcms-seletor__opcao {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 8px 10px;
+  border-radius: var(--pcms-radius-controle);
+  color: var(--pcms-grafite);
+  text-decoration: none;
+}
+
+.pcms-seletor__opcao .pcms-seletor__modulo {
+  color: var(--pcms-oxford);
+}
+
+.pcms-seletor__opcao .pcms-seletor__desc {
+  color: var(--pcms-grafite-suave);
+  grid-column: 1;
+}
+
+.pcms-seletor__opcao:hover {
+  background: var(--pcms-osso);
+}
+
+.pcms-seletor__opcao:focus-visible {
+  outline: 2px solid var(--pcms-oxford);
+  outline-offset: -2px;
+}
+
+.pcms-seletor__opcao--ativa .pcms-seletor__modulo {
+  color: var(--pcms-dourado);
+}
+
+.pcms-seletor__check {
+  width: 16px;
+  height: 16px;
+  color: var(--pcms-dourado);
+  grid-row: span 2;
 }
 
 .pcms-nav {
@@ -1817,39 +1916,6 @@ body {
   margin: 0;
   padding-left: 18px;
   line-height: 1.6;
-}
-
-/* =====================================================================
-   Seletor de módulo (Site | CRM) — extensão Fase A do portal unificado
-   ===================================================================== */
-.pcms-modulos {
-  display: flex;
-  margin: 0 22px 18px;
-  border: 1px solid rgba(244, 239, 230, 0.28);
-}
-.pcms-modulos__opcao {
-  flex: 1;
-  padding: 8px 0 7px;
-  text-align: center;
-  font-family: var(--font-corpo-cond, var(--font-corpo)), "Barlow", sans-serif;
-  font-size: 0.76rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(244, 239, 230, 0.68);
-  text-decoration: none;
-}
-.pcms-modulos__opcao + .pcms-modulos__opcao {
-  border-left: 1px solid rgba(244, 239, 230, 0.28);
-}
-.pcms-modulos__opcao--ativa {
-  background: rgba(181, 153, 90, 0.16);
-  color: var(--pcms-dourado);
-  box-shadow: inset 0 -2px 0 var(--pcms-dourado);
-}
-.pcms-modulos__opcao:focus-visible {
-  outline: 2px solid var(--pcms-dourado);
-  outline-offset: -2px;
 }
 
 /* Selos semânticos (padrão trazido do CRM, re-tokenizado Soberana) */
