@@ -6,11 +6,17 @@ import {
   listarOportunidadesCrm,
   listarUsuariosCms,
   obterCatalogoCrm,
+  listarProgramasCrm,
+  listarModulosCrm,
+  listarProdutosCrm,
   type CatalogoCrm,
   type ClienteCrmResumo,
   type ContatoCrmResumo,
   type OportunidadeCrmResumo,
   type UsuarioCmsResumo,
+  type ProgramaCrmResumo,
+  type ModuloCrmResumo,
+  type ProdutoCrmResumo,
 } from "@/lib/cms/painelCrm";
 
 import { ShellCrm } from "./ShellCrm";
@@ -31,17 +37,24 @@ export default async function PainelCrmPage() {
   let leads: LeadCmsResumo[] = [];
   let catalogo: CatalogoCrm = { programas: [], modulos: [], eventos: [] };
   let usuarios: UsuarioCmsResumo[] = [];
+  let programas: ProgramaCrmResumo[] = [];
+  let modulos: ModuloCrmResumo[] = [];
+  let produtos: ProdutoCrmResumo[] = [];
   let erroLeitura = false;
 
   try {
-    [clientes, contatos, oportunidades, leads, catalogo, usuarios] = await Promise.all([
-      listarClientesCrm(),
-      listarContatosCrm(),
-      listarOportunidadesCrm(),
-      listarLeadsCms(),
-      obterCatalogoCrm(),
-      listarUsuariosCms(),
-    ]);
+    [clientes, contatos, oportunidades, leads, catalogo, usuarios, programas, modulos, produtos] =
+      await Promise.all([
+        listarClientesCrm(),
+        listarContatosCrm(),
+        listarOportunidadesCrm(),
+        listarLeadsCms(),
+        obterCatalogoCrm(),
+        listarUsuariosCms(),
+        listarProgramasCrm(),
+        listarModulosCrm(),
+        listarProdutosCrm(),
+      ]);
   } catch (e) {
     console.error("[PainelCrmPage] Erro ao ler banco:", e);
     erroLeitura = true;
@@ -58,6 +71,9 @@ export default async function PainelCrmPage() {
       leads={leads}
       catalogo={catalogo}
       usuarios={usuarios}
+      programas={programas}
+      modulos={modulos}
+      produtos={produtos}
       hojeISO={hojeISO}
       erroLeitura={erroLeitura}
     />
