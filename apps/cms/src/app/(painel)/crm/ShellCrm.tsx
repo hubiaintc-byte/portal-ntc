@@ -8,10 +8,14 @@ import type {
   ClienteCrmDetalhe,
   ClienteCrmResumo,
   ContatoCrmResumo,
+  ModuloCrmResumo,
   OportunidadeCrmDetalhe,
   OportunidadeCrmResumo,
+  ProdutoCrmResumo,
+  ProgramaCrmResumo,
   UsuarioCmsResumo,
 } from "@/lib/cms/painelCrm";
+import { todosFollowups } from "@/lib/cms/kpisComercial";
 
 import { carregarLead } from "../acoes";
 import { carregarClienteCrm, carregarOportunidadeCrm } from "../acoesCrm";
@@ -25,8 +29,13 @@ import { FormContato } from "./FormContato";
 import { FormOportunidade } from "./FormOportunidade";
 import { TelaClientes } from "./TelaClientes";
 import { TelaContatos } from "./TelaContatos";
+import { TelaEmBreve } from "./TelaEmBreve";
+import { TelaFollowups } from "./TelaFollowups";
+import { TelaModulos } from "./TelaModulos";
 import { TelaOportunidades } from "./TelaOportunidades";
 import { TelaPainelComercial } from "./TelaPainelComercial";
+import { TelaProdutos } from "./TelaProdutos";
+import { TelaProgramas } from "./TelaProgramas";
 
 interface ShellCrmProps {
   usuario: { nome: string; email: string; perfil: string };
@@ -36,11 +45,17 @@ interface ShellCrmProps {
   leads: LeadCmsResumo[];
   catalogo: CatalogoCrm;
   usuarios: UsuarioCmsResumo[];
+  programas: ProgramaCrmResumo[];
+  modulos: ModuloCrmResumo[];
+  produtos: ProdutoCrmResumo[];
   hojeISO: string;
   erroLeitura: boolean;
 }
 
-type TelaCrmId = "painel" | "leads" | "clientes" | "contatos" | "oportunidades";
+type TelaCrmId =
+  | "painel" | "leads" | "clientes" | "contatos" | "oportunidades"
+  | "propostas" | "versoes" | "envios" | "followups" | "condicoes"
+  | "programas" | "modulos" | "produtos";
 
 /** Formulário de criação/edição aberto em tela cheia. */
 type FormCrmAberto =
@@ -82,22 +97,81 @@ const Ico = {
       <path d="M12 3 21 12l-9 9-9-9z" />
     </svg>
   ),
+  propostas: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 2h9l3 3v17H6z" /><path d="M14 2v4h4" /><path d="M9 12h6M9 16h6" />
+    </svg>
+  ),
+  versoes: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" />
+    </svg>
+  ),
+  envios: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 5h18v14H3z" /><path d="m3 6 9 7 9-7" />
+    </svg>
+  ),
+  followups: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 4v5h-5" />
+    </svg>
+  ),
+  condicoes: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3 3 8l9 5 9-5z" /><path d="M3 8v8l9 5 9-5V8" />
+    </svg>
+  ),
+  programas: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3 2 8l10 5 10-5z" /><path d="m6 10.5 6 3 6-3" />
+    </svg>
+  ),
+  modulos: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="4" /><rect x="3" y="10" width="18" height="4" /><rect x="3" y="16" width="18" height="4" />
+    </svg>
+  ),
+  produtos: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2 3 7v10l9 5 9-5V7z" /><path d="M12 12 3 7M12 12l9-5M12 12v10" />
+    </svg>
+  ),
 };
 
-const NAV_COMERCIAL: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
-  { id: "painel", rotulo: "Painel Comercial", icone: Ico.painel },
+const NAV_OPERACAO: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
+  { id: "painel", rotulo: "Dashboard Executivo", icone: Ico.painel },
   { id: "leads", rotulo: "Leads", icone: Ico.leads },
   { id: "clientes", rotulo: "Clientes", icone: Ico.clientes },
   { id: "contatos", rotulo: "Contatos", icone: Ico.contatos },
   { id: "oportunidades", rotulo: "Oportunidades", icone: Ico.oportunidades },
+  { id: "propostas", rotulo: "Propostas", icone: Ico.propostas },
+  { id: "versoes", rotulo: "Versões", icone: Ico.versoes },
+  { id: "envios", rotulo: "Envios", icone: Ico.envios },
+  { id: "followups", rotulo: "Follow-ups", icone: Ico.followups },
+  { id: "condicoes", rotulo: "Condições", icone: Ico.condicoes },
+];
+
+const NAV_CATALOGO: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
+  { id: "programas", rotulo: "Programas", icone: Ico.programas },
+  { id: "modulos", rotulo: "Módulos", icone: Ico.modulos },
+  { id: "produtos", rotulo: "Produtos / Eventos", icone: Ico.produtos },
 ];
 
 const CRUMB: Record<TelaCrmId, string> = {
-  painel: "CRM · Painel Comercial",
+  painel: "CRM · Dashboard Executivo",
   leads: "CRM · Leads",
   clientes: "CRM · Clientes",
   contatos: "CRM · Contatos",
   oportunidades: "CRM · Oportunidades",
+  propostas: "CRM · Propostas",
+  versoes: "CRM · Versões",
+  envios: "CRM · Envios",
+  followups: "CRM · Follow-ups",
+  condicoes: "CRM · Condições",
+  programas: "CRM · Programas",
+  modulos: "CRM · Módulos",
+  produtos: "CRM · Produtos / Eventos",
 };
 
 export function ShellCrm({
@@ -108,6 +182,9 @@ export function ShellCrm({
   leads,
   catalogo,
   usuarios,
+  programas,
+  modulos,
+  produtos,
   hojeISO,
   erroLeitura,
 }: ShellCrmProps) {
@@ -151,7 +228,10 @@ export function ShellCrm({
     });
   }
 
-  const grupos: GrupoNav[] = [{ rotulo: "Comercial", itens: NAV_COMERCIAL }];
+  const grupos: GrupoNav[] = [
+    { rotulo: "Operação Comercial", itens: NAV_OPERACAO },
+    { rotulo: "Catálogo Institucional", itens: NAV_CATALOGO },
+  ];
 
   return (
     <ShellPainel
@@ -238,6 +318,31 @@ export function ShellCrm({
               onAbrir={abrirOportunidade}
               onNovo={() => setFormAberto({ entidade: "oportunidade", inicial: null })}
             />
+          )}
+          {tela === "followups" && (
+            <TelaFollowups
+              followups={todosFollowups(oportunidades)}
+              onAbrirOportunidade={abrirOportunidade}
+            />
+          )}
+          {tela === "programas" && <TelaProgramas programas={programas} />}
+          {tela === "modulos" && <TelaModulos modulos={modulos} />}
+          {tela === "produtos" && <TelaProdutos produtos={produtos} />}
+          {tela === "propostas" && (
+            <TelaEmBreve eyebrow="Operação Comercial" titulo="Propostas"
+              descricao="Geração e gestão de propostas comerciais." />
+          )}
+          {tela === "versoes" && (
+            <TelaEmBreve eyebrow="Operação Comercial" titulo="Versões"
+              descricao="Histórico de versões das propostas." />
+          )}
+          {tela === "envios" && (
+            <TelaEmBreve eyebrow="Operação Comercial" titulo="Envios"
+              descricao="Registro de envios de propostas aos clientes." />
+          )}
+          {tela === "condicoes" && (
+            <TelaEmBreve eyebrow="Operação Comercial" titulo="Condições"
+              descricao="Condições comerciais padrão e específicas." />
           )}
         </>
       )}
