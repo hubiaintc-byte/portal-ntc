@@ -3,12 +3,15 @@
 import type { LeadCmsResumo } from "@/lib/cms/painelCms";
 import type { OportunidadeCrmResumo } from "@/lib/cms/painelCrm";
 import {
+  abertasPorStatus,
   calcularKpisComercial,
   followupsProximos,
   formatarMoedaBRL,
+  funilOportunidades,
 } from "@/lib/cms/kpisComercial";
 import { STATUS_OPORTUNIDADE } from "@ntc/lib";
 
+import { DonutStatus, FunilBarras } from "./GraficosComercial";
 import { rotuloDeLista, seloDeOportunidade } from "./seloStatus";
 
 interface TelaPainelComercialProps {
@@ -29,6 +32,8 @@ export function TelaPainelComercial({
 }: TelaPainelComercialProps) {
   const kpis = calcularKpisComercial(oportunidades, leads);
   const followups = followupsProximos(oportunidades, hojeISO);
+  const porStatus = abertasPorStatus(oportunidades);
+  const funil = funilOportunidades(oportunidades);
 
   const metricas = [
     { rotulo: "Oportunidades abertas", valor: String(kpis.oportunidadesAbertas) },
@@ -60,6 +65,17 @@ export function TelaPainelComercial({
             <div className="pcms-metrica__rotulo">{m.rotulo}</div>
           </div>
         ))}
+      </div>
+
+      <div className="pcms-graficos">
+        <section className="pcms-chart-box">
+          <h2>Oportunidades por status</h2>
+          <DonutStatus faixas={porStatus} />
+        </section>
+        <section className="pcms-chart-box">
+          <h2>Funil de oportunidades</h2>
+          <FunilBarras faixas={funil} />
+        </section>
       </div>
 
       <h2 className="pcms-pagehead__eyebrow">Follow-ups · próximos 7 dias</h2>
