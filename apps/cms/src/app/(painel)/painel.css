@@ -22,6 +22,9 @@ body {
   --pcms-oxford-escuro: #0b2545;
   --pcms-oxford-claro: #1e4e8c;
   --pcms-cardeal: #8e2b27;
+  --pcms-radius: 8px;
+  --pcms-radius-controle: 6px;
+  --pcms-sombra: 0 1px 2px rgba(17, 54, 94, 0.06), 0 4px 14px rgba(17, 54, 94, 0.08);
   --pcms-oliva: #5c6b3b;
   --pcms-dourado: #b5995a;
   --pcms-pergaminho: #f4efe6;
@@ -126,7 +129,8 @@ body {
   font-family: inherit;
   font-size: 0.9rem;
   padding: 9px 10px;
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
+  margin: 0 10px 2px;
   position: relative;
   transition:
     color 0.15s ease,
@@ -141,8 +145,7 @@ body {
 .pcms-nav__item--ativo {
   color: var(--pcms-dourado);
   font-weight: 600;
-  background: rgba(181, 153, 90, 0.1);
-  box-shadow: inset 3px 0 0 var(--pcms-dourado);
+  background: rgba(244, 239, 230, 0.12);
 }
 
 .pcms-nav__item:focus-visible {
@@ -233,12 +236,14 @@ body {
   gap: 9px;
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius-controle);
   padding: 8px 13px;
   width: 280px;
   color: var(--pcms-grafite-suave);
 }
 .pcms-search input {
   border: 0;
+  border-radius: var(--pcms-radius-controle);
   outline: 0;
   background: transparent;
   font-family: inherit;
@@ -299,17 +304,17 @@ body {
   font-size: 0.86rem;
   font-weight: 500;
   padding: 10px 18px;
-  border: 1px solid var(--pcms-oxford);
-  background: var(--pcms-oxford);
-  color: var(--pcms-osso);
+  border: 1px solid var(--pcms-dourado);
+  background: var(--pcms-dourado);
+  color: var(--pcms-oxford-escuro);
   cursor: pointer;
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   transition:
     background 0.15s ease,
     color 0.15s ease;
 }
-.pcms-btn:hover {
-  background: var(--pcms-oxford-escuro);
+.pcms-btn:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 999px rgba(17, 54, 94, 0.08);
 }
 .pcms-btn svg {
   width: 15px;
@@ -321,6 +326,7 @@ body {
 .pcms-btn--ghost {
   background: transparent;
   color: var(--pcms-oxford);
+  border-radius: var(--pcms-radius-controle);
 }
 .pcms-btn--ghost:hover {
   background: var(--pcms-pergaminho);
@@ -433,17 +439,19 @@ body {
 .pcms-metrica {
   background: #fff;
   border: 1px solid var(--pcms-linha);
-  border-top: 3px solid var(--pcms-oxford);
+  border-left: 3px solid var(--pcms-oxford);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
   padding: 20px 22px;
 }
 .pcms-metrica[data-vertical="gestao-publica"] {
-  border-top-color: var(--pcms-cardeal);
+  border-left-color: var(--pcms-cardeal);
 }
 .pcms-metrica[data-vertical="saude"] {
-  border-top-color: var(--pcms-oliva);
+  border-left-color: var(--pcms-oliva);
 }
 .pcms-metrica[data-vertical="educacao"] {
-  border-top-color: var(--pcms-dourado);
+  border-left-color: var(--pcms-dourado);
 }
 .pcms-metrica__valor {
   font-family: var(--font-titulo), "Cormorant Garamond", Georgia, serif;
@@ -545,6 +553,9 @@ body {
   border-collapse: collapse;
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
+  overflow: hidden;
   font-size: 0.9rem;
 }
 .pcms-tabela thead th {
@@ -699,6 +710,8 @@ body {
 .pcms-config-card {
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
   padding: 24px;
 }
 .pcms-config-card h3 {
@@ -734,7 +747,8 @@ body {
   margin-bottom: 6px;
 }
 .pcms-field input,
-.pcms-field select {
+.pcms-field select,
+.pcms-field textarea {
   width: 100%;
   border: 1px solid var(--pcms-linha);
   background: var(--pcms-osso);
@@ -742,10 +756,11 @@ body {
   font-family: inherit;
   font-size: 0.88rem;
   color: var(--pcms-grafite);
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
 }
 .pcms-field input:focus,
-.pcms-field select:focus {
+.pcms-field select:focus,
+.pcms-field textarea:focus {
   outline: 2px solid var(--pcms-oxford);
   outline-offset: -1px;
 }
@@ -810,6 +825,7 @@ body {
 .pcms-vazio {
   background: #fff;
   border: 1px dashed var(--pcms-linha);
+  border-radius: var(--pcms-radius);
   padding: 32px;
   text-align: center;
   color: var(--pcms-grafite-suave);
@@ -958,6 +974,7 @@ body {
 .pcms-btn--mini {
   padding: 6px 14px;
   font-size: 0.8rem;
+  border-radius: var(--pcms-radius-controle);
 }
 
 /* ===== Responsivo leve ================================================= */
@@ -1142,6 +1159,8 @@ body {
 .pcms-det-card {
   background: #fff;
   border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
   margin-bottom: 18px;
 }
 .pcms-det-card__head {
@@ -1447,6 +1466,9 @@ body {
   --pcms-linha: #d9d2c4;
   --pcms-erro: #9a1b1b;
   --pcms-sucesso: #3f6b3f;
+  --pcms-radius: 8px;
+  --pcms-radius-controle: 6px;
+  --pcms-sombra: 0 1px 2px rgba(17, 54, 94, 0.06), 0 4px 14px rgba(17, 54, 94, 0.08);
 
   display: grid;
   grid-template-columns: 46% 54%;
@@ -1547,7 +1569,7 @@ body {
   width: 100%;
   background: #fff;
   border: 1px solid var(--pcms-linha);
-  border-radius: 0;
+  border-radius: var(--pcms-radius-controle);
   padding: 12px;
   font: inherit;
   font-size: 0.95rem;
