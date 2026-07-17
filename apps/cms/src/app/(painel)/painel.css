@@ -88,12 +88,12 @@ body {
   padding-left: 2px;
 }
 
-.pcms-seletor {
+.pcms-seletor-modulo {
   position: relative;
   margin: 0 16px 18px;
 }
 
-.pcms-seletor__botao {
+.pcms-seletor-modulo__botao {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -109,40 +109,40 @@ body {
   text-align: left;
 }
 
-.pcms-seletor__botao:hover {
+.pcms-seletor-modulo__botao:hover {
   background: rgba(244, 239, 230, 0.14);
 }
 
-.pcms-seletor__botao:focus-visible {
+.pcms-seletor-modulo__botao:focus-visible {
   outline: 2px solid var(--pcms-dourado);
   outline-offset: 2px;
 }
 
-.pcms-seletor__textos {
+.pcms-seletor-modulo__textos {
   display: flex;
   flex-direction: column;
   gap: 1px;
 }
 
-.pcms-seletor__modulo {
+.pcms-seletor-modulo__modulo {
   font-weight: 600;
   font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.pcms-seletor__desc {
+.pcms-seletor-modulo__desc {
   font-size: 11px;
   color: rgba(244, 239, 230, 0.65);
 }
 
-.pcms-seletor__seta {
+.pcms-seletor-modulo__seta {
   width: 16px;
   height: 16px;
   flex: none;
 }
 
-.pcms-seletor__menu {
+.pcms-seletor-modulo__menu {
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
@@ -155,7 +155,7 @@ body {
   padding: 4px;
 }
 
-.pcms-seletor__opcao {
+.pcms-seletor-modulo__opcao {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
@@ -166,29 +166,29 @@ body {
   text-decoration: none;
 }
 
-.pcms-seletor__opcao .pcms-seletor__modulo {
+.pcms-seletor-modulo__opcao .pcms-seletor-modulo__modulo {
   color: var(--pcms-oxford);
 }
 
-.pcms-seletor__opcao .pcms-seletor__desc {
+.pcms-seletor-modulo__opcao .pcms-seletor-modulo__desc {
   color: var(--pcms-grafite-suave);
   grid-column: 1;
 }
 
-.pcms-seletor__opcao:hover {
+.pcms-seletor-modulo__opcao:hover {
   background: var(--pcms-osso);
 }
 
-.pcms-seletor__opcao:focus-visible {
+.pcms-seletor-modulo__opcao:focus-visible {
   outline: 2px solid var(--pcms-oxford);
   outline-offset: -2px;
 }
 
-.pcms-seletor__opcao--ativa .pcms-seletor__modulo {
+.pcms-seletor-modulo__opcao--ativa .pcms-seletor-modulo__modulo {
   color: var(--pcms-dourado);
 }
 
-.pcms-seletor__check {
+.pcms-seletor-modulo__check {
   width: 16px;
   height: 16px;
   color: var(--pcms-dourado);

@@ -21,6 +21,7 @@ const OPCOES: OpcaoModulo[] = [
 export function SeletorModulo({ modulo }: { modulo: ModuloPainel }) {
   const [aberto, setAberto] = useState(false);
   const raiz = useRef<HTMLDivElement>(null);
+  const botaoRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!aberto) return;
@@ -28,7 +29,10 @@ export function SeletorModulo({ modulo }: { modulo: ModuloPainel }) {
       if (raiz.current && !raiz.current.contains(e.target as Node)) setAberto(false);
     }
     function aoTeclar(e: KeyboardEvent) {
-      if (e.key === "Escape") setAberto(false);
+      if (e.key === "Escape") {
+        setAberto(false);
+        botaoRef.current?.focus();
+      }
     }
     document.addEventListener("mousedown", aoClicarFora);
     document.addEventListener("keydown", aoTeclar);
@@ -42,37 +46,38 @@ export function SeletorModulo({ modulo }: { modulo: ModuloPainel }) {
   if (!atual) return null;
 
   return (
-    <div className="pcms-seletor" ref={raiz}>
+    <div className="pcms-seletor-modulo" ref={raiz}>
       <button
         type="button"
-        className="pcms-seletor__botao"
+        className="pcms-seletor-modulo__botao"
         aria-haspopup="menu"
         aria-expanded={aberto}
         onClick={() => setAberto((v) => !v)}
+        ref={botaoRef}
       >
-        <span className="pcms-seletor__textos">
-          <span className="pcms-seletor__modulo">{atual.rotulo}</span>
-          <span className="pcms-seletor__desc">{atual.descricao}</span>
+        <span className="pcms-seletor-modulo__textos">
+          <span className="pcms-seletor-modulo__modulo">{atual.rotulo}</span>
+          <span className="pcms-seletor-modulo__desc">{atual.descricao}</span>
         </span>
-        <svg viewBox="0 0 24 24" aria-hidden="true" className="pcms-seletor__seta">
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="pcms-seletor-modulo__seta">
           <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" strokeWidth="1.5" />
         </svg>
       </button>
       {aberto && (
-        <div className="pcms-seletor__menu" role="menu" aria-label="Trocar de módulo">
+        <div className="pcms-seletor-modulo__menu" role="menu" aria-label="Trocar de módulo">
           {OPCOES.map((o) => (
             <Link
               key={o.id}
               role="menuitem"
               href={o.href}
-              className={`pcms-seletor__opcao${o.id === modulo ? " pcms-seletor__opcao--ativa" : ""}`}
+              className={`pcms-seletor-modulo__opcao${o.id === modulo ? " pcms-seletor-modulo__opcao--ativa" : ""}`}
               aria-current={o.id === modulo ? "page" : undefined}
               onClick={() => setAberto(false)}
             >
-              <span className="pcms-seletor__modulo">{o.rotulo}</span>
-              <span className="pcms-seletor__desc">{o.descricao}</span>
+              <span className="pcms-seletor-modulo__modulo">{o.rotulo}</span>
+              <span className="pcms-seletor-modulo__desc">{o.descricao}</span>
               {o.id === modulo && (
-                <svg viewBox="0 0 24 24" aria-hidden="true" className="pcms-seletor__check">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="pcms-seletor-modulo__check">
                   <path d="m5 12 5 5 9-10" fill="none" stroke="currentColor" strokeWidth="1.5" />
                 </svg>
               )}
