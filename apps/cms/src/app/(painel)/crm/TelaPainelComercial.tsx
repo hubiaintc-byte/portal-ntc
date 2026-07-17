@@ -46,8 +46,8 @@ export function TelaPainelComercial({
     <>
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Comercial</p>
-          <h1>Painel Comercial</h1>
+          <p className="pcms-pagehead__eyebrow">Operação Comercial</p>
+          <h1>Dashboard Executivo</h1>
           <p>Visão do funil de oportunidades e follow-ups da semana.</p>
         </div>
       </div>
