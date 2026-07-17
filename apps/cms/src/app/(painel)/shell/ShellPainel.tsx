@@ -54,33 +54,13 @@ export function ShellPainel({
     <div className="pcms-root">
       <aside className="pcms-sidebar">
         <div className="pcms-sidebar__brand">
-          <span className="pcms-sidebar__placa">
-            {/* Logo institucional completa; a placa clara garante contraste da barra Oxford. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-ntc.svg" alt="Grupo NTC" className="pcms-sidebar__logo" />
-          </span>
+          {/* Logo institucional com fundo transparente (decisão do PO em 17/07). */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-ntc.svg" alt="Grupo NTC" className="pcms-sidebar__logo" />
           <span className="pcms-sidebar__painel-rotulo">Painel Admin</span>
         </div>
 
         <SeletorModulo modulo={modulo} />
-
-        <div className="pcms-sidebar__usuario">
-          <div className="pcms-avatar-mini">{iniciais(usuario.nome)}</div>
-          <div className="pcms-sidebar__usuario-info">
-            <strong>{usuario.nome}</strong>
-            <span className="pcms-sidebar__perfil">{usuario.perfil.replace(/-/g, " ")}</span>
-          </div>
-          <form action={sair} className="pcms-sair__form">
-            <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M9 4H5v16h4" />
-                <path d="m14 8 4 4-4 4" />
-                <path d="M18 12H9" />
-              </svg>
-              Sair
-            </button>
-          </form>
-        </div>
 
         <nav className="pcms-nav" aria-label="Navegação principal do painel">
           {grupos.map((grupo) => (
@@ -101,6 +81,24 @@ export function ShellPainel({
             </div>
           ))}
         </nav>
+
+        <div className="pcms-sidebar__usuario">
+          <div className="pcms-avatar-mini">{iniciais(usuario.nome)}</div>
+          <div className="pcms-sidebar__usuario-info">
+            <strong>{usuario.nome}</strong>
+            <span className="pcms-sidebar__perfil">{usuario.perfil.replace(/-/g, " ")}</span>
+          </div>
+          <form action={sair} className="pcms-sair__form">
+            <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 4H5v16h4" />
+                <path d="m14 8 4 4-4 4" />
+                <path d="M18 12H9" />
+              </svg>
+              Sair
+            </button>
+          </form>
+        </div>
       </aside>
 
       <div className="pcms-main">

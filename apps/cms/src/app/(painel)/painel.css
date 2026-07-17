@@ -68,18 +68,11 @@ body {
   padding: 20px 16px 14px;
 }
 
-.pcms-sidebar__placa {
-  display: block;
-  background: var(--pcms-pergaminho);
-  border-radius: var(--pcms-radius);
-  padding: 10px 14px;
-}
-
 .pcms-sidebar__logo {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 56px;
+  max-height: 64px;
 }
 
 .pcms-sidebar__painel-rotulo {
@@ -263,12 +256,13 @@ body {
   fill: none;
 }
 
+/* Rodapé da sidebar: o nav acima tem flex-grow, então o bloco desce sozinho. */
 .pcms-sidebar__usuario {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 16px 16px;
-  padding: 10px 12px;
+  margin: auto 16px 16px;
+  padding: 12px;
   background: rgba(244, 239, 230, 0.06);
   border-radius: var(--pcms-radius);
 }
