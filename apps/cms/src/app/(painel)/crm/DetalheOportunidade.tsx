@@ -61,7 +61,7 @@ export function DetalheOportunidade({ oportunidade: o, onVoltar, onEditar }: Det
 
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Comercial</p>
+          <p className="pcms-pagehead__eyebrow">Operação Comercial</p>
           <h1>{o.codigo}</h1>
         </div>
         <div className="pcms-pagehead__acoes">

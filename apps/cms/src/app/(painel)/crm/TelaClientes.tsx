@@ -18,7 +18,7 @@ export function TelaClientes({ clientes, onAbrir, onNovo }: TelaClientesProps) {
     <>
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Comercial</p>
+          <p className="pcms-pagehead__eyebrow">Operação Comercial</p>
           <h1>Clientes</h1>
           <p>Órgãos e instituições do funil comercial.</p>
         </div>

@@ -18,7 +18,7 @@ export function TelaOportunidades({ oportunidades, onAbrir, onNovo }: TelaOportu
     <>
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Comercial</p>
+          <p className="pcms-pagehead__eyebrow">Operação Comercial</p>
           <h1>Oportunidades</h1>
           <p>Negociações em andamento no funil comercial.</p>
         </div>

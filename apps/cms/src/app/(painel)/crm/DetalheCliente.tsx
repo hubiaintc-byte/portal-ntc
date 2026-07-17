@@ -63,7 +63,7 @@ export function DetalheCliente({
 
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Comercial</p>
+          <p className="pcms-pagehead__eyebrow">Operação Comercial</p>
           <h1>{c.orgao}</h1>
         </div>
         <div className="pcms-pagehead__acoes">
