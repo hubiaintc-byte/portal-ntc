@@ -6,19 +6,27 @@ import { obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
   obterClienteCrm,
   obterOportunidadeCrm,
+  obterPropostaCrm,
   type ClienteCrmDetalhe,
   type OportunidadeCrmDetalhe,
+  type PropostaDetalhe,
 } from "@/lib/cms/painelCrm";
 import {
   atualizarClienteCrm,
   atualizarContatoCrm,
   atualizarOportunidade,
+  atualizarProposta,
   criarClienteCrm,
   criarContatoCrm,
   criarOportunidade,
+  criarProposta,
+  criarVersaoProposta,
+  registrarEnvio,
   type DadosClienteCrm,
   type DadosContatoCrm,
+  type DadosEnvio,
   type DadosOportunidade,
+  type DadosProposta,
 } from "@/lib/cms/painelCrmEscrita";
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
 
@@ -66,6 +74,38 @@ export async function salvarOportunidadeCrm(
   if (!(await obterUsuarioCms())) return RECUSADO;
   const resultado =
     id === null ? await criarOportunidade(dados) : await atualizarOportunidade(id, dados);
+  if (resultado.ok) revalidatePath("/crm");
+  return resultado;
+}
+
+export async function carregarPropostaCrm(id: string): Promise<PropostaDetalhe | null> {
+  if (!(await obterUsuarioCms())) return null;
+  return obterPropostaCrm(id);
+}
+
+export async function salvarPropostaCrm(
+  id: string | null,
+  dados: DadosProposta,
+): Promise<ResultadoEscrita> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  const resultado = id === null ? await criarProposta(dados) : await atualizarProposta(id, dados);
+  if (resultado.ok) revalidatePath("/crm");
+  return resultado;
+}
+
+export async function novaVersaoPropostaCrm(
+  codBase: string,
+  motivo: string,
+): Promise<ResultadoEscrita> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  const resultado = await criarVersaoProposta(codBase, motivo);
+  if (resultado.ok) revalidatePath("/crm");
+  return resultado;
+}
+
+export async function registrarEnvioCrm(dados: DadosEnvio): Promise<ResultadoEscrita> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  const resultado = await registrarEnvio(dados);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
 }
