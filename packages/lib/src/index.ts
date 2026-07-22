@@ -46,6 +46,7 @@ export { checarRateLimit, type ResultadoRateLimit } from "./forms/rateLimit";
 
 // CRM — listas controladas da Fase A
 export {
+  opcoes,
   slugDeRotulo,
   type OpcaoLista,
   UFS,
@@ -56,4 +57,18 @@ export {
   STATUS_CLIENTE_CRM,
   STATUS_OPORTUNIDADE,
   STATUS_OPORTUNIDADE_FECHADA,
+  TIPOS_PROPOSTA,
+  STATUS_PROPOSTA,
+  CANAIS_ENVIO,
+  STATUS_ENVIO,
 } from "./crm/listas";
+
+export {
+  calcularValoresProposta,
+  type EntradaValores,
+  type ValoresProposta,
+  siglaCanonica,
+  gerarCodigoBase,
+  proximaVersao,
+  codigoDaVersao,
+} from "./crm/propostas";
