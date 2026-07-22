@@ -141,6 +141,25 @@ export interface PropostaDetalhe extends PropostaResumo {
   envios: EnvioResumo[];
   elaboradorNome: string;
   aprovadorNome: string;
+  /** Campos crus (ids/valores) para round-trip fiel no FormProposta em modo edição. */
+  clienteId: string | null;
+  programaId: string | null;
+  oportunidadeId: string | null;
+  tipo: string | null;
+  modalidade: string | null;
+  replay: string | null;
+  condPagto: string | null;
+  condEspecificas: string | null;
+  observacoes: string | null;
+  valorUnitario: number | null;
+  qtdPagantes: number | null;
+  cortesias: number | null;
+  percDesconto: number | null;
+  validadeDias: number | null;
+  modulosIds: string[];
+  eventosIds: string[];
+  elaboradorId: string | null;
+  aprovadorId: string | null;
 }
 
 export interface VersaoResumo {
@@ -431,6 +450,12 @@ export async function obterPropostaCrm(id: string): Promise<PropostaDetalhe | nu
     rotulo: `${campoRel(e, "tipo") ?? "—"} · ${campoRel(e, "nome") ?? ""}`,
     detalhe: campoRel(e, "nome") ?? "",
   }));
+  const modulosIds = (Array.isArray(doc.modulos) ? doc.modulos : [])
+    .map((m) => idRel(m) ?? "")
+    .filter((id) => id !== "");
+  const eventosIds = (Array.isArray(doc.eventos) ? doc.eventos : [])
+    .map((e) => idRel(e) ?? "")
+    .filter((id) => id !== "");
   const enviosRes = await payload.find({
     collection: "envios",
     depth: 1,
@@ -444,6 +469,24 @@ export async function obterPropostaCrm(id: string): Promise<PropostaDetalhe | nu
     envios: enviosRes.docs.map(mapearEnvioResumo),
     elaboradorNome: campoRel(doc.elaborador, "nome") ?? "",
     aprovadorNome: campoRel(doc.aprovador, "nome") ?? "",
+    clienteId: idRel(doc.cliente),
+    programaId: idRel(doc.programa),
+    oportunidadeId: idRel(doc.oportunidade),
+    tipo: doc.tipo ?? null,
+    modalidade: doc.modalidade ?? null,
+    replay: doc.replay ?? null,
+    condPagto: doc.condPagto ?? null,
+    condEspecificas: doc.condEspecificas ?? null,
+    observacoes: doc.observacoes ?? null,
+    valorUnitario: doc.valorUnitario ?? null,
+    qtdPagantes: doc.qtdPagantes ?? null,
+    cortesias: doc.cortesias ?? null,
+    percDesconto: doc.percDesconto ?? null,
+    validadeDias: doc.validadeDias ?? null,
+    modulosIds,
+    eventosIds,
+    elaboradorId: idRel(doc.elaborador),
+    aprovadorId: idRel(doc.aprovador),
   };
 }
 

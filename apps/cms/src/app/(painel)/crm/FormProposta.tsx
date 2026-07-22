@@ -48,10 +48,10 @@ function numeroOuZero(v: string): number {
 
 /**
  * Wizard de criação/edição de proposta (5 blocos). `inicial === null` cria;
- * caso contrário edita a proposta vigente (id fixo, campos herdados dos
- * dados persistidos — DetalheProposta não expõe valorUnitario/qtdPagantes/
- * cortesias/percDesconto/etc., então a edição parte de valores em branco
- * exceto o que já está em PropostaDetalhe/PropostaResumo).
+ * caso contrário edita a proposta vigente — o estado é inicializado a partir
+ * dos campos crus de `PropostaDetalhe` (clienteId/programaId/valorUnitario/
+ * etc.), o mesmo padrão de round-trip fiel usado por FormOportunidade com
+ * OportunidadeCrmDetalhe.
  */
 export function FormProposta({
   inicial,
@@ -63,24 +63,24 @@ export function FormProposta({
   onCancelar,
 }: FormPropostaProps) {
   const [dados, setDados] = useState<DadosProposta>({
-    cliente: clientes.find((c) => c.orgao === inicial?.clienteNome)?.id ?? "",
-    programa: catalogo.programas.find((p) => p.sigla === inicial?.programaSigla)?.id ?? "",
-    oportunidade: "",
-    tipo: "",
-    modulos: [],
-    eventos: [],
-    valorUnitario: "",
-    qtdPagantes: "",
-    cortesias: "",
-    percDesconto: "",
-    modalidade: "",
-    replay: "",
-    condPagto: "",
-    condEspecificas: "",
-    observacoes: "",
-    elaborador: inicial !== null ? (usuarios.find((u) => u.nome === inicial.elaboradorNome)?.id ?? "") : "",
-    aprovador: inicial !== null ? (usuarios.find((u) => u.nome === inicial.aprovadorNome)?.id ?? "") : "",
-    validadeDias: "30",
+    cliente: inicial?.clienteId ?? "",
+    programa: inicial?.programaId ?? "",
+    oportunidade: inicial?.oportunidadeId ?? "",
+    tipo: inicial?.tipo ?? "",
+    modulos: inicial?.modulosIds ?? [],
+    eventos: inicial?.eventosIds ?? [],
+    valorUnitario: inicial !== null && inicial.valorUnitario !== null ? String(inicial.valorUnitario) : "",
+    qtdPagantes: inicial !== null && inicial.qtdPagantes !== null ? String(inicial.qtdPagantes) : "",
+    cortesias: inicial !== null && inicial.cortesias !== null ? String(inicial.cortesias) : "",
+    percDesconto: inicial !== null && inicial.percDesconto !== null ? String(inicial.percDesconto) : "",
+    modalidade: inicial?.modalidade ?? "",
+    replay: inicial?.replay ?? "",
+    condPagto: inicial?.condPagto ?? "",
+    condEspecificas: inicial?.condEspecificas ?? "",
+    observacoes: inicial?.observacoes ?? "",
+    elaborador: inicial?.elaboradorId ?? "",
+    aprovador: inicial?.aprovadorId ?? "",
+    validadeDias: inicial !== null && inicial.validadeDias !== null ? String(inicial.validadeDias) : "30",
     status: inicial?.status ?? "rascunho",
   });
   const [erro, setErro] = useState<string | null>(null);
@@ -109,6 +109,7 @@ export function FormProposta({
    * (prop recebida por este form) não traz módulos/quantidade/modalidade — só
    * `OportunidadeCrmDetalhe` os tem; o pré-preenchimento fica restrito ao que o
    * resumo oferece.
+   * TODO Fase B2: pré-preencher módulos/quantidade/modalidade exige OportunidadeCrmDetalhe.
    */
   function selecionarOportunidade(id: string) {
     const op = oportunidades.find((o) => o.id === id);

@@ -436,6 +436,12 @@ export async function atualizarProposta(
 ): Promise<ResultadoEscrita> {
   const clienteId = idOuNulo(dados.cliente);
   if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
+  // Programa vazio = sem programa (proposta customizada), permitido. Valor
+  // não vazio que não resolve para um id válido é erro — falha fechado, não
+  // grava null silenciosamente por cima de um programa já vinculado.
+  if (dados.programa.trim() !== "" && idOuNulo(dados.programa) === null) {
+    return { ok: false, erro: "Selecione um programa válido." };
+  }
   try {
     const payload = await obterPayload();
     // Recarrega para preservar codigoBase/codigo/versao — não são reeditáveis
