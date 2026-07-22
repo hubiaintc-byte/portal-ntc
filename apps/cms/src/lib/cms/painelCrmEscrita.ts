@@ -114,6 +114,13 @@ export function proximaSequencia(codigos: string[], ano: number): number {
 
 const ERRO_GENERICO = "Não foi possível salvar. Tente novamente.";
 
+/** ISO da validade: hoje + validadeDias. Fonte única usada por criarProposta e criarVersaoProposta. */
+function dataValidade(validadeDias: number): string {
+  const validade = new Date();
+  validade.setDate(validade.getDate() + validadeDias);
+  return validade.toISOString();
+}
+
 // Os campos abaixo são `select` na coleção (uniões literais geradas pelo
 // Payload em payload-types); os dados chegam como string livre do formulário
 // (a UI só oferece as opções válidas da coleção) — cast pontual campo a
@@ -408,14 +415,12 @@ export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscr
     const codigo = codigoDaVersao(codigoBase, versao);
     const agora = new Date();
     const validadeDias = numeroOuNulo(dados.validadeDias) ?? 30;
-    const validade = new Date(agora);
-    validade.setDate(validade.getDate() + validadeDias);
     await payload.create({
       collection: "propostas",
       data: {
         ...dadosProposta(dados, clienteId, { codigoBase, codigo, versao }),
         dataCriacao: agora.toISOString(),
-        validade: validade.toISOString(),
+        validade: dataValidade(validadeDias),
       },
     });
     return { ok: true };
@@ -471,6 +476,18 @@ export async function criarVersaoProposta(
     const versao = (vigente.versao ?? 1) + 1;
     const codigo = codigoDaVersao(codBase, versao);
     const agora = new Date();
+    const validadeDias = vigente.validadeDias ?? 30;
+
+    // Marca a anterior como substituída ANTES de criar a nova versão vigente:
+    // nunca há duas vigentes ao mesmo tempo. No pior caso (falha logo após
+    // este update), a anterior fica substituída sem sucessora — estado
+    // detectável e corrigível na próxima tentativa, ao contrário de duas
+    // vigentes simultâneas.
+    await payload.update({
+      collection: "propostas",
+      id: vigente.id,
+      data: { status: "substituida" as PropostaData["status"] },
+    });
 
     const nova = await payload.create({
       collection: "propostas",
@@ -499,18 +516,12 @@ export async function criarVersaoProposta(
         observacoes: vigente.observacoes,
         elaborador: vigente.elaborador,
         aprovador: vigente.aprovador,
-        validadeDias: vigente.validadeDias ?? 30,
+        validadeDias,
         dataCriacao: agora.toISOString(),
-        validade: agora.toISOString(),
+        validade: dataValidade(validadeDias),
         motivoRevisao: motivo,
         substitui: vigente.codigo,
       } as PropostaData,
-    });
-
-    await payload.update({
-      collection: "propostas",
-      id: vigente.id,
-      data: { status: "substituida" as PropostaData["status"] },
     });
 
     await payload.create({
