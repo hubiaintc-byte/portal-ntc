@@ -24,6 +24,9 @@ export interface Config {
     'clientes-crm': ClienteCrm;
     'contatos-crm': ContatoCrm;
     oportunidades: Oportunidade;
+    propostas: Proposta;
+    versoes: VersaoProposta;
+    envios: EnvioProposta;
     'audit-log': AuditLog;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -44,6 +47,9 @@ export interface Config {
     'clientes-crm': ClientesCrmSelect<false> | ClientesCrmSelect<true>;
     'contatos-crm': ContatosCrmSelect<false> | ContatosCrmSelect<true>;
     oportunidades: OportunidadesSelect<false> | OportunidadesSelect<true>;
+    propostas: PropostasSelect<false> | PropostasSelect<true>;
+    versoes: VersoesSelect<false> | VersoesSelect<true>;
+    envios: EnviosSelect<false> | EnviosSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -1097,6 +1103,89 @@ export interface Oportunidade {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "propostas".
+ */
+export interface Proposta {
+  id: number;
+  codigoBase: string;
+  codigo: string;
+  versao?: number | null;
+  oportunidade?: (number | null) | Oportunidade;
+  cliente: number | ClienteCrm;
+  programa?: (number | null) | Programa;
+  tipo?: ('programa-completo' | 'modulo-avulso' | 'produto-evento-avulso' | 'customizada') | null;
+  status?: ('rascunho' | 'enviada' | 'em-analise' | 'aprovada' | 'recusada' | 'substituida' | 'expirada') | null;
+  modulos?: (number | Modulo)[] | null;
+  eventos?: (number | Evento)[] | null;
+  valorUnitario?: number | null;
+  qtdPagantes?: number | null;
+  cortesias?: number | null;
+  percDesconto?: number | null;
+  /**
+   * Derivado.
+   */
+  valorBruto?: number | null;
+  /**
+   * Derivado.
+   */
+  desconto?: number | null;
+  /**
+   * Derivado.
+   */
+  valorLiquido?: number | null;
+  modalidade?: string | null;
+  replay?: string | null;
+  condPagto?: string | null;
+  condEspecificas?: string | null;
+  observacoes?: string | null;
+  elaborador?: (number | null) | User;
+  aprovador?: (number | null) | User;
+  validadeDias?: number | null;
+  dataCriacao?: string | null;
+  validade?: string | null;
+  motivoRevisao?: string | null;
+  /**
+   * Código da versão substituída.
+   */
+  substitui?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "versoes".
+ */
+export interface VersaoProposta {
+  id: number;
+  codBase: string;
+  nVersao?: number | null;
+  proposta?: (number | null) | Proposta;
+  data?: string | null;
+  substitui?: string | null;
+  motivo?: string | null;
+  sintese?: string | null;
+  statusAnterior?: string | null;
+  vigente?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios".
+ */
+export interface EnvioProposta {
+  id: number;
+  proposta: number | Proposta;
+  data?: string | null;
+  canal?: ('e-mail' | 'whatsapp' | 'oficio' | 'presencial' | 'outro') | null;
+  destinatarios?: string | null;
+  status?: ('enviada' | 'recebida' | 'em-analise' | 'respondida') | null;
+  observacoes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-log".
  */
 export interface AuditLog {
@@ -1177,6 +1266,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'oportunidades';
         value: number | Oportunidade;
+      } | null)
+    | ({
+        relationTo: 'propostas';
+        value: number | Proposta;
+      } | null)
+    | ({
+        relationTo: 'versoes';
+        value: number | VersaoProposta;
+      } | null)
+    | ({
+        relationTo: 'envios';
+        value: number | EnvioProposta;
       } | null)
     | ({
         relationTo: 'audit-log';
@@ -1719,6 +1820,74 @@ export interface OportunidadesSelect<T extends boolean = true> {
   proximaAcao?: T;
   followup?: T;
   responsavel?: T;
+  observacoes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "propostas_select".
+ */
+export interface PropostasSelect<T extends boolean = true> {
+  codigoBase?: T;
+  codigo?: T;
+  versao?: T;
+  oportunidade?: T;
+  cliente?: T;
+  programa?: T;
+  tipo?: T;
+  status?: T;
+  modulos?: T;
+  eventos?: T;
+  valorUnitario?: T;
+  qtdPagantes?: T;
+  cortesias?: T;
+  percDesconto?: T;
+  valorBruto?: T;
+  desconto?: T;
+  valorLiquido?: T;
+  modalidade?: T;
+  replay?: T;
+  condPagto?: T;
+  condEspecificas?: T;
+  observacoes?: T;
+  elaborador?: T;
+  aprovador?: T;
+  validadeDias?: T;
+  dataCriacao?: T;
+  validade?: T;
+  motivoRevisao?: T;
+  substitui?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "versoes_select".
+ */
+export interface VersoesSelect<T extends boolean = true> {
+  codBase?: T;
+  nVersao?: T;
+  proposta?: T;
+  data?: T;
+  substitui?: T;
+  motivo?: T;
+  sintese?: T;
+  statusAnterior?: T;
+  vigente?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios_select".
+ */
+export interface EnviosSelect<T extends boolean = true> {
+  proposta?: T;
+  data?: T;
+  canal?: T;
+  destinatarios?: T;
+  status?: T;
   observacoes?: T;
   updatedAt?: T;
   createdAt?: T;
