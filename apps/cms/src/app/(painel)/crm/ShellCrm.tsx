@@ -3,39 +3,56 @@
 import { useState, useTransition } from "react";
 
 import type { LeadCmsDetalhe, LeadCmsResumo } from "@/lib/cms/painelCms";
+import type { DadosEnvio } from "@/lib/cms/painelCrmEscrita";
 import type {
   CatalogoCrm,
   ClienteCrmDetalhe,
   ClienteCrmResumo,
   ContatoCrmResumo,
+  EnvioResumo,
   ModuloCrmResumo,
   OportunidadeCrmDetalhe,
   OportunidadeCrmResumo,
   ProdutoCrmResumo,
   ProgramaCrmResumo,
+  PropostaDetalhe,
+  PropostaResumo,
   UsuarioCmsResumo,
+  VersaoResumo,
 } from "@/lib/cms/painelCrm";
 import { todosFollowups } from "@/lib/cms/kpisComercial";
 
 import { carregarLead } from "../acoes";
-import { carregarClienteCrm, carregarOportunidadeCrm } from "../acoesCrm";
+import {
+  carregarClienteCrm,
+  carregarOportunidadeCrm,
+  carregarPropostaCrm,
+  novaVersaoPropostaCrm,
+  registrarEnvioCrm,
+} from "../acoesCrm";
 import { DetalheLead } from "../DetalheLead";
 import { TelaLeads } from "../TelaLeads";
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
+import { AvisoForm } from "./CamposCrm";
 import { DetalheCliente } from "./DetalheCliente";
 import { DetalheOportunidade } from "./DetalheOportunidade";
+import { DetalheProposta } from "./DetalheProposta";
 import { FormCliente } from "./FormCliente";
 import { FormContato } from "./FormContato";
 import { FormOportunidade } from "./FormOportunidade";
+import { FormProposta } from "./FormProposta";
 import { TelaClientes } from "./TelaClientes";
 import { TelaContatos } from "./TelaContatos";
 import { TelaEmBreve } from "./TelaEmBreve";
+import { TelaEnvios } from "./TelaEnvios";
 import { TelaFollowups } from "./TelaFollowups";
 import { TelaModulos } from "./TelaModulos";
 import { TelaOportunidades } from "./TelaOportunidades";
 import { TelaPainelComercial } from "./TelaPainelComercial";
 import { TelaProdutos } from "./TelaProdutos";
 import { TelaProgramas } from "./TelaProgramas";
+import { TelaPropostas } from "./TelaPropostas";
+import { TelaVersoes } from "./TelaVersoes";
 
 interface ShellCrmProps {
   usuario: { nome: string; email: string; perfil: string };
@@ -48,6 +65,9 @@ interface ShellCrmProps {
   programas: ProgramaCrmResumo[];
   modulos: ModuloCrmResumo[];
   produtos: ProdutoCrmResumo[];
+  propostas: PropostaResumo[];
+  envios: EnvioResumo[];
+  versoes: VersaoResumo[];
   hojeISO: string;
   erroLeitura: boolean;
 }
@@ -61,7 +81,8 @@ type TelaCrmId =
 type FormCrmAberto =
   | { entidade: "cliente"; inicial: ClienteCrmDetalhe | null }
   | { entidade: "contato"; inicial: ContatoCrmResumo | null }
-  | { entidade: "oportunidade"; inicial: OportunidadeCrmDetalhe | null };
+  | { entidade: "oportunidade"; inicial: OportunidadeCrmDetalhe | null }
+  | { entidade: "proposta"; inicial: PropostaDetalhe | null };
 
 /* Ícones lineares funcionais, peso 1.5 (CLAUDE.md §3). */
 const Ico = {
@@ -185,6 +206,9 @@ export function ShellCrm({
   programas,
   modulos,
   produtos,
+  propostas,
+  envios,
+  versoes,
   hojeISO,
   erroLeitura,
 }: ShellCrmProps) {
@@ -192,14 +216,18 @@ export function ShellCrm({
   const [clienteDet, setClienteDet] = useState<ClienteCrmDetalhe | null>(null);
   const [oportunidadeDet, setOportunidadeDet] = useState<OportunidadeCrmDetalhe | null>(null);
   const [leadDet, setLeadDet] = useState<LeadCmsDetalhe | null>(null);
+  const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
+  const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [carregando, iniciarCarga] = useTransition();
 
   function fecharTudo() {
     setClienteDet(null);
     setOportunidadeDet(null);
     setLeadDet(null);
+    setPropostaDet(null);
     setFormAberto(null);
+    setErroAcao(null);
   }
 
   function irPara(id: string) {
@@ -225,6 +253,37 @@ export function ShellCrm({
     iniciarCarga(async () => {
       const det = await carregarLead(id);
       if (det) setLeadDet(det);
+    });
+  }
+
+  function abrirProposta(id: string) {
+    iniciarCarga(async () => {
+      const det = await carregarPropostaCrm(id);
+      if (det) {
+        setErroAcao(null);
+        setPropostaDet(det);
+      }
+    });
+  }
+
+  function novaVersao(codBase: string, motivo: string) {
+    iniciarCarga(async () => {
+      const r = await novaVersaoPropostaCrm(codBase, motivo);
+      if (r.ok) fecharTudo();
+      else setErroAcao(r.erro ?? "Erro ao criar nova versão.");
+    });
+  }
+
+  function registrarEnvio(dados: DadosEnvio) {
+    iniciarCarga(async () => {
+      const r = await registrarEnvioCrm(dados);
+      if (r.ok) {
+        // Reabre a proposta para refletir o envio recém-registrado na lista.
+        const det = await carregarPropostaCrm(dados.proposta);
+        if (det) setPropostaDet(det);
+      } else {
+        setErroAcao(r.erro ?? "Erro ao registrar envio.");
+      }
     });
   }
 
@@ -271,6 +330,16 @@ export function ShellCrm({
           onSalvo={fecharTudo}
           onCancelar={fecharTudo}
         />
+      ) : formAberto?.entidade === "proposta" ? (
+        <FormProposta
+          inicial={formAberto.inicial}
+          clientes={clientes}
+          catalogo={catalogo}
+          usuarios={usuarios}
+          oportunidades={oportunidades}
+          onSalvo={fecharTudo}
+          onCancelar={fecharTudo}
+        />
       ) : clienteDet ? (
         <DetalheCliente
           cliente={clienteDet}
@@ -286,6 +355,17 @@ export function ShellCrm({
           onVoltar={fecharTudo}
           onEditar={() => setFormAberto({ entidade: "oportunidade", inicial: oportunidadeDet })}
         />
+      ) : propostaDet ? (
+        <>
+          <AvisoForm erro={erroAcao} />
+          <DetalheProposta
+            proposta={propostaDet}
+            onVoltar={fecharTudo}
+            onEditar={() => setFormAberto({ entidade: "proposta", inicial: propostaDet })}
+            onNovaVersao={novaVersao}
+            onRegistrarEnvio={registrarEnvio}
+          />
+        </>
       ) : (
         <>
           {tela === "painel" && (
@@ -329,17 +409,14 @@ export function ShellCrm({
           {tela === "modulos" && <TelaModulos modulos={modulos} />}
           {tela === "produtos" && <TelaProdutos produtos={produtos} />}
           {tela === "propostas" && (
-            <TelaEmBreve eyebrow="Operação Comercial" titulo="Propostas"
-              descricao="Geração e gestão de propostas comerciais." />
+            <TelaPropostas
+              propostas={propostas}
+              onAbrir={abrirProposta}
+              onNovo={() => setFormAberto({ entidade: "proposta", inicial: null })}
+            />
           )}
-          {tela === "versoes" && (
-            <TelaEmBreve eyebrow="Operação Comercial" titulo="Versões"
-              descricao="Histórico de versões das propostas." />
-          )}
-          {tela === "envios" && (
-            <TelaEmBreve eyebrow="Operação Comercial" titulo="Envios"
-              descricao="Registro de envios de propostas aos clientes." />
-          )}
+          {tela === "versoes" && <TelaVersoes versoes={versoes} onAbrirProposta={abrirProposta} />}
+          {tela === "envios" && <TelaEnvios envios={envios} />}
           {tela === "condicoes" && (
             <TelaEmBreve eyebrow="Operação Comercial" titulo="Condições"
               descricao="Condições comerciais padrão e específicas." />
