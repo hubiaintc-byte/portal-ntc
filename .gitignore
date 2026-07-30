@@ -51,9 +51,13 @@ uploads/
 # Artefatos transitórios de captura visual
 .tmp-screenshots/
 
-# Pasta /img/ é mantida fora do versionamento (fonte de SVGs/fotos
+# Pasta /img/ da RAIZ é mantida fora do versionamento (fonte de SVGs/fotos
 # que são copiados para apps/web/public/ conforme uso editorial).
-img/
+# ATENÇÃO: âncora com barra inicial. Sem ela (`img/`) a regra também casava
+# apps/web/public/img/ — assets servidos em produção — e os deixava fora do
+# deploy (404 no hero e demais fotos). public/img É versionado (exceção abaixo).
+/img/
+!apps/web/public/img/
 
 # Assets binários do seed — vivem no Supabase Storage após
 # pnpm payload:seed:imagens-home; o repo guarda só a estrutura e o
