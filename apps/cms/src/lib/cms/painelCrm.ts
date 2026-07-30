@@ -1,6 +1,16 @@
 import "server-only";
 
-import type { ClienteCrm, ContatoCrm, Evento, Modulo, Oportunidade, Programa } from "@ntc/types";
+import type {
+  ClienteCrm,
+  ContatoCrm,
+  EnvioProposta,
+  Evento,
+  Modulo,
+  Oportunidade,
+  Programa,
+  Proposta,
+  VersaoProposta,
+} from "@ntc/types";
 
 import { obterPayload } from "@/lib/payloadClient";
 
@@ -114,6 +124,65 @@ export interface ProdutoCrmResumo {
   valor: number | null;
 }
 
+export interface PropostaResumo {
+  id: string;
+  codigo: string;
+  codigoBase: string;
+  versao: number;
+  clienteNome: string;
+  programaSigla: string;
+  valorLiquido: number;
+  status: string;
+  vigente: boolean;
+}
+
+export interface PropostaDetalhe extends PropostaResumo {
+  itens: { rotulo: string; detalhe: string }[];
+  envios: EnvioResumo[];
+  elaboradorNome: string;
+  aprovadorNome: string;
+  /** Campos crus (ids/valores) para round-trip fiel no FormProposta em modo edição. */
+  clienteId: string | null;
+  programaId: string | null;
+  oportunidadeId: string | null;
+  tipo: string | null;
+  modalidade: string | null;
+  replay: string | null;
+  condPagto: string | null;
+  condEspecificas: string | null;
+  observacoes: string | null;
+  valorUnitario: number | null;
+  qtdPagantes: number | null;
+  cortesias: number | null;
+  percDesconto: number | null;
+  validadeDias: number | null;
+  modulosIds: string[];
+  eventosIds: string[];
+  elaboradorId: string | null;
+  aprovadorId: string | null;
+}
+
+export interface VersaoResumo {
+  id: string;
+  codBase: string;
+  nVersao: number;
+  data: string | null;
+  valorLiquido: number;
+  status: string;
+  motivo: string;
+  propostaId: string;
+}
+
+export interface EnvioResumo {
+  id: string;
+  propostaCodigo: string;
+  data: string | null;
+  canal: string;
+  destinatarios: string;
+  status: string;
+  observacoes: string;
+}
+
 /** Relationship do Payload: extrai id como string, populado ou não. */
 function idRel(v: unknown): string | null {
   if (typeof v === "string" || typeof v === "number") return String(v);
@@ -131,6 +200,15 @@ function campoRel(v: unknown, campo: string): string | null {
 }
 
 const soData = (iso: string | null | undefined): string | null => (iso ? iso.slice(0, 10) : null);
+
+/** Relationship populado: extrai uma propriedade numérica de exibição. */
+function campoRelNum(v: unknown, campo: string): number | null {
+  if (v && typeof v === "object" && campo in v) {
+    const bruto = (v as Record<string, unknown>)[campo];
+    return typeof bruto === "number" ? bruto : null;
+  }
+  return null;
+}
 
 function mapearClienteResumo(doc: ClienteCrm): ClienteCrmResumo {
   return {
@@ -314,4 +392,127 @@ export async function listarProdutosCrm(): Promise<ProdutoCrmResumo[]> {
     codigo: e.comercial?.codigo ?? null,
     valor: e.comercial?.valor ?? null,
   }));
+}
+
+function mapearPropostaResumo(doc: Proposta): PropostaResumo {
+  const status = doc.status ?? "rascunho";
+  return {
+    id: String(doc.id),
+    codigo: doc.codigo,
+    codigoBase: doc.codigoBase,
+    versao: doc.versao ?? 1,
+    clienteNome: campoRel(doc.cliente, "orgao") ?? "",
+    programaSigla: campoRel(doc.programa, "sigla") ?? "",
+    valorLiquido: doc.valorLiquido ?? 0,
+    status,
+    vigente: status !== "substituida",
+  };
+}
+
+function mapearEnvioResumo(doc: EnvioProposta): EnvioResumo {
+  return {
+    id: String(doc.id),
+    propostaCodigo: campoRel(doc.proposta, "codigo") ?? "",
+    data: soData(doc.data),
+    canal: doc.canal ?? "",
+    destinatarios: doc.destinatarios ?? "",
+    status: doc.status ?? "",
+    observacoes: doc.observacoes ?? "",
+  };
+}
+
+/** Só a versão vigente (maior `versao`) de cada `codigoBase`. */
+export async function listarPropostasCrm(): Promise<PropostaResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({ collection: "propostas", limit: 1000, depth: 1 });
+  const porBase = new Map<string, PropostaResumo>();
+  for (const doc of res.docs) {
+    const resumo = mapearPropostaResumo(doc);
+    const atual = porBase.get(resumo.codigoBase);
+    if (!atual || resumo.versao > atual.versao) porBase.set(resumo.codigoBase, resumo);
+  }
+  return [...porBase.values()].sort((a, b) => b.codigo.localeCompare(a.codigo));
+}
+
+export async function obterPropostaCrm(id: string): Promise<PropostaDetalhe | null> {
+  const payload = await obterPayload();
+  let doc: Proposta;
+  try {
+    doc = await payload.findByID({ collection: "propostas", id, depth: 1 });
+  } catch {
+    return null;
+  }
+  const modulosItens = (Array.isArray(doc.modulos) ? doc.modulos : []).map((m) => ({
+    rotulo: `M${campoRelNum(m, "numero") ?? ""} · ${campoRel(m, "titulo") ?? ""}`,
+    detalhe: campoRel(m, "titulo") ?? "",
+  }));
+  const eventosItens = (Array.isArray(doc.eventos) ? doc.eventos : []).map((e) => ({
+    rotulo: `${campoRel(e, "tipo") ?? "—"} · ${campoRel(e, "nome") ?? ""}`,
+    detalhe: campoRel(e, "nome") ?? "",
+  }));
+  const modulosIds = (Array.isArray(doc.modulos) ? doc.modulos : [])
+    .map((m) => idRel(m) ?? "")
+    .filter((id) => id !== "");
+  const eventosIds = (Array.isArray(doc.eventos) ? doc.eventos : [])
+    .map((e) => idRel(e) ?? "")
+    .filter((id) => id !== "");
+  const enviosRes = await payload.find({
+    collection: "envios",
+    depth: 1,
+    limit: 200,
+    where: { proposta: { equals: doc.id } },
+    sort: "-data",
+  });
+  return {
+    ...mapearPropostaResumo(doc),
+    itens: [...modulosItens, ...eventosItens],
+    envios: enviosRes.docs.map(mapearEnvioResumo),
+    elaboradorNome: campoRel(doc.elaborador, "nome") ?? "",
+    aprovadorNome: campoRel(doc.aprovador, "nome") ?? "",
+    clienteId: idRel(doc.cliente),
+    programaId: idRel(doc.programa),
+    oportunidadeId: idRel(doc.oportunidade),
+    tipo: doc.tipo ?? null,
+    modalidade: doc.modalidade ?? null,
+    replay: doc.replay ?? null,
+    condPagto: doc.condPagto ?? null,
+    condEspecificas: doc.condEspecificas ?? null,
+    observacoes: doc.observacoes ?? null,
+    valorUnitario: doc.valorUnitario ?? null,
+    qtdPagantes: doc.qtdPagantes ?? null,
+    cortesias: doc.cortesias ?? null,
+    percDesconto: doc.percDesconto ?? null,
+    validadeDias: doc.validadeDias ?? null,
+    modulosIds,
+    eventosIds,
+    elaboradorId: idRel(doc.elaborador),
+    aprovadorId: idRel(doc.aprovador),
+  };
+}
+
+export async function versoesDeProposta(codBase: string): Promise<VersaoResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "versoes",
+    depth: 1,
+    limit: 200,
+    where: { codBase: { equals: codBase } },
+    sort: "-nVersao",
+  });
+  return res.docs.map((doc: VersaoProposta) => ({
+    id: String(doc.id),
+    codBase: doc.codBase,
+    nVersao: doc.nVersao ?? 1,
+    data: soData(doc.data),
+    valorLiquido: campoRelNum(doc.proposta, "valorLiquido") ?? 0,
+    status: doc.statusAnterior ?? "",
+    motivo: doc.motivo ?? "",
+    propostaId: idRel(doc.proposta) ?? "",
+  }));
+}
+
+export async function todosEnviosCrm(): Promise<EnvioResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({ collection: "envios", depth: 1, limit: 500, sort: "-data" });
+  return res.docs.map(mapearEnvioResumo);
 }

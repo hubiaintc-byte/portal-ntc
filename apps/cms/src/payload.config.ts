@@ -21,9 +21,12 @@ import { Eventos } from "./collections/Eventos";
 import { Leads } from "./collections/Leads";
 import { Media } from "./collections/Media";
 import { Modulos } from "./collections/Modulos";
+import { EnviosProposta } from "./collections/EnviosProposta";
 import { Oportunidades } from "./collections/Oportunidades";
 import { Programas } from "./collections/Programas";
+import { Propostas } from "./collections/Propostas";
 import { Users } from "./collections/Users";
+import { VersoesProposta } from "./collections/VersoesProposta";
 import { CorpoDocente } from "./globals/CorpoDocente";
 import { Home } from "./globals/Home";
 import { OGrupo } from "./globals/OGrupo";
@@ -87,6 +90,9 @@ export default buildConfig({
     ClientesCrm,
     ContatosCrm,
     Oportunidades,
+    Propostas,
+    VersoesProposta,
+    EnviosProposta,
     AuditLog,
   ],
   globals: [Home, OGrupo, CorpoDocente, Rodape],

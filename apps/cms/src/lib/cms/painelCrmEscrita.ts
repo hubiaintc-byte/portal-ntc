@@ -1,5 +1,11 @@
 import "server-only";
 
+import {
+  calcularValoresProposta,
+  codigoDaVersao,
+  gerarCodigoBase,
+  proximaVersao,
+} from "@ntc/lib";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
 import { obterPayload } from "@/lib/payloadClient";
@@ -107,6 +113,13 @@ export function proximaSequencia(codigos: string[], ano: number): number {
 }
 
 const ERRO_GENERICO = "Não foi possível salvar. Tente novamente.";
+
+/** ISO da validade: hoje + validadeDias. Fonte única usada por criarProposta e criarVersaoProposta. */
+function dataValidade(validadeDias: number): string {
+  const validade = new Date();
+  validade.setDate(validade.getDate() + validadeDias);
+  return validade.toISOString();
+}
 
 // Os campos abaixo são `select` na coleção (uniões literais geradas pelo
 // Payload em payload-types); os dados chegam como string livre do formulário
@@ -278,6 +291,287 @@ export async function atualizarOportunidade(
     return { ok: true };
   } catch (e) {
     console.error("[atualizarOportunidade]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+// --- Propostas (spec 2026-07-22 · Fase B1) -------------------------------
+
+export interface DadosProposta {
+  cliente: string;
+  programa: string;
+  oportunidade: string;
+  tipo: string;
+  modulos: string[];
+  eventos: string[];
+  valorUnitario: string;
+  qtdPagantes: string;
+  cortesias: string;
+  percDesconto: string;
+  modalidade: string;
+  replay: string;
+  condPagto: string;
+  condEspecificas: string;
+  observacoes: string;
+  elaborador: string;
+  aprovador: string;
+  validadeDias: string;
+  status: string;
+}
+
+export interface DadosEnvio {
+  proposta: string;
+  data: string;
+  canal: string;
+  destinatarios: string;
+  status: string;
+  observacoes: string;
+}
+
+type PropostaData = RequiredDataFromCollectionSlug<"propostas">;
+type VersaoData = RequiredDataFromCollectionSlug<"versoes">;
+type EnvioData = RequiredDataFromCollectionSlug<"envios">;
+
+/**
+ * Mapper puro: resolve relationships, parseia números do form e grava os
+ * derivados (valorBruto/desconto/valorLiquido) via calcularValoresProposta.
+ * codigoBase/codigo/versao vêm fixados pelo chamador (criar/atualizar
+ * decidem a sequência de versionamento antes de montar os dados).
+ * `percDesconto` é gravado como número 0–100 (não fração) — mesma unidade
+ * que a coleção `propostas` e o formulário usam.
+ */
+export function dadosProposta(
+  dados: DadosProposta,
+  clienteId: number,
+  ids: { codigoBase: string; codigo: string; versao: number },
+): PropostaData {
+  const valorUnitario = numeroOuNulo(dados.valorUnitario) ?? 0;
+  const qtdPagantes = numeroOuNulo(dados.qtdPagantes) ?? 0;
+  const cortesias = numeroOuNulo(dados.cortesias) ?? 0;
+  const percDesconto = numeroOuNulo(dados.percDesconto) ?? 0;
+  const valores = calcularValoresProposta({
+    valorUnitario,
+    qtdPagantes,
+    cortesias,
+    percDesconto,
+  });
+  return {
+    codigoBase: ids.codigoBase,
+    codigo: ids.codigo,
+    versao: ids.versao,
+    cliente: clienteId,
+    programa: idOuNulo(dados.programa),
+    oportunidade: idOuNulo(dados.oportunidade),
+    tipo: ouNulo(dados.tipo) as PropostaData["tipo"],
+    status: (ouNulo(dados.status) ?? "rascunho") as PropostaData["status"],
+    modulos: idsLista(dados.modulos),
+    eventos: idsLista(dados.eventos),
+    valorUnitario,
+    qtdPagantes,
+    cortesias,
+    percDesconto,
+    valorBruto: valores.valorBruto,
+    desconto: valores.desconto,
+    valorLiquido: valores.valorLiquido,
+    modalidade: ouNulo(dados.modalidade),
+    replay: ouNulo(dados.replay),
+    condPagto: ouNulo(dados.condPagto),
+    condEspecificas: ouNulo(dados.condEspecificas),
+    observacoes: ouNulo(dados.observacoes),
+    elaborador: idOuNulo(dados.elaborador),
+    aprovador: idOuNulo(dados.aprovador),
+    validadeDias: numeroOuNulo(dados.validadeDias) ?? 30,
+  };
+}
+
+export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscrita> {
+  // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
+  const clienteId = idOuNulo(dados.cliente);
+  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
+  try {
+    const payload = await obterPayload();
+    const [programaDoc, clienteDoc] = await Promise.all([
+      dados.programa.trim() !== ""
+        ? payload.findByID({ collection: "programas", id: dados.programa, depth: 0 })
+        : null,
+      payload.findByID({ collection: "clientes-crm", id: clienteId, depth: 0 }),
+    ]);
+    const ano = new Date().getFullYear();
+    const codigoBase = gerarCodigoBase({
+      ano,
+      siglaPrograma: programaDoc?.sigla ?? "GERAL",
+      uf: clienteDoc.uf ?? "XX",
+      siglaCliente: clienteDoc.sigla ?? clienteDoc.orgao,
+    });
+    const existentes = await payload.find({
+      collection: "propostas",
+      where: { codigoBase: { equals: codigoBase } },
+      limit: 1000,
+      depth: 0,
+      select: { codigo: true },
+    });
+    const codigos = existentes.docs.map((doc) => doc.codigo).filter((c): c is string => Boolean(c));
+    const versao = proximaVersao(codigos);
+    const codigo = codigoDaVersao(codigoBase, versao);
+    const agora = new Date();
+    const validadeDias = numeroOuNulo(dados.validadeDias) ?? 30;
+    await payload.create({
+      collection: "propostas",
+      data: {
+        ...dadosProposta(dados, clienteId, { codigoBase, codigo, versao }),
+        dataCriacao: agora.toISOString(),
+        validade: dataValidade(validadeDias),
+      },
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[criarProposta]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function atualizarProposta(
+  id: string,
+  dados: DadosProposta,
+): Promise<ResultadoEscrita> {
+  const clienteId = idOuNulo(dados.cliente);
+  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
+  // Programa vazio = sem programa (proposta customizada), permitido. Valor
+  // não vazio que não resolve para um id válido é erro — falha fechado, não
+  // grava null silenciosamente por cima de um programa já vinculado.
+  if (dados.programa.trim() !== "" && idOuNulo(dados.programa) === null) {
+    return { ok: false, erro: "Selecione um programa válido." };
+  }
+  try {
+    const payload = await obterPayload();
+    // Recarrega para preservar codigoBase/codigo/versao — não são reeditáveis
+    // pelo formulário (mudam só via criarVersaoProposta).
+    const atual = await payload.findByID({ collection: "propostas", id, depth: 0 });
+    await payload.update({
+      collection: "propostas",
+      id,
+      data: dadosProposta(dados, clienteId, {
+        codigoBase: atual.codigoBase,
+        codigo: atual.codigo,
+        versao: atual.versao ?? 1,
+      }),
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[atualizarProposta]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function criarVersaoProposta(
+  codBase: string,
+  motivo: string,
+): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    const vigentes = await payload.find({
+      collection: "propostas",
+      where: { codigoBase: { equals: codBase } },
+      limit: 1000,
+      depth: 0,
+      sort: "-versao",
+    });
+    const vigente = vigentes.docs[0];
+    if (!vigente) return { ok: false, erro: "Proposta não encontrada." };
+
+    const versao = (vigente.versao ?? 1) + 1;
+    const codigo = codigoDaVersao(codBase, versao);
+    const agora = new Date();
+    const validadeDias = vigente.validadeDias ?? 30;
+
+    // Marca a anterior como substituída ANTES de criar a nova versão vigente:
+    // nunca há duas vigentes ao mesmo tempo. No pior caso (falha logo após
+    // este update), a anterior fica substituída sem sucessora — estado
+    // detectável e corrigível na próxima tentativa, ao contrário de duas
+    // vigentes simultâneas.
+    await payload.update({
+      collection: "propostas",
+      id: vigente.id,
+      data: { status: "substituida" as PropostaData["status"] },
+    });
+
+    const nova = await payload.create({
+      collection: "propostas",
+      data: {
+        codigoBase: vigente.codigoBase,
+        codigo,
+        versao,
+        oportunidade: vigente.oportunidade,
+        cliente: vigente.cliente,
+        programa: vigente.programa,
+        tipo: vigente.tipo,
+        status: "rascunho" as PropostaData["status"],
+        modulos: vigente.modulos,
+        eventos: vigente.eventos,
+        valorUnitario: vigente.valorUnitario,
+        qtdPagantes: vigente.qtdPagantes,
+        cortesias: vigente.cortesias,
+        percDesconto: vigente.percDesconto,
+        valorBruto: vigente.valorBruto,
+        desconto: vigente.desconto,
+        valorLiquido: vigente.valorLiquido,
+        modalidade: vigente.modalidade,
+        replay: vigente.replay,
+        condPagto: vigente.condPagto,
+        condEspecificas: vigente.condEspecificas,
+        observacoes: vigente.observacoes,
+        elaborador: vigente.elaborador,
+        aprovador: vigente.aprovador,
+        validadeDias,
+        dataCriacao: agora.toISOString(),
+        validade: dataValidade(validadeDias),
+        motivoRevisao: motivo,
+        substitui: vigente.codigo,
+      } as PropostaData,
+    });
+
+    await payload.create({
+      collection: "versoes",
+      data: {
+        codBase,
+        nVersao: versao,
+        proposta: nova.id,
+        data: agora.toISOString(),
+        substitui: vigente.codigo,
+        motivo,
+        sintese: motivo,
+        statusAnterior: "Substituída",
+        vigente: true,
+      } satisfies VersaoData,
+    });
+
+    return { ok: true };
+  } catch (e) {
+    console.error("[criarVersaoProposta]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function registrarEnvio(dados: DadosEnvio): Promise<ResultadoEscrita> {
+  // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
+  const propostaId = idOuNulo(dados.proposta);
+  if (propostaId === null) return { ok: false, erro: "Selecione a proposta." };
+  try {
+    const payload = await obterPayload();
+    await payload.create({
+      collection: "envios",
+      data: {
+        proposta: propostaId,
+        data: ouNulo(dados.data),
+        canal: ouNulo(dados.canal) as EnvioData["canal"],
+        destinatarios: ouNulo(dados.destinatarios),
+        status: ouNulo(dados.status) as EnvioData["status"],
+        observacoes: ouNulo(dados.observacoes),
+      },
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[registrarEnvio]", e);
     return { ok: false, erro: ERRO_GENERICO };
   }
 }

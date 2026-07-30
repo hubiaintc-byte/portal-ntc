@@ -19,7 +19,7 @@ export function slugDeRotulo(rotulo: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-const opcoes = (rotulos: string[]): OpcaoLista[] =>
+export const opcoes = (rotulos: string[]): OpcaoLista[] =>
   rotulos.map((label) => ({ label, value: slugDeRotulo(label) }));
 
 // prettier-ignore
@@ -56,3 +56,19 @@ export const STATUS_OPORTUNIDADE = opcoes([
 
 /** Status que tiram a oportunidade do funil (não contam como "aberta"). */
 export const STATUS_OPORTUNIDADE_FECHADA: string[] = ["contratada", "perdida", "cancelada"];
+
+export const TIPOS_PROPOSTA = opcoes([
+  "Programa Completo", "Módulo Avulso", "Produto/Evento Avulso", "Customizada",
+]);
+
+export const STATUS_PROPOSTA = opcoes([
+  "Rascunho", "Enviada", "Em análise", "Aprovada", "Recusada", "Substituída", "Expirada",
+]);
+
+export const CANAIS_ENVIO = opcoes([
+  "E-mail", "WhatsApp", "Ofício", "Presencial", "Outro",
+]);
+
+export const STATUS_ENVIO = opcoes([
+  "Enviada", "Recebida", "Em análise", "Respondida",
+]);

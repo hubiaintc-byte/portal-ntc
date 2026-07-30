@@ -19,11 +19,34 @@ const SELO_CLIENTE: Record<string, string> = {
   encerrado: "erro",
 };
 
+const SELO_PROPOSTA: Record<string, string> = {
+  rascunho: "info",
+  enviada: "info",
+  "em-analise": "atencao",
+  aprovada: "ok",
+  recusada: "erro",
+  substituida: "erro",
+  expirada: "erro",
+};
+
+const SELO_ENVIO: Record<string, string> = {
+  enviada: "info",
+  recebida: "info",
+  "em-analise": "atencao",
+  respondida: "ok",
+};
+
 export const seloDeOportunidade = (status: string): string =>
   `pcms-selo pcms-selo--${SELO_OPORTUNIDADE[status] ?? "info"}`;
 
 export const seloDeCliente = (status: string): string =>
   `pcms-selo pcms-selo--${SELO_CLIENTE[status] ?? "info"}`;
+
+export const seloDeProposta = (status: string): string =>
+  `pcms-selo pcms-selo--${SELO_PROPOSTA[status] ?? "info"}`;
+
+export const seloDeEnvio = (status: string): string =>
+  `pcms-selo pcms-selo--${SELO_ENVIO[status] ?? "info"}`;
 
 /** Rótulo legível a partir do value ("em-negociacao" → via lista). */
 export function rotuloDeLista(opcoes: { label: string; value: string }[], value: string | null): string {
