@@ -259,8 +259,9 @@ pnpm build             # build de produção
 pnpm preview           # preview do build de produção
 
 # Payload
-pnpm payload:generate  # regenera types
-pnpm payload:seed      # seed inicial (Áreas + 15 Programas em rascunho)
+pnpm payload:generate     # regenera types
+pnpm payload:push:schema  # sincroniza schema do banco (PAYLOAD_DB_PUSH=1). MANUAL, dev PARADO, diff antes. Responder N a DATA LOSS.
+pnpm payload:seed         # seed inicial (Áreas + 15 Programas em rascunho)
 ```
 
 ## 15. Variáveis de ambiente

@@ -19,6 +19,7 @@
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
     "payload:generate": "pnpm --filter @ntc/cms payload:generate",
+    "payload:push:schema": "pnpm --filter @ntc/cms payload:push:schema",
     "payload:seed": "pnpm --filter @ntc/cms payload:seed",
     "payload:seed:imagens-home": "pnpm --filter @ntc/cms payload:seed:imagens-home",
     "payload:seed:home-v3": "pnpm --filter @ntc/cms payload:seed:home-v3",
