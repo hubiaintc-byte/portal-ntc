@@ -22,12 +22,12 @@ import { StickyMobileCTA } from "./StickyMobileCTA";
 type EventoReal = NonNullable<(typeof EVENTOS_AGENDA)[keyof typeof EVENTOS_AGENDA]>;
 
 /**
- * Sobrescreve a capa estática de cada evento (`card.imagemUrl`) pela capa do
- * CMS quando houver, casando por slug via `buscarOverride` — mesma lógica da
- * Home (`aplicarCapaCms`), para que os cards da agenda exibam a mesma capa.
- * Falha do CMS → mantém a capa estática.
+ * Sobrescreve capa e data estáticas de cada card pelo que está no CMS, casando
+ * por slug via `buscarOverride` — mesma lógica da Home (`aplicarOverrideCard`),
+ * para que agenda e home exibam sempre a mesma capa e a mesma data.
+ * Campo ausente ou CMS fora do ar → mantém o estático.
  */
-async function aplicarCapaCms(eventos: EventoReal[]): Promise<EventoReal[]> {
+async function aplicarOverrideCard(eventos: EventoReal[]): Promise<EventoReal[]> {
   return Promise.all(
     eventos.map(async (e) => {
       if (!e.slug || !e.card) return e;
@@ -42,12 +42,12 @@ async function aplicarCapaCms(eventos: EventoReal[]): Promise<EventoReal[]> {
           const d = derivarDatasEvento(ovr.dataInicioISO);
           card = {
             ...card,
-            diaDataBloco: d.metaValue.split(" · ")[0] ?? card.diaDataBloco,
-            mesAnoDataBloco: d.sidebarValue.split(" · ").slice(1).join(" · ") ?? card.mesAnoDataBloco,
+            diaDataBloco: d.cardDia,
+            mesAnoDataBloco: d.cardMesAno,
             deadlineIso: d.deadlineISO.slice(0, 10),
           };
         }
-        return { ...e, card };
+        return card === e.card ? e : { ...e, card };
       } catch {
         // CMS fora do ar → estático intacto (fallback silencioso).
       }
@@ -82,7 +82,7 @@ export default async function AgendaPage() {
   const eventosBase = EVENTOS_LISTAGEM.map((slug) => EVENTOS_AGENDA[slug]).filter(
     (e): e is EventoReal => Boolean(e),
   );
-  const eventosReais = await aplicarCapaCms(eventosBase);
+  const eventosReais = await aplicarOverrideCard(eventosBase);
   const eventosAgenda: CartaoEvento[] = eventosReais
     .map((e, i) => paraCartaoAgenda(e, i + 1))
     .filter((c): c is CartaoEvento => Boolean(c));

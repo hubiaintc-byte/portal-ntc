@@ -10,6 +10,7 @@ import {
   paraCardHomeSecundario,
 } from "@/lib/eventos/adaptarParaCard";
 import { buscarOverride } from "@/lib/cms/overrideEventoOnline";
+import { derivarDatasEvento } from "@/lib/cms/derivarDatasEvento";
 
 import { SliderHero, type SlidePremium } from "./SliderHero";
 import { FALLBACK_HOME } from "./conteudoFallback";
@@ -44,22 +45,36 @@ const f = FALLBACK_HOME;
 type EventoReal = NonNullable<(typeof EVENTOS_AGENDA)[keyof typeof EVENTOS_AGENDA]>;
 
 /**
- * Sobrescreve a capa estática de cada evento (`card.imagemUrl`) pela capa do
- * CMS quando houver, casando por slug via `buscarOverride` (mesma fonte da
- * página /agenda/[slug]). Falha do CMS → mantém a capa estática. Só a capa é
- * sobrescrita aqui; o resto do card permanece do conteúdo aprovado.
+ * Sobrescreve capa e data estáticas de cada card pelo que está no CMS, casando
+ * por slug via `buscarOverride` (mesma fonte da página /agenda/[slug]). A data
+ * do CMS alimenta só o bloco de data do card (dia + mês/ano) e o `deadlineIso`
+ * usado em ordenação/contagem — o layout e o resto do card permanecem do
+ * conteúdo aprovado. Campo ausente ou CMS fora do ar → estático intacto.
  */
-async function aplicarCapaCms(eventos: EventoReal[]): Promise<EventoReal[]> {
+async function aplicarOverrideCard(eventos: EventoReal[]): Promise<EventoReal[]> {
   return Promise.all(
     eventos.map(async (e) => {
       if (!e.slug || !e.card) return e;
       try {
         const ovr = await buscarOverride(e.slug);
-        if (ovr?.coverUrl) {
-          return { ...e, card: { ...e.card, imagemUrl: ovr.coverUrl } };
+        if (!ovr) return e;
+
+        let card = e.card;
+        if (ovr.coverUrl) {
+          card = { ...card, imagemUrl: ovr.coverUrl };
         }
+        if (ovr.dataInicioISO) {
+          const d = derivarDatasEvento(ovr.dataInicioISO);
+          card = {
+            ...card,
+            diaDataBloco: d.cardDia,
+            mesAnoDataBloco: d.cardMesAno,
+            deadlineIso: ovr.dataInicioISO.slice(0, 10),
+          };
+        }
+        return card === e.card ? e : { ...e, card };
       } catch {
-        // CMS fora do ar → capa estática (fallback silencioso).
+        // CMS fora do ar → card estático (fallback silencioso).
       }
       return e;
     }),
@@ -72,7 +87,7 @@ export default async function HomePage() {
   const eventosBase = EVENTOS_LISTAGEM.map((slug) => EVENTOS_AGENDA[slug]).filter(
     (e): e is EventoReal => Boolean(e),
   );
-  const eventosReais = await aplicarCapaCms(eventosBase);
+  const eventosReais = await aplicarOverrideCard(eventosBase);
   const eventosPrincipais = eventosReais
     .filter((e) => e.card?.destaqueHome)
     .map(paraCardHomePrincipal)
