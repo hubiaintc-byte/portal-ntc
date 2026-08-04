@@ -30,7 +30,10 @@ export const Eventos: CollectionConfig = {
   },
   versions: { drafts: true, maxPerDoc: 50 },
   hooks: {
-    afterChange: [revalidatePage(["/agenda", "/agenda/:slug"])],
+    // "/" entra porque a Home monta cards de evento (capa + data) a partir
+    // desta coleção: sem ele, publicar um evento atualizava /agenda e a página
+    // do evento, mas a Home só pegava a mudança no ISR seguinte (revalidate 1h).
+    afterChange: [revalidatePage(["/", "/agenda", "/agenda/:slug"])],
   },
   fields: [
     {
