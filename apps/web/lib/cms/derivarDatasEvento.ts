@@ -16,6 +16,8 @@ export interface DatasDerivadasEvento {
   countdownDateText: string; // "Até 15 de Junho de 2026"
   icsStart: string; // "20260615T080000"
   icsEnd: string; // "20260615T180000"
+  cardDia: string; // "15"        → card.diaDataBloco
+  cardMesAno: string; // "Jun · 2026" → card.mesAnoDataBloco
 }
 
 const MESES_LONGOS = [
@@ -60,5 +62,7 @@ export function derivarDatasEvento(iso: string): DatasDerivadasEvento {
     countdownDateText: `Até ${dia2} de ${mesLongo} de ${ano}`,
     icsStart: `${compactaIcs}T080000`,
     icsEnd: `${compactaIcs}T180000`,
+    cardDia: dia2,
+    cardMesAno: `${mesCurto} · ${ano}`,
   };
 }
