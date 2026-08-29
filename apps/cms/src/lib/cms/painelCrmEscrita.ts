@@ -8,6 +8,9 @@ import {
 } from "@ntc/lib";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
+import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
+import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
+import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
 import { obterPayload } from "@/lib/payloadClient";
 
 import type { ResultadoEscrita } from "./painelCmsEscrita";
@@ -573,5 +576,39 @@ export async function registrarEnvio(dados: DadosEnvio): Promise<ResultadoEscrit
   } catch (e) {
     console.error("[registrarEnvio]", e);
     return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+// --- Geração de PDF da proposta (spec 2026-08-29 · Fase B2) ---------------
+
+function formatarDataCurta(iso: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+}
+
+export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscrita> {
+  const dados = await obterDadosDocumentoProposta(id);
+  if (!dados) return { ok: false, erro: "Proposta não encontrada." };
+
+  try {
+    const html = montarHtmlDocumentoProposta(dados);
+    const pdf = await gerarPdfDeHtml(html, {
+      codigo: dados.codigo,
+      validadeFormatada: formatarDataCurta(dados.validadeISO),
+      emitidaFormatada: formatarDataCurta(dados.dataCriacaoISO),
+    });
+
+    const payload = await obterPayload();
+    const nomeArquivo = `${dados.codigo}.pdf`;
+    const media = await payload.create({
+      collection: "media",
+      data: { alt: `Proposta ${dados.codigo}`, arquivoOriginal: true },
+      file: { data: pdf, mimetype: "application/pdf", name: nomeArquivo, size: pdf.length },
+    });
+    await payload.update({ collection: "propostas", id, data: { pdfGerado: media.id } });
+
+    return { ok: true };
+  } catch {
+    return { ok: false, erro: "Não foi possível gerar o PDF. Tente novamente." };
   }
 }

@@ -21,6 +21,7 @@ import {
   criarOportunidade,
   criarProposta,
   criarVersaoProposta,
+  gerarESalvarPdfProposta,
   registrarEnvio,
   type DadosClienteCrm,
   type DadosContatoCrm,
@@ -106,6 +107,13 @@ export async function novaVersaoPropostaCrm(
 export async function registrarEnvioCrm(dados: DadosEnvio): Promise<ResultadoEscrita> {
   if (!(await obterUsuarioCms())) return RECUSADO;
   const resultado = await registrarEnvio(dados);
+  if (resultado.ok) revalidatePath("/crm");
+  return resultado;
+}
+
+export async function gerarPdfPropostaCrm(id: string): Promise<ResultadoEscrita> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  const resultado = await gerarESalvarPdfProposta(id);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
 }

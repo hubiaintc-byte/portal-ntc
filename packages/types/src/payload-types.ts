@@ -1148,6 +1148,10 @@ export interface Proposta {
    * Código da versão substituída.
    */
   substitui?: string | null;
+  /**
+   * Gerado pelo botão 'Gerar PDF' na tela de detalhe.
+   */
+  pdfGerado?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -1858,6 +1862,7 @@ export interface PropostasSelect<T extends boolean = true> {
   validade?: T;
   motivoRevisao?: T;
   substitui?: T;
+  pdfGerado?: T;
   updatedAt?: T;
   createdAt?: T;
 }

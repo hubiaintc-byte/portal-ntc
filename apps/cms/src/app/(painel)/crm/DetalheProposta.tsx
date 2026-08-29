@@ -17,6 +17,8 @@ interface DetalheStatusProps {
   onEditar: () => void;
   onNovaVersao: (codBase: string, motivo: string) => void;
   onRegistrarEnvio: (dados: DadosEnvio) => void;
+  onGerarPdf: (id: string) => void;
+  gerandoPdf: boolean;
 }
 
 /** dd/mm/aaaa a partir de uma data ISO (yyyy-mm-dd); "—" para nulo. */
@@ -33,6 +35,8 @@ export function DetalheProposta({
   onEditar,
   onNovaVersao,
   onRegistrarEnvio,
+  onGerarPdf,
+  gerandoPdf,
 }: DetalheStatusProps) {
   const [novaVersaoAberta, setNovaVersaoAberta] = useState(false);
   const [motivo, setMotivo] = useState("");
@@ -85,6 +89,19 @@ export function DetalheProposta({
           <span className={seloDeProposta(p.status)}>{rotuloDeLista(STATUS_PROPOSTA, p.status)}</span>
           <button type="button" className="pcms-btn pcms-btn--ghost" onClick={() => setNovaVersaoAberta(true)}>
             Nova versão
+          </button>
+          {p.pdfGeradoUrl && (
+            <a href={p.pdfGeradoUrl} target="_blank" rel="noreferrer" className="pcms-btn pcms-btn--ghost">
+              Baixar PDF
+            </a>
+          )}
+          <button
+            type="button"
+            className="pcms-btn pcms-btn--ghost"
+            disabled={gerandoPdf}
+            onClick={() => onGerarPdf(p.id)}
+          >
+            {gerandoPdf ? "Gerando…" : "Gerar PDF"}
           </button>
           <button type="button" className="pcms-btn pcms-btn--ghost" onClick={onEditar}>
             Editar

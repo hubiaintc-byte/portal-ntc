@@ -160,6 +160,7 @@ export interface PropostaDetalhe extends PropostaResumo {
   eventosIds: string[];
   elaboradorId: string | null;
   aprovadorId: string | null;
+  pdfGeradoUrl: string | null;
 }
 
 export interface VersaoResumo {
@@ -487,6 +488,10 @@ export async function obterPropostaCrm(id: string): Promise<PropostaDetalhe | nu
     eventosIds,
     elaboradorId: idRel(doc.elaborador),
     aprovadorId: idRel(doc.aprovador),
+    pdfGeradoUrl:
+      doc.pdfGerado && typeof doc.pdfGerado === "object" && "url" in doc.pdfGerado
+        ? ((doc.pdfGerado as { url?: string | null }).url ?? null)
+        : null,
   };
 }
 
