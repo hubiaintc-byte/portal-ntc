@@ -373,7 +373,10 @@ describe("montarHtmlDocumentoProposta", () => {
 
   it("formata valores em BRL e datas em dd/mm/aaaa", () => {
     const html = montarHtmlDocumentoProposta(DADOS_BASE);
-    expect(html).toContain("R$ 900");
+    // normaliza espaço não-quebrável (U+00A0) que o Intl.NumberFormat pt-BR
+    // pode emitir entre "R$" e o valor, dependendo do ICU do runtime —
+    // mesma defesa já usada em apps/cms/src/lib/cms/kpisComercial.test.ts.
+    expect(html.replace(/\s/g, " ")).toContain("R$ 900");
     expect(html).toContain("29/08/2026");
   });
 });
