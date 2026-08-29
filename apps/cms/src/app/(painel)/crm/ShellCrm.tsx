@@ -27,6 +27,7 @@ import {
   carregarClienteCrm,
   carregarOportunidadeCrm,
   carregarPropostaCrm,
+  gerarPdfPropostaCrm,
   novaVersaoPropostaCrm,
   registrarEnvioCrm,
 } from "../acoesCrm";
@@ -287,6 +288,18 @@ export function ShellCrm({
     });
   }
 
+  function gerarPdf(id: string) {
+    iniciarCarga(async () => {
+      const r = await gerarPdfPropostaCrm(id);
+      if (r.ok) {
+        const det = await carregarPropostaCrm(id);
+        if (det) setPropostaDet(det);
+      } else {
+        setErroAcao(r.erro ?? "Erro ao gerar PDF.");
+      }
+    });
+  }
+
   const grupos: GrupoNav[] = [
     { rotulo: "Operação Comercial", itens: NAV_OPERACAO },
     { rotulo: "Catálogo Institucional", itens: NAV_CATALOGO },
@@ -364,6 +377,8 @@ export function ShellCrm({
             onEditar={() => setFormAberto({ entidade: "proposta", inicial: propostaDet })}
             onNovaVersao={novaVersao}
             onRegistrarEnvio={registrarEnvio}
+            onGerarPdf={gerarPdf}
+            gerandoPdf={carregando}
           />
         </>
       ) : (

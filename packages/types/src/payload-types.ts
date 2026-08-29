@@ -27,6 +27,7 @@ export interface Config {
     propostas: Proposta;
     versoes: VersaoProposta;
     envios: EnvioProposta;
+    'documentos-comerciais': DocumentosComerciai;
     'audit-log': AuditLog;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -50,6 +51,7 @@ export interface Config {
     propostas: PropostasSelect<false> | PropostasSelect<true>;
     versoes: VersoesSelect<false> | VersoesSelect<true>;
     envios: EnviosSelect<false> | EnviosSelect<true>;
+    'documentos-comerciais': DocumentosComerciaisSelect<false> | DocumentosComerciaisSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -1148,8 +1150,32 @@ export interface Proposta {
    * Código da versão substituída.
    */
   substitui?: string | null;
+  /**
+   * Gerado pelo botão 'Gerar PDF' na tela de detalhe.
+   */
+  pdfGerado?: (number | null) | DocumentosComerciai;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documentos-comerciais".
+ */
+export interface DocumentosComerciai {
+  id: number;
+  alt?: string | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1278,6 +1304,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'envios';
         value: number | EnvioProposta;
+      } | null)
+    | ({
+        relationTo: 'documentos-comerciais';
+        value: number | DocumentosComerciai;
       } | null)
     | ({
         relationTo: 'audit-log';
@@ -1858,6 +1888,7 @@ export interface PropostasSelect<T extends boolean = true> {
   validade?: T;
   motivoRevisao?: T;
   substitui?: T;
+  pdfGerado?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1891,6 +1922,25 @@ export interface EnviosSelect<T extends boolean = true> {
   observacoes?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documentos-comerciais_select".
+ */
+export interface DocumentosComerciaisSelect<T extends boolean = true> {
+  alt?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

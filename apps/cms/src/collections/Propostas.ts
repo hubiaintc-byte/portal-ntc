@@ -55,5 +55,11 @@ export const Propostas: CollectionConfig = {
     { name: "validade", type: "date" },
     { name: "motivoRevisao", type: "text" },
     { name: "substitui", type: "text", admin: { description: "Código da versão substituída." } },
+    {
+      name: "pdfGerado",
+      type: "relationship",
+      relationTo: "documentos-comerciais",
+      admin: { readOnly: true, description: "Gerado pelo botão 'Gerar PDF' na tela de detalhe." },
+    },
   ],
 };

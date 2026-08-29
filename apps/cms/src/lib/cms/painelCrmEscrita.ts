@@ -1,5 +1,7 @@
 import "server-only";
 
+import { randomBytes } from "node:crypto";
+
 import {
   calcularValoresProposta,
   codigoDaVersao,
@@ -8,6 +10,9 @@ import {
 } from "@ntc/lib";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
+import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
+import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
+import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
 import { obterPayload } from "@/lib/payloadClient";
 
 import type { ResultadoEscrita } from "./painelCmsEscrita";
@@ -573,5 +578,59 @@ export async function registrarEnvio(dados: DadosEnvio): Promise<ResultadoEscrit
   } catch (e) {
     console.error("[registrarEnvio]", e);
     return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+// --- Geração de PDF da proposta (spec 2026-08-29 · Fase B2) ---------------
+
+function formatarDataCurta(iso: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+}
+
+export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscrita> {
+  const dados = await obterDadosDocumentoProposta(id);
+  if (!dados) return { ok: false, erro: "Proposta não encontrada." };
+
+  try {
+    const html = montarHtmlDocumentoProposta(dados);
+    const pdf = await gerarPdfDeHtml(html, {
+      codigo: dados.codigo,
+      validadeFormatada: formatarDataCurta(dados.validadeISO),
+      emitidaFormatada: formatarDataCurta(dados.dataCriacaoISO),
+    });
+
+    const payload = await obterPayload();
+
+    const propostaAtual = await payload.findByID({ collection: "propostas", id, depth: 0 });
+    const pdfAnteriorId =
+      typeof propostaAtual.pdfGerado === "string" || typeof propostaAtual.pdfGerado === "number"
+        ? propostaAtual.pdfGerado
+        : null;
+
+    // Sufixo aleatório: mesmo que o bucket ainda não seja privado (ver
+    // SUPABASE_BUCKET_PRIVADO em payload.config.ts), o nome do objeto não
+    // pode ser adivinhado só a partir do código da proposta.
+    const sufixo = randomBytes(4).toString("hex");
+    const nomeArquivo = `${dados.codigo}-${sufixo}.pdf`;
+    const media = await payload.create({
+      collection: "documentos-comerciais",
+      data: { alt: `Proposta ${dados.codigo}` },
+      file: { data: pdf, mimetype: "application/pdf", name: nomeArquivo, size: pdf.length },
+    });
+    await payload.update({ collection: "propostas", id, data: { pdfGerado: media.id } });
+
+    if (pdfAnteriorId !== null) {
+      try {
+        await payload.delete({ collection: "documentos-comerciais", id: pdfAnteriorId });
+      } catch (e) {
+        console.error("[gerarESalvarPdfProposta] falha ao remover PDF anterior", e);
+      }
+    }
+
+    return { ok: true };
+  } catch (e) {
+    console.error("[gerarESalvarPdfProposta]", e);
+    return { ok: false, erro: "Não foi possível gerar o PDF. Tente novamente." };
   }
 }
