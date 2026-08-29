@@ -16,6 +16,7 @@ import { ClientesCrm } from "./collections/ClientesCrm";
 import { Clientes } from "./collections/Clientes";
 import { ContatosCrm } from "./collections/ContatosCrm";
 import { Conteudos } from "./collections/Conteudos";
+import { DocumentosComerciais } from "./collections/DocumentosComerciais";
 import { Especialistas } from "./collections/Especialistas";
 import { Eventos } from "./collections/Eventos";
 import { Leads } from "./collections/Leads";
@@ -93,6 +94,7 @@ export default buildConfig({
     Propostas,
     VersoesProposta,
     EnviosProposta,
+    DocumentosComerciais,
     AuditLog,
   ],
   globals: [Home, OGrupo, CorpoDocente, Rodape],
@@ -142,6 +144,10 @@ export default buildConfig({
             const fullPath = prefix ? `${prefix}/${filename}` : filename;
             return `${supabaseUrl}/storage/v1/object/public/${bucketName}/${fullPath}`;
           },
+        },
+        "documentos-comerciais": {
+          prefix: "documentos-comerciais",
+          disableLocalStorage: true,
         },
       },
       bucket,

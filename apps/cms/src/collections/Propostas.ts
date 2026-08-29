@@ -58,7 +58,7 @@ export const Propostas: CollectionConfig = {
     {
       name: "pdfGerado",
       type: "relationship",
-      relationTo: "media",
+      relationTo: "documentos-comerciais",
       admin: { readOnly: true, description: "Gerado pelo botão 'Gerar PDF' na tela de detalhe." },
     },
   ],

@@ -26,7 +26,7 @@ describe("gerarESalvarPdfProposta", () => {
     vi.clearAllMocks();
   });
 
-  it("gera o PDF, salva em media e vincula à proposta", async () => {
+  it("gera o PDF, salva em documentos-comerciais e vincula à proposta", async () => {
     obterDadosDocumentoPropostaMock.mockResolvedValue({
       id: "42",
       codigo: "NTC-PROP-2026-PROGE-SP-X-v01",
@@ -35,16 +35,18 @@ describe("gerarESalvarPdfProposta", () => {
     });
     gerarPdfDeHtmlMock.mockResolvedValue(Buffer.from("conteudo-pdf-fake"));
 
+    const findByID = vi.fn().mockResolvedValue({ pdfGerado: null });
     const criarMedia = vi.fn().mockResolvedValue({ id: 77 });
     const update = vi.fn().mockResolvedValue({});
-    obterPayloadMock.mockResolvedValue({ create: criarMedia, update });
+    const del = vi.fn().mockResolvedValue({});
+    obterPayloadMock.mockResolvedValue({ findByID, create: criarMedia, update, delete: del });
 
     const resultado = await gerarESalvarPdfProposta("42");
 
     expect(resultado.ok).toBe(true);
     expect(criarMedia).toHaveBeenCalledWith(
       expect.objectContaining({
-        collection: "media",
+        collection: "documentos-comerciais",
         file: expect.objectContaining({
           mimetype: "application/pdf",
           name: "NTC-PROP-2026-PROGE-SP-X-v01.pdf",
@@ -56,6 +58,28 @@ describe("gerarESalvarPdfProposta", () => {
       id: "42",
       data: { pdfGerado: 77 },
     });
+    expect(del).not.toHaveBeenCalled();
+  });
+
+  it("remove o PDF anterior após gerar e vincular o novo", async () => {
+    obterDadosDocumentoPropostaMock.mockResolvedValue({
+      id: "42",
+      codigo: "NTC-PROP-2026-PROGE-SP-X-v02",
+      validadeISO: "2026-09-28T12:00:00.000Z",
+      dataCriacaoISO: "2026-08-29T12:00:00.000Z",
+    });
+    gerarPdfDeHtmlMock.mockResolvedValue(Buffer.from("conteudo-pdf-fake"));
+
+    const findByID = vi.fn().mockResolvedValue({ pdfGerado: 55 });
+    const criarMedia = vi.fn().mockResolvedValue({ id: 77 });
+    const update = vi.fn().mockResolvedValue({});
+    const del = vi.fn().mockResolvedValue({});
+    obterPayloadMock.mockResolvedValue({ findByID, create: criarMedia, update, delete: del });
+
+    const resultado = await gerarESalvarPdfProposta("42");
+
+    expect(resultado.ok).toBe(true);
+    expect(del).toHaveBeenCalledWith({ collection: "documentos-comerciais", id: 55 });
   });
 
   it("devolve erro quando a proposta não existe", async () => {

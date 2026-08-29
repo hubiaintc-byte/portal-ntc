@@ -599,13 +599,28 @@ export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscr
     });
 
     const payload = await obterPayload();
+
+    const propostaAtual = await payload.findByID({ collection: "propostas", id, depth: 0 });
+    const pdfAnteriorId =
+      typeof propostaAtual.pdfGerado === "string" || typeof propostaAtual.pdfGerado === "number"
+        ? propostaAtual.pdfGerado
+        : null;
+
     const nomeArquivo = `${dados.codigo}.pdf`;
     const media = await payload.create({
-      collection: "media",
-      data: { alt: `Proposta ${dados.codigo}`, arquivoOriginal: true },
+      collection: "documentos-comerciais",
+      data: { alt: `Proposta ${dados.codigo}` },
       file: { data: pdf, mimetype: "application/pdf", name: nomeArquivo, size: pdf.length },
     });
     await payload.update({ collection: "propostas", id, data: { pdfGerado: media.id } });
+
+    if (pdfAnteriorId !== null) {
+      try {
+        await payload.delete({ collection: "documentos-comerciais", id: pdfAnteriorId });
+      } catch (e) {
+        console.error("[gerarESalvarPdfProposta] falha ao remover PDF anterior", e);
+      }
+    }
 
     return { ok: true };
   } catch (e) {
