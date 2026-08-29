@@ -608,7 +608,8 @@ export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscr
     await payload.update({ collection: "propostas", id, data: { pdfGerado: media.id } });
 
     return { ok: true };
-  } catch {
+  } catch (e) {
+    console.error("[gerarESalvarPdfProposta]", e);
     return { ok: false, erro: "Não foi possível gerar o PDF. Tente novamente." };
   }
 }
