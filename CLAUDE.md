@@ -1,11 +1,13 @@
 # CLAUDE.md Operacional — Portal Grupo NTC
 ## Instruções permanentes para o Claude Code · v1 Sprint F
 
-**Versão:** 1.5 · 17 de julho de 2026
+**Versão:** 1.6.1 · 27 de agosto de 2026
 **Destino:** este arquivo está na raiz do monorepo. O Claude Code o lê automaticamente em toda sessão e o trata como instrução de mais alta prioridade depois do prompt do usuário.
 
 ### Histórico de revisões
 
+- **v1.6.1 — 27/08/2026** — limpeza de pasta local (pente-fino pesando a máquina). Removidos sem risco (regeneram sozinhos): caches `.next` de web e cms (259 MB), cache `.turbo` (209 MB), `*.tsbuildinfo`, 25 scripts de debug `_probe-*.tmp.mjs`/`_valida-*.tmp.mjs` em `scripts/`, e uma duplicata de `06_Pagina_Programa_AGIP_v1.html` na raiz (idêntica à de `feito/`). **Nova pasta `arquivos-fonte/`** (§13) criada e versionada: `img/` da raiz (fotos/logos brutos, 62 MB) virou `arquivos-fonte/fotos-logos-brutos/`, e `Marca_NTC_Pacote_Oficial/` (kit oficial completo da marca, 31 MB) virou `arquivos-fonte/marca-ntc-pacote-oficial/` — ambos commitados localmente (`5136e7b`) para permitir apagar as cópias em disco sem perder o material-fonte; regra órfã `/img/` removida do `.gitignore`. Total liberado no disco: ~500 MB (Fase 1); ~93 MB adicionais movidos para dentro do controle de versão (Fase 2, ainda sem push). Ficaram de fora por decisão pendente do usuário: os 5 PDFs "Folder · Módulo..." na raiz (2 de PROGE ainda sem evento correspondente no site, 3 de EDUTEC prováveis já usados), `NTC_Comercial_Premium.html` (referência viva da Fase B2 do CRM), `05_Pagina_Evento_AGIP_SP_Hibrido_v1.html` (evento AGIP ainda não portado) e a duplicata `feito/12_Pagina_Contato_v1.html` (não commitada, diverge da versão já commitada na raiz — não comparada nesta sessão).
+- **v1.6 — 26/08/2026** — sessão de pente-fino: §19 reescrita com o estado real verificado em código (branches locais auditadas: as 9 fora da `main` — `feat/cms-soberana`, `feat/cms-tela-leads`, `feat/cms-eventos-template`, `feat/ocultar-palestrante-site`, `feat/crm-modulo`, `feat/nova-identidade-logos`, `fix/data-card-home-cms`, `fix/imagens-public-img-404`, `fix/revalidar-home-ao-publicar-evento` — estão 100% mergeadas na `main`, sem trabalho órfão; candidatas a limpeza, decisão do usuário). Validado com `pnpm dev` local: site (home, agenda, evento, programa) e Painel Admin (`/entrar`, `/crm`) sobem sem erro de build/runtime. Mudanças incorporadas desde a v1.5 que ainda não estavam documentadas: **CRM Fase B1 mergeada** (`a4a5c49`) — Propostas, Versões e Envios viraram telas reais (antes eram cascas "Em breve"); fix de revalidação da Home ao publicar evento; fix do card de evento na Home para ler a data do CMS; fix de `public/img` não versionado (quebrava fotos em prod); nova identidade visual (logos). Coleções do Payload subiram de 11 para 17 (+ `propostas`, `versoes-proposta`, `envios-proposta` da Fase B1, além de `clientes-crm`/`contatos-crm`/`oportunidades` da Fase A que já estavam contadas). Backlog revisado: item "CRM Fases B/C/D" do §19.2 desmembrado — Fase B1 (registro de propostas) está pronta, falta só o motor A4/PDF (Fase B2, não iniciada) e a tela **Condições** (ainda "Em breve"); Fases C e D seguem do zero.
 - **v1.5 — 17/07/2026** — merge da branch `feat/crm-modulo` na `main` (PR #2). Além da Fase A: (1) notificação de lead via Resend REST em `aposCriarLead` (default de destino + escape HTML; sem `RESEND_API_KEY` degrada para console); (2) reestilização do Painel Admin com o idiom do CRM legado (cantos arredondados e sombras — **exceção deliberada ao §3, válida SÓ no painel admin**; site público mantém `border-radius: 0`), logo transparente + seletor de módulo em droplist + bloco do usuário no rodapé da sidebar + gráficos SVG próprios (sem lib) no Dashboard; (3) páginas do CRM organizadas em 2 grupos — **Operação Comercial** (Dashboard Executivo, Leads, Clientes, Contatos, Oportunidades + cascas "Em breve" Propostas/Versões/Envios/Condições) e **Catálogo Institucional** (Programas, Módulos, Produtos/Eventos, listas read-only). §19 atualizada. Specs/planos em `docs/superpowers/` (2026-07-17).
 - **v1.4 — 16/07/2026** — Fase A do portal admin unificado: módulo CRM na rota `/crm` (seletor Site|CRM na sidebar, casco compartilhado `ShellPainel`), coleções `clientes-crm`/`contatos-crm`/`oportunidades`, grupo `comercial` em modulos/eventos, importador `crm:importar`. §19 atualizada. Spec/plano em `docs/superpowers/` (2026-07-15).
 - **v1.3 — 16/06/2026** — sessão de reativação dos formulários: adicionada §19 (Estado e backlog do CMS) com o que falta para o go-live. Formulários `/api/forms/*` reativados (handlers restaurados do commit `9402e85` + front ligado ao fetch real). Resend e anti-spam (hCaptcha/rate-limit) seguem como stub por decisão do PO.
@@ -43,6 +45,8 @@ Você deve consultar como fonte de verdade, nesta ordem de precedência:
 6. Protótipos HTML aprovados em `docs/prototipos/` — fonte visual canônica.
 
 Antes de qualquer decisão de modelagem, componente novo ou rota, **consulte os documentos acima**. Se houver conflito entre documentos, o mais específico vence (Inventário sobre DAB para componentes; Mapa sobre Inventário para fluxo de rota).
+
+Para saber **o que fazer a seguir** no CMS/CRM (não como modelar, mas o que está pendente e em que ordem), consulte `docs/16_Roadmap_CMS_CRM_v1.md` — organizado em Janelas/Sessões no mesmo formato do `docs/15_Prompts_Iniciais_Claude_Code_v1.md`, com prompt pronto pra colar em cada sessão.
 
 ## 3. Identidade visual — Soberana 2026
 
@@ -233,6 +237,10 @@ Banner de cookies aparece **antes** do `<main>` em primeira visita, com categori
 │   ├── lib/          → utilitários compartilhados (formatadores, helpers)
 │   └── types/        → tipos compartilhados (incluindo gerados pelo Payload)
 ├── docs/             → documentos de governança (10-15)
+├── arquivos-fonte/   → material-fonte bruto versionado (fotos/logos em alta
+│                        resolução, kit oficial da marca). NÃO é servido pelo
+│                        app — as versões otimizadas em uso ficam em
+│                        apps/web/public/img/ e apps/cms/public/.
 ├── CLAUDE.md         → este arquivo
 ├── turbo.json
 ├── package.json
@@ -338,36 +346,60 @@ Não improvise. Não invente. Não interprete liberalmente.
 
 ---
 
-## 19. Estado e backlog do CMS (atualizado 17/07/2026)
+## 19. Estado e backlog do CMS/CRM (atualizado 26/08/2026, verificado em código + `pnpm dev` local)
 
-O CMS é um **Payload CMS 3** com **11 coleções + 4 globals** modeladas e um **Painel Admin próprio** (route group `apps/cms/src/app/(painel)/`, ex-"CMS Soberano") que é o único admin desde 11/06/2026 — o admin nativo do Payload foi removido. O painel está operacional para **ler, editar e publicar** o que já existe; **criar do zero** (fora do CRM) e o **anti-spam dos formulários** ainda têm pendências.
+O CMS é um **Payload CMS 3** com **17 coleções + 4 globals** modeladas e um **Painel Admin próprio** (route group `apps/cms/src/app/(painel)/`, ex-"CMS Soberano") que é o único admin desde 11/06/2026 — o admin nativo do Payload foi removido. O painel está operacional para **ler, editar e publicar** o que já existe, incluindo o registro comercial completo de propostas do CRM; **criar do zero fora do CRM**, o **motor de PDF de propostas**, o **anti-spam** e o **2FA** ainda têm pendências.
 
-### 19.1. O que já funciona
+### 19.1. Estrutura atual
 
-- **Modelagem completa**: Áreas, Programas, Módulos, Eventos, Especialistas, Conteúdos, Clientes, Leads, Media, Users, AuditLog + globals Home, Corpo Docente, O Grupo, Rodapé.
-- **Painel Admin**: Dashboard, Palestrantes, Eventos, curadoria da Home — todos com dados reais via Local API.
-- **Editar e publicar** eventos (nome, data, resumo, capa, folder PDF, palestrantes) e ocultar/exibir palestrantes do site.
-- **Fluxo rascunho → publicar → revalidar** funcionando, com o site atualizando via `/api/revalidate`.
+**Monorepo** (ver §13 para o desenho completo): `apps/web` (site público), `apps/cms` (Payload + Painel Admin, mesmo deploy), `packages/{ui,lib,types}`.
+
+**Site (`apps/web/app`) — route groups:**
+`(home)` · `(institucional)` · `(o-grupo)` · `(programas)` (`/programas/[slug]`, `/programas/[slug]/modulos/[modulo]`) · `(capacitacao)` (`/agenda`, `/agenda/[slug]`) · `(conteudos)` · `(solucoes)` · `(vertical)`.
+
+**Coleções do Payload (17):** `users`, `media`, `areas`, `programas`, `modulos`, `eventos`, `especialistas`, `conteudos`, `clientes`, `leads`, `clientes-crm`, `contatos-crm`, `oportunidades`, `propostas`, `versoes-proposta`, `envios-proposta`, `audit-log`.
+**Globals (4):** Home, O Grupo, Corpo Docente, Rodapé.
+
+**Painel Admin — módulo Site:** Dashboard, Palestrantes, Eventos, curadoria da Home, Usuários, Configurações (parcial) — todos com dados reais via Local API.
+
+**Painel Admin — módulo CRM (rota `/crm`, casco `ShellCrm` dentro do `ShellPainel` compartilhado, seletor Site|CRM na sidebar):**
+- **Operação Comercial:** Dashboard Executivo (KPIs + gráficos SVG próprios + follow-ups) · Leads · Clientes · Contatos · Oportunidades · **Propostas · Versões · Envios** (reais desde a Fase B1, 22/07) · Condições (**ainda "Em breve"** — única casca vazia que resta no grupo).
+- **Catálogo Institucional:** Programas, Módulos, Produtos/Eventos — listas **read-only** (edição segue no módulo Site).
+- Coleções próprias do CRM: `clientes-crm`, `contatos-crm`, `oportunidades`, `propostas`, `versoes-proposta`, `envios-proposta`. Catálogo comercial único (oportunidades/propostas apontam para `programas`/`modulos`/`eventos`, que têm o grupo `comercial`).
+- Importador do CRM legado: `CRM_JSON=/caminho.json CRM_DRY_RUN=1 pnpm crm:importar` (idempotente; sem dry-run grava).
+
+### 19.2. O que já funciona
+
+- **Fluxo rascunho → publicar → revalidar** de Áreas/Programas/Módulos/Eventos/Especialistas/Conteúdos/Home, com o site atualizando via `/api/revalidate` (inclui a Home revalidando ao publicar evento, desde 25/08).
 - **Upload de mídia** no Supabase Storage com variantes de imagem (Sharp).
-- **Módulo CRM** (desde 16/07/2026, Fase A; ampliado em 17/07): rota `/crm` no mesmo painel. Sidebar com **seletor de módulo Site|CRM em droplist** (casco `ShellPainel`), logo institucional transparente e bloco do usuário (nome/perfil/Sair) no rodapé. Menu do CRM em 2 grupos: **Operação Comercial** (Dashboard Executivo — KPIs + gráficos SVG próprios + follow-ups; Leads; Clientes; Contatos; Oportunidades — todos com **criar e editar** de verdade) e **Catálogo Institucional** (Programas, Módulos, Produtos/Eventos — listas **read-only** dos dados comerciais; edição segue no módulo Site). Coleções `clientes-crm`, `contatos-crm`, `oportunidades`; catálogo único (oportunidades apontam para `programas`/`modulos`/`eventos`, que ganharam grupo `comercial`). Importador do CRM legado: `CRM_JSON=/caminho.json CRM_DRY_RUN=1 pnpm crm:importar` (idempotente; sem dry-run grava). Sincronização de schema controlada: `pnpm payload:push:schema` (nunca com dev paralelo). Specs em `docs/superpowers/specs/2026-07-15-*` e `2026-07-17-*`.
-- **Gestão de usuários + recuperação de senha** (desde 17/07): tela **Usuários** (super-admin: listar, criar com convite por e-mail, editar, remover, com proteção do último super-admin); fluxo **esqueci/redefinir senha** no `/entrar` (tokens nativos do Payload); **trocar a própria senha** em Configurações → Minha conta. E-mail via adapter Resend (sem `RESEND_API_KEY`, degrada para log no console).
-- **Notificação de Lead via Resend** (desde 17/07): `aposCriarLead` envia e-mail interno via REST do Resend quando há `RESEND_API_KEY` (default de destino `LEADS_EMAIL_DESTINO`/`contato@institutontc.com.br`, corpo com HTML escapado, resposta de erro logada). Sem a chave, só loga.
+- **Gestão de usuários + recuperação de senha**: tela Usuários (super-admin: listar, criar com convite por e-mail, editar, remover, com proteção do último super-admin); fluxo esqueci/redefinir senha no `/entrar` (tokens nativos do Payload); trocar a própria senha em Configurações → Minha conta. E-mail via adapter Resend (sem `RESEND_API_KEY`, degrada para log no console).
+- **Notificação de Lead via Resend**: `aposCriarLead` envia e-mail interno via REST do Resend quando há `RESEND_API_KEY` (default `LEADS_EMAIL_DESTINO`/`contato@institutontc.com.br`, HTML escapado). Sem a chave, só loga.
+- **CRM Operação Comercial**: Leads/Clientes/Contatos/Oportunidades com criar e editar reais.
+- **CRM Fase B1 — Propostas** (mergeada 22/07, `a4a5c49`): wizard de criação, tela de detalhe editável, versionamento (código-base + versão), registro de envios. É registro/gestão do ciclo comercial — **não gera o documento em PDF ainda** (isso é a Fase B2, não iniciada; não encontrei nenhum código de geração de PDF/A4 no repo).
 
-### 19.2. Backlog — o que falta para o go-live (em ordem de prioridade)
+### 19.3. Backlog — o que falta para o go-live (em ordem de prioridade)
 
-1. **2FA do admin (TOTP)** — login é só senha + JWT de 14 dias. 2FA nunca foi implementado (a tela de Configurações mostra o toggle, mas é UI sem persistência). Pendência da Janela C (§17.8). **Bloqueador de go-live.**
-2. **`RESEND_API_KEY` real na Vercel** — o código de e-mail (notificação de lead, convites de usuário, recuperação de senha) já existe e funciona; falta o PO provisionar a chave e setá-la nas envs da Vercel (projetos **cms E web**) + `.env` locais, redeploy e um teste real de envio. Sem a chave, tudo degrada para log no console.
-3. **Criar conteúdo novo pelo painel (fora do CRM)** — botões "Novo evento" e "Novo palestrante" seguem desabilitados ("Em breve"). O padrão de formulário de criação já existe (`FormCliente`/`FormOportunidade` + `CamposCrm` no CRM) e pode ser replicado.
-4. **Anti-spam real** — `verificarHcaptcha` e `checarRateLimit` são stubs controlados por flag (`HCAPTCHA_ENABLED`, `RATELIMIT_ENABLED`, ambos `false`). Implementar siteverify real + store de rate-limit (ex.: Upstash) antes do tráfego público. **Incluir `/entrar/recuperar` no escopo do rate-limit** (hoje nada impede e-mail-bombing do endereço de admin conhecido).
-5. **Tela de Configurações** — só a seção "Minha conta" é funcional; as demais seções são demonstrativas (não persistem).
-6. **AuditLog** — coleção existe, mas nenhum hook escreve nela (sem rastro de quem alterou o quê).
-7. **CRM Fases B/C/D** — telas Propostas, Versões, Envios e Condições existem como cascas "Em breve". Falta: **Fase B** (Propostas — wizard + gerador de proposta A4, o grosso do CRM legado; coleções novas), **Fase C** (Financeiro — Contratos, Empenhos, NFs, Recebimentos, Comissões) e **Fase D** (permissões por módulo). Também pendente: grupos **Biblioteca Comercial** e **Financeiro** no menu.
+1. **2FA do admin (TOTP)** — login é só senha + JWT de 14 dias. Nunca foi implementado: não há campo TOTP em `Users.ts` nem lógica de verificação; a seção "Segurança e acesso" da tela Configurações está rotulada **"Demonstrativo"** no próprio código — os toggles (2FA, expiração de sessão, auditoria) são decorativos, não persistem nada. Pendência da Janela C (§17.8). **Bloqueador de go-live.**
+2. **`RESEND_API_KEY` real na Vercel** — código já funciona (notificação de lead, convites, recuperação de senha); falta o PO provisionar a chave nas envs da Vercel (projetos **cms e web**) + `.env` locais, redeploy e teste real de envio.
+3. **Anti-spam real** — `verificarHcaptcha`/`checarRateLimit` seguem stub, atrás de `HCAPTCHA_ENABLED`/`RATELIMIT_ENABLED` (ambos `false`); confirmado também na UI — o toggle "hCaptcha" em Configurações aparece desligado. Implementar siteverify real + store de rate-limit (ex.: Upstash) antes do tráfego público. **Incluir `/entrar/recuperar`** (hoje nada impede e-mail-bombing do endereço de admin conhecido).
+4. **CRM Fase B2 — motor A4/PDF de proposta** — é o objetivo original que faltou da Fase B (o "grosso" do CRM legado): gerar o documento formatado a partir do registro já existente em Propostas/Versões.
+5. **Tela Condições** — última casca "Em breve" do grupo Operação Comercial.
+6. **Criar conteúdo novo pelo painel (fora do CRM)** — botões "Novo evento"/"Novo palestrante" seguem desabilitados. Padrão de formulário de criação já existe (`FormCliente`/`FormOportunidade`/`CamposCrm` no CRM) e pode ser replicado.
+7. **Tela de Configurações** — só "Minha conta" é funcional; Segurança, Integrações e Notificações são mockup visual (rotuladas "Demonstrativo" no próprio código).
+8. **AuditLog** — coleção existe (`AuditLog.ts`, campos usuario/ação/entidade/metadata/ip), registrada no `payload.config.ts`, mas **nenhum hook escreve nela** — zero rastro de auditoria hoje, apesar do toggle de Configurações sugerir o contrário.
+9. **CRM Fase C (Financeiro)** — Contratos, Empenhos, NFs, Recebimentos, Comissões: não iniciada.
+10. **CRM Fase D (permissões por módulo)** — não iniciada.
+11. **Grupos "Biblioteca Comercial" e "Financeiro"** no menu do CRM — não existem ainda.
 
-### 19.3. Regra ao mexer em formulários
+### 19.4. Housekeeping pendente (não bloqueia go-live)
+
+Auditoria de 26/08 confirmou que as branches locais `feat/cms-soberana`, `feat/cms-tela-leads`, `feat/cms-eventos-template`, `feat/ocultar-palestrante-site`, `feat/crm-modulo`, `feat/nova-identidade-logos`, `fix/data-card-home-cms`, `fix/imagens-public-img-404` e `fix/revalidar-home-ao-publicar-evento` estão **100% mergeadas na `main`** (`git merge-base --is-ancestor` confirmou as 9), sem nenhum commit à frente — não há trabalho perdido nelas. São candidatas a `git branch -d` (local) e, se o usuário concordar, remoção dos equivalentes em `origin` (5 delas têm branch remota). Decisão e execução ficam para o usuário — apagar branch remota é ação visível para terceiros.
+
+### 19.5. Regra ao mexer em formulários
 
 A infra de forms já existe e não deve ser reinventada (§5.1): schemas Zod em `packages/lib/src/forms/schemas.ts`, helpers de resposta em `apps/web/lib/respostaForm.ts`, `extrairOrigem`/`aposCriarLead`/`verificarHcaptcha`/`checarRateLimit` em `packages/lib/src/forms/`. Os handlers de referência estão preservados no commit `9402e85`. LGPD (§12) é obrigatório em todo submit: consentimento não pré-marcado, versão da política, timestamp e IP gravados no Lead.
 
 ---
 
 **Fim das instruções permanentes.**
-*Portal Grupo NTC · CLAUDE.md · v1.5 · 17 de julho de 2026 · Instituto NTC do Brasil*
+*Portal Grupo NTC · CLAUDE.md · v1.6.1 · 27 de agosto de 2026 · Instituto NTC do Brasil*
