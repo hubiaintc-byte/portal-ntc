@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Motor de PDF (CRM Fase B2): pacotes com binário nativo — o bundler/
+  // tracer do Next não deve tentar empacotá-los, só deixá-los externos.
+  // Chave estável do Next 15 (não é `experimental.serverComponentsExternalPackages`).
+  serverExternalPackages: ["playwright-core", "@sparticuz/chromium", "playwright"],
   experimental: {
     reactCompiler: false,
     // Server Actions do Painel Admin recebem uploads (capa, folder PDF).

@@ -58,7 +58,8 @@ export async function obterDadosDocumentoProposta(
   let doc: Proposta;
   try {
     doc = await payload.findByID({ collection: "propostas", id, depth: 2 });
-  } catch {
+  } catch (e) {
+    console.error("[obterDadosDocumentoProposta]", e);
     return null;
   }
 
