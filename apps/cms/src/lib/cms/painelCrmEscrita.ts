@@ -1,5 +1,7 @@
 import "server-only";
 
+import { randomBytes } from "node:crypto";
+
 import {
   calcularValoresProposta,
   codigoDaVersao,
@@ -609,7 +611,7 @@ export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscr
     // Sufixo aleatório: mesmo que o bucket ainda não seja privado (ver
     // SUPABASE_BUCKET_PRIVADO em payload.config.ts), o nome do objeto não
     // pode ser adivinhado só a partir do código da proposta.
-    const sufixo = Math.random().toString(36).slice(2, 10);
+    const sufixo = randomBytes(4).toString("hex");
     const nomeArquivo = `${dados.codigo}-${sufixo}.pdf`;
     const media = await payload.create({
       collection: "documentos-comerciais",
