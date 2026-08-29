@@ -90,26 +90,12 @@ Bloqueador declarado no `CLAUDE.md` §17.8. Sem 2FA e sem anti-spam real, o port
 
 A Fase B1 (registro/versionamento de propostas) está pronta e mergeada. Falta o que a torna útil de verdade: gerar o documento.
 
-### Sessão D1 — Motor A4/PDF de proposta
+### Sessão D1 — Motor A4/PDF de proposta ✅ concluída (29/08/2026)
 
-- **Objetivo:** gerar o PDF formatado a partir do registro já existente em `propostas`/`versoes-proposta`.
-- **Escopo:** motor de geração (avaliar lib de PDF compatível com a stack — decisão técnica a expor antes de codar, §5.4 proíbe libs fora da stack aprovada sem perguntar), 4 templates conforme o CRM legado.
-- **Referência:** `NTC_Comercial_Premium.html` (raiz do repo) é a fonte de design do CRM legado — layout e conteúdo dos documentos.
-- **Pré-requisito:** nenhum técnico; útil ter o `NTC_Comercial_Premium.html` como referência à mão.
-- **Estimativa:** 2–3 sessões (é o maior bloco do roadmap).
-- **Prompt:**
-  ```
-  Vamos implementar o motor de geração de PDF das propostas do CRM (Fase B2).
-
-  Leia primeiro:
-  1. docs/superpowers/specs/2026-07-22-crm-fase-b1-propostas-design.md (o que a B1 já entregou)
-  2. apps/cms/src/collections/Propostas.ts, VersoesProposta.ts
-  3. NTC_Comercial_Premium.html (raiz) — referência de design dos 4 templates do CRM legado
-
-  Escopo: gerar o documento A4 formatado a partir de uma versão de proposta existente,
-  com os 4 templates do legado. Antes de codar, proponha a lib de geração de PDF
-  (fora da stack aprovada — precisa da minha aprovação, CLAUDE.md §5.4) e exponha o plano.
-  ```
+- **Entregue:** fatia vertical — capa + 3 seções (Identificação, Quadro Comercial, Condições Comerciais), tokens visuais do site (não a paleta do CRM legado), Playwright (dev local reaproveita o Chromium da raiz do monorepo; produção via `@sparticuz/chromium` na Vercel). PDF é gerado e salvo vinculado à proposta (campo `pdfGerado`, coleção dedicada `documentos-comerciais`, leitura restrita a usuário autenticado) — não é só download sob demanda. Plano: `docs/superpowers/plans/2026-08-29-crm-fase-b2-motor-pdf-propostas.md`. Branch `feat/crm-fase-b2-motor-pdf` mergeada na `main` (15 commits — 5 tasks do plano + 2 rounds de fix pós-revisão final whole-branch).
+- **Não entregue nesta sessão (fica para D2):** as ~15 seções descritivas restantes do documento completo do legado (histórico institucional, metodologia etc.) — a Biblioteca Comercial (D2) é pré-requisito de conteúdo para elas.
+- **Pendência de infraestrutura antes do go-live com dados reais de cliente (CLAUDE.md §19.3 item 4):** `documentos-comerciais` ainda cai no bucket público `ntc-portal-media` (compartilhado com `media`) até o PO criar um bucket privado no Supabase Storage e configurar `SUPABASE_BUCKET_PRIVADO` (`.env.example`). Mitigado com nome de arquivo não-adivinhável, mas não é `read`-privado de fato até o bucket existir.
+- **Outras pendências levantadas na revisão final, não bloqueadoras:** `maxDuration` da função serverless não configurado (cold start do Chromium pode estourar o timeout padrão da Vercel — validar em deploy real); mismatch de versão do Node exigida por `@sparticuz/chromium` vs. o `engines` do repo (decisão de runtime da Vercel, não de código); fontes do cabeçalho/rodapé do PDF (não o corpo) seguem em fallback.
 
 ### Sessão D2 — Biblioteca Comercial + Textos-Padrão
 
