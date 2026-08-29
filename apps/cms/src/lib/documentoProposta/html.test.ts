@@ -71,12 +71,14 @@ describe("montarHtmlDocumentoProposta", () => {
     expect(html).toContain("&lt;script&gt;");
   });
 
-  it("formata valores em BRL e datas em dd/mm/aaaa", () => {
+  it("formata valores em BRL com centavos e datas em dd/mm/aaaa", () => {
     const html = montarHtmlDocumentoProposta(DADOS_BASE);
     // normaliza espaço não-quebrável (U+00A0) que o Intl.NumberFormat pt-BR
     // pode emitir entre "R$" e o valor, dependendo do ICU do runtime —
     // mesma defesa já usada em apps/cms/src/lib/cms/kpisComercial.test.ts.
-    expect(html.replace(/\s/g, " ")).toContain("R$ 900");
+    // Documento comercial usa 2 casas decimais (não a mesma formatação de
+    // KPI do dashboard, que arredonda para reais inteiros).
+    expect(html.replace(/\s/g, " ")).toContain("R$ 900,00");
     expect(html).toContain("29/08/2026");
   });
 });

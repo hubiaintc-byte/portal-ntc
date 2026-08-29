@@ -59,6 +59,11 @@ export async function gerarPdfDeHtml(html: string, meta: MetaCabecalhoPdf): Prom
   try {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "load" });
+    // `waitUntil: "load"` garante que a folha de estilo do Google Fonts
+    // carregou, mas não que os arquivos de fonte (Cormorant Garamond,
+    // Barlow) já foram baixados/parseados — sem isto o Chromium tira o
+    // snapshot do PDF ainda no fallback Helvetica/Times.
+    await page.evaluate(() => document.fonts.ready);
     const pdf = await page.pdf({
       format: "A4",
       printBackground: true,

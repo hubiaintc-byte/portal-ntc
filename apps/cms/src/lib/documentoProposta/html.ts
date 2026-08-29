@@ -1,8 +1,23 @@
 import "server-only";
 
-import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
-
 import type { DadosDocumentoProposta } from "./dados";
+
+/**
+ * Formatação de moeda ESPECÍFICA do documento (2 casas decimais) — não usar
+ * `formatarMoedaBRL` de `@/lib/cms/kpisComercial` aqui: aquela é para tiles
+ * de KPI do dashboard, que arredondam para reais inteiros de propósito.
+ * Num documento contratual com percentuais calculados (desconto =
+ * valorBruto × percDesconto/100), os centavos são rotina — arredondar
+ * quebraria a reconciliação entre os itens e o total impresso.
+ */
+function formatarMoedaDocumento(valor: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(valor);
+}
 
 function esc(v: string): string {
   return v
@@ -58,10 +73,10 @@ function secaoQuadroComercial(d: DadosDocumentoProposta): Secao {
     ? d.itens
         .map(
           (i) =>
-            `<tr><td>${esc(i.rotulo)}</td><td>${esc(i.cargaHoraria)}</td><td class="qc-right">${formatarMoedaBRL(i.valorUnitario)}</td></tr>`,
+            `<tr><td>${esc(i.rotulo)}</td><td>${esc(i.cargaHoraria)}</td><td class="qc-right">${formatarMoedaDocumento(i.valorUnitario)}</td></tr>`,
         )
         .join("")
-    : `<tr><td colspan="3" style="text-align:center;color:#6B6B6B;font-style:italic">Item único · ${formatarMoedaBRL(d.valorUnitario)}</td></tr>`;
+    : `<tr><td colspan="3" style="text-align:center;color:#6B6B6B;font-style:italic">Item único · ${formatarMoedaDocumento(d.valorUnitario)}</td></tr>`;
 
   return {
     titulo: "Quadro Comercial",
@@ -69,9 +84,9 @@ function secaoQuadroComercial(d: DadosDocumentoProposta): Secao {
       <p>Apresentamos o quadro de investimento da presente proposta, fundamentado em quantitativo de <strong>${d.qtdPagantes} inscrição(ões) pagante(s)</strong> e <strong>${d.cortesias} cortesia(s) institucional(is)</strong>, totalizando <strong>${acessos} acessos</strong>.</p>
       <table class="qc"><thead><tr><th>Item</th><th>CH</th><th class="qc-right">Valor unitário</th></tr></thead><tbody>${linhasItens}</tbody></table>
       <table class="qc"><tbody>
-        <tr><td>Valor bruto</td><td class="qc-right">${formatarMoedaBRL(d.valorBruto)}</td></tr>
-        <tr><td>Desconto institucional (${d.percDesconto}%)</td><td class="qc-right">${formatarMoedaBRL(d.desconto)}</td></tr>
-        <tr class="total"><td>VALOR LÍQUIDO DA PROPOSTA</td><td class="qc-right">${formatarMoedaBRL(d.valorLiquido)}</td></tr>
+        <tr><td>Valor bruto</td><td class="qc-right">${formatarMoedaDocumento(d.valorBruto)}</td></tr>
+        <tr><td>Desconto institucional (${d.percDesconto}%)</td><td class="qc-right">${formatarMoedaDocumento(d.desconto)}</td></tr>
+        <tr class="total"><td>VALOR LÍQUIDO DA PROPOSTA</td><td class="qc-right">${formatarMoedaDocumento(d.valorLiquido)}</td></tr>
       </tbody></table>
     `,
   };
@@ -135,7 +150,10 @@ function estilosDocumento(): string {
     p{margin-bottom:6pt;text-align:justify}
     strong{color:#11365E;font-weight:600}
 
-    .cover{width:210mm;min-height:297mm;padding:28mm 22mm 26mm;background:linear-gradient(135deg,#11365E 0%,#0B2545 100%);color:#F4EFE6;page-break-after:always;display:flex;flex-direction:column;justify-content:space-between}
+    /* 297mm (A4) - 42mm (margin top 22mm + bottom 20mm de gerarPdfDeHtml.ts,
+       aplicada em TODAS as páginas incluindo a capa) = 255mm. Não voltar
+       para 297mm: isso transborda 42mm para uma página 2 quase em branco. */
+    .cover{width:210mm;min-height:calc(297mm - 42mm);padding:28mm 22mm 26mm;background:linear-gradient(135deg,#11365E 0%,#0B2545 100%);color:#F4EFE6;page-break-after:always;display:flex;flex-direction:column;justify-content:space-between}
     .cover .brand{font-family:'Cormorant Garamond';font-size:12.5pt;color:#B5995A;letter-spacing:3pt;text-transform:uppercase;font-weight:600}
     .cover .selo{font-size:8.5pt;letter-spacing:2.3pt;color:#D9D2C4;margin-top:5pt;text-transform:uppercase}
     .cover .titulo{font-family:'Cormorant Garamond';font-size:34pt;line-height:1.08;color:#F4EFE6;margin:10pt 0;font-weight:600}
@@ -174,6 +192,9 @@ export function montarHtmlDocumentoProposta(dados: DadosDocumentoProposta): stri
   return `<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <title>${esc(dados.codigo)} · Proposta Instituto NTC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 ${estilosDocumento()}
 </head>
 <body>
