@@ -65,3 +65,6 @@ apps/cms/src/seed/assets/*
 !apps/cms/src/seed/assets/README.md
 # Brainstorming visual companion (superpowers)
 .superpowers/
+
+# Worktrees locais de feature isolada (superpowers:using-git-worktrees)
+.worktrees/
