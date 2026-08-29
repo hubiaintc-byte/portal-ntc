@@ -78,8 +78,8 @@ importers:
         specifier: 3.18.0
         version: 3.18.0(graphql@16.14.0)(monaco-editor@0.55.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.9.3)
       playwright-core:
-        specifier: ^1.62.1
-        version: 1.62.1
+        specifier: 1.60.0
+        version: 1.60.0
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -111,6 +111,9 @@ importers:
       eslint-config-next:
         specifier: 15.5.18
         version: 15.5.18(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
+      playwright:
+        specifier: ^1.60.0
+        version: 1.60.0
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
@@ -3867,11 +3870,6 @@ packages:
   playwright-core@1.60.0:
     resolution: {integrity: sha512-9bW6zvX/m0lEbgTKJ6YppOKx8H3VOPBMOCFh2irXFOT4BbHgrx5hPjwJYLT40Lu+4qtD36qKc/Hn56StUW57IA==}
     engines: {node: '>=18'}
-    hasBin: true
-
-  playwright-core@1.62.1:
-    resolution: {integrity: sha512-wPYSwEBJY9GHraISXqyqtx0na0LpO3XEX7jNDhntbex7tzUS7kLnZsOlFruFJB4Hi/rhDMjXGqHewDZ68nYZVw==}
-    engines: {node: '>=20'}
     hasBin: true
 
   playwright@1.60.0:
@@ -8618,8 +8616,6 @@ snapshots:
       thread-stream: 3.1.0
 
   playwright-core@1.60.0: {}
-
-  playwright-core@1.62.1: {}
 
   playwright@1.60.0:
     dependencies:
