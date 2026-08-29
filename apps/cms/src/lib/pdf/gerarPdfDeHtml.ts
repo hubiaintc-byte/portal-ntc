@@ -59,10 +59,13 @@ export async function gerarPdfDeHtml(html: string, meta: MetaCabecalhoPdf): Prom
   try {
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "load" });
-    // `waitUntil: "load"` garante que a folha de estilo do Google Fonts
-    // carregou, mas não que os arquivos de fonte (Cormorant Garamond,
-    // Barlow) já foram baixados/parseados — sem isto o Chromium tira o
-    // snapshot do PDF ainda no fallback Helvetica/Times.
+    // As fontes da marca (Cormorant Garamond, Barlow) vão embutidas como
+    // data URI base64 no próprio HTML (ver
+    // documentoProposta/fontsEmbutidas.ts) — sem chamada de rede. Mesmo
+    // assim, decodificar/parsear um @font-face com src em base64 não é
+    // síncrono com `waitUntil: "load"`; sem aguardar `document.fonts.ready`
+    // o Chromium pode tirar o snapshot do PDF ainda no fallback
+    // Helvetica/Times.
     await page.evaluate(() => document.fonts.ready);
     const pdf = await page.pdf({
       format: "A4",

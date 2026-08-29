@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { DadosDocumentoProposta } from "./dados";
+import { FONTES_EMBUTIDAS_CSS } from "./fontsEmbutidas";
 
 /**
  * Formatação de moeda ESPECÍFICA do documento (2 casas decimais) — não usar
@@ -140,6 +141,7 @@ function estilosDocumento(): string {
   // sessão: o documento usa a paleta oficial, não a paleta própria do
   // legado NTC_Comercial_Premium.html.
   return `<style>
+    ${FONTES_EMBUTIDAS_CSS}
     *{box-sizing:border-box;margin:0;padding:0}
     html,body{background:#fff}
     body{font-family:'Barlow',sans-serif;color:#2B2B2B;line-height:1.55;font-size:10.5pt}
@@ -192,9 +194,6 @@ export function montarHtmlDocumentoProposta(dados: DadosDocumentoProposta): stri
   return `<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <title>${esc(dados.codigo)} · Proposta Instituto NTC</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 ${estilosDocumento()}
 </head>
 <body>
