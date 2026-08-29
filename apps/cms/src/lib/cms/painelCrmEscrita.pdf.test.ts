@@ -49,7 +49,7 @@ describe("gerarESalvarPdfProposta", () => {
         collection: "documentos-comerciais",
         file: expect.objectContaining({
           mimetype: "application/pdf",
-          name: "NTC-PROP-2026-PROGE-SP-X-v01.pdf",
+          name: expect.stringMatching(/^NTC-PROP-2026-PROGE-SP-X-v01-[a-z0-9]+\.pdf$/),
         }),
       }),
     );

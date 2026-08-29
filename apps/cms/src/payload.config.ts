@@ -38,6 +38,13 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 const bucket = process.env.SUPABASE_BUCKET || "ntc-portal-media";
+// Bucket dedicado e privado para documentos comerciais (propostas em PDF —
+// CRM Fase B2). Enquanto SUPABASE_BUCKET_PRIVADO não for criado no Supabase
+// e configurado, cai de volta no bucket público de `media` — a coleção
+// documentos-comerciais.access.read continua exigindo usuário autenticado
+// via /api/documentos-comerciais/file/*, mas o objeto em si só fica
+// realmente privado quando o bucket dedicado existir. Ver CLAUDE.md §12.
+const bucketPrivado = process.env.SUPABASE_BUCKET_PRIVADO || bucket;
 
 /**
  * Configuração do Payload 3 — Portal Grupo NTC · Sprint F.
@@ -145,12 +152,30 @@ export default buildConfig({
             return `${supabaseUrl}/storage/v1/object/public/${bucketName}/${fullPath}`;
           },
         },
+      },
+      bucket,
+      config: {
+        endpoint: process.env.SUPABASE_S3_ENDPOINT || "",
+        region: process.env.SUPABASE_S3_REGION || "sa-east-1",
+        credentials: {
+          accessKeyId: process.env.SUPABASE_S3_ACCESS_KEY_ID || "",
+          secretAccessKey: process.env.SUPABASE_S3_SECRET_ACCESS_KEY || "",
+        },
+        forcePathStyle: true,
+      },
+    }),
+    // Plugin separado (bucket próprio) para documentos comerciais — nunca
+    // compartilha bucket com `media`, que é público para leitura. Enquanto
+    // SUPABASE_BUCKET_PRIVADO não existir, bucketPrivado cai no bucket
+    // público como fallback (ver comentário acima da constante).
+    s3Storage({
+      collections: {
         "documentos-comerciais": {
           prefix: "documentos-comerciais",
           disableLocalStorage: true,
         },
       },
-      bucket,
+      bucket: bucketPrivado,
       config: {
         endpoint: process.env.SUPABASE_S3_ENDPOINT || "",
         region: process.env.SUPABASE_S3_REGION || "sa-east-1",

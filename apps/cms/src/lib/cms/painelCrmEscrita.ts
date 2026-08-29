@@ -606,7 +606,11 @@ export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscr
         ? propostaAtual.pdfGerado
         : null;
 
-    const nomeArquivo = `${dados.codigo}.pdf`;
+    // Sufixo aleatório: mesmo que o bucket ainda não seja privado (ver
+    // SUPABASE_BUCKET_PRIVADO em payload.config.ts), o nome do objeto não
+    // pode ser adivinhado só a partir do código da proposta.
+    const sufixo = Math.random().toString(36).slice(2, 10);
+    const nomeArquivo = `${dados.codigo}-${sufixo}.pdf`;
     const media = await payload.create({
       collection: "documentos-comerciais",
       data: { alt: `Proposta ${dados.codigo}` },
