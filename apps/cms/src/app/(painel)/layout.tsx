@@ -1,3 +1,5 @@
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
@@ -21,7 +23,11 @@ export const metadata: Metadata = {
 export default function PainelLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" className={`${cormorant.variable} ${barlow.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }
