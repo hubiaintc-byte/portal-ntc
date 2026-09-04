@@ -112,8 +112,13 @@ export async function conferirAutenticacao(params: {
   });
   if (!verificacao.verified) return null;
   const { newCounter } = verificacao.authenticationInfo;
-  // Contador não avançou (ou retrocedeu) = indício de credencial clonada/replay.
-  if (newCounter <= params.counterAtual) {
+  // Autenticadores de plataforma (Touch ID, passkeys sincronizadas via
+  // iCloud/Google/etc.) sempre reportam counter=0 — não há sinal de
+  // clonagem a avaliar nesse caso. Mesma condição que
+  // @simplewebauthn/server aplica internamente em verifyAuthenticationResponse
+  // (só compara quando algum dos dois lados já reportou um contador real).
+  const contadorRelevante = newCounter > 0 || params.counterAtual > 0;
+  if (contadorRelevante && newCounter <= params.counterAtual) {
     console.error("[conferirAutenticacao] contador não avançou — possível clonagem", {
       credentialId: params.credentialIdEsperado,
       counterAtual: params.counterAtual,

@@ -137,4 +137,22 @@ describe("conferirAutenticacao", () => {
     });
     expect(resultado).toEqual({ novoContador: 6 });
   });
+
+  it("aceita counter=0 → counter=0 (autenticadores sem contador real, ex.: Touch ID)", async () => {
+    vi.resetModules();
+    const modulo = await import("@simplewebauthn/server");
+    vi.mocked(modulo.verifyAuthenticationResponse).mockResolvedValue({
+      verified: true,
+      authenticationInfo: { newCounter: 0 },
+    } as unknown as Awaited<ReturnType<typeof modulo.verifyAuthenticationResponse>>);
+    const { conferirAutenticacao } = await import("./webauthn");
+    const resultado = await conferirAutenticacao({
+      resposta: {} as Parameters<typeof conferirAutenticacao>[0]["resposta"],
+      challenge: "abc",
+      credentialIdEsperado: "cred-1",
+      publicKeyBase64: Buffer.from([1, 2, 3]).toString("base64"),
+      counterAtual: 0,
+    });
+    expect(resultado).toEqual({ novoContador: 0 });
+  });
 });
