@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { montarTransicaoEstagio } from "./historicoEstagio";
+import { ehEstagioOportunidade, lerEstagioOuNulo, montarTransicaoEstagio } from "./historicoEstagio";
 
 describe("montarTransicaoEstagio", () => {
   beforeEach(() => {
@@ -65,5 +65,61 @@ describe("montarTransicaoEstagio", () => {
 
     const semAutor = montarTransicaoEstagio({ oportunidadeId: 7, anterior: null, novo: "mapeada" });
     expect(semAutor?.atorSistema).toBe("sistema");
+  });
+});
+
+describe("ehEstagioOportunidade", () => {
+  it("aceita um slug válido da lista de estágios", () => {
+    expect(ehEstagioOportunidade("negociacao-tramitacao")).toBe(true);
+  });
+
+  it("rejeita uma string que não é um estágio conhecido", () => {
+    expect(ehEstagioOportunidade("estagio-inventado")).toBe(false);
+  });
+
+  it("rejeita valores que não são string", () => {
+    expect(ehEstagioOportunidade(null)).toBe(false);
+    expect(ehEstagioOportunidade(undefined)).toBe(false);
+    expect(ehEstagioOportunidade(42)).toBe(false);
+  });
+});
+
+describe("lerEstagioOuNulo", () => {
+  it("devolve o próprio valor quando é um estágio válido", () => {
+    expect(lerEstagioOuNulo("qualificada")).toBe("qualificada");
+  });
+
+  it("devolve null para uma string fora da lista de estágios, em vez de propagá-la", () => {
+    expect(lerEstagioOuNulo("estagio-que-nao-existe")).toBeNull();
+  });
+
+  it("devolve null quando o valor está ausente", () => {
+    expect(lerEstagioOuNulo(undefined)).toBeNull();
+    expect(lerEstagioOuNulo(null)).toBeNull();
+  });
+
+  it("um estágio corrompido no `previousDoc` não bloqueia nem contamina a transição", () => {
+    // Simula o que o hook faz: lê doc/previousDoc pela guard antes de montar a
+    // transição. Um valor fora da lista em `previousDoc.estagio` (dado
+    // corrompido ou desatualizado) vira `null` — a transição para um estágio
+    // novo válido sai registrada como se fosse a primeira atribuição, nunca
+    // com a string inválida propagada para `estagioAnterior`.
+    expect(
+      montarTransicaoEstagio({
+        oportunidadeId: 7,
+        anterior: lerEstagioOuNulo("lixo-no-banco"),
+        novo: lerEstagioOuNulo("mapeada"),
+      }),
+    ).toMatchObject({ estagioAnterior: null, estagioNovo: "mapeada" });
+  });
+
+  it("um estágio corrompido no `doc.estagio` (novo) é tratado como ausente — sem transição", () => {
+    expect(
+      montarTransicaoEstagio({
+        oportunidadeId: 7,
+        anterior: lerEstagioOuNulo("negociacao-tramitacao"),
+        novo: lerEstagioOuNulo("lixo-no-banco"),
+      }),
+    ).toBeNull();
   });
 });

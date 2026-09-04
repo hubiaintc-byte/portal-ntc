@@ -11,7 +11,7 @@ import {
 import { atendimentoComercial } from "../access/atendimentoComercial";
 import { superAdmin } from "../access/superAdmin";
 import { calcularStatusLegadoEspelhado } from "../lib/crm/espelhoStatusLegado";
-import { montarTransicaoEstagio } from "../lib/crm/historicoEstagio";
+import { lerEstagioOuNulo, montarTransicaoEstagio } from "../lib/crm/historicoEstagio";
 
 /**
  * Mantém o campo `status` legado preenchido a partir de estágio+situação. O
@@ -35,8 +35,8 @@ const registrarTransicaoEstagio: CollectionAfterChangeHook = async ({ context, d
   if (context?.migracaoP0 === true) return doc;
   const transicao = montarTransicaoEstagio({
     oportunidadeId: doc.id,
-    anterior: typeof previousDoc?.estagio === "string" ? previousDoc.estagio : null,
-    novo: typeof doc.estagio === "string" ? doc.estagio : null,
+    anterior: lerEstagioOuNulo(previousDoc?.estagio),
+    novo: lerEstagioOuNulo(doc.estagio),
     usuarioId: req.user?.collection === "users" ? req.user.id : null,
   });
   if (transicao === null) return doc;
