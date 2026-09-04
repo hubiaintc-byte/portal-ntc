@@ -180,12 +180,12 @@ O **Manual Operacional do NTC Comercial Premium** (documento `NTC-COM-CRM-01`, v
 
 | # | Divergência | Natureza | Onde se resolve |
 |---|---|---|---|
-| M1 | **A migração não aparece no manual.** `migrateP0` marca `migracao_pendente_revisao` em 5 dos 8 status antigos, e para *Perdida*/*Cancelada* grava `Mapeada` — que o próprio código chama de "fallback técnico, NÃO verdade histórica". O manual §11 ensina o oposto ("Mapeada = oportunidade identificada, ainda sem trabalho ativo"), e a fila de revisão (`p0FilaRevisaoMigracao`) existe só no console, sem tela. Quem seguir o manual lê oportunidade perdida migrada como oportunidade nova no topo do funil | sistema + texto | **H1** (flag e motivo), **H7** (tela da fila), **H8** (seção nova no manual) |
+| M1 | **A migração não aparece no manual.** `migrateP0` marca `migracao_pendente_revisao` em 5 dos 8 status antigos, e para *Perdida*/*Cancelada* grava `Mapeada` — que o próprio código chama de "fallback técnico, NÃO verdade histórica". O manual §11 ensina o oposto ("Mapeada = oportunidade identificada, ainda sem trabalho ativo"), e a fila de revisão (`p0FilaRevisaoMigracao`) existe só no console, sem tela. Quem seguir o manual lê oportunidade perdida migrada como oportunidade nova no topo do funil | sistema + texto | **H1** (flag e motivo) ✅ concluído 04/09/2026 — **H7** (tela da fila), **H8** (seção nova no manual) seguem pendentes |
 | M2 | **O Dashboard não mostra os 11 estágios.** O gráfico "Funil de Oportunidades" está com os 6 status legados *hardcoded* e lê o espelho `status`. O §33 do manual lista como limitação apenas o "aging detalhado" — não avisa que o painel está num eixo diferente do funil que o próprio manual ensina | sistema + texto | **H7** (funil por estágio), **H8** (§33) |
 | M3 | **A Figura 4 é captura da v3.0 e a legenda afirma o contrário.** A legenda diz "as colunas «Estágio» e «Situação» aparecem separadas"; a imagem mostra `QTD. EST. · VALOR · PROB. · STATUS` com valores legados — que são os `listCols` da v3.0 | captura | **H8** |
 | M4 | **§10 sub-declara os campos obrigatórios da Oportunidade.** Cita só "Cliente é obrigatório"; no sistema também são obrigatórios **Programa, UF, Origem da demanda, Data de abertura e Responsável comercial** | texto | **H8** (e **H1** define os `required` de fato no Payload) |
 | M5 | **§16, redação.** Diz que um hard gate "Sim" bloqueia concluir a avaliação; o sistema não impede concluir — bloqueia o **estágio** Qualificada. O §18 está correto | texto | **H8** |
-| M6 | **§30 promete "por quem" e o histórico migrado mostra "—".** As linhas de migração gravam `usuario: 'migracao'`, que não resolve para nenhum usuário cadastrado (visível na própria Figura 10) | sistema | **H1** |
+| M6 | **§30 promete "por quem" e o histórico migrado mostra "—".** As linhas de migração gravam `usuario: 'migracao'`, que não resolve para nenhum usuário cadastrado (visível na própria Figura 10) | sistema | **H1** ✅ concluído 04/09/2026 |
 | M7 | **O campo `status` legado continua sendo gravado por trás e o manual não menciona.** Quem exportar os dados encontra dois campos representando a mesma coisa | texto | **H8**; some quando o espelho for removido (sessão própria pós-H7) |
 | M8 | **Autenticação.** O manual descreve acesso por seleção de usuário sem senha e marca `[VALIDAR COM TI/DESENVOLVIMENTO]`. No portal já é e-mail + senha, com 2FA em andamento na Janela C | texto | **H8** (o trabalho de código é da Janela C) |
 
@@ -200,7 +200,7 @@ Não são erros do manual — ele documenta o protótipo, e o protótipo não te
 
 ---
 
-### Sessão H1 — Fundação: estágio, situação, histórico e migração
+### Sessão H1 — Fundação: estágio, situação, histórico e migração ✅ concluída (04/09/2026)
 
 - **Objetivo:** `oportunidades` passa a ter `estagio` + `situacao`, com histórico imutável de transições, sem quebrar nenhuma tela existente.
 - **Escopo:**
@@ -229,6 +229,8 @@ Não são erros do manual — ele documenta o protótipo, e o protótipo não te
   quebrar o Dashboard e os gráficos. Exponha o plano antes de codar (CLAUDE.md §8) e me
   chame antes de rodar payload:push:schema.
   ```
+- **Entregue:** branch `feat/crm-janela-h1-funil-p0` mergeada (12 commits, `6b10404`..`58c6dad`), execução via `subagent-driven-development` — 7 tasks do plano (as tasks 3, 4 e 5 num dispatch único) + 2 rodadas de correção pós-revisão na task do modelo de dados. Dois `payload:push:schema` aplicados no banco de desenvolvimento sem prompt de DATA LOSS, `payload:generate` rodado depois de cada um. `pnpm lint`, `typecheck`, `test` e `build` verdes no monorepo inteiro (138 testes no cms, 25 em `@ntc/lib`). As divergências **M1** e **M6** de §4.0 têm sua parte de sistema resolvida aqui: `migracaoPendenteRevisao`/`migracaoFlag` tornam a oportunidade migrada legível como migrada na própria tela, e o histórico de migração grava um ator legível (`atorSistema: "migração automática"`) em vez do `usuario: 'migracao'` que não resolvia no protótipo — a parte de tela da M1 (fila de revisão como tela de trabalho da Direção) continua pendente para a **H7**.
+- **Pendências que ficaram:** o checkpoint visual humano (`CLAUDE.md` §6) ainda não foi feito. O banco de desenvolvimento tem zero oportunidades — o dry-run do script de migração reportou 0 registros, então nunca foi exercitado contra dado real; a primeira execução com dado de verdade será sem ensaio e exige backup antes (§5). A fila de revisão de migração (`migracaoPendenteRevisao`) segue sem tela própria, só filtro/coluna na listagem — vira tela de trabalho na **H7**. O campo `status` legado continua sendo gravado como espelho até a H7 migrar Dashboard e gráficos; nesta sessão eles não foram tocados e continuam lendo os 6 status legados, não os 11 estágios (M2, sem mudança aqui).
 
 ---
 
