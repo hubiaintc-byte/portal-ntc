@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { obterUsuarioCms } from "@/lib/cms/autenticacao";
+import { obterUsuarioAutenticado, obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
   listarHistoricoEstagio,
   obterClienteCrm,
@@ -78,13 +78,23 @@ export async function salvarContatoCrm(
   return resultado;
 }
 
+/**
+ * O usuário da sessão desce até a Local API (parâmetro `usuario`) para virar
+ * `req.user` no hook que grava o histórico de estágio — sem isso toda
+ * transição do funil sairia com autor "sistema". `obterUsuarioAutenticado`
+ * devolve o mesmo objeto que `obterUsuarioCms` já buscava, então continua
+ * sendo uma única validação de sessão por save.
+ */
 export async function salvarOportunidadeCrm(
   id: string | null,
   dados: DadosOportunidade,
 ): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCms())) return RECUSADO;
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
   const resultado =
-    id === null ? await criarOportunidade(dados) : await atualizarOportunidade(id, dados);
+    id === null
+      ? await criarOportunidade(dados, usuario)
+      : await atualizarOportunidade(id, dados, usuario);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
 }

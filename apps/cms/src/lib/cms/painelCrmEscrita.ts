@@ -10,6 +10,7 @@ import {
 } from "@ntc/lib";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
+import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
 import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
 import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
@@ -257,7 +258,16 @@ function dadosOportunidade(
   };
 }
 
-export async function criarOportunidade(dados: DadosOportunidade): Promise<ResultadoEscrita> {
+/**
+ * `usuario` é a sessão do painel repassada à Local API em `user:` — é assim
+ * que o hook `registrarTransicaoEstagio` de `oportunidades` recebe `req.user`
+ * e grava a transição com autor humano em vez de "sistema". Sem isso o
+ * histórico do funil sai anônimo (docs/17 §1.2).
+ */
+export async function criarOportunidade(
+  dados: DadosOportunidade,
+  usuario: UsuarioAutenticado | null,
+): Promise<ResultadoEscrita> {
   // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
   const clienteId = idOuNulo(dados.cliente);
   if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
@@ -276,6 +286,7 @@ export async function criarOportunidade(dados: DadosOportunidade): Promise<Resul
     await payload.create({
       collection: "oportunidades",
       data: { codigo, ...dadosOportunidade(dados, clienteId) },
+      user: usuario,
     });
     return { ok: true };
   } catch (e) {
@@ -284,9 +295,11 @@ export async function criarOportunidade(dados: DadosOportunidade): Promise<Resul
   }
 }
 
+/** Ver `criarOportunidade`: `usuario` vira `req.user` no hook do histórico. */
 export async function atualizarOportunidade(
   id: string,
   dados: DadosOportunidade,
+  usuario: UsuarioAutenticado | null,
 ): Promise<ResultadoEscrita> {
   const clienteId = idOuNulo(dados.cliente);
   if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
@@ -296,6 +309,7 @@ export async function atualizarOportunidade(
       collection: "oportunidades",
       id,
       data: dadosOportunidade(dados, clienteId),
+      user: usuario,
     });
     return { ok: true };
   } catch (e) {
