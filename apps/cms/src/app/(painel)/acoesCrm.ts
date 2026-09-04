@@ -4,12 +4,14 @@ import { revalidatePath } from "next/cache";
 
 import { obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
+  listarHistoricoEstagio,
   obterClienteCrm,
   obterOportunidadeCrm,
   obterPropostaCrm,
   type ClienteCrmDetalhe,
   type OportunidadeCrmDetalhe,
   type PropostaDetalhe,
+  type TransicaoEstagioResumo,
 } from "@/lib/cms/painelCrm";
 import {
   atualizarClienteCrm,
@@ -46,6 +48,14 @@ export async function carregarClienteCrm(id: string): Promise<ClienteCrmDetalhe 
 export async function carregarOportunidadeCrm(id: string): Promise<OportunidadeCrmDetalhe | null> {
   if (!(await obterUsuarioCms())) return null;
   return obterOportunidadeCrm(id);
+}
+
+export async function carregarHistoricoOportunidade(
+  id: string,
+): Promise<TransicaoEstagioResumo[]> {
+  // Server Action é endpoint público: sessão antes de qualquer leitura.
+  if (!(await obterUsuarioCms())) return [];
+  return listarHistoricoEstagio(id);
 }
 
 export async function salvarClienteCrm(

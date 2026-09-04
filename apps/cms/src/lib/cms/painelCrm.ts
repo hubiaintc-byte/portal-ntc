@@ -69,6 +69,10 @@ export interface OportunidadeCrmResumo {
   valor: number | null;
   probabilidade: number | null;
   status: string;
+  estagio: string;
+  situacao: string;
+  migracaoPendenteRevisao: boolean;
+  migracaoFlag: string | null;
   dataAberturaISO: string | null;
   followupISO: string | null;
   responsavelNome: string | null;
@@ -253,6 +257,10 @@ function mapearOportunidadeResumo(doc: Oportunidade): OportunidadeCrmResumo {
     dataAberturaISO: soData(doc.dataAbertura),
     followupISO: soData(doc.followup),
     responsavelNome: campoRel(doc.responsavel, "nome"),
+    estagio: doc.estagio ?? "mapeada",
+    situacao: doc.situacao ?? "ativa",
+    migracaoPendenteRevisao: doc.migracaoPendenteRevisao === true,
+    migracaoFlag: doc.migracaoFlag ?? null,
   };
 }
 
@@ -520,4 +528,34 @@ export async function todosEnviosCrm(): Promise<EnvioResumo[]> {
   const payload = await obterPayload();
   const res = await payload.find({ collection: "envios", depth: 1, limit: 500, sort: "-data" });
   return res.docs.map(mapearEnvioResumo);
+}
+
+export interface TransicaoEstagioResumo {
+  id: string;
+  estagioAnterior: string | null;
+  estagioNovo: string;
+  dataHoraISO: string | null;
+  /** Nome do usuário, ou o ator de sistema quando a transição foi automática. */
+  autor: string;
+}
+
+/** Histórico de estágio de uma oportunidade, do mais recente para o mais antigo. */
+export async function listarHistoricoEstagio(
+  oportunidadeId: string,
+): Promise<TransicaoEstagioResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "historico-estagio",
+    where: { oportunidade: { equals: oportunidadeId } },
+    depth: 1,
+    limit: 200,
+    sort: "-dataHora",
+  });
+  return res.docs.map((doc) => ({
+    id: String(doc.id),
+    estagioAnterior: doc.estagioAnterior ?? null,
+    estagioNovo: doc.estagioNovo,
+    dataHoraISO: typeof doc.dataHora === "string" ? doc.dataHora : null,
+    autor: campoRel(doc.usuario, "nome") ?? doc.atorSistema ?? "sistema",
+  }));
 }

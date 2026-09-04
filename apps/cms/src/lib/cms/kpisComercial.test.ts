@@ -14,6 +14,7 @@ import {
 const opp = (extra: Partial<OportunidadeCrmResumo>): OportunidadeCrmResumo => ({
   id: "1", codigo: "OPO-1", clienteId: "1", clienteNome: "SEDUC-TO", programaSigla: "EDUTEC",
   valor: null, probabilidade: null, status: "em-qualificacao",
+  estagio: "mapeada", situacao: "ativa", migracaoPendenteRevisao: false, migracaoFlag: null,
   dataAberturaISO: null, followupISO: null, responsavelNome: null,
   ...extra,
 });
