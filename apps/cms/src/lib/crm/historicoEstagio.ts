@@ -13,7 +13,9 @@ import { ESTAGIO_OPORTUNIDADE } from "@ntc/lib";
  * `estagioNovo`/`estagioAnterior` como `string` solto, que o Payload rejeita
  * na escrita em `historico-estagio` (campo `select`, união literal).
  */
-export type EstagioOportunidade = NonNullable<RequiredDataFromCollectionSlug<"oportunidades">["estagio"]>;
+export type EstagioOportunidade = NonNullable<
+  RequiredDataFromCollectionSlug<"oportunidades">["estagio"]
+>;
 
 export interface EntradaTransicaoEstagio {
   oportunidadeId: number | string;

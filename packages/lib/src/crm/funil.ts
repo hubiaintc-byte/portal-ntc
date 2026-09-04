@@ -23,7 +23,11 @@ export const ESTAGIO_OPORTUNIDADE: OpcaoLista[] = opcoes([
   "Ganha",
 ]);
 
-export const SITUACAO_OPORTUNIDADE: OpcaoLista[] = opcoes(["Ativa", "Perdida", "Adiada / Nurturing"]);
+export const SITUACAO_OPORTUNIDADE: OpcaoLista[] = opcoes([
+  "Ativa",
+  "Perdida",
+  "Adiada / Nurturing",
+]);
 
 /** Estágios com equivalente direto no enum legado STATUS_OPORTUNIDADE. */
 const LEGADO_POR_ESTAGIO: Record<string, string> = {
@@ -57,7 +61,8 @@ export interface PlanoMigracaoP0 {
   flag: string;
 }
 
-const FALLBACK_PERDIDA = "[VALIDAR COM A DIREÇÃO] estágio anterior desconhecido — Mapeada é fallback técnico, NÃO verdade histórica";
+const FALLBACK_PERDIDA =
+  "[VALIDAR COM A DIREÇÃO] estágio anterior desconhecido — Mapeada é fallback técnico, NÃO verdade histórica";
 
 const TABELA_MIGRACAO: Record<string, PlanoMigracaoP0> = {
   "em-qualificacao": {
@@ -73,7 +78,12 @@ const TABELA_MIGRACAO: Record<string, PlanoMigracaoP0> = {
     flag: "",
   },
   "proposta-enviada": { estagio: "proposta-enviada", situacao: "ativa", revisao: false, flag: "" },
-  "em-negociacao": { estagio: "negociacao-tramitacao", situacao: "ativa", revisao: false, flag: "" },
+  "em-negociacao": {
+    estagio: "negociacao-tramitacao",
+    situacao: "ativa",
+    revisao: false,
+    flag: "",
+  },
   aprovada: {
     estagio: "contratacao-em-formalizacao",
     situacao: "ativa",
