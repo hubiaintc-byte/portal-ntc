@@ -4,10 +4,15 @@ import Link from "next/link";
 import { useActionState } from "react";
 
 import { entrar, type EstadoLogin } from "../acoesAuth";
+import { ConfirmarPasskey } from "./ConfirmarPasskey";
 
 /** Formulário de login — invoca a Server Action `entrar` com estado de erro. */
 export function FormLogin() {
   const [estado, agir, enviando] = useActionState<EstadoLogin | null, FormData>(entrar, null);
+
+  if (estado?.precisaPasskey) {
+    return <ConfirmarPasskey precisaPasskey={estado.precisaPasskey} />;
+  }
 
   return (
     <form className="pcms-login__form" action={agir}>
