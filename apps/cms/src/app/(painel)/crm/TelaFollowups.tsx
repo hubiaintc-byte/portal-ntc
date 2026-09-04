@@ -2,9 +2,9 @@
 
 import type { OportunidadeCrmResumo } from "@/lib/cms/painelCrm";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
-import { STATUS_OPORTUNIDADE } from "@ntc/lib";
+import { ESTAGIO_OPORTUNIDADE } from "@ntc/lib";
 
-import { rotuloDeLista, seloDeOportunidade } from "./seloStatus";
+import { rotuloDeLista, seloDeEstagio } from "./seloStatus";
 
 interface TelaFollowupsProps {
   followups: OportunidadeCrmResumo[];
@@ -33,7 +33,7 @@ export function TelaFollowups({ followups, onAbrirOportunidade }: TelaFollowupsP
               <th>Cliente</th>
               <th>Programa</th>
               <th>Valor</th>
-              <th>Status</th>
+              <th>Estágio</th>
             </tr>
           </thead>
           <tbody>
@@ -58,8 +58,8 @@ export function TelaFollowups({ followups, onAbrirOportunidade }: TelaFollowupsP
                 <td>{o.programaSigla ?? "—"}</td>
                 <td>{o.valor !== null ? formatarMoedaBRL(o.valor) : "—"}</td>
                 <td>
-                  <span className={seloDeOportunidade(o.status)}>
-                    {rotuloDeLista(STATUS_OPORTUNIDADE, o.status)}
+                  <span className={seloDeEstagio(o.estagio)}>
+                    {rotuloDeLista(ESTAGIO_OPORTUNIDADE, o.estagio)}
                   </span>
                 </td>
               </tr>

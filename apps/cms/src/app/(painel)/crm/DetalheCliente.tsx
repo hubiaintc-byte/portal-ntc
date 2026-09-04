@@ -3,16 +3,16 @@
 import {
   AREAS_CRM,
   ESFERAS_CRM,
+  ESTAGIO_OPORTUNIDADE,
   ORIGENS_CRM,
   STATUS_CLIENTE_CRM,
-  STATUS_OPORTUNIDADE,
   TIPOS_INSTITUICAO,
 } from "@ntc/lib";
 
 import type { ClienteCrmDetalhe } from "@/lib/cms/painelCrm";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
-import { rotuloDeLista, seloDeCliente, seloDeOportunidade } from "./seloStatus";
+import { rotuloDeLista, seloDeCliente, seloDeEstagio } from "./seloStatus";
 
 interface DetalheClienteProps {
   cliente: ClienteCrmDetalhe;
@@ -141,7 +141,7 @@ export function DetalheCliente({
               <tr>
                 <th>Código</th>
                 <th>Valor</th>
-                <th>Status</th>
+                <th>Estágio</th>
               </tr>
             </thead>
             <tbody>
@@ -162,8 +162,8 @@ export function DetalheCliente({
                   <td>{o.codigo}</td>
                   <td>{o.valor !== null ? formatarMoedaBRL(o.valor) : "—"}</td>
                   <td>
-                    <span className={seloDeOportunidade(o.status)}>
-                      {rotuloDeLista(STATUS_OPORTUNIDADE, o.status)}
+                    <span className={seloDeEstagio(o.estagio)}>
+                      {rotuloDeLista(ESTAGIO_OPORTUNIDADE, o.estagio)}
                     </span>
                   </td>
                 </tr>
