@@ -24,6 +24,7 @@ export interface Config {
     'clientes-crm': ClienteCrm;
     'contatos-crm': ContatoCrm;
     oportunidades: Oportunidade;
+    'historico-estagio': HistoricoEstagio;
     propostas: Proposta;
     versoes: VersaoProposta;
     envios: EnvioProposta;
@@ -48,6 +49,7 @@ export interface Config {
     'clientes-crm': ClientesCrmSelect<false> | ClientesCrmSelect<true>;
     'contatos-crm': ContatosCrmSelect<false> | ContatosCrmSelect<true>;
     oportunidades: OportunidadesSelect<false> | OportunidadesSelect<true>;
+    'historico-estagio': HistoricoEstagioSelect<false> | HistoricoEstagioSelect<true>;
     propostas: PropostasSelect<false> | PropostasSelect<true>;
     versoes: VersoesSelect<false> | VersoesSelect<true>;
     envios: EnviosSelect<false> | EnviosSelect<true>;
@@ -1079,6 +1081,9 @@ export interface Oportunidade {
    */
   valor?: number | null;
   probabilidade?: number | null;
+  /**
+   * Campo legado, preenchido automaticamente a partir de Estágio e Situação. Não editar: será removido depois da Sessão H7.
+   */
   status?:
     | (
         | 'em-qualificacao'
@@ -1091,6 +1096,36 @@ export interface Oportunidade {
         | 'cancelada'
       )
     | null;
+  /**
+   * Posição no funil comercial (manual NTC-COM-CRM-01 §11).
+   */
+  estagio?:
+    | (
+        | 'mapeada'
+        | 'prospeccao-relacionamento'
+        | 'demanda-identificada'
+        | 'qualificada'
+        | 'diagnostico-realizado'
+        | 'solucao-em-construcao'
+        | 'proposta-em-elaboracao'
+        | 'proposta-enviada'
+        | 'negociacao-tramitacao'
+        | 'contratacao-em-formalizacao'
+        | 'ganha'
+      )
+    | null;
+  /**
+   * Condição da oportunidade — independente do estágio (§12).
+   */
+  situacao?: ('ativa' | 'perdida' | 'adiada-nurturing') | null;
+  /**
+   * Estágio atribuído pela migração automática e ainda não confirmado pela Direção. Enquanto marcado, o estágio é provisório e não é verdade histórica.
+   */
+  migracaoPendenteRevisao?: boolean | null;
+  /**
+   * O que a Direção precisa confirmar nesta oportunidade migrada.
+   */
+  migracaoFlag?: string | null;
   dataAbertura?: string | null;
   dataPrevFechamento?: string | null;
   proximaAcao?: string | null;
@@ -1100,6 +1135,50 @@ export interface Oportunidade {
   followup?: string | null;
   responsavel?: (number | null) | User;
   observacoes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "historico-estagio".
+ */
+export interface HistoricoEstagio {
+  id: number;
+  oportunidade: number | Oportunidade;
+  estagioAnterior?:
+    | (
+        | 'mapeada'
+        | 'prospeccao-relacionamento'
+        | 'demanda-identificada'
+        | 'qualificada'
+        | 'diagnostico-realizado'
+        | 'solucao-em-construcao'
+        | 'proposta-em-elaboracao'
+        | 'proposta-enviada'
+        | 'negociacao-tramitacao'
+        | 'contratacao-em-formalizacao'
+        | 'ganha'
+      )
+    | null;
+  estagioNovo:
+    | 'mapeada'
+    | 'prospeccao-relacionamento'
+    | 'demanda-identificada'
+    | 'qualificada'
+    | 'diagnostico-realizado'
+    | 'solucao-em-construcao'
+    | 'proposta-em-elaboracao'
+    | 'proposta-enviada'
+    | 'negociacao-tramitacao'
+    | 'contratacao-em-formalizacao'
+    | 'ganha';
+  dataHora: string;
+  usuario?: (number | null) | User;
+  /**
+   * Preenchido quando a transição não veio de um usuário (migração, importador).
+   */
+  atorSistema?: string | null;
+  motivo?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1292,6 +1371,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'oportunidades';
         value: number | Oportunidade;
+      } | null)
+    | ({
+        relationTo: 'historico-estagio';
+        value: number | HistoricoEstagio;
       } | null)
     | ({
         relationTo: 'propostas';
@@ -1845,12 +1928,31 @@ export interface OportunidadesSelect<T extends boolean = true> {
   valor?: T;
   probabilidade?: T;
   status?: T;
+  estagio?: T;
+  situacao?: T;
+  migracaoPendenteRevisao?: T;
+  migracaoFlag?: T;
   dataAbertura?: T;
   dataPrevFechamento?: T;
   proximaAcao?: T;
   followup?: T;
   responsavel?: T;
   observacoes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "historico-estagio_select".
+ */
+export interface HistoricoEstagioSelect<T extends boolean = true> {
+  oportunidade?: T;
+  estagioAnterior?: T;
+  estagioNovo?: T;
+  dataHora?: T;
+  usuario?: T;
+  atorSistema?: T;
+  motivo?: T;
   updatedAt?: T;
   createdAt?: T;
 }
