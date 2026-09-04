@@ -64,7 +64,8 @@ export interface DadosOportunidade {
   modalidade: string;
   valor: string;
   probabilidade: string;
-  status: string;
+  estagio: string;
+  situacao: string;
   dataAbertura: string;
   dataPrevFechamento: string;
   proximaAcao: string;
@@ -243,7 +244,10 @@ function dadosOportunidade(
     modalidade: ouNulo(dados.modalidade),
     valor: numeroOuNulo(dados.valor),
     probabilidade: numeroOuNulo(dados.probabilidade),
-    status: (ouNulo(dados.status) ?? "em-qualificacao") as OportunidadeData["status"],
+    // `status` legado NÃO é montado aqui: o hook beforeChange da coleção
+    // oportunidades o deriva de estagio+situacao (fonte única).
+    estagio: (ouNulo(dados.estagio) ?? "mapeada") as OportunidadeData["estagio"],
+    situacao: (ouNulo(dados.situacao) ?? "ativa") as OportunidadeData["situacao"],
     dataAbertura: ouNulo(dados.dataAbertura),
     dataPrevFechamento: ouNulo(dados.dataPrevFechamento),
     proximaAcao: ouNulo(dados.proximaAcao),
