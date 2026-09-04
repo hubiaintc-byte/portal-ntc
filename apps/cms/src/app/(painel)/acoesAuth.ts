@@ -3,8 +3,25 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import type {
+  AuthenticationResponseJSON,
+  PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialRequestOptionsJSON,
+  RegistrationResponseJSON,
+} from "@simplewebauthn/server";
+
 import { COOKIE_SESSAO, obterUsuarioCms } from "@/lib/cms/autenticacao";
+import {
+  confirmarCadastroPasskey,
+  confirmarLoginPasskey,
+  listarPasskeysDoUsuario,
+  prepararCadastroPasskey,
+  prepararLoginPasskey,
+  removerPasskey,
+  type PasskeyResumo,
+} from "@/lib/cms/painelPasskeys";
 import { obterPayload } from "@/lib/payloadClient";
+import { cifrarTokenPonte, decifrarTokenPonte } from "@/lib/passkeys/tokens";
 import { validarNovaSenha } from "@/lib/validarNovaSenha";
 
 const QUATORZE_DIAS_S = 60 * 60 * 24 * 14;
@@ -12,6 +29,11 @@ const QUATORZE_DIAS_S = 60 * 60 * 24 * 14;
 export interface EstadoLogin {
   erro?: string;
   ok?: string;
+  /** Presente quando a senha bateu mas o usuário tem passkey — 2º fator pendente. */
+  precisaPasskey?: {
+    tokenPendente: string;
+    opcoesAutenticacao: PublicKeyCredentialRequestOptionsJSON;
+  };
 }
 
 /**
@@ -30,12 +52,15 @@ export async function entrar(
   if (!email || !senha) return { erro: "Informe e-mail e senha." };
 
   let token: string | undefined;
+  let usuarioId: string | undefined;
   try {
     const payload = await obterPayload();
-    ({ token } = await payload.login({
+    const resultado = await payload.login({
       collection: "users",
       data: { email, password: senha },
-    }));
+    });
+    token = resultado.token;
+    usuarioId = resultado.user ? String(resultado.user.id) : undefined;
   } catch (e) {
     // 401 = credencial inválida/lockout (APIError do Payload). Qualquer outra
     // coisa (banco fora etc.) recebe mensagem neutra, sem vazar detalhe.
@@ -44,7 +69,18 @@ export async function entrar(
       ? { erro: "E-mail ou senha incorretos." }
       : { erro: "Não foi possível entrar. Tente novamente." };
   }
-  if (!token) return { erro: "Não foi possível entrar. Tente novamente." };
+  if (!token || !usuarioId) return { erro: "Não foi possível entrar. Tente novamente." };
+
+  const pendente = await prepararLoginPasskey(usuarioId);
+  if (pendente) {
+    const tokenPendente = await cifrarTokenPonte({
+      userId: usuarioId,
+      sessaoReal: token,
+      challenge: pendente.challenge,
+      manter,
+    });
+    return { precisaPasskey: { tokenPendente, opcoesAutenticacao: pendente.opcoes } };
+  }
 
   const jarra = await cookies();
   jarra.set(COOKIE_SESSAO, token, {
@@ -54,6 +90,28 @@ export async function entrar(
     path: "/",
     // Sem "manter sessão": cookie de sessão (morre ao fechar o navegador).
     ...(manter ? { maxAge: QUATORZE_DIAS_S } : {}),
+  });
+  redirect("/");
+}
+
+/** Completa o login depois da senha, confirmando o 2º fator (passkey). */
+export async function verificarAutenticacaoPasskey(
+  tokenPendente: string,
+  resposta: AuthenticationResponseJSON,
+): Promise<{ erro?: string }> {
+  const claims = await decifrarTokenPonte(tokenPendente);
+  if (!claims) return { erro: "Sessão de login expirada. Entre novamente." };
+
+  const ok = await confirmarLoginPasskey(claims.userId, resposta, claims.challenge);
+  if (!ok) return { erro: "Não foi possível confirmar o passkey. Tente novamente." };
+
+  const jarra = await cookies();
+  jarra.set(COOKIE_SESSAO, claims.sessaoReal, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    ...(claims.manter ? { maxAge: QUATORZE_DIAS_S } : {}),
   });
   redirect("/");
 }
@@ -165,4 +223,39 @@ export async function trocarMinhaSenha(
       : { erro: "Não foi possível alterar a senha. Tente novamente." };
   }
   return { ok: "Senha alterada com sucesso." };
+}
+
+/** Opções pra cadastrar um novo passkey — exige sessão ativa. */
+export async function obterOpcoesCadastroPasskeyCms(): Promise<
+  | { ok: true; opcoes: PublicKeyCredentialCreationOptionsJSON; tokenDesafio: string }
+  | { ok: false; erro: string }
+> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario) return { ok: false, erro: "Sessão expirada. Entre novamente." };
+  const { opcoes, tokenDesafio } = await prepararCadastroPasskey(usuario.id, usuario.email, usuario.nome);
+  return { ok: true, opcoes, tokenDesafio };
+}
+
+export async function verificarCadastroPasskeyCms(
+  resposta: RegistrationResponseJSON,
+  tokenDesafio: string,
+  apelido: string,
+): Promise<ReturnType<typeof confirmarCadastroPasskey>> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario) return { ok: false, erro: "Sessão expirada. Entre novamente." };
+  return confirmarCadastroPasskey(usuario.id, resposta, tokenDesafio, apelido);
+}
+
+export async function listarMinhasPasskeysCms(): Promise<PasskeyResumo[]> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario) return [];
+  return listarPasskeysDoUsuario(usuario.id);
+}
+
+export async function removerPasskeyProprioCms(
+  passkeyId: string,
+): Promise<ReturnType<typeof removerPasskey>> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario) return { ok: false, erro: "Sessão expirada. Entre novamente." };
+  return removerPasskey(passkeyId, usuario.id, false);
 }
