@@ -17,6 +17,11 @@
  *    (uma vez por e-mail).
  * 5. Oportunidades: refs não resolvidas em `cliente` pulam o registro; nas
  *    demais, omitem a ref (com aviso).
+ * 6. Oportunidades sem programa, UF, origem, data de abertura ou responsável
+ *    são puladas com aviso nomeando código e campo faltante — os cinco são
+ *    obrigatórios na coleção (decisão do PO · Manual NTC-COM-CRM-01), e o
+ *    export legado pode não trazê-los. Sem esta guarda o create quebraria no
+ *    meio da importação, deixando o lote pela metade.
  */
 import {
   AREAS_CRM,
@@ -90,11 +95,14 @@ export interface DadosContatoCrm {
 export interface DadosOportunidade {
   codigo: string;
   cliente: string | MarcadorClienteLegado;
-  programa: string | null;
+  /** Obrigatório na coleção: o planejamento pula a oportunidade sem ele (regra 6). */
+  programa: string;
   modulos: string[];
   eventos: string[];
-  uf: string | null;
-  origem: string | null;
+  /** Obrigatório na coleção (regra 6). */
+  uf: string;
+  /** Obrigatório na coleção (regra 6). */
+  origem: string;
   quantidade: number | null;
   modalidade: string | null;
   valor: number | null;
@@ -104,11 +112,13 @@ export interface DadosOportunidade {
   situacao: string;
   migracaoPendenteRevisao: boolean;
   migracaoFlag: string | null;
-  dataAbertura: string | null;
+  /** Obrigatório na coleção (regra 6). */
+  dataAbertura: string;
   dataPrevFechamento: string | null;
   proximaAcao: string | null;
   followup: string | null;
-  responsavel: string | null;
+  /** Obrigatório na coleção (regra 6). */
+  responsavel: string;
   observacoes: string | null;
 }
 
@@ -458,6 +468,39 @@ export function planejarImportacao(
     const contexto = `Oportunidade "${codigo}"`;
     const programaLegadoId = texto(registro, "programa");
     const programaPayloadId = resolverPrograma(programaLegadoId, contexto);
+    const uf = ufValidada(texto(registro, "uf"), avisos, contexto);
+    const origem = slugValidado(texto(registro, "origem"), ORIGENS_CRM, avisos, contexto);
+    const dataAbertura = texto(registro, "data_abertura");
+    const responsavel = resolverResponsavel(texto(registro, "responsavel"), contexto);
+
+    // Regra 6: os cinco campos obrigatórios da coleção. Faltando qualquer um,
+    // a oportunidade é pulada aqui — melhor um aviso nominal do que um create
+    // rejeitado no meio do lote. Campo a campo (e não em laço sobre um array)
+    // porque é assim que o TypeScript estreita os cinco para não-nulo.
+    const pularPorObrigatorio = (campo: string): void => {
+      avisos.push(`${contexto}: sem ${campo} — oportunidade ignorada (campo obrigatório).`);
+      ignorados += 1;
+    };
+    if (programaPayloadId === null) {
+      pularPorObrigatorio("programa");
+      continue;
+    }
+    if (uf === null) {
+      pularPorObrigatorio("UF");
+      continue;
+    }
+    if (origem === null) {
+      pularPorObrigatorio("origem");
+      continue;
+    }
+    if (dataAbertura === null) {
+      pularPorObrigatorio("data de abertura");
+      continue;
+    }
+    if (responsavel === null) {
+      pularPorObrigatorio("responsável");
+      continue;
+    }
 
     const data: DadosOportunidade = {
       codigo,
@@ -465,8 +508,8 @@ export function planejarImportacao(
       programa: programaPayloadId,
       modulos: resolverModulos(lista(registro, "modulos"), programaPayloadId, contexto),
       eventos: resolverEventos(lista(registro, "produtos"), contexto),
-      uf: ufValidada(texto(registro, "uf"), avisos, contexto),
-      origem: slugValidado(texto(registro, "origem"), ORIGENS_CRM, avisos, contexto),
+      uf,
+      origem,
       quantidade: numero(registro, "qtd"),
       modalidade: texto(registro, "modalidade"),
       valor: numero(registro, "valor"),
@@ -483,11 +526,11 @@ export function planejarImportacao(
           migracaoFlag: plano.revisao ? plano.flag : null,
         };
       })(),
-      dataAbertura: texto(registro, "data_abertura"),
+      dataAbertura,
       dataPrevFechamento: texto(registro, "data_prev_fech"),
       proximaAcao: texto(registro, "proxima_acao"),
       followup: texto(registro, "followup"),
-      responsavel: resolverResponsavel(texto(registro, "responsavel"), contexto),
+      responsavel,
       observacoes: texto(registro, "observacoes"),
     };
     criarOportunidades.push({ idLegado: registro.id, clienteLegadoId, data });

@@ -104,14 +104,32 @@ export function FormOportunidade({
           onMudar={m("cliente")}
           opcoes={clientes.map((c) => ({ label: c.orgao, value: c.id }))}
         />
+        {/* Programa, UF, Origem, Data de abertura e Responsável são obrigatórios
+            na coleção (decisão do PO · Manual Operacional NTC-COM-CRM-01); a
+            marcação aqui é conveniência de UI — quem recusa de fato é
+            `validarObrigatoriosOportunidade` na camada de escrita. */}
         <CampoSelect
           rotulo="Programa"
           valor={dados.programa}
           onMudar={(v) => setDados((d) => ({ ...d, programa: v, modulos: [] }))}
           opcoes={catalogo.programas.map((p) => ({ label: `${p.sigla} — ${p.nome}`, value: p.id }))}
+          obrigatorio
         />
-        <CampoSelect rotulo="UF" valor={dados.uf} onMudar={m("uf")} opcoes={paraOpcoes(UFS)} curto />
-        <CampoSelect rotulo="Origem" valor={dados.origem} onMudar={m("origem")} opcoes={ORIGENS_CRM} />
+        <CampoSelect
+          rotulo="UF"
+          valor={dados.uf}
+          onMudar={m("uf")}
+          opcoes={paraOpcoes(UFS)}
+          obrigatorio
+          curto
+        />
+        <CampoSelect
+          rotulo="Origem"
+          valor={dados.origem}
+          onMudar={m("origem")}
+          opcoes={ORIGENS_CRM}
+          obrigatorio
+        />
         <CampoNumero rotulo="Quantidade" valor={dados.quantidade} onMudar={m("quantidade")} curto />
         <CampoTexto rotulo="Modalidade" valor={dados.modalidade} onMudar={m("modalidade")} />
         <CampoNumero rotulo="Valor (R$)" valor={dados.valor} onMudar={m("valor")} curto />
@@ -128,7 +146,12 @@ export function FormOportunidade({
           onMudar={m("situacao")}
           opcoes={SITUACAO_OPORTUNIDADE}
         />
-        <CampoData rotulo="Data de abertura" valor={dados.dataAbertura} onMudar={m("dataAbertura")} />
+        <CampoData
+          rotulo="Data de abertura"
+          valor={dados.dataAbertura}
+          onMudar={m("dataAbertura")}
+          obrigatorio
+        />
         <CampoData
           rotulo="Previsão de fechamento"
           valor={dados.dataPrevFechamento}
@@ -141,6 +164,7 @@ export function FormOportunidade({
           valor={dados.responsavel}
           onMudar={m("responsavel")}
           opcoes={usuarios.map((u) => ({ label: u.nome, value: u.id }))}
+          obrigatorio
         />
       </div>
 

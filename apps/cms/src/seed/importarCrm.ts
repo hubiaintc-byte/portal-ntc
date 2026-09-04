@@ -178,7 +178,10 @@ for (const item of plano.criarOportunidades) {
     data: {
       codigo: item.data.codigo,
       cliente: clienteId,
-      programa: item.data.programa ? paraIdPayload(item.data.programa) : null,
+      // programa/uf/origem/dataAbertura/responsavel são obrigatórios na
+      // coleção; o planejamento já pulou (com aviso) as oportunidades
+      // incompletas, então aqui os cinco chegam preenchidos.
+      programa: paraIdPayload(item.data.programa),
       modulos: item.data.modulos.map(paraIdPayload),
       eventos: item.data.eventos.map(paraIdPayload),
       uf: item.data.uf as UfOportunidade,
@@ -195,7 +198,7 @@ for (const item of plano.criarOportunidades) {
       dataPrevFechamento: item.data.dataPrevFechamento,
       proximaAcao: item.data.proximaAcao,
       followup: item.data.followup,
-      responsavel: item.data.responsavel ? paraIdPayload(item.data.responsavel) : null,
+      responsavel: paraIdPayload(item.data.responsavel),
       observacoes: item.data.observacoes,
     },
   });

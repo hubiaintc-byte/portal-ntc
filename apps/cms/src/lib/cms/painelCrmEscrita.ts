@@ -230,17 +230,54 @@ export async function atualizarContatoCrm(
   }
 }
 
+/**
+ * Os cinco campos que a coleção `oportunidades` exige além de código, cliente,
+ * estágio e situação (decisão do PO · Manual Operacional NTC-COM-CRM-01),
+ * já normalizados e garantidamente não nulos.
+ */
+interface ObrigatoriosOportunidade {
+  programaId: number;
+  uf: string;
+  origem: string;
+  dataAbertura: string;
+  responsavelId: number;
+}
+
+type ValidacaoObrigatorios =
+  | { ok: true; valores: ObrigatoriosOportunidade }
+  | { ok: false; erro: string };
+
+/**
+ * Falha fechado antes de tocar a Local API: nem a validação do Payload nem o
+ * `required` do HTML são garantia aqui — a Server Action é chamável direto.
+ * Mensagem específica por campo, no mesmo estilo de "Selecione o cliente.".
+ */
+function validarObrigatoriosOportunidade(dados: DadosOportunidade): ValidacaoObrigatorios {
+  const programaId = idOuNulo(dados.programa);
+  if (programaId === null) return { ok: false, erro: "Selecione o programa." };
+  const uf = ouNulo(dados.uf);
+  if (uf === null) return { ok: false, erro: "Selecione a UF." };
+  const origem = ouNulo(dados.origem);
+  if (origem === null) return { ok: false, erro: "Selecione a origem." };
+  const dataAbertura = ouNulo(dados.dataAbertura);
+  if (dataAbertura === null) return { ok: false, erro: "Informe a data de abertura." };
+  const responsavelId = idOuNulo(dados.responsavel);
+  if (responsavelId === null) return { ok: false, erro: "Selecione o responsável comercial." };
+  return { ok: true, valores: { programaId, uf, origem, dataAbertura, responsavelId } };
+}
+
 function dadosOportunidade(
   dados: DadosOportunidade,
   clienteId: number,
+  obrigatorios: ObrigatoriosOportunidade,
 ): Omit<OportunidadeData, "codigo"> {
   return {
     cliente: clienteId,
-    programa: idOuNulo(dados.programa),
+    programa: obrigatorios.programaId,
     modulos: idsLista(dados.modulos),
     eventos: idsLista(dados.eventos),
-    uf: ouNulo(dados.uf) as OportunidadeData["uf"],
-    origem: ouNulo(dados.origem) as OportunidadeData["origem"],
+    uf: obrigatorios.uf as OportunidadeData["uf"],
+    origem: obrigatorios.origem as OportunidadeData["origem"],
     quantidade: numeroOuNulo(dados.quantidade),
     modalidade: ouNulo(dados.modalidade),
     valor: numeroOuNulo(dados.valor),
@@ -249,11 +286,11 @@ function dadosOportunidade(
     // oportunidades o deriva de estagio+situacao (fonte única).
     estagio: (ouNulo(dados.estagio) ?? "mapeada") as OportunidadeData["estagio"],
     situacao: (ouNulo(dados.situacao) ?? "ativa") as OportunidadeData["situacao"],
-    dataAbertura: ouNulo(dados.dataAbertura),
+    dataAbertura: obrigatorios.dataAbertura,
     dataPrevFechamento: ouNulo(dados.dataPrevFechamento),
     proximaAcao: ouNulo(dados.proximaAcao),
     followup: ouNulo(dados.followup),
-    responsavel: idOuNulo(dados.responsavel),
+    responsavel: obrigatorios.responsavelId,
     observacoes: ouNulo(dados.observacoes),
   };
 }
@@ -271,6 +308,8 @@ export async function criarOportunidade(
   // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
   const clienteId = idOuNulo(dados.cliente);
   if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
+  const obrigatorios = validarObrigatoriosOportunidade(dados);
+  if (!obrigatorios.ok) return { ok: false, erro: obrigatorios.erro };
   try {
     const payload = await obterPayload();
     const ano = new Date().getFullYear();
@@ -285,7 +324,7 @@ export async function criarOportunidade(
     const codigo = gerarCodigoOportunidade(ano, proximaSequencia(codigos, ano));
     await payload.create({
       collection: "oportunidades",
-      data: { codigo, ...dadosOportunidade(dados, clienteId) },
+      data: { codigo, ...dadosOportunidade(dados, clienteId, obrigatorios.valores) },
       user: usuario,
     });
     return { ok: true };
@@ -303,12 +342,14 @@ export async function atualizarOportunidade(
 ): Promise<ResultadoEscrita> {
   const clienteId = idOuNulo(dados.cliente);
   if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
+  const obrigatorios = validarObrigatoriosOportunidade(dados);
+  if (!obrigatorios.ok) return { ok: false, erro: obrigatorios.erro };
   try {
     const payload = await obterPayload();
     await payload.update({
       collection: "oportunidades",
       id,
-      data: dadosOportunidade(dados, clienteId),
+      data: dadosOportunidade(dados, clienteId, obrigatorios.valores),
       user: usuario,
     });
     return { ok: true };

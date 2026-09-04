@@ -72,11 +72,16 @@ export const Oportunidades: CollectionConfig = {
   fields: [
     { name: "codigo", type: "text", required: true, unique: true },
     { name: "cliente", type: "relationship", relationTo: "clientes-crm", required: true },
-    { name: "programa", type: "relationship", relationTo: "programas" },
+    // Os cinco campos abaixo (programa, uf, origem, dataAbertura, responsavel)
+    // são obrigatórios por decisão do PO: é o que o Manual Operacional
+    // NTC-COM-CRM-01 já documenta como mínimo de uma oportunidade registrada.
+    // A regra é reforçada na camada de escrita do painel (painelCrmEscrita.ts),
+    // que falha fechado antes de tocar a Local API.
+    { name: "programa", type: "relationship", relationTo: "programas", required: true },
     { name: "modulos", type: "relationship", relationTo: "modulos", hasMany: true },
     { name: "eventos", type: "relationship", relationTo: "eventos", hasMany: true },
-    { name: "uf", type: "select", options: UFS },
-    { name: "origem", type: "select", options: ORIGENS_CRM },
+    { name: "uf", type: "select", options: UFS, required: true },
+    { name: "origem", type: "select", options: ORIGENS_CRM, required: true },
     {
       name: "quantidade",
       type: "number",
@@ -130,11 +135,11 @@ export const Oportunidades: CollectionConfig = {
         description: "O que a Direção precisa confirmar nesta oportunidade migrada.",
       },
     },
-    { name: "dataAbertura", type: "date" },
+    { name: "dataAbertura", type: "date", required: true },
     { name: "dataPrevFechamento", type: "date" },
     { name: "proximaAcao", type: "text" },
     { name: "followup", type: "date", admin: { description: "Data do próximo follow-up." } },
-    { name: "responsavel", type: "relationship", relationTo: "users" },
+    { name: "responsavel", type: "relationship", relationTo: "users", required: true },
     { name: "observacoes", type: "textarea" },
   ],
 };

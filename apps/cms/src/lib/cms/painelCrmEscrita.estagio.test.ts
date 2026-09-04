@@ -91,6 +91,46 @@ describe("escrita da oportunidade — estágio e situação", () => {
   });
 });
 
+describe("escrita da oportunidade — campos obrigatórios", () => {
+  // Programa, UF, origem, data de abertura e responsável passaram a ser
+  // obrigatórios (decisão do PO · Manual NTC-COM-CRM-01). A recusa é da camada
+  // de escrita: nem o `required` do HTML nem a validação do Payload cobrem uma
+  // Server Action chamada direto.
+  it("recusa a criação sem programa, antes de tocar a Local API", async () => {
+    const { create } = montarPayloadFalso();
+    const r = await criarOportunidade({ ...dadosBase, programa: "" }, null);
+    expect(r).toEqual({ ok: false, erro: "Selecione o programa." });
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("recusa a criação sem responsável, antes de tocar a Local API", async () => {
+    const { create } = montarPayloadFalso();
+    const r = await criarOportunidade({ ...dadosBase, responsavel: "" }, null);
+    expect(r).toEqual({ ok: false, erro: "Selecione o responsável comercial." });
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("recusa a atualização sem data de abertura, antes de tocar a Local API", async () => {
+    const { update } = montarPayloadFalso();
+    const r = await atualizarOportunidade("7", { ...dadosBase, dataAbertura: "" }, null);
+    expect(r).toEqual({ ok: false, erro: "Informe a data de abertura." });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("grava os cinco obrigatórios quando todos vêm preenchidos", async () => {
+    const { criados } = montarPayloadFalso();
+    const r = await criarOportunidade(dadosBase, null);
+    expect(r.ok).toBe(true);
+    expect(criados[0]).toMatchObject({
+      programa: 2,
+      uf: "SP",
+      origem: "indicacao",
+      dataAbertura: "2026-09-01",
+      responsavel: 1,
+    });
+  });
+});
+
 describe("escrita da oportunidade — autoria da transição de estágio", () => {
   // O hook `registrarTransicaoEstagio` da coleção lê `req.user`, que a Local
   // API só popula quando a chamada passa `user`. Sem isso o histórico do funil

@@ -74,8 +74,12 @@ describe("planejarImportacao", () => {
   it("gera avisos para refs e valores não resolvidos", () => {
     const semCatalogo: ExistentesNoBanco = { ...existentes, programasPorSigla: new Map(), modulosPorChave: new Map(), eventosPorNome: new Map(), usuariosPorEmail: new Map() };
     const plano = planejarImportacao(dados, semCatalogo);
-    expect(plano.avisos.length).toBeGreaterThan(0);
-    expect(plano.criarOportunidades[0]?.data.programa).toBeNull();
+    expect(plano.avisos.some((a) => a.includes('programa de sigla "EDUTEC" não encontrado'))).toBe(true);
+    expect(plano.avisos.some((a) => a.includes("responsável com e-mail"))).toBe(true);
+    // O cliente continua sendo criado; só a oportunidade cai, por depender do
+    // programa (obrigatório na coleção).
+    expect(plano.criarClientes).toHaveLength(1);
+    expect(plano.criarOportunidades).toHaveLength(0);
   });
 
   it("deduplica cliente com a mesma chave natural dentro do lote (1 criado + aviso)", () => {
@@ -153,6 +157,46 @@ describe("planejarImportacao", () => {
     const plano = planejarImportacao(semCliente, existentes);
     expect(plano.criarOportunidades).toHaveLength(0);
     expect(plano.avisos.some((a) => a.includes('Oportunidade "OPO-2026-001"') && a.includes("não resolvido"))).toBe(true);
+  });
+
+  it("pula oportunidade sem campo obrigatório, com aviso nomeando código e campo", () => {
+    const oportunidadeBase = dados.tabelas?.oportunidades?.[0];
+    if (!oportunidadeBase) throw new Error("fixture sem oportunidade base");
+    // O export legado pode simplesmente não trazer o campo.
+    const semDataAbertura = { ...oportunidadeBase };
+    delete semDataAbertura.data_abertura;
+    const incompleta: ExportCrmLegado = {
+      ...dados,
+      tabelas: { ...dados.tabelas, oportunidades: [semDataAbertura] },
+    };
+    const plano = planejarImportacao(incompleta, existentes);
+    expect(plano.criarOportunidades).toHaveLength(0);
+    expect(
+      plano.avisos.some(
+        (a) =>
+          a.includes('Oportunidade "OPO-2026-001"') &&
+          a.includes("sem data de abertura") &&
+          a.includes("campo obrigatório"),
+      ),
+    ).toBe(true);
+    // Continua contando como registro pulado, como os demais descartes.
+    expect(plano.resumo.ignorados).toBe(1);
+    // O cliente do lote não é penalizado pela oportunidade incompleta.
+    expect(plano.criarClientes).toHaveLength(1);
+  });
+
+  it("pula oportunidade sem UF válida com aviso do campo obrigatório", () => {
+    const oportunidadeBase = dados.tabelas?.oportunidades?.[0];
+    if (!oportunidadeBase) throw new Error("fixture sem oportunidade base");
+    const semUf: ExportCrmLegado = {
+      ...dados,
+      tabelas: { ...dados.tabelas, oportunidades: [{ ...oportunidadeBase, uf: "XX" }] },
+    };
+    const plano = planejarImportacao(semUf, existentes);
+    expect(plano.criarOportunidades).toHaveLength(0);
+    expect(
+      plano.avisos.some((a) => a.includes('Oportunidade "OPO-2026-001"') && a.includes("sem UF")),
+    ).toBe(true);
   });
 
   it("traduz o status legado do export para estágio e situação do funil P0", () => {

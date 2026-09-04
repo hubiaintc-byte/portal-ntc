@@ -75,15 +75,18 @@ interface CampoSelectProps {
   valor: string;
   onMudar: (v: string) => void;
   opcoes: OpcaoLista[];
+  obrigatorio?: boolean;
   curto?: boolean;
 }
 
-export function CampoSelect({ rotulo, valor, onMudar, opcoes, curto }: CampoSelectProps) {
+export function CampoSelect({ rotulo, valor, onMudar, opcoes, obrigatorio, curto }: CampoSelectProps) {
   const id = useId();
   return (
     <div className={`pcms-field${curto ? " pcms-field--curto" : ""}`}>
       <label htmlFor={id}>{rotulo}</label>
-      <select id={id} value={valor} onChange={(e) => onMudar(e.target.value)}>
+      {/* A opção placeholder tem value="" — é o que faz `required` barrar o
+          envio enquanto nada foi escolhido. */}
+      <select id={id} value={valor} required={obrigatorio} onChange={(e) => onMudar(e.target.value)}>
         <option value="">—</option>
         {opcoes.map((o) => (
           <option key={o.value} value={o.value}>
@@ -116,14 +119,21 @@ interface CampoDataProps {
   rotulo: string;
   valor: string;
   onMudar: (v: string) => void;
+  obrigatorio?: boolean;
 }
 
-export function CampoData({ rotulo, valor, onMudar }: CampoDataProps) {
+export function CampoData({ rotulo, valor, onMudar, obrigatorio }: CampoDataProps) {
   const id = useId();
   return (
     <div className="pcms-field pcms-field--curto">
       <label htmlFor={id}>{rotulo}</label>
-      <input id={id} type="date" value={valor} onChange={(e) => onMudar(e.target.value)} />
+      <input
+        id={id}
+        type="date"
+        value={valor}
+        required={obrigatorio}
+        onChange={(e) => onMudar(e.target.value)}
+      />
     </div>
   );
 }
