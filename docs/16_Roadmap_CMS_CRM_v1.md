@@ -186,6 +186,19 @@ Não iniciada. Inclui os grupos de menu "Biblioteca Comercial" e "Financeiro" qu
 
 ---
 
+## Janela H — Processo Comercial B2G (P0)
+
+Acrescentada em 03/09/2026, a partir do protótipo `NTC_Comercial_Premium_v3.3_P0_CHECKPOINT.html`. Transforma o funil em processo governado: 11 estágios + situação, qualificação COM-04 versionada com score e hard gates, contratação com instrumentos, handoff obrigatório para Operações antes de "Ganha", histórico imutável e auditoria.
+
+- **Documento próprio:** `docs/17_Migracao_P0_Processo_Comercial_B2G_v1.md` — o que mudou no protótipo, a distância até o Payload, 7 sessões (H1–H7) com prompts, manual de migração de dados e riscos.
+- **Ordem:** depois da Janela C, **antes** das Janelas F e G (a Janela F modela Contratos/Empenhos e o P0 já define `contratacao`/`instrumentos-formalizacao` — fazer F antes obriga a modelar duas vezes). A Janela D é independente e pode ser intercalada.
+- **A Sessão H6 substitui a Sessão E3** deste roadmap (AuditLog) — não executar as duas.
+- **Sessões:** H1 (fundação: estágio/situação/histórico/migração) · H2 (qualificação COM-04) · H3 (porta de "Qualificada") · H4 (contratação e instrumentos) · H5 (handoff e porta de "Ganha") · H6 (integridade e auditoria) · H7 (navegação, dashboard, fila de revisão) · **H8** (reedição do Manual Operacional em v1.1 — única sessão sem código).
+- **Critério de aceite da Janela:** o **Manual Operacional NTC-COM-CRM-01 v1.0** (aprovado para uso interno) foi conferido contra o código em 04/09/2026 e é fiel ao protótipo nas regras duras — seus §§18, 26, 28, 29 e 34 são a bateria de testes de H3–H6. As 8 divergências encontradas estão em `docs/17` §4.0, distribuídas em H1, H7 e H8. **Atenção:** o manual descreve o protótipo, não o Painel Admin — não circular como "manual do CRM" antes de H7 (risco R8).
+- **Pré-requisito:** 7 decisões do PO listadas em `docs/17` §3, sendo a primeira fornecer a especificação `NTC_CRM_EspecificacaoTecnica_P0_v1.0_RELEASE`, que é citada no protótipo mas não está no repositório.
+
+---
+
 ## Housekeeping (não é produção, mas está pendente)
 
 Registrado para não esquecer, não bloqueia nenhuma Janela acima:
