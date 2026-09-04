@@ -1024,53 +1024,47 @@ export interface Oportunidade {
   id: number;
   codigo: string;
   cliente: number | ClienteCrm;
-  programa?: (number | null) | Programa;
+  programa: number | Programa;
   modulos?: (number | Modulo)[] | null;
   eventos?: (number | Evento)[] | null;
-  uf?:
-    | (
-        | 'AC'
-        | 'AL'
-        | 'AM'
-        | 'AP'
-        | 'BA'
-        | 'CE'
-        | 'DF'
-        | 'ES'
-        | 'GO'
-        | 'MA'
-        | 'MG'
-        | 'MS'
-        | 'MT'
-        | 'PA'
-        | 'PB'
-        | 'PE'
-        | 'PI'
-        | 'PR'
-        | 'RJ'
-        | 'RN'
-        | 'RO'
-        | 'RR'
-        | 'RS'
-        | 'SC'
-        | 'SE'
-        | 'SP'
-        | 'TO'
-      )
-    | null;
-  origem?:
-    | (
-        | 'indicacao'
-        | 'indicacao-institucional'
-        | 'evento'
-        | 'prospeccao-ativa'
-        | 'cliente-recorrente'
-        | 'continuidade-de-relacionamento'
-        | 'inbound'
-        | 'eventon'
-        | 'outros'
-      )
-    | null;
+  uf:
+    | 'AC'
+    | 'AL'
+    | 'AM'
+    | 'AP'
+    | 'BA'
+    | 'CE'
+    | 'DF'
+    | 'ES'
+    | 'GO'
+    | 'MA'
+    | 'MG'
+    | 'MS'
+    | 'MT'
+    | 'PA'
+    | 'PB'
+    | 'PE'
+    | 'PI'
+    | 'PR'
+    | 'RJ'
+    | 'RN'
+    | 'RO'
+    | 'RR'
+    | 'RS'
+    | 'SC'
+    | 'SE'
+    | 'SP'
+    | 'TO';
+  origem:
+    | 'indicacao'
+    | 'indicacao-institucional'
+    | 'evento'
+    | 'prospeccao-ativa'
+    | 'cliente-recorrente'
+    | 'continuidade-de-relacionamento'
+    | 'inbound'
+    | 'eventon'
+    | 'outros';
   /**
    * Quantidade estimada de participantes.
    */
@@ -1123,14 +1117,14 @@ export interface Oportunidade {
    * O que a Direção precisa confirmar nesta oportunidade migrada.
    */
   migracaoFlag?: string | null;
-  dataAbertura?: string | null;
+  dataAbertura: string;
   dataPrevFechamento?: string | null;
   proximaAcao?: string | null;
   /**
    * Data do próximo follow-up.
    */
   followup?: string | null;
-  responsavel?: (number | null) | User;
+  responsavel: number | User;
   observacoes?: string | null;
   updatedAt: string;
   createdAt: string;
