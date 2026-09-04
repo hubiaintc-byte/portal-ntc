@@ -6,23 +6,26 @@ import {
   SITUACAO_OPORTUNIDADE,
   STATUS_OPORTUNIDADE,
   UFS,
-  estagioLegado,
 } from "@ntc/lib";
 
 import { atendimentoComercial } from "../access/atendimentoComercial";
 import { superAdmin } from "../access/superAdmin";
+import { calcularStatusLegadoEspelhado } from "../lib/crm/espelhoStatusLegado";
 import { montarTransicaoEstagio } from "../lib/crm/historicoEstagio";
 
 /**
- * Mantém o campo `status` legado preenchido a partir de estagio+situacao. O
+ * Mantém o campo `status` legado preenchido a partir de estágio+situação. O
  * Dashboard e os gráficos ainda leem `status` — a migração deles é a Sessão H7,
  * e só depois dela o campo pode ser removido (docs/17, Global Constraints).
+ *
+ * Invólucro fino: a regra fica em `calcularStatusLegadoEspelhado` (pura,
+ * testada), que já lê `originalDoc` como fallback para atualizações parciais
+ * que só enviam um dos dois campos.
  */
-const espelharStatusLegado: CollectionBeforeChangeHook = ({ data }) => {
-  const estagio = typeof data?.estagio === "string" ? data.estagio : null;
-  const situacao = typeof data?.situacao === "string" ? data.situacao : null;
-  if (estagio === null && situacao === null) return data;
-  return { ...data, status: estagioLegado(estagio ?? "mapeada", situacao ?? "ativa") };
+const espelharStatusLegado: CollectionBeforeChangeHook = ({ data, originalDoc }) => {
+  const status = calcularStatusLegadoEspelhado(data, originalDoc);
+  if (status === null) return data;
+  return { ...data, status };
 };
 
 /** Grava a transição no histórico append-only sempre que o estágio muda. */
