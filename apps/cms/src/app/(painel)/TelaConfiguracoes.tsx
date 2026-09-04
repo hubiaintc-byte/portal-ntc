@@ -74,8 +74,17 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
   }
 
   async function removerPasskeyProprio(id: string) {
-    const resultado = await removerPasskeyProprioCms(id);
-    if (resultado.ok) setPasskeys(await listarMinhasPasskeysCms());
+    setErroPasskey(null);
+    try {
+      const resultado = await removerPasskeyProprioCms(id);
+      if (!resultado.ok) {
+        setErroPasskey(resultado.erro ?? "Não foi possível remover o passkey. Tente novamente.");
+        return;
+      }
+      setPasskeys(await listarMinhasPasskeysCms());
+    } catch {
+      setErroPasskey("Não foi possível remover o passkey. Tente novamente.");
+    }
   }
 
   function enviar(e: React.FormEvent) {
