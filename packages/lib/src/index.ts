@@ -64,6 +64,14 @@ export {
 } from "./crm/listas";
 
 export {
+  ESTAGIO_OPORTUNIDADE,
+  SITUACAO_OPORTUNIDADE,
+  estagioLegado,
+  planejarMigracaoOportunidade,
+  type PlanoMigracaoP0,
+} from "./crm/funil";
+
+export {
   calcularValoresProposta,
   type EntradaValores,
   type ValoresProposta,
