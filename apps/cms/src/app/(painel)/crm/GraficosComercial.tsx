@@ -1,26 +1,24 @@
-import type { FaixaStatusOportunidade } from "@/lib/cms/kpisComercial";
+import type { FaixaEstagioOportunidade } from "@/lib/cms/kpisComercial";
 
 /**
  * Gráficos SVG do Painel Comercial (sem biblioteca — decisão do spec de
- * 17/07). Cores por status em ordem fixa, validadas para CVD; a legenda com
- * contagens é o equivalente textual obrigatório (contraste do dourado/areia
- * sobre branco fica abaixo de 3:1).
+ * 17/07). A legenda com contagens é o equivalente textual obrigatório.
+ *
+ * O funil P0 tem 10 faixas até Ganha, e a paleta da marca tem 4 acentos: dar
+ * uma cor categórica a cada estágio exigiria inventar tokens (CLAUDE.md §5.2).
+ * Como o funil é ordinal, e não categórico, a codificação correta é uma rampa
+ * de um só matiz — Oxford, do mais claro (início do funil) ao cheio (fim) —,
+ * aplicada por opacidade sobre o próprio token, sem cor nova.
  */
 
-const COR_POR_STATUS: Record<string, string> = {
-  "em-qualificacao": "#11365E",
-  "apresentacao-institucional": "#B5995A",
-  "proposta-enviada": "#5C6B3B",
-  "em-negociacao": "#8E2B27",
-  aprovada: "#D9D2C4",
-};
+const COR_FUNIL = "#11365E";
 
-const COR_FALLBACK = "#5a5a5a";
+/** Opacidade da faixa pela posição na sequência recebida (início claro → fim cheio). */
+const opacidadeDe = (indice: number, total: number): number =>
+  total <= 1 ? 1 : 0.35 + (0.65 * indice) / (total - 1);
 
-const corDe = (status: string): string => COR_POR_STATUS[status] ?? COR_FALLBACK;
-
-/** Donut de oportunidades abertas por status, com legenda de contagens. */
-export function DonutStatus({ faixas }: { faixas: FaixaStatusOportunidade[] }) {
+/** Donut de oportunidades abertas por estágio, com legenda de contagens. */
+export function DonutEstagios({ faixas }: { faixas: FaixaEstagioOportunidade[] }) {
   const total = faixas.reduce((soma, f) => soma + f.quantidade, 0);
   if (total === 0) {
     return <p className="pcms-grafico__vazio">Nenhuma oportunidade aberta registrada.</p>;
@@ -35,23 +33,24 @@ export function DonutStatus({ faixas }: { faixas: FaixaStatusOportunidade[] }) {
       <svg
         viewBox="0 0 120 120"
         role="img"
-        aria-label={`Oportunidades abertas por status: ${faixas
+        aria-label={`Oportunidades abertas por estágio: ${faixas
           .map((f) => `${f.rotulo} ${f.quantidade}`)
           .join(", ")}`}
       >
-        {faixas.map((f) => {
+        {faixas.map((f, i) => {
           const fracao = f.quantidade / total;
           const arco = fracao * CIRCUNF;
           const offset = -acumulado * CIRCUNF;
           acumulado += fracao;
           return (
             <circle
-              key={f.status}
+              key={f.estagio}
               cx="60"
               cy="60"
               r={RAIO}
               fill="none"
-              stroke={corDe(f.status)}
+              stroke={COR_FUNIL}
+              strokeOpacity={opacidadeDe(i, faixas.length)}
               strokeWidth="16"
               strokeDasharray={`${Math.max(arco - 2, 0.5)} ${CIRCUNF - Math.max(arco - 2, 0.5)}`}
               strokeDashoffset={offset}
@@ -69,9 +68,13 @@ export function DonutStatus({ faixas }: { faixas: FaixaStatusOportunidade[] }) {
         </text>
       </svg>
       <ul className="pcms-grafico__legenda">
-        {faixas.map((f) => (
-          <li key={f.status}>
-            <span className="pcms-grafico__cor" style={{ background: corDe(f.status) }} aria-hidden />
+        {faixas.map((f, i) => (
+          <li key={f.estagio}>
+            <span
+              className="pcms-grafico__cor"
+              style={{ background: COR_FUNIL, opacity: opacidadeDe(i, faixas.length) }}
+              aria-hidden
+            />
             {f.rotulo}
             <b>{f.quantidade}</b>
           </li>
@@ -81,8 +84,8 @@ export function DonutStatus({ faixas }: { faixas: FaixaStatusOportunidade[] }) {
   );
 }
 
-/** Barras horizontais do funil (todos os status abertos, ordem fixa). */
-export function FunilBarras({ faixas }: { faixas: FaixaStatusOportunidade[] }) {
+/** Barras horizontais do funil (todos os estágios até Ganha, na ordem do funil). */
+export function FunilBarras({ faixas }: { faixas: FaixaEstagioOportunidade[] }) {
   const maximo = Math.max(...faixas.map((f) => f.quantidade), 1);
   const ALTURA_LINHA = 30;
   const LARGURA = 320;
@@ -101,7 +104,7 @@ export function FunilBarras({ faixas }: { faixas: FaixaStatusOportunidade[] }) {
         const largura = ((LARGURA - LARGURA_ROTULO - 30) * f.quantidade) / maximo;
         const y = i * ALTURA_LINHA;
         return (
-          <g key={f.status}>
+          <g key={f.estagio}>
             <text x={LARGURA_ROTULO - 8} y={y + 19} textAnchor="end" className="pcms-grafico__eixo">
               {f.rotulo}
             </text>
@@ -111,7 +114,7 @@ export function FunilBarras({ faixas }: { faixas: FaixaStatusOportunidade[] }) {
               width={Math.max(largura, f.quantidade > 0 ? 4 : 0)}
               height={16}
               rx="3"
-              fill="#11365E"
+              fill={COR_FUNIL}
             >
               <title>{`${f.rotulo}: ${f.quantidade}`}</title>
             </rect>

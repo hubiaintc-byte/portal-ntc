@@ -3,16 +3,16 @@
 import type { LeadCmsResumo } from "@/lib/cms/painelCms";
 import type { OportunidadeCrmResumo } from "@/lib/cms/painelCrm";
 import {
-  abertasPorStatus,
+  abertasPorEstagio,
   calcularKpisComercial,
   followupsProximos,
   formatarMoedaBRL,
   funilOportunidades,
 } from "@/lib/cms/kpisComercial";
-import { STATUS_OPORTUNIDADE } from "@ntc/lib";
+import { ESTAGIO_OPORTUNIDADE } from "@ntc/lib";
 
-import { DonutStatus, FunilBarras } from "./GraficosComercial";
-import { rotuloDeLista, seloDeOportunidade } from "./seloStatus";
+import { DonutEstagios, FunilBarras } from "./GraficosComercial";
+import { rotuloDeLista, seloDeEstagio } from "./seloStatus";
 
 interface TelaPainelComercialProps {
   oportunidades: OportunidadeCrmResumo[];
@@ -32,7 +32,7 @@ export function TelaPainelComercial({
 }: TelaPainelComercialProps) {
   const kpis = calcularKpisComercial(oportunidades, leads);
   const followups = followupsProximos(oportunidades, hojeISO);
-  const porStatus = abertasPorStatus(oportunidades);
+  const porEstagio = abertasPorEstagio(oportunidades);
   const funil = funilOportunidades(oportunidades);
 
   const metricas = [
@@ -69,8 +69,8 @@ export function TelaPainelComercial({
 
       <div className="pcms-graficos">
         <section className="pcms-chart-box">
-          <h2>Oportunidades por status</h2>
-          <DonutStatus faixas={porStatus} />
+          <h2>Oportunidades por estágio</h2>
+          <DonutEstagios faixas={porEstagio} />
         </section>
         <section className="pcms-chart-box">
           <h2>Funil de oportunidades</h2>
@@ -89,7 +89,7 @@ export function TelaPainelComercial({
               <th>Cliente</th>
               <th>Programa</th>
               <th>Valor</th>
-              <th>Status</th>
+              <th>Estágio</th>
               <th>Follow-up</th>
             </tr>
           </thead>
@@ -114,8 +114,8 @@ export function TelaPainelComercial({
                 <td>{o.programaSigla ?? "—"}</td>
                 <td>{o.valor !== null ? formatarMoedaBRL(o.valor) : "—"}</td>
                 <td>
-                  <span className={seloDeOportunidade(o.status)}>
-                    {rotuloDeLista(STATUS_OPORTUNIDADE, o.status)}
+                  <span className={seloDeEstagio(o.estagio)}>
+                    {rotuloDeLista(ESTAGIO_OPORTUNIDADE, o.estagio)}
                   </span>
                 </td>
                 <td>{o.followupISO?.split("-").reverse().join("/") ?? "—"}</td>
