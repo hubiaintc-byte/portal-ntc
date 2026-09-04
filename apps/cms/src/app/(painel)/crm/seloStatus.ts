@@ -36,6 +36,33 @@ const SELO_ENVIO: Record<string, string> = {
   respondida: "ok",
 };
 
+/** Estágio: neutro no início do funil, atenção na negociação, ok em Ganha. */
+const SELO_ESTAGIO: Record<string, string> = {
+  mapeada: "info",
+  "prospeccao-relacionamento": "info",
+  "demanda-identificada": "info",
+  qualificada: "info",
+  "diagnostico-realizado": "info",
+  "solucao-em-construcao": "info",
+  "proposta-em-elaboracao": "info",
+  "proposta-enviada": "info",
+  "negociacao-tramitacao": "atencao",
+  "contratacao-em-formalizacao": "atencao",
+  ganha: "ok",
+};
+
+const SELO_SITUACAO: Record<string, string> = {
+  ativa: "ok",
+  perdida: "erro",
+  "adiada-nurturing": "atencao",
+};
+
+export const seloDeEstagio = (estagio: string): string =>
+  `pcms-selo pcms-selo--${SELO_ESTAGIO[estagio] ?? "info"}`;
+
+export const seloDeSituacao = (situacao: string): string =>
+  `pcms-selo pcms-selo--${SELO_SITUACAO[situacao] ?? "info"}`;
+
 export const seloDeOportunidade = (status: string): string =>
   `pcms-selo pcms-selo--${SELO_OPORTUNIDADE[status] ?? "info"}`;
 

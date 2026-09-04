@@ -1,11 +1,11 @@
 "use client";
 
-import { STATUS_OPORTUNIDADE } from "@ntc/lib";
+import { ESTAGIO_OPORTUNIDADE, SITUACAO_OPORTUNIDADE } from "@ntc/lib";
 
 import type { OportunidadeCrmResumo } from "@/lib/cms/painelCrm";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
-import { rotuloDeLista, seloDeOportunidade } from "./seloStatus";
+import { rotuloDeLista, seloDeEstagio, seloDeSituacao } from "./seloStatus";
 
 interface TelaOportunidadesProps {
   oportunidades: OportunidadeCrmResumo[];
@@ -40,7 +40,8 @@ export function TelaOportunidades({ oportunidades, onAbrir, onNovo }: TelaOportu
               <th>Programa</th>
               <th>Valor</th>
               <th>Prob.</th>
-              <th>Status</th>
+              <th>Estágio</th>
+              <th>Situação</th>
               <th>Follow-up</th>
             </tr>
           </thead>
@@ -67,8 +68,18 @@ export function TelaOportunidades({ oportunidades, onAbrir, onNovo }: TelaOportu
                 <td>{o.valor !== null ? formatarMoedaBRL(o.valor) : "—"}</td>
                 <td>{o.probabilidade !== null ? `${o.probabilidade}%` : "—"}</td>
                 <td>
-                  <span className={seloDeOportunidade(o.status)}>
-                    {rotuloDeLista(STATUS_OPORTUNIDADE, o.status)}
+                  <span className={seloDeEstagio(o.estagio)}>
+                    {rotuloDeLista(ESTAGIO_OPORTUNIDADE, o.estagio)}
+                  </span>
+                  {o.migracaoPendenteRevisao ? (
+                    <span className="pcms-selo pcms-selo--atencao" title={o.migracaoFlag ?? ""}>
+                      revisar migração
+                    </span>
+                  ) : null}
+                </td>
+                <td>
+                  <span className={seloDeSituacao(o.situacao)}>
+                    {rotuloDeLista(SITUACAO_OPORTUNIDADE, o.situacao)}
                   </span>
                 </td>
                 <td>{o.followupISO?.split("-").reverse().join("/") ?? "—"}</td>

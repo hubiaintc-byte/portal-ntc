@@ -17,6 +17,7 @@ import type {
   ProgramaCrmResumo,
   PropostaDetalhe,
   PropostaResumo,
+  TransicaoEstagioResumo,
   UsuarioCmsResumo,
   VersaoResumo,
 } from "@/lib/cms/painelCrm";
@@ -25,6 +26,7 @@ import { todosFollowups } from "@/lib/cms/kpisComercial";
 import { carregarLead } from "../acoes";
 import {
   carregarClienteCrm,
+  carregarHistoricoOportunidade,
   carregarOportunidadeCrm,
   carregarPropostaCrm,
   gerarPdfPropostaCrm,
@@ -216,6 +218,7 @@ export function ShellCrm({
   const [tela, setTela] = useState<TelaCrmId>("painel");
   const [clienteDet, setClienteDet] = useState<ClienteCrmDetalhe | null>(null);
   const [oportunidadeDet, setOportunidadeDet] = useState<OportunidadeCrmDetalhe | null>(null);
+  const [historicoOportunidade, setHistoricoOportunidade] = useState<TransicaoEstagioResumo[]>([]);
   const [leadDet, setLeadDet] = useState<LeadCmsDetalhe | null>(null);
   const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
@@ -225,6 +228,7 @@ export function ShellCrm({
   function fecharTudo() {
     setClienteDet(null);
     setOportunidadeDet(null);
+    setHistoricoOportunidade([]);
     setLeadDet(null);
     setPropostaDet(null);
     setFormAberto(null);
@@ -245,8 +249,14 @@ export function ShellCrm({
 
   function abrirOportunidade(id: string) {
     iniciarCarga(async () => {
-      const det = await carregarOportunidadeCrm(id);
-      if (det) setOportunidadeDet(det);
+      const [det, historico] = await Promise.all([
+        carregarOportunidadeCrm(id),
+        carregarHistoricoOportunidade(id),
+      ]);
+      if (det) {
+        setOportunidadeDet(det);
+        setHistoricoOportunidade(historico);
+      }
     });
   }
 
@@ -365,6 +375,7 @@ export function ShellCrm({
       ) : oportunidadeDet ? (
         <DetalheOportunidade
           oportunidade={oportunidadeDet}
+          historico={historicoOportunidade}
           onVoltar={fecharTudo}
           onEditar={() => setFormAberto({ entidade: "oportunidade", inicial: oportunidadeDet })}
         />

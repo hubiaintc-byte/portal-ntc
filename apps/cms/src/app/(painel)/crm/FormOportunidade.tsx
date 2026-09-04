@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 
-import { ORIGENS_CRM, STATUS_OPORTUNIDADE, UFS } from "@ntc/lib";
+import { ESTAGIO_OPORTUNIDADE, ORIGENS_CRM, SITUACAO_OPORTUNIDADE, UFS } from "@ntc/lib";
 
 import type {
   CatalogoCrm,
@@ -60,7 +60,8 @@ export function FormOportunidade({
     valor: inicial !== null && inicial.valor !== null ? String(inicial.valor) : "",
     probabilidade:
       inicial !== null && inicial.probabilidade !== null ? String(inicial.probabilidade) : "",
-    status: inicial?.status ?? "em-qualificacao",
+    estagio: inicial?.estagio ?? "mapeada",
+    situacao: inicial?.situacao ?? "ativa",
     dataAbertura: inicial?.dataAberturaISO ?? new Date().toISOString().slice(0, 10),
     dataPrevFechamento: inicial?.dataPrevFechamentoISO ?? "",
     proximaAcao: inicial?.proximaAcao ?? "",
@@ -115,7 +116,18 @@ export function FormOportunidade({
         <CampoTexto rotulo="Modalidade" valor={dados.modalidade} onMudar={m("modalidade")} />
         <CampoNumero rotulo="Valor (R$)" valor={dados.valor} onMudar={m("valor")} curto />
         <CampoNumero rotulo="Probabilidade (%)" valor={dados.probabilidade} onMudar={m("probabilidade")} curto />
-        <CampoSelect rotulo="Status" valor={dados.status} onMudar={m("status")} opcoes={STATUS_OPORTUNIDADE} />
+        <CampoSelect
+          rotulo="Estágio (posição no funil)"
+          valor={dados.estagio}
+          onMudar={m("estagio")}
+          opcoes={ESTAGIO_OPORTUNIDADE}
+        />
+        <CampoSelect
+          rotulo="Situação"
+          valor={dados.situacao}
+          onMudar={m("situacao")}
+          opcoes={SITUACAO_OPORTUNIDADE}
+        />
         <CampoData rotulo="Data de abertura" valor={dados.dataAbertura} onMudar={m("dataAbertura")} />
         <CampoData
           rotulo="Previsão de fechamento"
