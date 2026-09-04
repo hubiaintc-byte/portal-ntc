@@ -22,6 +22,7 @@ import {
   AREAS_CRM,
   ESFERAS_CRM,
   ORIGENS_CRM,
+  planejarMigracaoOportunidade,
   slugDeRotulo,
   STATUS_CLIENTE_CRM,
   STATUS_OPORTUNIDADE,
@@ -98,7 +99,11 @@ export interface DadosOportunidade {
   modalidade: string | null;
   valor: number | null;
   probabilidade: number | null;
-  status: string | null;
+  /** Funil P0 (docs/17) é a fonte; `status` legado é derivado pelo hook da coleção. */
+  estagio: string;
+  situacao: string;
+  migracaoPendenteRevisao: boolean;
+  migracaoFlag: string | null;
   dataAbertura: string | null;
   dataPrevFechamento: string | null;
   proximaAcao: string | null;
@@ -466,7 +471,18 @@ export function planejarImportacao(
       modalidade: texto(registro, "modalidade"),
       valor: numero(registro, "valor"),
       probabilidade: numero(registro, "prob"),
-      status: slugValidado(texto(registro, "status"), STATUS_OPORTUNIDADE, avisos, contexto),
+      // O funil P0 é a fonte; `status` legado é derivado pelo hook da coleção.
+      ...(() => {
+        const plano = planejarMigracaoOportunidade(
+          slugValidado(texto(registro, "status"), STATUS_OPORTUNIDADE, avisos, contexto),
+        );
+        return {
+          estagio: plano.estagio,
+          situacao: plano.situacao,
+          migracaoPendenteRevisao: plano.revisao,
+          migracaoFlag: plano.revisao ? plano.flag : null,
+        };
+      })(),
       dataAbertura: texto(registro, "data_abertura"),
       dataPrevFechamento: texto(registro, "data_prev_fech"),
       proximaAcao: texto(registro, "proxima_acao"),

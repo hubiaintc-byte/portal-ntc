@@ -14,11 +14,13 @@ import { getPayload, type RequiredDataFromCollectionSlug } from "payload";
 
 import { slugDeRotulo } from "@ntc/lib";
 
+import { lerEstagioOuNulo } from "../lib/crm/historicoEstagio";
 import {
   planejarImportacao,
   type ExistentesNoBanco,
   type ExportCrmLegado,
 } from "../lib/crm/importadorCrm";
+import { ehSituacaoOportunidade } from "../lib/crm/situacaoOportunidade";
 import config from "../payload.config";
 
 // Os selects do plano já saem validados contra as listas de @ntc/lib em
@@ -33,7 +35,6 @@ type OrigemClienteCrm = RequiredDataFromCollectionSlug<"clientes-crm">["origem"]
 type StatusClienteCrm = RequiredDataFromCollectionSlug<"clientes-crm">["status"];
 type UfOportunidade = RequiredDataFromCollectionSlug<"oportunidades">["uf"];
 type OrigemOportunidade = RequiredDataFromCollectionSlug<"oportunidades">["origem"];
-type StatusOportunidade = RequiredDataFromCollectionSlug<"oportunidades">["status"];
 
 const caminho = process.env.CRM_JSON;
 const dryRun = process.env.CRM_DRY_RUN === "1";
@@ -156,6 +157,22 @@ for (const item of plano.criarContatos) {
 for (const item of plano.criarOportunidades) {
   const clienteId = resolverClienteId(item.data.cliente);
   if (clienteId === null) continue;
+
+  // O funil P0 é a fonte (estagio/situacao); `status` legado é derivado pelo
+  // hook `beforeChange` da coleção — não é montado aqui. `estagio`/`situacao`
+  // vêm de `planejarMigracaoOportunidade` (TABELA_MIGRACAO controlada), então
+  // só falham a guarda num cenário de corrupção de dados — tratado como erro
+  // defensivo, no mesmo padrão de `migrarOportunidadesP0.ts`.
+  const estagio = lerEstagioOuNulo(item.data.estagio);
+  const situacao = ehSituacaoOportunidade(item.data.situacao) ? item.data.situacao : null;
+  if (estagio === null || situacao === null) {
+    console.error(
+      `Oportunidade "${item.data.codigo}": estagio/situacao fora das listas válidas ` +
+        `(estagio=${item.data.estagio}, situacao=${item.data.situacao}) — ignorada.`,
+    );
+    continue;
+  }
+
   await payload.create({
     collection: "oportunidades",
     data: {
@@ -170,7 +187,10 @@ for (const item of plano.criarOportunidades) {
       modalidade: item.data.modalidade,
       valor: item.data.valor,
       probabilidade: item.data.probabilidade,
-      status: item.data.status as StatusOportunidade,
+      estagio,
+      situacao,
+      migracaoPendenteRevisao: item.data.migracaoPendenteRevisao,
+      migracaoFlag: item.data.migracaoFlag,
       dataAbertura: item.data.dataAbertura,
       dataPrevFechamento: item.data.dataPrevFechamento,
       proximaAcao: item.data.proximaAcao,

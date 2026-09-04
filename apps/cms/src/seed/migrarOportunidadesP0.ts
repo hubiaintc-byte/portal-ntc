@@ -12,23 +12,12 @@
  * migracaoPendenteRevisao = true e a flag explicando o que a Direção precisa
  * confirmar. "Mapeada" vindo de Perdida/Cancelada é fallback técnico.
  */
-import { planejarMigracaoOportunidade, SITUACAO_OPORTUNIDADE } from "@ntc/lib";
-import { getPayload, type RequiredDataFromCollectionSlug } from "payload";
+import { planejarMigracaoOportunidade } from "@ntc/lib";
+import { getPayload } from "payload";
 
 import { lerEstagioOuNulo, montarTransicaoEstagio } from "../lib/crm/historicoEstagio";
+import { ehSituacaoOportunidade } from "../lib/crm/situacaoOportunidade";
 import config from "../payload.config";
-
-/**
- * União literal das 3 situações, no mesmo padrão de `EstagioOportunidade` em
- * historicoEstagio.ts. `PlanoMigracaoP0.situacao` (de @ntc/lib) é tipado como
- * `string` solto — este guard estreita para o literal antes de gravar no
- * campo `select` da coleção, sem recorrer a `as`.
- */
-type SituacaoOportunidade = NonNullable<RequiredDataFromCollectionSlug<"oportunidades">["situacao"]>;
-
-function ehSituacaoOportunidade(v: string): v is SituacaoOportunidade {
-  return SITUACAO_OPORTUNIDADE.some((opcao) => opcao.value === v);
-}
 
 const APLICAR = process.env.CRM_MIGRACAO_APLICAR === "1";
 

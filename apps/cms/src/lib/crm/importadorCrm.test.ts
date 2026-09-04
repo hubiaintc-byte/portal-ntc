@@ -154,4 +154,33 @@ describe("planejarImportacao", () => {
     expect(plano.criarOportunidades).toHaveLength(0);
     expect(plano.avisos.some((a) => a.includes('Oportunidade "OPO-2026-001"') && a.includes("não resolvido"))).toBe(true);
   });
+
+  it("traduz o status legado do export para estágio e situação do funil P0", () => {
+    const plano = planejarImportacao(dados, existentes);
+    const oportunidade = plano.criarOportunidades[0];
+    expect(oportunidade?.data).toMatchObject({
+      estagio: "negociacao-tramitacao",
+      situacao: "ativa",
+      migracaoPendenteRevisao: false,
+      migracaoFlag: null,
+    });
+  });
+
+  it("marca revisão quando o status legado é ambíguo", () => {
+    const oportunidadeBase = dados.tabelas?.oportunidades?.[0];
+    if (!oportunidadeBase) throw new Error("fixture sem oportunidade base");
+    const ambiguo: ExportCrmLegado = {
+      ...dados,
+      tabelas: {
+        ...dados.tabelas,
+        oportunidades: [{ ...oportunidadeBase, status: "Contratada" }],
+      },
+    };
+    const plano = planejarImportacao(ambiguo, existentes);
+    expect(plano.criarOportunidades[0]?.data).toMatchObject({
+      estagio: "contratacao-em-formalizacao",
+      migracaoPendenteRevisao: true,
+    });
+    expect(plano.criarOportunidades[0]?.data.migracaoFlag).toContain("[VALIDAR COM A DIREÇÃO]");
+  });
 });
