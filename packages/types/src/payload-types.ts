@@ -1099,25 +1099,22 @@ export interface Oportunidade {
   /**
    * Posição no funil comercial (manual NTC-COM-CRM-01 §11).
    */
-  estagio?:
-    | (
-        | 'mapeada'
-        | 'prospeccao-relacionamento'
-        | 'demanda-identificada'
-        | 'qualificada'
-        | 'diagnostico-realizado'
-        | 'solucao-em-construcao'
-        | 'proposta-em-elaboracao'
-        | 'proposta-enviada'
-        | 'negociacao-tramitacao'
-        | 'contratacao-em-formalizacao'
-        | 'ganha'
-      )
-    | null;
+  estagio:
+    | 'mapeada'
+    | 'prospeccao-relacionamento'
+    | 'demanda-identificada'
+    | 'qualificada'
+    | 'diagnostico-realizado'
+    | 'solucao-em-construcao'
+    | 'proposta-em-elaboracao'
+    | 'proposta-enviada'
+    | 'negociacao-tramitacao'
+    | 'contratacao-em-formalizacao'
+    | 'ganha';
   /**
    * Condição da oportunidade — independente do estágio (§12).
    */
-  situacao?: ('ativa' | 'perdida' | 'adiada-nurturing') | null;
+  situacao: 'ativa' | 'perdida' | 'adiada-nurturing';
   /**
    * Estágio atribuído pela migração automática e ainda não confirmado pela Direção. Enquanto marcado, o estágio é provisório e não é verdade histórica.
    */
