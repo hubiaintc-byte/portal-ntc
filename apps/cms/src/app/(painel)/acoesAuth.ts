@@ -71,7 +71,17 @@ export async function entrar(
   }
   if (!token || !usuarioId) return { erro: "Não foi possível entrar. Tente novamente." };
 
-  const pendente = await prepararLoginPasskey(usuarioId);
+  let pendente: Awaited<ReturnType<typeof prepararLoginPasskey>>;
+  try {
+    pendente = await prepararLoginPasskey(usuarioId);
+  } catch (e) {
+    // Falha ao consultar passkeys (ex.: tabela ainda não existe porque
+    // pnpm payload:push:schema não rodou) NÃO pode virar bypass do 2º
+    // fator nem derrubar o login de quem não tem passkey — falha
+    // fechada com mensagem neutra, como qualquer outro erro deste fluxo.
+    console.error("[entrar] falha ao consultar passkeys", e);
+    return { erro: "Não foi possível entrar. Tente novamente." };
+  }
   if (pendente) {
     const tokenPendente = await cifrarTokenPonte({
       userId: usuarioId,

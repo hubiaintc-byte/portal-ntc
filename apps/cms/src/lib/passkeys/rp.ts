@@ -14,7 +14,14 @@ export interface ConfigRp {
 }
 
 export function obterConfigRp(): ConfigRp {
-  const url = new URL(process.env.PAYLOAD_PUBLIC_SERVER_URL ?? "http://localhost:3001");
+  const bruto = process.env.PAYLOAD_PUBLIC_SERVER_URL;
+  if (!bruto && process.env.NODE_ENV === "production") {
+    // Cair silenciosamente pra localhost em produção faria toda cerimônia
+    // WebAuthn falhar com um erro opaco pro usuário (RP ID/origin errados)
+    // — melhor falhar cedo e alto.
+    throw new Error("PAYLOAD_PUBLIC_SERVER_URL não configurada em produção — passkeys exigem essa env var.");
+  }
+  const url = new URL(bruto ?? "http://localhost:3001");
   return {
     rpID: url.hostname,
     rpName: "Painel Admin NTC",
