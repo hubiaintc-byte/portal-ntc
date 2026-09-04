@@ -35,6 +35,7 @@ import {
   type ResultadoUsuarios,
   type UsuarioGestaoResumo,
 } from "@/lib/cms/painelCmsUsuarios";
+import { listarPasskeysDoUsuario, removerPasskey, type PasskeyResumo } from "@/lib/cms/painelPasskeys";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
@@ -258,4 +259,21 @@ export async function reenviarConviteUsuarioCms(id: string): Promise<ResultadoEs
   if (!usuario || usuario.perfil !== "super-admin") return RECUSADO_SUPER_ADMIN;
   const p = await obterPayloadUsuarios();
   return reenviarConvite(p, id);
+}
+
+/**
+ * Passkeys de outro usuário (tela Usuários) — mesma guarda super-admin das
+ * demais actions deste bloco; remoção reaproveita removerPasskey (Task 4)
+ * com chamadorEhSuperAdmin=true, que ignora a checagem de dono.
+ */
+export async function listarPasskeysDeUsuarioCms(usuarioId: string): Promise<PasskeyResumo[]> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario || usuario.perfil !== "super-admin") return [];
+  return listarPasskeysDoUsuario(usuarioId);
+}
+
+export async function removerPasskeyAdminCms(passkeyId: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario || usuario.perfil !== "super-admin") return RECUSADO_SUPER_ADMIN;
+  return removerPasskey(passkeyId, usuario.id, true);
 }
