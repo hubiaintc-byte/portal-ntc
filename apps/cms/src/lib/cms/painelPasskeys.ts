@@ -109,11 +109,10 @@ export async function confirmarCadastroPasskey(
     await payload.create({
       collection: "passkeys",
       data: {
-        // O tipo gerado do Payload exige number | User pro relationship, mas
-        // a Local API aceita o id como string em runtime (mesmo padrão de
-        // where: { usuario: { equals: usuarioId } } logo acima, que não
-        // precisa desse cast por não passar pelo tipo de escrita).
-        usuario: usuarioId as unknown as number,
+        // Relationship do Payload é id numérico (mesmo padrão de
+        // painelCrmEscrita.ts/painelCmsEscrita.ts) — usuarioId chega como
+        // string.
+        usuario: Number(usuarioId),
         apelido,
         credentialId: verificado.credentialId,
         publicKey: verificado.publicKeyBase64,

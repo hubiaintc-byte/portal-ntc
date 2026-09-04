@@ -141,7 +141,7 @@ describe("prepararCadastroPasskey / confirmarCadastroPasskey", () => {
     expect(payloadFalso.create).toHaveBeenCalledWith({
       collection: "passkeys",
       data: {
-        usuario: "42",
+        usuario: 42,
         apelido: "MacBook do Jotta",
         credentialId: "novo-cred",
         publicKey: "base64==",
