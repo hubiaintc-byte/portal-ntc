@@ -89,7 +89,7 @@ Na tela Usuários (já super-admin-only, mesmo padrão de `removerUsuarioCms`): 
 - **Navegador sem suporte a WebAuthn** — detectar via `browserSupportsWebAuthn()` do `@simplewebauthn/browser`; esconder a opção de cadastro e mostrar aviso.
 - **Token de ponte expirado** (>5 min) — usuário reinicia o login do zero (mensagem clara, não um erro genérico).
 - **Contador retrocedendo** — rejeita a autenticação e loga (`console.error`, mesmo padrão de `gerarESalvarPdfProposta` já usado no projeto) — indício de clonagem de credencial.
-- **Dispositivo perdido, sem outro passkey cadastrado** — usuário ainda loga normalmente com senha (2º fator é opcional/gradual, não bloqueia); para remover o passkey órfão, pede pro super-admin remover pela tela Usuários.
+- **Dispositivo perdido, sem outro passkey cadastrado** — **correção pós-revisão final:** ao contrário do que esta linha dizia originalmente, uma vez que o usuário tem QUALQUER passkey cadastrado, `entrar()` sempre exige o 2º fator (decisão de design confirmada na sessão de brainstorming, implementada corretamente na Task 5) — perder o único dispositivo bloqueia o login por senha também. A recuperação depende de outro super-admin remover o passkey órfão pela tela Usuários; **se houver um único super-admin no sistema, não há recuperação in-app** — regra operacional: cadastrar pelo menos 2 passkeys (ex.: notebook + celular) antes de depender desta feature, ou garantir uma segunda conta super-admin.
 - **Usuário remove o próprio último passkey** — permitido; volta a logar só com senha (consistente com "opcional").
 
 ## Configuração
@@ -112,3 +112,4 @@ Nenhuma env var nova. RP ID e origin do WebAuthn (precisam bater exatamente com 
 
 - Sem "códigos de recuperação" — mitigado pela remoção via super-admin.
 - 2º fator opcional nesta fase — não fecha sozinho o requisito "2FA obrigatório" do DAB §10.1; enforço obrigatório fica para decisão futura do PO, depois que a adoção estiver validada.
+- Sem um segundo super-admin (ou pelo menos 2 passkeys cadastrados na única conta), o único super-admin pode ficar sem recuperação in-app caso perca todos os dispositivos com passkey — ver a correção acima em "Tratamento de erros e casos de borda".
