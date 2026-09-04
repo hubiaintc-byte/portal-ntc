@@ -162,26 +162,47 @@ export async function redefinirSenha(
   if (invalida) return { erro: invalida };
 
   let tokenSessao: string | undefined;
+  let usuarioId: string | undefined;
   try {
     const payload = await obterPayload();
-    ({ token: tokenSessao } = await payload.resetPassword({
+    const resultado = await payload.resetPassword({
       collection: "users",
       data: { token, password: senha },
       overrideAccess: true,
-    }));
+    });
+    tokenSessao = resultado.token;
+    usuarioId = resultado.user ? String((resultado.user as { id: unknown }).id) : undefined;
   } catch {
     return { erro: "Link inválido ou expirado. Solicite uma nova redefinição." };
   }
-
-  if (tokenSessao) {
-    const jarra = await cookies();
-    jarra.set(COOKIE_SESSAO, tokenSessao, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-    });
+  if (!tokenSessao || !usuarioId) {
+    return { erro: "Não foi possível concluir. Tente novamente." };
   }
+
+  let pendente: Awaited<ReturnType<typeof prepararLoginPasskey>>;
+  try {
+    pendente = await prepararLoginPasskey(usuarioId);
+  } catch (e) {
+    console.error("[redefinirSenha]", e);
+    return { erro: "Não foi possível concluir. Tente novamente." };
+  }
+  if (pendente) {
+    const tokenPendente = await cifrarTokenPonte({
+      userId: usuarioId,
+      sessaoReal: tokenSessao,
+      challenge: pendente.challenge,
+      manter: false,
+    });
+    return { precisaPasskey: { tokenPendente, opcoesAutenticacao: pendente.opcoes } };
+  }
+
+  const jarra = await cookies();
+  jarra.set(COOKIE_SESSAO, tokenSessao, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
   redirect("/");
 }
 

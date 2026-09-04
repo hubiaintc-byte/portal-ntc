@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import { SENHA_MINIMO } from "@/lib/validarNovaSenha";
 
 import { redefinirSenha, type EstadoLogin } from "../../acoesAuth";
+import { ConfirmarPasskey } from "../ConfirmarPasskey";
 
 interface FormRedefinirProps {
   token: string;
@@ -19,6 +20,10 @@ export function FormRedefinir({ token, boasVindas }: FormRedefinirProps) {
     redefinirSenha,
     null,
   );
+
+  if (estado?.precisaPasskey) {
+    return <ConfirmarPasskey precisaPasskey={estado.precisaPasskey} />;
+  }
 
   return (
     <form className="pcms-login__form" action={agir}>
