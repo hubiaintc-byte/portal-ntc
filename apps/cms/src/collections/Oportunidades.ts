@@ -14,9 +14,11 @@ import { calcularStatusLegadoEspelhado } from "../lib/crm/espelhoStatusLegado";
 import { lerEstagioOuNulo, montarTransicaoEstagio } from "../lib/crm/historicoEstagio";
 
 /**
- * Mantém o campo `status` legado preenchido a partir de estágio+situação. O
- * Dashboard e os gráficos ainda leem `status` — a migração deles é a Sessão H7,
- * e só depois dela o campo pode ser removido (docs/17, Global Constraints).
+ * Mantém o campo `status` legado preenchido a partir de estágio+situação como
+ * espelho automatizado. O Dashboard e os gráficos já foram migrados para ler
+ * `estagio` e `situacao` — o campo `status` é preservado apenas porque ainda
+ * existe na coleção e pode ser lido por consumidores externos e pela base de
+ * dados já gravada.
  *
  * Invólucro fino: a regra fica em `calcularStatusLegadoEspelhado` (pura,
  * testada), que já lê `originalDoc` como fallback para atualizações parciais
