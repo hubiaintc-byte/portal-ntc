@@ -19,6 +19,7 @@ import { Conteudos } from "./collections/Conteudos";
 import { DocumentosComerciais } from "./collections/DocumentosComerciais";
 import { Especialistas } from "./collections/Especialistas";
 import { Eventos } from "./collections/Eventos";
+import { HistoricoEstagio } from "./collections/HistoricoEstagio";
 import { Leads } from "./collections/Leads";
 import { Media } from "./collections/Media";
 import { Modulos } from "./collections/Modulos";
@@ -98,6 +99,7 @@ export default buildConfig({
     ClientesCrm,
     ContatosCrm,
     Oportunidades,
+    HistoricoEstagio,
     Propostas,
     VersoesProposta,
     EnviosProposta,
