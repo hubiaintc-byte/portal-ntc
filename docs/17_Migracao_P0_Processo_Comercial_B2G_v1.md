@@ -327,13 +327,13 @@ Ordem obrigatória. Cada passo depende do anterior.
 2. **Parar o `pnpm dev`.** `payload:push:schema` com dev rodando corrompe o `.next` compartilhado e o schema. Regra do projeto, já custou uma sessão.
 3. **Diffar o schema** antes de aplicar (`CLAUDE.md` §14). Responder **N** a qualquer prompt de `DATA LOSS` — os campos novos são aditivos; se aparecer perda de dados, tem algo errado no diff, não no banco.
 4. **Aplicar `pnpm payload:push:schema`** com os campos novos, **nullable** nesta etapa (`required` só entra depois que os dados existirem — do contrário o push falha nas linhas existentes).
-5. **Rodar o script em dry-run:** `DRY_RUN=1 pnpm tsx scripts/migrar-oportunidades-p0.ts`. A saída lista cada oportunidade, o status de origem, o destino e a flag de revisão. Conferir a contagem total contra o banco.
-6. **Rodar de verdade** e conferir: nenhuma oportunidade sem `estagio`; um `historico-estagio` por oportunidade migrada, com `usuario: "migracao"` e o motivo citando o status de origem.
+5. **Rodar o script em dry-run, imediatamente após o push do passo 4:** `pnpm --filter @ntc/cms crm:migrar-p0` (arquivo `apps/cms/src/seed/migrarOportunidadesP0.ts`; dry-run é o padrão, sem env var). A saída lista cada oportunidade, o status de origem, o destino e a flag de revisão, e fecha com o total de oportunidades no banco e quantas foram percorridas — conferir esse total contra o banco. **Não abra o painel entre o push e a migração:** `estagio`/`situacao` têm `defaultValue`, então o push preenche toda a base com `mapeada`/`ativa` e a verdade fica só no `status` legado; uma única edição pela interface reescreve esse `status` a partir do estágio default (hook `espelharStatusLegado`) e a posição real de funil daquela oportunidade se perde.
+6. **Rodar de verdade** (`CRM_MIGRACAO_APLICAR=1 pnpm --filter @ntc/cms crm:migrar-p0` — env var em vez de flag porque o pnpm engole flags sem `--`) e conferir: nenhuma oportunidade sem `estagio`; um `historico-estagio` por oportunidade migrada, com `usuario` nulo, `atorSistema: "migração automática"` e o motivo citando o status de origem.
 7. **Despachar a fila de revisão com a direção** (decisão #4). Enquanto `migracaoPendenteRevisao` for `true`, o registro **não é verdade histórica** — em particular, `Mapeada` para os Perdida/Cancelada é fallback técnico, e tratá-lo como dado real distorce qualquer relatório de funil.
 8. **Só então** tornar `estagio`/`situacao` `required` e aplicar o push final.
 9. **Repetir em produção** (Vercel/Supabase de produção) na mesma ordem, com o mesmo backup prévio.
 
-**Idempotência:** o script pula quem já tem `estagio`. Pode rodar duas vezes sem duplicar histórico — mas confira isso no dry-run antes de confiar.
+**Idempotência:** o script pula quem **já tem linha em `historico-estagio`** — não quem tem `estagio` preenchido, que o `defaultValue` do push preenche em todo mundo e faria o script pular a base inteira relatando sucesso. Pode rodar duas vezes sem duplicar histórico, e é auto-recuperável: se morrer entre o update da oportunidade e o create do histórico, a re-execução refaz os dois. Confira isso no dry-run antes de confiar.
 
 ---
 
