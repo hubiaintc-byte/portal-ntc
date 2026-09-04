@@ -98,16 +98,21 @@ export function FormOportunidade({
       />
       <AvisoForm erro={erro} />
       <div className="pcms-editor__grid">
+        {/* Todos os campos obrigatórios da coleção `oportunidades` são marcados
+            aqui, para o formulário não ensinar um recorte da regra: Cliente,
+            Programa, UF, Origem, Estágio, Situação, Data de abertura e
+            Responsável (destes, Programa, UF, Origem, Data de abertura e
+            Responsável entraram por decisão do PO · Manual Operacional
+            NTC-COM-CRM-01). A marcação é conveniência de UI — quem recusa de
+            fato é a camada de escrita: `validarObrigatoriosOportunidade` e a
+            guarda de cliente em painelCrmEscrita.ts. */}
         <CampoSelect
           rotulo="Cliente"
           valor={dados.cliente}
           onMudar={m("cliente")}
           opcoes={clientes.map((c) => ({ label: c.orgao, value: c.id }))}
+          obrigatorio
         />
-        {/* Programa, UF, Origem, Data de abertura e Responsável são obrigatórios
-            na coleção (decisão do PO · Manual Operacional NTC-COM-CRM-01); a
-            marcação aqui é conveniência de UI — quem recusa de fato é
-            `validarObrigatoriosOportunidade` na camada de escrita. */}
         <CampoSelect
           rotulo="Programa"
           valor={dados.programa}
@@ -139,12 +144,14 @@ export function FormOportunidade({
           valor={dados.estagio}
           onMudar={m("estagio")}
           opcoes={ESTAGIO_OPORTUNIDADE}
+          obrigatorio
         />
         <CampoSelect
           rotulo="Situação"
           valor={dados.situacao}
           onMudar={m("situacao")}
           opcoes={SITUACAO_OPORTUNIDADE}
+          obrigatorio
         />
         <CampoData
           rotulo="Data de abertura"
