@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { DIMENSOES_COM04, HARD_GATES_COM04 } from "@ntc/lib";
 
-import { erroDoGateQualificada } from "./gateQualificada";
+import { decisaoGateQualificada, erroDoGateQualificada } from "./gateQualificada";
 
 function avaliacaoCompleta(): Record<string, unknown> {
   const av: Record<string, unknown> = {
@@ -51,5 +51,43 @@ describe("erroDoGateQualificada", () => {
     expect(args.collection).toBe("avaliacoes-qualificacao");
     expect(JSON.stringify(args.where)).toContain("\"equals\":7");
     expect(JSON.stringify(args.where)).toContain("vigente");
+  });
+});
+
+describe("decisaoGateQualificada", () => {
+  it("aciona o gate quando a oportunidade é criada já como Qualificada", () => {
+    // Criação: não existe `originalDoc`. Sem id ainda — o chamador (hook da
+    // coleção) deve bloquear direto, sem consultar a Local API.
+    const decisao = decisaoGateQualificada({ estagio: "qualificada" }, undefined);
+    expect(decisao).toEqual({ precisaGate: true, oportunidadeId: undefined });
+  });
+
+  it("aciona o gate quando a atualização transiciona outro estágio para Qualificada", () => {
+    const decisao = decisaoGateQualificada(
+      { estagio: "qualificada" },
+      { estagio: "negociacao", id: 7 },
+    );
+    expect(decisao).toEqual({ precisaGate: true, oportunidadeId: 7 });
+  });
+
+  it("NÃO aciona o gate ao editar uma oportunidade já Qualificada por motivo não relacionado", () => {
+    const decisao = decisaoGateQualificada(
+      { estagio: "qualificada" },
+      { estagio: "qualificada", id: 7 },
+    );
+    expect(decisao.precisaGate).toBe(false);
+  });
+
+  it("NÃO aciona o gate quando a transição é para qualquer outro estágio", () => {
+    const decisao = decisaoGateQualificada(
+      { estagio: "perdida" },
+      { estagio: "negociacao", id: 7 },
+    );
+    expect(decisao.precisaGate).toBe(false);
+  });
+
+  it("NÃO aciona o gate numa criação que não é Qualificada", () => {
+    const decisao = decisaoGateQualificada({ estagio: "mapeada" }, undefined);
+    expect(decisao.precisaGate).toBe(false);
   });
 });

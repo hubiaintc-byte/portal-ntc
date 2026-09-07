@@ -52,3 +52,51 @@ export async function erroDoGateQualificada(
   });
   return avaliacaoPermiteQualificada(comoAvaliacaoCom04(resultado.docs[0] ?? null));
 }
+
+/** Forma mínima do `data`/`originalDoc` do hook `beforeChange` que a decisão lê. */
+export interface CamposGateQualificada {
+  estagio?: string | null;
+  id?: number | string | null;
+}
+
+export interface DecisaoGateQualificada {
+  /** true quando esta escrita está transicionando o estágio PARA "qualificada". */
+  precisaGate: boolean;
+  /**
+   * Id da oportunidade a consultar no gate. `undefined` quando a escrita é
+   * uma criação (a oportunidade ainda não tem id) — nesse caso não há como
+   * existir avaliação vigente, e o chamador deve bloquear direto, sem
+   * consultar a Local API.
+   */
+  oportunidadeId: number | string | undefined;
+}
+
+const idOuIndefinido = (v: number | string | null | undefined): number | string | undefined =>
+  v === null || v === undefined ? undefined : v;
+
+/**
+ * Decide, a partir de `data`/`originalDoc` do hook `beforeChange` de
+ * `oportunidades`, se esta escrita precisa passar pelo gate do §18 e contra
+ * qual id de oportunidade. Pura — sem I/O — para ser testada sem mockar a
+ * Local API; o hook da coleção é só o invólucro fino que chama esta função e,
+ * quando `precisaGate` é `true`, decide a mensagem (consultando
+ * `erroDoGateQualificada` quando há id, ou bloqueando direto quando não há).
+ *
+ * Só age na transição PARA "qualificada": se `originalDoc.estagio` já é
+ * "qualificada" (edição por motivo não relacionado, ex.: trocar o
+ * responsável), ou se `data.estagio` não é "qualificada" (criação/edição
+ * indo para qualquer outro estágio), a resposta é `precisaGate: false` e o
+ * `oportunidadeId` não importa. Na criação, `originalDoc` não existe —
+ * `originalDoc?.estagio` fica `undefined` (`!== "qualificada"`) — então uma
+ * oportunidade criada DIRETO como "Qualificada" também aciona o gate, com
+ * `oportunidadeId: undefined` (ainda não existe id a consultar).
+ */
+export function decisaoGateQualificada(
+  data: CamposGateQualificada | null | undefined,
+  originalDoc: CamposGateQualificada | null | undefined,
+): DecisaoGateQualificada {
+  const precisaGate = originalDoc?.estagio !== "qualificada" && data?.estagio === "qualificada";
+  if (!precisaGate) return { precisaGate: false, oportunidadeId: undefined };
+  const oportunidadeId = idOuIndefinido(originalDoc?.id) ?? idOuIndefinido(data?.id);
+  return { precisaGate: true, oportunidadeId };
+}
