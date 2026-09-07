@@ -13,13 +13,14 @@
  */
 import { getPayload } from "payload";
 
+import { SENHA_MINIMO } from "../lib/validarNovaSenha";
 import config from "../payload.config";
 
 const email = (process.env.ADMIN_EMAIL ?? "contato@institutontc.com.br").toLowerCase();
 const senha = process.env.NOVA_SENHA;
 
-if (!senha || senha.length < 12) {
-  console.error("Defina NOVA_SENHA com pelo menos 12 caracteres.");
+if (!senha || senha.length < SENHA_MINIMO) {
+  console.error(`Defina NOVA_SENHA com pelo menos ${SENHA_MINIMO} caracteres.`);
   process.exit(1);
 }
 

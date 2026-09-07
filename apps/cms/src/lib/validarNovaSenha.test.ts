@@ -3,8 +3,12 @@ import { describe, expect, it } from "vitest";
 import { validarNovaSenha } from "./validarNovaSenha";
 
 describe("validarNovaSenha", () => {
-  it("rejeita senha curta", () => {
-    expect(validarNovaSenha("curta123", "curta123")).toContain("12 caracteres");
+  it("rejeita senha abaixo do mínimo", () => {
+    expect(validarNovaSenha("curta12", "curta12")).toContain("8 caracteres");
+  });
+
+  it("aceita senha exatamente no mínimo", () => {
+    expect(validarNovaSenha("curta123", "curta123")).toBeNull();
   });
 
   it("rejeita confirmação divergente", () => {

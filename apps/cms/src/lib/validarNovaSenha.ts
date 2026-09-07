@@ -1,5 +1,5 @@
 /** Regras de senha nova do Painel Admin (reset, convite e troca). */
-export const SENHA_MINIMO = 12;
+export const SENHA_MINIMO = 8;
 
 /** null = válida; senão, mensagem de erro em PT para exibir no formulário. */
 export function validarNovaSenha(senha: string, confirmacao: string): string | null {
