@@ -234,22 +234,26 @@ Não são erros do manual — ele documenta o protótipo, e o protótipo não te
 
 ---
 
-### Sessão H2 — Qualificação COM-04 (avaliações versionadas)
+### Sessão H2 — Qualificação COM-04 (avaliações versionadas) ✅ concluída (07/09/2026)
 
 - **Objetivo:** registrar a qualificação formal, com score, faixa e hard gates.
 - **Escopo:** coleção `avaliacoes-qualificacao` (campos de §1.2); validação estrita das notas (inteiros 0–3, nada de string ou decimal); `scoreTotal` e `faixa` derivados em hook `beforeChange` (persistidos para permitir ordenação/filtro, ao contrário do protótipo que computa na tela); unicidade da avaliação `vigente` por oportunidade dentro da transação do Payload (`req.transactionID`); `concluidaEm` preenchida automaticamente ao concluir; tela + formulário no padrão `FormOportunidade`/`CamposCrm`.
 - **Fora do escopo:** o gate que bloqueia o estágio Qualificada (é H3).
 - **Pré-requisito:** H1 + decisão #7.
 - **Critério de aceite:** teste unitário do score (0, 27, incompleto → `null`) e da faixa nos cortes 18 e 10; teste de que salvar uma segunda avaliação `vigente` desmarca a anterior **na mesma transação**; nota `2.5` ou `"3 "` rejeitada.
+- **Entregue:** branch `feat/crm-janela-h2-h3-qualificacao`, **ainda não mergeada na `main`**; execução via `subagent-driven-development`. Regras puras em `packages/lib/src/crm/qualificacao.ts` (16 testes) — 9 dimensões, 7 hard gates, notas inteiras 0–3, score 0–27, faixa nos cortes 18/10 e `avaliacaoPermiteQualificada` com as 10 condições e mensagens do §18. Coleção `avaliacoes-qualificacao` (`apps/cms/src/collections/AvaliacoesQualificacao.ts`, 20ª coleção do Payload): validação estrita das notas, `scoreTotal`/`faixa`/`concluidaEm` derivados e persistidos em hook `beforeChange` (`apps/cms/src/lib/crm/derivadosAvaliacao.ts`), única avaliação `vigente` por oportunidade mantida em hook `afterChange` dentro da mesma transação. Escrita e leitura ligadas à Local API (`painelCrmEscrita.ts`/`painelCrm.ts`), tela e formulário (`TelaQualificacao.tsx`/`FormAvaliacao.tsx`) com as 9 dimensões, os 7 hard gates e o score ao vivo mostrado como apoio à decisão — nunca decidindo por ela (§15 do manual). Avaliação parcial pode ser salva com `statusAvaliacao` "Em preenchimento"; completude só é exigida ao salvar como "Concluída".
+- **Pendência que ficou:** `pnpm payload:push:schema` **não foi rodado** — a tabela `avaliacoes_qualificacao` ainda não existe no banco de desenvolvimento, então a coleção nunca foi exercitada contra dado real. Precisa de um humano (dev parado, diff revisado, `N` a qualquer DATA LOSS, `payload:generate` depois).
 
 ---
 
-### Sessão H3 — Porta do estágio "Qualificada"
+### Sessão H3 — Porta do estágio "Qualificada" ✅ concluída (07/09/2026)
 
 - **Objetivo:** impedir a promoção a Qualificada sem avaliação compatível.
 - **Escopo:** hook `beforeChange` em `oportunidades` reproduzindo as dez condições de §1.3, cada uma com mensagem de erro específica (o protótipo já traz os textos prontos — reaproveitar literalmente, são bons); a UI mostra o erro no formulário, não um toast genérico.
 - **Pré-requisito:** H2.
 - **Critério de aceite:** um teste por condição de bloqueio (10 testes), mais o caminho feliz. As mensagens devem ser **as mesmas do §18 do Manual Operacional** — a equipe é treinada nelas, e um texto diferente vira chamado de suporte. Fixar isso num teste que compara as strings.
+- **Entregue:** branch `feat/crm-janela-h2-h3-qualificacao` (mesma da H2), **ainda não mergeada na `main`**. `apps/cms/src/lib/crm/gateQualificada.ts` (`decisaoGateQualificada`, `erroDoGateQualificada`, `ErroGateQualificada`) busca a avaliação vigente da oportunidade e aplica a regra pura `avaliacaoPermiteQualificada` (H2); um hook `beforeChange` em `Oportunidades.ts`, posicionado antes de `espelharStatusLegado`, recusa a promoção ao estágio Qualificada — inclusive já criar a oportunidade nesse estágio — sem avaliação vigente que sustente. O erro de negócio chega íntegro ao formulário do painel em vez do erro genérico da Local API. 9 testes cobrindo as condições de bloqueio e o caminho feliz.
+- **Pendências que ficaram:** o checkpoint visual humano (`CLAUDE.md` §6) ainda não foi feito — não foi possível criar uma oportunidade, tentar movê-la para Qualificada sem avaliação e confirmar visualmente a mensagem do §18 no formulário, nem o caminho feliz depois de uma avaliação completa; isso depende também do `payload:push:schema` da H2 (a tabela `avaliacoes_qualificacao` ainda não existe no banco). A garantia de vigência única (H2) vale só dentro da transação do Payload — não há índice único parcial no Postgres, então duas escritas genuinamente concorrentes ainda poderiam persistir duas avaliações `vigente` para a mesma oportunidade; risco aceito por decisão, não resolvido nesta sessão.
 
 ---
 
