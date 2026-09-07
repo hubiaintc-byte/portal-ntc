@@ -28,6 +28,7 @@ import { Oportunidades } from "./collections/Oportunidades";
 import { Passkeys } from "./collections/Passkeys";
 import { Programas } from "./collections/Programas";
 import { Propostas } from "./collections/Propostas";
+import { TentativasAcesso } from "./collections/TentativasAcesso";
 import { Users } from "./collections/Users";
 import { VersoesProposta } from "./collections/VersoesProposta";
 import { CorpoDocente } from "./globals/CorpoDocente";
@@ -106,6 +107,7 @@ export default buildConfig({
     VersoesProposta,
     EnviosProposta,
     DocumentosComerciais,
+    TentativasAcesso,
     AuditLog,
   ],
   globals: [Home, OGrupo, CorpoDocente, Rodape],
