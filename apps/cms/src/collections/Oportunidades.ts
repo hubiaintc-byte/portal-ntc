@@ -11,7 +11,41 @@ import {
 import { atendimentoComercial } from "../access/atendimentoComercial";
 import { superAdmin } from "../access/superAdmin";
 import { calcularStatusLegadoEspelhado } from "../lib/crm/espelhoStatusLegado";
+import { ErroGateQualificada, erroDoGateQualificada } from "../lib/crm/gateQualificada";
 import { lerEstagioOuNulo, montarTransicaoEstagio } from "../lib/crm/historicoEstagio";
+
+/**
+ * Gate do estágio "Qualificada" (Sessão H3 · docs/17 · Manual NTC-COM-CRM-01
+ * §18): só libera a transição PARA "qualificada" quando a avaliação COM-04
+ * vigente da oportunidade cumpre as 10 condições do manual. Roda ANTES de
+ * `espelharStatusLegado` na lista de `beforeChange` — se o gate recusar
+ * (lançando `ErroGateQualificada`), a escrita inteira aborta, então não pode
+ * sobrar um espelho `status` gravado para um estágio que nunca foi aceito.
+ *
+ * A condição só age quando o estágio MUDA para "qualificada": edições que
+ * mantêm "qualificada" (ex.: trocar o responsável) não re-exigem o gate. Na
+ * criação, `originalDoc` não existe — `originalDoc?.estagio` fica
+ * `undefined`, que já é `!== "qualificada"` — então uma oportunidade criada
+ * DIRETO como "Qualificada" também passa pelo gate. Nesse caso não há ainda
+ * um id de oportunidade (o registro não foi inserido): a consulta é pulada e
+ * o bloqueio é imediato com a mesma mensagem do §18, porque é logicamente
+ * impossível existir uma avaliação vigente para uma oportunidade que ainda
+ * não existe.
+ */
+const bloquearQualificadaSemAvaliacao: CollectionBeforeChangeHook = async ({
+  data,
+  originalDoc,
+  req,
+}) => {
+  if (originalDoc?.estagio === "qualificada" || data.estagio !== "qualificada") return data;
+  const oportunidadeId: number | string | undefined = originalDoc?.id ?? data.id;
+  const mensagem =
+    oportunidadeId === undefined
+      ? "Estágio Qualificada bloqueado: não há avaliação vigente."
+      : await erroDoGateQualificada(req.payload, oportunidadeId, req);
+  if (mensagem !== null) throw new ErroGateQualificada(mensagem);
+  return data;
+};
 
 /**
  * Mantém o campo `status` legado preenchido a partir de estágio+situação como
@@ -68,7 +102,7 @@ export const Oportunidades: CollectionConfig = {
     delete: superAdmin,
   },
   hooks: {
-    beforeChange: [espelharStatusLegado],
+    beforeChange: [bloquearQualificadaSemAvaliacao, espelharStatusLegado],
     afterChange: [registrarTransicaoEstagio],
   },
   fields: [

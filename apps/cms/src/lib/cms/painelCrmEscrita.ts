@@ -13,6 +13,7 @@ import {
 import type { RequiredDataFromCollectionSlug } from "payload";
 
 import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
+import { ErroGateQualificada } from "@/lib/crm/gateQualificada";
 import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
 import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
@@ -331,6 +332,11 @@ export async function criarOportunidade(
     });
     return { ok: true };
   } catch (e) {
+    // O gate do estágio "Qualificada" (Sessão H3 · docs/17 §18) lança um erro
+    // tipado com a mensagem contratual do manual — é justamente o que o
+    // usuário precisa ler para corrigir a avaliação, então não pode virar o
+    // ERRO_GENERICO que os demais erros de escrita recebem.
+    if (e instanceof ErroGateQualificada) return { ok: false, erro: e.message };
     console.error("[criarOportunidade]", e);
     return { ok: false, erro: ERRO_GENERICO };
   }
@@ -356,6 +362,8 @@ export async function atualizarOportunidade(
     });
     return { ok: true };
   } catch (e) {
+    // Ver `criarOportunidade`: repassa a mensagem contratual do gate §18.
+    if (e instanceof ErroGateQualificada) return { ok: false, erro: e.message };
     console.error("[atualizarOportunidade]", e);
     return { ok: false, erro: ERRO_GENERICO };
   }

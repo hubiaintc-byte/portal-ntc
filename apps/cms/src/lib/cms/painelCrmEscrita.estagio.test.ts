@@ -8,6 +8,7 @@ const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
 const { criarOportunidade, atualizarOportunidade } = await import("./painelCrmEscrita");
+const { ErroGateQualificada } = await import("@/lib/crm/gateQualificada");
 
 type UsuarioAutenticado = Parameters<typeof criarOportunidade>[1];
 
@@ -145,5 +146,39 @@ describe("escrita da oportunidade — autoria da transição de estágio", () =>
     const { update } = montarPayloadFalso();
     await atualizarOportunidade("7", dadosBase, usuarioFalso);
     expect(update).toHaveBeenCalledWith(expect.objectContaining({ id: "7", user: usuarioFalso }));
+  });
+});
+
+describe("escrita da oportunidade — gate do estágio Qualificada (Sessão H3)", () => {
+  // O hook `bloquearQualificadaSemAvaliacao` da coleção lança `ErroGateQualificada`
+  // com a mensagem contratual do manual §18. A camada de escrita precisa
+  // repassar essa mensagem íntegra ao painel — não o ERRO_GENERICO, que
+  // esconderia justamente o que o usuário precisa ler para corrigir.
+  const mensagemDoGate = "Estágio Qualificada bloqueado: não há avaliação vigente.";
+
+  it("repassa a mensagem do gate quando a Local API recusa ao criar", async () => {
+    montarPayloadFalso();
+    obterPayloadMock.mockResolvedValue({
+      find: vi.fn().mockResolvedValue({ docs: [] }),
+      create: vi.fn().mockRejectedValue(new ErroGateQualificada(mensagemDoGate)),
+      update: vi.fn(),
+    });
+    const r = await criarOportunidade({ ...dadosBase, estagio: "qualificada" }, usuarioFalso);
+    expect(r).toEqual({ ok: false, erro: mensagemDoGate });
+  });
+
+  it("repassa a mensagem do gate quando a Local API recusa ao atualizar", async () => {
+    montarPayloadFalso();
+    obterPayloadMock.mockResolvedValue({
+      find: vi.fn().mockResolvedValue({ docs: [] }),
+      create: vi.fn(),
+      update: vi.fn().mockRejectedValue(new ErroGateQualificada(mensagemDoGate)),
+    });
+    const r = await atualizarOportunidade(
+      "7",
+      { ...dadosBase, estagio: "qualificada" },
+      usuarioFalso,
+    );
+    expect(r).toEqual({ ok: false, erro: mensagemDoGate });
   });
 });
