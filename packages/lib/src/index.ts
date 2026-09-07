@@ -17,7 +17,7 @@ export {
   type TitulacaoDocente,
 } from "./tipos";
 
-// Forms — schemas Zod, origem, política, hooks e stubs de segurança.
+// Forms — schemas Zod, origem, política, hooks e anti-spam.
 export {
   schemaProposta,
   schemaContato,
@@ -40,7 +40,7 @@ export { POLITICA_VERSAO_ATUAL } from "./forms/politicaVersao";
 
 export { aposCriarLead, type LeadCriado } from "./forms/aposCriarLead";
 
-export { verificarHcaptcha } from "./forms/hcaptcha";
+export { verificarCaptcha } from "./forms/captcha";
 
 export {
   checarRateLimit,
