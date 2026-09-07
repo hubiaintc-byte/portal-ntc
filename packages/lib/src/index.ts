@@ -42,7 +42,14 @@ export { aposCriarLead, type LeadCriado } from "./forms/aposCriarLead";
 
 export { verificarHcaptcha } from "./forms/hcaptcha";
 
-export { checarRateLimit, type ResultadoRateLimit } from "./forms/rateLimit";
+export {
+  checarRateLimit,
+  LIMITE_PADRAO,
+  LIMITE_RECUPERACAO,
+  type LimiteRota,
+  type ResultadoRateLimit,
+  type StoreRateLimit,
+} from "./forms/rateLimit";
 
 // CRM — listas controladas da Fase A
 export {
