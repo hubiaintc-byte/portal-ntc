@@ -79,6 +79,12 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
   const m = <K extends keyof DadosAvaliacao>(campo: K) => (v: DadosAvaliacao[K]) =>
     setDados((d) => ({ ...d, [campo]: v }));
 
+  // As 9 notas só são obrigatórias quando a avaliação é salva como
+  // "concluída" — em "em preenchimento" o avaliador pode salvar parcial e
+  // retomar depois. A UI não pode exigir mais do que a camada de escrita
+  // (validarObrigatoriosAvaliacao em painelCrmEscrita.ts) de fato recusa.
+  const notasObrigatorias = dados.statusAvaliacao === "concluida";
+
   // Resumo ao vivo (manual §15) — apoia a leitura do avaliador, não decide:
   // quem decide é o campo Resultado, no bloco Decisão.
   const avaliacaoAoVivo: AvaliacaoCom04 = {
@@ -170,7 +176,7 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
           valor={dados.notaNecessidade}
           onMudar={m("notaNecessidade")}
           opcoes={NOTA_OPCOES}
-          obrigatorio
+          obrigatorio={notasObrigatorias}
           curto
         />
         <CampoSelect
@@ -178,7 +184,7 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
           valor={dados.notaAderencia}
           onMudar={m("notaAderencia")}
           opcoes={NOTA_OPCOES}
-          obrigatorio
+          obrigatorio={notasObrigatorias}
           curto
         />
         <CampoSelect
@@ -186,7 +192,7 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
           valor={dados.notaPrioridade}
           onMudar={m("notaPrioridade")}
           opcoes={NOTA_OPCOES}
-          obrigatorio
+          obrigatorio={notasObrigatorias}
           curto
         />
         <CampoSelect
@@ -194,7 +200,7 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
           valor={dados.notaTiming}
           onMudar={m("notaTiming")}
           opcoes={NOTA_OPCOES}
-          obrigatorio
+          obrigatorio={notasObrigatorias}
           curto
         />
         <CampoSelect
@@ -202,7 +208,7 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
           valor={dados.notaCaminho}
           onMudar={m("notaCaminho")}
           opcoes={NOTA_OPCOES}
-          obrigatorio
+          obrigatorio={notasObrigatorias}
           curto
         />
         <CampoSelect
@@ -210,7 +216,7 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
           valor={dados.notaStakeholders}
           onMudar={m("notaStakeholders")}
           opcoes={NOTA_OPCOES}
-          obrigatorio
+          obrigatorio={notasObrigatorias}
           curto
         />
         <CampoSelect
@@ -218,7 +224,7 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
           valor={dados.notaOrcamento}
           onMudar={m("notaOrcamento")}
           opcoes={NOTA_OPCOES}
-          obrigatorio
+          obrigatorio={notasObrigatorias}
           curto
         />
         <CampoSelect
@@ -226,7 +232,7 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
           valor={dados.notaRisco}
           onMudar={m("notaRisco")}
           opcoes={NOTA_OPCOES}
-          obrigatorio
+          obrigatorio={notasObrigatorias}
           curto
         />
         <CampoSelect
@@ -234,7 +240,7 @@ export function FormAvaliacao({ inicial, oportunidades, usuarios, onSalvo, onCan
           valor={dados.notaValor}
           onMudar={m("notaValor")}
           opcoes={NOTA_OPCOES}
-          obrigatorio
+          obrigatorio={notasObrigatorias}
           curto
         />
       </div>

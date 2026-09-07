@@ -402,7 +402,7 @@ function numeroDeNota(v: string): number {
 interface ObrigatoriosAvaliacao {
   oportunidadeId: number;
   avaliadorId: number;
-  notas: Record<string, number>;
+  notas: Record<string, number | null>;
 }
 
 type ValidacaoAvaliacao =
@@ -410,10 +410,14 @@ type ValidacaoAvaliacao =
   | { ok: false; erro: string };
 
 /**
- * Falha fechado antes de tocar a Local API. As 9 notas são validadas contra
- * `notaValida` de @ntc/lib (0-3 inteiro, manual §15) — a primeira dimensão
- * fora da faixa interrompe com o rótulo dela, para o avaliador saber onde
- * corrigir.
+ * Falha fechado antes de tocar a Local API. Uma nota fora de 0-3 é sempre
+ * recusada (`notaValida` de @ntc/lib, manual §15) — a primeira dimensão fora
+ * da faixa interrompe com o rótulo dela, para o avaliador saber onde
+ * corrigir. Nota vazia só é recusada quando a avaliação está sendo salva como
+ * "concluída": durante "em preenchimento" o avaliador pode salvar com notas
+ * parciais e retomar depois — mesmo padrão tolerado por
+ * `notasCompletas`/`calcularScore` (@ntc/lib) e pelo hook `beforeChange` da
+ * coleção, que já convivem com `scoreTotal: null` nesse estado.
  */
 function validarObrigatoriosAvaliacao(dados: DadosAvaliacao): ValidacaoAvaliacao {
   const oportunidadeId = idOuNulo(dados.oportunidade);
@@ -432,9 +436,15 @@ function validarObrigatoriosAvaliacao(dados: DadosAvaliacao): ValidacaoAvaliacao
     notaRisco: dados.notaRisco,
     notaValor: dados.notaValor,
   };
-  const notas: Record<string, number> = {};
+  const exigirCompletas = dados.statusAvaliacao === "concluida";
+  const notas: Record<string, number | null> = {};
   for (const d of DIMENSOES_COM04) {
-    const numero = numeroDeNota(notasBrutas[d.campo] ?? "");
+    const bruto = (notasBrutas[d.campo] ?? "").trim();
+    if (bruto === "" && !exigirCompletas) {
+      notas[d.campo] = null;
+      continue;
+    }
+    const numero = numeroDeNota(bruto);
     if (!notaValida(numero)) {
       return {
         ok: false,

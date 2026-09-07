@@ -93,4 +93,32 @@ describe("criarAvaliacao", () => {
     expect(r.ok).toBe(false);
     expect(r.erro).toContain("0, 1, 2 ou 3");
   });
+
+  // Manual §13/§19: uma avaliação "em preenchimento" pode ser salva parcial e
+  // retomada depois — mesma tolerância de notasCompletas()/calcularScore()
+  // (@ntc/lib) e do hook beforeChange da coleção, que já convive com
+  // scoreTotal: null nesse estado.
+  it("aceita notas vazias quando a avaliação está em preenchimento", async () => {
+    const { criados } = montarPayloadFalso();
+    const r = await criarAvaliacao(
+      { ...dadosBase, statusAvaliacao: "em-preenchimento", notaTiming: "", notaCaminho: "" },
+      usuarioFalso,
+    );
+    expect(r.ok).toBe(true);
+    expect(criados[0]).toMatchObject({
+      notaTiming: null,
+      notaCaminho: null,
+      notaNecessidade: 3,
+    });
+  });
+
+  it("recusa nota vazia quando a avaliação é salva como concluída", async () => {
+    montarPayloadFalso();
+    const r = await criarAvaliacao(
+      { ...dadosBase, statusAvaliacao: "concluida", notaTiming: "" },
+      usuarioFalso,
+    );
+    expect(r.ok).toBe(false);
+    expect(r.erro).toContain("0, 1, 2 ou 3");
+  });
 });
