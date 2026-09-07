@@ -30,6 +30,7 @@ export interface Config {
     versoes: VersaoProposta;
     envios: EnvioProposta;
     'documentos-comerciais': DocumentosComerciai;
+    'tentativas-acesso': TentativasAcesso;
     'audit-log': AuditLog;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -56,6 +57,7 @@ export interface Config {
     versoes: VersoesSelect<false> | VersoesSelect<true>;
     envios: EnviosSelect<false> | EnviosSelect<true>;
     'documentos-comerciais': DocumentosComerciaisSelect<false> | DocumentosComerciaisSelect<true>;
+    'tentativas-acesso': TentativasAcessoSelect<false> | TentativasAcessoSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -1302,6 +1304,19 @@ export interface EnvioProposta {
   createdAt: string;
 }
 /**
+ * Lastro efêmero do rate limit. Linhas se apagam sozinhas fora da janela.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tentativas-acesso".
+ */
+export interface TentativasAcesso {
+  id: number;
+  rota: string;
+  ip: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-log".
  */
@@ -1407,6 +1422,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'documentos-comerciais';
         value: number | DocumentosComerciai;
+      } | null)
+    | ({
+        relationTo: 'tentativas-acesso';
+        value: number | TentativasAcesso;
       } | null)
     | ({
         relationTo: 'audit-log';
@@ -2074,6 +2093,16 @@ export interface DocumentosComerciaisSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tentativas-acesso_select".
+ */
+export interface TentativasAcessoSelect<T extends boolean = true> {
+  rota?: T;
+  ip?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
