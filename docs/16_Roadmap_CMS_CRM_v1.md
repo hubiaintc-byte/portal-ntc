@@ -41,26 +41,12 @@ Estas ações **não são tarefas do Claude Code** — são provisionamento/deci
 
 Bloqueador declarado no `CLAUDE.md` §17.8. Sem 2FA e sem anti-spam real, o portal não deveria receber tráfego público de verdade.
 
-### Sessão C1 — 2FA do admin (TOTP)
+### Sessão C1 — 2º fator do admin ✅ entregue via passkey/WebAuthn (07/09/2026)
 
-- **Objetivo:** exigir segundo fator (TOTP) no login de super-admin.
-- **Escopo:** campo TOTP em `Users.ts` (secret + habilitado), fluxo de setup (QR code) em Configurações → Segurança, verificação no login (`/entrar`) via middleware custom com `otplib` — não há plugin oficial mantido pro Payload 3 (confirmado em 19/05/2026, `CLAUDE.md` §17.8). Trocar o toggle "Demonstrativo" da tela Configurações por um que persiste de verdade.
-- **Fora do escopo:** 2FA obrigatório pra todo usuário (só super-admin por ora, conforme §17.8) — se quiser estender, é decisão à parte.
-- **Pré-requisito:** nenhum — pode começar já.
-- **Estimativa:** 1–2 sessões (setup + verificação + UI).
-- **Prompt:**
-  ```
-  Vamos implementar 2FA (TOTP) no login do Painel Admin.
-
-  Leia primeiro:
-  1. CLAUDE.md §5.8 (zona sensível — não desabilite 2FA nem rotacione secrets sem ordem) e §17.8 (contexto: sem plugin oficial pro Payload 3, via middleware custom com otplib)
-  2. apps/cms/src/collections/Users.ts
-  3. A seção "Segurança e acesso" em TelaConfiguracoes.tsx (hoje é "Demonstrativo" — toggle sem persistência)
-
-  Escopo desta sessão: TOTP obrigatório só para super-admin. Campo de secret em Users,
-  fluxo de setup com QR code em Configurações, verificação no /entrar. Antes de codar,
-  exponha o plano (§8) e as decisões técnicas que precisam da minha confirmação.
-  ```
+- **Entregue, mas NÃO como TOTP.** O escopo original desta sessão (TOTP com `otplib`, QR code, campo de secret em `Users.ts`) foi **descartado** — em 02/09 o PO optou por **passkey/WebAuthn** no lugar, que é mais forte (resistente a phishing, sem segredo compartilhado) e não depende de plugin. Spec: `docs/superpowers/specs/2026-09-02-passkey-2fa-design.md`. Plano: `docs/superpowers/plans/2026-09-02-passkey-2fa-implementation.md`. Mergeado na `main` (CLAUDE.md v1.9).
+- **O que existe hoje:** 20ª coleção `passkeys`; senha continua sendo o 1º fator; quem cadastra passkey passa a confirmar com ele (Touch ID/Windows Hello/chave física) antes da sessão abrir — inclusive no fluxo "esqueci minha senha"; autogestão em Configurações → Minha conta; remoção pelo super-admin na tela Usuários (cobre dispositivo perdido).
+- **Diferença importante em relação ao plano original:** é **opcional por usuário** (quem não cadastra segue só com senha), então **não fecha sozinho o "2FA obrigatório" do DAB §10.1**. Tornar obrigatório é decisão do PO — quando for, o enforço é pequeno (barrar login sem passkey cadastrado).
+- **Pendente:** checkpoint visual humano (§6). A seção "Segurança e acesso" da tela Configurações continua "Demonstrativo" — a parte real de passkeys mora em "Minha conta".
 
 ### Sessão C2 — Anti-spam real
 
