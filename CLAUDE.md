@@ -369,7 +369,7 @@ O CMS é um **Payload CMS 3** com **20 coleções + 4 globals** modeladas e um *
 **Painel Admin — módulo CRM (rota `/crm`, casco `ShellCrm` dentro do `ShellPainel` compartilhado, seletor Site|CRM na sidebar):**
 - **Operação Comercial:** Dashboard Executivo (KPIs + gráficos SVG próprios + follow-ups) · Leads · Clientes · Contatos · Oportunidades · **Propostas · Versões · Envios** (reais desde a Fase B1, 22/07) · Condições (**ainda "Em breve"** — única casca vazia que resta no grupo).
 - **Catálogo Institucional:** Programas, Módulos, Produtos/Eventos — listas **read-only** (edição segue no módulo Site).
-- **Processo Comercial B2G (P0)** (terceiro grupo de menu, aberto na Sessão H3): **Qualificação (COM-04)** — tela de avaliação por oportunidade.
+- **Processo Comercial B2G (P0)** (terceiro grupo de menu, aberto na Sessão H2): **Qualificação (COM-04)** — tela de avaliação por oportunidade.
 - Coleções próprias do CRM: `clientes-crm`, `contatos-crm`, `oportunidades`, `propostas`, `versoes-proposta`, `envios-proposta`, `historico-estagio`, `avaliacoes-qualificacao`. Catálogo comercial único (oportunidades/propostas apontam para `programas`/`modulos`/`eventos`, que têm o grupo `comercial`).
 - Importador do CRM legado: `CRM_JSON=/caminho.json CRM_DRY_RUN=1 pnpm crm:importar` (idempotente; sem dry-run grava) — desde a Sessão H1, já grava `estagio`/`situacao` do funil novo.
 - **Fundação do funil P0** (Sessão H1 da Janela H, `docs/17`): `oportunidades` ganhou os campos `estagio` (11 estágios) e `situacao` (3 valores), ortogonais ao `status` legado — mantido, mas agora derivado por hook `beforeChange`. Toda transição de estágio é gravada na coleção `historico-estagio` (append-only, hook `afterChange`). Telas de Oportunidades (lista, formulário, detalhe) já refletem o funil novo; o Dashboard e os gráficos comerciais também já leem `estagio`/`situacao` (antecipado da Sessão H7 logo depois da H1 — o espelho `status` continua sendo gravado, só a leitura mudou).
@@ -413,4 +413,4 @@ A infra de forms já existe e não deve ser reinventada (§5.1): schemas Zod em 
 ---
 
 **Fim das instruções permanentes.**
-*Portal Grupo NTC · CLAUDE.md · v1.8 · 4 de setembro de 2026 · Instituto NTC do Brasil*
+*Portal Grupo NTC · CLAUDE.md · v1.9 · 7 de setembro de 2026 · Instituto NTC do Brasil*

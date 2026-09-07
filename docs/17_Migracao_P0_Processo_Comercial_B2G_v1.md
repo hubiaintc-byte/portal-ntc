@@ -288,12 +288,12 @@ Não são erros do manual — ele documenta o protótipo, e o protótipo não te
 
 ### Sessão H7 — Navegação, dashboard e encerramento da migração
 
-- **Objetivo:** o P0 aparece no menu e o dashboard passa a ler o modelo novo.
-- **Escopo:** 3º grupo de navegação em `ShellCrm.tsx` ("Processo Comercial B2G"); `GraficosComercial.tsx` e `TelaPainelComercial.tsx` migrados de `status` para `estagio`/`situacao` (funil de 11 etapas); tela/filtro da **fila de revisão de migração** (`migracaoPendenteRevisao = true`) para a direção despachar; `importadorCrm.ts` passa a gravar `estagio`/`situacao`.
-  - **Divergência M2:** o funil do Dashboard é o ponto exato do problema. No protótipo ele está com os 6 status legados *hardcoded* lendo o espelho `status` — o que faz o painel contradizer o funil de 11 estágios que o manual ensina. Aqui ele passa a agregar por `estagio`, com `situacao` como filtro (Ativa por padrão), e **exclui do gráfico** o que ainda estiver pendente de revisão de migração, para não criar um pico artificial em `Mapeada`.
-  - **Divergência M1 (a outra metade):** a fila de revisão deixa de ser função de console e vira tela de trabalho da direção — lista, filtro, e a ação de confirmar o estágio (que limpa `migracaoPendenteRevisao` e grava o motivo no histórico).
+- **Objetivo:** a fila de revisão de migração vira tela de trabalho da Direção, e o P0 recebe o checkpoint visual completo. A navegação e o dashboard, que dão nome original a esta sessão, já foram antecipados — o 3º grupo de menu "Processo Comercial B2G (P0)" foi criado na **H2**, e `GraficosComercial.tsx`/`TelaPainelComercial.tsx` já leem `estagio`/`situacao` desde logo depois da **H1** (ver "Atualização pós-H1" na Sessão H1 abaixo).
+- **Escopo:** tela/filtro da **fila de revisão de migração** (`migracaoPendenteRevisao = true`) para a Direção despachar — hoje a informação só aparece como selo em `TelaOportunidades.tsx`/`DetalheOportunidade.tsx`, sem tela de trabalho própria nem ação de confirmar o estágio; ao entrar nesta sessão, conferir que o grupo "Processo Comercial B2G (P0)" já recebeu os itens de menu das sessões H4/H5 (Contratação, Handoff), que devem ter chegado por conta própria em cada sessão.
+  - **Divergência M2:** ✅ **resolvida na parte de sistema já na H1** — o funil do Dashboard agrega por `estagio`, com `situacao` como filtro (Ativa por padrão), e exclui do gráfico o que estiver pendente de revisão de migração, para não criar um pico artificial em `Mapeada`. Só falta a parte de texto (§33 do manual, escopo da **H8**).
+  - **Divergência M1 (a outra metade):** ainda pendente — a fila de revisão deixa de ser função de console e vira tela de trabalho da direção — lista, filtro, e a ação de confirmar o estágio (que limpa `migracaoPendenteRevisao` e grava o motivo no histórico).
 - **Pré-requisito:** H1–H6 + decisão #4 em andamento.
-- **Critério de aceite:** checkpoint visual (`CLAUDE.md` §6) desktop 1440 + mobile 375 do CRM inteiro; funil do Dashboard exibindo os 11 estágios (M2); fila de revisão zerada ou com pendências explicitamente aceitas pelo PO.
+- **Critério de aceite:** checkpoint visual (`CLAUDE.md` §6) desktop 1440 + mobile 375 do CRM inteiro, incluindo confirmar visualmente o funil do Dashboard com os 11 estágios (M2, já implementado desde a H1) e o grupo "Processo Comercial B2G (P0)" completo; fila de revisão zerada ou com pendências explicitamente aceitas pelo PO.
 - **Só depois disso** o campo `status` legado pode ser considerado para remoção — **em sessão separada**, nunca junto com esta.
 
 ---
