@@ -1,8 +1,9 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { checarRateLimit, LIMITE_RECUPERACAO } from "@ntc/lib";
 import type {
   AuthenticationResponseJSON,
   PublicKeyCredentialCreationOptionsJSON,
@@ -21,6 +22,7 @@ import {
   type PasskeyResumo,
 } from "@/lib/cms/painelPasskeys";
 import { obterPayload } from "@/lib/payloadClient";
+import { criarStoreRateLimit } from "@/lib/storeRateLimit";
 import { cifrarTokenPonte, decifrarTokenPonte } from "@/lib/passkeys/tokens";
 import { validarNovaSenha } from "@/lib/validarNovaSenha";
 
@@ -146,6 +148,24 @@ export async function solicitarRecuperacao(
 ): Promise<EstadoLogin> {
   const email = String(formData.get("email") ?? "").trim();
   if (!email) return { erro: "Informe o e-mail." };
+
+  // Sem isto, o endereço de admin (conhecido) pode ser bombardeado de
+  // e-mails de recuperação por qualquer um, em loop.
+  const cabecalhos = await headers();
+  const xff = cabecalhos.get("x-forwarded-for") ?? "";
+  const ip = xff.split(",")[0]?.trim() || cabecalhos.get("x-real-ip") || "0.0.0.0";
+  const limite = await checarRateLimit(
+    ip,
+    "/entrar/recuperar",
+    criarStoreRateLimit(),
+    LIMITE_RECUPERACAO,
+  );
+  if (!limite.ok) {
+    // Mensagem genérica de propósito: não revela se o e-mail existe nem
+    // que houve bloqueio por IP (spec 2026-07-10 §2).
+    return { ok: MENSAGEM_RECUPERACAO };
+  }
+
   try {
     const payload = await obterPayload();
     await payload.forgotPassword({ collection: "users", data: { email } });
