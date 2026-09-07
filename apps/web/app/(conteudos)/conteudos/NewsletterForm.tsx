@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { POLITICA_VERSAO_ATUAL } from "@ntc/lib";
+import { CampoTurnstile } from "@ntc/ui";
 
 import { NEWSLETTER_FORM } from "./conteudoConteudos";
 
@@ -51,6 +52,10 @@ export function NewsletterForm() {
     const vertical = String(data.get("vertical") ?? "");
     const orgao = String(data.get("orgao") ?? "").trim();
     const consent = data.get("consent") !== null;
+    // Nome do campo no corpo do POST é histórico (`hcaptchaToken`); o
+    // provedor hoje é o Turnstile, que injeta o token neste input.
+    const turnstileToken =
+      (form.elements.namedItem("cf-turnstile-response") as HTMLInputElement | null)?.value ?? "";
 
     const validEmail = EMAIL_REGEX.test(email);
 
@@ -71,6 +76,7 @@ export function NewsletterForm() {
         instituicao: orgao || undefined,
         origem: montarOrigem(),
         consentimentoLgpd: { aceito: true, politicaVersao: POLITICA_VERSAO_ATUAL },
+        hcaptchaToken: turnstileToken,
       }),
     })
       .then(async (res) => {
@@ -138,6 +144,7 @@ export function NewsletterForm() {
         <input type="checkbox" name="consent" required />
         <span dangerouslySetInnerHTML={{ __html: NEWSLETTER_FORM.consentHtml }} />
       </label>
+      <CampoTurnstile />
       <button type="submit" className="btn btn--gold" disabled={status === "sending"}>
         {NEWSLETTER_FORM.botaoTexto} <span className="btn-arrow">→</span>
       </button>

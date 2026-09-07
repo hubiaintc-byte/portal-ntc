@@ -11,6 +11,8 @@ import {
   type ReactNode,
 } from "react";
 
+import { CampoTurnstile } from "@ntc/ui";
+
 import {
   BULK_INSCRITOS_RANGES,
   FORMS_ASIDES,
@@ -719,6 +721,8 @@ function PainelAtendimento({ tabAtiva, status, onSubmit }: PainelAtendimentoProp
             </label>
           </div>
 
+          <CampoTurnstile />
+
           <div className="form-actions full">
             <button
               type="submit"
@@ -956,6 +960,8 @@ function PainelProposta({
               e da LGPD (Lei 13.709/2018).
             </label>
           </div>
+
+          <CampoTurnstile />
 
           <div className="form-actions full">
             <button
@@ -1256,6 +1262,8 @@ function PainelEquipe({
             </label>
           </div>
 
+          <CampoTurnstile />
+
           <div className="form-actions full">
             <button
               type="submit"
@@ -1393,6 +1401,8 @@ function PainelImprensa({ tabAtiva, status, onSubmit }: PainelImprensaProps) {
               e da LGPD.
             </label>
           </div>
+
+          <CampoTurnstile />
 
           <div className="form-actions full">
             <button

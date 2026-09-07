@@ -10,6 +10,7 @@
  *
  * Resta apenas o que toda rota consome:
  * - BannerCookies (banner LGPD sticky-bottom, root layout)
+ * - CampoTurnstile (widget de captcha dos formulários públicos)
  * - DialogoPolitica (modal de política, usado por BannerCookies se preciso)
  * - tokens (paleta Soberana 2026)
  */
@@ -18,4 +19,5 @@ export { tokens } from "./tokens";
 export type { Tokens, CorSoberana, EscalaTipografica } from "./tokens";
 
 export { BannerCookies } from "./components/helpers/BannerCookies";
+export { CampoTurnstile } from "./components/helpers/CampoTurnstile";
 export { DialogoPolitica } from "./components/helpers/DialogoPolitica";

@@ -195,7 +195,12 @@ export async function enviarLead(kind: TabId, form: HTMLFormElement): Promise<Re
   const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    // O nome do campo é histórico: os handlers leem `hcaptchaToken` desde a
+    // primeira versão. O provedor hoje é o Cloudflare Turnstile, que injeta
+    // o token no input `cf-turnstile-response` dentro do próprio <form>.
+    // Vai aqui e não nos 4 corpos de `montarCorpo` porque as 4 abas passam
+    // por este único ponto de envio.
+    body: JSON.stringify({ ...body, hcaptchaToken: valor(form, "cf-turnstile-response") }),
   });
   const json = (await res.json().catch(() => ({}))) as Partial<ResultadoEnvio>;
   return {

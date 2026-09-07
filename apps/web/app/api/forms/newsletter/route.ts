@@ -4,12 +4,13 @@ import {
   extrairOrigem,
   POLITICA_VERSAO_ATUAL,
   schemaNewsletter,
-  verificarHcaptcha,
+  verificarCaptcha,
 } from "@ntc/lib";
 
 import type { Payload } from "payload";
 
 import { obterPayload } from "@/lib/payloadClient";
+import { criarStoreRateLimit } from "@/lib/storeRateLimit";
 import {
   errosDeZod,
   respostaErro,
@@ -69,15 +70,16 @@ export async function POST(req: Request) {
     typeof (body as Record<string, unknown>).hcaptchaToken === "string"
       ? ((body as Record<string, unknown>).hcaptchaToken as string)
       : undefined;
-  const captchaOk = await verificarHcaptcha(captchaToken);
+  const xff = req.headers.get("x-forwarded-for") ?? "";
+  const ip = xff.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "0.0.0.0";
+
+  const captchaOk = await verificarCaptcha(captchaToken, ip);
   if (!captchaOk) return respostaErro("Falha na verificação de captcha.", 400);
 
   const validacao = schemaNewsletter.safeParse(body);
   if (!validacao.success) return respostaValidacao(errosDeZod(validacao.error));
 
-  const xff = req.headers.get("x-forwarded-for") ?? "";
-  const ip = xff.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "0.0.0.0";
-  const limit = await checarRateLimit(ip, "/api/forms/newsletter");
+  const limit = await checarRateLimit(ip, "/api/forms/newsletter", criarStoreRateLimit());
   if (!limit.ok) return respostaRateLimit(limit.retryAfterSegundos);
 
   const dados = validacao.data;
