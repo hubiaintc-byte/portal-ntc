@@ -57,11 +57,32 @@ const SELO_SITUACAO: Record<string, string> = {
   "adiada-nurturing": "atencao",
 };
 
+/** Resultado da avaliação COM-04 (manual §18): Qualificada é a única decisão positiva. */
+const SELO_RESULTADO: Record<string, string> = {
+  qualificada: "ok",
+  "qualificar-mais": "atencao",
+  nurturing: "info",
+  "nao-qualificada": "erro",
+};
+
+/** Faixa de leitura do score COM-04 (manual §15): referência, não decisão. */
+const SELO_FAIXA: Record<string, string> = {
+  forte: "ok",
+  intermediario: "atencao",
+  fraco: "erro",
+};
+
 export const seloDeEstagio = (estagio: string): string =>
   `pcms-selo pcms-selo--${SELO_ESTAGIO[estagio] ?? "info"}`;
 
 export const seloDeSituacao = (situacao: string): string =>
   `pcms-selo pcms-selo--${SELO_SITUACAO[situacao] ?? "info"}`;
+
+export const seloDeResultado = (resultado: string): string =>
+  `pcms-selo pcms-selo--${SELO_RESULTADO[resultado] ?? "info"}`;
+
+export const seloDeFaixa = (faixa: string): string =>
+  `pcms-selo pcms-selo--${SELO_FAIXA[faixa] ?? "info"}`;
 
 export const seloDeOportunidade = (status: string): string =>
   `pcms-selo pcms-selo--${SELO_OPORTUNIDADE[status] ?? "info"}`;

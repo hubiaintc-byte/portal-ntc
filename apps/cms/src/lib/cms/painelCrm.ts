@@ -1,6 +1,7 @@
 import "server-only";
 
 import type {
+  AvaliacaoQualificacao,
   ClienteCrm,
   ContatoCrm,
   EnvioProposta,
@@ -558,4 +559,108 @@ export async function listarHistoricoEstagio(
     dataHoraISO: typeof doc.dataHora === "string" ? doc.dataHora : null,
     autor: campoRel(doc.usuario, "nome") ?? doc.atorSistema ?? "sistema",
   }));
+}
+
+// --- Avaliação de Qualificação · COM-04 (Sessão H2/H3 · docs/17 · Manual
+// NTC-COM-CRM-01 §§13-19) --------------------------------------------------
+
+export interface AvaliacaoResumo {
+  id: string;
+  oportunidadeId: string;
+  oportunidadeCodigo: string;
+  statusAvaliacao: string;
+  scoreTotal: number | null;
+  faixa: string | null;
+  resultado: string | null;
+  vigente: boolean;
+  concluidaEmISO: string | null;
+  avaliadorNome: string | null;
+}
+
+export interface AvaliacaoDetalhe extends AvaliacaoResumo {
+  notaNecessidade: number | null;
+  notaAderencia: number | null;
+  notaPrioridade: number | null;
+  notaTiming: number | null;
+  notaCaminho: number | null;
+  notaStakeholders: number | null;
+  notaOrcamento: number | null;
+  notaRisco: number | null;
+  notaValor: number | null;
+  hgAderencia: string | null;
+  hgJuridico: string | null;
+  hgCondicao: string | null;
+  hgIncapacidade: string | null;
+  hgDemanda: string | null;
+  hgRequisito: string | null;
+  hgIntegridade: string | null;
+  justificativa: string | null;
+  proximoPasso: string | null;
+  observacoes: string | null;
+  avaliadorId: string | null;
+  ownerId: string | null;
+}
+
+function mapearAvaliacaoResumo(doc: AvaliacaoQualificacao): AvaliacaoResumo {
+  return {
+    id: String(doc.id),
+    oportunidadeId: idRel(doc.oportunidade) ?? "",
+    oportunidadeCodigo: campoRel(doc.oportunidade, "codigo") ?? "",
+    statusAvaliacao: doc.statusAvaliacao,
+    scoreTotal: doc.scoreTotal ?? null,
+    faixa: doc.faixa ?? null,
+    resultado: doc.resultado ?? null,
+    vigente: doc.vigente === true,
+    concluidaEmISO: soData(doc.concluidaEm),
+    avaliadorNome: campoRel(doc.avaliador, "nome"),
+  };
+}
+
+/**
+ * Todas as avaliações, mais recente primeiro — inclui as não vigentes: uma
+ * oportunidade pode ter mais de uma no tempo (requalificação, manual §19).
+ */
+export async function listarAvaliacoesCrm(): Promise<AvaliacaoResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "avaliacoes-qualificacao",
+    depth: 1,
+    limit: 500,
+    sort: "-createdAt",
+  });
+  return res.docs.map(mapearAvaliacaoResumo);
+}
+
+export async function obterAvaliacaoCrm(id: string): Promise<AvaliacaoDetalhe | null> {
+  const payload = await obterPayload();
+  let doc: AvaliacaoQualificacao;
+  try {
+    doc = await payload.findByID({ collection: "avaliacoes-qualificacao", id, depth: 1 });
+  } catch {
+    return null;
+  }
+  return {
+    ...mapearAvaliacaoResumo(doc),
+    notaNecessidade: doc.notaNecessidade ?? null,
+    notaAderencia: doc.notaAderencia ?? null,
+    notaPrioridade: doc.notaPrioridade ?? null,
+    notaTiming: doc.notaTiming ?? null,
+    notaCaminho: doc.notaCaminho ?? null,
+    notaStakeholders: doc.notaStakeholders ?? null,
+    notaOrcamento: doc.notaOrcamento ?? null,
+    notaRisco: doc.notaRisco ?? null,
+    notaValor: doc.notaValor ?? null,
+    hgAderencia: doc.hgAderencia ?? null,
+    hgJuridico: doc.hgJuridico ?? null,
+    hgCondicao: doc.hgCondicao ?? null,
+    hgIncapacidade: doc.hgIncapacidade ?? null,
+    hgDemanda: doc.hgDemanda ?? null,
+    hgRequisito: doc.hgRequisito ?? null,
+    hgIntegridade: doc.hgIntegridade ?? null,
+    justificativa: doc.justificativa ?? null,
+    proximoPasso: doc.proximoPasso ?? null,
+    observacoes: doc.observacoes ?? null,
+    avaliadorId: idRel(doc.avaliador),
+    ownerId: idRel(doc.owner),
+  };
 }
