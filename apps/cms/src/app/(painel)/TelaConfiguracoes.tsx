@@ -40,7 +40,15 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
   const [carregandoPasskeys, setCarregandoPasskeys] = useState(true);
   const [cadastrandoPasskey, setCadastrandoPasskey] = useState(false);
   const [erroPasskey, setErroPasskey] = useState<string | null>(null);
-  const suportaWebAuthn = typeof window !== "undefined" && browserSupportsWebAuthn();
+  // Detectado só depois da montagem: avaliar no render faz o servidor
+  // renderizar "não tem suporte" (não existe `window` no SSR) e o cliente
+  // renderizar a seção real — mismatch de hidratação que deixa a seção
+  // presa na mensagem errada. `null` = ainda não sabemos.
+  const [suportaWebAuthn, setSuportaWebAuthn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setSuportaWebAuthn(browserSupportsWebAuthn());
+  }, []);
 
   useEffect(() => {
     listarMinhasPasskeysCms()
@@ -174,8 +182,15 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
           <hr className="pcms-editor__hr" />
           <h4>Passkeys</h4>
           <p>Segundo fator de login neste painel — opcional, um por dispositivo.</p>
-          {!suportaWebAuthn ? (
-            <p className="pcms-form-aviso">Este navegador não tem suporte a passkeys.</p>
+          {suportaWebAuthn === null ? (
+            <p>Verificando suporte do navegador…</p>
+          ) : suportaWebAuthn === false ? (
+            <p className="pcms-form-aviso">
+              Passkeys indisponíveis neste navegador. Isso acontece quando a página não está num
+              contexto seguro — o WebAuthn só funciona em <strong>https://</strong> ou{" "}
+              <strong>http://localhost</strong>. Acessando por IP da rede (ex.: 192.168.x.x) o
+              navegador desabilita a API.
+            </p>
           ) : (
             <>
               {erroPasskey ? (
