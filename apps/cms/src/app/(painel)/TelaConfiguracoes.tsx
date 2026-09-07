@@ -1,15 +1,23 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+
+import { startRegistration, browserSupportsWebAuthn } from "@simplewebauthn/browser";
 
 import { SENHA_MINIMO } from "@/lib/validarNovaSenha";
 
-import { trocarMinhaSenha } from "./acoesAuth";
+import {
+  listarMinhasPasskeysCms,
+  obterOpcoesCadastroPasskeyCms,
+  removerPasskeyProprioCms,
+  trocarMinhaSenha,
+  verificarCadastroPasskeyCms,
+} from "./acoesAuth";
 import { AvisoForm, CampoSenha } from "./crm/CamposCrm";
 
 interface TelaConfiguracoesProps {
   /** Usuário logado — usado só para exibir o e-mail da conta na seção real. */
-  usuario: { nome: string; email: string };
+  usuario: { id: string; nome: string; email: string };
 }
 
 /**
@@ -25,6 +33,59 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
   const [sucesso, setSucesso] = useState<string | null>(null);
   const [salvando, iniciarSalvar] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+
+  const [passkeys, setPasskeys] = useState<
+    { id: string; apelido: string; criadoEm: string; ultimoUsoEm: string | null }[]
+  >([]);
+  const [carregandoPasskeys, setCarregandoPasskeys] = useState(true);
+  const [cadastrandoPasskey, setCadastrandoPasskey] = useState(false);
+  const [erroPasskey, setErroPasskey] = useState<string | null>(null);
+  const suportaWebAuthn = typeof window !== "undefined" && browserSupportsWebAuthn();
+
+  useEffect(() => {
+    listarMinhasPasskeysCms()
+      .then(setPasskeys)
+      .finally(() => setCarregandoPasskeys(false));
+  }, []);
+
+  async function cadastrarPasskey() {
+    const apelido = window.prompt("Como quer chamar este dispositivo? (ex.: MacBook do Jotta)");
+    if (!apelido) return;
+    setErroPasskey(null);
+    setCadastrandoPasskey(true);
+    try {
+      const preparo = await obterOpcoesCadastroPasskeyCms();
+      if (!preparo.ok) {
+        setErroPasskey(preparo.erro);
+        return;
+      }
+      const resposta = await startRegistration({ optionsJSON: preparo.opcoes });
+      const resultado = await verificarCadastroPasskeyCms(resposta, preparo.tokenDesafio, apelido);
+      if (!resultado.ok) {
+        setErroPasskey(resultado.erro ?? "Não foi possível cadastrar o passkey.");
+        return;
+      }
+      setPasskeys(await listarMinhasPasskeysCms());
+    } catch {
+      setErroPasskey("Não foi possível cadastrar o passkey. Tente novamente.");
+    } finally {
+      setCadastrandoPasskey(false);
+    }
+  }
+
+  async function removerPasskeyProprio(id: string) {
+    setErroPasskey(null);
+    try {
+      const resultado = await removerPasskeyProprioCms(id);
+      if (!resultado.ok) {
+        setErroPasskey(resultado.erro ?? "Não foi possível remover o passkey. Tente novamente.");
+        return;
+      }
+      setPasskeys(await listarMinhasPasskeysCms());
+    } catch {
+      setErroPasskey("Não foi possível remover o passkey. Tente novamente.");
+    }
+  }
 
   function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -109,6 +170,50 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
               {salvando ? "Salvando…" : "Alterar senha"}
             </button>
           </form>
+
+          <hr className="pcms-editor__hr" />
+          <h4>Passkeys</h4>
+          <p>Segundo fator de login neste painel — opcional, um por dispositivo.</p>
+          {!suportaWebAuthn ? (
+            <p className="pcms-form-aviso">Este navegador não tem suporte a passkeys.</p>
+          ) : (
+            <>
+              {erroPasskey ? (
+                <p className="pcms-login__erro" role="alert">
+                  {erroPasskey}
+                </p>
+              ) : null}
+              {carregandoPasskeys ? (
+                <p>Carregando…</p>
+              ) : passkeys.length === 0 ? (
+                <p>Nenhum passkey cadastrado ainda.</p>
+              ) : (
+                <ul style={{ listStyle: "none", padding: 0 }}>
+                  {passkeys.map((p) => (
+                    <li
+                      key={p.id}
+                      style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}
+                    >
+                      <span>
+                        <strong>{p.apelido}</strong> · cadastrado em {new Date(p.criadoEm).toLocaleDateString("pt-BR")}
+                        {p.ultimoUsoEm ? ` · usado em ${new Date(p.ultimoUsoEm).toLocaleDateString("pt-BR")}` : ""}
+                      </span>
+                      <button
+                        type="button"
+                        className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+                        onClick={() => removerPasskeyProprio(p.id)}
+                      >
+                        Remover
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <button type="button" className="pcms-btn" onClick={cadastrarPasskey} disabled={cadastrandoPasskey}>
+                {cadastrandoPasskey ? "Cadastrando…" : "Adicionar passkey"}
+              </button>
+            </>
+          )}
         </section>
 
         <section className="pcms-config-card">

@@ -12,6 +12,7 @@ export interface Config {
   };
   collections: {
     users: User;
+    passkeys: Passkey;
     media: Media;
     areas: Area;
     programas: Programa;
@@ -37,6 +38,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     areas: AreasSelect<false> | AreasSelect<true>;
     programas: ProgramasSelect<false> | ProgramasSelect<true>;
@@ -125,6 +127,25 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkeys".
+ */
+export interface Passkey {
+  id: number;
+  usuario: number | User;
+  /**
+   * Nome livre pra identificar o dispositivo — ex.: "MacBook do Jotta".
+   */
+  apelido: string;
+  credentialId: string;
+  publicKey: string;
+  counter: number;
+  transports?: string[] | null;
+  ultimoUsoEm?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1316,6 +1337,10 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'passkeys';
+        value: number | Passkey;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -1445,6 +1470,21 @@ export interface UsersSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkeys_select".
+ */
+export interface PasskeysSelect<T extends boolean = true> {
+  usuario?: T;
+  apelido?: T;
+  credentialId?: T;
+  publicKey?: T;
+  counter?: T;
+  transports?: T;
+  ultimoUsoEm?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

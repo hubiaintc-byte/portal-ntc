@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { Fragment, useState, useTransition } from "react";
 
 import type { OpcaoLista } from "@ntc/lib";
 
@@ -9,7 +9,9 @@ import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
 import {
   criarUsuarioCms,
   editarUsuarioCms,
+  listarPasskeysDeUsuarioCms,
   reenviarConviteUsuarioCms,
+  removerPasskeyAdminCms,
   removerUsuarioCms,
 } from "./acoes";
 import { AvisoForm, BarraForm, CampoSelect, CampoTexto } from "./crm/CamposCrm";
@@ -67,6 +69,10 @@ export function TelaUsuarios({
   );
   const [salvando, iniciarSalvar] = useTransition();
   const [removendo, iniciarRemover] = useTransition();
+  const [expandido, setExpandido] = useState<string | null>(null);
+  const [passkeysPorUsuario, setPasskeysPorUsuario] = useState<
+    Record<string, { id: string; apelido: string; criadoEm: string; ultimoUsoEm: string | null }[]>
+  >({});
 
   const editando =
     modo !== "lista" && modo !== "novo" ? (usuarios.find((u) => u.id === modo) ?? null) : null;
@@ -154,6 +160,44 @@ export function TelaUsuarios({
       .finally(() => setReenviando(null));
   }
 
+  async function alternarExpandido(usuarioId: string) {
+    if (expandido === usuarioId) {
+      setExpandido(null);
+      return;
+    }
+    setExpandido(usuarioId);
+    if (!passkeysPorUsuario[usuarioId]) {
+      const lista = await listarPasskeysDeUsuarioCms(usuarioId);
+      setPasskeysPorUsuario((atual) => ({ ...atual, [usuarioId]: lista }));
+    }
+  }
+
+  // Mesma lição da tela Configurações (Task 6): resultado.ok === false ou uma
+  // exceção não podem passar em silêncio — reaproveita o feedbackLinha já
+  // usado por remover()/reenviarConvite() nesta mesma linha.
+  async function removerPasskeyDeUsuario(usuarioId: string, passkeyId: string) {
+    setFeedbackLinha(null);
+    try {
+      const resultado = await removerPasskeyAdminCms(passkeyId);
+      if (resultado.ok) {
+        const lista = await listarPasskeysDeUsuarioCms(usuarioId);
+        setPasskeysPorUsuario((atual) => ({ ...atual, [usuarioId]: lista }));
+      } else {
+        setFeedbackLinha({
+          id: usuarioId,
+          ok: false,
+          texto: resultado.erro ?? "Não foi possível remover o passkey.",
+        });
+      }
+    } catch {
+      setFeedbackLinha({
+        id: usuarioId,
+        ok: false,
+        texto: "Não foi possível remover o passkey. Tente novamente.",
+      });
+    }
+  }
+
   if (formAberto) {
     return (
       <form onSubmit={enviar}>
@@ -229,74 +273,121 @@ export function TelaUsuarios({
           </thead>
           <tbody>
             {usuarios.map((u) => (
-              <tr key={u.id}>
-                <td>
-                  <strong>{u.nome}</strong>
-                  {u.id === usuarioAtualId && <> · <small>você</small></>}
-                </td>
-                <td>{u.email}</td>
-                <td>
-                  <span className="pcms-selo pcms-selo--info">{ROTULO_PERFIL[u.perfil] ?? u.perfil}</span>
-                </td>
-                <td>{new Date(u.atualizadoEm).toLocaleDateString("pt-BR")}</td>
-                <td>
-                  <div className="pcms-home-row__acoes">
-                    <button
-                      type="button"
-                      className="pcms-btn pcms-btn--ghost pcms-btn--mini"
-                      onClick={() => abrirEdicao(u)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      type="button"
-                      className="pcms-btn pcms-btn--ghost pcms-btn--mini"
-                      onClick={() => reenviarConvite(u.id)}
-                      disabled={reenviando === u.id}
-                    >
-                      {reenviando === u.id ? "Enviando…" : "Reenviar convite"}
-                    </button>
-                    {confirmandoRemocao === u.id ? (
-                      <>
-                        <button
-                          type="button"
-                          className="pcms-btn pcms-btn--mini"
-                          onClick={() => remover(u.id)}
-                          disabled={removendo}
-                        >
-                          {removendo ? "Removendo…" : "Confirmar remoção?"}
-                        </button>
-                        <button
-                          type="button"
-                          className="pcms-btn pcms-btn--ghost pcms-btn--mini"
-                          onClick={() => setConfirmandoRemocao(null)}
-                          disabled={removendo}
-                        >
-                          Cancelar
-                        </button>
-                      </>
-                    ) : (
+              <Fragment key={u.id}>
+                <tr>
+                  <td>
+                    <strong>{u.nome}</strong>
+                    {u.id === usuarioAtualId && <> · <small>você</small></>}
+                  </td>
+                  <td>{u.email}</td>
+                  <td>
+                    <span className="pcms-selo pcms-selo--info">{ROTULO_PERFIL[u.perfil] ?? u.perfil}</span>
+                  </td>
+                  <td>{new Date(u.atualizadoEm).toLocaleDateString("pt-BR")}</td>
+                  <td>
+                    <div className="pcms-home-row__acoes">
                       <button
                         type="button"
                         className="pcms-btn pcms-btn--ghost pcms-btn--mini"
-                        onClick={() => setConfirmandoRemocao(u.id)}
-                        disabled={u.id === usuarioAtualId}
-                        title={u.id === usuarioAtualId ? "Você não pode remover a si mesmo." : undefined}
+                        onClick={() => abrirEdicao(u)}
                       >
-                        Remover
+                        Editar
                       </button>
-                    )}
-                    {feedbackLinha?.id === u.id && (
-                      <span
-                        role={feedbackLinha.ok ? "status" : "alert"}
-                        className={`pcms-selo pcms-selo--${feedbackLinha.ok ? "ok" : "erro"}`}
+                      <button
+                        type="button"
+                        className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+                        onClick={() => reenviarConvite(u.id)}
+                        disabled={reenviando === u.id}
                       >
-                        {feedbackLinha.texto}
-                      </span>
-                    )}
-                  </div>
-                </td>
-              </tr>
+                        {reenviando === u.id ? "Enviando…" : "Reenviar convite"}
+                      </button>
+                      <button
+                        type="button"
+                        className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+                        onClick={() => alternarExpandido(u.id)}
+                      >
+                        {expandido === u.id ? "Ocultar passkeys" : "Passkeys"}
+                      </button>
+                      {confirmandoRemocao === u.id ? (
+                        <>
+                          <button
+                            type="button"
+                            className="pcms-btn pcms-btn--mini"
+                            onClick={() => remover(u.id)}
+                            disabled={removendo}
+                          >
+                            {removendo ? "Removendo…" : "Confirmar remoção?"}
+                          </button>
+                          <button
+                            type="button"
+                            className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+                            onClick={() => setConfirmandoRemocao(null)}
+                            disabled={removendo}
+                          >
+                            Cancelar
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+                          onClick={() => setConfirmandoRemocao(u.id)}
+                          disabled={u.id === usuarioAtualId}
+                          title={u.id === usuarioAtualId ? "Você não pode remover a si mesmo." : undefined}
+                        >
+                          Remover
+                        </button>
+                      )}
+                      {feedbackLinha?.id === u.id && (
+                        <span
+                          role={feedbackLinha.ok ? "status" : "alert"}
+                          className={`pcms-selo pcms-selo--${feedbackLinha.ok ? "ok" : "erro"}`}
+                        >
+                          {feedbackLinha.texto}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+                {expandido === u.id && (
+                  <tr>
+                    <td colSpan={5}>
+                      {(() => {
+                        const passkeysDoUsuario = passkeysPorUsuario[u.id];
+                        if (!passkeysDoUsuario) return <p>Carregando…</p>;
+                        if (passkeysDoUsuario.length === 0) return <p>Nenhum passkey cadastrado.</p>;
+                        return (
+                          <ul style={{ listStyle: "none", padding: 0 }}>
+                            {passkeysDoUsuario.map((p) => (
+                              <li
+                                key={p.id}
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                  gap: 8,
+                                }}
+                              >
+                                <span>
+                                  <strong>{p.apelido}</strong> · cadastrado em{" "}
+                                  {new Date(p.criadoEm).toLocaleDateString("pt-BR")}
+                                </span>
+                                <button
+                                  type="button"
+                                  className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+                                  onClick={() => removerPasskeyDeUsuario(u.id, p.id)}
+                                >
+                                  Remover
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        );
+                      })()}
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>

@@ -25,6 +25,7 @@ import { Media } from "./collections/Media";
 import { Modulos } from "./collections/Modulos";
 import { EnviosProposta } from "./collections/EnviosProposta";
 import { Oportunidades } from "./collections/Oportunidades";
+import { Passkeys } from "./collections/Passkeys";
 import { Programas } from "./collections/Programas";
 import { Propostas } from "./collections/Propostas";
 import { Users } from "./collections/Users";
@@ -87,6 +88,7 @@ export default buildConfig({
   },
   collections: [
     Users,
+    Passkeys,
     Media,
     Areas,
     Programas,
