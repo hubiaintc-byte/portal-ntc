@@ -13,7 +13,8 @@ import {
 
 import { atendimentoComercial } from "../access/atendimentoComercial";
 import { superAdmin } from "../access/superAdmin";
-import { montarDerivadosAvaliacao } from "../lib/crm/derivadosAvaliacao";
+import { hojeEmSaoPaulo, montarDerivadosAvaliacao } from "../lib/crm/derivadosAvaliacao";
+import { desmarcarOutrasVigentes } from "../lib/crm/vigenciaAvaliacao";
 
 /** Nota 0-3 inteira; o manual §15 recusa 2,5 e valores fora da faixa. */
 const validarNota = (valor: number | null | undefined): true | string =>
@@ -21,42 +22,42 @@ const validarNota = (valor: number | null | undefined): true | string =>
     ? true
     : "Use apenas os inteiros 0, 1, 2 ou 3.";
 
-/** Estreita o `data` do hook (tipo genérico do Payload) para a forma que as regras puras leem. */
-const comoAvaliacaoCom04 = (data: Record<string, unknown>): AvaliacaoCom04 => data;
+/** Estreita o `data`/`originalDoc` do hook (tipo genérico do Payload) para a forma que as regras puras leem. */
+const comoAvaliacaoCom04 = (dados: Record<string, unknown> | null | undefined): AvaliacaoCom04 | null =>
+  dados ?? null;
 
-const gravarDerivados: CollectionBeforeChangeHook = ({ data }) => ({
+/**
+ * Invólucro fino: a regra fica em `montarDerivadosAvaliacao` (pura, testada),
+ * que lê `originalDoc` como fallback para escritas parciais — assim os
+ * derivados não dependem de quantos campos o chamador enviou.
+ */
+const gravarDerivados: CollectionBeforeChangeHook = ({ data, originalDoc }) => ({
   ...data,
-  ...montarDerivadosAvaliacao(comoAvaliacaoCom04(data), new Date().toISOString().slice(0, 10)),
+  ...montarDerivadosAvaliacao(
+    comoAvaliacaoCom04(data),
+    hojeEmSaoPaulo(),
+    comoAvaliacaoCom04(originalDoc),
+  ),
 });
 
 /**
- * Uma única avaliação vigente por oportunidade (manual §13). Desmarca as
- * anteriores na MESMA transação — `req` repassado — para não existir instante
- * em que duas valem ao mesmo tempo.
+ * Uma única avaliação vigente por oportunidade (manual §13). Invólucro fino:
+ * o filtro e a escrita ficam em `desmarcarOutrasVigentes` (`vigenciaAvaliacao.ts`,
+ * testada), que desmarca as anteriores na MESMA transação — `req` repassado —
+ * para não existir instante em que duas valem ao mesmo tempo.
  */
 const manterUnicaVigente: CollectionAfterChangeHook = async ({ doc, req }) => {
-  if (doc.vigente !== true) return doc;
-  const oportunidadeId = typeof doc.oportunidade === "object" ? doc.oportunidade?.id : doc.oportunidade;
-  if (oportunidadeId === undefined || oportunidadeId === null) return doc;
-  await req.payload.update({
-    collection: "avaliacoes-qualificacao",
-    where: {
-      and: [
-        { oportunidade: { equals: oportunidadeId } },
-        { id: { not_equals: doc.id } },
-        { vigente: { equals: true } },
-      ],
-    },
-    data: { vigente: false },
-    req,
-  });
+  await desmarcarOutrasVigentes(req.payload, doc, req);
   return doc;
 };
 
 /**
  * Avaliações de Qualificação (COM-04) — docs/17 §1.2, Manual §§13-19.
- * A avaliação antiga nunca é sobrescrita: requalificar é criar uma nova e
- * marcá-la como vigente (§19).
+ * Requalificar é modelado como criar uma NOVA avaliação e marcá-la como
+ * vigente (§19), o que preserva a anterior como histórico. A imutabilidade da
+ * avaliação já concluída não é imposta aqui: `update` segue liberado a todo o
+ * atendimento comercial, e travar a edição de uma avaliação concluída é
+ * escopo da Sessão H6 (integridade e auditoria, docs/17).
  */
 export const AvaliacoesQualificacao: CollectionConfig = {
   slug: "avaliacoes-qualificacao",
