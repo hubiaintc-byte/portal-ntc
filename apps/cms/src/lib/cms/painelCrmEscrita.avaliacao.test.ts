@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
-const { criarAvaliacao } = await import("./painelCrmEscrita");
+const { atualizarAvaliacao, criarAvaliacao } = await import("./painelCrmEscrita");
 
 type UsuarioAutenticado = Parameters<typeof criarAvaliacao>[1];
 
@@ -53,16 +53,22 @@ const dadosBase = {
 function montarPayloadFalso() {
   const criados: Record<string, unknown>[] = [];
   const opcoes: Record<string, unknown>[] = [];
+  const atualizados: Record<string, unknown>[] = [];
+  const opcoesAtualizacao: Record<string, unknown>[] = [];
   obterPayloadMock.mockResolvedValue({
     create: vi.fn(async (args: { data: Record<string, unknown> }) => {
       criados.push(args.data);
       opcoes.push(args as unknown as Record<string, unknown>);
       return { id: 1, ...args.data };
     }),
-    update: vi.fn().mockResolvedValue({}),
+    update: vi.fn(async (args: { data: Record<string, unknown> }) => {
+      atualizados.push(args.data);
+      opcoesAtualizacao.push(args as unknown as Record<string, unknown>);
+      return { id: 9, ...args.data };
+    }),
     find: vi.fn().mockResolvedValue({ docs: [] }),
   });
-  return { criados, opcoes };
+  return { criados, opcoes, atualizados, opcoesAtualizacao };
 }
 
 afterEach(() => vi.clearAllMocks());
@@ -120,5 +126,52 @@ describe("criarAvaliacao", () => {
     );
     expect(r.ok).toBe(false);
     expect(r.erro).toContain("0, 1, 2 ou 3");
+  });
+});
+
+/**
+ * A transição "em preenchimento" → "concluída" acontece na ATUALIZAÇÃO, não na
+ * criação: é aqui que a exigência de completude morde de verdade.
+ */
+describe("atualizarAvaliacao", () => {
+  it("propaga o usuário da sessão e o id para a Local API", async () => {
+    const { opcoesAtualizacao } = montarPayloadFalso();
+    const r = await atualizarAvaliacao("9", dadosBase, usuarioFalso);
+    expect(r.ok).toBe(true);
+    expect(opcoesAtualizacao[0]).toMatchObject({
+      collection: "avaliacoes-qualificacao",
+      id: "9",
+      user: usuarioFalso,
+    });
+  });
+
+  it("converte as notas de texto para número inteiro", async () => {
+    const { atualizados } = montarPayloadFalso();
+    await atualizarAvaliacao("9", dadosBase, usuarioFalso);
+    expect(atualizados[0]).toMatchObject({ notaNecessidade: 3, notaRisco: 2, oportunidade: 7 });
+  });
+
+  it("recusa nota vazia quando a avaliação passa a concluída", async () => {
+    const { atualizados } = montarPayloadFalso();
+    const r = await atualizarAvaliacao(
+      "9",
+      { ...dadosBase, statusAvaliacao: "concluida", notaTiming: "" },
+      usuarioFalso,
+    );
+    expect(r.ok).toBe(false);
+    expect(r.erro).toContain("0, 1, 2 ou 3");
+    // A recusa é anterior à Local API: nada foi gravado.
+    expect(atualizados).toHaveLength(0);
+  });
+
+  it("aceita nota vazia enquanto a avaliação segue em preenchimento", async () => {
+    const { atualizados } = montarPayloadFalso();
+    const r = await atualizarAvaliacao(
+      "9",
+      { ...dadosBase, statusAvaliacao: "em-preenchimento", notaTiming: "" },
+      usuarioFalso,
+    );
+    expect(r.ok).toBe(true);
+    expect(atualizados[0]).toMatchObject({ notaTiming: null, notaNecessidade: 3 });
   });
 });
