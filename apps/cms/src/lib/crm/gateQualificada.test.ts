@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { DIMENSOES_COM04, HARD_GATES_COM04 } from "@ntc/lib";
 
-import { decisaoGateQualificada, erroDoGateQualificada } from "./gateQualificada";
+import { ErroGateQualificada, decisaoGateQualificada, erroDoGateQualificada } from "./gateQualificada";
 
 function avaliacaoCompleta(): Record<string, unknown> {
   const av: Record<string, unknown> = {
@@ -44,13 +44,27 @@ describe("erroDoGateQualificada", () => {
     expect(await erroDoGateQualificada(payload, 7)).toBeNull();
   });
 
-  it("consulta só a avaliação vigente daquela oportunidade", async () => {
+  it("consulta só a avaliação vigente daquela oportunidade, a mais recente primeiro", async () => {
     const { payload, find } = payloadCom([avaliacaoCompleta()]);
     await erroDoGateQualificada(payload, 7);
-    const args = find.mock.calls[0]![0] as { collection: string; where: unknown };
+    const args = find.mock.calls[0]![0] as { collection: string; where: unknown; sort: unknown };
     expect(args.collection).toBe("avaliacoes-qualificacao");
     expect(JSON.stringify(args.where)).toContain("\"equals\":7");
     expect(JSON.stringify(args.where)).toContain("vigente");
+    // Sem índice único parcial, duas vigentes ainda são possíveis em escritas
+    // concorrentes; o `sort` decide qual delas o gate lê.
+    expect(args.sort).toBe("-createdAt");
+  });
+});
+
+describe("ErroGateQualificada", () => {
+  it("é um erro de requisição (400), não falha de servidor", () => {
+    const erro = new ErroGateQualificada("Estágio Qualificada bloqueado: não há avaliação vigente.");
+    expect(erro.status).toBe(400);
+    expect(erro.name).toBe("ErroGateQualificada");
+    expect(erro.message).toBe("Estágio Qualificada bloqueado: não há avaliação vigente.");
+    expect(erro instanceof ErroGateQualificada).toBe(true);
+    expect(erro instanceof Error).toBe(true);
   });
 });
 

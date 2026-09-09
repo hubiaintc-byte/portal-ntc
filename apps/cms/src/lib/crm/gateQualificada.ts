@@ -6,6 +6,7 @@
  * `null` quando as 10 condições do §18 estão cumpridas.
  */
 
+import { APIError } from "payload";
 import type { Payload, PayloadRequest } from "payload";
 import type { AvaliacaoQualificacao } from "@ntc/types";
 
@@ -26,8 +27,18 @@ const comoAvaliacaoCom04 = (doc: AvaliacaoQualificacao | null): AvaliacaoCom04 |
  * Erro de negócio do gate — distinto de uma falha genérica de escrita. A
  * camada de escrita (`painelCrmEscrita.ts`) o reconhece pelo tipo e repassa
  * a mensagem íntegra ao usuário, em vez do erro genérico que a esconderia.
+ *
+ * Estende o `APIError` do Payload com status 400: a recusa é regra de negócio
+ * (o cliente mandou uma transição que o §18 não permite), não falha do
+ * servidor. Sem isso, uma escrita em `oportunidades` via REST ou GraphQL —
+ * caminhos que não passam por `painelCrmEscrita.ts` — devolveria 500.
  */
-export class ErroGateQualificada extends Error {}
+export class ErroGateQualificada extends APIError {
+  constructor(message: string) {
+    super(message, 400);
+    this.name = "ErroGateQualificada";
+  }
+}
 
 /**
  * Devolve a mensagem de bloqueio do §18, ou `null` quando a avaliação vigente
@@ -46,6 +57,10 @@ export async function erroDoGateQualificada(
     where: {
       and: [{ oportunidade: { equals: oportunidadeId } }, { vigente: { equals: true } }],
     },
+    // Sem índice único parcial no Postgres (decisão registrada), duas escritas
+    // genuinamente concorrentes ainda podem deixar duas avaliações vigentes;
+    // ordenar pela mais nova torna a leitura do gate determinística.
+    sort: "-createdAt",
     limit: 1,
     depth: 0,
     req,
