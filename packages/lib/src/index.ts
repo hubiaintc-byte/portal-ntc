@@ -79,6 +79,21 @@ export {
 } from "./crm/funil";
 
 export {
+  STATUS_AVALIACAO,
+  RESULTADO_QUALIFICACAO,
+  HARD_GATE_ESTADO,
+  FAIXA_SCORE,
+  DIMENSOES_COM04,
+  HARD_GATES_COM04,
+  notaValida,
+  notasCompletas,
+  calcularScore,
+  faixaDoScore,
+  avaliacaoPermiteQualificada,
+  type AvaliacaoCom04,
+} from "./crm/qualificacao";
+
+export {
   calcularValoresProposta,
   type EntradaValores,
   type ValoresProposta,

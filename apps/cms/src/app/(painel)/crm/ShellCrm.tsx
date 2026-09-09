@@ -5,6 +5,8 @@ import { useState, useTransition } from "react";
 import type { LeadCmsDetalhe, LeadCmsResumo } from "@/lib/cms/painelCms";
 import type { DadosEnvio } from "@/lib/cms/painelCrmEscrita";
 import type {
+  AvaliacaoDetalhe,
+  AvaliacaoResumo,
   CatalogoCrm,
   ClienteCrmDetalhe,
   ClienteCrmResumo,
@@ -25,6 +27,7 @@ import { todosFollowups } from "@/lib/cms/kpisComercial";
 
 import { carregarLead } from "../acoes";
 import {
+  carregarAvaliacaoCrm,
   carregarClienteCrm,
   carregarHistoricoOportunidade,
   carregarOportunidadeCrm,
@@ -40,6 +43,7 @@ import { AvisoForm } from "./CamposCrm";
 import { DetalheCliente } from "./DetalheCliente";
 import { DetalheOportunidade } from "./DetalheOportunidade";
 import { DetalheProposta } from "./DetalheProposta";
+import { FormAvaliacao } from "./FormAvaliacao";
 import { FormCliente } from "./FormCliente";
 import { FormContato } from "./FormContato";
 import { FormOportunidade } from "./FormOportunidade";
@@ -55,6 +59,7 @@ import { TelaPainelComercial } from "./TelaPainelComercial";
 import { TelaProdutos } from "./TelaProdutos";
 import { TelaProgramas } from "./TelaProgramas";
 import { TelaPropostas } from "./TelaPropostas";
+import { TelaQualificacao } from "./TelaQualificacao";
 import { TelaVersoes } from "./TelaVersoes";
 
 interface ShellCrmProps {
@@ -71,6 +76,7 @@ interface ShellCrmProps {
   propostas: PropostaResumo[];
   envios: EnvioResumo[];
   versoes: VersaoResumo[];
+  avaliacoes: AvaliacaoResumo[];
   hojeISO: string;
   erroLeitura: boolean;
 }
@@ -78,6 +84,7 @@ interface ShellCrmProps {
 type TelaCrmId =
   | "painel" | "leads" | "clientes" | "contatos" | "oportunidades"
   | "propostas" | "versoes" | "envios" | "followups" | "condicoes"
+  | "qualificacao"
   | "programas" | "modulos" | "produtos";
 
 /** Formulário de criação/edição aberto em tela cheia. */
@@ -85,7 +92,8 @@ type FormCrmAberto =
   | { entidade: "cliente"; inicial: ClienteCrmDetalhe | null }
   | { entidade: "contato"; inicial: ContatoCrmResumo | null }
   | { entidade: "oportunidade"; inicial: OportunidadeCrmDetalhe | null }
-  | { entidade: "proposta"; inicial: PropostaDetalhe | null };
+  | { entidade: "proposta"; inicial: PropostaDetalhe | null }
+  | { entidade: "avaliacao"; inicial: AvaliacaoDetalhe | null };
 
 /* Ícones lineares funcionais, peso 1.5 (CLAUDE.md §3). */
 const Ico = {
@@ -146,6 +154,12 @@ const Ico = {
       <path d="M12 3 3 8l9 5 9-5z" /><path d="M3 8v8l9 5 9-5V8" />
     </svg>
   ),
+  qualificacao: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="3" width="16" height="18" rx="1" />
+      <path d="m8.5 12 2.5 2.5L16 9.5" />
+    </svg>
+  ),
   programas: (
     <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 3 2 8l10 5 10-5z" /><path d="m6 10.5 6 3 6-3" />
@@ -176,6 +190,15 @@ const NAV_OPERACAO: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] 
   { id: "condicoes", rotulo: "Condições", icone: Ico.condicoes },
 ];
 
+/**
+ * P0 — Processo Comercial B2G (docs/17). Só a Qualificação (COM-04, Sessões
+ * H2/H3) está pronta; Contratações, Instrumentos, Handoff e Histórico chegam
+ * nas Sessões H4-H7.
+ */
+const NAV_P0: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
+  { id: "qualificacao", rotulo: "Qualificação (COM-04)", icone: Ico.qualificacao },
+];
+
 const NAV_CATALOGO: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
   { id: "programas", rotulo: "Programas", icone: Ico.programas },
   { id: "modulos", rotulo: "Módulos", icone: Ico.modulos },
@@ -193,6 +216,7 @@ const CRUMB: Record<TelaCrmId, string> = {
   envios: "CRM · Envios",
   followups: "CRM · Follow-ups",
   condicoes: "CRM · Condições",
+  qualificacao: "CRM · Qualificação (COM-04)",
   programas: "CRM · Programas",
   modulos: "CRM · Módulos",
   produtos: "CRM · Produtos / Eventos",
@@ -212,6 +236,7 @@ export function ShellCrm({
   propostas,
   envios,
   versoes,
+  avaliacoes,
   hojeISO,
   erroLeitura,
 }: ShellCrmProps) {
@@ -277,6 +302,17 @@ export function ShellCrm({
     });
   }
 
+  /**
+   * Sem tela de detalhe própria (escopo desta sessão): abre direto no
+   * formulário de edição, mesmo padrão de onEditar em TelaContatos.
+   */
+  function abrirAvaliacao(id: string) {
+    iniciarCarga(async () => {
+      const det = await carregarAvaliacaoCrm(id);
+      if (det) setFormAberto({ entidade: "avaliacao", inicial: det });
+    });
+  }
+
   function novaVersao(codBase: string, motivo: string) {
     iniciarCarga(async () => {
       const r = await novaVersaoPropostaCrm(codBase, motivo);
@@ -312,6 +348,7 @@ export function ShellCrm({
 
   const grupos: GrupoNav[] = [
     { rotulo: "Operação Comercial", itens: NAV_OPERACAO },
+    { rotulo: "Processo Comercial B2G (P0)", itens: NAV_P0 },
     { rotulo: "Catálogo Institucional", itens: NAV_CATALOGO },
   ];
 
@@ -360,6 +397,14 @@ export function ShellCrm({
           catalogo={catalogo}
           usuarios={usuarios}
           oportunidades={oportunidades}
+          onSalvo={fecharTudo}
+          onCancelar={fecharTudo}
+        />
+      ) : formAberto?.entidade === "avaliacao" ? (
+        <FormAvaliacao
+          inicial={formAberto.inicial}
+          oportunidades={oportunidades}
+          usuarios={usuarios}
           onSalvo={fecharTudo}
           onCancelar={fecharTudo}
         />
@@ -446,6 +491,13 @@ export function ShellCrm({
           {tela === "condicoes" && (
             <TelaEmBreve eyebrow="Operação Comercial" titulo="Condições"
               descricao="Condições comerciais padrão e específicas." />
+          )}
+          {tela === "qualificacao" && (
+            <TelaQualificacao
+              avaliacoes={avaliacoes}
+              onAbrir={abrirAvaliacao}
+              onNovo={() => setFormAberto({ entidade: "avaliacao", inicial: null })}
+            />
           )}
         </>
       )}

@@ -3,14 +3,17 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 
 import {
+  DIMENSOES_COM04,
   calcularValoresProposta,
   codigoDaVersao,
   gerarCodigoBase,
+  notaValida,
   proximaVersao,
 } from "@ntc/lib";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
 import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
+import { ErroGateQualificada } from "@/lib/crm/gateQualificada";
 import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
 import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
@@ -329,6 +332,11 @@ export async function criarOportunidade(
     });
     return { ok: true };
   } catch (e) {
+    // O gate do estágio "Qualificada" (Sessão H3 · docs/17 §18) lança um erro
+    // tipado com a mensagem contratual do manual — é justamente o que o
+    // usuário precisa ler para corrigir a avaliação, então não pode virar o
+    // ERRO_GENERICO que os demais erros de escrita recebem.
+    if (e instanceof ErroGateQualificada) return { ok: false, erro: e.message };
     console.error("[criarOportunidade]", e);
     return { ok: false, erro: ERRO_GENERICO };
   }
@@ -354,7 +362,183 @@ export async function atualizarOportunidade(
     });
     return { ok: true };
   } catch (e) {
+    // Ver `criarOportunidade`: repassa a mensagem contratual do gate §18.
+    if (e instanceof ErroGateQualificada) return { ok: false, erro: e.message };
     console.error("[atualizarOportunidade]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+// --- Avaliação de Qualificação · COM-04 (Sessão H2/H3 · docs/17 · Manual
+// NTC-COM-CRM-01 §§13-19) --------------------------------------------------
+
+export interface DadosAvaliacao {
+  oportunidade: string;
+  statusAvaliacao: string;
+  avaliador: string;
+  owner: string;
+  notaNecessidade: string;
+  notaAderencia: string;
+  notaPrioridade: string;
+  notaTiming: string;
+  notaCaminho: string;
+  notaStakeholders: string;
+  notaOrcamento: string;
+  notaRisco: string;
+  notaValor: string;
+  hgAderencia: string;
+  hgJuridico: string;
+  hgCondicao: string;
+  hgIncapacidade: string;
+  hgDemanda: string;
+  hgRequisito: string;
+  hgIntegridade: string;
+  resultado: string;
+  justificativa: string;
+  proximoPasso: string;
+  vigente: boolean;
+  observacoes: string;
+}
+
+type AvaliacaoData = RequiredDataFromCollectionSlug<"avaliacoes-qualificacao">;
+
+/** "3" → 3; vazio ou não numérico vira NaN, que `notaValida` recusa (mesmo critério do form). */
+function numeroDeNota(v: string): number {
+  return v.trim() === "" ? Number.NaN : Number(v);
+}
+
+interface ObrigatoriosAvaliacao {
+  oportunidadeId: number;
+  avaliadorId: number;
+  notas: Record<string, number | null>;
+}
+
+type ValidacaoAvaliacao =
+  | { ok: true; valores: ObrigatoriosAvaliacao }
+  | { ok: false; erro: string };
+
+/**
+ * Falha fechado antes de tocar a Local API. Uma nota fora de 0-3 é sempre
+ * recusada (`notaValida` de @ntc/lib, manual §15) — a primeira dimensão fora
+ * da faixa interrompe com o rótulo dela, para o avaliador saber onde
+ * corrigir. Nota vazia só é recusada quando a avaliação está sendo salva como
+ * "concluída": durante "em preenchimento" o avaliador pode salvar com notas
+ * parciais e retomar depois — mesmo padrão tolerado por
+ * `notasCompletas`/`calcularScore` (@ntc/lib) e pelo hook `beforeChange` da
+ * coleção, que já convivem com `scoreTotal: null` nesse estado.
+ */
+function validarObrigatoriosAvaliacao(dados: DadosAvaliacao): ValidacaoAvaliacao {
+  const oportunidadeId = idOuNulo(dados.oportunidade);
+  if (oportunidadeId === null) return { ok: false, erro: "Selecione a oportunidade." };
+  const avaliadorId = idOuNulo(dados.avaliador);
+  if (avaliadorId === null) return { ok: false, erro: "Selecione o avaliador." };
+
+  const notasBrutas: Record<string, string> = {
+    notaNecessidade: dados.notaNecessidade,
+    notaAderencia: dados.notaAderencia,
+    notaPrioridade: dados.notaPrioridade,
+    notaTiming: dados.notaTiming,
+    notaCaminho: dados.notaCaminho,
+    notaStakeholders: dados.notaStakeholders,
+    notaOrcamento: dados.notaOrcamento,
+    notaRisco: dados.notaRisco,
+    notaValor: dados.notaValor,
+  };
+  const exigirCompletas = dados.statusAvaliacao === "concluida";
+  const notas: Record<string, number | null> = {};
+  for (const d of DIMENSOES_COM04) {
+    const bruto = (notasBrutas[d.campo] ?? "").trim();
+    if (bruto === "" && !exigirCompletas) {
+      notas[d.campo] = null;
+      continue;
+    }
+    const numero = numeroDeNota(bruto);
+    if (!notaValida(numero)) {
+      return {
+        ok: false,
+        erro: `Nota inválida em ${d.rotulo}: use apenas os inteiros 0, 1, 2 ou 3.`,
+      };
+    }
+    notas[d.campo] = numero;
+  }
+  return { ok: true, valores: { oportunidadeId, avaliadorId, notas } };
+}
+
+/**
+ * `scoreTotal`/`faixa`/`concluidaEm` NÃO são montados aqui: o hook
+ * `beforeChange` da coleção `avaliacoes-qualificacao` os deriva das 9 notas e
+ * do status (fonte única) — mesmo padrão de `status` legado em
+ * `dadosOportunidade`.
+ */
+function dadosAvaliacao(dados: DadosAvaliacao, obrigatorios: ObrigatoriosAvaliacao): AvaliacaoData {
+  return {
+    oportunidade: obrigatorios.oportunidadeId,
+    statusAvaliacao: (ouNulo(dados.statusAvaliacao) ?? "em-preenchimento") as AvaliacaoData["statusAvaliacao"],
+    avaliador: obrigatorios.avaliadorId,
+    owner: idOuNulo(dados.owner),
+    notaNecessidade: obrigatorios.notas.notaNecessidade,
+    notaAderencia: obrigatorios.notas.notaAderencia,
+    notaPrioridade: obrigatorios.notas.notaPrioridade,
+    notaTiming: obrigatorios.notas.notaTiming,
+    notaCaminho: obrigatorios.notas.notaCaminho,
+    notaStakeholders: obrigatorios.notas.notaStakeholders,
+    notaOrcamento: obrigatorios.notas.notaOrcamento,
+    notaRisco: obrigatorios.notas.notaRisco,
+    notaValor: obrigatorios.notas.notaValor,
+    hgAderencia: ouNulo(dados.hgAderencia) as AvaliacaoData["hgAderencia"],
+    hgJuridico: ouNulo(dados.hgJuridico) as AvaliacaoData["hgJuridico"],
+    hgCondicao: ouNulo(dados.hgCondicao) as AvaliacaoData["hgCondicao"],
+    hgIncapacidade: ouNulo(dados.hgIncapacidade) as AvaliacaoData["hgIncapacidade"],
+    hgDemanda: ouNulo(dados.hgDemanda) as AvaliacaoData["hgDemanda"],
+    hgRequisito: ouNulo(dados.hgRequisito) as AvaliacaoData["hgRequisito"],
+    hgIntegridade: ouNulo(dados.hgIntegridade) as AvaliacaoData["hgIntegridade"],
+    resultado: ouNulo(dados.resultado) as AvaliacaoData["resultado"],
+    justificativa: ouNulo(dados.justificativa),
+    proximoPasso: ouNulo(dados.proximoPasso),
+    vigente: dados.vigente,
+    observacoes: ouNulo(dados.observacoes),
+  };
+}
+
+/** Ver `criarOportunidade`: `usuario` chega à Local API para popular `req.user`. */
+export async function criarAvaliacao(
+  dados: DadosAvaliacao,
+  usuario: UsuarioAutenticado | null,
+): Promise<ResultadoEscrita> {
+  const obrigatorios = validarObrigatoriosAvaliacao(dados);
+  if (!obrigatorios.ok) return { ok: false, erro: obrigatorios.erro };
+  try {
+    const payload = await obterPayload();
+    await payload.create({
+      collection: "avaliacoes-qualificacao",
+      data: dadosAvaliacao(dados, obrigatorios.valores),
+      user: usuario,
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[criarAvaliacao]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function atualizarAvaliacao(
+  id: string,
+  dados: DadosAvaliacao,
+  usuario: UsuarioAutenticado | null,
+): Promise<ResultadoEscrita> {
+  const obrigatorios = validarObrigatoriosAvaliacao(dados);
+  if (!obrigatorios.ok) return { ok: false, erro: obrigatorios.erro };
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "avaliacoes-qualificacao",
+      id,
+      data: dadosAvaliacao(dados, obrigatorios.valores),
+      user: usuario,
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[atualizarAvaliacao]", e);
     return { ok: false, erro: ERRO_GENERICO };
   }
 }

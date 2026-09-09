@@ -5,19 +5,23 @@ import { revalidatePath } from "next/cache";
 import { obterUsuarioAutenticado, obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
   listarHistoricoEstagio,
+  obterAvaliacaoCrm,
   obterClienteCrm,
   obterOportunidadeCrm,
   obterPropostaCrm,
+  type AvaliacaoDetalhe,
   type ClienteCrmDetalhe,
   type OportunidadeCrmDetalhe,
   type PropostaDetalhe,
   type TransicaoEstagioResumo,
 } from "@/lib/cms/painelCrm";
 import {
+  atualizarAvaliacao,
   atualizarClienteCrm,
   atualizarContatoCrm,
   atualizarOportunidade,
   atualizarProposta,
+  criarAvaliacao,
   criarClienteCrm,
   criarContatoCrm,
   criarOportunidade,
@@ -25,6 +29,7 @@ import {
   criarVersaoProposta,
   gerarESalvarPdfProposta,
   registrarEnvio,
+  type DadosAvaliacao,
   type DadosClienteCrm,
   type DadosContatoCrm,
   type DadosEnvio,
@@ -134,6 +139,24 @@ export async function registrarEnvioCrm(dados: DadosEnvio): Promise<ResultadoEsc
 export async function gerarPdfPropostaCrm(id: string): Promise<ResultadoEscrita> {
   if (!(await obterUsuarioCms())) return RECUSADO;
   const resultado = await gerarESalvarPdfProposta(id);
+  if (resultado.ok) revalidatePath("/crm");
+  return resultado;
+}
+
+export async function carregarAvaliacaoCrm(id: string): Promise<AvaliacaoDetalhe | null> {
+  if (!(await obterUsuarioCms())) return null;
+  return obterAvaliacaoCrm(id);
+}
+
+/** Ver `salvarOportunidadeCrm`: `usuario` chega à Local API para popular `req.user`. */
+export async function salvarAvaliacaoCrm(
+  id: string | null,
+  dados: DadosAvaliacao,
+): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const resultado =
+    id === null ? await criarAvaliacao(dados, usuario) : await atualizarAvaliacao(id, dados, usuario);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
 }

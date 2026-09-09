@@ -12,6 +12,7 @@ import sharp from "sharp";
 
 import { Areas } from "./collections/Areas";
 import { AuditLog } from "./collections/AuditLog";
+import { AvaliacoesQualificacao } from "./collections/AvaliacoesQualificacao";
 import { ClientesCrm } from "./collections/ClientesCrm";
 import { Clientes } from "./collections/Clientes";
 import { ContatosCrm } from "./collections/ContatosCrm";
@@ -103,6 +104,7 @@ export default buildConfig({
     ContatosCrm,
     Oportunidades,
     HistoricoEstagio,
+    AvaliacoesQualificacao,
     Propostas,
     VersoesProposta,
     EnviosProposta,

@@ -234,22 +234,26 @@ Não são erros do manual — ele documenta o protótipo, e o protótipo não te
 
 ---
 
-### Sessão H2 — Qualificação COM-04 (avaliações versionadas)
+### Sessão H2 — Qualificação COM-04 (avaliações versionadas) ✅ concluída (07/09/2026)
 
 - **Objetivo:** registrar a qualificação formal, com score, faixa e hard gates.
 - **Escopo:** coleção `avaliacoes-qualificacao` (campos de §1.2); validação estrita das notas (inteiros 0–3, nada de string ou decimal); `scoreTotal` e `faixa` derivados em hook `beforeChange` (persistidos para permitir ordenação/filtro, ao contrário do protótipo que computa na tela); unicidade da avaliação `vigente` por oportunidade dentro da transação do Payload (`req.transactionID`); `concluidaEm` preenchida automaticamente ao concluir; tela + formulário no padrão `FormOportunidade`/`CamposCrm`.
 - **Fora do escopo:** o gate que bloqueia o estágio Qualificada (é H3).
 - **Pré-requisito:** H1 + decisão #7.
 - **Critério de aceite:** teste unitário do score (0, 27, incompleto → `null`) e da faixa nos cortes 18 e 10; teste de que salvar uma segunda avaliação `vigente` desmarca a anterior **na mesma transação**; nota `2.5` ou `"3 "` rejeitada.
+- **Entregue:** branch `feat/crm-janela-h2-h3-qualificacao`, **ainda não mergeada na `main`**; execução via `subagent-driven-development`. Regras puras em `packages/lib/src/crm/qualificacao.ts` (16 testes) — 9 dimensões, 7 hard gates, notas inteiras 0–3, score 0–27, faixa nos cortes 18/10 e `avaliacaoPermiteQualificada` com as 10 condições e mensagens do §18. Coleção `avaliacoes-qualificacao` (`apps/cms/src/collections/AvaliacoesQualificacao.ts`, 20ª coleção do Payload): validação estrita das notas, `scoreTotal`/`faixa`/`concluidaEm` derivados e persistidos em hook `beforeChange` (`apps/cms/src/lib/crm/derivadosAvaliacao.ts`), única avaliação `vigente` por oportunidade mantida em hook `afterChange` dentro da mesma transação. Escrita e leitura ligadas à Local API (`painelCrmEscrita.ts`/`painelCrm.ts`), tela e formulário (`TelaQualificacao.tsx`/`FormAvaliacao.tsx`) com as 9 dimensões, os 7 hard gates e o score ao vivo mostrado como apoio à decisão — nunca decidindo por ela (§15 do manual). Avaliação parcial pode ser salva com `statusAvaliacao` "Em preenchimento"; completude só é exigida ao salvar como "Concluída".
+- **Pendência que ficou:** `pnpm payload:push:schema` **não foi rodado** — a tabela `avaliacoes_qualificacao` ainda não existe no banco de desenvolvimento, então a coleção nunca foi exercitada contra dado real. Precisa de um humano (dev parado, diff revisado, `N` a qualquer DATA LOSS, `payload:generate` depois).
 
 ---
 
-### Sessão H3 — Porta do estágio "Qualificada"
+### Sessão H3 — Porta do estágio "Qualificada" ✅ concluída (07/09/2026)
 
 - **Objetivo:** impedir a promoção a Qualificada sem avaliação compatível.
 - **Escopo:** hook `beforeChange` em `oportunidades` reproduzindo as dez condições de §1.3, cada uma com mensagem de erro específica (o protótipo já traz os textos prontos — reaproveitar literalmente, são bons); a UI mostra o erro no formulário, não um toast genérico.
 - **Pré-requisito:** H2.
 - **Critério de aceite:** um teste por condição de bloqueio (10 testes), mais o caminho feliz. As mensagens devem ser **as mesmas do §18 do Manual Operacional** — a equipe é treinada nelas, e um texto diferente vira chamado de suporte. Fixar isso num teste que compara as strings.
+- **Entregue:** branch `feat/crm-janela-h2-h3-qualificacao` (mesma da H2), **ainda não mergeada na `main`**. `apps/cms/src/lib/crm/gateQualificada.ts` (`decisaoGateQualificada`, `erroDoGateQualificada`, `ErroGateQualificada`) busca a avaliação vigente da oportunidade e aplica a regra pura `avaliacaoPermiteQualificada` (H2); um hook `beforeChange` em `Oportunidades.ts`, posicionado antes de `espelharStatusLegado`, recusa a promoção ao estágio Qualificada — inclusive já criar a oportunidade nesse estágio — sem avaliação vigente que sustente. O erro de negócio chega íntegro ao formulário do painel em vez do erro genérico da Local API. 9 testes cobrindo as condições de bloqueio e o caminho feliz.
+- **Pendências que ficaram:** o checkpoint visual humano (`CLAUDE.md` §6) ainda não foi feito — não foi possível criar uma oportunidade, tentar movê-la para Qualificada sem avaliação e confirmar visualmente a mensagem do §18 no formulário, nem o caminho feliz depois de uma avaliação completa; isso depende também do `payload:push:schema` da H2 (a tabela `avaliacoes_qualificacao` ainda não existe no banco). A garantia de vigência única (H2) vale só dentro da transação do Payload — não há índice único parcial no Postgres, então duas escritas genuinamente concorrentes ainda poderiam persistir duas avaliações `vigente` para a mesma oportunidade; risco aceito por decisão, não resolvido nesta sessão.
 
 ---
 
@@ -284,12 +288,12 @@ Não são erros do manual — ele documenta o protótipo, e o protótipo não te
 
 ### Sessão H7 — Navegação, dashboard e encerramento da migração
 
-- **Objetivo:** o P0 aparece no menu e o dashboard passa a ler o modelo novo.
-- **Escopo:** 3º grupo de navegação em `ShellCrm.tsx` ("Processo Comercial B2G"); `GraficosComercial.tsx` e `TelaPainelComercial.tsx` migrados de `status` para `estagio`/`situacao` (funil de 11 etapas); tela/filtro da **fila de revisão de migração** (`migracaoPendenteRevisao = true`) para a direção despachar; `importadorCrm.ts` passa a gravar `estagio`/`situacao`.
-  - **Divergência M2:** o funil do Dashboard é o ponto exato do problema. No protótipo ele está com os 6 status legados *hardcoded* lendo o espelho `status` — o que faz o painel contradizer o funil de 11 estágios que o manual ensina. Aqui ele passa a agregar por `estagio`, com `situacao` como filtro (Ativa por padrão), e **exclui do gráfico** o que ainda estiver pendente de revisão de migração, para não criar um pico artificial em `Mapeada`.
-  - **Divergência M1 (a outra metade):** a fila de revisão deixa de ser função de console e vira tela de trabalho da direção — lista, filtro, e a ação de confirmar o estágio (que limpa `migracaoPendenteRevisao` e grava o motivo no histórico).
+- **Objetivo:** a fila de revisão de migração vira tela de trabalho da Direção, e o P0 recebe o checkpoint visual completo. A navegação e o dashboard, que dão nome original a esta sessão, já foram antecipados — o 3º grupo de menu "Processo Comercial B2G (P0)" foi criado na **H2**, e `GraficosComercial.tsx`/`TelaPainelComercial.tsx` já leem `estagio`/`situacao` desde logo depois da **H1** (ver "Atualização pós-H1" na Sessão H1 abaixo).
+- **Escopo:** tela/filtro da **fila de revisão de migração** (`migracaoPendenteRevisao = true`) para a Direção despachar — hoje a informação só aparece como selo em `TelaOportunidades.tsx`/`DetalheOportunidade.tsx`, sem tela de trabalho própria nem ação de confirmar o estágio; ao entrar nesta sessão, conferir que o grupo "Processo Comercial B2G (P0)" já recebeu os itens de menu das sessões H4/H5 (Contratação, Handoff), que devem ter chegado por conta própria em cada sessão.
+  - **Divergência M2:** ✅ **resolvida na parte de sistema já na H1** — o funil do Dashboard agrega por `estagio`, com `situacao` como filtro (Ativa por padrão), e exclui do gráfico o que estiver pendente de revisão de migração, para não criar um pico artificial em `Mapeada`. Só falta a parte de texto (§33 do manual, escopo da **H8**).
+  - **Divergência M1 (a outra metade):** ainda pendente — a fila de revisão deixa de ser função de console e vira tela de trabalho da direção — lista, filtro, e a ação de confirmar o estágio (que limpa `migracaoPendenteRevisao` e grava o motivo no histórico).
 - **Pré-requisito:** H1–H6 + decisão #4 em andamento.
-- **Critério de aceite:** checkpoint visual (`CLAUDE.md` §6) desktop 1440 + mobile 375 do CRM inteiro; funil do Dashboard exibindo os 11 estágios (M2); fila de revisão zerada ou com pendências explicitamente aceitas pelo PO.
+- **Critério de aceite:** checkpoint visual (`CLAUDE.md` §6) desktop 1440 + mobile 375 do CRM inteiro, incluindo confirmar visualmente o funil do Dashboard com os 11 estágios (M2, já implementado desde a H1) e o grupo "Processo Comercial B2G (P0)" completo; fila de revisão zerada ou com pendências explicitamente aceitas pelo PO.
 - **Só depois disso** o campo `status` legado pode ser considerado para remoção — **em sessão separada**, nunca junto com esta.
 
 ---

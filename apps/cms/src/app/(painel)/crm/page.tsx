@@ -1,6 +1,7 @@
 import { exigirUsuarioCms } from "@/lib/cms/autenticacao";
 import { listarLeadsCms, type LeadCmsResumo } from "@/lib/cms/painelCms";
 import {
+  listarAvaliacoesCrm,
   listarClientesCrm,
   listarContatosCrm,
   listarOportunidadesCrm,
@@ -12,6 +13,7 @@ import {
   listarPropostasCrm,
   todosEnviosCrm,
   versoesDeProposta,
+  type AvaliacaoResumo,
   type CatalogoCrm,
   type ClienteCrmResumo,
   type ContatoCrmResumo,
@@ -49,10 +51,11 @@ export default async function PainelCrmPage() {
   let propostas: PropostaResumo[] = [];
   let envios: EnvioResumo[] = [];
   let versoes: VersaoResumo[] = [];
+  let avaliacoes: AvaliacaoResumo[] = [];
   let erroLeitura = false;
 
   try {
-    [clientes, contatos, oportunidades, leads, catalogo, usuarios, programas, modulos, produtos, propostas, envios] =
+    [clientes, contatos, oportunidades, leads, catalogo, usuarios, programas, modulos, produtos, propostas, envios, avaliacoes] =
       await Promise.all([
         listarClientesCrm(),
         listarContatosCrm(),
@@ -65,6 +68,7 @@ export default async function PainelCrmPage() {
         listarProdutosCrm(),
         listarPropostasCrm(),
         todosEnviosCrm(),
+        listarAvaliacoesCrm(),
       ]);
 
     // Lista achatada de versões de todas as propostas (TelaVersoes espera não
@@ -98,6 +102,7 @@ export default async function PainelCrmPage() {
       propostas={propostas}
       envios={envios}
       versoes={versoes}
+      avaliacoes={avaliacoes}
       hojeISO={hojeISO}
       erroLeitura={erroLeitura}
     />

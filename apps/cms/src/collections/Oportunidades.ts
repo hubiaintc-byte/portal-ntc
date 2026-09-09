@@ -6,12 +6,51 @@ import {
   SITUACAO_OPORTUNIDADE,
   STATUS_OPORTUNIDADE,
   UFS,
+  avaliacaoPermiteQualificada,
 } from "@ntc/lib";
 
 import { atendimentoComercial } from "../access/atendimentoComercial";
 import { superAdmin } from "../access/superAdmin";
 import { calcularStatusLegadoEspelhado } from "../lib/crm/espelhoStatusLegado";
+import {
+  ErroGateQualificada,
+  decisaoGateQualificada,
+  erroDoGateQualificada,
+} from "../lib/crm/gateQualificada";
 import { lerEstagioOuNulo, montarTransicaoEstagio } from "../lib/crm/historicoEstagio";
+
+/**
+ * Gate do estágio "Qualificada" (Sessão H3 · docs/17 · Manual NTC-COM-CRM-01
+ * §18): só libera a transição PARA "qualificada" quando a avaliação COM-04
+ * vigente da oportunidade cumpre as 10 condições do manual. Roda ANTES de
+ * `espelharStatusLegado` na lista de `beforeChange` — se o gate recusar
+ * (lançando `ErroGateQualificada`), a escrita inteira aborta, então não pode
+ * sobrar um espelho `status` gravado para um estágio que nunca foi aceito.
+ *
+ * Invólucro fino: a decisão de SE o gate age e CONTRA QUAL id de oportunidade
+ * fica em `decisaoGateQualificada` (pura, testada em `gateQualificada.test.ts`
+ * — cobre criação já em "Qualificada", transição de outro estágio, edição de
+ * uma oportunidade já "Qualificada" por motivo não relacionado, e transição
+ * para qualquer outro estágio). Quando não há id (criação direto como
+ * "Qualificada" — a oportunidade ainda não existe, então não pode haver
+ * avaliação vigente para ela), a mensagem vem direto de
+ * `avaliacaoPermiteQualificada(null)` — a MESMA fonte de verdade contratual
+ * do §18 usada por `erroDoGateQualificada`, nunca um literal duplicado aqui.
+ */
+const bloquearQualificadaSemAvaliacao: CollectionBeforeChangeHook = async ({
+  data,
+  originalDoc,
+  req,
+}) => {
+  const decisao = decisaoGateQualificada(data, originalDoc);
+  if (!decisao.precisaGate) return data;
+  const mensagem =
+    decisao.oportunidadeId === undefined
+      ? avaliacaoPermiteQualificada(null)
+      : await erroDoGateQualificada(req.payload, decisao.oportunidadeId, req);
+  if (mensagem !== null) throw new ErroGateQualificada(mensagem);
+  return data;
+};
 
 /**
  * Mantém o campo `status` legado preenchido a partir de estágio+situação como
@@ -68,7 +107,7 @@ export const Oportunidades: CollectionConfig = {
     delete: superAdmin,
   },
   hooks: {
-    beforeChange: [espelharStatusLegado],
+    beforeChange: [bloquearQualificadaSemAvaliacao, espelharStatusLegado],
     afterChange: [registrarTransicaoEstagio],
   },
   fields: [

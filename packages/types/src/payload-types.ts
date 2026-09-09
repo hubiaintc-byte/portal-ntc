@@ -26,6 +26,7 @@ export interface Config {
     'contatos-crm': ContatoCrm;
     oportunidades: Oportunidade;
     'historico-estagio': HistoricoEstagio;
+    'avaliacoes-qualificacao': AvaliacaoQualificacao;
     propostas: Proposta;
     versoes: VersaoProposta;
     envios: EnvioProposta;
@@ -53,6 +54,7 @@ export interface Config {
     'contatos-crm': ContatosCrmSelect<false> | ContatosCrmSelect<true>;
     oportunidades: OportunidadesSelect<false> | OportunidadesSelect<true>;
     'historico-estagio': HistoricoEstagioSelect<false> | HistoricoEstagioSelect<true>;
+    'avaliacoes-qualificacao': AvaliacoesQualificacaoSelect<false> | AvaliacoesQualificacaoSelect<true>;
     propostas: PropostasSelect<false> | PropostasSelect<true>;
     versoes: VersoesSelect<false> | VersoesSelect<true>;
     envios: EnviosSelect<false> | EnviosSelect<true>;
@@ -1198,6 +1200,59 @@ export interface HistoricoEstagio {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "avaliacoes-qualificacao".
+ */
+export interface AvaliacaoQualificacao {
+  id: number;
+  oportunidade: number | Oportunidade;
+  sequencia?: number | null;
+  statusAvaliacao: 'em-preenchimento' | 'concluida' | 'cancelada';
+  /**
+   * Preenchida automaticamente quando a avaliação é concluída.
+   */
+  concluidaEm?: string | null;
+  avaliador: number | User;
+  owner?: (number | null) | User;
+  notaNecessidade?: number | null;
+  notaAderencia?: number | null;
+  notaPrioridade?: number | null;
+  notaTiming?: number | null;
+  notaCaminho?: number | null;
+  notaStakeholders?: number | null;
+  notaOrcamento?: number | null;
+  notaRisco?: number | null;
+  notaValor?: number | null;
+  /**
+   * Soma das 9 dimensões (0-27). Derivado.
+   */
+  scoreTotal?: number | null;
+  /**
+   * Referência de leitura do score. Derivada.
+   */
+  faixa?: ('forte' | 'intermediario' | 'fraco') | null;
+  hgAderencia?: ('sim' | 'nao' | 'em-validacao') | null;
+  hgJuridico?: ('sim' | 'nao' | 'em-validacao') | null;
+  hgCondicao?: ('sim' | 'nao' | 'em-validacao') | null;
+  hgIncapacidade?: ('sim' | 'nao' | 'em-validacao') | null;
+  hgDemanda?: ('sim' | 'nao' | 'em-validacao') | null;
+  hgRequisito?: ('sim' | 'nao' | 'em-validacao') | null;
+  hgIntegridade?: ('sim' | 'nao' | 'em-validacao') | null;
+  /**
+   * Decisão do avaliador. O score é apoio, não decide (manual §15).
+   */
+  resultado?: ('qualificada' | 'qualificar-mais' | 'nurturing' | 'nao-qualificada') | null;
+  justificativa?: string | null;
+  proximoPasso?: string | null;
+  /**
+   * Uma única avaliação vigente por oportunidade (manual §13).
+   */
+  vigente?: boolean | null;
+  observacoes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "propostas".
  */
 export interface Proposta {
@@ -1406,6 +1461,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'historico-estagio';
         value: number | HistoricoEstagio;
+      } | null)
+    | ({
+        relationTo: 'avaliacoes-qualificacao';
+        value: number | AvaliacaoQualificacao;
       } | null)
     | ({
         relationTo: 'propostas';
@@ -2003,6 +2062,43 @@ export interface HistoricoEstagioSelect<T extends boolean = true> {
   usuario?: T;
   atorSistema?: T;
   motivo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "avaliacoes-qualificacao_select".
+ */
+export interface AvaliacoesQualificacaoSelect<T extends boolean = true> {
+  oportunidade?: T;
+  sequencia?: T;
+  statusAvaliacao?: T;
+  concluidaEm?: T;
+  avaliador?: T;
+  owner?: T;
+  notaNecessidade?: T;
+  notaAderencia?: T;
+  notaPrioridade?: T;
+  notaTiming?: T;
+  notaCaminho?: T;
+  notaStakeholders?: T;
+  notaOrcamento?: T;
+  notaRisco?: T;
+  notaValor?: T;
+  scoreTotal?: T;
+  faixa?: T;
+  hgAderencia?: T;
+  hgJuridico?: T;
+  hgCondicao?: T;
+  hgIncapacidade?: T;
+  hgDemanda?: T;
+  hgRequisito?: T;
+  hgIntegridade?: T;
+  resultado?: T;
+  justificativa?: T;
+  proximoPasso?: T;
+  vigente?: T;
+  observacoes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
