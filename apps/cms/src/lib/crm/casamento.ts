@@ -82,6 +82,18 @@ export const casarClienteDoLead: CollectionAfterChangeHook<Lead> = async ({ doc,
     por = "criado";
   }
 
+  // Grava o motivo em `req.context` ANTES do update aninhado (e não só no
+  // `context` passado a ele): o update roda o `afterChange` de `leads` de
+  // novo, na mesma transação, e devolve o controle para o segundo hook do
+  // `afterChange` externo do `create` (`registrarLeadNaLinhaDoTempo`) —
+  // que precisa enxergar `casamentoAutomatico` para não duplicar o item da
+  // linha do tempo (fix round 1, achado Critical da revisão). `req.context`
+  // é o mesmo objeto em toda a operação (Payload o mutila via
+  // `createLocalReq`), então esta escrita é o jeito garantido de o hook
+  // externo ver o valor, independente de qual `context` o Payload repassa
+  // a cada chamada de hook.
+  req.context.casamentoAutomatico = por;
+
   await req.payload.update({
     collection: "leads",
     id: doc.id,

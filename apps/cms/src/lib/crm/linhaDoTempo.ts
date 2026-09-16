@@ -71,6 +71,12 @@ export function entradasDoLead(p: ParametrosEntradasDoLead): EntradaLinhaDoTempo
   const comum = { clienteId, leadId, usuarioId: p.usuarioId, referencia };
 
   if (p.operation === "create") {
+    // Lead casado/criado automaticamente na própria criação (Task 7):
+    // `casarClienteDoLead` já fez um `update` aninhado que passou por este
+    // mesmo hook com `operation: "update"` e escreveu o item "lead" com o
+    // detalhe do casamento. Sem este corte, o `afterChange` externo do
+    // `create` (que já vê `doc.cliente` preenchido) duplicaria o item.
+    if (p.casamentoAutomatico !== null) return [];
     return [{ ...comum, tipo: "lead", titulo: p.doc.origemEntrada === "manual" ? "Lead criado manualmente" : "Lead recebido pelo site" }];
   }
 
@@ -118,8 +124,15 @@ export const registrarLeadNaLinhaDoTempo: CollectionAfterChangeHook<Lead> = asyn
 }) => {
   if (doc.tipo !== "proposta") return doc;
   const usuarioId = req.user?.collection === "users" ? Number(req.user.id) : null;
+  // Lido de `context` (o argumento do hook, que o Payload passa como
+  // `req.context` no momento da chamada) e também de `req.context`
+  // diretamente — dois pontos de leitura para o mesmo valor, porque a
+  // `update` aninhada de `casarClienteDoLead` (Task 7) grava o motivo nos
+  // dois lugares e este hook não deve depender de qual dos dois o Payload
+  // de fato repassa em cada versão/caminho de chamada.
   const casamentoAutomatico =
-    typeof context?.casamentoAutomatico === "string" ? context.casamentoAutomatico : null;
+    (typeof context?.casamentoAutomatico === "string" ? context.casamentoAutomatico : null) ??
+    (typeof req.context?.casamentoAutomatico === "string" ? req.context.casamentoAutomatico : null);
   const entradas = entradasDoLead({ operation, doc, previousDoc, usuarioId, casamentoAutomatico });
   for (const entrada of entradas) {
     await registrarNaLinhaDoTempo(req, entrada);

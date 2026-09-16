@@ -32,6 +32,12 @@ describe("entradasDoLead", () => {
     expect(entradasDoLead({ ...base, operation: "create", doc: { ...lead, cliente: null } })).toEqual([]);
   });
 
+  it("create com casamentoAutomatico não gera nada (fix round 1: o update aninhado do casamento já escreveu o item, com o detalhe — gerar de novo aqui duplicaria)", () => {
+    expect(
+      entradasDoLead({ usuarioId: 5, casamentoAutomatico: "dominio", operation: "create", doc: lead }),
+    ).toEqual([]);
+  });
+
   it("vínculo feito pelo casamento automático gera 'lead' com o motivo", () => {
     const itens = entradasDoLead({
       ...base,
