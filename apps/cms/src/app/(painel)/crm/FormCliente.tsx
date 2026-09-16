@@ -9,6 +9,7 @@ import type { DadosClienteCrm } from "@/lib/cms/painelCrmEscrita";
 
 import { salvarClienteCrm } from "../acoesCrm";
 import { AvisoForm, BarraForm, CampoArea, CampoSelect, CampoTexto } from "./CamposCrm";
+import { EditorContatos } from "./EditorContatos";
 
 interface FormClienteProps {
   inicial: ClienteCrmDetalhe | null;
@@ -33,8 +34,6 @@ export function FormCliente({ inicial, usuarios, onSalvo, onCancelar }: FormClie
     origem: inicial?.origem ?? "manual",
     responsavel: inicial?.responsavelId ?? "",
     observacoes: inicial?.observacoes ?? "",
-    // Contatos ainda não são editáveis aqui (Task 11 traz o EditorContatos):
-    // o form só preserva o array que veio, para o save não apagá-los.
     contatos:
       inicial?.contatos.map((c) => ({
         nome: c.nome,
@@ -89,6 +88,7 @@ export function FormCliente({ inicial, usuarios, onSalvo, onCancelar }: FormClie
           opcoes={usuarios.map((u) => ({ label: u.nome, value: u.id }))}
         />
       </div>
+      <EditorContatos contatos={dados.contatos} onMudar={m("contatos")} />
       <CampoArea rotulo="Observações" valor={dados.observacoes} onMudar={m("observacoes")} />
     </form>
   );

@@ -19,6 +19,7 @@ import type {
 } from "@/lib/cms/painelCrm";
 
 import {
+  adicionarNotaCrm,
   carregarClienteCrm,
   carregarLeadCrm,
   carregarPropostaCrm,
@@ -297,6 +298,13 @@ export function ShellCrm({
           cliente={clienteDet}
           onVoltar={fecharTudo}
           onEditar={() => setFormAberto({ entidade: "cliente", inicial: clienteDet })}
+          onAbrirLead={abrirLead}
+          onNovoLead={() => setModalLead({ modo: "novo" })}
+          onNota={async (t) => {
+            const r = await adicionarNotaCrm(clienteDet.id, null, t);
+            if (r.ok) abrirCliente(clienteDet.id);
+            return r.ok ? null : (r.erro ?? "Erro.");
+          }}
         />
       ) : propostaDet ? (
         <>
@@ -361,7 +369,13 @@ export function ShellCrm({
           clientes={clientes}
           catalogo={catalogo}
           usuarios={usuarios}
-          onFechar={() => setModalLead(null)}
+          clientePreSelecionado={clienteDet?.id}
+          onFechar={() => {
+            setModalLead(null);
+            // O modal pode ter criado/movido um negócio deste cliente — recarrega
+            // para a linha do tempo e a lista de negócios refletirem o que mudou.
+            if (clienteDet) abrirCliente(clienteDet.id);
+          }}
           onAtualizado={abrirLead}
           onAbrirCliente={(id) => {
             setModalLead(null);

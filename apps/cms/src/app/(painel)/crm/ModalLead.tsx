@@ -25,6 +25,8 @@ interface ModalLeadProps {
   /** Recarrega o lead após qualquer escrita (o pai chama carregarLeadCrm). */
   onAtualizado: (id: string) => void;
   onAbrirCliente: (id: string) => void;
+  /** Novo lead aberto de dentro do cliente: pré-seleciona esse cliente no FormLead. */
+  clientePreSelecionado?: string;
 }
 
 const FMT_DATA_HORA = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
@@ -49,7 +51,16 @@ function Par({ rotulo, valor }: { rotulo: string; valor: React.ReactNode }) {
 }
 
 /** Modal único do lead (spec §4.4): usado no kanban, em Leads e no cliente. A aba Ações chega na Sessão 2. */
-export function ModalLead({ lead, clientes, catalogo, usuarios, onFechar, onAtualizado, onAbrirCliente }: ModalLeadProps) {
+export function ModalLead({
+  lead,
+  clientes,
+  catalogo,
+  usuarios,
+  onFechar,
+  onAtualizado,
+  onAbrirCliente,
+  clientePreSelecionado,
+}: ModalLeadProps) {
   const [aba, setAba] = useState<Aba>("dados");
   const [editando, setEditando] = useState(lead === null);
   const [perdendo, setPerdendo] = useState(false);
@@ -264,6 +275,7 @@ export function ModalLead({ lead, clientes, catalogo, usuarios, onFechar, onAtua
               clientes={clientes}
               catalogo={catalogo}
               usuarios={usuarios}
+              clientePreSelecionado={clientePreSelecionado}
               onSalvo={() => {
                 setEditando(false);
                 if (lead) onAtualizado(lead.id);

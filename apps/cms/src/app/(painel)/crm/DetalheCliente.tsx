@@ -1,27 +1,32 @@
 "use client";
 
-import { AREAS_CRM, ESFERAS_CRM, ORIGENS_CLIENTE, TIPOS_INSTITUICAO } from "@ntc/lib";
+import { AREAS_CRM, ESFERAS_CRM, ORIGENS_CLIENTE, TIPOS_INSTITUICAO, rotuloDoEstagio } from "@ntc/lib";
 
 import type { ClienteCrmDetalhe } from "@/lib/cms/painelCrm";
+import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
-import { rotuloDeLista } from "./seloStatus";
+import { LinhaDoTempo } from "./LinhaDoTempo";
+import { rotuloDeLista, seloDeEstagioLead } from "./seloStatus";
 
 interface DetalheClienteProps {
   cliente: ClienteCrmDetalhe;
   onVoltar: () => void;
   onEditar: () => void;
+  onAbrirLead: (id: string) => void;
+  onNovoLead: () => void;
+  onNota: (texto: string) => Promise<string | null>;
 }
 
-/** Tela cheia de detalhe de um cliente — leitura, com atalho para editar. */
-export function DetalheCliente({ cliente: c, onVoltar, onEditar }: DetalheClienteProps) {
+const FMT = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
+const ROTULO_STATUS_EVENTO: Record<string, string> = { agendado: "Agendado", realizado: "Realizado", cancelado: "Cancelado" };
+
+/** Detalhe do cliente, o ativo permanente: dados + contatos, negócios, eventos e a linha do tempo com nota manual. */
+export function DetalheCliente({ cliente: c, onVoltar, onEditar, onAbrirLead, onNovoLead, onNota }: DetalheClienteProps) {
   const dados = [
     { rotulo: "Órgão", valor: c.orgao },
     { rotulo: "Sigla", valor: c.sigla ?? "—" },
     { rotulo: "Tipo", valor: rotuloDeLista(TIPOS_INSTITUICAO, c.tipo) },
-    {
-      rotulo: "Município",
-      valor: c.municipio !== null ? `${c.municipio}${c.uf !== null ? ` / ${c.uf}` : ""}` : "—",
-    },
+    { rotulo: "Município", valor: c.municipio !== null ? `${c.municipio}${c.uf !== null ? ` / ${c.uf}` : ""}` : (c.uf ?? "—") },
     { rotulo: "Esfera", valor: rotuloDeLista(ESFERAS_CRM, c.esfera) },
     { rotulo: "Área", valor: rotuloDeLista(AREAS_CRM, c.area) },
     { rotulo: "CNPJ", valor: c.cnpj ?? "—" },
@@ -41,70 +46,146 @@ export function DetalheCliente({ cliente: c, onVoltar, onEditar }: DetalheClient
 
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Operação Comercial</p>
+          <p className="pcms-pagehead__eyebrow">Cliente</p>
           <h1>{c.orgao}</h1>
+          {c.observacoes && <p>{c.observacoes}</p>}
         </div>
         <div className="pcms-pagehead__acoes">
           <button type="button" className="pcms-btn pcms-btn--ghost" onClick={onEditar}>
             Editar
           </button>
+          <button type="button" className="pcms-btn" onClick={onNovoLead}>
+            Novo lead
+          </button>
         </div>
       </div>
 
-      <section className="pcms-det-bloco">
-        <h2>Dados institucionais</h2>
-        <dl className="pcms-deflist">
-          {dados.map((d) => (
-            <div key={d.rotulo} className="pcms-deflist__item">
-              <dt>{d.rotulo}</dt>
-              <dd>{d.valor}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      {c.observacoes !== null && (
-        <section className="pcms-det-bloco">
-          <h2>Observações</h2>
-          <p>{c.observacoes}</p>
-        </section>
-      )}
-
-      <section className="pcms-det-bloco">
-        <div className="pcms-editor__head--sub">Contatos</div>
-        {c.contatos.length === 0 ? (
-          <p>Nenhum contato cadastrado.</p>
-        ) : (
-          <table className="pcms-tabela">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Cargo</th>
-                <th>Setor</th>
-                <th>E-mail</th>
-                <th>WhatsApp</th>
-                <th>Papel</th>
-              </tr>
-            </thead>
-            <tbody>
-              {c.contatos.map((ct, i) => (
-                <tr key={`${ct.nome}-${i}`}>
-                  <td>{ct.nome}</td>
-                  <td>{ct.cargo ?? "—"}</td>
-                  <td>{ct.setor ?? "—"}</td>
-                  <td>{ct.email ?? "—"}</td>
-                  <td>{ct.whatsapp ?? "—"}</td>
-                  <td>
-                    {ct.principal && <span className="pcms-selo pcms-selo--ok">Principal</span>}{" "}
-                    {ct.decisor && <span className="pcms-selo pcms-selo--info">Decisor</span>}
-                    {!ct.principal && !ct.decisor && "—"}
-                  </td>
-                </tr>
+      <div className="pcms-det-grid">
+        <div className="pcms-det-main">
+          <section className="pcms-det-bloco">
+            <h2>Dados</h2>
+            <dl className="pcms-deflist">
+              {dados.map((d) => (
+                <div key={d.rotulo} className="pcms-deflist__item">
+                  <dt>{d.rotulo}</dt>
+                  <dd>{d.valor}</dd>
+                </div>
               ))}
-            </tbody>
-          </table>
-        )}
-      </section>
+            </dl>
+          </section>
+
+          <section className="pcms-det-bloco">
+            <h2>Contatos</h2>
+            {c.contatos.length === 0 ? (
+              <div className="pcms-vazio">Nenhum contato cadastrado.</div>
+            ) : (
+              <table className="pcms-tabela">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Setor</th>
+                    <th>E-mail</th>
+                    <th>WhatsApp</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {c.contatos.map((ct) => (
+                    <tr key={`${ct.nome}-${ct.email ?? ""}`}>
+                      <td>
+                        <strong>{ct.nome}</strong>
+                      </td>
+                      <td>{ct.cargo ?? "—"}</td>
+                      <td>{ct.setor ?? "—"}</td>
+                      <td>{ct.email ?? "—"}</td>
+                      <td>{ct.whatsapp ?? "—"}</td>
+                      <td>
+                        {ct.principal && <span className="pcms-selo pcms-selo--ok">Principal</span>}{" "}
+                        {ct.decisor && <span className="pcms-selo pcms-selo--info">Decisor</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </section>
+
+          <section className="pcms-det-bloco">
+            <h2>Negócios</h2>
+            {c.negocios.length === 0 ? (
+              <div className="pcms-vazio">Nenhum lead deste cliente.</div>
+            ) : (
+              <table className="pcms-tabela">
+                <thead>
+                  <tr>
+                    <th>Recebido</th>
+                    <th>Contato</th>
+                    <th>Programa</th>
+                    <th>Valor</th>
+                    <th>Estágio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {c.negocios.map((l) => (
+                    <tr
+                      key={l.id}
+                      className="pcms-linha-click"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Abrir lead de ${l.nome}`}
+                      onClick={() => onAbrirLead(l.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onAbrirLead(l.id);
+                        }
+                      }}
+                    >
+                      <td>{FMT.format(new Date(l.criadoEmISO))}</td>
+                      <td>{l.nome}</td>
+                      <td>{l.programaSigla ?? "—"}</td>
+                      <td>{l.valorEstimado !== null ? formatarMoedaBRL(l.valorEstimado) : "—"}</td>
+                      <td>
+                        <span className={seloDeEstagioLead(l.estagio)}>{rotuloDoEstagio(l.estagio)}</span>
+                        {l.perdido && (
+                          <>
+                            {" "}
+                            <span className="pcms-selo pcms-selo--erro">Perdido</span>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </section>
+
+          <section className="pcms-det-bloco">
+            <h2>Eventos</h2>
+            {c.eventos.length === 0 ? (
+              <div className="pcms-vazio">Nenhum evento ainda. (Agendar evento chega na Sessão 4.)</div>
+            ) : (
+              <ul className="pcms-eventos-cliente">
+                {c.eventos.map((ev) => (
+                  <li key={ev.id}>
+                    <strong>{ev.titulo}</strong> · {FMT.format(new Date(ev.dataInicioISO))} · {ev.modalidade ?? "—"} ·{" "}
+                    <span className="pcms-selo pcms-selo--info">{ROTULO_STATUS_EVENTO[ev.status] ?? ev.status}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+
+        <aside className="pcms-det-side">
+          <section className="pcms-det-bloco">
+            <h2>Linha do tempo</h2>
+            <LinhaDoTempo itens={c.linhaDoTempo} onNota={onNota} />
+          </section>
+        </aside>
+      </div>
     </>
   );
 }

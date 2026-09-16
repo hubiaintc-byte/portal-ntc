@@ -17,12 +17,14 @@ interface FormLeadProps {
   usuarios: UsuarioCmsResumo[];
   onSalvo: () => void;
   onCancelar: () => void;
+  /** Novo lead aberto de dentro do cliente: pré-seleciona esse cliente (só vale na criação). */
+  clientePreSelecionado?: string;
 }
 
 const paraOpcoes = (valores: readonly string[]) => valores.map((v) => ({ label: v, value: v }));
 
 /** Criação manual (Novo lead) e edição dos campos manuais do lead — dentro do ModalLead. */
-export function FormLead({ inicial, clientes, catalogo, usuarios, onSalvo, onCancelar }: FormLeadProps) {
+export function FormLead({ inicial, clientes, catalogo, usuarios, onSalvo, onCancelar, clientePreSelecionado }: FormLeadProps) {
   const [dados, setDados] = useState<DadosLeadManual>({
     nome: inicial?.nome ?? "",
     email: inicial?.email ?? "",
@@ -35,7 +37,7 @@ export function FormLead({ inicial, clientes, catalogo, usuarios, onSalvo, onCan
     participantesEstimados:
       inicial !== null && inicial.participantesEstimados !== null ? String(inicial.participantesEstimados) : "",
     mensagem: inicial?.mensagem ?? "",
-    cliente: inicial?.clienteId ?? "",
+    cliente: inicial === null ? (clientePreSelecionado ?? "") : (inicial.clienteId ?? ""),
     novoClienteOrgao: "",
     responsavel: inicial?.responsavelId ?? "",
     valorEstimado: inicial !== null && inicial.valorEstimado !== null ? String(inicial.valorEstimado) : "",

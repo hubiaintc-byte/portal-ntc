@@ -2106,3 +2106,12 @@ body {
 .pcms-timeline__item small { color: var(--pcms-grafite-suave); }
 .pcms-timeline__item--perda { border-left-color: var(--pcms-cardeal); }
 .pcms-timeline__item--nota { border-left-color: var(--pcms-dourado); }
+
+/* Detalhe do cliente (Task 11): contatos editáveis, negócios, eventos, linha do tempo. */
+.pcms-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.pcms-det-side { min-width: 0; }
+.pcms-contatos__linha { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.4fr 1fr auto auto auto; gap: 8px; align-items: center; border: 1px solid var(--pcms-linha); padding: 10px; margin: 0 0 8px; }
+.pcms-contatos__linha input:not([type="radio"]):not([type="checkbox"]) { font: inherit; padding: 6px 8px; border: 1px solid var(--pcms-linha); min-width: 0; }
+.pcms-contatos__linha label { font-size: 0.82rem; white-space: nowrap; }
+@media (max-width: 1100px) { .pcms-contatos__linha { grid-template-columns: 1fr 1fr; } }
+.pcms-eventos-cliente { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
