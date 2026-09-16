@@ -1,47 +1,16 @@
-import { useMemo, useState } from "react";
+import { rotuloDoEstagio } from "@ntc/lib";
 
-import type { LeadCmsResumo, LeadTipoCms } from "@/lib/cms/painelCms";
+import type { LeadCrmResumo } from "@/lib/cms/painelCrm";
 
-const ROTULO_TIPO: Record<LeadTipoCms, string> = {
-  proposta: "Proposta",
-  contato: "Contato",
-  newsletter: "Newsletter",
-  candidatura: "Candidatura",
-};
-
-/** Rótulo legível para os status da coleção Leads (shared/types LEAD_STATUS). */
-const ROTULO_STATUS: Record<string, string> = {
-  novo: "Novo",
-  "em-atendimento": "Em atendimento",
-  qualificado: "Qualificado",
-  descartado: "Descartado",
-  convertido: "Convertido",
-};
-
-type FiltroTipo = "todos" | LeadTipoCms;
-
-const CHIPS: { id: FiltroTipo; rotulo: string }[] = [
-  { id: "todos", rotulo: "Todos" },
-  { id: "proposta", rotulo: "Propostas" },
-  { id: "contato", rotulo: "Contato" },
-  { id: "newsletter", rotulo: "Newsletter" },
-  { id: "candidatura", rotulo: "Candidaturas" },
-];
+import { seloDeEstagioLead } from "./crm/seloStatus";
 
 interface TelaLeadsProps {
-  leads: LeadCmsResumo[];
+  leads: LeadCrmResumo[];
   onAbrir: (id: string) => void;
 }
 
-/** Listagem de leads — dados reais do banco (somente leitura, triagem comercial). */
+/** Listagem simples dos leads do CRM (tipo = proposta) — o kanban chega na Task 9. */
 export function TelaLeads({ leads, onAbrir }: TelaLeadsProps) {
-  const [filtro, setFiltro] = useState<FiltroTipo>("todos");
-
-  const visiveis = useMemo(
-    () => (filtro === "todos" ? leads : leads.filter((l) => l.tipo === filtro)),
-    [leads, filtro],
-  );
-
   return (
     <>
       <div className="pcms-pagehead">
@@ -51,46 +20,26 @@ export function TelaLeads({ leads, onAbrir }: TelaLeadsProps) {
           <p>
             {leads.length === 0
               ? "Nenhum lead recebido ainda."
-              : `${leads.length} ${leads.length === 1 ? "lead recebido" : "leads recebidos"} pelos formulários do site.`}
+              : `${leads.length} ${leads.length === 1 ? "lead" : "leads"} no funil comercial.`}
           </p>
         </div>
       </div>
 
-      <div className="pcms-toolbar">
-        <div className="pcms-filtros">
-          {CHIPS.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              className={`pcms-chip${filtro === c.id ? " pcms-chip--ativo" : ""}`}
-              aria-pressed={filtro === c.id}
-              onClick={() => setFiltro(c.id)}
-            >
-              {c.rotulo}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {visiveis.length === 0 ? (
-        <div className="pcms-vazio">
-          {leads.length === 0
-            ? "Nenhum lead recebido ainda."
-            : "Nenhum lead deste tipo."}
-        </div>
+      {leads.length === 0 ? (
+        <div className="pcms-vazio">Nenhum lead recebido ainda.</div>
       ) : (
         <table className="pcms-tabela">
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>Instituição</th>
-              <th>Tipo</th>
+              <th>Órgão</th>
+              <th>Contato</th>
+              <th>Programa</th>
+              <th>Estágio</th>
               <th>Recebido</th>
-              <th>Status</th>
             </tr>
           </thead>
           <tbody>
-            {visiveis.map((l) => (
+            {leads.map((l) => (
               <tr
                 key={l.id}
                 className="pcms-linha-click"
@@ -106,6 +55,9 @@ export function TelaLeads({ leads, onAbrir }: TelaLeadsProps) {
                 }}
               >
                 <td>
+                  <strong>{l.instituicao}</strong>
+                </td>
+                <td>
                   <div className="pcms-cel-nome">
                     <span>
                       <strong>{l.nome}</strong>
@@ -113,16 +65,12 @@ export function TelaLeads({ leads, onAbrir }: TelaLeadsProps) {
                     </span>
                   </div>
                 </td>
-                <td>{l.instituicao}</td>
+                <td>{l.programaSigla ?? "—"}</td>
                 <td>
-                  <span className="pcms-modalidade">{ROTULO_TIPO[l.tipo]}</span>
+                  <span className={seloDeEstagioLead(l.estagio)}>{rotuloDoEstagio(l.estagio)}</span>{" "}
+                  {l.perdido && <span className="pcms-selo pcms-selo--erro">Perdido</span>}
                 </td>
-                <td>{l.data}</td>
-                <td>
-                  <span className={`pcms-selo pcms-selo--${l.status}`}>
-                    {ROTULO_STATUS[l.status] ?? l.status}
-                  </span>
-                </td>
+                <td>{new Date(l.criadoEmISO).toLocaleDateString("pt-BR")}</td>
               </tr>
             ))}
           </tbody>

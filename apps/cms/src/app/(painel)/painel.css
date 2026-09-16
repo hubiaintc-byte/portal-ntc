@@ -875,28 +875,6 @@ body {
   color: var(--pcms-erro);
 }
 
-/* Selos de status de Lead (LEAD_STATUS — triagem comercial). */
-.pcms-selo--novo {
-  background: rgba(30, 78, 140, 0.12);
-  color: var(--pcms-oxford-claro);
-}
-.pcms-selo--em-atendimento {
-  background: rgba(181, 153, 90, 0.16);
-  color: #8a6d2f;
-}
-.pcms-selo--qualificado {
-  background: rgba(181, 153, 90, 0.22);
-  color: #6f5520;
-}
-.pcms-selo--convertido {
-  background: rgba(63, 107, 63, 0.14);
-  color: var(--pcms-sucesso);
-}
-.pcms-selo--descartado {
-  background: rgba(45, 45, 45, 0.1);
-  color: var(--pcms-grafite-suave);
-}
-
 /* Coluna de status: empilha selos (foto + oculto) sem encostar. */
 .pcms-cel-status {
   display: flex;

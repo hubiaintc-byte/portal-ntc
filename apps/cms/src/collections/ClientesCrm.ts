@@ -4,7 +4,6 @@ import {
   AREAS_CRM,
   ESFERAS_CRM,
   ORIGENS_CLIENTE,
-  STATUS_CLIENTE_CRM,
   TIPOS_INSTITUICAO,
   UFS,
 } from "@ntc/lib";
@@ -23,7 +22,7 @@ export const ClientesCrm: CollectionConfig = {
   typescript: { interface: "ClienteCrm" },
   admin: {
     useAsTitle: "orgao",
-    defaultColumns: ["orgao", "uf", "status", "responsavel"],
+    defaultColumns: ["orgao", "uf", "esfera", "responsavel"],
     group: "CRM",
   },
   access: {
@@ -53,8 +52,6 @@ export const ClientesCrm: CollectionConfig = {
     { name: "esfera", type: "select", options: ESFERAS_CRM },
     { name: "area", type: "select", options: AREAS_CRM },
     { name: "cnpj", type: "text" },
-    { name: "dirigente", type: "text" },
-    { name: "cargoDirigente", type: "text" },
     { name: "email", type: "email" },
     { name: "origem", type: "select", options: ORIGENS_CLIENTE, defaultValue: "manual" },
     {
@@ -71,15 +68,7 @@ export const ClientesCrm: CollectionConfig = {
         { name: "decisor", type: "checkbox", defaultValue: false },
       ],
     },
-    {
-      name: "potencial",
-      type: "number",
-      min: 0,
-      admin: { description: "Potencial estimado de contratação (R$)." },
-    },
-    { name: "status", type: "select", options: STATUS_CLIENTE_CRM, defaultValue: "prospect" },
     { name: "responsavel", type: "relationship", relationTo: "users" },
-    { name: "proximaAcao", type: "text" },
     { name: "observacoes", type: "textarea" },
     {
       name: "clienteSite",

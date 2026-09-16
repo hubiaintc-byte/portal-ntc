@@ -52,7 +52,7 @@ describe("criarVersaoProposta — validade da nova versão", () => {
     versao: 1,
     status: "vigente",
     validadeDias: 45, // != 0 e != o default de 30, para provar que é lido da base
-    oportunidade: null,
+    lead: 7,
     cliente: 3,
     programa: 2,
     tipo: "programa-completo",

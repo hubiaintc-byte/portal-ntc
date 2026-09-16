@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { slugDeRotulo, STATUS_CLIENTE_CRM, STATUS_OPORTUNIDADE, UFS } from "@ntc/lib";
+import { slugDeRotulo, UFS } from "@ntc/lib";
 
 describe("listas do CRM", () => {
   it("slugDeRotulo normaliza acentos, espaços e pontuação", () => {
@@ -10,9 +10,7 @@ describe("listas do CRM", () => {
     expect(slugDeRotulo("À vista após NF · 15 dias")).toBe("a-vista-apos-nf-15-dias");
   });
 
-  it("listas têm os valores do CRM legado", () => {
+  it("UFS tem as 27 unidades federativas", () => {
     expect(UFS).toHaveLength(27);
-    expect(STATUS_CLIENTE_CRM.map((o) => o.value)).toContain("prospect");
-    expect(STATUS_OPORTUNIDADE.map((o) => o.value)).toContain("proposta-enviada");
   });
 });

@@ -60,38 +60,11 @@ export {
   AREAS_CRM,
   ESFERAS_CRM,
   TIPOS_INSTITUICAO,
-  ORIGENS_CRM,
-  STATUS_CLIENTE_CRM,
-  STATUS_OPORTUNIDADE,
-  STATUS_OPORTUNIDADE_FECHADA,
   TIPOS_PROPOSTA,
   STATUS_PROPOSTA,
   CANAIS_ENVIO,
   STATUS_ENVIO,
 } from "./crm/listas";
-
-export {
-  ESTAGIO_OPORTUNIDADE,
-  SITUACAO_OPORTUNIDADE,
-  estagioLegado,
-  planejarMigracaoOportunidade,
-  type PlanoMigracaoP0,
-} from "./crm/funil";
-
-export {
-  STATUS_AVALIACAO,
-  RESULTADO_QUALIFICACAO,
-  HARD_GATE_ESTADO,
-  FAIXA_SCORE,
-  DIMENSOES_COM04,
-  HARD_GATES_COM04,
-  notaValida,
-  notasCompletas,
-  calcularScore,
-  faixaDoScore,
-  avaliacaoPermiteQualificada,
-  type AvaliacaoCom04,
-} from "./crm/qualificacao";
 
 export {
   calcularValoresProposta,

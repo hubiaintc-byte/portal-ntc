@@ -7,7 +7,7 @@ import { calcularValoresProposta, STATUS_PROPOSTA, TIPOS_PROPOSTA } from "@ntc/l
 import type {
   CatalogoCrm,
   ClienteCrmResumo,
-  OportunidadeCrmResumo,
+  LeadCrmResumo,
   PropostaDetalhe,
   UsuarioCmsResumo,
 } from "@/lib/cms/painelCrm";
@@ -30,7 +30,7 @@ interface FormPropostaProps {
   clientes: ClienteCrmResumo[];
   catalogo: CatalogoCrm;
   usuarios: UsuarioCmsResumo[];
-  oportunidades: OportunidadeCrmResumo[];
+  leads: LeadCrmResumo[];
   onSalvo: () => void;
   onCancelar: () => void;
 }
@@ -50,22 +50,21 @@ function numeroOuZero(v: string): number {
  * Wizard de criação/edição de proposta (5 blocos). `inicial === null` cria;
  * caso contrário edita a proposta vigente — o estado é inicializado a partir
  * dos campos crus de `PropostaDetalhe` (clienteId/programaId/valorUnitario/
- * etc.), o mesmo padrão de round-trip fiel usado por FormOportunidade com
- * OportunidadeCrmDetalhe.
+ * etc.), round-trip fiel.
  */
 export function FormProposta({
   inicial,
   clientes,
   catalogo,
   usuarios,
-  oportunidades,
+  leads,
   onSalvo,
   onCancelar,
 }: FormPropostaProps) {
   const [dados, setDados] = useState<DadosProposta>({
     cliente: inicial?.clienteId ?? "",
     programa: inicial?.programaId ?? "",
-    oportunidade: inicial?.oportunidadeId ?? "",
+    lead: inicial?.leadId ?? "",
     tipo: inicial?.tipo ?? "",
     modulos: inicial?.modulosIds ?? [],
     eventos: inicial?.eventosIds ?? [],
@@ -104,24 +103,18 @@ export function FormProposta({
     [dados.valorUnitario, dados.qtdPagantes, dados.cortesias, dados.percDesconto],
   );
 
-  /**
-   * Selecionar oportunidade pré-preenche cliente e programa. `OportunidadeCrmResumo`
-   * (prop recebida por este form) não traz módulos/quantidade/modalidade — só
-   * `OportunidadeCrmDetalhe` os tem; o pré-preenchimento fica restrito ao que o
-   * resumo oferece.
-   * TODO Fase B2: pré-preencher módulos/quantidade/modalidade exige OportunidadeCrmDetalhe.
-   */
-  function selecionarOportunidade(id: string) {
-    const op = oportunidades.find((o) => o.id === id);
-    if (op === undefined) {
-      setDados((d) => ({ ...d, oportunidade: "" }));
+  /** Selecionar o lead pré-preenche cliente (quando casado) e programa (quando informado). */
+  function selecionarLead(id: string) {
+    const l = leads.find((o) => o.id === id);
+    if (l === undefined) {
+      setDados((d) => ({ ...d, lead: "" }));
       return;
     }
     setDados((d) => ({
       ...d,
-      oportunidade: id,
-      cliente: op.clienteId,
-      programa: catalogo.programas.find((p) => p.sigla === op.programaSigla)?.id ?? d.programa,
+      lead: id,
+      cliente: l.clienteId ?? d.cliente,
+      programa: catalogo.programas.find((p) => p.sigla === l.programaSigla)?.id ?? d.programa,
     }));
   }
 
@@ -148,10 +141,11 @@ export function FormProposta({
       <div className="pcms-editor__head--sub">Identificação</div>
       <div className="pcms-editor__grid">
         <CampoSelect
-          rotulo="Oportunidade (opcional)"
-          valor={dados.oportunidade}
-          onMudar={selecionarOportunidade}
-          opcoes={oportunidades.map((o) => ({ label: `${o.codigo} — ${o.clienteNome}`, value: o.id }))}
+          rotulo="Lead"
+          valor={dados.lead}
+          onMudar={selecionarLead}
+          opcoes={leads.map((l) => ({ label: `${l.instituicao} — ${l.nome}`, value: l.id }))}
+          obrigatorio
         />
         <CampoSelect
           rotulo="Cliente"

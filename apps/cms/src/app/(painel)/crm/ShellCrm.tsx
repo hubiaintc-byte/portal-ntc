@@ -2,35 +2,25 @@
 
 import { useState, useTransition } from "react";
 
-import type { LeadCmsDetalhe, LeadCmsResumo } from "@/lib/cms/painelCms";
+import type { LeadCmsDetalhe } from "@/lib/cms/painelCms";
 import type { DadosEnvio } from "@/lib/cms/painelCrmEscrita";
 import type {
-  AvaliacaoDetalhe,
-  AvaliacaoResumo,
   CatalogoCrm,
   ClienteCrmDetalhe,
   ClienteCrmResumo,
-  ContatoCrmResumo,
   EnvioResumo,
+  LeadCrmResumo,
   ModuloCrmResumo,
-  OportunidadeCrmDetalhe,
-  OportunidadeCrmResumo,
   ProdutoCrmResumo,
   ProgramaCrmResumo,
   PropostaDetalhe,
   PropostaResumo,
-  TransicaoEstagioResumo,
   UsuarioCmsResumo,
-  VersaoResumo,
 } from "@/lib/cms/painelCrm";
-import { todosFollowups } from "@/lib/cms/kpisComercial";
 
 import { carregarLead } from "../acoes";
 import {
-  carregarAvaliacaoCrm,
   carregarClienteCrm,
-  carregarHistoricoOportunidade,
-  carregarOportunidadeCrm,
   carregarPropostaCrm,
   gerarPdfPropostaCrm,
   novaVersaoPropostaCrm,
@@ -41,33 +31,21 @@ import { TelaLeads } from "../TelaLeads";
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { AvisoForm } from "./CamposCrm";
 import { DetalheCliente } from "./DetalheCliente";
-import { DetalheOportunidade } from "./DetalheOportunidade";
 import { DetalheProposta } from "./DetalheProposta";
-import { FormAvaliacao } from "./FormAvaliacao";
 import { FormCliente } from "./FormCliente";
-import { FormContato } from "./FormContato";
-import { FormOportunidade } from "./FormOportunidade";
 import { FormProposta } from "./FormProposta";
 import { TelaClientes } from "./TelaClientes";
-import { TelaContatos } from "./TelaContatos";
-import { TelaEmBreve } from "./TelaEmBreve";
 import { TelaEnvios } from "./TelaEnvios";
-import { TelaFollowups } from "./TelaFollowups";
 import { TelaModulos } from "./TelaModulos";
-import { TelaOportunidades } from "./TelaOportunidades";
 import { TelaPainelComercial } from "./TelaPainelComercial";
 import { TelaProdutos } from "./TelaProdutos";
 import { TelaProgramas } from "./TelaProgramas";
 import { TelaPropostas } from "./TelaPropostas";
-import { TelaQualificacao } from "./TelaQualificacao";
-import { TelaVersoes } from "./TelaVersoes";
 
 interface ShellCrmProps {
   usuario: { nome: string; email: string; perfil: string };
   clientes: ClienteCrmResumo[];
-  contatos: ContatoCrmResumo[];
-  oportunidades: OportunidadeCrmResumo[];
-  leads: LeadCmsResumo[];
+  leads: LeadCrmResumo[];
   catalogo: CatalogoCrm;
   usuarios: UsuarioCmsResumo[];
   programas: ProgramaCrmResumo[];
@@ -75,25 +53,18 @@ interface ShellCrmProps {
   produtos: ProdutoCrmResumo[];
   propostas: PropostaResumo[];
   envios: EnvioResumo[];
-  versoes: VersaoResumo[];
-  avaliacoes: AvaliacaoResumo[];
   hojeISO: string;
   erroLeitura: boolean;
 }
 
 type TelaCrmId =
-  | "painel" | "leads" | "clientes" | "contatos" | "oportunidades"
-  | "propostas" | "versoes" | "envios" | "followups" | "condicoes"
-  | "qualificacao"
+  | "painel" | "leads" | "clientes" | "propostas" | "envios"
   | "programas" | "modulos" | "produtos";
 
 /** Formulário de criação/edição aberto em tela cheia. */
 type FormCrmAberto =
   | { entidade: "cliente"; inicial: ClienteCrmDetalhe | null }
-  | { entidade: "contato"; inicial: ContatoCrmResumo | null }
-  | { entidade: "oportunidade"; inicial: OportunidadeCrmDetalhe | null }
-  | { entidade: "proposta"; inicial: PropostaDetalhe | null }
-  | { entidade: "avaliacao"; inicial: AvaliacaoDetalhe | null };
+  | { entidade: "proposta"; inicial: PropostaDetalhe | null };
 
 /* Ícones lineares funcionais, peso 1.5 (CLAUDE.md §3). */
 const Ico = {
@@ -118,46 +89,14 @@ const Ico = {
       <path d="M14 12h2M14 16h2" />
     </svg>
   ),
-  contatos: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="9" r="3.2" />
-      <path d="M5.5 20c0-3.3 2.9-5.5 6.5-5.5s6.5 2.2 6.5 5.5" />
-    </svg>
-  ),
-  oportunidades: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3 21 12l-9 9-9-9z" />
-    </svg>
-  ),
   propostas: (
     <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M6 2h9l3 3v17H6z" /><path d="M14 2v4h4" /><path d="M9 12h6M9 16h6" />
     </svg>
   ),
-  versoes: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" />
-    </svg>
-  ),
   envios: (
     <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M3 5h18v14H3z" /><path d="m3 6 9 7 9-7" />
-    </svg>
-  ),
-  followups: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 4v5h-5" />
-    </svg>
-  ),
-  condicoes: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3 3 8l9 5 9-5z" /><path d="M3 8v8l9 5 9-5V8" />
-    </svg>
-  ),
-  qualificacao: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="4" y="3" width="16" height="18" rx="1" />
-      <path d="m8.5 12 2.5 2.5L16 9.5" />
     </svg>
   ),
   programas: (
@@ -177,26 +116,12 @@ const Ico = {
   ),
 };
 
-const NAV_OPERACAO: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
-  { id: "painel", rotulo: "Dashboard Executivo", icone: Ico.painel },
+const NAV_COMERCIAL: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
+  { id: "painel", rotulo: "Dashboard", icone: Ico.painel },
   { id: "leads", rotulo: "Leads", icone: Ico.leads },
   { id: "clientes", rotulo: "Clientes", icone: Ico.clientes },
-  { id: "contatos", rotulo: "Contatos", icone: Ico.contatos },
-  { id: "oportunidades", rotulo: "Oportunidades", icone: Ico.oportunidades },
   { id: "propostas", rotulo: "Propostas", icone: Ico.propostas },
-  { id: "versoes", rotulo: "Versões", icone: Ico.versoes },
   { id: "envios", rotulo: "Envios", icone: Ico.envios },
-  { id: "followups", rotulo: "Follow-ups", icone: Ico.followups },
-  { id: "condicoes", rotulo: "Condições", icone: Ico.condicoes },
-];
-
-/**
- * P0 — Processo Comercial B2G (docs/17). Só a Qualificação (COM-04, Sessões
- * H2/H3) está pronta; Contratações, Instrumentos, Handoff e Histórico chegam
- * nas Sessões H4-H7.
- */
-const NAV_P0: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
-  { id: "qualificacao", rotulo: "Qualificação (COM-04)", icone: Ico.qualificacao },
 ];
 
 const NAV_CATALOGO: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
@@ -206,17 +131,11 @@ const NAV_CATALOGO: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] 
 ];
 
 const CRUMB: Record<TelaCrmId, string> = {
-  painel: "CRM · Dashboard Executivo",
+  painel: "CRM · Dashboard",
   leads: "CRM · Leads",
   clientes: "CRM · Clientes",
-  contatos: "CRM · Contatos",
-  oportunidades: "CRM · Oportunidades",
   propostas: "CRM · Propostas",
-  versoes: "CRM · Versões",
   envios: "CRM · Envios",
-  followups: "CRM · Follow-ups",
-  condicoes: "CRM · Condições",
-  qualificacao: "CRM · Qualificação (COM-04)",
   programas: "CRM · Programas",
   modulos: "CRM · Módulos",
   produtos: "CRM · Produtos / Eventos",
@@ -225,8 +144,6 @@ const CRUMB: Record<TelaCrmId, string> = {
 export function ShellCrm({
   usuario,
   clientes,
-  contatos,
-  oportunidades,
   leads,
   catalogo,
   usuarios,
@@ -235,15 +152,11 @@ export function ShellCrm({
   produtos,
   propostas,
   envios,
-  versoes,
-  avaliacoes,
   hojeISO,
   erroLeitura,
 }: ShellCrmProps) {
   const [tela, setTela] = useState<TelaCrmId>("painel");
   const [clienteDet, setClienteDet] = useState<ClienteCrmDetalhe | null>(null);
-  const [oportunidadeDet, setOportunidadeDet] = useState<OportunidadeCrmDetalhe | null>(null);
-  const [historicoOportunidade, setHistoricoOportunidade] = useState<TransicaoEstagioResumo[]>([]);
   const [leadDet, setLeadDet] = useState<LeadCmsDetalhe | null>(null);
   const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
@@ -252,8 +165,6 @@ export function ShellCrm({
 
   function fecharTudo() {
     setClienteDet(null);
-    setOportunidadeDet(null);
-    setHistoricoOportunidade([]);
     setLeadDet(null);
     setPropostaDet(null);
     setFormAberto(null);
@@ -272,19 +183,6 @@ export function ShellCrm({
     });
   }
 
-  function abrirOportunidade(id: string) {
-    iniciarCarga(async () => {
-      const [det, historico] = await Promise.all([
-        carregarOportunidadeCrm(id),
-        carregarHistoricoOportunidade(id),
-      ]);
-      if (det) {
-        setOportunidadeDet(det);
-        setHistoricoOportunidade(historico);
-      }
-    });
-  }
-
   function abrirLead(id: string) {
     iniciarCarga(async () => {
       const det = await carregarLead(id);
@@ -299,17 +197,6 @@ export function ShellCrm({
         setErroAcao(null);
         setPropostaDet(det);
       }
-    });
-  }
-
-  /**
-   * Sem tela de detalhe própria (escopo desta sessão): abre direto no
-   * formulário de edição, mesmo padrão de onEditar em TelaContatos.
-   */
-  function abrirAvaliacao(id: string) {
-    iniciarCarga(async () => {
-      const det = await carregarAvaliacaoCrm(id);
-      if (det) setFormAberto({ entidade: "avaliacao", inicial: det });
     });
   }
 
@@ -347,8 +234,7 @@ export function ShellCrm({
   }
 
   const grupos: GrupoNav[] = [
-    { rotulo: "Operação Comercial", itens: NAV_OPERACAO },
-    { rotulo: "Processo Comercial B2G (P0)", itens: NAV_P0 },
+    { rotulo: "Comercial", itens: NAV_COMERCIAL },
     { rotulo: "Catálogo Institucional", itens: NAV_CATALOGO },
   ];
 
@@ -372,39 +258,13 @@ export function ShellCrm({
           onSalvo={fecharTudo}
           onCancelar={fecharTudo}
         />
-      ) : formAberto?.entidade === "contato" ? (
-        <FormContato
-          inicial={formAberto.inicial}
-          clientes={clientes}
-          clientePreSelecionado={clienteDet?.id}
-          onSalvo={fecharTudo}
-          onCancelar={fecharTudo}
-        />
-      ) : formAberto?.entidade === "oportunidade" ? (
-        <FormOportunidade
-          inicial={formAberto.inicial}
-          clientes={clientes}
-          catalogo={catalogo}
-          usuarios={usuarios}
-          clientePreSelecionado={clienteDet?.id}
-          onSalvo={fecharTudo}
-          onCancelar={fecharTudo}
-        />
       ) : formAberto?.entidade === "proposta" ? (
         <FormProposta
           inicial={formAberto.inicial}
           clientes={clientes}
           catalogo={catalogo}
           usuarios={usuarios}
-          oportunidades={oportunidades}
-          onSalvo={fecharTudo}
-          onCancelar={fecharTudo}
-        />
-      ) : formAberto?.entidade === "avaliacao" ? (
-        <FormAvaliacao
-          inicial={formAberto.inicial}
-          oportunidades={oportunidades}
-          usuarios={usuarios}
+          leads={leads}
           onSalvo={fecharTudo}
           onCancelar={fecharTudo}
         />
@@ -413,16 +273,6 @@ export function ShellCrm({
           cliente={clienteDet}
           onVoltar={fecharTudo}
           onEditar={() => setFormAberto({ entidade: "cliente", inicial: clienteDet })}
-          onAbrirOportunidade={abrirOportunidade}
-          onNovaOportunidade={() => setFormAberto({ entidade: "oportunidade", inicial: null })}
-          onNovoContato={() => setFormAberto({ entidade: "contato", inicial: null })}
-        />
-      ) : oportunidadeDet ? (
-        <DetalheOportunidade
-          oportunidade={oportunidadeDet}
-          historico={historicoOportunidade}
-          onVoltar={fecharTudo}
-          onEditar={() => setFormAberto({ entidade: "oportunidade", inicial: oportunidadeDet })}
         />
       ) : propostaDet ? (
         <>
@@ -440,13 +290,7 @@ export function ShellCrm({
       ) : (
         <>
           {tela === "painel" && (
-            <TelaPainelComercial
-              oportunidades={oportunidades}
-              leads={leads}
-              hojeISO={hojeISO}
-              erroLeitura={erroLeitura}
-              onAbrirOportunidade={abrirOportunidade}
-            />
+            <TelaPainelComercial leads={leads} hojeISO={hojeISO} erroLeitura={erroLeitura} />
           )}
           {tela === "leads" && <TelaLeads leads={leads} onAbrir={abrirLead} />}
           {tela === "clientes" && (
@@ -454,26 +298,6 @@ export function ShellCrm({
               clientes={clientes}
               onAbrir={abrirCliente}
               onNovo={() => setFormAberto({ entidade: "cliente", inicial: null })}
-            />
-          )}
-          {tela === "contatos" && (
-            <TelaContatos
-              contatos={contatos}
-              onEditar={(c) => setFormAberto({ entidade: "contato", inicial: c })}
-              onNovo={() => setFormAberto({ entidade: "contato", inicial: null })}
-            />
-          )}
-          {tela === "oportunidades" && (
-            <TelaOportunidades
-              oportunidades={oportunidades}
-              onAbrir={abrirOportunidade}
-              onNovo={() => setFormAberto({ entidade: "oportunidade", inicial: null })}
-            />
-          )}
-          {tela === "followups" && (
-            <TelaFollowups
-              followups={todosFollowups(oportunidades)}
-              onAbrirOportunidade={abrirOportunidade}
             />
           )}
           {tela === "programas" && <TelaProgramas programas={programas} />}
@@ -486,19 +310,7 @@ export function ShellCrm({
               onNovo={() => setFormAberto({ entidade: "proposta", inicial: null })}
             />
           )}
-          {tela === "versoes" && <TelaVersoes versoes={versoes} onAbrirProposta={abrirProposta} />}
           {tela === "envios" && <TelaEnvios envios={envios} />}
-          {tela === "condicoes" && (
-            <TelaEmBreve eyebrow="Operação Comercial" titulo="Condições"
-              descricao="Condições comerciais padrão e específicas." />
-          )}
-          {tela === "qualificacao" && (
-            <TelaQualificacao
-              avaliacoes={avaliacoes}
-              onAbrir={abrirAvaliacao}
-              onNovo={() => setFormAberto({ entidade: "avaliacao", inicial: null })}
-            />
-          )}
         </>
       )}
     </ShellPainel>

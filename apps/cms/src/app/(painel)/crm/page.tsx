@@ -1,10 +1,7 @@
 import { exigirUsuarioCms } from "@/lib/cms/autenticacao";
-import { listarLeadsCms, type LeadCmsResumo } from "@/lib/cms/painelCms";
 import {
-  listarAvaliacoesCrm,
   listarClientesCrm,
-  listarContatosCrm,
-  listarOportunidadesCrm,
+  listarLeadsCrm,
   listarUsuariosCms,
   obterCatalogoCrm,
   listarProgramasCrm,
@@ -12,19 +9,15 @@ import {
   listarProdutosCrm,
   listarPropostasCrm,
   todosEnviosCrm,
-  versoesDeProposta,
-  type AvaliacaoResumo,
   type CatalogoCrm,
   type ClienteCrmResumo,
-  type ContatoCrmResumo,
-  type OportunidadeCrmResumo,
+  type LeadCrmResumo,
   type UsuarioCmsResumo,
   type ProgramaCrmResumo,
   type ModuloCrmResumo,
   type ProdutoCrmResumo,
   type PropostaResumo,
   type EnvioResumo,
-  type VersaoResumo,
 } from "@/lib/cms/painelCrm";
 
 import { ShellCrm } from "./ShellCrm";
@@ -40,9 +33,7 @@ export default async function PainelCrmPage() {
   const usuario = await exigirUsuarioCms();
 
   let clientes: ClienteCrmResumo[] = [];
-  let contatos: ContatoCrmResumo[] = [];
-  let oportunidades: OportunidadeCrmResumo[] = [];
-  let leads: LeadCmsResumo[] = [];
+  let leads: LeadCrmResumo[] = [];
   let catalogo: CatalogoCrm = { programas: [], modulos: [], eventos: [] };
   let usuarios: UsuarioCmsResumo[] = [];
   let programas: ProgramaCrmResumo[] = [];
@@ -50,17 +41,13 @@ export default async function PainelCrmPage() {
   let produtos: ProdutoCrmResumo[] = [];
   let propostas: PropostaResumo[] = [];
   let envios: EnvioResumo[] = [];
-  let versoes: VersaoResumo[] = [];
-  let avaliacoes: AvaliacaoResumo[] = [];
   let erroLeitura = false;
 
   try {
-    [clientes, contatos, oportunidades, leads, catalogo, usuarios, programas, modulos, produtos, propostas, envios, avaliacoes] =
+    [clientes, leads, catalogo, usuarios, programas, modulos, produtos, propostas, envios] =
       await Promise.all([
         listarClientesCrm(),
-        listarContatosCrm(),
-        listarOportunidadesCrm(),
-        listarLeadsCms(),
+        listarLeadsCrm(),
         obterCatalogoCrm(),
         listarUsuariosCms(),
         listarProgramasCrm(),
@@ -68,18 +55,7 @@ export default async function PainelCrmPage() {
         listarProdutosCrm(),
         listarPropostasCrm(),
         todosEnviosCrm(),
-        listarAvaliacoesCrm(),
       ]);
-
-    // Lista achatada de versões de todas as propostas (TelaVersoes espera não
-    // agrupada — ver task-5-report.md). `listarPropostasCrm()` já devolve só a
-    // versão vigente por codigoBase, então o número de chamadas aqui é o
-    // número de propostas distintas (catálogo curado, volume baixo — não é
-    // N+1 pesado no sentido de paginação/alto tráfego). Ver task-6-report.md
-    // para a decisão eager vs. lazy.
-    const basesUnicas = [...new Set(propostas.map((p) => p.codigoBase))];
-    const versoesPorBase = await Promise.all(basesUnicas.map((base) => versoesDeProposta(base)));
-    versoes = versoesPorBase.flat();
   } catch (e) {
     console.error("[PainelCrmPage] Erro ao ler banco:", e);
     erroLeitura = true;
@@ -91,8 +67,6 @@ export default async function PainelCrmPage() {
     <ShellCrm
       usuario={usuario}
       clientes={clientes}
-      contatos={contatos}
-      oportunidades={oportunidades}
       leads={leads}
       catalogo={catalogo}
       usuarios={usuarios}
@@ -101,8 +75,6 @@ export default async function PainelCrmPage() {
       produtos={produtos}
       propostas={propostas}
       envios={envios}
-      versoes={versoes}
-      avaliacoes={avaliacoes}
       hojeISO={hojeISO}
       erroLeitura={erroLeitura}
     />

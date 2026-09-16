@@ -2,27 +2,13 @@
 
 import { useState, useTransition } from "react";
 
-import {
-  AREAS_CRM,
-  ESFERAS_CRM,
-  ORIGENS_CRM,
-  STATUS_CLIENTE_CRM,
-  TIPOS_INSTITUICAO,
-  UFS,
-} from "@ntc/lib";
+import { AREAS_CRM, ESFERAS_CRM, ORIGENS_CLIENTE, TIPOS_INSTITUICAO, UFS } from "@ntc/lib";
 
 import type { ClienteCrmDetalhe, UsuarioCmsResumo } from "@/lib/cms/painelCrm";
 import type { DadosClienteCrm } from "@/lib/cms/painelCrmEscrita";
 
 import { salvarClienteCrm } from "../acoesCrm";
-import {
-  AvisoForm,
-  BarraForm,
-  CampoArea,
-  CampoNumero,
-  CampoSelect,
-  CampoTexto,
-} from "./CamposCrm";
+import { AvisoForm, BarraForm, CampoArea, CampoSelect, CampoTexto } from "./CamposCrm";
 
 interface FormClienteProps {
   inicial: ClienteCrmDetalhe | null;
@@ -43,15 +29,22 @@ export function FormCliente({ inicial, usuarios, onSalvo, onCancelar }: FormClie
     esfera: inicial?.esfera ?? "",
     area: inicial?.area ?? "",
     cnpj: inicial?.cnpj ?? "",
-    dirigente: inicial?.dirigente ?? "",
-    cargoDirigente: inicial?.cargoDirigente ?? "",
     email: inicial?.email ?? "",
-    origem: inicial?.origem ?? "",
-    potencial: inicial !== null && inicial.potencial !== null ? String(inicial.potencial) : "",
-    status: inicial?.status ?? "prospect",
+    origem: inicial?.origem ?? "manual",
     responsavel: inicial?.responsavelId ?? "",
-    proximaAcao: inicial?.proximaAcao ?? "",
     observacoes: inicial?.observacoes ?? "",
+    // Contatos ainda não são editáveis aqui (Task 11 traz o EditorContatos):
+    // o form só preserva o array que veio, para o save não apagá-los.
+    contatos:
+      inicial?.contatos.map((c) => ({
+        nome: c.nome,
+        cargo: c.cargo ?? "",
+        setor: c.setor ?? "",
+        email: c.email ?? "",
+        whatsapp: c.whatsapp ?? "",
+        principal: c.principal,
+        decisor: c.decisor,
+      })) ?? [],
   });
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, iniciarSalvar] = useTransition();
@@ -87,19 +80,14 @@ export function FormCliente({ inicial, usuarios, onSalvo, onCancelar }: FormClie
         <CampoSelect rotulo="Esfera" valor={dados.esfera} onMudar={m("esfera")} opcoes={ESFERAS_CRM} />
         <CampoSelect rotulo="Área" valor={dados.area} onMudar={m("area")} opcoes={AREAS_CRM} />
         <CampoTexto rotulo="CNPJ" valor={dados.cnpj} onMudar={m("cnpj")} curto />
-        <CampoTexto rotulo="Dirigente" valor={dados.dirigente} onMudar={m("dirigente")} />
-        <CampoTexto rotulo="Cargo do dirigente" valor={dados.cargoDirigente} onMudar={m("cargoDirigente")} />
         <CampoTexto rotulo="E-mail" tipo="email" valor={dados.email} onMudar={m("email")} />
-        <CampoSelect rotulo="Origem" valor={dados.origem} onMudar={m("origem")} opcoes={ORIGENS_CRM} />
-        <CampoNumero rotulo="Potencial (R$)" valor={dados.potencial} onMudar={m("potencial")} curto />
-        <CampoSelect rotulo="Status" valor={dados.status} onMudar={m("status")} opcoes={STATUS_CLIENTE_CRM} />
+        <CampoSelect rotulo="Origem" valor={dados.origem} onMudar={m("origem")} opcoes={ORIGENS_CLIENTE} />
         <CampoSelect
           rotulo="Responsável"
           valor={dados.responsavel}
           onMudar={m("responsavel")}
           opcoes={usuarios.map((u) => ({ label: u.nome, value: u.id }))}
         />
-        <CampoTexto rotulo="Próxima ação" valor={dados.proximaAcao} onMudar={m("proximaAcao")} />
       </div>
       <CampoArea rotulo="Observações" valor={dados.observacoes} onMudar={m("observacoes")} />
     </form>

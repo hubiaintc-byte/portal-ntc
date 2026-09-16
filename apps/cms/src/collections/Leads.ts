@@ -3,7 +3,7 @@ import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 import { ESTAGIOS_LEAD, MOTIVOS_PERDA, ORIGENS_ENTRADA_LEAD } from "@ntc/lib";
 
 import { atendimentoComercial } from "../access/atendimentoComercial";
-import { ESFERA_INSTITUCIONAL, LEAD_STATUS, LEAD_TIPO } from "../shared/types";
+import { ESFERA_INSTITUCIONAL, LEAD_TIPO } from "../shared/types";
 
 /**
  * Leads (doc 11 §11).
@@ -25,7 +25,7 @@ export const Leads: CollectionConfig = {
   labels: { singular: "Lead", plural: "Leads" },
   admin: {
     useAsTitle: "identificacao",
-    defaultColumns: ["identificacao", "tipo", "status", "createdAt"],
+    defaultColumns: ["identificacao", "tipo", "estagio", "createdAt"],
     group: "Comercial",
     listSearchableFields: ["email", "nome", "instituicao"],
   },
@@ -44,13 +44,6 @@ export const Leads: CollectionConfig = {
       admin: { readOnly: true },
     },
     { name: "identificacao", type: "text", admin: { hidden: true } },
-    {
-      name: "status",
-      type: "select",
-      options: LEAD_STATUS.map((s) => ({ label: s, value: s })),
-      defaultValue: "novo",
-      required: true,
-    },
     { name: "observacoesInternas", type: "textarea" },
 
     // ---- CRM (spec 2026-09-15 §3.1): o lead é o card do kanban ------------

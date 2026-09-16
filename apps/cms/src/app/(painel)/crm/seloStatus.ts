@@ -1,24 +1,4 @@
-/** Classe de selo (pcms-selo--*) por status de oportunidade e cliente. */
-const SELO_OPORTUNIDADE: Record<string, string> = {
-  "em-qualificacao": "info",
-  "apresentacao-institucional": "info",
-  "proposta-enviada": "info",
-  "em-negociacao": "atencao",
-  aprovada: "ok",
-  contratada: "ok",
-  perdida: "erro",
-  cancelada: "erro",
-};
-
-const SELO_CLIENTE: Record<string, string> = {
-  prospect: "info",
-  "em-qualificacao": "info",
-  "em-negociacao": "atencao",
-  "cliente-ativo": "ok",
-  "cliente-inativo": "erro",
-  encerrado: "erro",
-};
-
+/** Classe de selo (pcms-selo--*) por status de proposta, envio e estágio do lead. */
 const SELO_PROPOSTA: Record<string, string> = {
   rascunho: "info",
   enviada: "info",
@@ -36,59 +16,22 @@ const SELO_ENVIO: Record<string, string> = {
   respondida: "ok",
 };
 
-/** Estágio: neutro no início do funil, atenção na negociação, ok em Ganha. */
-const SELO_ESTAGIO: Record<string, string> = {
-  mapeada: "info",
-  "prospeccao-relacionamento": "info",
-  "demanda-identificada": "info",
-  qualificada: "info",
-  "diagnostico-realizado": "info",
-  "solucao-em-construcao": "info",
-  "proposta-em-elaboracao": "info",
-  "proposta-enviada": "info",
-  "negociacao-tramitacao": "atencao",
-  "contratacao-em-formalizacao": "atencao",
-  ganha: "ok",
+/** Estágio do lead: neutro no início, atenção na proposta, ok do evento em diante. */
+const SELO_ESTAGIO_LEAD: Record<string, string> = {
+  lead: "info",
+  oportunidade: "info",
+  "em-contato": "info",
+  "proposta-em-producao": "atencao",
+  "proposta-enviada": "atencao",
+  "proposta-aceita": "ok",
+  "evento-agendado": "ok",
+  "contrato-recebido": "ok",
+  "links-enviados": "ok",
+  "evento-realizado": "ok",
 };
 
-const SELO_SITUACAO: Record<string, string> = {
-  ativa: "ok",
-  perdida: "erro",
-  "adiada-nurturing": "atencao",
-};
-
-/** Resultado da avaliação COM-04 (manual §18): Qualificada é a única decisão positiva. */
-const SELO_RESULTADO: Record<string, string> = {
-  qualificada: "ok",
-  "qualificar-mais": "atencao",
-  nurturing: "info",
-  "nao-qualificada": "erro",
-};
-
-/** Faixa de leitura do score COM-04 (manual §15): referência, não decisão. */
-const SELO_FAIXA: Record<string, string> = {
-  forte: "ok",
-  intermediario: "atencao",
-  fraco: "erro",
-};
-
-export const seloDeEstagio = (estagio: string): string =>
-  `pcms-selo pcms-selo--${SELO_ESTAGIO[estagio] ?? "info"}`;
-
-export const seloDeSituacao = (situacao: string): string =>
-  `pcms-selo pcms-selo--${SELO_SITUACAO[situacao] ?? "info"}`;
-
-export const seloDeResultado = (resultado: string): string =>
-  `pcms-selo pcms-selo--${SELO_RESULTADO[resultado] ?? "info"}`;
-
-export const seloDeFaixa = (faixa: string): string =>
-  `pcms-selo pcms-selo--${SELO_FAIXA[faixa] ?? "info"}`;
-
-export const seloDeOportunidade = (status: string): string =>
-  `pcms-selo pcms-selo--${SELO_OPORTUNIDADE[status] ?? "info"}`;
-
-export const seloDeCliente = (status: string): string =>
-  `pcms-selo pcms-selo--${SELO_CLIENTE[status] ?? "info"}`;
+export const seloDeEstagioLead = (estagio: string): string =>
+  `pcms-selo pcms-selo--${SELO_ESTAGIO_LEAD[estagio] ?? "info"}`;
 
 export const seloDeProposta = (status: string): string =>
   `pcms-selo pcms-selo--${SELO_PROPOSTA[status] ?? "info"}`;

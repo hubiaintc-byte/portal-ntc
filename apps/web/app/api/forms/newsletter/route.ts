@@ -92,7 +92,6 @@ export async function POST(req: Request) {
       collection: "leads",
       data: {
         tipo: "newsletter",
-        status: "novo",
         estagio: "lead",
         origemEntrada: "site",
         nome: dados.nome,

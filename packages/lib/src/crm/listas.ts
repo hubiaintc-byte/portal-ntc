@@ -9,7 +9,7 @@ export interface OpcaoLista {
   value: string;
 }
 
-/** "Em qualificação" → "em-qualificacao". Também usado pelo importador. */
+/** "Em qualificação" → "em-qualificacao". */
 export function slugDeRotulo(rotulo: string): string {
   return rotulo
     .normalize("NFD")
@@ -39,23 +39,6 @@ export const TIPOS_INSTITUICAO = opcoes([
   "Secretaria Federal", "Secretaria Estadual", "Secretaria Municipal", "Autarquia",
   "Fundação", "Tribunal", "Câmara", "Assembleia", "Consórcio", "Escola de Governo", "Outro",
 ]);
-
-export const ORIGENS_CRM = opcoes([
-  "Indicação", "Indicação institucional", "Evento", "Prospecção ativa",
-  "Cliente recorrente", "Continuidade de relacionamento", "Inbound", "EventON", "Outros",
-]);
-
-export const STATUS_CLIENTE_CRM = opcoes([
-  "Prospect", "Em qualificação", "Em negociação", "Cliente ativo", "Cliente inativo", "Encerrado",
-]);
-
-export const STATUS_OPORTUNIDADE = opcoes([
-  "Em qualificação", "Apresentação institucional", "Proposta enviada", "Em negociação",
-  "Aprovada", "Contratada", "Perdida", "Cancelada",
-]);
-
-/** Status que tiram a oportunidade do funil (não contam como "aberta"). */
-export const STATUS_OPORTUNIDADE_FECHADA: string[] = ["contratada", "perdida", "cancelada"];
 
 export const TIPOS_PROPOSTA = opcoes([
   "Programa Completo", "Módulo Avulso", "Produto/Evento Avulso", "Customizada",

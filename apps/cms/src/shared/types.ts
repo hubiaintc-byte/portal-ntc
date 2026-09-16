@@ -24,15 +24,6 @@ export type EsferaInstitucional = (typeof ESFERA_INSTITUCIONAL)[number];
 export const LEAD_TIPO = ["proposta", "contato", "newsletter", "candidatura"] as const;
 export type LeadTipo = (typeof LEAD_TIPO)[number];
 
-export const LEAD_STATUS = [
-  "novo",
-  "em-atendimento",
-  "qualificado",
-  "descartado",
-  "convertido",
-] as const;
-export type LeadStatus = (typeof LEAD_STATUS)[number];
-
 export const TITULACAO_DOCENTE = [
   "doutorado",
   "pos-doutorado",

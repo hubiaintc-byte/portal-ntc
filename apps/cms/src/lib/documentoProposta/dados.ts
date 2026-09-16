@@ -64,6 +64,10 @@ export async function obterDadosDocumentoProposta(
   }
 
   const cliente = ehObjeto<ClienteCrm>(doc.cliente) ? doc.cliente : null;
+  // Contatos vivem embutidos no cliente (spec 2026-09-15 §3.2); o "dirigente"
+  // do documento é o contato principal, ou o primeiro cadastrado.
+  const contatos = cliente?.contatos ?? [];
+  const contatoPrincipal = contatos.find((c) => c.principal === true) ?? contatos[0] ?? null;
   const programa = ehObjeto<Programa>(doc.programa) ? doc.programa : null;
   const elaborador = ehObjeto<User>(doc.elaborador) ? doc.elaborador : null;
 
@@ -101,7 +105,7 @@ export async function obterDadosDocumentoProposta(
     clienteSigla: cliente?.sigla ?? cliente?.orgao ?? "—",
     clienteUf: cliente?.uf ?? "",
     clienteMunicipio: cliente?.municipio ?? "—",
-    clienteDirigente: cliente?.dirigente ?? "—",
+    clienteDirigente: contatoPrincipal?.nome ?? "—",
     programaNome: programa?.nomeCompleto ?? "Programa Estratégico NTC",
     programaSigla: programa?.sigla ?? "",
     itens,

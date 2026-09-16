@@ -16,7 +16,8 @@ export function TelaDashboard({ eventos, palestrantes, leads, erroLeitura }: Tel
   const eventosPublicados = eventos.filter((e) => e.status === "publicado").length;
   const eventosRascunho = eventos.filter((e) => e.status === "rascunho").length;
   const palestrantesComFoto = palestrantes.filter((p) => p.temFoto).length;
-  const leadsNovos = leads.filter((l) => l.status === "novo").length;
+  const limite = Date.now() - 30 * 86_400_000;
+  const leadsNovos = leads.filter((l) => Date.parse(l.dataISO) >= limite).length;
 
   const metricas = [
     {
@@ -38,7 +39,7 @@ export function TelaDashboard({ eventos, palestrantes, leads, erroLeitura }: Tel
       vertical: "educacao" as const,
     },
     {
-      rotulo: "Leads novos",
+      rotulo: "Leads (30 dias)",
       valor: String(leadsNovos),
       delta:
         leads.length === 0

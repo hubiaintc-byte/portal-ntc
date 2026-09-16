@@ -27,7 +27,10 @@ describe("obterDadosDocumentoProposta", () => {
         sigla: "SEDUC-SP",
         municipio: "São Paulo",
         uf: "SP",
-        dirigente: "Fulano de Tal",
+        contatos: [
+          { nome: "Beltrano Assessor", principal: false },
+          { nome: "Fulano de Tal", principal: true },
+        ],
       },
       programa: { id: 7, sigla: "PROGE", nomeCompleto: "Programa de Gestão Estratégica" },
       modulos: [{ id: 1, numero: 1, titulo: "Gestão Democrática", cargaHoraria: "40h" }],
@@ -48,6 +51,7 @@ describe("obterDadosDocumentoProposta", () => {
 
     expect(dados).not.toBeNull();
     expect(dados?.clienteOrgao).toBe("Secretaria de Educação de São Paulo");
+    expect(dados?.clienteDirigente).toBe("Fulano de Tal");
     expect(dados?.programaNome).toBe("Programa de Gestão Estratégica");
     expect(dados?.tipoTexto).toBe("Trilha Completa de Programa Estratégico");
     expect(dados?.itens).toEqual([

@@ -12,7 +12,7 @@ describe("dadosProposta", () => {
         percDesconto: "10",
         cliente: "1",
         programa: "2",
-        oportunidade: "",
+        lead: "7",
         tipo: "programa-completo",
         modulos: [],
         eventos: [],
@@ -27,8 +27,10 @@ describe("dadosProposta", () => {
         status: "rascunho",
       },
       3, // clienteId
+      7, // leadId
       { codigoBase: "NTC-PROP-2026-PROGE-SP-X", codigo: "NTC-PROP-2026-PROGE-SP-X-v01", versao: 1 },
     );
+    expect(d.lead).toBe(7);
     expect(d.valorBruto).toBe(1000);
     expect(d.desconto).toBe(100);
     expect(d.valorLiquido).toBe(900);

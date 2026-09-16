@@ -12,24 +12,20 @@ import sharp from "sharp";
 
 import { Areas } from "./collections/Areas";
 import { AuditLog } from "./collections/AuditLog";
-import { AvaliacoesQualificacao } from "./collections/AvaliacoesQualificacao";
 import { ClientesCrm } from "./collections/ClientesCrm";
 import { Clientes } from "./collections/Clientes";
-import { ContatosCrm } from "./collections/ContatosCrm";
 import { Conteudos } from "./collections/Conteudos";
 import { DocumentosComerciais } from "./collections/DocumentosComerciais";
 import { EnviosEmail } from "./collections/EnviosEmail";
 import { Especialistas } from "./collections/Especialistas";
 import { Eventos } from "./collections/Eventos";
 import { EventosComerciais } from "./collections/EventosComerciais";
-import { HistoricoEstagio } from "./collections/HistoricoEstagio";
 import { Leads } from "./collections/Leads";
 import { LinhaDoTempo } from "./collections/LinhaDoTempo";
 import { Media } from "./collections/Media";
 import { ModelosEmail } from "./collections/ModelosEmail";
 import { Modulos } from "./collections/Modulos";
 import { EnviosProposta } from "./collections/EnviosProposta";
-import { Oportunidades } from "./collections/Oportunidades";
 import { Passkeys } from "./collections/Passkeys";
 import { Programas } from "./collections/Programas";
 import { Propostas } from "./collections/Propostas";
@@ -105,10 +101,6 @@ export default buildConfig({
     Clientes,
     Leads,
     ClientesCrm,
-    ContatosCrm,
-    Oportunidades,
-    HistoricoEstagio,
-    AvaliacoesQualificacao,
     Propostas,
     VersoesProposta,
     EnviosProposta,

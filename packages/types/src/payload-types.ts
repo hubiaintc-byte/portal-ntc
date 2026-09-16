@@ -23,10 +23,6 @@ export interface Config {
     clientes: Cliente;
     leads: Lead;
     'clientes-crm': ClienteCrm;
-    'contatos-crm': ContatoCrm;
-    oportunidades: Oportunidade;
-    'historico-estagio': HistoricoEstagio;
-    'avaliacoes-qualificacao': AvaliacaoQualificacao;
     propostas: Proposta;
     versoes: VersaoProposta;
     envios: EnvioProposta;
@@ -55,10 +51,6 @@ export interface Config {
     clientes: ClientesSelect<false> | ClientesSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     'clientes-crm': ClientesCrmSelect<false> | ClientesCrmSelect<true>;
-    'contatos-crm': ContatosCrmSelect<false> | ContatosCrmSelect<true>;
-    oportunidades: OportunidadesSelect<false> | OportunidadesSelect<true>;
-    'historico-estagio': HistoricoEstagioSelect<false> | HistoricoEstagioSelect<true>;
-    'avaliacoes-qualificacao': AvaliacoesQualificacaoSelect<false> | AvaliacoesQualificacaoSelect<true>;
     propostas: PropostasSelect<false> | PropostasSelect<true>;
     versoes: VersoesSelect<false> | VersoesSelect<true>;
     envios: EnviosSelect<false> | EnviosSelect<true>;
@@ -852,7 +844,6 @@ export interface Lead {
   id: number;
   tipo: 'proposta' | 'contato' | 'newsletter' | 'candidatura';
   identificacao?: string | null;
-  status: 'novo' | 'em-atendimento' | 'qualificado' | 'descartado' | 'convertido';
   observacoesInternas?: string | null;
   /**
    * Coluna do kanban comercial.
@@ -1024,8 +1015,6 @@ export interface ClienteCrm {
       )
     | null;
   cnpj?: string | null;
-  dirigente?: string | null;
-  cargoDirigente?: string | null;
   email?: string | null;
   origem?: ('lead-site' | 'manual' | 'importado') | null;
   /**
@@ -1043,247 +1032,12 @@ export interface ClienteCrm {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Potencial estimado de contratação (R$).
-   */
-  potencial?: number | null;
-  status?:
-    | ('prospect' | 'em-qualificacao' | 'em-negociacao' | 'cliente-ativo' | 'cliente-inativo' | 'encerrado')
-    | null;
   responsavel?: (number | null) | User;
-  proximaAcao?: string | null;
   observacoes?: string | null;
   /**
    * Instituição correspondente na vitrine do site, se houver.
    */
   clienteSite?: (number | null) | Cliente;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contatos-crm".
- */
-export interface ContatoCrm {
-  id: number;
-  nome: string;
-  cliente: number | ClienteCrm;
-  cargo?: string | null;
-  setor?: string | null;
-  email?: string | null;
-  whatsapp?: string | null;
-  principal?: boolean | null;
-  decisor?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "oportunidades".
- */
-export interface Oportunidade {
-  id: number;
-  codigo: string;
-  cliente: number | ClienteCrm;
-  programa: number | Programa;
-  modulos?: (number | Modulo)[] | null;
-  eventos?: (number | Evento)[] | null;
-  uf:
-    | 'AC'
-    | 'AL'
-    | 'AM'
-    | 'AP'
-    | 'BA'
-    | 'CE'
-    | 'DF'
-    | 'ES'
-    | 'GO'
-    | 'MA'
-    | 'MG'
-    | 'MS'
-    | 'MT'
-    | 'PA'
-    | 'PB'
-    | 'PE'
-    | 'PI'
-    | 'PR'
-    | 'RJ'
-    | 'RN'
-    | 'RO'
-    | 'RR'
-    | 'RS'
-    | 'SC'
-    | 'SE'
-    | 'SP'
-    | 'TO';
-  origem:
-    | 'indicacao'
-    | 'indicacao-institucional'
-    | 'evento'
-    | 'prospeccao-ativa'
-    | 'cliente-recorrente'
-    | 'continuidade-de-relacionamento'
-    | 'inbound'
-    | 'eventon'
-    | 'outros';
-  /**
-   * Quantidade estimada de participantes.
-   */
-  quantidade?: number | null;
-  modalidade?: string | null;
-  /**
-   * Valor estimado (R$).
-   */
-  valor?: number | null;
-  probabilidade?: number | null;
-  /**
-   * Campo legado, preenchido automaticamente a partir de Estágio e Situação. Não editar: será removido depois da Sessão H7.
-   */
-  status?:
-    | (
-        | 'em-qualificacao'
-        | 'apresentacao-institucional'
-        | 'proposta-enviada'
-        | 'em-negociacao'
-        | 'aprovada'
-        | 'contratada'
-        | 'perdida'
-        | 'cancelada'
-      )
-    | null;
-  /**
-   * Posição no funil comercial (manual NTC-COM-CRM-01 §11).
-   */
-  estagio:
-    | 'mapeada'
-    | 'prospeccao-relacionamento'
-    | 'demanda-identificada'
-    | 'qualificada'
-    | 'diagnostico-realizado'
-    | 'solucao-em-construcao'
-    | 'proposta-em-elaboracao'
-    | 'proposta-enviada'
-    | 'negociacao-tramitacao'
-    | 'contratacao-em-formalizacao'
-    | 'ganha';
-  /**
-   * Condição da oportunidade — independente do estágio (§12).
-   */
-  situacao: 'ativa' | 'perdida' | 'adiada-nurturing';
-  /**
-   * Estágio atribuído pela migração automática e ainda não confirmado pela Direção. Enquanto marcado, o estágio é provisório e não é verdade histórica.
-   */
-  migracaoPendenteRevisao?: boolean | null;
-  /**
-   * O que a Direção precisa confirmar nesta oportunidade migrada.
-   */
-  migracaoFlag?: string | null;
-  dataAbertura: string;
-  dataPrevFechamento?: string | null;
-  proximaAcao?: string | null;
-  /**
-   * Data do próximo follow-up.
-   */
-  followup?: string | null;
-  responsavel: number | User;
-  observacoes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "historico-estagio".
- */
-export interface HistoricoEstagio {
-  id: number;
-  oportunidade: number | Oportunidade;
-  estagioAnterior?:
-    | (
-        | 'mapeada'
-        | 'prospeccao-relacionamento'
-        | 'demanda-identificada'
-        | 'qualificada'
-        | 'diagnostico-realizado'
-        | 'solucao-em-construcao'
-        | 'proposta-em-elaboracao'
-        | 'proposta-enviada'
-        | 'negociacao-tramitacao'
-        | 'contratacao-em-formalizacao'
-        | 'ganha'
-      )
-    | null;
-  estagioNovo:
-    | 'mapeada'
-    | 'prospeccao-relacionamento'
-    | 'demanda-identificada'
-    | 'qualificada'
-    | 'diagnostico-realizado'
-    | 'solucao-em-construcao'
-    | 'proposta-em-elaboracao'
-    | 'proposta-enviada'
-    | 'negociacao-tramitacao'
-    | 'contratacao-em-formalizacao'
-    | 'ganha';
-  dataHora: string;
-  usuario?: (number | null) | User;
-  /**
-   * Preenchido quando a transição não veio de um usuário (migração, importador).
-   */
-  atorSistema?: string | null;
-  motivo?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "avaliacoes-qualificacao".
- */
-export interface AvaliacaoQualificacao {
-  id: number;
-  oportunidade: number | Oportunidade;
-  sequencia?: number | null;
-  statusAvaliacao: 'em-preenchimento' | 'concluida' | 'cancelada';
-  /**
-   * Preenchida automaticamente quando a avaliação é concluída.
-   */
-  concluidaEm?: string | null;
-  avaliador: number | User;
-  owner?: (number | null) | User;
-  notaNecessidade?: number | null;
-  notaAderencia?: number | null;
-  notaPrioridade?: number | null;
-  notaTiming?: number | null;
-  notaCaminho?: number | null;
-  notaStakeholders?: number | null;
-  notaOrcamento?: number | null;
-  notaRisco?: number | null;
-  notaValor?: number | null;
-  /**
-   * Soma das 9 dimensões (0-27). Derivado.
-   */
-  scoreTotal?: number | null;
-  /**
-   * Referência de leitura do score. Derivada.
-   */
-  faixa?: ('forte' | 'intermediario' | 'fraco') | null;
-  hgAderencia?: ('sim' | 'nao' | 'em-validacao') | null;
-  hgJuridico?: ('sim' | 'nao' | 'em-validacao') | null;
-  hgCondicao?: ('sim' | 'nao' | 'em-validacao') | null;
-  hgIncapacidade?: ('sim' | 'nao' | 'em-validacao') | null;
-  hgDemanda?: ('sim' | 'nao' | 'em-validacao') | null;
-  hgRequisito?: ('sim' | 'nao' | 'em-validacao') | null;
-  hgIntegridade?: ('sim' | 'nao' | 'em-validacao') | null;
-  /**
-   * Decisão do avaliador. O score é apoio, não decide (manual §15).
-   */
-  resultado?: ('qualificada' | 'qualificar-mais' | 'nurturing' | 'nao-qualificada') | null;
-  justificativa?: string | null;
-  proximoPasso?: string | null;
-  /**
-   * Uma única avaliação vigente por oportunidade (manual §13).
-   */
-  vigente?: boolean | null;
-  observacoes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1296,7 +1050,7 @@ export interface Proposta {
   codigoBase: string;
   codigo: string;
   versao?: number | null;
-  oportunidade?: (number | null) | Oportunidade;
+  lead: number | Lead;
   cliente: number | ClienteCrm;
   programa?: (number | null) | Programa;
   tipo?: ('programa-completo' | 'modulo-avulso' | 'produto-evento-avulso' | 'customizada') | null;
@@ -1603,22 +1357,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'clientes-crm';
         value: number | ClienteCrm;
-      } | null)
-    | ({
-        relationTo: 'contatos-crm';
-        value: number | ContatoCrm;
-      } | null)
-    | ({
-        relationTo: 'oportunidades';
-        value: number | Oportunidade;
-      } | null)
-    | ({
-        relationTo: 'historico-estagio';
-        value: number | HistoricoEstagio;
-      } | null)
-    | ({
-        relationTo: 'avaliacoes-qualificacao';
-        value: number | AvaliacaoQualificacao;
       } | null)
     | ({
         relationTo: 'propostas';
@@ -2088,7 +1826,6 @@ export interface ClientesSelect<T extends boolean = true> {
 export interface LeadsSelect<T extends boolean = true> {
   tipo?: T;
   identificacao?: T;
-  status?: T;
   observacoesInternas?: T;
   estagio?: T;
   perdido?: T;
@@ -2173,8 +1910,6 @@ export interface ClientesCrmSelect<T extends boolean = true> {
   esfera?: T;
   area?: T;
   cnpj?: T;
-  dirigente?: T;
-  cargoDirigente?: T;
   email?: T;
   origem?: T;
   contatos?:
@@ -2189,110 +1924,9 @@ export interface ClientesCrmSelect<T extends boolean = true> {
         decisor?: T;
         id?: T;
       };
-  potencial?: T;
-  status?: T;
   responsavel?: T;
-  proximaAcao?: T;
   observacoes?: T;
   clienteSite?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contatos-crm_select".
- */
-export interface ContatosCrmSelect<T extends boolean = true> {
-  nome?: T;
-  cliente?: T;
-  cargo?: T;
-  setor?: T;
-  email?: T;
-  whatsapp?: T;
-  principal?: T;
-  decisor?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "oportunidades_select".
- */
-export interface OportunidadesSelect<T extends boolean = true> {
-  codigo?: T;
-  cliente?: T;
-  programa?: T;
-  modulos?: T;
-  eventos?: T;
-  uf?: T;
-  origem?: T;
-  quantidade?: T;
-  modalidade?: T;
-  valor?: T;
-  probabilidade?: T;
-  status?: T;
-  estagio?: T;
-  situacao?: T;
-  migracaoPendenteRevisao?: T;
-  migracaoFlag?: T;
-  dataAbertura?: T;
-  dataPrevFechamento?: T;
-  proximaAcao?: T;
-  followup?: T;
-  responsavel?: T;
-  observacoes?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "historico-estagio_select".
- */
-export interface HistoricoEstagioSelect<T extends boolean = true> {
-  oportunidade?: T;
-  estagioAnterior?: T;
-  estagioNovo?: T;
-  dataHora?: T;
-  usuario?: T;
-  atorSistema?: T;
-  motivo?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "avaliacoes-qualificacao_select".
- */
-export interface AvaliacoesQualificacaoSelect<T extends boolean = true> {
-  oportunidade?: T;
-  sequencia?: T;
-  statusAvaliacao?: T;
-  concluidaEm?: T;
-  avaliador?: T;
-  owner?: T;
-  notaNecessidade?: T;
-  notaAderencia?: T;
-  notaPrioridade?: T;
-  notaTiming?: T;
-  notaCaminho?: T;
-  notaStakeholders?: T;
-  notaOrcamento?: T;
-  notaRisco?: T;
-  notaValor?: T;
-  scoreTotal?: T;
-  faixa?: T;
-  hgAderencia?: T;
-  hgJuridico?: T;
-  hgCondicao?: T;
-  hgIncapacidade?: T;
-  hgDemanda?: T;
-  hgRequisito?: T;
-  hgIntegridade?: T;
-  resultado?: T;
-  justificativa?: T;
-  proximoPasso?: T;
-  vigente?: T;
-  observacoes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2304,7 +1938,7 @@ export interface PropostasSelect<T extends boolean = true> {
   codigoBase?: T;
   codigo?: T;
   versao?: T;
-  oportunidade?: T;
+  lead?: T;
   cliente?: T;
   programa?: T;
   tipo?: T;

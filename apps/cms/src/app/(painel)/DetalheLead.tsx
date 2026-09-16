@@ -9,14 +9,6 @@ const ROTULO_TIPO: Record<LeadTipoCms, string> = {
   candidatura: "Candidatura ao corpo docente",
 };
 
-const ROTULO_STATUS: Record<string, string> = {
-  novo: "Novo",
-  "em-atendimento": "Em atendimento",
-  qualificado: "Qualificado",
-  descartado: "Descartado",
-  convertido: "Convertido",
-};
-
 interface DetalheLeadProps {
   lead: LeadCmsDetalhe;
   onVoltar: () => void;
@@ -47,9 +39,6 @@ export function DetalheLead({ lead: l, onVoltar }: DetalheLeadProps) {
           <h1>{l.nome}</h1>
           <p>Recebido em {l.data}</p>
         </div>
-        <span className={`pcms-selo pcms-selo--${l.status}`}>
-          {ROTULO_STATUS[l.status] ?? l.status}
-        </span>
       </div>
 
       <div className="pcms-det-grid">

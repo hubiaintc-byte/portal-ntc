@@ -1,11 +1,10 @@
 "use client";
 
-import { AREAS_CRM, STATUS_CLIENTE_CRM } from "@ntc/lib";
+import { ESFERAS_CRM, ORIGENS_CLIENTE } from "@ntc/lib";
 
 import type { ClienteCrmResumo } from "@/lib/cms/painelCrm";
-import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
-import { rotuloDeLista, seloDeCliente } from "./seloStatus";
+import { rotuloDeLista } from "./seloStatus";
 
 interface TelaClientesProps {
   clientes: ClienteCrmResumo[];
@@ -37,9 +36,9 @@ export function TelaClientes({ clientes, onAbrir, onNovo }: TelaClientesProps) {
             <tr>
               <th>Órgão</th>
               <th>UF</th>
-              <th>Área</th>
-              <th>Potencial</th>
-              <th>Status</th>
+              <th>Esfera</th>
+              <th>Contato principal</th>
+              <th>Origem</th>
               <th>Responsável</th>
             </tr>
           </thead>
@@ -63,13 +62,9 @@ export function TelaClientes({ clientes, onAbrir, onNovo }: TelaClientesProps) {
                   {c.sigla !== null && <> · {c.sigla}</>}
                 </td>
                 <td>{c.uf ?? "—"}</td>
-                <td>{rotuloDeLista(AREAS_CRM, c.area)}</td>
-                <td>{c.potencial !== null ? formatarMoedaBRL(c.potencial) : "—"}</td>
-                <td>
-                  <span className={seloDeCliente(c.status)}>
-                    {rotuloDeLista(STATUS_CLIENTE_CRM, c.status)}
-                  </span>
-                </td>
+                <td>{rotuloDeLista(ESFERAS_CRM, c.esfera)}</td>
+                <td>{c.contatoPrincipal ?? "—"}</td>
+                <td>{rotuloDeLista(ORIGENS_CLIENTE, c.origem)}</td>
                 <td>{c.responsavelNome ?? "—"}</td>
               </tr>
             ))}

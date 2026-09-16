@@ -106,7 +106,6 @@ export interface LeadCmsResumo {
   email: string;
   instituicao: string;
   tipo: LeadTipoCms;
-  status: string;
   /** Data de entrada formatada pt-BR. */
   data: string;
   /** ISO de createdAt, para ordenação/uso futuro. */
@@ -504,7 +503,6 @@ export async function listarLeadsCms(): Promise<LeadCmsResumo[]> {
       email?: string;
       instituicao?: string;
       tipo?: string;
-      status?: string;
       createdAt?: string;
     };
     return {
@@ -513,7 +511,6 @@ export async function listarLeadsCms(): Promise<LeadCmsResumo[]> {
       email: doc.email ?? "—",
       instituicao: doc.instituicao || "—",
       tipo: normalizarTipo(doc.tipo),
-      status: doc.status ?? "novo",
       data: doc.createdAt ? FMT_DATA.format(new Date(doc.createdAt)) : "—",
       dataISO: doc.createdAt ?? "",
     };
@@ -536,7 +533,6 @@ export async function obterLeadCms(id: string): Promise<LeadCmsDetalhe | null> {
     instituicao?: string;
     esfera?: string;
     tipo?: string;
-    status?: string;
     observacoesInternas?: string;
     createdAt?: string;
     detalhesProposta?: {
@@ -614,7 +610,6 @@ export async function obterLeadCms(id: string): Promise<LeadCmsDetalhe | null> {
     email: d.email ?? "—",
     instituicao: d.instituicao || "—",
     tipo,
-    status: d.status ?? "novo",
     data: d.createdAt ? FMT_DATA_HORA.format(new Date(d.createdAt)) : "—",
     dataISO: d.createdAt ?? "",
     telefone: d.telefone ?? null,

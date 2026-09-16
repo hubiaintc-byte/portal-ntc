@@ -120,7 +120,6 @@ export async function POST(req: Request) {
       collection: "leads",
       data: {
         tipo: "candidatura",
-        status: "novo",
         estagio: "lead",
         origemEntrada: "site",
         nome: dados.nome,

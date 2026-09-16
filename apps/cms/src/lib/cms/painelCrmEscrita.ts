@@ -2,18 +2,9 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
-import {
-  DIMENSOES_COM04,
-  calcularValoresProposta,
-  codigoDaVersao,
-  gerarCodigoBase,
-  notaValida,
-  proximaVersao,
-} from "@ntc/lib";
+import { calcularValoresProposta, codigoDaVersao, gerarCodigoBase, proximaVersao } from "@ntc/lib";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
-import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
-import { ErroGateQualificada } from "@/lib/crm/gateQualificada";
 import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
 import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
@@ -26,6 +17,16 @@ import type { ResultadoEscrita } from "./painelCmsEscrita";
  * com mensagem neutra — o detalhe do erro vai para o console do servidor.
  */
 
+export interface DadosContato {
+  nome: string;
+  cargo: string;
+  setor: string;
+  email: string;
+  whatsapp: string;
+  principal: boolean;
+  decisor: boolean;
+}
+
 export interface DadosClienteCrm {
   orgao: string;
   sigla: string;
@@ -35,47 +36,11 @@ export interface DadosClienteCrm {
   esfera: string;
   area: string;
   cnpj: string;
-  dirigente: string;
-  cargoDirigente: string;
   email: string;
   origem: string;
-  potencial: string;
-  status: string;
-  responsavel: string;
-  proximaAcao: string;
-  observacoes: string;
-}
-
-export interface DadosContatoCrm {
-  nome: string;
-  cliente: string;
-  cargo: string;
-  setor: string;
-  email: string;
-  whatsapp: string;
-  principal: boolean;
-  decisor: boolean;
-}
-
-export interface DadosOportunidade {
-  cliente: string;
-  programa: string;
-  modulos: string[];
-  eventos: string[];
-  uf: string;
-  origem: string;
-  quantidade: string;
-  modalidade: string;
-  valor: string;
-  probabilidade: string;
-  estagio: string;
-  situacao: string;
-  dataAbertura: string;
-  dataPrevFechamento: string;
-  proximaAcao: string;
-  followup: string;
   responsavel: string;
   observacoes: string;
+  contatos: DadosContato[];
 }
 
 const ouNulo = (v: string): string | null => (v.trim().length > 0 ? v.trim() : null);
@@ -98,30 +63,6 @@ export function numeroOuNulo(v: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-export function gerarCodigoOportunidade(ano: number, sequencia: number): string {
-  return `OPO-${ano}-${String(sequencia).padStart(3, "0")}`;
-}
-
-/**
- * Deriva a próxima sequência a partir do maior sufixo numérico já usado no
- * ano, em vez de contar quantos registros existem — o importador legado
- * preserva códigos verbatim e pode pular números, deixando o conjunto
- * esparso (ex.: OPO-2026-001 e OPO-2026-005 sem 002-004). Contar registros
- * geraria um código já existente e a unique constraint rejeitaria o save.
- */
-export function proximaSequencia(codigos: string[], ano: number): number {
-  const prefixo = `OPO-${ano}-`;
-  let maiorSufixo = 0;
-  for (const codigo of codigos) {
-    if (!codigo.startsWith(prefixo)) continue;
-    const sufixo = Number(codigo.slice(prefixo.length));
-    if (Number.isInteger(sufixo) && sufixo > maiorSufixo) {
-      maiorSufixo = sufixo;
-    }
-  }
-  return maiorSufixo + 1;
-}
-
 const ERRO_GENERICO = "Não foi possível salvar. Tente novamente.";
 
 /** ISO da validade: hoje + validadeDias. Fonte única usada por criarProposta e criarVersaoProposta. */
@@ -136,8 +77,6 @@ function dataValidade(validadeDias: number): string {
 // (a UI só oferece as opções válidas da coleção) — cast pontual campo a
 // campo, sem `any`, mesmo padrão de painelCmsEscrita.ts (salvarCamposEvento).
 type ClienteCrmData = RequiredDataFromCollectionSlug<"clientes-crm">;
-type ContatoCrmData = RequiredDataFromCollectionSlug<"contatos-crm">;
-type OportunidadeData = RequiredDataFromCollectionSlug<"oportunidades">;
 
 function dadosCliente(dados: DadosClienteCrm): ClienteCrmData {
   return {
@@ -149,20 +88,30 @@ function dadosCliente(dados: DadosClienteCrm): ClienteCrmData {
     esfera: ouNulo(dados.esfera) as ClienteCrmData["esfera"],
     area: ouNulo(dados.area) as ClienteCrmData["area"],
     cnpj: ouNulo(dados.cnpj),
-    dirigente: ouNulo(dados.dirigente),
-    cargoDirigente: ouNulo(dados.cargoDirigente),
     email: ouNulo(dados.email),
-    origem: ouNulo(dados.origem) as ClienteCrmData["origem"],
-    potencial: numeroOuNulo(dados.potencial),
-    status: (ouNulo(dados.status) ?? "prospect") as ClienteCrmData["status"],
+    origem: (ouNulo(dados.origem) ?? "manual") as ClienteCrmData["origem"],
     responsavel: idOuNulo(dados.responsavel),
-    proximaAcao: ouNulo(dados.proximaAcao),
     observacoes: ouNulo(dados.observacoes),
+    contatos: dados.contatos
+      .filter((c) => c.nome.trim() !== "")
+      .map((c) => ({
+        nome: c.nome.trim(),
+        cargo: ouNulo(c.cargo),
+        setor: ouNulo(c.setor),
+        email: ouNulo(c.email),
+        whatsapp: ouNulo(c.whatsapp),
+        principal: c.principal,
+        decisor: c.decisor,
+      })),
   };
 }
 
+/** Mesma regra do hook `beforeChange` da coleção — aqui para a mensagem chegar ao formulário. */
+const ERRO_PRINCIPAL = "Só um contato pode ser o principal.";
+
 export async function criarClienteCrm(dados: DadosClienteCrm): Promise<ResultadoEscrita> {
   if (dados.orgao.trim() === "") return { ok: false, erro: "Informe o órgão." };
+  if (dados.contatos.filter((c) => c.principal).length > 1) return { ok: false, erro: ERRO_PRINCIPAL };
   try {
     const payload = await obterPayload();
     await payload.create({ collection: "clientes-crm", data: dadosCliente(dados) });
@@ -178,6 +127,7 @@ export async function atualizarClienteCrm(
   dados: DadosClienteCrm,
 ): Promise<ResultadoEscrita> {
   if (dados.orgao.trim() === "") return { ok: false, erro: "Informe o órgão." };
+  if (dados.contatos.filter((c) => c.principal).length > 1) return { ok: false, erro: ERRO_PRINCIPAL };
   try {
     const payload = await obterPayload();
     await payload.update({ collection: "clientes-crm", id, data: dadosCliente(dados) });
@@ -188,367 +138,12 @@ export async function atualizarClienteCrm(
   }
 }
 
-function dadosContato(dados: DadosContatoCrm, clienteId: number): ContatoCrmData {
-  return {
-    nome: dados.nome.trim(),
-    cliente: clienteId,
-    cargo: ouNulo(dados.cargo),
-    setor: ouNulo(dados.setor),
-    email: ouNulo(dados.email),
-    whatsapp: ouNulo(dados.whatsapp),
-    principal: dados.principal,
-    decisor: dados.decisor,
-  };
-}
-
-export async function criarContatoCrm(dados: DadosContatoCrm): Promise<ResultadoEscrita> {
-  if (dados.nome.trim() === "") return { ok: false, erro: "Informe nome e cliente." };
-  // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
-  const clienteId = idOuNulo(dados.cliente);
-  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
-  try {
-    const payload = await obterPayload();
-    await payload.create({ collection: "contatos-crm", data: dadosContato(dados, clienteId) });
-    return { ok: true };
-  } catch (e) {
-    console.error("[criarContatoCrm]", e);
-    return { ok: false, erro: ERRO_GENERICO };
-  }
-}
-
-export async function atualizarContatoCrm(
-  id: string,
-  dados: DadosContatoCrm,
-): Promise<ResultadoEscrita> {
-  if (dados.nome.trim() === "") return { ok: false, erro: "Informe nome e cliente." };
-  const clienteId = idOuNulo(dados.cliente);
-  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
-  try {
-    const payload = await obterPayload();
-    await payload.update({ collection: "contatos-crm", id, data: dadosContato(dados, clienteId) });
-    return { ok: true };
-  } catch (e) {
-    console.error("[atualizarContatoCrm]", e);
-    return { ok: false, erro: ERRO_GENERICO };
-  }
-}
-
-/**
- * Os cinco campos que a coleção `oportunidades` exige além de código, cliente,
- * estágio e situação (decisão do PO · Manual Operacional NTC-COM-CRM-01),
- * já normalizados e garantidamente não nulos.
- */
-interface ObrigatoriosOportunidade {
-  programaId: number;
-  uf: string;
-  origem: string;
-  dataAbertura: string;
-  responsavelId: number;
-}
-
-type ValidacaoObrigatorios =
-  | { ok: true; valores: ObrigatoriosOportunidade }
-  | { ok: false; erro: string };
-
-/**
- * Falha fechado antes de tocar a Local API: nem a validação do Payload nem o
- * `required` do HTML são garantia aqui — a Server Action é chamável direto.
- * Mensagem específica por campo, no mesmo estilo de "Selecione o cliente.".
- */
-function validarObrigatoriosOportunidade(dados: DadosOportunidade): ValidacaoObrigatorios {
-  const programaId = idOuNulo(dados.programa);
-  if (programaId === null) return { ok: false, erro: "Selecione o programa." };
-  const uf = ouNulo(dados.uf);
-  if (uf === null) return { ok: false, erro: "Selecione a UF." };
-  const origem = ouNulo(dados.origem);
-  if (origem === null) return { ok: false, erro: "Selecione a origem." };
-  const dataAbertura = ouNulo(dados.dataAbertura);
-  if (dataAbertura === null) return { ok: false, erro: "Informe a data de abertura." };
-  const responsavelId = idOuNulo(dados.responsavel);
-  if (responsavelId === null) return { ok: false, erro: "Selecione o responsável comercial." };
-  return { ok: true, valores: { programaId, uf, origem, dataAbertura, responsavelId } };
-}
-
-function dadosOportunidade(
-  dados: DadosOportunidade,
-  clienteId: number,
-  obrigatorios: ObrigatoriosOportunidade,
-): Omit<OportunidadeData, "codigo"> {
-  return {
-    cliente: clienteId,
-    programa: obrigatorios.programaId,
-    modulos: idsLista(dados.modulos),
-    eventos: idsLista(dados.eventos),
-    uf: obrigatorios.uf as OportunidadeData["uf"],
-    origem: obrigatorios.origem as OportunidadeData["origem"],
-    quantidade: numeroOuNulo(dados.quantidade),
-    modalidade: ouNulo(dados.modalidade),
-    valor: numeroOuNulo(dados.valor),
-    probabilidade: numeroOuNulo(dados.probabilidade),
-    // `status` legado NÃO é montado aqui: o hook beforeChange da coleção
-    // oportunidades o deriva de estagio+situacao (fonte única).
-    estagio: (ouNulo(dados.estagio) ?? "mapeada") as OportunidadeData["estagio"],
-    situacao: (ouNulo(dados.situacao) ?? "ativa") as OportunidadeData["situacao"],
-    dataAbertura: obrigatorios.dataAbertura,
-    dataPrevFechamento: ouNulo(dados.dataPrevFechamento),
-    proximaAcao: ouNulo(dados.proximaAcao),
-    followup: ouNulo(dados.followup),
-    responsavel: obrigatorios.responsavelId,
-    observacoes: ouNulo(dados.observacoes),
-  };
-}
-
-/**
- * `usuario` é a sessão do painel repassada à Local API em `user:` — é assim
- * que o hook `registrarTransicaoEstagio` de `oportunidades` recebe `req.user`
- * e grava a transição com autor humano em vez de "sistema". Sem isso o
- * histórico do funil sai anônimo (docs/17 §1.2).
- */
-export async function criarOportunidade(
-  dados: DadosOportunidade,
-  usuario: UsuarioAutenticado | null,
-): Promise<ResultadoEscrita> {
-  // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
-  const clienteId = idOuNulo(dados.cliente);
-  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
-  const obrigatorios = validarObrigatoriosOportunidade(dados);
-  if (!obrigatorios.ok) return { ok: false, erro: obrigatorios.erro };
-  try {
-    const payload = await obterPayload();
-    const ano = new Date().getFullYear();
-    const existentes = await payload.find({
-      collection: "oportunidades",
-      where: { codigo: { like: `OPO-${ano}-` } },
-      limit: 1000,
-      depth: 0,
-      select: { codigo: true },
-    });
-    const codigos = existentes.docs.map((doc) => doc.codigo).filter((c): c is string => Boolean(c));
-    const codigo = gerarCodigoOportunidade(ano, proximaSequencia(codigos, ano));
-    await payload.create({
-      collection: "oportunidades",
-      data: { codigo, ...dadosOportunidade(dados, clienteId, obrigatorios.valores) },
-      user: usuario,
-    });
-    return { ok: true };
-  } catch (e) {
-    // O gate do estágio "Qualificada" (Sessão H3 · docs/17 §18) lança um erro
-    // tipado com a mensagem contratual do manual — é justamente o que o
-    // usuário precisa ler para corrigir a avaliação, então não pode virar o
-    // ERRO_GENERICO que os demais erros de escrita recebem.
-    if (e instanceof ErroGateQualificada) return { ok: false, erro: e.message };
-    console.error("[criarOportunidade]", e);
-    return { ok: false, erro: ERRO_GENERICO };
-  }
-}
-
-/** Ver `criarOportunidade`: `usuario` vira `req.user` no hook do histórico. */
-export async function atualizarOportunidade(
-  id: string,
-  dados: DadosOportunidade,
-  usuario: UsuarioAutenticado | null,
-): Promise<ResultadoEscrita> {
-  const clienteId = idOuNulo(dados.cliente);
-  if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
-  const obrigatorios = validarObrigatoriosOportunidade(dados);
-  if (!obrigatorios.ok) return { ok: false, erro: obrigatorios.erro };
-  try {
-    const payload = await obterPayload();
-    await payload.update({
-      collection: "oportunidades",
-      id,
-      data: dadosOportunidade(dados, clienteId, obrigatorios.valores),
-      user: usuario,
-    });
-    return { ok: true };
-  } catch (e) {
-    // Ver `criarOportunidade`: repassa a mensagem contratual do gate §18.
-    if (e instanceof ErroGateQualificada) return { ok: false, erro: e.message };
-    console.error("[atualizarOportunidade]", e);
-    return { ok: false, erro: ERRO_GENERICO };
-  }
-}
-
-// --- Avaliação de Qualificação · COM-04 (Sessão H2/H3 · docs/17 · Manual
-// NTC-COM-CRM-01 §§13-19) --------------------------------------------------
-
-export interface DadosAvaliacao {
-  oportunidade: string;
-  statusAvaliacao: string;
-  avaliador: string;
-  owner: string;
-  notaNecessidade: string;
-  notaAderencia: string;
-  notaPrioridade: string;
-  notaTiming: string;
-  notaCaminho: string;
-  notaStakeholders: string;
-  notaOrcamento: string;
-  notaRisco: string;
-  notaValor: string;
-  hgAderencia: string;
-  hgJuridico: string;
-  hgCondicao: string;
-  hgIncapacidade: string;
-  hgDemanda: string;
-  hgRequisito: string;
-  hgIntegridade: string;
-  resultado: string;
-  justificativa: string;
-  proximoPasso: string;
-  vigente: boolean;
-  observacoes: string;
-}
-
-type AvaliacaoData = RequiredDataFromCollectionSlug<"avaliacoes-qualificacao">;
-
-/** "3" → 3; vazio ou não numérico vira NaN, que `notaValida` recusa (mesmo critério do form). */
-function numeroDeNota(v: string): number {
-  return v.trim() === "" ? Number.NaN : Number(v);
-}
-
-interface ObrigatoriosAvaliacao {
-  oportunidadeId: number;
-  avaliadorId: number;
-  notas: Record<string, number | null>;
-}
-
-type ValidacaoAvaliacao =
-  | { ok: true; valores: ObrigatoriosAvaliacao }
-  | { ok: false; erro: string };
-
-/**
- * Falha fechado antes de tocar a Local API. Uma nota fora de 0-3 é sempre
- * recusada (`notaValida` de @ntc/lib, manual §15) — a primeira dimensão fora
- * da faixa interrompe com o rótulo dela, para o avaliador saber onde
- * corrigir. Nota vazia só é recusada quando a avaliação está sendo salva como
- * "concluída": durante "em preenchimento" o avaliador pode salvar com notas
- * parciais e retomar depois — mesmo padrão tolerado por
- * `notasCompletas`/`calcularScore` (@ntc/lib) e pelo hook `beforeChange` da
- * coleção, que já convivem com `scoreTotal: null` nesse estado.
- */
-function validarObrigatoriosAvaliacao(dados: DadosAvaliacao): ValidacaoAvaliacao {
-  const oportunidadeId = idOuNulo(dados.oportunidade);
-  if (oportunidadeId === null) return { ok: false, erro: "Selecione a oportunidade." };
-  const avaliadorId = idOuNulo(dados.avaliador);
-  if (avaliadorId === null) return { ok: false, erro: "Selecione o avaliador." };
-
-  const notasBrutas: Record<string, string> = {
-    notaNecessidade: dados.notaNecessidade,
-    notaAderencia: dados.notaAderencia,
-    notaPrioridade: dados.notaPrioridade,
-    notaTiming: dados.notaTiming,
-    notaCaminho: dados.notaCaminho,
-    notaStakeholders: dados.notaStakeholders,
-    notaOrcamento: dados.notaOrcamento,
-    notaRisco: dados.notaRisco,
-    notaValor: dados.notaValor,
-  };
-  const exigirCompletas = dados.statusAvaliacao === "concluida";
-  const notas: Record<string, number | null> = {};
-  for (const d of DIMENSOES_COM04) {
-    const bruto = (notasBrutas[d.campo] ?? "").trim();
-    if (bruto === "" && !exigirCompletas) {
-      notas[d.campo] = null;
-      continue;
-    }
-    const numero = numeroDeNota(bruto);
-    if (!notaValida(numero)) {
-      return {
-        ok: false,
-        erro: `Nota inválida em ${d.rotulo}: use apenas os inteiros 0, 1, 2 ou 3.`,
-      };
-    }
-    notas[d.campo] = numero;
-  }
-  return { ok: true, valores: { oportunidadeId, avaliadorId, notas } };
-}
-
-/**
- * `scoreTotal`/`faixa`/`concluidaEm` NÃO são montados aqui: o hook
- * `beforeChange` da coleção `avaliacoes-qualificacao` os deriva das 9 notas e
- * do status (fonte única) — mesmo padrão de `status` legado em
- * `dadosOportunidade`.
- */
-function dadosAvaliacao(dados: DadosAvaliacao, obrigatorios: ObrigatoriosAvaliacao): AvaliacaoData {
-  return {
-    oportunidade: obrigatorios.oportunidadeId,
-    statusAvaliacao: (ouNulo(dados.statusAvaliacao) ?? "em-preenchimento") as AvaliacaoData["statusAvaliacao"],
-    avaliador: obrigatorios.avaliadorId,
-    owner: idOuNulo(dados.owner),
-    notaNecessidade: obrigatorios.notas.notaNecessidade,
-    notaAderencia: obrigatorios.notas.notaAderencia,
-    notaPrioridade: obrigatorios.notas.notaPrioridade,
-    notaTiming: obrigatorios.notas.notaTiming,
-    notaCaminho: obrigatorios.notas.notaCaminho,
-    notaStakeholders: obrigatorios.notas.notaStakeholders,
-    notaOrcamento: obrigatorios.notas.notaOrcamento,
-    notaRisco: obrigatorios.notas.notaRisco,
-    notaValor: obrigatorios.notas.notaValor,
-    hgAderencia: ouNulo(dados.hgAderencia) as AvaliacaoData["hgAderencia"],
-    hgJuridico: ouNulo(dados.hgJuridico) as AvaliacaoData["hgJuridico"],
-    hgCondicao: ouNulo(dados.hgCondicao) as AvaliacaoData["hgCondicao"],
-    hgIncapacidade: ouNulo(dados.hgIncapacidade) as AvaliacaoData["hgIncapacidade"],
-    hgDemanda: ouNulo(dados.hgDemanda) as AvaliacaoData["hgDemanda"],
-    hgRequisito: ouNulo(dados.hgRequisito) as AvaliacaoData["hgRequisito"],
-    hgIntegridade: ouNulo(dados.hgIntegridade) as AvaliacaoData["hgIntegridade"],
-    resultado: ouNulo(dados.resultado) as AvaliacaoData["resultado"],
-    justificativa: ouNulo(dados.justificativa),
-    proximoPasso: ouNulo(dados.proximoPasso),
-    vigente: dados.vigente,
-    observacoes: ouNulo(dados.observacoes),
-  };
-}
-
-/** Ver `criarOportunidade`: `usuario` chega à Local API para popular `req.user`. */
-export async function criarAvaliacao(
-  dados: DadosAvaliacao,
-  usuario: UsuarioAutenticado | null,
-): Promise<ResultadoEscrita> {
-  const obrigatorios = validarObrigatoriosAvaliacao(dados);
-  if (!obrigatorios.ok) return { ok: false, erro: obrigatorios.erro };
-  try {
-    const payload = await obterPayload();
-    await payload.create({
-      collection: "avaliacoes-qualificacao",
-      data: dadosAvaliacao(dados, obrigatorios.valores),
-      user: usuario,
-    });
-    return { ok: true };
-  } catch (e) {
-    console.error("[criarAvaliacao]", e);
-    return { ok: false, erro: ERRO_GENERICO };
-  }
-}
-
-export async function atualizarAvaliacao(
-  id: string,
-  dados: DadosAvaliacao,
-  usuario: UsuarioAutenticado | null,
-): Promise<ResultadoEscrita> {
-  const obrigatorios = validarObrigatoriosAvaliacao(dados);
-  if (!obrigatorios.ok) return { ok: false, erro: obrigatorios.erro };
-  try {
-    const payload = await obterPayload();
-    await payload.update({
-      collection: "avaliacoes-qualificacao",
-      id,
-      data: dadosAvaliacao(dados, obrigatorios.valores),
-      user: usuario,
-    });
-    return { ok: true };
-  } catch (e) {
-    console.error("[atualizarAvaliacao]", e);
-    return { ok: false, erro: ERRO_GENERICO };
-  }
-}
-
 // --- Propostas (spec 2026-07-22 · Fase B1) -------------------------------
 
 export interface DadosProposta {
   cliente: string;
   programa: string;
-  oportunidade: string;
+  lead: string;
   tipo: string;
   modulos: string[];
   eventos: string[];
@@ -591,6 +186,7 @@ type EnvioData = RequiredDataFromCollectionSlug<"envios">;
 export function dadosProposta(
   dados: DadosProposta,
   clienteId: number,
+  leadId: number,
   ids: { codigoBase: string; codigo: string; versao: number },
 ): PropostaData {
   const valorUnitario = numeroOuNulo(dados.valorUnitario) ?? 0;
@@ -607,9 +203,9 @@ export function dadosProposta(
     codigoBase: ids.codigoBase,
     codigo: ids.codigo,
     versao: ids.versao,
+    lead: leadId,
     cliente: clienteId,
     programa: idOuNulo(dados.programa),
-    oportunidade: idOuNulo(dados.oportunidade),
     tipo: ouNulo(dados.tipo) as PropostaData["tipo"],
     status: (ouNulo(dados.status) ?? "rascunho") as PropostaData["status"],
     modulos: idsLista(dados.modulos),
@@ -634,6 +230,8 @@ export function dadosProposta(
 
 export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscrita> {
   // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
+  const leadId = idOuNulo(dados.lead);
+  if (leadId === null) return { ok: false, erro: "Selecione o lead." };
   const clienteId = idOuNulo(dados.cliente);
   if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
   try {
@@ -666,7 +264,7 @@ export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscr
     await payload.create({
       collection: "propostas",
       data: {
-        ...dadosProposta(dados, clienteId, { codigoBase, codigo, versao }),
+        ...dadosProposta(dados, clienteId, leadId, { codigoBase, codigo, versao }),
         dataCriacao: agora.toISOString(),
         validade: dataValidade(validadeDias),
       },
@@ -682,6 +280,8 @@ export async function atualizarProposta(
   id: string,
   dados: DadosProposta,
 ): Promise<ResultadoEscrita> {
+  const leadId = idOuNulo(dados.lead);
+  if (leadId === null) return { ok: false, erro: "Selecione o lead." };
   const clienteId = idOuNulo(dados.cliente);
   if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
   // Programa vazio = sem programa (proposta customizada), permitido. Valor
@@ -698,7 +298,7 @@ export async function atualizarProposta(
     await payload.update({
       collection: "propostas",
       id,
-      data: dadosProposta(dados, clienteId, {
+      data: dadosProposta(dados, clienteId, leadId, {
         codigoBase: atual.codigoBase,
         codigo: atual.codigo,
         versao: atual.versao ?? 1,
@@ -749,7 +349,7 @@ export async function criarVersaoProposta(
         codigoBase: vigente.codigoBase,
         codigo,
         versao,
-        oportunidade: vigente.oportunidade,
+        lead: vigente.lead,
         cliente: vigente.cliente,
         programa: vigente.programa,
         tipo: vigente.tipo,

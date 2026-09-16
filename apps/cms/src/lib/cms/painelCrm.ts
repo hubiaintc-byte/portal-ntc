@@ -1,13 +1,11 @@
 import "server-only";
 
 import type {
-  AvaliacaoQualificacao,
   ClienteCrm,
-  ContatoCrm,
   EnvioProposta,
   Evento,
+  Lead,
   Modulo,
-  Oportunidade,
   Programa,
   Proposta,
   VersaoProposta,
@@ -17,42 +15,12 @@ import { obterPayload } from "@/lib/payloadClient";
 
 /**
  * Leitura de dados do módulo CRM (rota /crm). SOMENTE LEITURA, via Local API.
- * Mapeia as coleções clientes-crm/contatos-crm/oportunidades para tipos
- * enxutos que as telas consomem. server-only: nunca vaza ao browser.
+ * Mapeia as coleções leads/clientes-crm/propostas para tipos enxutos que as
+ * telas consomem. server-only: nunca vaza ao browser.
  */
 
-export interface ClienteCrmResumo {
-  id: string;
-  orgao: string;
-  sigla: string | null;
-  municipio: string | null;
-  uf: string | null;
-  area: string | null;
-  status: string;
-  potencial: number | null;
-  responsavelNome: string | null;
-}
-
-export interface ClienteCrmDetalhe extends ClienteCrmResumo {
-  tipo: string | null;
-  esfera: string | null;
-  cnpj: string | null;
-  dirigente: string | null;
-  cargoDirigente: string | null;
-  email: string | null;
-  origem: string | null;
-  proximaAcao: string | null;
-  observacoes: string | null;
-  responsavelId: string | null;
-  contatos: ContatoCrmResumo[];
-  oportunidades: OportunidadeCrmResumo[];
-}
-
-export interface ContatoCrmResumo {
-  id: string;
+export interface ContatoResumo {
   nome: string;
-  clienteId: string;
-  clienteNome: string;
   cargo: string | null;
   setor: string | null;
   email: string | null;
@@ -61,36 +29,49 @@ export interface ContatoCrmResumo {
   decisor: boolean;
 }
 
-export interface OportunidadeCrmResumo {
+export interface ClienteCrmResumo {
   id: string;
-  codigo: string;
-  clienteId: string;
-  clienteNome: string;
-  programaSigla: string | null;
-  valor: number | null;
-  probabilidade: number | null;
-  status: string;
-  estagio: string;
-  situacao: string;
-  migracaoPendenteRevisao: boolean;
-  migracaoFlag: string | null;
-  dataAberturaISO: string | null;
-  followupISO: string | null;
+  orgao: string;
+  sigla: string | null;
+  municipio: string | null;
+  uf: string | null;
+  esfera: string | null;
+  area: string | null;
+  origem: string | null;
   responsavelNome: string | null;
+  contatoPrincipal: string | null;
 }
 
-export interface OportunidadeCrmDetalhe extends OportunidadeCrmResumo {
-  programaId: string | null;
-  modulos: { id: string; titulo: string }[];
-  eventos: { id: string; nome: string }[];
-  uf: string | null;
-  origem: string | null;
-  quantidade: number | null;
-  modalidade: string | null;
-  dataPrevFechamentoISO: string | null;
-  proximaAcao: string | null;
+export interface ClienteCrmDetalhe extends ClienteCrmResumo {
+  tipo: string | null;
+  cnpj: string | null;
+  email: string | null;
   observacoes: string | null;
   responsavelId: string | null;
+  contatos: ContatoResumo[];
+}
+
+export interface LeadCrmResumo {
+  id: string;
+  nome: string;
+  email: string;
+  instituicao: string;
+  cargo: string | null;
+  programaSigla: string | null;
+  participantesEstimados: number | null;
+  estagio: string;
+  perdido: boolean;
+  motivoPerda: string | null;
+  clienteId: string | null;
+  clienteNome: string | null;
+  responsavelId: string | null;
+  responsavelNome: string | null;
+  valorEstimado: number | null;
+  origemEntrada: string;
+  /** ISO de createdAt. */
+  criadoEmISO: string;
+  /** ISO de updatedAt — proxy de "dias na coluna" até a Sessão 5 gravar por transição. */
+  atualizadoEmISO: string;
 }
 
 export interface CatalogoCrm {
@@ -139,6 +120,7 @@ export interface PropostaResumo {
   valorLiquido: number;
   status: string;
   vigente: boolean;
+  leadId: string | null;
 }
 
 export interface PropostaDetalhe extends PropostaResumo {
@@ -149,7 +131,7 @@ export interface PropostaDetalhe extends PropostaResumo {
   /** Campos crus (ids/valores) para round-trip fiel no FormProposta em modo edição. */
   clienteId: string | null;
   programaId: string | null;
-  oportunidadeId: string | null;
+  leadId: string | null;
   tipo: string | null;
   modalidade: string | null;
   replay: string | null;
@@ -216,53 +198,68 @@ function campoRelNum(v: unknown, campo: string): number | null {
   return null;
 }
 
+function mapearContatos(doc: ClienteCrm): ContatoResumo[] {
+  return (doc.contatos ?? []).map((c) => ({
+    nome: c.nome,
+    cargo: c.cargo ?? null,
+    setor: c.setor ?? null,
+    email: c.email ?? null,
+    whatsapp: c.whatsapp ?? null,
+    principal: c.principal ?? false,
+    decisor: c.decisor ?? false,
+  }));
+}
+
 function mapearClienteResumo(doc: ClienteCrm): ClienteCrmResumo {
+  const contatos = mapearContatos(doc);
   return {
     id: String(doc.id),
     orgao: doc.orgao,
     sigla: doc.sigla ?? null,
     municipio: doc.municipio ?? null,
     uf: doc.uf ?? null,
+    esfera: doc.esfera ?? null,
     area: doc.area ?? null,
-    status: doc.status ?? "prospect",
-    potencial: doc.potencial ?? null,
+    origem: doc.origem ?? null,
     responsavelNome: campoRel(doc.responsavel, "nome"),
+    contatoPrincipal: (contatos.find((c) => c.principal) ?? contatos[0])?.nome ?? null,
   };
 }
 
-function mapearContato(doc: ContatoCrm): ContatoCrmResumo {
+export function mapearLeadCrm(doc: Lead): LeadCrmResumo {
   return {
     id: String(doc.id),
     nome: doc.nome,
-    clienteId: idRel(doc.cliente) ?? "",
-    clienteNome: campoRel(doc.cliente, "orgao") ?? "",
+    email: doc.email,
+    instituicao: doc.instituicao ?? "—",
     cargo: doc.cargo ?? null,
-    setor: doc.setor ?? null,
-    email: doc.email ?? null,
-    whatsapp: doc.whatsapp ?? null,
-    principal: doc.principal ?? false,
-    decisor: doc.decisor ?? false,
+    programaSigla: campoRel(doc.detalhesProposta?.programa, "sigla"),
+    participantesEstimados: doc.detalhesProposta?.participantesEstimados ?? null,
+    estagio: doc.estagio ?? "lead",
+    perdido: doc.perdido === true,
+    motivoPerda: doc.motivoPerda ?? null,
+    clienteId: idRel(doc.cliente),
+    clienteNome: campoRel(doc.cliente, "orgao"),
+    responsavelId: idRel(doc.responsavel),
+    responsavelNome: campoRel(doc.responsavel, "nome"),
+    valorEstimado: doc.valorEstimado ?? null,
+    origemEntrada: doc.origemEntrada ?? "site",
+    criadoEmISO: doc.createdAt,
+    atualizadoEmISO: doc.updatedAt,
   };
 }
 
-function mapearOportunidadeResumo(doc: Oportunidade): OportunidadeCrmResumo {
-  return {
-    id: String(doc.id),
-    codigo: doc.codigo,
-    clienteId: idRel(doc.cliente) ?? "",
-    clienteNome: campoRel(doc.cliente, "orgao") ?? "",
-    programaSigla: campoRel(doc.programa, "sigla"),
-    valor: doc.valor ?? null,
-    probabilidade: doc.probabilidade ?? null,
-    status: doc.status ?? "em-qualificacao",
-    dataAberturaISO: soData(doc.dataAbertura),
-    followupISO: soData(doc.followup),
-    responsavelNome: campoRel(doc.responsavel, "nome"),
-    estagio: doc.estagio ?? "mapeada",
-    situacao: doc.situacao ?? "ativa",
-    migracaoPendenteRevisao: doc.migracaoPendenteRevisao === true,
-    migracaoFlag: doc.migracaoFlag ?? null,
-  };
+/** Só os leads do CRM: `tipo = proposta` (site e manuais). */
+export async function listarLeadsCrm(): Promise<LeadCrmResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "leads",
+    depth: 1,
+    limit: 500,
+    sort: "-createdAt",
+    where: { tipo: { equals: "proposta" } },
+  });
+  return res.docs.map(mapearLeadCrm);
 }
 
 export async function listarClientesCrm(): Promise<ClienteCrmResumo[]> {
@@ -284,66 +281,14 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
   } catch {
     return null;
   }
-  const [contatos, oportunidades] = await Promise.all([
-    payload.find({ collection: "contatos-crm", depth: 1, limit: 100, where: { cliente: { equals: doc.id } }, sort: "nome" }),
-    payload.find({ collection: "oportunidades", depth: 1, limit: 100, where: { cliente: { equals: doc.id } }, sort: "-dataAbertura" }),
-  ]);
   return {
     ...mapearClienteResumo(doc),
     tipo: doc.tipo ?? null,
-    esfera: doc.esfera ?? null,
     cnpj: doc.cnpj ?? null,
-    dirigente: doc.dirigente ?? null,
-    cargoDirigente: doc.cargoDirigente ?? null,
     email: doc.email ?? null,
-    origem: doc.origem ?? null,
-    proximaAcao: doc.proximaAcao ?? null,
     observacoes: doc.observacoes ?? null,
     responsavelId: idRel(doc.responsavel),
-    contatos: contatos.docs.map(mapearContato),
-    oportunidades: oportunidades.docs.map(mapearOportunidadeResumo),
-  };
-}
-
-export async function listarContatosCrm(): Promise<ContatoCrmResumo[]> {
-  const payload = await obterPayload();
-  const res = await payload.find({ collection: "contatos-crm", depth: 1, limit: 500, sort: "nome" });
-  return res.docs.map(mapearContato);
-}
-
-export async function listarOportunidadesCrm(): Promise<OportunidadeCrmResumo[]> {
-  const payload = await obterPayload();
-  const res = await payload.find({ collection: "oportunidades", depth: 1, limit: 500, sort: "-dataAbertura" });
-  return res.docs.map(mapearOportunidadeResumo);
-}
-
-export async function obterOportunidadeCrm(id: string): Promise<OportunidadeCrmDetalhe | null> {
-  const payload = await obterPayload();
-  let doc: Oportunidade;
-  try {
-    doc = await payload.findByID({ collection: "oportunidades", id, depth: 1 });
-  } catch {
-    return null;
-  }
-  const modulos = (Array.isArray(doc.modulos) ? doc.modulos : [])
-    .map((m) => ({ id: idRel(m) ?? "", titulo: campoRel(m, "titulo") ?? "" }))
-    .filter((m) => m.id !== "");
-  const eventos = (Array.isArray(doc.eventos) ? doc.eventos : [])
-    .map((e) => ({ id: idRel(e) ?? "", nome: campoRel(e, "nome") ?? "" }))
-    .filter((e) => e.id !== "");
-  return {
-    ...mapearOportunidadeResumo(doc),
-    programaId: idRel(doc.programa),
-    modulos,
-    eventos,
-    uf: doc.uf ?? null,
-    origem: doc.origem ?? null,
-    quantidade: doc.quantidade ?? null,
-    modalidade: doc.modalidade ?? null,
-    dataPrevFechamentoISO: soData(doc.dataPrevFechamento),
-    proximaAcao: doc.proximaAcao ?? null,
-    observacoes: doc.observacoes ?? null,
-    responsavelId: idRel(doc.responsavel),
+    contatos: mapearContatos(doc),
   };
 }
 
@@ -416,6 +361,7 @@ function mapearPropostaResumo(doc: Proposta): PropostaResumo {
     valorLiquido: doc.valorLiquido ?? 0,
     status,
     vigente: status !== "substituida",
+    leadId: idRel(doc.lead),
   };
 }
 
@@ -481,7 +427,7 @@ export async function obterPropostaCrm(id: string): Promise<PropostaDetalhe | nu
     aprovadorNome: campoRel(doc.aprovador, "nome") ?? "",
     clienteId: idRel(doc.cliente),
     programaId: idRel(doc.programa),
-    oportunidadeId: idRel(doc.oportunidade),
+    leadId: idRel(doc.lead),
     tipo: doc.tipo ?? null,
     modalidade: doc.modalidade ?? null,
     replay: doc.replay ?? null,
@@ -531,136 +477,3 @@ export async function todosEnviosCrm(): Promise<EnvioResumo[]> {
   return res.docs.map(mapearEnvioResumo);
 }
 
-export interface TransicaoEstagioResumo {
-  id: string;
-  estagioAnterior: string | null;
-  estagioNovo: string;
-  dataHoraISO: string | null;
-  /** Nome do usuário, ou o ator de sistema quando a transição foi automática. */
-  autor: string;
-}
-
-/** Histórico de estágio de uma oportunidade, do mais recente para o mais antigo. */
-export async function listarHistoricoEstagio(
-  oportunidadeId: string,
-): Promise<TransicaoEstagioResumo[]> {
-  const payload = await obterPayload();
-  const res = await payload.find({
-    collection: "historico-estagio",
-    where: { oportunidade: { equals: oportunidadeId } },
-    depth: 1,
-    limit: 200,
-    sort: "-dataHora",
-  });
-  return res.docs.map((doc) => ({
-    id: String(doc.id),
-    estagioAnterior: doc.estagioAnterior ?? null,
-    estagioNovo: doc.estagioNovo,
-    dataHoraISO: typeof doc.dataHora === "string" ? doc.dataHora : null,
-    autor: campoRel(doc.usuario, "nome") ?? doc.atorSistema ?? "sistema",
-  }));
-}
-
-// --- Avaliação de Qualificação · COM-04 (Sessão H2/H3 · docs/17 · Manual
-// NTC-COM-CRM-01 §§13-19) --------------------------------------------------
-
-export interface AvaliacaoResumo {
-  id: string;
-  oportunidadeId: string;
-  oportunidadeCodigo: string;
-  statusAvaliacao: string;
-  scoreTotal: number | null;
-  faixa: string | null;
-  resultado: string | null;
-  vigente: boolean;
-  concluidaEmISO: string | null;
-  avaliadorNome: string | null;
-}
-
-export interface AvaliacaoDetalhe extends AvaliacaoResumo {
-  notaNecessidade: number | null;
-  notaAderencia: number | null;
-  notaPrioridade: number | null;
-  notaTiming: number | null;
-  notaCaminho: number | null;
-  notaStakeholders: number | null;
-  notaOrcamento: number | null;
-  notaRisco: number | null;
-  notaValor: number | null;
-  hgAderencia: string | null;
-  hgJuridico: string | null;
-  hgCondicao: string | null;
-  hgIncapacidade: string | null;
-  hgDemanda: string | null;
-  hgRequisito: string | null;
-  hgIntegridade: string | null;
-  justificativa: string | null;
-  proximoPasso: string | null;
-  observacoes: string | null;
-  avaliadorId: string | null;
-  ownerId: string | null;
-}
-
-function mapearAvaliacaoResumo(doc: AvaliacaoQualificacao): AvaliacaoResumo {
-  return {
-    id: String(doc.id),
-    oportunidadeId: idRel(doc.oportunidade) ?? "",
-    oportunidadeCodigo: campoRel(doc.oportunidade, "codigo") ?? "",
-    statusAvaliacao: doc.statusAvaliacao,
-    scoreTotal: doc.scoreTotal ?? null,
-    faixa: doc.faixa ?? null,
-    resultado: doc.resultado ?? null,
-    vigente: doc.vigente === true,
-    concluidaEmISO: soData(doc.concluidaEm),
-    avaliadorNome: campoRel(doc.avaliador, "nome"),
-  };
-}
-
-/**
- * Todas as avaliações, mais recente primeiro — inclui as não vigentes: uma
- * oportunidade pode ter mais de uma no tempo (requalificação, manual §19).
- */
-export async function listarAvaliacoesCrm(): Promise<AvaliacaoResumo[]> {
-  const payload = await obterPayload();
-  const res = await payload.find({
-    collection: "avaliacoes-qualificacao",
-    depth: 1,
-    limit: 500,
-    sort: "-createdAt",
-  });
-  return res.docs.map(mapearAvaliacaoResumo);
-}
-
-export async function obterAvaliacaoCrm(id: string): Promise<AvaliacaoDetalhe | null> {
-  const payload = await obterPayload();
-  let doc: AvaliacaoQualificacao;
-  try {
-    doc = await payload.findByID({ collection: "avaliacoes-qualificacao", id, depth: 1 });
-  } catch {
-    return null;
-  }
-  return {
-    ...mapearAvaliacaoResumo(doc),
-    notaNecessidade: doc.notaNecessidade ?? null,
-    notaAderencia: doc.notaAderencia ?? null,
-    notaPrioridade: doc.notaPrioridade ?? null,
-    notaTiming: doc.notaTiming ?? null,
-    notaCaminho: doc.notaCaminho ?? null,
-    notaStakeholders: doc.notaStakeholders ?? null,
-    notaOrcamento: doc.notaOrcamento ?? null,
-    notaRisco: doc.notaRisco ?? null,
-    notaValor: doc.notaValor ?? null,
-    hgAderencia: doc.hgAderencia ?? null,
-    hgJuridico: doc.hgJuridico ?? null,
-    hgCondicao: doc.hgCondicao ?? null,
-    hgIncapacidade: doc.hgIncapacidade ?? null,
-    hgDemanda: doc.hgDemanda ?? null,
-    hgRequisito: doc.hgRequisito ?? null,
-    hgIntegridade: doc.hgIntegridade ?? null,
-    justificativa: doc.justificativa ?? null,
-    proximoPasso: doc.proximoPasso ?? null,
-    observacoes: doc.observacoes ?? null,
-    avaliadorId: idRel(doc.avaliador),
-    ownerId: idRel(doc.owner),
-  };
-}
