@@ -2,6 +2,9 @@
 ## O que mudou no protótipo (v3.0 → v3.3 P0) e como levar isso para o Payload · v1
 
 **Versão:** 1.1 · 4 de setembro de 2026
+
+> **Nota (16/09/2026):** as Janelas/Sessões deste documento que tratam do CRM (Janela H inteira no `docs/17`; Sessões D2 e E3 e Janelas F e G no `docs/16`) foram **substituídas** pelo spec `docs/superpowers/specs/2026-09-15-crm-fluxo-comercial-kanban-design.md`. O texto abaixo é mantido como histórico e não deve ser executado.
+
 **Base:** diff verificado linha a linha entre `NTC_Comercial_Premium.html` (v3.0, 4.478 linhas) e `NTC_Comercial_Premium_v3.3_P0_CHECKPOINT.html` (4.907 linhas), somado ao estado real do CRM em `apps/cms` lido em código; a partir da v1.1, também o **Manual Operacional NTC-COM-CRM-01 v1.0 FINAL** conferido contra o mesmo código (§4.0).
 
 ### Histórico de revisões

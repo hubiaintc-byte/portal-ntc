@@ -2,6 +2,9 @@
 ## Do estado atual ao go-live · v1
 
 **Versão:** 1.0 · 27 de agosto de 2026
+
+> **Nota (16/09/2026):** as Janelas/Sessões deste documento que tratam do CRM (Janela H inteira no `docs/17`; Sessões D2 e E3 e Janelas F e G no `docs/16`) foram **substituídas** pelo spec `docs/superpowers/specs/2026-09-15-crm-fluxo-comercial-kanban-design.md`. O texto abaixo é mantido como histórico e não deve ser executado.
+
 **Base:** estado real verificado em código e `pnpm dev` local em 26-27/08/2026 (ver `CLAUDE.md` §19, v1.6.1).
 **Companheiro de:** `docs/15_Prompts_Iniciais_Claude_Code_v1.md` (mesmo formato — Janela → Sessão → prompt pronto pra colar).
 **Função:** organizar o backlog do CMS/CRM em sessões executáveis, na ordem que faz sentido por dependência, para retomar a produção sem precisar reconstruir o contexto do zero a cada vez.
