@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { ESTAGIOS_LEAD, MOTIVOS_PERDA, rotuloDoEstagio } from "@ntc/lib";
 
@@ -29,6 +29,9 @@ interface ModalLeadProps {
 
 const FMT_DATA_HORA = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
 
+const FOCAVEIS =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /** "2026-03-10" → "10/03/2026"; ISO com hora → data e hora locais. */
 function dataLegivel(iso: string): string {
   if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso.split("-").reverse().join("/");
@@ -55,6 +58,24 @@ export function ModalLead({ lead, clientes, catalogo, usuarios, onFechar, onAtua
   const [clienteNovo, setClienteNovo] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [ocupado, iniciar] = useTransition();
+  const painelRef = useRef<HTMLDivElement>(null);
+  const fecharRef = useRef<HTMLButtonElement>(null);
+  const montadoRef = useRef(true);
+
+  // Gestão de foco do dialog, sem lib: ao abrir, foco no botão Fechar (a
+  // partir dele Tab chega ao select de estágio — o caminho por teclado para
+  // mover o card); ao fechar, devolve o foco a quem abriu (card, linha da
+  // tabela). O ref de montagem evita que uma escrita ainda pendente chame
+  // onAtualizado depois do fechamento e reabra o modal.
+  useEffect(() => {
+    montadoRef.current = true;
+    const anterior = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    fecharRef.current?.focus();
+    return () => {
+      montadoRef.current = false;
+      anterior?.focus();
+    };
+  }, []);
 
   // Fechar com Esc (mesmo padrão do ModalImportarPdf).
   useEffect(() => {
@@ -65,10 +86,28 @@ export function ModalLead({ lead, clientes, catalogo, usuarios, onFechar, onAtua
     return () => document.removeEventListener("keydown", aoTeclar);
   }, [onFechar]);
 
+  /** Mantém o Tab dentro do dialog (ciclo entre o primeiro e o último focável). */
+  function prenderTab(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key !== "Tab" || !painelRef.current) return;
+    const focaveis = Array.from(painelRef.current.querySelectorAll<HTMLElement>(FOCAVEIS));
+    if (focaveis.length === 0) return;
+    const primeiro = focaveis[0]!;
+    const ultimo = focaveis[focaveis.length - 1]!;
+    const ativo = document.activeElement;
+    if (e.shiftKey && (ativo === primeiro || !painelRef.current.contains(ativo))) {
+      e.preventDefault();
+      ultimo.focus();
+    } else if (!e.shiftKey && ativo === ultimo) {
+      e.preventDefault();
+      primeiro.focus();
+    }
+  }
+
   function executar(acao: () => Promise<{ ok: boolean; erro?: string }>, depois?: () => void) {
     setErro(null);
     iniciar(async () => {
       const r = await acao();
+      if (!montadoRef.current) return;
       if (!r.ok) {
         setErro(r.erro ?? "Erro.");
         return;
@@ -89,8 +128,9 @@ export function ModalLead({ lead, clientes, catalogo, usuarios, onFechar, onAtua
       onClick={(e) => {
         if (e.target === e.currentTarget) onFechar();
       }}
+      onKeyDown={prenderTab}
     >
-      <div className="pcms-modal pcms-modal--largo">
+      <div className="pcms-modal pcms-modal--largo" ref={painelRef}>
         <div className="pcms-modal__head">
           <div>
             <p className="pcms-pagehead__eyebrow">{lead ? `Lead · ${lead.nome}` : "Comercial"}</p>
@@ -104,7 +144,7 @@ export function ModalLead({ lead, clientes, catalogo, usuarios, onFechar, onAtua
               )}
             </h2>
           </div>
-          <button type="button" className="pcms-modal__fechar" onClick={onFechar} aria-label="Fechar">
+          <button type="button" className="pcms-modal__fechar" onClick={onFechar} aria-label="Fechar" ref={fecharRef}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
@@ -168,7 +208,14 @@ export function ModalLead({ lead, clientes, catalogo, usuarios, onFechar, onAtua
             className="pcms-modal__perda"
             onSubmit={(e) => {
               e.preventDefault();
-              executar(() => marcarLeadPerdidoCrm(lead.id, motivo, detalhe), () => setPerdendo(false));
+              executar(
+                () => marcarLeadPerdidoCrm(lead.id, motivo, detalhe),
+                () => {
+                  setPerdendo(false);
+                  setMotivo("");
+                  setDetalhe("");
+                },
+              );
             }}
           >
             <label>

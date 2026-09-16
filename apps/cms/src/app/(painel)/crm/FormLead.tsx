@@ -73,12 +73,17 @@ export function FormLead({ inicial, clientes, catalogo, usuarios, onSalvo, onCan
       <div className="pcms-editor__grid">
         <CampoTexto rotulo="Instituição (como informada)" valor={dados.instituicao} onMudar={m("instituicao")} />
         <CampoSelect rotulo="Esfera" valor={dados.esfera} onMudar={m("esfera")} opcoes={paraOpcoes(ESFERA_INSTITUCIONAL)} />
-        <CampoSelect
-          rotulo="Cliente"
-          valor={dados.cliente}
-          onMudar={m("cliente")}
-          opcoes={clientes.map((c) => ({ label: c.orgao, value: c.id }))}
-        />
+        {/* Só na criação: na edição o cliente muda por "Trocar cliente → Vincular"
+            (aba Dados), que grava a troca na linha do tempo — atualizarLeadCrm
+            não escreve `cliente`. */}
+        {inicial === null && (
+          <CampoSelect
+            rotulo="Cliente"
+            valor={dados.cliente}
+            onMudar={m("cliente")}
+            opcoes={clientes.map((c) => ({ label: c.orgao, value: c.id }))}
+          />
+        )}
         {inicial === null && dados.cliente === "" && (
           <CampoTexto rotulo="Ou criar cliente novo (órgão)" valor={dados.novoClienteOrgao} onMudar={m("novoClienteOrgao")} />
         )}

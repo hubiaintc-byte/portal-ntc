@@ -356,6 +356,7 @@ export function ShellCrm({
       {/* O modal do lead sobrepõe a tela ativa (kanban, Leads ou cliente) em vez de substituí-la. */}
       {modalLead && (
         <ModalLead
+          key={modalLead.modo === "ver" ? modalLead.lead.id : "novo"}
           lead={modalLead.modo === "ver" ? modalLead.lead : null}
           clientes={clientes}
           catalogo={catalogo}

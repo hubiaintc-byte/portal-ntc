@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useId, useState, useTransition } from "react";
 
 import type { ItemLinhaDoTempoResumo } from "@/lib/cms/painelCrm";
 
@@ -17,6 +17,7 @@ export function LinhaDoTempo({ itens, onNota }: LinhaDoTempoProps) {
   const [texto, setTexto] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [salvando, iniciar] = useTransition();
+  const idNota = useId();
 
   function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -33,9 +34,9 @@ export function LinhaDoTempo({ itens, onNota }: LinhaDoTempoProps) {
     <div className="pcms-timeline">
       {onNota && (
         <form className="pcms-timeline__nota" onSubmit={enviar}>
-          <label htmlFor="pcms-nota">Nota</label>
+          <label htmlFor={idNota}>Nota</label>
           <textarea
-            id="pcms-nota"
+            id={idNota}
             rows={2}
             value={texto}
             onChange={(e) => setTexto(e.target.value)}

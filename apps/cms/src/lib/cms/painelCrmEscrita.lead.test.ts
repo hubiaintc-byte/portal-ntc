@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
-const { adicionarNota, criarLeadManual, marcarLeadPerdido, moverLead } = await import("./painelCrmEscrita");
+const { adicionarNota, atualizarLeadCrm, criarLeadManual, marcarLeadPerdido, moverLead } = await import("./painelCrmEscrita");
 
 const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
 
@@ -111,6 +111,24 @@ describe("criarLeadManual", () => {
     const primeira = create.mock.calls[0]![0] as { collection: string; data: Record<string, unknown> };
     expect(primeira.collection).toBe("clientes-crm");
     expect(primeira.data.esfera).toBeNull();
+  });
+
+  it("atualizarLeadCrm não exige cliente (lead sem vínculo continua editável) e não toca o cliente", async () => {
+    const { update } = payloadFalso();
+    expect(await atualizarLeadCrm("7", { ...dados, cliente: "", novoClienteOrgao: "", telefone: "11 9" }, usuario)).toEqual({ ok: true });
+    const chamada = update.mock.calls[0]![0] as { collection: string; id: string; data: Record<string, unknown> };
+    expect(chamada.collection).toBe("leads");
+    expect(chamada.id).toBe("7");
+    expect(chamada.data.telefone).toBe("11 9");
+    expect(chamada.data).not.toHaveProperty("cliente");
+    expect(chamada.data).not.toHaveProperty("novoClienteOrgao");
+  });
+
+  it("atualizarLeadCrm ainda exige nome e e-mail", async () => {
+    const { update } = payloadFalso();
+    expect(await atualizarLeadCrm("7", { ...dados, nome: "" }, usuario)).toEqual({ ok: false, erro: "Informe o nome do contato." });
+    expect(await atualizarLeadCrm("7", { ...dados, email: " " }, usuario)).toEqual({ ok: false, erro: "Informe o e-mail do contato." });
+    expect(update).not.toHaveBeenCalled();
   });
 
   it("grava tipo proposta, origem manual, estágio lead e vínculo manual", async () => {

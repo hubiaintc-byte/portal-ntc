@@ -505,9 +505,22 @@ export interface DadosLeadManual {
   observacoes: string;
 }
 
-function validarLeadManual(dados: DadosLeadManual): string | null {
+/** Regras comuns a criação e edição: só o contato é obrigatório. */
+function validarContatoDoLead(dados: DadosLeadManual): string | null {
   if (dados.nome.trim() === "") return "Informe o nome do contato.";
   if (dados.email.trim() === "") return "Informe o e-mail do contato.";
+  return null;
+}
+
+/**
+ * Criação exige um cliente (existente ou a criar). A edição não passa por
+ * aqui: o vínculo com o cliente muda só por `vincularClienteAoLead`, que
+ * registra a troca na linha do tempo — e um lead ainda sem cliente continua
+ * editável nos demais campos.
+ */
+function validarLeadManual(dados: DadosLeadManual): string | null {
+  const erro = validarContatoDoLead(dados);
+  if (erro) return erro;
   if (idOuNulo(dados.cliente) === null && dados.novoClienteOrgao.trim() === "") {
     return "Selecione o cliente ou informe o órgão para criar um novo.";
   }
@@ -590,7 +603,7 @@ export async function criarLeadManual(dados: DadosLeadManual, usuario: UsuarioAu
 }
 
 export async function atualizarLeadCrm(id: string, dados: DadosLeadManual, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
-  const erro = validarLeadManual(dados);
+  const erro = validarContatoDoLead(dados);
   if (erro) return { ok: false, erro };
   try {
     const payload = await obterPayload();
