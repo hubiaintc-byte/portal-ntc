@@ -2031,3 +2031,50 @@ body {
   border-left-color: var(--pcms-erro);
   background: rgba(154, 27, 27, 0.06);
 }
+
+/* ===== CRM Kanban ======================================================= */
+.pcms-kanban__toolbar { gap: 12px; flex-wrap: wrap; align-items: center; }
+.pcms-kanban__toolbar .pcms-field { margin-bottom: 0; }
+.pcms-kanban__busca { min-width: 260px; flex: 1; }
+.pcms-kanban__toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--pcms-grafite); }
+.pcms-kanban__colunas {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 1fr);
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  align-items: start;
+}
+.pcms-kanban__coluna {
+  background: var(--pcms-pergaminho);
+  border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+}
+.pcms-kanban__coluna--alvo { outline: 2px solid var(--pcms-oxford); outline-offset: -2px; }
+.pcms-kanban__cabecalho { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--pcms-linha); }
+.pcms-kanban__cabecalho h2 { font-family: var(--font-corpo), "Barlow", sans-serif; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--pcms-oxford); margin: 0; }
+.pcms-kanban__contagem { background: #fff; border: 1px solid var(--pcms-linha); border-radius: 999px; padding: 1px 9px; font-size: 0.78rem; color: var(--pcms-grafite); }
+.pcms-kanban__cards { display: flex; flex-direction: column; gap: 10px; padding: 12px; }
+.pcms-kanban__card {
+  background: #fff;
+  border: 1px solid var(--pcms-linha);
+  border-left: 3px solid var(--pcms-oxford);
+  border-radius: var(--pcms-radius);
+  box-shadow: var(--pcms-sombra);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: grab;
+}
+.pcms-kanban__card:focus-visible { outline: 2px solid var(--pcms-oxford); outline-offset: 2px; }
+.pcms-kanban__card--arrastando { opacity: 0.5; }
+.pcms-kanban__card--perdido { border-left-color: var(--pcms-cardeal); opacity: 0.7; cursor: default; }
+.pcms-kanban__orgao { color: var(--pcms-oxford); font-size: 0.95rem; line-height: 1.25; }
+.pcms-kanban__contato { color: var(--pcms-grafite); font-size: 0.85rem; }
+.pcms-kanban__meta, .pcms-kanban__rodape { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--pcms-grafite-suave); }
+.pcms-kanban__vazio { text-align: center; color: var(--pcms-grafite-suave); padding: 18px 0; }

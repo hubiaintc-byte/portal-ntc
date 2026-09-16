@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 import type { LeadCmsDetalhe } from "@/lib/cms/painelCms";
 import type { DadosEnvio } from "@/lib/cms/painelCrmEscrita";
@@ -23,6 +23,7 @@ import {
   carregarClienteCrm,
   carregarPropostaCrm,
   gerarPdfPropostaCrm,
+  moverLeadCrm,
   novaVersaoPropostaCrm,
   registrarEnvioCrm,
 } from "../acoesCrm";
@@ -162,6 +163,9 @@ export function ShellCrm({
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [carregando, iniciarCarga] = useTransition();
+  const [leadsLocal, setLeadsLocal] = useState<LeadCrmResumo[]>(leads);
+
+  useEffect(() => setLeadsLocal(leads), [leads]);
 
   function fecharTudo() {
     setClienteDet(null);
@@ -187,6 +191,18 @@ export function ShellCrm({
     iniciarCarga(async () => {
       const det = await carregarLead(id);
       if (det) setLeadDet(det);
+    });
+  }
+
+  function moverLead(id: string, estagio: string) {
+    const anterior = leadsLocal;
+    setLeadsLocal((ls) => ls.map((l) => (l.id === id ? { ...l, estagio, atualizadoEmISO: new Date().toISOString() } : l)));
+    iniciarCarga(async () => {
+      const r = await moverLeadCrm(id, estagio);
+      if (!r.ok) {
+        setLeadsLocal(anterior);
+        setErroAcao(r.erro ?? "Erro ao mover o lead.");
+      }
     });
   }
 
@@ -289,10 +305,18 @@ export function ShellCrm({
         </>
       ) : (
         <>
+          <AvisoForm erro={erroAcao} />
           {tela === "painel" && (
-            <TelaPainelComercial leads={leads} hojeISO={hojeISO} erroLeitura={erroLeitura} />
+            <TelaPainelComercial
+              leads={leadsLocal}
+              usuarios={usuarios}
+              hojeISO={hojeISO}
+              erroLeitura={erroLeitura}
+              onAbrirLead={abrirLead}
+              onMoverLead={moverLead}
+            />
           )}
-          {tela === "leads" && <TelaLeads leads={leads} onAbrir={abrirLead} />}
+          {tela === "leads" && <TelaLeads leads={leadsLocal} onAbrir={abrirLead} />}
           {tela === "clientes" && (
             <TelaClientes
               clientes={clientes}

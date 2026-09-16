@@ -1,16 +1,28 @@
 "use client";
 
-import type { LeadCrmResumo } from "@/lib/cms/painelCrm";
+import type { LeadCrmResumo, UsuarioCmsResumo } from "@/lib/cms/painelCrm";
 import { calcularKpisComercial, formatarMoedaBRL } from "@/lib/cms/kpisComercial";
+
+import { Kanban } from "./Kanban";
 
 interface TelaPainelComercialProps {
   leads: LeadCrmResumo[];
+  usuarios: UsuarioCmsResumo[];
   hojeISO: string;
   erroLeitura: boolean;
+  onAbrirLead: (id: string) => void;
+  onMoverLead: (id: string, estagio: string) => void;
 }
 
-/** Dashboard comercial — KPIs sobre os leads do funil (spec 2026-09-15 §4.2). */
-export function TelaPainelComercial({ leads, hojeISO, erroLeitura }: TelaPainelComercialProps) {
+/** Dashboard comercial — KPIs + quadro kanban do funil (spec 2026-09-15 §4.2). */
+export function TelaPainelComercial({
+  leads,
+  usuarios,
+  hojeISO,
+  erroLeitura,
+  onAbrirLead,
+  onMoverLead,
+}: TelaPainelComercialProps) {
   const kpis = calcularKpisComercial(leads, hojeISO);
 
   const metricas = [
@@ -26,7 +38,7 @@ export function TelaPainelComercial({ leads, hojeISO, erroLeitura }: TelaPainelC
         <div>
           <p className="pcms-pagehead__eyebrow">Comercial</p>
           <h1>Dashboard</h1>
-          <p>Visão do funil comercial.</p>
+          <p>Leads em andamento por estágio. Arraste para mover; clique para abrir.</p>
         </div>
       </div>
 
@@ -45,7 +57,7 @@ export function TelaPainelComercial({ leads, hojeISO, erroLeitura }: TelaPainelC
         ))}
       </div>
 
-      <div className="pcms-vazio">Quadro kanban — Task 9.</div>
+      <Kanban leads={leads} usuarios={usuarios} hojeISO={hojeISO} onAbrir={onAbrirLead} onMover={onMoverLead} />
     </>
   );
 }

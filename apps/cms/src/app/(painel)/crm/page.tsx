@@ -61,7 +61,7 @@ export default async function PainelCrmPage() {
     erroLeitura = true;
   }
 
-  const hojeISO = new Date().toISOString().slice(0, 10);
+  const hojeISO = new Date().toISOString();
 
   return (
     <ShellCrm
