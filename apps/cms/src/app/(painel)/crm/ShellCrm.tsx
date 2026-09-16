@@ -195,12 +195,18 @@ export function ShellCrm({
   }
 
   function moverLead(id: string, estagio: string) {
-    const anterior = leadsLocal;
+    const original = leadsLocal.find((l) => l.id === id);
+    const estagioOriginal = original?.estagio;
+    const atualizadoOriginal = original?.atualizadoEmISO;
     setLeadsLocal((ls) => ls.map((l) => (l.id === id ? { ...l, estagio, atualizadoEmISO: new Date().toISOString() } : l)));
     iniciarCarga(async () => {
       const r = await moverLeadCrm(id, estagio);
       if (!r.ok) {
-        setLeadsLocal(anterior);
+        if (estagioOriginal !== undefined && atualizadoOriginal !== undefined) {
+          setLeadsLocal((ls) =>
+            ls.map((l) => (l.id === id ? { ...l, estagio: estagioOriginal, atualizadoEmISO: atualizadoOriginal } : l)),
+          );
+        }
         setErroAcao(r.erro ?? "Erro ao mover o lead.");
       }
     });

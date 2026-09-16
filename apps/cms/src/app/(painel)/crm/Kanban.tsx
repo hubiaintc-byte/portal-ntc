@@ -17,8 +17,9 @@ interface KanbanProps {
 
 /**
  * Quadro kanban do fluxo comercial (spec 2026-09-15 §4.2). Arraste com a API
- * HTML5 nativa (sem lib). O select de estágio do modal é o caminho por
- * teclado — o card em si abre o modal com Enter/Espaço.
+ * HTML5 nativa (sem lib). O select de estágio do modal do lead será o
+ * caminho por teclado para mover — chega na Task 10; por ora o card abre o
+ * `DetalheLead` (Enter/Espaço).
  */
 export function Kanban({ leads, usuarios, hojeISO, onAbrir, onMover }: KanbanProps) {
   const [busca, setBusca] = useState("");
@@ -87,7 +88,10 @@ export function Kanban({ leads, usuarios, hojeISO, onAbrir, onMover }: KanbanPro
               key={estagio.value}
               className={`pcms-kanban__coluna${alvo ? " pcms-kanban__coluna--alvo" : ""}`}
               onDragOver={(e) => { e.preventDefault(); if (colunaAlvo !== estagio.value) setColunaAlvo(estagio.value); }}
-              onDragLeave={() => { if (colunaAlvo === estagio.value) setColunaAlvo(null); }}
+              onDragLeave={(e) => {
+                if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+                if (colunaAlvo === estagio.value) setColunaAlvo(null);
+              }}
               onDrop={(e) => { e.preventDefault(); soltar(estagio.value); }}
             >
               <header className="pcms-kanban__cabecalho">
@@ -102,7 +106,7 @@ export function Kanban({ leads, usuarios, hojeISO, onAbrir, onMover }: KanbanPro
                     draggable={!l.perdido}
                     role="button"
                     tabIndex={0}
-                    aria-label={`Abrir lead de ${l.instituicao}`}
+                    aria-label={`Abrir lead de ${l.clienteNome ?? l.instituicao}`}
                     onDragStart={(e) => { e.dataTransfer.effectAllowed = "move"; setArrastando(l.id); }}
                     onDragEnd={() => { setArrastando(null); setColunaAlvo(null); }}
                     onClick={() => onAbrir(l.id)}
