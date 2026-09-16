@@ -2,9 +2,10 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
-import { calcularValoresProposta, codigoDaVersao, gerarCodigoBase, proximaVersao } from "@ntc/lib";
+import { calcularValoresProposta, codigoDaVersao, ehEstagioLead, gerarCodigoBase, MOTIVOS_PERDA, proximaVersao } from "@ntc/lib";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
+import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
 import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
 import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
@@ -475,5 +476,172 @@ export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscr
   } catch (e) {
     console.error("[gerarESalvarPdfProposta]", e);
     return { ok: false, erro: "Não foi possível gerar o PDF. Tente novamente." };
+  }
+}
+
+// --- Lead (kanban) e linha do tempo (spec 2026-09-15 · Sessão 1) ----------
+
+type LeadData = RequiredDataFromCollectionSlug<"leads">;
+type LinhaDoTempoData = RequiredDataFromCollectionSlug<"linha-do-tempo">;
+
+export interface DadosLeadManual {
+  nome: string;
+  email: string;
+  telefone: string;
+  cargo: string;
+  instituicao: string;
+  esfera: string;
+  programa: string;
+  modalidade: string;
+  participantesEstimados: string;
+  mensagem: string;
+  cliente: string;
+  responsavel: string;
+  valorEstimado: string;
+  dataPrevistaEvento: string;
+  observacoes: string;
+}
+
+function validarLeadManual(dados: DadosLeadManual): string | null {
+  if (dados.nome.trim() === "") return "Informe o nome do contato.";
+  if (dados.email.trim() === "") return "Informe o e-mail do contato.";
+  if (idOuNulo(dados.cliente) === null) return "Selecione o cliente.";
+  return null;
+}
+
+/** Campos editáveis pela UI (criação manual e edição do modal). */
+function camposEditaveisDoLead(dados: DadosLeadManual): Partial<LeadData> {
+  return {
+    nome: dados.nome.trim(),
+    email: dados.email.trim(),
+    telefone: ouNulo(dados.telefone),
+    cargo: ouNulo(dados.cargo),
+    instituicao: ouNulo(dados.instituicao),
+    esfera: ouNulo(dados.esfera) as LeadData["esfera"],
+    detalhesProposta: {
+      programa: idOuNulo(dados.programa),
+      modalidade: ouNulo(dados.modalidade) as NonNullable<LeadData["detalhesProposta"]>["modalidade"],
+      participantesEstimados: numeroOuNulo(dados.participantesEstimados),
+      mensagem: ouNulo(dados.mensagem),
+    },
+    responsavel: idOuNulo(dados.responsavel),
+    valorEstimado: numeroOuNulo(dados.valorEstimado),
+    dataPrevistaEvento: ouNulo(dados.dataPrevistaEvento),
+    observacoes: ouNulo(dados.observacoes),
+  };
+}
+
+export async function criarLeadManual(dados: DadosLeadManual, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  const erro = validarLeadManual(dados);
+  if (erro) return { ok: false, erro };
+  try {
+    const payload = await obterPayload();
+    const data: LeadData = {
+      ...camposEditaveisDoLead(dados),
+      nome: dados.nome.trim(),
+      email: dados.email.trim(),
+      tipo: "proposta",
+      origemEntrada: "manual",
+      estagio: "lead",
+      perdido: false,
+      cliente: idOuNulo(dados.cliente),
+      clienteCasadoPor: "manual",
+      consentimentoLgpd: { aceito: false },
+    };
+    await payload.create({ collection: "leads", data, user: usuario });
+    return { ok: true };
+  } catch (e) {
+    console.error("[criarLeadManual]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function atualizarLeadCrm(id: string, dados: DadosLeadManual, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  const erro = validarLeadManual(dados);
+  if (erro) return { ok: false, erro };
+  try {
+    const payload = await obterPayload();
+    await payload.update({ collection: "leads", id, data: camposEditaveisDoLead(dados), user: usuario });
+    return { ok: true };
+  } catch (e) {
+    console.error("[atualizarLeadCrm]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function moverLead(id: string, estagio: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  if (!ehEstagioLead(estagio)) return { ok: false, erro: "Estágio inválido." };
+  try {
+    const payload = await obterPayload();
+    await payload.update({ collection: "leads", id, data: { estagio }, user: usuario });
+    return { ok: true };
+  } catch (e) {
+    console.error("[moverLead]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function marcarLeadPerdido(id: string, motivo: string, detalhe: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  if (!MOTIVOS_PERDA.some((m) => m.value === motivo)) return { ok: false, erro: "Informe o motivo da perda." };
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "leads",
+      id,
+      data: { perdido: true, motivoPerda: motivo as LeadData["motivoPerda"], detalhePerda: ouNulo(detalhe), perdidoEm: new Date().toISOString() },
+      user: usuario,
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[marcarLeadPerdido]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function reabrirLead(id: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.update({ collection: "leads", id, data: { perdido: false, motivoPerda: null, detalhePerda: null, perdidoEm: null }, user: usuario });
+    return { ok: true };
+  } catch (e) {
+    console.error("[reabrirLead]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function vincularClienteAoLead(id: string, clienteId: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  const cliente = idOuNulo(clienteId);
+  if (cliente === null) return { ok: false, erro: "Selecione o cliente." };
+  try {
+    const payload = await obterPayload();
+    await payload.update({ collection: "leads", id, data: { cliente, clienteCasadoPor: "manual" }, user: usuario });
+    return { ok: true };
+  } catch (e) {
+    console.error("[vincularClienteAoLead]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export async function adicionarNota(clienteId: string, leadId: string | null, texto: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  const cliente = idOuNulo(clienteId);
+  if (cliente === null) return { ok: false, erro: "Cliente inválido." };
+  const detalhe = texto.trim();
+  if (detalhe === "") return { ok: false, erro: "Escreva a nota." };
+  try {
+    const payload = await obterPayload();
+    const data: LinhaDoTempoData = {
+      cliente,
+      lead: leadId === null ? null : idOuNulo(leadId),
+      tipo: "nota",
+      titulo: "Nota",
+      detalhe,
+      usuario: Number(usuario.id),
+      em: new Date().toISOString(),
+    };
+    await payload.create({ collection: "linha-do-tempo", data, user: usuario });
+    return { ok: true };
+  } catch (e) {
+    console.error("[adicionarNota]", e);
+    return { ok: false, erro: ERRO_GENERICO };
   }
 }

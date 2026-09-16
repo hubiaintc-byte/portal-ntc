@@ -2,23 +2,33 @@
 
 import { revalidatePath } from "next/cache";
 
-import { obterUsuarioCms } from "@/lib/cms/autenticacao";
+import { obterUsuarioAutenticado, obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
   obterClienteCrm,
+  obterLeadCrm,
   obterPropostaCrm,
   type ClienteCrmDetalhe,
+  type LeadCrmDetalhe,
   type PropostaDetalhe,
 } from "@/lib/cms/painelCrm";
 import {
+  adicionarNota,
   atualizarClienteCrm,
+  atualizarLeadCrm,
   atualizarProposta,
   criarClienteCrm,
+  criarLeadManual,
   criarProposta,
   criarVersaoProposta,
   gerarESalvarPdfProposta,
+  marcarLeadPerdido,
+  moverLead,
+  reabrirLead,
   registrarEnvio,
+  vincularClienteAoLead,
   type DadosClienteCrm,
   type DadosEnvio,
+  type DadosLeadManual,
   type DadosProposta,
 } from "@/lib/cms/painelCrmEscrita";
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
@@ -82,4 +92,57 @@ export async function gerarPdfPropostaCrm(id: string): Promise<ResultadoEscrita>
   const resultado = await gerarESalvarPdfProposta(id);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
+}
+
+export async function carregarLeadCrm(id: string): Promise<LeadCrmDetalhe | null> {
+  if (!(await obterUsuarioCms())) return null;
+  return obterLeadCrm(id);
+}
+
+export async function salvarLeadCrm(id: string | null, dados: DadosLeadManual): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = id === null ? await criarLeadManual(dados, usuario) : await atualizarLeadCrm(id, dados, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function moverLeadCrm(id: string, estagio: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await moverLead(id, estagio, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function marcarLeadPerdidoCrm(id: string, motivo: string, detalhe: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await marcarLeadPerdido(id, motivo, detalhe, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function reabrirLeadCrm(id: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await reabrirLead(id, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function vincularClienteCrm(leadId: string, clienteId: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await vincularClienteAoLead(leadId, clienteId, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function adicionarNotaCrm(clienteId: string, leadId: string | null, texto: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await adicionarNota(clienteId, leadId, texto, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
 }

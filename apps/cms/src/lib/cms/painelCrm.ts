@@ -4,12 +4,15 @@ import type {
   ClienteCrm,
   EnvioProposta,
   Evento,
+  EventoComercial,
   Lead,
+  LinhaDoTempo,
   Modulo,
   Programa,
   Proposta,
   VersaoProposta,
 } from "@ntc/types";
+import type { Where } from "payload";
 
 import { obterPayload } from "@/lib/payloadClient";
 
@@ -49,6 +52,9 @@ export interface ClienteCrmDetalhe extends ClienteCrmResumo {
   observacoes: string | null;
   responsavelId: string | null;
   contatos: ContatoResumo[];
+  negocios: LeadCrmResumo[];
+  linhaDoTempo: ItemLinhaDoTempoResumo[];
+  eventos: EventoComercialResumo[];
 }
 
 export interface LeadCrmResumo {
@@ -262,6 +268,117 @@ export async function listarLeadsCrm(): Promise<LeadCrmResumo[]> {
   return res.docs.map(mapearLeadCrm);
 }
 
+export interface ItemLinhaDoTempoResumo {
+  id: string;
+  tipo: string;
+  titulo: string;
+  detalhe: string | null;
+  usuarioNome: string | null;
+  emISO: string;
+  leadId: string | null;
+  referencia: { colecao: string; id: string } | null;
+}
+
+function mapearItemLinhaDoTempo(doc: LinhaDoTempo): ItemLinhaDoTempoResumo {
+  const ref = doc.referencia;
+  return {
+    id: String(doc.id),
+    tipo: doc.tipo,
+    titulo: doc.titulo,
+    detalhe: doc.detalhe ?? null,
+    usuarioNome: campoRel(doc.usuario, "nome"),
+    emISO: doc.em,
+    leadId: idRel(doc.lead),
+    referencia: ref?.colecao && ref.id ? { colecao: ref.colecao, id: ref.id } : null,
+  };
+}
+
+export async function listarLinhaDoTempo(
+  filtro: { clienteId: string } | { leadId: string },
+): Promise<ItemLinhaDoTempoResumo[]> {
+  const payload = await obterPayload();
+  const where: Where = "clienteId" in filtro ? { cliente: { equals: filtro.clienteId } } : { lead: { equals: filtro.leadId } };
+  const res = await payload.find({ collection: "linha-do-tempo", depth: 1, limit: 300, sort: "-em", where });
+  return res.docs.map(mapearItemLinhaDoTempo);
+}
+
+export interface EventoComercialResumo {
+  id: string;
+  titulo: string;
+  dataInicioISO: string;
+  status: string;
+  modalidade: string | null;
+  local: string | null;
+  leadId: string;
+}
+
+function mapearEventoComercial(doc: EventoComercial): EventoComercialResumo {
+  return {
+    id: String(doc.id),
+    titulo: doc.titulo,
+    dataInicioISO: doc.dataInicio,
+    status: doc.status,
+    modalidade: doc.modalidade ?? null,
+    local: doc.local ?? null,
+    leadId: idRel(doc.lead) ?? "",
+  };
+}
+
+export interface LeadCrmDetalhe extends LeadCrmResumo {
+  telefone: string | null;
+  esfera: string | null;
+  modalidade: string | null;
+  mensagem: string | null;
+  programaId: string | null;
+  origem: { rotulo: string; valor: string }[];
+  consentimento: { aceito: boolean; timestamp: string | null; politicaVersao: string | null; ipSubmissao: string | null };
+  observacoes: string | null;
+  dataPrevistaEventoISO: string | null;
+  perdidoEmISO: string | null;
+  detalhePerda: string | null;
+  clienteCasadoPor: string | null;
+  linhaDoTempo: ItemLinhaDoTempoResumo[];
+}
+
+export async function obterLeadCrm(id: string): Promise<LeadCrmDetalhe | null> {
+  const payload = await obterPayload();
+  let doc: Lead;
+  try {
+    doc = await payload.findByID({ collection: "leads", id, depth: 1 });
+  } catch {
+    return null;
+  }
+  if (doc.tipo !== "proposta") return null;
+  const linhaDoTempo = await listarLinhaDoTempo({ leadId: id });
+  const og = doc.origem ?? {};
+  const origem: { rotulo: string; valor: string }[] = [];
+  const par = (rotulo: string, v: unknown) => { if (typeof v === "string" && v !== "") origem.push({ rotulo, valor: v }); };
+  par("Página", og.paginaSubmissao); par("Referrer", og.referrer); par("utm_source", og.utmSource);
+  par("utm_medium", og.utmMedium); par("utm_campaign", og.utmCampaign); par("utm_term", og.utmTerm); par("utm_content", og.utmContent);
+  const cons = doc.consentimentoLgpd;
+  return {
+    ...mapearLeadCrm(doc),
+    telefone: doc.telefone ?? null,
+    esfera: doc.esfera ?? null,
+    modalidade: doc.detalhesProposta?.modalidade ?? null,
+    mensagem: doc.detalhesProposta?.mensagem ?? null,
+    programaId: idRel(doc.detalhesProposta?.programa),
+    origem,
+    consentimento: {
+      aceito: cons?.aceito === true,
+      timestamp: cons?.timestamp ?? null,
+      politicaVersao: cons?.politicaVersao ?? null,
+      ipSubmissao: cons?.ipSubmissao ?? null,
+    },
+    observacoes: doc.observacoes ?? null,
+    dataPrevistaEventoISO: soData(doc.dataPrevistaEvento),
+    perdidoEmISO: doc.perdidoEm ?? null,
+    detalhePerda: doc.detalhePerda ?? null,
+    clienteCasadoPor: doc.clienteCasadoPor ?? null,
+    linhaDoTempo,
+  };
+}
+
 export async function listarClientesCrm(): Promise<ClienteCrmResumo[]> {
   const payload = await obterPayload();
   const res = await payload.find({
@@ -281,6 +398,11 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
   } catch {
     return null;
   }
+  const [negocios, linhaDoTempo, eventos] = await Promise.all([
+    payload.find({ collection: "leads", depth: 1, limit: 200, sort: "-createdAt", where: { cliente: { equals: doc.id }, tipo: { equals: "proposta" } } }),
+    listarLinhaDoTempo({ clienteId: id }),
+    payload.find({ collection: "eventos-comerciais", depth: 0, limit: 100, sort: "-dataInicio", where: { cliente: { equals: doc.id } } }),
+  ]);
   return {
     ...mapearClienteResumo(doc),
     tipo: doc.tipo ?? null,
@@ -289,6 +411,9 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
     observacoes: doc.observacoes ?? null,
     responsavelId: idRel(doc.responsavel),
     contatos: mapearContatos(doc),
+    negocios: negocios.docs.map(mapearLeadCrm),
+    linhaDoTempo,
+    eventos: eventos.docs.map(mapearEventoComercial),
   };
 }
 

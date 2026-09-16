@@ -13,13 +13,15 @@ const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
 const obterUsuarioCmsMock = vi.fn();
+const obterUsuarioAutenticadoMock = vi.fn();
 vi.mock("@/lib/cms/autenticacao", () => ({
   obterUsuarioCms: obterUsuarioCmsMock,
+  obterUsuarioAutenticado: obterUsuarioAutenticadoMock,
 }));
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
-const { salvarClienteCrm } = await import("./acoesCrm");
+const { moverLeadCrm, salvarClienteCrm } = await import("./acoesCrm");
 type DadosClienteCrm = Parameters<typeof salvarClienteCrm>[1];
 
 const usuarioFalso = { id: "5", nome: "Ana Diretora", perfil: "super-admin" };
@@ -83,5 +85,21 @@ describe("salvarClienteCrm — sessão antes da Local API", () => {
     expect(resultado).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
     expect(create).not.toHaveBeenCalled();
     expect(update).not.toHaveBeenCalled();
+  });
+});
+
+describe("moverLeadCrm", () => {
+  it("sem sessão recusa sem tocar a Local API", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(null);
+    const { update } = montarPayloadFalso();
+    expect(await moverLeadCrm("7", "em-contato")).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("repassa o usuário da sessão à Local API (autor da transição na linha do tempo)", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(usuarioFalso);
+    const { update } = montarPayloadFalso();
+    expect(await moverLeadCrm("7", "em-contato")).toEqual({ ok: true });
+    expect(update).toHaveBeenCalledWith(expect.objectContaining({ collection: "leads", user: usuarioFalso }));
   });
 });
