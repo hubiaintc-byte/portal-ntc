@@ -18,11 +18,15 @@ import { Clientes } from "./collections/Clientes";
 import { ContatosCrm } from "./collections/ContatosCrm";
 import { Conteudos } from "./collections/Conteudos";
 import { DocumentosComerciais } from "./collections/DocumentosComerciais";
+import { EnviosEmail } from "./collections/EnviosEmail";
 import { Especialistas } from "./collections/Especialistas";
 import { Eventos } from "./collections/Eventos";
+import { EventosComerciais } from "./collections/EventosComerciais";
 import { HistoricoEstagio } from "./collections/HistoricoEstagio";
 import { Leads } from "./collections/Leads";
+import { LinhaDoTempo } from "./collections/LinhaDoTempo";
 import { Media } from "./collections/Media";
+import { ModelosEmail } from "./collections/ModelosEmail";
 import { Modulos } from "./collections/Modulos";
 import { EnviosProposta } from "./collections/EnviosProposta";
 import { Oportunidades } from "./collections/Oportunidades";
@@ -109,6 +113,10 @@ export default buildConfig({
     VersoesProposta,
     EnviosProposta,
     DocumentosComerciais,
+    EventosComerciais,
+    ModelosEmail,
+    EnviosEmail,
+    LinhaDoTempo,
     TentativasAcesso,
     AuditLog,
   ],

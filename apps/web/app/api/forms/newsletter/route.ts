@@ -93,6 +93,8 @@ export async function POST(req: Request) {
       data: {
         tipo: "newsletter",
         status: "novo",
+        estagio: "lead",
+        origemEntrada: "site",
         nome: dados.nome,
         email: dados.email,
         instituicao: dados.instituicao,

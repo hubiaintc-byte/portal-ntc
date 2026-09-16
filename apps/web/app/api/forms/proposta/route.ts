@@ -57,6 +57,8 @@ export async function POST(req: Request) {
       data: {
         tipo: "proposta",
         status: "novo",
+        estagio: "lead",
+        origemEntrada: "site",
         nome: dados.nome,
         email: dados.email,
         telefone: dados.telefone,

@@ -3,7 +3,7 @@ import type { CollectionConfig } from "payload";
 import {
   AREAS_CRM,
   ESFERAS_CRM,
-  ORIGENS_CRM,
+  ORIGENS_CLIENTE,
   STATUS_CLIENTE_CRM,
   TIPOS_INSTITUICAO,
   UFS,
@@ -32,6 +32,18 @@ export const ClientesCrm: CollectionConfig = {
     update: atendimentoComercial,
     delete: superAdmin,
   },
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        const contatos = Array.isArray(data?.contatos) ? data.contatos : [];
+        const principais = contatos.filter((c) => c?.principal === true);
+        if (principais.length > 1) {
+          throw new Error("Só um contato pode ser o principal.");
+        }
+        return data;
+      },
+    ],
+  },
   fields: [
     { name: "orgao", type: "text", required: true },
     { name: "sigla", type: "text" },
@@ -44,7 +56,21 @@ export const ClientesCrm: CollectionConfig = {
     { name: "dirigente", type: "text" },
     { name: "cargoDirigente", type: "text" },
     { name: "email", type: "email" },
-    { name: "origem", type: "select", options: ORIGENS_CRM },
+    { name: "origem", type: "select", options: ORIGENS_CLIENTE, defaultValue: "manual" },
+    {
+      name: "contatos",
+      type: "array",
+      admin: { description: "Pessoas do órgão. No máximo um contato principal." },
+      fields: [
+        { name: "nome", type: "text", required: true },
+        { name: "cargo", type: "text" },
+        { name: "setor", type: "text" },
+        { name: "email", type: "email" },
+        { name: "whatsapp", type: "text" },
+        { name: "principal", type: "checkbox", defaultValue: false },
+        { name: "decisor", type: "checkbox", defaultValue: false },
+      ],
+    },
     {
       name: "potencial",
       type: "number",

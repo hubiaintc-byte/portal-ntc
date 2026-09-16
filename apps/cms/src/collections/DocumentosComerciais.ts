@@ -32,5 +32,9 @@ export const DocumentosComerciais: CollectionConfig = {
   upload: {
     mimeTypes: ["application/pdf"],
   },
-  fields: [{ name: "alt", type: "text" }],
+  fields: [
+    { name: "alt", type: "text" },
+    { name: "descricao", type: "text" },
+    { name: "evento", type: "relationship", relationTo: "eventos-comerciais", index: true },
+  ],
 };

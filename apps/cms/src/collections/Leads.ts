@@ -1,5 +1,7 @@
 import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 
+import { ESTAGIOS_LEAD, MOTIVOS_PERDA, ORIGENS_ENTRADA_LEAD } from "@ntc/lib";
+
 import { atendimentoComercial } from "../access/atendimentoComercial";
 import { ESFERA_INSTITUCIONAL, LEAD_STATUS, LEAD_TIPO } from "../shared/types";
 
@@ -50,6 +52,44 @@ export const Leads: CollectionConfig = {
       required: true,
     },
     { name: "observacoesInternas", type: "textarea" },
+
+    // ---- CRM (spec 2026-09-15 §3.1): o lead é o card do kanban ------------
+    {
+      name: "estagio",
+      type: "select",
+      options: ESTAGIOS_LEAD,
+      defaultValue: "lead",
+      required: true,
+      index: true,
+      admin: { description: "Coluna do kanban comercial." },
+    },
+    { name: "perdido", type: "checkbox", defaultValue: false, index: true },
+    { name: "motivoPerda", type: "select", options: MOTIVOS_PERDA },
+    { name: "perdidoEm", type: "date" },
+    { name: "detalhePerda", type: "text" },
+    { name: "cliente", type: "relationship", relationTo: "clientes-crm", index: true },
+    {
+      name: "clienteCasadoPor",
+      type: "select",
+      options: [
+        { label: "CNPJ", value: "cnpj" },
+        { label: "Domínio do e-mail", value: "dominio" },
+        { label: "Nome do órgão", value: "nome" },
+        { label: "Cliente criado a partir do lead", value: "criado" },
+        { label: "Vínculo manual", value: "manual" },
+      ],
+    },
+    { name: "responsavel", type: "relationship", relationTo: "users" },
+    { name: "valorEstimado", type: "number", min: 0 },
+    { name: "dataPrevistaEvento", type: "date" },
+    { name: "observacoes", type: "textarea" },
+    {
+      name: "origemEntrada",
+      type: "select",
+      options: ORIGENS_ENTRADA_LEAD,
+      defaultValue: "site",
+      required: true,
+    },
 
     { name: "nome", type: "text", required: true },
     { name: "email", type: "email", required: true },

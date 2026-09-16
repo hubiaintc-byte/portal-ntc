@@ -31,6 +31,10 @@ export interface Config {
     versoes: VersaoProposta;
     envios: EnvioProposta;
     'documentos-comerciais': DocumentosComerciai;
+    'eventos-comerciais': EventoComercial;
+    'modelos-email': ModeloEmail;
+    'envios-email': EnvioEmail;
+    'linha-do-tempo': LinhaDoTempo;
     'tentativas-acesso': TentativasAcesso;
     'audit-log': AuditLog;
     'payload-locked-documents': PayloadLockedDocument;
@@ -59,6 +63,10 @@ export interface Config {
     versoes: VersoesSelect<false> | VersoesSelect<true>;
     envios: EnviosSelect<false> | EnviosSelect<true>;
     'documentos-comerciais': DocumentosComerciaisSelect<false> | DocumentosComerciaisSelect<true>;
+    'eventos-comerciais': EventosComerciaisSelect<false> | EventosComerciaisSelect<true>;
+    'modelos-email': ModelosEmailSelect<false> | ModelosEmailSelect<true>;
+    'envios-email': EnviosEmailSelect<false> | EnviosEmailSelect<true>;
+    'linha-do-tempo': LinhaDoTempoSelect<false> | LinhaDoTempoSelect<true>;
     'tentativas-acesso': TentativasAcessoSelect<false> | TentativasAcessoSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -846,6 +854,31 @@ export interface Lead {
   identificacao?: string | null;
   status: 'novo' | 'em-atendimento' | 'qualificado' | 'descartado' | 'convertido';
   observacoesInternas?: string | null;
+  /**
+   * Coluna do kanban comercial.
+   */
+  estagio:
+    | 'lead'
+    | 'oportunidade'
+    | 'em-contato'
+    | 'proposta-em-producao'
+    | 'proposta-enviada'
+    | 'proposta-aceita'
+    | 'evento-agendado'
+    | 'contrato-recebido'
+    | 'links-enviados'
+    | 'evento-realizado';
+  perdido?: boolean | null;
+  motivoPerda?: ('sem-resposta' | 'recusou' | 'sem-orcamento' | 'cancelado' | 'outro') | null;
+  perdidoEm?: string | null;
+  detalhePerda?: string | null;
+  cliente?: (number | null) | ClienteCrm;
+  clienteCasadoPor?: ('cnpj' | 'dominio' | 'nome' | 'criado' | 'manual') | null;
+  responsavel?: (number | null) | User;
+  valorEstimado?: number | null;
+  dataPrevistaEvento?: string | null;
+  observacoes?: string | null;
+  origemEntrada: 'site' | 'manual' | 'whatsapp';
   nome: string;
   email: string;
   telefone?: string | null;
@@ -994,18 +1027,21 @@ export interface ClienteCrm {
   dirigente?: string | null;
   cargoDirigente?: string | null;
   email?: string | null;
-  origem?:
-    | (
-        | 'indicacao'
-        | 'indicacao-institucional'
-        | 'evento'
-        | 'prospeccao-ativa'
-        | 'cliente-recorrente'
-        | 'continuidade-de-relacionamento'
-        | 'inbound'
-        | 'eventon'
-        | 'outros'
-      )
+  origem?: ('lead-site' | 'manual' | 'importado') | null;
+  /**
+   * Pessoas do órgão. No máximo um contato principal.
+   */
+  contatos?:
+    | {
+        nome: string;
+        cargo?: string | null;
+        setor?: string | null;
+        email?: string | null;
+        whatsapp?: string | null;
+        principal?: boolean | null;
+        decisor?: boolean | null;
+        id?: string | null;
+      }[]
     | null;
   /**
    * Potencial estimado de contratação (R$).
@@ -1312,6 +1348,8 @@ export interface Proposta {
 export interface DocumentosComerciai {
   id: number;
   alt?: string | null;
+  descricao?: string | null;
+  evento?: (number | null) | EventoComercial;
   prefix?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -1324,6 +1362,40 @@ export interface DocumentosComerciai {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventos-comerciais".
+ */
+export interface EventoComercial {
+  id: number;
+  lead: number | Lead;
+  cliente: number | ClienteCrm;
+  proposta?: (number | null) | Proposta;
+  titulo: string;
+  dataInicio: string;
+  dataFim?: string | null;
+  modalidade?: ('presencial' | 'online' | 'hibrido') | null;
+  local?: string | null;
+  moduloCatalogo?: (number | null) | Modulo;
+  contratoEmpenho?: {
+    tipo?: ('contrato' | 'empenho' | 'termo' | 'outro') | null;
+    numero?: string | null;
+    data?: string | null;
+    valor?: number | null;
+    arquivo?: (number | null) | DocumentosComerciai;
+  };
+  linksInscricao?:
+    | {
+        rotulo: string;
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  status: 'agendado' | 'realizado' | 'cancelado';
+  observacoes?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1355,6 +1427,88 @@ export interface EnvioProposta {
   destinatarios?: string | null;
   status?: ('enviada' | 'recebida' | 'em-analise' | 'respondida') | null;
   observacoes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modelos-email".
+ */
+export interface ModeloEmail {
+  id: number;
+  nome: string;
+  finalidade: 'proposta' | 'documentos' | 'links-inscricao' | 'livre';
+  padrao?: boolean | null;
+  assunto: string;
+  corpo: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  anexarPdfProposta?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-email".
+ */
+export interface EnvioEmail {
+  id: number;
+  lead?: (number | null) | Lead;
+  cliente?: (number | null) | ClienteCrm;
+  modelo?: (number | null) | ModeloEmail;
+  finalidade: 'proposta' | 'documentos' | 'links-inscricao' | 'livre';
+  destinatarios: string;
+  copia?: string | null;
+  assunto: string;
+  corpoRenderizado: string;
+  anexos?: (number | DocumentosComerciai)[] | null;
+  enviadoPor?: (number | null) | User;
+  enviadoEm: string;
+  idResend?: string | null;
+  status: 'enviado' | 'falhou';
+  erro?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "linha-do-tempo".
+ */
+export interface LinhaDoTempo {
+  id: number;
+  cliente: number | ClienteCrm;
+  lead?: (number | null) | Lead;
+  tipo:
+    | 'lead'
+    | 'transicao'
+    | 'perda'
+    | 'reabertura'
+    | 'email'
+    | 'proposta'
+    | 'evento'
+    | 'documento'
+    | 'vinculo'
+    | 'nota';
+  titulo: string;
+  detalhe?: string | null;
+  referencia?: {
+    colecao?: string | null;
+    id?: string | null;
+  };
+  usuario?: (number | null) | User;
+  em: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -1481,6 +1635,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'documentos-comerciais';
         value: number | DocumentosComerciai;
+      } | null)
+    | ({
+        relationTo: 'eventos-comerciais';
+        value: number | EventoComercial;
+      } | null)
+    | ({
+        relationTo: 'modelos-email';
+        value: number | ModeloEmail;
+      } | null)
+    | ({
+        relationTo: 'envios-email';
+        value: number | EnvioEmail;
+      } | null)
+    | ({
+        relationTo: 'linha-do-tempo';
+        value: number | LinhaDoTempo;
       } | null)
     | ({
         relationTo: 'tentativas-acesso';
@@ -1920,6 +2090,18 @@ export interface LeadsSelect<T extends boolean = true> {
   identificacao?: T;
   status?: T;
   observacoesInternas?: T;
+  estagio?: T;
+  perdido?: T;
+  motivoPerda?: T;
+  perdidoEm?: T;
+  detalhePerda?: T;
+  cliente?: T;
+  clienteCasadoPor?: T;
+  responsavel?: T;
+  valorEstimado?: T;
+  dataPrevistaEvento?: T;
+  observacoes?: T;
+  origemEntrada?: T;
   nome?: T;
   email?: T;
   telefone?: T;
@@ -1995,6 +2177,18 @@ export interface ClientesCrmSelect<T extends boolean = true> {
   cargoDirigente?: T;
   email?: T;
   origem?: T;
+  contatos?:
+    | T
+    | {
+        nome?: T;
+        cargo?: T;
+        setor?: T;
+        email?: T;
+        whatsapp?: T;
+        principal?: T;
+        decisor?: T;
+        id?: T;
+      };
   potencial?: T;
   status?: T;
   responsavel?: T;
@@ -2177,6 +2371,8 @@ export interface EnviosSelect<T extends boolean = true> {
  */
 export interface DocumentosComerciaisSelect<T extends boolean = true> {
   alt?: T;
+  descricao?: T;
+  evento?: T;
   prefix?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2189,6 +2385,98 @@ export interface DocumentosComerciaisSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventos-comerciais_select".
+ */
+export interface EventosComerciaisSelect<T extends boolean = true> {
+  lead?: T;
+  cliente?: T;
+  proposta?: T;
+  titulo?: T;
+  dataInicio?: T;
+  dataFim?: T;
+  modalidade?: T;
+  local?: T;
+  moduloCatalogo?: T;
+  contratoEmpenho?:
+    | T
+    | {
+        tipo?: T;
+        numero?: T;
+        data?: T;
+        valor?: T;
+        arquivo?: T;
+      };
+  linksInscricao?:
+    | T
+    | {
+        rotulo?: T;
+        url?: T;
+        id?: T;
+      };
+  status?: T;
+  observacoes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modelos-email_select".
+ */
+export interface ModelosEmailSelect<T extends boolean = true> {
+  nome?: T;
+  finalidade?: T;
+  padrao?: T;
+  assunto?: T;
+  corpo?: T;
+  anexarPdfProposta?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-email_select".
+ */
+export interface EnviosEmailSelect<T extends boolean = true> {
+  lead?: T;
+  cliente?: T;
+  modelo?: T;
+  finalidade?: T;
+  destinatarios?: T;
+  copia?: T;
+  assunto?: T;
+  corpoRenderizado?: T;
+  anexos?: T;
+  enviadoPor?: T;
+  enviadoEm?: T;
+  idResend?: T;
+  status?: T;
+  erro?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "linha-do-tempo_select".
+ */
+export interface LinhaDoTempoSelect<T extends boolean = true> {
+  cliente?: T;
+  lead?: T;
+  tipo?: T;
+  titulo?: T;
+  detalhe?: T;
+  referencia?:
+    | T
+    | {
+        colecao?: T;
+        id?: T;
+      };
+  usuario?: T;
+  em?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
