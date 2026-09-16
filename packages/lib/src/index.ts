@@ -114,3 +114,15 @@ export {
   rotuloDoEstagio,
   diasEntre,
 } from "./crm/estagios";
+
+export {
+  casarCliente,
+  normalizarNome,
+  somenteDigitos,
+  dominioDoEmail,
+  ehDominioInstitucional,
+  type LeadParaCasar,
+  type ClienteCandidato,
+  type MotivoCasamento,
+  type ResultadoCasamento,
+} from "./crm/casamento-cliente";
