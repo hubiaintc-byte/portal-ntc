@@ -102,3 +102,15 @@ export {
   proximaVersao,
   codigoDaVersao,
 } from "./crm/propostas";
+
+export {
+  ESTAGIOS_LEAD,
+  type EstagioLead,
+  MOTIVOS_PERDA,
+  ORIGENS_ENTRADA_LEAD,
+  ORIGENS_CLIENTE,
+  ehEstagioLead,
+  indiceDoEstagio,
+  rotuloDoEstagio,
+  diasEntre,
+} from "./crm/estagios";
