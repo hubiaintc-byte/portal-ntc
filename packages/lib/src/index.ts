@@ -126,3 +126,14 @@ export {
   type MotivoCasamento,
   type ResultadoCasamento,
 } from "./crm/casamento-cliente";
+
+export {
+  TIPOS_LINHA_DO_TEMPO,
+  type TipoLinhaDoTempo,
+  type ItemLinhaDoTempo,
+  type EntradaLinhaDoTempo,
+  type ReferenciaLinhaDoTempo,
+  montarItemLinhaDoTempo,
+  tituloTransicao,
+  tituloPerda,
+} from "./crm/linha-do-tempo";
