@@ -6,10 +6,8 @@ import type { RequiredDataFromCollectionSlug } from "payload";
 import { obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
   obterEventoCms,
-  obterLeadCms,
   obterPalestranteCms,
   type EventoCmsDetalhe,
-  type LeadCmsDetalhe,
   type PalestranteCmsDetalhe,
 } from "@/lib/cms/painelCms";
 import {
@@ -56,11 +54,6 @@ export async function carregarEvento(id: string): Promise<EventoCmsDetalhe | nul
 export async function carregarPalestrante(id: string): Promise<PalestranteCmsDetalhe | null> {
   if (!(await obterUsuarioCms())) return null;
   return obterPalestranteCms(id);
-}
-
-export async function carregarLead(id: string): Promise<LeadCmsDetalhe | null> {
-  if (!(await obterUsuarioCms())) return null;
-  return obterLeadCms(id);
 }
 
 /** Salva o conjunto completo de campos editáveis e retorna o detalhe atualizado. */

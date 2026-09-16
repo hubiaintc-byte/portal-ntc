@@ -35,7 +35,7 @@ export function candidatoDeCliente(doc: ClienteCrm): ClienteCandidato {
  * no CRM e viram `null` — o cliente nasce sem esfera definida, não com um
  * valor incorreto.
  */
-const ESFERA_LEAD_PARA_CLIENTE: Record<string, ClienteCrmData["esfera"]> = {
+export const ESFERA_LEAD_PARA_CLIENTE: Record<string, ClienteCrmData["esfera"]> = {
   municipal: "municipal",
   estadual: "estadual",
   federal: "federal",

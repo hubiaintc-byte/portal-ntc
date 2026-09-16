@@ -2,13 +2,13 @@
 
 import { useEffect, useState, useTransition } from "react";
 
-import type { LeadCmsDetalhe } from "@/lib/cms/painelCms";
 import type { DadosEnvio } from "@/lib/cms/painelCrmEscrita";
 import type {
   CatalogoCrm,
   ClienteCrmDetalhe,
   ClienteCrmResumo,
   EnvioResumo,
+  LeadCrmDetalhe,
   LeadCrmResumo,
   ModuloCrmResumo,
   ProdutoCrmResumo,
@@ -18,25 +18,25 @@ import type {
   UsuarioCmsResumo,
 } from "@/lib/cms/painelCrm";
 
-import { carregarLead } from "../acoes";
 import {
   carregarClienteCrm,
+  carregarLeadCrm,
   carregarPropostaCrm,
   gerarPdfPropostaCrm,
   moverLeadCrm,
   novaVersaoPropostaCrm,
   registrarEnvioCrm,
 } from "../acoesCrm";
-import { DetalheLead } from "../DetalheLead";
-import { TelaLeads } from "../TelaLeads";
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { AvisoForm } from "./CamposCrm";
 import { DetalheCliente } from "./DetalheCliente";
 import { DetalheProposta } from "./DetalheProposta";
 import { FormCliente } from "./FormCliente";
 import { FormProposta } from "./FormProposta";
+import { ModalLead } from "./ModalLead";
 import { TelaClientes } from "./TelaClientes";
 import { TelaEnvios } from "./TelaEnvios";
+import { TelaLeadsCrm } from "./TelaLeadsCrm";
 import { TelaModulos } from "./TelaModulos";
 import { TelaPainelComercial } from "./TelaPainelComercial";
 import { TelaProdutos } from "./TelaProdutos";
@@ -66,6 +66,9 @@ type TelaCrmId =
 type FormCrmAberto =
   | { entidade: "cliente"; inicial: ClienteCrmDetalhe | null }
   | { entidade: "proposta"; inicial: PropostaDetalhe | null };
+
+/** Modal do lead: sobreposição à tela ativa (spec §4.4) — ver um lead ou criar um novo. */
+type ModalLeadAberto = { modo: "ver"; lead: LeadCrmDetalhe } | { modo: "novo" };
 
 /* Ícones lineares funcionais, peso 1.5 (CLAUDE.md §3). */
 const Ico = {
@@ -158,7 +161,7 @@ export function ShellCrm({
 }: ShellCrmProps) {
   const [tela, setTela] = useState<TelaCrmId>("painel");
   const [clienteDet, setClienteDet] = useState<ClienteCrmDetalhe | null>(null);
-  const [leadDet, setLeadDet] = useState<LeadCmsDetalhe | null>(null);
+  const [modalLead, setModalLead] = useState<ModalLeadAberto | null>(null);
   const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
@@ -169,7 +172,7 @@ export function ShellCrm({
 
   function fecharTudo() {
     setClienteDet(null);
-    setLeadDet(null);
+    setModalLead(null);
     setPropostaDet(null);
     setFormAberto(null);
     setErroAcao(null);
@@ -187,10 +190,11 @@ export function ShellCrm({
     });
   }
 
+  /** Abre (ou recarrega, após uma escrita) o lead no modal. */
   function abrirLead(id: string) {
     iniciarCarga(async () => {
-      const det = await carregarLead(id);
-      if (det) setLeadDet(det);
+      const det = await carregarLeadCrm(id);
+      if (det) setModalLead({ modo: "ver", lead: det });
     });
   }
 
@@ -271,9 +275,7 @@ export function ShellCrm({
       carregando={carregando}
     >
       {/* Detalhes e formulários em tela cheia têm precedência sobre a tela ativa. */}
-      {leadDet ? (
-        <DetalheLead lead={leadDet} onVoltar={() => setLeadDet(null)} />
-      ) : formAberto?.entidade === "cliente" ? (
+      {formAberto?.entidade === "cliente" ? (
         <FormCliente
           inicial={formAberto.inicial}
           usuarios={usuarios}
@@ -322,7 +324,14 @@ export function ShellCrm({
               onMoverLead={moverLead}
             />
           )}
-          {tela === "leads" && <TelaLeads leads={leadsLocal} onAbrir={abrirLead} />}
+          {tela === "leads" && (
+            <TelaLeadsCrm
+              leads={leadsLocal}
+              usuarios={usuarios}
+              onAbrir={abrirLead}
+              onNovo={() => setModalLead({ modo: "novo" })}
+            />
+          )}
           {tela === "clientes" && (
             <TelaClientes
               clientes={clientes}
@@ -342,6 +351,22 @@ export function ShellCrm({
           )}
           {tela === "envios" && <TelaEnvios envios={envios} />}
         </>
+      )}
+
+      {/* O modal do lead sobrepõe a tela ativa (kanban, Leads ou cliente) em vez de substituí-la. */}
+      {modalLead && (
+        <ModalLead
+          lead={modalLead.modo === "ver" ? modalLead.lead : null}
+          clientes={clientes}
+          catalogo={catalogo}
+          usuarios={usuarios}
+          onFechar={() => setModalLead(null)}
+          onAtualizado={abrirLead}
+          onAbrirCliente={(id) => {
+            setModalLead(null);
+            abrirCliente(id);
+          }}
+        />
       )}
     </ShellPainel>
   );

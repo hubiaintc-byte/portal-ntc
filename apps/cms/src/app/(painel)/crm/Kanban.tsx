@@ -17,9 +17,8 @@ interface KanbanProps {
 
 /**
  * Quadro kanban do fluxo comercial (spec 2026-09-15 §4.2). Arraste com a API
- * HTML5 nativa (sem lib). O select de estágio do modal do lead será o
- * caminho por teclado para mover — chega na Task 10; por ora o card abre o
- * `DetalheLead` (Enter/Espaço).
+ * HTML5 nativa (sem lib). O caminho por teclado para mover é o select de
+ * estágio do `ModalLead`, que o card abre com Enter/Espaço.
  */
 export function Kanban({ leads, usuarios, hojeISO, onAbrir, onMover }: KanbanProps) {
   const [busca, setBusca] = useState("");

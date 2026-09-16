@@ -6,6 +6,7 @@ import { calcularValoresProposta, codigoDaVersao, ehEstagioLead, gerarCodigoBase
 import type { RequiredDataFromCollectionSlug } from "payload";
 
 import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
+import { ESFERA_LEAD_PARA_CLIENTE } from "@/lib/crm/casamento";
 import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
 import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
@@ -496,6 +497,8 @@ export interface DadosLeadManual {
   participantesEstimados: string;
   mensagem: string;
   cliente: string;
+  /** Órgão de um cliente a criar na hora, quando `cliente` está vazio (só na criação; a edição ignora). */
+  novoClienteOrgao: string;
   responsavel: string;
   valorEstimado: string;
   dataPrevistaEvento: string;
@@ -505,7 +508,9 @@ export interface DadosLeadManual {
 function validarLeadManual(dados: DadosLeadManual): string | null {
   if (dados.nome.trim() === "") return "Informe o nome do contato.";
   if (dados.email.trim() === "") return "Informe o e-mail do contato.";
-  if (idOuNulo(dados.cliente) === null) return "Selecione o cliente.";
+  if (idOuNulo(dados.cliente) === null && dados.novoClienteOrgao.trim() === "") {
+    return "Selecione o cliente ou informe o órgão para criar um novo.";
+  }
   return null;
 }
 
@@ -536,6 +541,34 @@ export async function criarLeadManual(dados: DadosLeadManual, usuario: UsuarioAu
   if (erro) return { ok: false, erro };
   try {
     const payload = await obterPayload();
+    let clienteId = idOuNulo(dados.cliente);
+    if (clienteId === null) {
+      // "Criar o cliente na hora": o contato do lead vira o contato principal
+      // do órgão novo. A esfera passa pelo mesmo mapa do casamento automático
+      // — `privada`/`terceiro-setor` não existem em clientes-crm e viram null.
+      const esferaLead = ouNulo(dados.esfera);
+      const novo = await payload.create({
+        collection: "clientes-crm",
+        data: {
+          orgao: dados.novoClienteOrgao.trim(),
+          esfera: esferaLead === null ? null : (ESFERA_LEAD_PARA_CLIENTE[esferaLead] ?? null),
+          origem: "manual",
+          contatos: [
+            {
+              nome: dados.nome.trim(),
+              cargo: ouNulo(dados.cargo),
+              setor: null,
+              email: dados.email.trim(),
+              whatsapp: ouNulo(dados.telefone),
+              principal: true,
+              decisor: false,
+            },
+          ],
+        },
+        user: usuario,
+      });
+      clienteId = Number(novo.id);
+    }
     const data: LeadData = {
       ...camposEditaveisDoLead(dados),
       nome: dados.nome.trim(),
@@ -544,7 +577,7 @@ export async function criarLeadManual(dados: DadosLeadManual, usuario: UsuarioAu
       origemEntrada: "manual",
       estagio: "lead",
       perdido: false,
-      cliente: idOuNulo(dados.cliente),
+      cliente: clienteId,
       clienteCasadoPor: "manual",
       consentimentoLgpd: { aceito: false },
     };

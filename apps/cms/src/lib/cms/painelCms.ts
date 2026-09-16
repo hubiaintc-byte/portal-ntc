@@ -112,24 +112,6 @@ export interface LeadCmsResumo {
   dataISO: string;
 }
 
-export interface LeadCmsDetalhe extends LeadCmsResumo {
-  telefone: string | null;
-  cargo: string | null;
-  esfera: string | null;
-  observacoesInternas: string | null;
-  /** Pares rótulo→valor específicos do tipo (proposta/contato/newsletter/candidatura). */
-  detalhes: { rotulo: string; valor: string }[];
-  origem: { rotulo: string; valor: string }[];
-  consentimento: {
-    aceito: boolean;
-    timestamp: string | null;
-    politicaVersao: string | null;
-    ipSubmissao: string | null;
-  };
-  /** Currículo anexado (só candidatura), nome + URL, ou null. */
-  curriculo: { nome: string; url: string } | null;
-}
-
 export interface PalestranteCmsDetalhe extends PalestranteCmsResumo {
   cargoAtual: string | null;
   curriculoCurtoHtml: string;
@@ -144,15 +126,6 @@ const FMT_DATA = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "short",
   year: "numeric",
-  timeZone: "America/Sao_Paulo",
-});
-
-const FMT_DATA_HORA = new Intl.DateTimeFormat("pt-BR", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
   timeZone: "America/Sao_Paulo",
 });
 
@@ -466,27 +439,6 @@ function normalizarTipo(t: unknown): LeadTipoCms {
   return TIPOS_VALIDOS.includes(t as LeadTipoCms) ? (t as LeadTipoCms) : "contato";
 }
 
-/** Acrescenta um par rótulo→valor à lista quando o valor existe e não é vazio. */
-function adicionarPar(
-  lista: { rotulo: string; valor: string }[],
-  rotulo: string,
-  valor: unknown,
-): void {
-  if (valor === null || valor === undefined) return;
-  const s = typeof valor === "string" ? valor : String(valor);
-  if (s.trim() === "") return;
-  lista.push({ rotulo, valor: s });
-}
-
-/** Nomes de uma relação hasMany resolvida (ex. áreas de interesse), juntos por vírgula. */
-function nomesDeRelacoes(rels: unknown): string {
-  if (!Array.isArray(rels)) return "";
-  return rels
-    .map((r) => nomeDeRelacao(r))
-    .filter((s): s is string => Boolean(s))
-    .join(", ");
-}
-
 export async function listarLeadsCms(): Promise<LeadCmsResumo[]> {
   const payload = await obterPayload();
   const res = await payload.find({
@@ -517,113 +469,3 @@ export async function listarLeadsCms(): Promise<LeadCmsResumo[]> {
   });
 }
 
-export async function obterLeadCms(id: string): Promise<LeadCmsDetalhe | null> {
-  const payload = await obterPayload();
-  const doc = (await payload
-    .findByID({ collection: "leads", id, depth: 1 })
-    .catch(() => null)) as Record<string, unknown> | null;
-  if (!doc) return null;
-
-  const d = doc as unknown as {
-    id: string | number;
-    nome?: string;
-    email?: string;
-    telefone?: string;
-    cargo?: string;
-    instituicao?: string;
-    esfera?: string;
-    tipo?: string;
-    observacoesInternas?: string;
-    createdAt?: string;
-    detalhesProposta?: {
-      programa?: unknown;
-      modalidade?: string;
-      participantesEstimados?: number;
-      mensagem?: string;
-    };
-    detalhesContato?: { assunto?: string; mensagem?: string };
-    detalhesNewsletter?: { areasInteresse?: unknown };
-    detalhesCandidatura?: {
-      titulacao?: string;
-      linhasAtuacao?: unknown;
-      apresentacao?: string;
-      linkLattes?: string;
-      linkLinkedin?: string;
-      curriculo?: unknown;
-    };
-    origem?: Record<string, unknown>;
-    consentimentoLgpd?: {
-      aceito?: boolean;
-      timestamp?: string;
-      politicaVersao?: string;
-      ipSubmissao?: string;
-    };
-  };
-
-  const tipo = normalizarTipo(d.tipo);
-
-  const detalhes: { rotulo: string; valor: string }[] = [];
-  if (tipo === "proposta" && d.detalhesProposta) {
-    const p = d.detalhesProposta;
-    adicionarPar(detalhes, "Programa", nomeDeRelacao(p.programa, "sigla"));
-    adicionarPar(detalhes, "Modalidade", p.modalidade);
-    adicionarPar(detalhes, "Participantes estimados", p.participantesEstimados);
-    adicionarPar(detalhes, "Mensagem", p.mensagem);
-  } else if (tipo === "contato" && d.detalhesContato) {
-    adicionarPar(detalhes, "Assunto", d.detalhesContato.assunto);
-    adicionarPar(detalhes, "Mensagem", d.detalhesContato.mensagem);
-  } else if (tipo === "newsletter" && d.detalhesNewsletter) {
-    adicionarPar(detalhes, "Áreas de interesse", nomesDeRelacoes(d.detalhesNewsletter.areasInteresse));
-  } else if (tipo === "candidatura" && d.detalhesCandidatura) {
-    const c = d.detalhesCandidatura;
-    adicionarPar(detalhes, "Titulação", c.titulacao);
-    adicionarPar(detalhes, "Linhas de atuação", nomesDeRelacoes(c.linhasAtuacao));
-    adicionarPar(detalhes, "Apresentação", c.apresentacao);
-    adicionarPar(detalhes, "Lattes", c.linkLattes);
-    adicionarPar(detalhes, "LinkedIn", c.linkLinkedin);
-  }
-
-  const origem: { rotulo: string; valor: string }[] = [];
-  const og = d.origem ?? {};
-  adicionarPar(origem, "Página", og.paginaSubmissao);
-  adicionarPar(origem, "Referrer", og.referrer);
-  adicionarPar(origem, "utm_source", og.utmSource);
-  adicionarPar(origem, "utm_medium", og.utmMedium);
-  adicionarPar(origem, "utm_campaign", og.utmCampaign);
-  adicionarPar(origem, "utm_term", og.utmTerm);
-  adicionarPar(origem, "utm_content", og.utmContent);
-
-  const cv = d.detalhesCandidatura?.curriculo;
-  const curriculo =
-    typeof cv === "object" && cv !== null && (cv as { url?: string }).url
-      ? {
-          nome: nomeDeMidia(cv) ?? "Currículo",
-          url: (cv as { url: string }).url,
-        }
-      : null;
-
-  const cons = d.consentimentoLgpd ?? {};
-
-  return {
-    id: String(d.id),
-    nome: d.nome ?? "—",
-    email: d.email ?? "—",
-    instituicao: d.instituicao || "—",
-    tipo,
-    data: d.createdAt ? FMT_DATA_HORA.format(new Date(d.createdAt)) : "—",
-    dataISO: d.createdAt ?? "",
-    telefone: d.telefone ?? null,
-    cargo: d.cargo ?? null,
-    esfera: d.esfera ?? null,
-    observacoesInternas: d.observacoesInternas ?? null,
-    detalhes,
-    origem,
-    consentimento: {
-      aceito: Boolean(cons.aceito),
-      timestamp: cons.timestamp ? FMT_DATA_HORA.format(new Date(cons.timestamp)) : null,
-      politicaVersao: cons.politicaVersao ?? null,
-      ipSubmissao: cons.ipSubmissao ?? null,
-    },
-    curriculo,
-  };
-}

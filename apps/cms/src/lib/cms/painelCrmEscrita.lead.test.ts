@@ -71,14 +71,46 @@ describe("criarLeadManual", () => {
   const dados = {
     nome: "Bruno", email: "b@x.gov.br", telefone: "", cargo: "", instituicao: "SME", esfera: "municipal",
     programa: "", modalidade: "", participantesEstimados: "40", mensagem: "", cliente: "3", responsavel: "5",
-    valorEstimado: "12000", dataPrevistaEvento: "", observacoes: "",
+    valorEstimado: "12000", dataPrevistaEvento: "", observacoes: "", novoClienteOrgao: "",
   };
 
-  it("exige nome, e-mail e cliente", async () => {
-    payloadFalso();
+  it("exige nome, e-mail e cliente (ou o órgão de um cliente novo)", async () => {
+    const { create } = payloadFalso();
     expect(await criarLeadManual({ ...dados, nome: "" }, usuario)).toEqual({ ok: false, erro: "Informe o nome do contato." });
     expect(await criarLeadManual({ ...dados, email: "" }, usuario)).toEqual({ ok: false, erro: "Informe o e-mail do contato." });
-    expect(await criarLeadManual({ ...dados, cliente: "" }, usuario)).toEqual({ ok: false, erro: "Selecione o cliente." });
+    expect(await criarLeadManual({ ...dados, cliente: "" }, usuario)).toEqual({
+      ok: false,
+      erro: "Selecione o cliente ou informe o órgão para criar um novo.",
+    });
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("sem cliente selecionado, cria o cliente na hora e vincula o lead a ele", async () => {
+    const { create } = payloadFalso();
+    expect(await criarLeadManual({ ...dados, cliente: "", novoClienteOrgao: " Prefeitura X ", telefone: "11 9", cargo: "Secretário" }, usuario)).toEqual({ ok: true });
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(create).toHaveBeenNthCalledWith(1, expect.objectContaining({
+      collection: "clientes-crm",
+      user: usuario,
+      data: {
+        orgao: "Prefeitura X",
+        esfera: "municipal",
+        origem: "manual",
+        contatos: [{ nome: "Bruno", cargo: "Secretário", setor: null, email: "b@x.gov.br", whatsapp: "11 9", principal: true, decisor: false }],
+      },
+    }));
+    expect(create).toHaveBeenNthCalledWith(2, expect.objectContaining({
+      collection: "leads",
+      data: expect.objectContaining({ cliente: 1, clienteCasadoPor: "manual" }),
+    }));
+  });
+
+  it("esfera do lead sem correspondente no CRM (privada) não vai para o cliente novo", async () => {
+    const { create } = payloadFalso();
+    await criarLeadManual({ ...dados, cliente: "", novoClienteOrgao: "ONG Y", esfera: "privada" }, usuario);
+    const primeira = create.mock.calls[0]![0] as { collection: string; data: Record<string, unknown> };
+    expect(primeira.collection).toBe("clientes-crm");
+    expect(primeira.data.esfera).toBeNull();
   });
 
   it("grava tipo proposta, origem manual, estágio lead e vínculo manual", async () => {
