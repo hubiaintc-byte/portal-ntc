@@ -2,11 +2,26 @@ import "server-only";
 
 import { randomBytes } from "node:crypto";
 
-import { calcularValoresProposta, codigoDaVersao, ehEstagioLead, gerarCodigoBase, MOTIVOS_PERDA, proximaVersao } from "@ntc/lib";
+import {
+  calcularValoresProposta,
+  codigoDaVersao,
+  ehEstagioLead,
+  estagioDaAcaoEvento,
+  exigeConfirmacaoDupla,
+  gerarCodigoBase,
+  MOTIVOS_PERDA,
+  podeApagarCliente,
+  proximaVersao,
+  tituloLeadApagado,
+  urlValida,
+  type AcaoEvento,
+} from "@ntc/lib";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
 import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
 import { ESFERA_LEAD_PARA_CLIENTE } from "@/lib/crm/casamento";
+import { entradasDoDocumento, registrarNaLinhaDoTempo } from "@/lib/crm/linhaDoTempo";
+import { executarEmTransacao } from "@/lib/crm/transacao";
 import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
 import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
@@ -63,6 +78,16 @@ export function numeroOuNulo(v: string): number | null {
   if (limpo === "") return null;
   const n = Number(limpo);
   return Number.isFinite(n) ? n : null;
+}
+
+/** Deriva o id de um relationship do Payload, populado (objeto) ou não (número). */
+function idDeRelacionamento(v: number | { id: number | string } | null | undefined): number | null {
+  if (typeof v === "number") return v;
+  if (v && typeof v === "object" && "id" in v) {
+    const n = Number(v.id);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
 }
 
 const ERRO_GENERICO = "Não foi possível salvar. Tente novamente.";
@@ -554,48 +579,52 @@ export async function criarLeadManual(dados: DadosLeadManual, usuario: UsuarioAu
   if (erro) return { ok: false, erro };
   try {
     const payload = await obterPayload();
-    let clienteId = idOuNulo(dados.cliente);
-    if (clienteId === null) {
-      // "Criar o cliente na hora": o contato do lead vira o contato principal
-      // do órgão novo. A esfera passa pelo mesmo mapa do casamento automático
-      // — `privada`/`terceiro-setor` não existem em clientes-crm e viram null.
-      const esferaLead = ouNulo(dados.esfera);
-      const novo = await payload.create({
-        collection: "clientes-crm",
-        data: {
-          orgao: dados.novoClienteOrgao.trim(),
-          esfera: esferaLead === null ? null : (ESFERA_LEAD_PARA_CLIENTE[esferaLead] ?? null),
-          origem: "manual",
-          contatos: [
-            {
-              nome: dados.nome.trim(),
-              cargo: ouNulo(dados.cargo),
-              setor: null,
-              email: dados.email.trim(),
-              whatsapp: ouNulo(dados.telefone),
-              principal: true,
-              decisor: false,
-            },
-          ],
-        },
-        user: usuario,
-      });
-      clienteId = Number(novo.id);
-    }
-    const data: LeadData = {
-      ...camposEditaveisDoLead(dados),
-      nome: dados.nome.trim(),
-      email: dados.email.trim(),
-      tipo: "proposta",
-      origemEntrada: "manual",
-      estagio: "lead",
-      perdido: false,
-      cliente: clienteId,
-      clienteCasadoPor: "manual",
-      consentimentoLgpd: { aceito: false },
-    };
-    await payload.create({ collection: "leads", data, user: usuario });
-    return { ok: true };
+    return await executarEmTransacao(payload, usuario, async (req) => {
+      let clienteId = idOuNulo(dados.cliente);
+      if (clienteId === null) {
+        // "Criar o cliente na hora": o contato do lead vira o contato principal
+        // do órgão novo. A esfera passa pelo mesmo mapa do casamento automático
+        // — `privada`/`terceiro-setor` não existem em clientes-crm e viram null.
+        // Cliente e lead entram na mesma transação (executarEmTransacao): se a
+        // escrita do lead falhar, o cliente recém-criado não fica órfão.
+        const esferaLead = ouNulo(dados.esfera);
+        const novo = await payload.create({
+          collection: "clientes-crm",
+          data: {
+            orgao: dados.novoClienteOrgao.trim(),
+            esfera: esferaLead === null ? null : (ESFERA_LEAD_PARA_CLIENTE[esferaLead] ?? null),
+            origem: "manual",
+            contatos: [
+              {
+                nome: dados.nome.trim(),
+                cargo: ouNulo(dados.cargo),
+                setor: null,
+                email: dados.email.trim(),
+                whatsapp: ouNulo(dados.telefone),
+                principal: true,
+                decisor: false,
+              },
+            ],
+          },
+          req,
+        });
+        clienteId = Number(novo.id);
+      }
+      const data: LeadData = {
+        ...camposEditaveisDoLead(dados),
+        nome: dados.nome.trim(),
+        email: dados.email.trim(),
+        tipo: "proposta",
+        origemEntrada: "manual",
+        estagio: "lead",
+        perdido: false,
+        cliente: clienteId,
+        clienteCasadoPor: "manual",
+        consentimentoLgpd: { aceito: false },
+      };
+      await payload.create({ collection: "leads", data, req });
+      return { ok: true };
+    });
   } catch (e) {
     console.error("[criarLeadManual]", e);
     return { ok: false, erro: ERRO_GENERICO };
@@ -704,6 +733,376 @@ export async function adicionarNota(clienteId: string, leadId: string | null, te
     return { ok: true };
   } catch (e) {
     console.error("[adicionarNota]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+// --- Evento comercial, documentos e exclusão (spec-adendo 2026-09-17 · Sessão 4) ---
+
+type EventoComercialData = RequiredDataFromCollectionSlug<"eventos-comerciais">;
+type ContratoEmpenhoData = NonNullable<EventoComercialData["contratoEmpenho"]>;
+type DocumentoComercialData = RequiredDataFromCollectionSlug<"documentos-comerciais">;
+
+export interface DadosEvento {
+  titulo: string;
+  dataInicio: string;
+  dataFim: string;
+  modalidade: string;
+  local: string;
+  moduloCatalogo: string;
+  observacoes: string;
+}
+
+export interface DadosContrato {
+  tipo: string;
+  numero: string;
+  data: string;
+  valor: string;
+}
+
+export interface DadosLink {
+  rotulo: string;
+  url: string;
+}
+
+export const TAMANHO_MAX_DOCUMENTO = 20 * 1024 * 1024;
+export const MIMES_DOCUMENTO = [
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+];
+
+function erroDoArquivo(arquivo: File): string | null {
+  if (arquivo.size > TAMANHO_MAX_DOCUMENTO) return "Arquivo maior que 20 MB.";
+  if (!MIMES_DOCUMENTO.includes(arquivo.type)) return "Tipo de arquivo não permitido.";
+  return null;
+}
+
+/** As três ações que movem o card fecham nas mesmas mensagens do kanban — nunca null nestes casos. */
+function estagioObrigatorio(acao: AcaoEvento): string {
+  const estagio = estagioDaAcaoEvento(acao);
+  if (estagio === null) throw new Error(`Ação sem estágio de destino: ${acao}`);
+  return estagio;
+}
+
+/** Cria o evento comercial vinculado ao cliente do lead e move o card. */
+export async function agendarEvento(leadId: string, dados: DadosEvento, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  const titulo = dados.titulo.trim();
+  if (titulo === "") return { ok: false, erro: "Informe o título do evento." };
+  const dataInicio = ouNulo(dados.dataInicio);
+  if (dataInicio === null) return { ok: false, erro: "Informe a data de início." };
+  try {
+    const payload = await obterPayload();
+    return await executarEmTransacao(payload, usuario, async (req) => {
+      const lead = await payload.findByID({ collection: "leads", id: leadId, depth: 0, req });
+      const clienteId = idDeRelacionamento(lead.cliente);
+      if (clienteId === null) return { ok: false, erro: "Lead sem cliente vinculado." };
+      const data: EventoComercialData = {
+        lead: Number(leadId),
+        cliente: clienteId,
+        titulo,
+        dataInicio,
+        dataFim: ouNulo(dados.dataFim),
+        modalidade: ouNulo(dados.modalidade) as EventoComercialData["modalidade"],
+        local: ouNulo(dados.local),
+        moduloCatalogo: idOuNulo(dados.moduloCatalogo),
+        status: "agendado",
+        observacoes: ouNulo(dados.observacoes),
+      };
+      await payload.create({ collection: "eventos-comerciais", data, req });
+      await payload.update({
+        collection: "leads",
+        id: leadId,
+        data: { estagio: estagioObrigatorio("agendar") as LeadData["estagio"] },
+        req,
+      });
+      return { ok: true };
+    });
+  } catch (e) {
+    console.error("[agendarEvento]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/**
+ * Registra contrato/empenho (com upload opcional) e move o card para
+ * "Contrato/empenho recebido" — a menos que o evento já tenha ficado sem
+ * lead (apagado com dependentes, spec §5.6), caso em que só o grupo muda.
+ * Sem arquivo novo, preserva o arquivo já registrado (o grupo inteiro é
+ * substituído na escrita — não dá para enviar só os campos que mudaram).
+ */
+export async function registrarContratoEmpenho(
+  eventoId: string,
+  dados: DadosContrato,
+  arquivo: File | null,
+  usuario: UsuarioAutenticado,
+): Promise<ResultadoEscrita> {
+  if (arquivo !== null) {
+    const erro = erroDoArquivo(arquivo);
+    if (erro) return { ok: false, erro };
+  }
+  try {
+    const payload = await obterPayload();
+    return await executarEmTransacao(payload, usuario, async (req) => {
+      const evento = await payload.findByID({ collection: "eventos-comerciais", id: eventoId, depth: 0, req });
+      let arquivoId = idDeRelacionamento(evento.contratoEmpenho?.arquivo);
+      if (arquivo !== null) {
+        const documento = await payload.create({
+          collection: "documentos-comerciais",
+          data: { evento: Number(eventoId), descricao: "Contrato/empenho", alt: arquivo.name },
+          file: {
+            data: Buffer.from(await arquivo.arrayBuffer()),
+            mimetype: arquivo.type,
+            name: arquivo.name,
+            size: arquivo.size,
+          },
+          req,
+        });
+        arquivoId = Number(documento.id);
+      }
+      const contratoEmpenho: ContratoEmpenhoData = {
+        tipo: ouNulo(dados.tipo) as ContratoEmpenhoData["tipo"],
+        numero: ouNulo(dados.numero),
+        data: ouNulo(dados.data),
+        valor: numeroOuNulo(dados.valor),
+        arquivo: arquivoId,
+      };
+      await payload.update({ collection: "eventos-comerciais", id: eventoId, data: { contratoEmpenho }, req });
+      const leadId = idDeRelacionamento(evento.lead);
+      if (leadId !== null) {
+        await payload.update({
+          collection: "leads",
+          id: String(leadId),
+          data: { estagio: estagioObrigatorio("registrar-contrato") as LeadData["estagio"] },
+          req,
+        });
+      }
+      return { ok: true };
+    });
+  } catch (e) {
+    console.error("[registrarContratoEmpenho]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/** Salva os links de inscrição do evento. Não move o card. */
+export async function salvarLinksInscricao(eventoId: string, links: DadosLink[], usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  for (const link of links) {
+    if (!urlValida(link.url)) return { ok: false, erro: `Link inválido: ${link.url}` };
+  }
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "eventos-comerciais",
+      id: eventoId,
+      data: { linksInscricao: links.map((l) => ({ rotulo: l.rotulo.trim(), url: l.url.trim() })) },
+      user: usuario,
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[salvarLinksInscricao]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/** Marca o evento como realizado e move o card para "Evento realizado". */
+export async function marcarEventoRealizado(eventoId: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    return await executarEmTransacao(payload, usuario, async (req) => {
+      const evento = await payload.findByID({ collection: "eventos-comerciais", id: eventoId, depth: 0, req });
+      await payload.update({
+        collection: "eventos-comerciais",
+        id: eventoId,
+        data: { status: "realizado" as EventoComercialData["status"] },
+        req,
+      });
+      const leadId = idDeRelacionamento(evento.lead);
+      if (leadId !== null) {
+        await payload.update({
+          collection: "leads",
+          id: String(leadId),
+          data: { estagio: estagioObrigatorio("realizado") as LeadData["estagio"] },
+          req,
+        });
+      }
+      return { ok: true };
+    });
+  } catch (e) {
+    console.error("[marcarEventoRealizado]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/** Cancela o evento. Não mexe no card — cancelar não é um destino de estágio. */
+export async function cancelarEvento(eventoId: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "eventos-comerciais",
+      id: eventoId,
+      data: { status: "cancelado" as EventoComercialData["status"] },
+      user: usuario,
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[cancelarEvento]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/** Anexa um documento avulso ao evento (fora do fluxo de contrato/empenho). */
+export async function subirDocumentoEvento(
+  eventoId: string,
+  arquivo: File,
+  descricao: string,
+  usuario: UsuarioAutenticado,
+): Promise<ResultadoEscrita> {
+  const erro = erroDoArquivo(arquivo);
+  if (erro) return { ok: false, erro };
+  try {
+    const payload = await obterPayload();
+    const data: DocumentoComercialData = {
+      evento: Number(eventoId),
+      descricao: ouNulo(descricao),
+      alt: arquivo.name,
+    };
+    await payload.create({
+      collection: "documentos-comerciais",
+      data,
+      file: {
+        data: Buffer.from(await arquivo.arrayBuffer()),
+        mimetype: arquivo.type,
+        name: arquivo.name,
+        size: arquivo.size,
+      },
+      user: usuario,
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[subirDocumentoEvento]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/**
+ * Remove um documento comercial. O item "Documento removido" na linha do
+ * tempo é responsabilidade daqui (não de um hook `afterDelete`, que não tem
+ * o cliente à mão sem outra consulta — mesma nota de `registrarDocumentoNaLinhaDoTempo`).
+ */
+export async function removerDocumentoEvento(documentoId: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    return await executarEmTransacao(payload, usuario, async (req) => {
+      const documento = await payload.findByID({ collection: "documentos-comerciais", id: documentoId, depth: 0, req });
+      const eventoId = idDeRelacionamento(documento.evento);
+      let clienteId: number | null = null;
+      let leadId: number | null = null;
+      if (eventoId !== null) {
+        const evento = await payload.findByID({ collection: "eventos-comerciais", id: eventoId, depth: 0, req });
+        clienteId = idDeRelacionamento(evento.cliente);
+        leadId = idDeRelacionamento(evento.lead);
+      }
+      const entradas = entradasDoDocumento({
+        operation: "delete",
+        doc: documento,
+        clienteId,
+        leadId,
+        usuarioId: Number(usuario.id),
+      });
+      for (const entrada of entradas) {
+        await registrarNaLinhaDoTempo(req, entrada);
+      }
+      await payload.delete({ collection: "documentos-comerciais", id: documentoId, req });
+      return { ok: true };
+    });
+  } catch (e) {
+    console.error("[removerDocumentoEvento]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/**
+ * Apaga o lead (spec §5.6). Com evento/proposta/envio vinculado, exige
+ * digitar o nome do contato para confirmar (dupla confirmação). Desvincula
+ * (não apaga) os dependentes — nenhuma cascata — e grava "Lead apagado" na
+ * linha do tempo do cliente, se houver, antes de apagar.
+ */
+export async function apagarLead(leadId: string, confirmacaoNome: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    return await executarEmTransacao(payload, usuario, async (req) => {
+      const lead = await payload.findByID({ collection: "leads", id: leadId, depth: 0, req });
+      const [eventos, propostas, envios] = await Promise.all([
+        payload.count({ collection: "eventos-comerciais", where: { lead: { equals: leadId } }, req }),
+        payload.count({ collection: "propostas", where: { lead: { equals: leadId } }, req }),
+        payload.count({ collection: "envios-email", where: { lead: { equals: leadId } }, req }),
+      ]);
+      if (
+        exigeConfirmacaoDupla({
+          numEventos: eventos.totalDocs,
+          numPropostas: propostas.totalDocs,
+          numEnvios: envios.totalDocs,
+        })
+      ) {
+        const nomeConfere = confirmacaoNome.trim().toLowerCase() === lead.nome.trim().toLowerCase();
+        if (!nomeConfere) return { ok: false, erro: "Digite o nome do contato para confirmar." };
+      }
+      const clienteId = idDeRelacionamento(lead.cliente);
+      if (clienteId !== null) {
+        await registrarNaLinhaDoTempo(req, {
+          clienteId,
+          leadId: null,
+          tipo: "lead",
+          titulo: tituloLeadApagado({ nome: lead.nome, instituicao: lead.instituicao ?? null, estagio: lead.estagio }),
+          usuarioId: Number(usuario.id),
+          referencia: null,
+        });
+      }
+      const desvincula = { where: { lead: { equals: leadId } }, data: { lead: null }, req } as const;
+      await Promise.all([
+        payload.update({ collection: "eventos-comerciais", ...desvincula }),
+        payload.update({ collection: "propostas", ...desvincula }),
+        payload.update({ collection: "envios-email", ...desvincula }),
+        payload.update({ collection: "linha-do-tempo", ...desvincula }),
+      ]);
+      await payload.delete({ collection: "leads", id: leadId, req });
+      return { ok: true };
+    });
+  } catch (e) {
+    console.error("[apagarLead]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/**
+ * Apaga o cliente (spec §5.6) — só permitido sem leads (tipo proposta) nem
+ * eventos vinculados. O hook `beforeDelete` de `clientes-crm` repete a
+ * mesma regra (`bloquearClienteComDependentes`); a checagem aqui evita uma
+ * viagem ao banco a mais quando já sabemos que vai falhar.
+ */
+export async function apagarCliente(clienteId: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    return await executarEmTransacao(payload, usuario, async (req) => {
+      const [leads, eventos] = await Promise.all([
+        payload.count({
+          collection: "leads",
+          where: { and: [{ cliente: { equals: clienteId } }, { tipo: { equals: "proposta" } }] },
+          req,
+        }),
+        payload.count({ collection: "eventos-comerciais", where: { cliente: { equals: clienteId } }, req }),
+      ]);
+      const r = podeApagarCliente({ numLeads: leads.totalDocs, numEventos: eventos.totalDocs });
+      if (!r.ok) return { ok: false, erro: r.motivo };
+      await payload.delete({ collection: "linha-do-tempo", where: { cliente: { equals: clienteId } }, req });
+      await payload.delete({ collection: "clientes-crm", id: clienteId, req });
+      return { ok: true };
+    });
+  } catch (e) {
+    console.error("[apagarCliente]", e);
     return { ok: false, erro: ERRO_GENERICO };
   }
 }

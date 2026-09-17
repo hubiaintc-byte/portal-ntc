@@ -3,6 +3,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
+const executarEmTransacaoMock = vi.fn(
+  async (payload: unknown, usuario: unknown, fn: (req: unknown) => unknown) => fn({ payload, user: usuario }),
+);
+vi.mock("@/lib/crm/transacao", () => ({ executarEmTransacao: executarEmTransacaoMock }));
+
 const { adicionarNota, atualizarLeadCrm, criarLeadManual, marcarLeadPerdido, moverLead } = await import("./painelCrmEscrita");
 
 const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
@@ -125,7 +130,7 @@ describe("criarLeadManual", () => {
     expect(create).toHaveBeenCalledTimes(2);
     expect(create).toHaveBeenNthCalledWith(1, expect.objectContaining({
       collection: "clientes-crm",
-      user: usuario,
+      req: expect.objectContaining({ user: usuario }),
       data: {
         orgao: "Prefeitura X",
         esfera: "municipal",
@@ -171,7 +176,7 @@ describe("criarLeadManual", () => {
     expect(create).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: "leads",
-        user: usuario,
+        req: expect.objectContaining({ user: usuario }),
         data: expect.objectContaining({
           tipo: "proposta", origemEntrada: "manual", estagio: "lead", perdido: false, cliente: 3, clienteCasadoPor: "manual",
           nome: "Bruno", email: "b@x.gov.br", instituicao: "SME", esfera: "municipal", responsavel: 5, valorEstimado: 12000,
