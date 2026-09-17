@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { authenticated } from "../access/authenticated";
 import { sanitizarFilename } from "../hooks/sanitizarFilename";
+import { registrarDocumentoNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
 
 /**
  * Coleção privada para documentos comerciais gerados (propostas em PDF —
@@ -16,6 +17,7 @@ import { sanitizarFilename } from "../hooks/sanitizarFilename";
 export const DocumentosComerciais: CollectionConfig = {
   slug: "documentos-comerciais",
   labels: { singular: "Documento Comercial", plural: "Documentos Comerciais" },
+  typescript: { interface: "DocumentoComercial" },
   admin: {
     useAsTitle: "filename",
     group: "CRM",
@@ -28,9 +30,16 @@ export const DocumentosComerciais: CollectionConfig = {
   },
   hooks: {
     beforeOperation: [sanitizarFilename],
+    afterChange: [registrarDocumentoNaLinhaDoTempo],
   },
   upload: {
-    mimeTypes: ["application/pdf"],
+    mimeTypes: [
+      "application/pdf",
+      "image/png",
+      "image/jpeg",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ],
   },
   fields: [
     { name: "alt", type: "text" },

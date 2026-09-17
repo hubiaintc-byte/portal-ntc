@@ -10,6 +10,7 @@ import {
 
 import { atendimentoComercial } from "../access/atendimentoComercial";
 import { superAdmin } from "../access/superAdmin";
+import { bloquearClienteComDependentes } from "../lib/crm/exclusaoCliente";
 
 /**
  * Clientes (CRM) — conta comercial do funil (spec 2026-07-15 §Modelagem).
@@ -42,6 +43,7 @@ export const ClientesCrm: CollectionConfig = {
         return data;
       },
     ],
+    beforeDelete: [bloquearClienteComDependentes],
   },
   fields: [
     { name: "orgao", type: "text", required: true },

@@ -4,11 +4,12 @@ import {
   ehEstagioLead,
   montarItemLinhaDoTempo,
   rotuloDoEstagio,
+  TIPOS_CONTRATO,
   tituloPerda,
   tituloTransicao,
   type EntradaLinhaDoTempo,
 } from "@ntc/lib";
-import type { Lead } from "@ntc/types";
+import type { DocumentoComercial, EventoComercial, Lead } from "@ntc/types";
 
 /**
  * Linha do tempo do cliente (spec 2026-09-15 §5.5). Um único ponto de escrita:
@@ -134,6 +135,133 @@ export const registrarLeadNaLinhaDoTempo: CollectionAfterChangeHook<Lead> = asyn
     (typeof context?.casamentoAutomatico === "string" ? context.casamentoAutomatico : null) ??
     (typeof req.context?.casamentoAutomatico === "string" ? req.context.casamentoAutomatico : null);
   const entradas = entradasDoLead({ operation, doc, previousDoc, usuarioId, casamentoAutomatico });
+  for (const entrada of entradas) {
+    await registrarNaLinhaDoTempo(req, entrada);
+  }
+  return doc;
+};
+
+type ContratoEmpenho = NonNullable<EventoComercial["contratoEmpenho"]>;
+
+/** Vazio = nenhum dos campos do grupo foi preenchido ainda. */
+function contratoEmpenhoVazio(c: ContratoEmpenho | undefined | null): boolean {
+  if (!c) return true;
+  return c.tipo == null && !c.numero?.trim() && c.data == null && c.valor == null && c.arquivo == null;
+}
+
+function tituloContratoRegistrado(c: ContratoEmpenho | undefined | null): string {
+  const rotuloTipo = c?.tipo ? (TIPOS_CONTRATO.find((t) => t.value === c.tipo)?.label ?? c.tipo) : null;
+  const numero = c?.numero?.trim() || null;
+  const partes = [rotuloTipo, numero].filter((s): s is string => s !== null);
+  return partes.length > 0 ? `Contrato/empenho registrado · ${partes.join(" ")}` : "Contrato/empenho registrado";
+}
+
+export interface ParametrosEntradasDoEvento {
+  operation: "create" | "update";
+  doc: EventoComercial;
+  previousDoc?: EventoComercial;
+  usuarioId: number | null;
+}
+
+/** Pura: decide quais itens uma escrita em `eventos-comerciais` gera. */
+export function entradasDoEvento(p: ParametrosEntradasDoEvento): EntradaLinhaDoTempo[] {
+  const clienteId = idRel(p.doc.cliente);
+  if (clienteId === null) return [];
+  const leadId = idRel(p.doc.lead);
+  const referencia = { colecao: "eventos-comerciais", id: String(p.doc.id) };
+  const comum = { clienteId, leadId, usuarioId: p.usuarioId, referencia };
+
+  if (p.operation === "create") {
+    return [{ ...comum, tipo: "evento", titulo: `Evento agendado · ${p.doc.titulo}` }];
+  }
+
+  const antes = p.previousDoc;
+  if (!antes) return [];
+  const itens: EntradaLinhaDoTempo[] = [];
+
+  if (contratoEmpenhoVazio(antes.contratoEmpenho) && !contratoEmpenhoVazio(p.doc.contratoEmpenho)) {
+    itens.push({ ...comum, tipo: "evento", titulo: tituloContratoRegistrado(p.doc.contratoEmpenho) });
+  }
+
+  const numLinksAntes = antes.linksInscricao?.length ?? 0;
+  const numLinksAgora = p.doc.linksInscricao?.length ?? 0;
+  if (numLinksAntes !== numLinksAgora) {
+    itens.push({ ...comum, tipo: "evento", titulo: `Links de inscrição atualizados (${numLinksAgora})` });
+  }
+
+  if (antes.status !== p.doc.status) {
+    if (p.doc.status === "realizado") {
+      itens.push({ ...comum, tipo: "evento", titulo: `Evento realizado · ${p.doc.titulo}` });
+    } else if (p.doc.status === "cancelado") {
+      itens.push({ ...comum, tipo: "evento", titulo: `Evento cancelado · ${p.doc.titulo}` });
+    }
+  }
+
+  return itens;
+}
+
+/** Hook `afterChange` de `eventos-comerciais`. Só grava; a decisão é de `entradasDoEvento`. */
+export const registrarEventoNaLinhaDoTempo: CollectionAfterChangeHook<EventoComercial> = async ({
+  doc,
+  previousDoc,
+  operation,
+  req,
+}) => {
+  const usuarioId = req.user?.collection === "users" ? Number(req.user.id) : null;
+  const entradas = entradasDoEvento({ operation, doc, previousDoc, usuarioId });
+  for (const entrada of entradas) {
+    await registrarNaLinhaDoTempo(req, entrada);
+  }
+  return doc;
+};
+
+export interface ParametrosEntradasDoDocumento {
+  operation: "create" | "delete";
+  doc: DocumentoComercial;
+  /** Já resolvido pelo hook a partir do evento (o documento não sabe o cliente sozinho). */
+  clienteId: number | null;
+  leadId?: number | null;
+  usuarioId: number | null;
+}
+
+/** Pura: decide quais itens uma escrita/remoção em `documentos-comerciais` gera. */
+export function entradasDoDocumento(p: ParametrosEntradasDoDocumento): EntradaLinhaDoTempo[] {
+  if (p.clienteId === null) return [];
+  const referencia = { colecao: "documentos-comerciais", id: String(p.doc.id) };
+  const verbo = p.operation === "create" ? "anexado" : "removido";
+  return [
+    {
+      clienteId: p.clienteId,
+      leadId: p.leadId ?? null,
+      tipo: "documento",
+      titulo: `Documento ${verbo} · ${p.doc.filename ?? ""}`,
+      detalhe: p.doc.descricao ?? null,
+      referencia,
+      usuarioId: p.usuarioId,
+    },
+  ];
+}
+
+/**
+ * Hook `afterChange` de `documentos-comerciais`, só na criação — a remoção
+ * é registrada pela escrita que a provoca (Task 3), porque `afterDelete`
+ * não tem o cliente à mão sem outra consulta. Documentos sem `evento` (ex.:
+ * o PDF de proposta gerado pela Fase B2) não têm cliente para amarrar e não
+ * geram item nenhum — sem fetch nenhum nesse caso.
+ */
+export const registrarDocumentoNaLinhaDoTempo: CollectionAfterChangeHook<DocumentoComercial> = async ({
+  doc,
+  operation,
+  req,
+}) => {
+  if (operation !== "create") return doc;
+  const eventoId = idRel(doc.evento);
+  if (eventoId === null) return doc;
+  const usuarioId = req.user?.collection === "users" ? Number(req.user.id) : null;
+  const evento = await req.payload.findByID({ collection: "eventos-comerciais", id: eventoId, depth: 0, req });
+  const clienteId = idRel(evento.cliente);
+  const leadId = idRel(evento.lead);
+  const entradas = entradasDoDocumento({ operation: "create", doc, clienteId, leadId, usuarioId });
   for (const entrada of entradas) {
     await registrarNaLinhaDoTempo(req, entrada);
   }

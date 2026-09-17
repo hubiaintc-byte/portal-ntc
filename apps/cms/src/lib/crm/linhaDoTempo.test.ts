@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { Lead } from "@ntc/types";
+import type { DocumentoComercial, EventoComercial, Lead } from "@ntc/types";
 
-import { entradasDoLead } from "./linhaDoTempo";
+import { entradasDoDocumento, entradasDoEvento, entradasDoLead } from "./linhaDoTempo";
 
 const lead = {
   id: 7,
@@ -82,5 +82,148 @@ describe("entradasDoLead", () => {
 
   it("lead sem cliente nunca gera item (a linha do tempo é do cliente)", () => {
     expect(entradasDoLead({ ...base, operation: "update", doc: { ...lead, cliente: null, estagio: "em-contato" }, previousDoc: { ...lead, cliente: null } })).toEqual([]);
+  });
+});
+
+const evento = {
+  id: 10,
+  lead: 7,
+  cliente: 3,
+  titulo: "Curso de Gestão Escolar",
+  dataInicio: "2026-10-01T00:00:00.000Z",
+  status: "agendado",
+  contratoEmpenho: {},
+  linksInscricao: [],
+  createdAt: "2026-09-17T00:00:00.000Z",
+  updatedAt: "2026-09-17T00:00:00.000Z",
+} as unknown as EventoComercial;
+
+const baseEvento = { usuarioId: 5 };
+
+describe("entradasDoEvento", () => {
+  it("create gera 'Evento agendado · <titulo>' com cliente/lead/referência", () => {
+    const itens = entradasDoEvento({ ...baseEvento, operation: "create", doc: evento });
+    expect(itens).toEqual([
+      expect.objectContaining({
+        clienteId: 3,
+        leadId: 7,
+        tipo: "evento",
+        titulo: "Evento agendado · Curso de Gestão Escolar",
+        referencia: { colecao: "eventos-comerciais", id: "10" },
+        usuarioId: 5,
+      }),
+    ]);
+  });
+
+  it("create sem cliente não gera nada", () => {
+    expect(
+      entradasDoEvento({ ...baseEvento, operation: "create", doc: { ...evento, cliente: null } as unknown as EventoComercial }),
+    ).toEqual([]);
+  });
+
+  it("contrato/empenho preenchido (tipo + número) gera 'Contrato/empenho registrado · Empenho 2026NE000123'", () => {
+    const itens = entradasDoEvento({
+      ...baseEvento,
+      operation: "update",
+      doc: { ...evento, contratoEmpenho: { tipo: "empenho", numero: "2026NE000123" } },
+      previousDoc: evento,
+    });
+    expect(itens).toEqual([expect.objectContaining({ tipo: "evento", titulo: "Contrato/empenho registrado · Empenho 2026NE000123" })]);
+  });
+
+  it("contrato/empenho só com tipo (sem número) omite o número", () => {
+    const itens = entradasDoEvento({
+      ...baseEvento,
+      operation: "update",
+      doc: { ...evento, contratoEmpenho: { tipo: "empenho" } },
+      previousDoc: evento,
+    });
+    expect(itens).toEqual([expect.objectContaining({ titulo: "Contrato/empenho registrado · Empenho" })]);
+  });
+
+  it("contrato/empenho preenchido sem tipo nem número (só data/valor) omite os dois", () => {
+    const itens = entradasDoEvento({
+      ...baseEvento,
+      operation: "update",
+      doc: { ...evento, contratoEmpenho: { data: "2026-09-20", valor: 1000 } },
+      previousDoc: evento,
+    });
+    expect(itens).toEqual([expect.objectContaining({ titulo: "Contrato/empenho registrado" })]);
+  });
+
+  it("contrato/empenho que já estava preenchido não gera item de novo", () => {
+    const cheio: EventoComercial = { ...evento, contratoEmpenho: { tipo: "empenho", numero: "2026NE000123" } };
+    expect(entradasDoEvento({ ...baseEvento, operation: "update", doc: cheio, previousDoc: cheio })).toEqual([]);
+  });
+
+  it("links de inscrição mudando de quantidade gera 'Links de inscrição atualizados (N)'", () => {
+    const itens = entradasDoEvento({
+      ...baseEvento,
+      operation: "update",
+      doc: {
+        ...evento,
+        linksInscricao: [
+          { rotulo: "Turma A", url: "https://x.com/a" },
+          { rotulo: "Turma B", url: "https://x.com/b" },
+        ],
+      },
+      previousDoc: evento,
+    });
+    expect(itens).toEqual([expect.objectContaining({ tipo: "evento", titulo: "Links de inscrição atualizados (2)" })]);
+  });
+
+  it("status agendado → realizado", () => {
+    const itens = entradasDoEvento({ ...baseEvento, operation: "update", doc: { ...evento, status: "realizado" }, previousDoc: evento });
+    expect(itens).toEqual([expect.objectContaining({ titulo: "Evento realizado · Curso de Gestão Escolar" })]);
+  });
+
+  it("status agendado → cancelado", () => {
+    const itens = entradasDoEvento({ ...baseEvento, operation: "update", doc: { ...evento, status: "cancelado" }, previousDoc: evento });
+    expect(itens).toEqual([expect.objectContaining({ titulo: "Evento cancelado · Curso de Gestão Escolar" })]);
+  });
+
+  it("update sem mudança relevante não gera nada", () => {
+    expect(entradasDoEvento({ ...baseEvento, operation: "update", doc: { ...evento, observacoes: "x" }, previousDoc: evento })).toEqual([]);
+  });
+
+  it("update sem previousDoc (defensivo) não gera nada", () => {
+    expect(entradasDoEvento({ ...baseEvento, operation: "update", doc: evento })).toEqual([]);
+  });
+});
+
+const documento = {
+  id: 20,
+  filename: "proposta-sme-2026.pdf",
+  descricao: "Proposta comercial enviada",
+  evento: 10,
+  createdAt: "2026-09-17T00:00:00.000Z",
+  updatedAt: "2026-09-17T00:00:00.000Z",
+} as unknown as DocumentoComercial;
+
+describe("entradasDoDocumento", () => {
+  it("create com cliente resolvido (documento anexado a um evento) gera 'Documento anexado · <filename>'", () => {
+    const itens = entradasDoDocumento({ operation: "create", doc: documento, clienteId: 3, leadId: 7, usuarioId: 5 });
+    expect(itens).toEqual([
+      expect.objectContaining({
+        clienteId: 3,
+        leadId: 7,
+        tipo: "documento",
+        titulo: "Documento anexado · proposta-sme-2026.pdf",
+        detalhe: "Proposta comercial enviada",
+        referencia: { colecao: "documentos-comerciais", id: "20" },
+        usuarioId: 5,
+      }),
+    ]);
+  });
+
+  it("sem cliente resolvido (documento sem evento, ex. PDF de proposta) não gera nada", () => {
+    expect(
+      entradasDoDocumento({
+        operation: "create",
+        doc: { ...documento, evento: null } as unknown as DocumentoComercial,
+        clienteId: null,
+        usuarioId: 5,
+      }),
+    ).toEqual([]);
   });
 });

@@ -29,7 +29,8 @@ export const Propostas: CollectionConfig = {
     { name: "codigoBase", type: "text", required: true, index: true },
     { name: "codigo", type: "text", required: true, unique: true },
     { name: "versao", type: "number", defaultValue: 1 },
-    { name: "lead", type: "relationship", relationTo: "leads", required: true, index: true },
+    // opcional para o lead poder ser apagado sem cascata (spec §5.6)
+    { name: "lead", type: "relationship", relationTo: "leads", index: true },
     { name: "cliente", type: "relationship", relationTo: "clientes-crm", required: true },
     { name: "programa", type: "relationship", relationTo: "programas" },
     { name: "tipo", type: "select", options: TIPOS_PROPOSTA },

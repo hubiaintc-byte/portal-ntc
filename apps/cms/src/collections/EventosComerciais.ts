@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { atendimentoComercial } from "../access/atendimentoComercial";
 import { superAdmin } from "../access/superAdmin";
+import { registrarEventoNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
 
 /**
  * Evento comercial (spec §3.4): a turma/entrega contratada por um órgão.
@@ -19,8 +20,10 @@ export const EventosComerciais: CollectionConfig = {
     update: atendimentoComercial,
     delete: superAdmin,
   },
+  hooks: { afterChange: [registrarEventoNaLinhaDoTempo] },
   fields: [
-    { name: "lead", type: "relationship", relationTo: "leads", required: true, index: true },
+    // opcional para o lead poder ser apagado sem cascata (spec §5.6)
+    { name: "lead", type: "relationship", relationTo: "leads", index: true },
     { name: "cliente", type: "relationship", relationTo: "clientes-crm", required: true, index: true },
     { name: "proposta", type: "relationship", relationTo: "propostas" },
     { name: "titulo", type: "text", required: true },

@@ -26,7 +26,7 @@ export interface Config {
     propostas: Proposta;
     versoes: VersaoProposta;
     envios: EnvioProposta;
-    'documentos-comerciais': DocumentosComerciai;
+    'documentos-comerciais': DocumentoComercial;
     'eventos-comerciais': EventoComercial;
     'modelos-email': ModeloEmail;
     'envios-email': EnvioEmail;
@@ -1050,7 +1050,7 @@ export interface Proposta {
   codigoBase: string;
   codigo: string;
   versao?: number | null;
-  lead: number | Lead;
+  lead?: (number | null) | Lead;
   cliente: number | ClienteCrm;
   programa?: (number | null) | Programa;
   tipo?: ('programa-completo' | 'modulo-avulso' | 'produto-evento-avulso' | 'customizada') | null;
@@ -1091,7 +1091,7 @@ export interface Proposta {
   /**
    * Gerado pelo botão 'Gerar PDF' na tela de detalhe.
    */
-  pdfGerado?: (number | null) | DocumentosComerciai;
+  pdfGerado?: (number | null) | DocumentoComercial;
   updatedAt: string;
   createdAt: string;
 }
@@ -1099,7 +1099,7 @@ export interface Proposta {
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "documentos-comerciais".
  */
-export interface DocumentosComerciai {
+export interface DocumentoComercial {
   id: number;
   alt?: string | null;
   descricao?: string | null;
@@ -1123,7 +1123,7 @@ export interface DocumentosComerciai {
  */
 export interface EventoComercial {
   id: number;
-  lead: number | Lead;
+  lead?: (number | null) | Lead;
   cliente: number | ClienteCrm;
   proposta?: (number | null) | Proposta;
   titulo: string;
@@ -1137,7 +1137,7 @@ export interface EventoComercial {
     numero?: string | null;
     data?: string | null;
     valor?: number | null;
-    arquivo?: (number | null) | DocumentosComerciai;
+    arquivo?: (number | null) | DocumentoComercial;
   };
   linksInscricao?:
     | {
@@ -1227,7 +1227,7 @@ export interface EnvioEmail {
   copia?: string | null;
   assunto: string;
   corpoRenderizado: string;
-  anexos?: (number | DocumentosComerciai)[] | null;
+  anexos?: (number | DocumentoComercial)[] | null;
   enviadoPor?: (number | null) | User;
   enviadoEm: string;
   idResend?: string | null;
@@ -1372,7 +1372,7 @@ export interface PayloadLockedDocument {
       } | null)
     | ({
         relationTo: 'documentos-comerciais';
-        value: number | DocumentosComerciai;
+        value: number | DocumentoComercial;
       } | null)
     | ({
         relationTo: 'eventos-comerciais';
