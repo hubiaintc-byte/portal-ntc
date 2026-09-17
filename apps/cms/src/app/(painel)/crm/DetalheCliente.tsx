@@ -91,8 +91,8 @@ export function DetalheCliente({ cliente: c, onVoltar, onEditar, onAbrirLead, on
                   </tr>
                 </thead>
                 <tbody>
-                  {c.contatos.map((ct) => (
-                    <tr key={`${ct.nome}-${ct.email ?? ""}`}>
+                  {c.contatos.map((ct, i) => (
+                    <tr key={`${i}-${ct.nome}`}>
                       <td>
                         <strong>{ct.nome}</strong>
                       </td>

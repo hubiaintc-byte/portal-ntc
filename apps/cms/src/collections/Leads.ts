@@ -19,8 +19,16 @@ import { ESFERA_INSTITUCIONAL, LEAD_TIPO } from "../shared/types";
  * Por isso o grupo `sincronizacaoCrm` previsto no doc 11 §11 foi omitido —
  * autorização explícita do PO em 2026-05-20 (CLAUDE.md §5.1).
  *
- * `create` é público (formulários enviam via API); demais ações exigem
- * `atendimento-comercial` ou `super-admin` (DAB §10.1).
+ * Access (DAB §10.1): todas as operações, inclusive `create`, exigem
+ * `atendimento-comercial` ou `super-admin`. Os 4 handlers do site
+ * (`apps/web/app/api/forms/*`) criam leads pela Local API
+ * (`obterPayload().create`), que roda com `overrideAccess: true` por padrão
+ * e por isso não passa por esta regra. O `create` via REST (`POST /api/leads`)
+ * ficava público até a Sessão 1 do kanban; com os campos do CRM (`cliente`,
+ * `estagio`, `valorEstimado`…) e os hooks de casamento/linha do tempo agora
+ * alcançáveis pelo create, ele passou a ser restrito aos perfis do CRM —
+ * um anônimo não pode mais escrever na linha do tempo de um cliente qualquer
+ * nem criar clientes em massa sem captcha/rate limit.
  */
 export const Leads: CollectionConfig = {
   slug: "leads",
@@ -33,7 +41,7 @@ export const Leads: CollectionConfig = {
   },
   access: {
     read: atendimentoComercial,
-    create: () => true,
+    create: atendimentoComercial,
     update: atendimentoComercial,
     delete: atendimentoComercial,
   },
@@ -43,6 +51,7 @@ export const Leads: CollectionConfig = {
       type: "select",
       options: LEAD_TIPO.map((t) => ({ label: t, value: t })),
       required: true,
+      index: true,
       admin: { readOnly: true },
     },
     { name: "identificacao", type: "text", admin: { hidden: true } },

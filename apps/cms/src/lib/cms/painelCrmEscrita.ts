@@ -668,16 +668,32 @@ export async function vincularClienteAoLead(id: string, clienteId: string, usuar
   }
 }
 
+/**
+ * Nota manual na linha do tempo. Com `leadId`, o cliente é derivado do lead
+ * no banco (o `clienteId` passado pelo cliente HTTP é ignorado): uma nota do
+ * modal nunca cai na linha do tempo de outro cliente. Sem `leadId`, a nota é
+ * do cliente informado (tela do cliente).
+ */
 export async function adicionarNota(clienteId: string, leadId: string | null, texto: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
-  const cliente = idOuNulo(clienteId);
-  if (cliente === null) return { ok: false, erro: "Cliente inválido." };
   const detalhe = texto.trim();
   if (detalhe === "") return { ok: false, erro: "Escreva a nota." };
+  const lead = leadId === null ? null : idOuNulo(leadId);
+  if (leadId !== null && lead === null) return { ok: false, erro: "Lead inválido." };
   try {
     const payload = await obterPayload();
+    let cliente: number | null;
+    if (lead !== null) {
+      const doc = await payload.findByID({ collection: "leads", id: lead, depth: 0 });
+      const ref = doc.cliente;
+      cliente = typeof ref === "number" ? ref : typeof ref === "object" && ref !== null ? Number(ref.id) : null;
+      if (cliente === null || !Number.isFinite(cliente)) return { ok: false, erro: "Lead sem cliente vinculado." };
+    } else {
+      cliente = idOuNulo(clienteId);
+      if (cliente === null) return { ok: false, erro: "Cliente inválido." };
+    }
     const data: LinhaDoTempoData = {
       cliente,
-      lead: leadId === null ? null : idOuNulo(leadId),
+      lead,
       tipo: "nota",
       titulo: "Nota",
       detalhe,

@@ -7,11 +7,12 @@ const { adicionarNota, atualizarLeadCrm, criarLeadManual, marcarLeadPerdido, mov
 
 const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
 
-function payloadFalso() {
+function payloadFalso(leadNoBanco: Record<string, unknown> = { id: 7, cliente: 3 }) {
   const create = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 1, ...data }));
   const update = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 7, ...data }));
-  obterPayloadMock.mockResolvedValue({ create, update });
-  return { create, update };
+  const findByID = vi.fn(async () => leadNoBanco);
+  obterPayloadMock.mockResolvedValue({ create, update, findByID });
+  return { create, update, findByID };
 }
 
 afterEach(() => vi.clearAllMocks());
@@ -54,9 +55,23 @@ describe("adicionarNota", () => {
     expect(create).not.toHaveBeenCalled();
   });
 
-  it("grava item tipo nota na linha do tempo, com lead opcional", async () => {
-    const { create } = payloadFalso();
-    expect(await adicionarNota("3", "7", "Liguei, pediu retorno em março", usuario)).toEqual({ ok: true });
+  it("sem lead, grava a nota no cliente informado sem consultar o lead", async () => {
+    const { create, findByID } = payloadFalso();
+    expect(await adicionarNota("3", null, "Reunião marcada", usuario)).toEqual({ ok: true });
+    expect(findByID).not.toHaveBeenCalled();
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: "linha-do-tempo",
+        user: usuario,
+        data: expect.objectContaining({ cliente: 3, lead: null, tipo: "nota", titulo: "Nota", detalhe: "Reunião marcada", usuario: 5 }),
+      }),
+    );
+  });
+
+  it("com lead, deriva o cliente do lead no banco e ignora o clienteId passado", async () => {
+    const { create, findByID } = payloadFalso({ id: 7, cliente: 3 });
+    expect(await adicionarNota("99", "7", "Liguei, pediu retorno em março", usuario)).toEqual({ ok: true });
+    expect(findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: "leads", id: 7, depth: 0 }));
     expect(create).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: "linha-do-tempo",
@@ -64,6 +79,25 @@ describe("adicionarNota", () => {
         data: expect.objectContaining({ cliente: 3, lead: 7, tipo: "nota", titulo: "Nota", detalhe: "Liguei, pediu retorno em março", usuario: 5 }),
       }),
     );
+  });
+
+  it("com lead populado (objeto), usa o id do cliente do objeto", async () => {
+    const { create } = payloadFalso({ id: 7, cliente: { id: 4, orgao: "SME" } });
+    expect(await adicionarNota("99", "7", "Nota", usuario)).toEqual({ ok: true });
+    const chamada = create.mock.calls[0]![0] as { data: Record<string, unknown> };
+    expect(chamada.data.cliente).toBe(4);
+  });
+
+  it("recusa lead sem cliente vinculado", async () => {
+    const { create } = payloadFalso({ id: 7, cliente: null });
+    expect(await adicionarNota("3", "7", "Nota", usuario)).toEqual({ ok: false, erro: "Lead sem cliente vinculado." });
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("sem lead, recusa cliente inválido", async () => {
+    const { create } = payloadFalso();
+    expect(await adicionarNota("", null, "Nota", usuario)).toEqual({ ok: false, erro: "Cliente inválido." });
+    expect(create).not.toHaveBeenCalled();
   });
 });
 

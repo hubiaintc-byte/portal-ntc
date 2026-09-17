@@ -19,24 +19,39 @@ type Situacao = "ativos" | "perdidos" | "todos";
 
 const FMT = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
 
+/** Data local `aaaa-mm-dd` de um ISO — comparável ao valor de `<input type="date">`. */
+function chaveDiaLocal(iso: string): string {
+  const d = new Date(iso);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
 /** Lista dos leads do CRM (tipo = proposta) com filtros; abre o ModalLead e cria lead manual. */
 export function TelaLeadsCrm({ leads, usuarios, onAbrir, onNovo }: TelaLeadsCrmProps) {
   const [estagio, setEstagio] = useState("");
   const [situacao, setSituacao] = useState<Situacao>("ativos");
   const [responsavel, setResponsavel] = useState("");
   const [busca, setBusca] = useState("");
+  const [periodoDe, setPeriodoDe] = useState("");
+  const [periodoAte, setPeriodoAte] = useState("");
 
   const visiveis = useMemo(() => {
     const termo = busca.trim().toLowerCase();
-    return leads.filter(
-      (l) =>
+    return leads.filter((l) => {
+      // Período (spec §4.3): inclusivo nas duas pontas, vazio = sem limite.
+      const dia = periodoDe !== "" || periodoAte !== "" ? chaveDiaLocal(l.criadoEmISO) : "";
+      return (
         (estagio === "" || l.estagio === estagio) &&
         (situacao === "todos" || (situacao === "perdidos") === l.perdido) &&
         (responsavel === "" || l.responsavelId === responsavel) &&
+        (periodoDe === "" || dia >= periodoDe) &&
+        (periodoAte === "" || dia <= periodoAte) &&
         (termo === "" ||
-          [l.instituicao, l.nome, l.email, l.clienteNome ?? ""].some((v) => v.toLowerCase().includes(termo))),
-    );
-  }, [leads, estagio, situacao, responsavel, busca]);
+          [l.instituicao, l.nome, l.email, l.clienteNome ?? ""].some((v) => v.toLowerCase().includes(termo)))
+      );
+    });
+  }, [leads, estagio, situacao, responsavel, busca, periodoDe, periodoAte]);
 
   return (
     <>
@@ -91,6 +106,26 @@ export function TelaLeadsCrm({ leads, usuarios, onAbrir, onNovo }: TelaLeadsCrmP
               </option>
             ))}
           </select>
+        </div>
+        <div className="pcms-field pcms-field--curto pcms-field--data">
+          <label htmlFor="leads-periodo-de">Recebido de</label>
+          <input
+            id="leads-periodo-de"
+            type="date"
+            value={periodoDe}
+            max={periodoAte || undefined}
+            onChange={(e) => setPeriodoDe(e.target.value)}
+          />
+        </div>
+        <div className="pcms-field pcms-field--curto pcms-field--data">
+          <label htmlFor="leads-periodo-ate">até</label>
+          <input
+            id="leads-periodo-ate"
+            type="date"
+            value={periodoAte}
+            min={periodoDe || undefined}
+            onChange={(e) => setPeriodoAte(e.target.value)}
+          />
         </div>
       </div>
 

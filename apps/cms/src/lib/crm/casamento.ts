@@ -92,6 +92,10 @@ export const casarClienteDoLead: CollectionAfterChangeHook<Lead> = async ({ doc,
   // `createLocalReq`), então esta escrita é o jeito garantido de o hook
   // externo ver o valor, independente de qual `context` o Payload repassa
   // a cada chamada de hook.
+  // ATENÇÃO: a flag fica viva no `req` até o fim da operação. Uma importação
+  // em lote que reutilize um mesmo `req` para criar vários leads precisa
+  // zerar `req.context.casamentoAutomatico` antes de cada `create`, senão o
+  // segundo lead herda o valor do primeiro e a linha do tempo dele sai errada.
   req.context.casamentoAutomatico = por;
 
   await req.payload.update({

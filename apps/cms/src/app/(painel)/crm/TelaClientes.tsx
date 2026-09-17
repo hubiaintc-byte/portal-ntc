@@ -6,6 +6,8 @@ import type { ClienteCrmResumo } from "@/lib/cms/painelCrm";
 
 import { rotuloDeLista } from "./seloStatus";
 
+const FMT = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
+
 interface TelaClientesProps {
   clientes: ClienteCrmResumo[];
   onAbrir: (id: string) => void;
@@ -38,6 +40,8 @@ export function TelaClientes({ clientes, onAbrir, onNovo }: TelaClientesProps) {
               <th>UF</th>
               <th>Esfera</th>
               <th>Contato principal</th>
+              <th>Negócios</th>
+              <th>Último registro</th>
               <th>Origem</th>
               <th>Responsável</th>
             </tr>
@@ -64,6 +68,8 @@ export function TelaClientes({ clientes, onAbrir, onNovo }: TelaClientesProps) {
                 <td>{c.uf ?? "—"}</td>
                 <td>{rotuloDeLista(ESFERAS_CRM, c.esfera)}</td>
                 <td>{c.contatoPrincipal ?? "—"}</td>
+                <td>{c.numNegocios}</td>
+                <td>{c.ultimoItemISO ? FMT.format(new Date(c.ultimoItemISO)) : "—"}</td>
                 <td>{rotuloDeLista(ORIGENS_CLIENTE, c.origem)}</td>
                 <td>{c.responsavelNome ?? "—"}</td>
               </tr>

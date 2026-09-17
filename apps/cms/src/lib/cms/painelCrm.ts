@@ -43,6 +43,10 @@ export interface ClienteCrmResumo {
   origem: string | null;
   responsavelNome: string | null;
   contatoPrincipal: string | null;
+  /** Leads do CRM (`tipo = proposta`) vinculados ao cliente. */
+  numNegocios: number;
+  /** ISO do item mais recente da linha do tempo do cliente, ou null se vazia. */
+  ultimoItemISO: string | null;
 }
 
 export interface ClienteCrmDetalhe extends ClienteCrmResumo {
@@ -216,7 +220,13 @@ function mapearContatos(doc: ClienteCrm): ContatoResumo[] {
   }));
 }
 
-function mapearClienteResumo(doc: ClienteCrm): ClienteCrmResumo {
+/** Agregados por cliente que não vivem no documento (spec §4.5: nº de negócios e último registro). */
+interface AgregadosCliente {
+  numNegocios: number;
+  ultimoItemISO: string | null;
+}
+
+function mapearClienteResumo(doc: ClienteCrm, agregados: AgregadosCliente): ClienteCrmResumo {
   const contatos = mapearContatos(doc);
   return {
     id: String(doc.id),
@@ -229,6 +239,8 @@ function mapearClienteResumo(doc: ClienteCrm): ClienteCrmResumo {
     origem: doc.origem ?? null,
     responsavelNome: campoRel(doc.responsavel, "nome"),
     contatoPrincipal: (contatos.find((c) => c.principal) ?? contatos[0])?.nome ?? null,
+    numNegocios: agregados.numNegocios,
+    ultimoItemISO: agregados.ultimoItemISO,
   };
 }
 
@@ -387,7 +399,29 @@ export async function listarClientesCrm(): Promise<ClienteCrmResumo[]> {
     limit: 500,
     sort: "orgao",
   });
-  return res.docs.map(mapearClienteResumo);
+  // Agregados client-side (duas leituras, sem N+1): nº de negócios por
+  // cliente e o item mais recente da linha do tempo (ordenada por -em, o
+  // primeiro visto por cliente é o último registro).
+  const [leads, itens] = await Promise.all([
+    payload.find({ collection: "leads", depth: 0, limit: 1000, where: { tipo: { equals: "proposta" } } }),
+    payload.find({ collection: "linha-do-tempo", depth: 0, limit: 1000, sort: "-em" }),
+  ]);
+  const negociosPorCliente = new Map<string, number>();
+  for (const lead of leads.docs) {
+    const clienteId = idRel(lead.cliente);
+    if (clienteId) negociosPorCliente.set(clienteId, (negociosPorCliente.get(clienteId) ?? 0) + 1);
+  }
+  const ultimoItemPorCliente = new Map<string, string>();
+  for (const item of itens.docs) {
+    const clienteId = idRel(item.cliente);
+    if (clienteId && !ultimoItemPorCliente.has(clienteId)) ultimoItemPorCliente.set(clienteId, item.em);
+  }
+  return res.docs.map((doc) =>
+    mapearClienteResumo(doc, {
+      numNegocios: negociosPorCliente.get(String(doc.id)) ?? 0,
+      ultimoItemISO: ultimoItemPorCliente.get(String(doc.id)) ?? null,
+    }),
+  );
 }
 
 export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | null> {
@@ -403,15 +437,19 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
     listarLinhaDoTempo({ clienteId: id }),
     payload.find({ collection: "eventos-comerciais", depth: 0, limit: 100, sort: "-dataInicio", where: { cliente: { equals: doc.id } } }),
   ]);
+  const negociosMapeados = negocios.docs.map(mapearLeadCrm);
   return {
-    ...mapearClienteResumo(doc),
+    ...mapearClienteResumo(doc, {
+      numNegocios: negociosMapeados.length,
+      ultimoItemISO: linhaDoTempo[0]?.emISO ?? null,
+    }),
     tipo: doc.tipo ?? null,
     cnpj: doc.cnpj ?? null,
     email: doc.email ?? null,
     observacoes: doc.observacoes ?? null,
     responsavelId: idRel(doc.responsavel),
     contatos: mapearContatos(doc),
-    negocios: negocios.docs.map(mapearLeadCrm),
+    negocios: negociosMapeados,
     linhaDoTempo,
     eventos: eventos.docs.map(mapearEventoComercial),
   };

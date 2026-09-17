@@ -68,6 +68,10 @@ export function ModalLead({
   const [detalhe, setDetalhe] = useState("");
   const [clienteNovo, setClienteNovo] = useState("");
   const [erro, setErro] = useState<string | null>(null);
+  // Valor otimista do select de estágio: sem ele, o controle voltava ao
+  // valor antigo entre o onChange e a recarga do lead (o select é controlado
+  // por `lead.estagio`). Ressincroniza quando o lead recarregado chegar.
+  const [estagioLocal, setEstagioLocal] = useState(lead?.estagio ?? "lead");
   const [ocupado, iniciar] = useTransition();
   const painelRef = useRef<HTMLDivElement>(null);
   const fecharRef = useRef<HTMLButtonElement>(null);
@@ -87,6 +91,11 @@ export function ModalLead({
       anterior?.focus();
     };
   }, []);
+
+  const estagioDoLead = lead?.estagio;
+  useEffect(() => {
+    if (estagioDoLead) setEstagioLocal(estagioDoLead);
+  }, [estagioDoLead]);
 
   // Fechar com Esc (mesmo padrão do ModalImportarPdf).
   useEffect(() => {
@@ -114,13 +123,18 @@ export function ModalLead({
     }
   }
 
-  function executar(acao: () => Promise<{ ok: boolean; erro?: string }>, depois?: () => void) {
+  function executar(
+    acao: () => Promise<{ ok: boolean; erro?: string }>,
+    depois?: () => void,
+    aoFalhar?: () => void,
+  ) {
     setErro(null);
     iniciar(async () => {
       const r = await acao();
       if (!montadoRef.current) return;
       if (!r.ok) {
         setErro(r.erro ?? "Erro.");
+        aoFalhar?.();
         return;
       }
       depois?.();
@@ -167,12 +181,17 @@ export function ModalLead({
             <label className="pcms-modal__estagio">
               Estágio
               <select
-                value={lead.estagio}
+                value={estagioLocal}
                 disabled={ocupado || lead.perdido}
                 aria-label="Estágio do lead"
                 onChange={(e) => {
                   const estagio = e.target.value;
-                  executar(() => moverLeadCrm(lead.id, estagio));
+                  setEstagioLocal(estagio);
+                  executar(
+                    () => moverLeadCrm(lead.id, estagio),
+                    undefined,
+                    () => setEstagioLocal(lead.estagio),
+                  );
                 }}
               >
                 {ESTAGIOS_LEAD.map((e) => (

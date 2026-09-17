@@ -2036,6 +2036,10 @@ body {
 .pcms-kanban__toolbar { gap: 12px; flex-wrap: wrap; align-items: center; }
 .pcms-kanban__toolbar .pcms-field { margin-bottom: 0; }
 .pcms-kanban__busca { min-width: 260px; flex: 1; }
+/* Filtro de período (Leads): rótulo e input na mesma linha, para alinhar com os selects da toolbar. */
+.pcms-kanban__toolbar .pcms-field--data { display: flex; align-items: center; gap: 8px; }
+.pcms-kanban__toolbar .pcms-field--data label { margin: 0; white-space: nowrap; }
+.pcms-kanban__toolbar .pcms-field--data input { width: auto; }
 .pcms-kanban__toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--pcms-grafite); }
 .pcms-kanban__colunas {
   display: grid;
@@ -2086,7 +2090,7 @@ body {
 .pcms-modal__estagio select, .pcms-modal__perda select, .pcms-modal__perda input, .pcms-modal__vincular select { font: inherit; padding: 6px 10px; border: 1px solid var(--pcms-linha); background: #fff; color: var(--pcms-grafite); }
 .pcms-modal__resp { color: var(--pcms-grafite-suave); }
 .pcms-modal__acoes { margin-left: auto; display: flex; gap: 8px; }
-.pcms-modal__perda { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; padding: 12px 26px; background: var(--pcms-pergaminho); }
+.pcms-modal__perda { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; padding: 12px 26px; background: var(--pcms-pergaminho); }
 .pcms-modal__perda label { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; }
 .pcms-modal__abas { display: flex; gap: 8px; padding: 12px 26px 0; }
 .pcms-modal__body .pcms-det-bloco { margin-bottom: 22px; }
