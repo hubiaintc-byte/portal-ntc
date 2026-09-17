@@ -110,3 +110,23 @@ export {
   tituloTransicao,
   tituloPerda,
 } from "./crm/linha-do-tempo";
+
+export {
+  type AcaoEvento,
+  type StatusEvento,
+  type EventoParaAcoes,
+  type LeadParaAcoes,
+  TIPOS_CONTRATO,
+  MODALIDADES_EVENTO,
+  STATUS_EVENTO,
+  eventoCorrente,
+  acoesDeEvento,
+  estagioDaAcaoEvento,
+  urlValida,
+} from "./crm/eventos";
+
+export {
+  podeApagarCliente,
+  exigeConfirmacaoDupla,
+  tituloLeadApagado,
+} from "./crm/exclusao";
