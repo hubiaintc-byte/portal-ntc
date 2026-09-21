@@ -15,8 +15,16 @@ export function UploadDocumento({ eventoId, onEnviado }: UploadDocumentoProps) {
   const idArquivo = useId();
   const idDescricao = useId();
   const [descricao, setDescricao] = useState("");
+  const [nomeArquivo, setNomeArquivo] = useState<string | null>(null);
   const [enviando, iniciar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
+
+  function aoEscolher(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setNomeArquivo(file.name);
+    setErro(null);
+  }
 
   function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -33,6 +41,7 @@ export function UploadDocumento({ eventoId, onEnviado }: UploadDocumentoProps) {
       const r = await subirDocumentoEventoCrm(eventoId, descricao, fd);
       if (r.ok) {
         setDescricao("");
+        setNomeArquivo(null);
         if (inputRef.current) inputRef.current.value = "";
         onEnviado();
       } else {
@@ -44,16 +53,26 @@ export function UploadDocumento({ eventoId, onEnviado }: UploadDocumentoProps) {
   return (
     <form className="pcms-upload" onSubmit={enviar}>
       <span className="pcms-det-meta__rot">Novo documento</span>
+      <p className="pcms-upload__atual">{nomeArquivo ?? "Nenhum arquivo escolhido"}</p>
       <input
         ref={inputRef}
         id={idArquivo}
         type="file"
         accept=".pdf,.png,.jpg,.jpeg,.docx,.xlsx"
         className="pcms-upload__input"
+        onChange={aoEscolher}
         disabled={enviando}
         aria-label="Arquivo do documento"
       />
       <small>até 20 MB.</small>
+      <button
+        type="button"
+        className="pcms-btn pcms-btn--ghost"
+        onClick={() => inputRef.current?.click()}
+        disabled={enviando}
+      >
+        {enviando ? "Enviando…" : "Escolher arquivo"}
+      </button>
       <div className="pcms-field pcms-field--curto">
         <label htmlFor={idDescricao}>Descrição (opcional)</label>
         <input
