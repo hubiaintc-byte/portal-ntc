@@ -13,22 +13,34 @@ import {
 } from "@/lib/cms/painelCrm";
 import {
   adicionarNota,
+  agendarEvento,
+  apagarCliente,
+  apagarLead,
   atualizarClienteCrm,
   atualizarLeadCrm,
   atualizarProposta,
+  cancelarEvento,
   criarClienteCrm,
   criarLeadManual,
   criarProposta,
   criarVersaoProposta,
   gerarESalvarPdfProposta,
+  marcarEventoRealizado,
   marcarLeadPerdido,
   moverLead,
   reabrirLead,
+  registrarContratoEmpenho,
   registrarEnvio,
+  removerDocumentoEvento,
+  salvarLinksInscricao,
+  subirDocumentoEvento,
   vincularClienteAoLead,
   type DadosClienteCrm,
+  type DadosContrato,
   type DadosEnvio,
+  type DadosEvento,
   type DadosLeadManual,
+  type DadosLink,
   type DadosProposta,
 } from "@/lib/cms/painelCrmEscrita";
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
@@ -143,6 +155,94 @@ export async function adicionarNotaCrm(clienteId: string, leadId: string | null,
   const usuario = await obterUsuarioAutenticado();
   if (!usuario) return RECUSADO;
   const r = await adicionarNota(clienteId, leadId, texto, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function agendarEventoCrm(leadId: string, dados: DadosEvento): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await agendarEvento(leadId, dados, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+/** O arquivo do contrato/empenho é opcional — chega no campo "arquivo" do FormData quando presente. */
+export async function registrarContratoCrm(
+  eventoId: string,
+  dados: DadosContrato,
+  formData: FormData,
+): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const bruto = formData.get("arquivo");
+  const arquivo = bruto instanceof File && bruto.size > 0 ? bruto : null;
+  const r = await registrarContratoEmpenho(eventoId, dados, arquivo, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function salvarLinksCrm(eventoId: string, links: DadosLink[]): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await salvarLinksInscricao(eventoId, links, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function marcarEventoRealizadoCrm(eventoId: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await marcarEventoRealizado(eventoId, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function cancelarEventoCrm(eventoId: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await cancelarEvento(eventoId, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+/** O arquivo é obrigatório aqui (diferente de registrarContratoCrm) — chega no campo "arquivo" do FormData. */
+export async function subirDocumentoEventoCrm(
+  eventoId: string,
+  descricao: string,
+  formData: FormData,
+): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const arquivo = formData.get("arquivo");
+  if (!(arquivo instanceof File) || arquivo.size === 0) {
+    return { ok: false, erro: "Nenhum arquivo selecionado." };
+  }
+  const r = await subirDocumentoEvento(eventoId, arquivo, descricao, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function removerDocumentoEventoCrm(documentoId: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await removerDocumentoEvento(documentoId, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function apagarLeadCrm(leadId: string, confirmacaoNome: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await apagarLead(leadId, confirmacaoNome, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+export async function apagarClienteCrm(clienteId: string): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await apagarCliente(clienteId, usuario);
   if (r.ok) revalidatePath("/crm");
   return r;
 }

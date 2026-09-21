@@ -21,8 +21,21 @@ vi.mock("@/lib/cms/autenticacao", () => ({
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
-const { moverLeadCrm, salvarClienteCrm } = await import("./acoesCrm");
+/**
+ * agendarEventoCrm/apagarLeadCrm chamam funções de painelCrmEscrita.ts que
+ * escrevem via `executarEmTransacao` (transação real do Payload — não dá
+ * para exercitar contra o payload falso deste arquivo). Mesmo padrão de
+ * painelCrmEscrita.evento.test.ts: mocka o helper para só invocar `fn` com
+ * um req de mentira, preservando o usuário repassado como segundo argumento.
+ */
+const executarEmTransacaoMock = vi.fn(
+  async (payload: unknown, usuario: unknown, fn: (req: unknown) => unknown) => fn({ payload, user: usuario }),
+);
+vi.mock("@/lib/crm/transacao", () => ({ executarEmTransacao: executarEmTransacaoMock }));
+
+const { moverLeadCrm, salvarClienteCrm, agendarEventoCrm, apagarLeadCrm } = await import("./acoesCrm");
 type DadosClienteCrm = Parameters<typeof salvarClienteCrm>[1];
+type DadosEvento = Parameters<typeof agendarEventoCrm>[1];
 
 const usuarioFalso = { id: "5", nome: "Ana Diretora", perfil: "super-admin" };
 
@@ -45,13 +58,27 @@ const dadosBase: DadosClienteCrm = {
 function montarPayloadFalso() {
   const create = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 1, ...data }));
   const update = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 7, ...data }));
+  const findByID = vi.fn(async () => ({ id: 7, cliente: 3 }));
+  const count = vi.fn(async () => ({ totalDocs: 0 }));
   obterPayloadMock.mockResolvedValue({
     find: vi.fn().mockResolvedValue({ docs: [] }),
     create,
     update,
+    findByID,
+    count,
   });
-  return { create, update };
+  return { create, update, findByID, count };
 }
+
+const dadosEventoBase: DadosEvento = {
+  titulo: "Curso de Gestão Escolar",
+  dataInicio: "2026-10-01",
+  dataFim: "",
+  modalidade: "presencial",
+  local: "Auditório central",
+  moduloCatalogo: "",
+  observacoes: "",
+};
 
 afterEach(() => vi.clearAllMocks());
 
@@ -101,5 +128,32 @@ describe("moverLeadCrm", () => {
     const { update } = montarPayloadFalso();
     expect(await moverLeadCrm("7", "em-contato")).toEqual({ ok: true });
     expect(update).toHaveBeenCalledWith(expect.objectContaining({ collection: "leads", user: usuarioFalso }));
+  });
+});
+
+describe("agendarEventoCrm", () => {
+  it("sem sessão recusa sem tocar a Local API", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(null);
+    const { create } = montarPayloadFalso();
+    expect(await agendarEventoCrm("7", dadosEventoBase)).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(create).not.toHaveBeenCalled();
+    expect(executarEmTransacaoMock).not.toHaveBeenCalled();
+  });
+
+  it("repassa o usuário da sessão para a escrita transacional do evento", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(usuarioFalso);
+    montarPayloadFalso();
+    const resultado = await agendarEventoCrm("7", dadosEventoBase);
+    expect(resultado).toEqual({ ok: true });
+    expect(executarEmTransacaoMock).toHaveBeenCalledWith(expect.anything(), usuarioFalso, expect.any(Function));
+  });
+});
+
+describe("apagarLeadCrm", () => {
+  it("sem sessão recusa sem tocar a Local API", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(null);
+    montarPayloadFalso();
+    expect(await apagarLeadCrm("7", "Ana Contato")).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(executarEmTransacaoMock).not.toHaveBeenCalled();
   });
 });

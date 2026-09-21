@@ -2,6 +2,7 @@ import "server-only";
 
 import type {
   ClienteCrm,
+  DocumentoComercial,
   EnvioProposta,
   Evento,
   EventoComercial,
@@ -12,7 +13,7 @@ import type {
   Proposta,
   VersaoProposta,
 } from "@ntc/types";
-import type { Where } from "payload";
+import type { Payload, Where } from "payload";
 
 import { obterPayload } from "@/lib/payloadClient";
 
@@ -314,26 +315,125 @@ export async function listarLinhaDoTempo(
   return res.docs.map(mapearItemLinhaDoTempo);
 }
 
+export interface DocumentoEventoResumo {
+  id: string;
+  nome: string;
+  descricao: string | null;
+  url: string;
+  tamanho: number | null;
+  criadoEmISO: string;
+}
+
 export interface EventoComercialResumo {
   id: string;
   titulo: string;
   dataInicioISO: string;
+  dataFimISO: string | null;
   status: string;
   modalidade: string | null;
   local: string | null;
-  leadId: string;
+  observacoes: string | null;
+  leadId: string | null;
+  leadNome: string | null;
+  clienteId: string;
+  moduloTitulo: string | null;
+  contrato: {
+    tipo: string | null;
+    numero: string | null;
+    dataISO: string | null;
+    valor: number | null;
+    arquivo: { nome: string; url: string } | null;
+  } | null;
+  links: { rotulo: string; url: string }[];
+  documentos: DocumentoEventoResumo[];
+  numDocumentos: number;
 }
 
-function mapearEventoComercial(doc: EventoComercial): EventoComercialResumo {
+function mapearDocumentoEvento(doc: DocumentoComercial): DocumentoEventoResumo {
+  return {
+    id: String(doc.id),
+    nome: doc.filename ?? "",
+    descricao: doc.descricao ?? null,
+    url: doc.url ?? "",
+    tamanho: doc.filesize ?? null,
+    criadoEmISO: doc.createdAt,
+  };
+}
+
+/** Relationship populado com um DocumentoComercial: extrai { nome, url } ou null. */
+function arquivoDoContrato(v: unknown): { nome: string; url: string } | null {
+  if (v && typeof v === "object" && "url" in v) {
+    const doc = v as DocumentoComercial;
+    return { nome: doc.filename ?? "", url: doc.url ?? "" };
+  }
+  return null;
+}
+
+function mapearEventoComercial(doc: EventoComercial, documentos: DocumentoEventoResumo[]): EventoComercialResumo {
+  const c = doc.contratoEmpenho;
+  const arquivo = arquivoDoContrato(c?.arquivo);
+  const tipo = c?.tipo ?? null;
+  const numero = c?.numero ?? null;
+  const dataISO = c?.data ?? null;
+  const valor = c?.valor ?? null;
+  const contratoVazio = tipo === null && numero === null && dataISO === null && valor === null && arquivo === null;
   return {
     id: String(doc.id),
     titulo: doc.titulo,
     dataInicioISO: doc.dataInicio,
+    dataFimISO: doc.dataFim ?? null,
     status: doc.status,
     modalidade: doc.modalidade ?? null,
     local: doc.local ?? null,
-    leadId: idRel(doc.lead) ?? "",
+    observacoes: doc.observacoes ?? null,
+    leadId: idRel(doc.lead),
+    leadNome: campoRel(doc.lead, "nome"),
+    clienteId: idRel(doc.cliente) ?? "",
+    moduloTitulo: campoRel(doc.moduloCatalogo, "titulo"),
+    contrato: contratoVazio ? null : { tipo, numero, dataISO, valor, arquivo },
+    links: (doc.linksInscricao ?? []).map((l) => ({ rotulo: l.rotulo, url: l.url })),
+    documentos,
+    numDocumentos: documentos.length,
   };
+}
+
+/**
+ * Busca os documentos de um lote de eventos numa única `find` (evita N+1) e
+ * agrupa por evento antes de mapear. Pula a busca quando não há eventos.
+ */
+async function mapearEventosComDocumentos(
+  payload: Payload,
+  docs: EventoComercial[],
+): Promise<EventoComercialResumo[]> {
+  if (docs.length === 0) return [];
+  const documentosRes = await payload.find({
+    collection: "documentos-comerciais",
+    depth: 0,
+    limit: 500,
+    sort: "-createdAt",
+    where: { evento: { in: docs.map((d) => d.id) } },
+  });
+  const porEvento = new Map<string, DocumentoEventoResumo[]>();
+  for (const documento of documentosRes.docs) {
+    const eventoId = idRel(documento.evento);
+    if (!eventoId) continue;
+    const lista = porEvento.get(eventoId) ?? [];
+    lista.push(mapearDocumentoEvento(documento));
+    porEvento.set(eventoId, lista);
+  }
+  return docs.map((doc) => mapearEventoComercial(doc, porEvento.get(String(doc.id)) ?? []));
+}
+
+export async function listarEventosDoLead(leadId: string): Promise<EventoComercialResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "eventos-comerciais",
+    depth: 1,
+    limit: 100,
+    sort: "-dataInicio",
+    where: { lead: { equals: leadId } },
+  });
+  return mapearEventosComDocumentos(payload, res.docs);
 }
 
 export interface LeadCrmDetalhe extends LeadCrmResumo {
@@ -350,6 +450,9 @@ export interface LeadCrmDetalhe extends LeadCrmResumo {
   detalhePerda: string | null;
   clienteCasadoPor: string | null;
   linhaDoTempo: ItemLinhaDoTempoResumo[];
+  eventos: EventoComercialResumo[];
+  numPropostas: number;
+  numEnvios: number;
 }
 
 export async function obterLeadCrm(id: string): Promise<LeadCrmDetalhe | null> {
@@ -361,7 +464,12 @@ export async function obterLeadCrm(id: string): Promise<LeadCrmDetalhe | null> {
     return null;
   }
   if (doc.tipo !== "proposta") return null;
-  const linhaDoTempo = await listarLinhaDoTempo({ leadId: id });
+  const [linhaDoTempo, eventos, propostasRes, enviosRes] = await Promise.all([
+    listarLinhaDoTempo({ leadId: id }),
+    listarEventosDoLead(id),
+    payload.count({ collection: "propostas", where: { lead: { equals: id } } }),
+    payload.count({ collection: "envios-email", where: { lead: { equals: id } } }),
+  ]);
   const og = doc.origem ?? {};
   const origem: { rotulo: string; valor: string }[] = [];
   const par = (rotulo: string, v: unknown) => { if (typeof v === "string" && v !== "") origem.push({ rotulo, valor: v }); };
@@ -388,6 +496,9 @@ export async function obterLeadCrm(id: string): Promise<LeadCrmDetalhe | null> {
     detalhePerda: doc.detalhePerda ?? null,
     clienteCasadoPor: doc.clienteCasadoPor ?? null,
     linhaDoTempo,
+    eventos,
+    numPropostas: propostasRes.totalDocs,
+    numEnvios: enviosRes.totalDocs,
   };
 }
 
@@ -432,11 +543,12 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
   } catch {
     return null;
   }
-  const [negocios, linhaDoTempo, eventos] = await Promise.all([
+  const [negocios, linhaDoTempo, eventosRes] = await Promise.all([
     payload.find({ collection: "leads", depth: 1, limit: 200, sort: "-createdAt", where: { cliente: { equals: doc.id }, tipo: { equals: "proposta" } } }),
     listarLinhaDoTempo({ clienteId: id }),
-    payload.find({ collection: "eventos-comerciais", depth: 0, limit: 100, sort: "-dataInicio", where: { cliente: { equals: doc.id } } }),
+    payload.find({ collection: "eventos-comerciais", depth: 1, limit: 100, sort: "-dataInicio", where: { cliente: { equals: doc.id } } }),
   ]);
+  const eventos = await mapearEventosComDocumentos(payload, eventosRes.docs);
   const negociosMapeados = negocios.docs.map(mapearLeadCrm);
   return {
     ...mapearClienteResumo(doc, {
@@ -451,7 +563,7 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
     contatos: mapearContatos(doc),
     negocios: negociosMapeados,
     linhaDoTempo,
-    eventos: eventos.docs.map(mapearEventoComercial),
+    eventos,
   };
 }
 
