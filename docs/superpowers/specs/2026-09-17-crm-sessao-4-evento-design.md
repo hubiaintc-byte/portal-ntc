@@ -14,7 +14,7 @@ O PO aguarda o modelo de proposta que a Sessão 2 precisa; o evento não depende
 | 1 | A **aba Ações** do modal nasce nesta sessão só com as ações de evento; "Criar proposta" (S2) e as ações de e-mail (S3) entram na mesma aba depois. |
 | 2 | **Links de inscrição são só cadastro** (rótulo + URL, obtidos na plataforma externa e digitados). O botão "Enviar links de inscrição" e o e-mail são da Sessão 3. Salvar links **não** move o card; o PO arrasta para "Links enviados" quando mandar por fora. |
 | 3 | As **regras de exclusão do spec §5.6** entram aqui (era o previsto). |
-| 4 | **Sem `push:schema`**: o modelo já existe desde a Sessão 1. `eventos-comerciais.lead` passa de obrigatório para opcional só na validação do Payload (o adapter não emite `NOT NULL` para `required`, comprovado no push de 17/09). |
+| 4 | **Corrigido em 21/09/2026** — a premissa estava errada: `required: true` **emite** `NOT NULL` no adapter drizzle 3.18 (`@payloadcms/drizzle@3.18.0/dist/schema/traverseFields.js:718-719`), e o banco confirma `eventos_comerciais.lead_id NOT NULL`. Tornar `eventos-comerciais.lead` e `propostas.lead` opcionais **exige** `ALTER TABLE ... ALTER COLUMN lead_id DROP NOT NULL` nas duas tabelas — ver `CLAUDE.md` §19.3 item 0 (pendência bloqueante do PO). Até esse `ALTER TABLE` rodar, "Apagar lead" falha (fechado, sem corrupção de dado) para qualquer lead com evento ou proposta vinculados. |
 
 ## 1. Aba Ações e o evento no modal
 

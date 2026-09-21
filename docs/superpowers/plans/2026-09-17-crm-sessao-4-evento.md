@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - CLAUDE.md tem precedência (§3 idiom do painel é exceção aceita; §5.4 sem dependência nova; §5.7 sem `any`/`@ts-ignore`/`eslint-disable`; §10 a11y; §12 LGPD).
-- **Sem `push:schema`**: nenhuma coleção/campo novo. `eventos-comerciais.lead` passa de `required: true` para opcional (só validação). Nunca rodar `payload:push:schema`.
+- **Corrigido em 21/09/2026**: a premissa "sem `push:schema`" estava errada. `required: true` emite `NOT NULL` no adapter drizzle 3.18 (`@payloadcms/drizzle@3.18.0/dist/schema/traverseFields.js:718-719`, confirmado contra o banco), então tirar `required: true` de `eventos-comerciais.lead`/`propostas.lead` só na validação do Payload **não** os torna opcionais no Postgres — `lead_id` continua `NOT NULL` até um `ALTER TABLE ... DROP NOT NULL` manual do PO (ver `CLAUDE.md` §19.3 item 0). Nenhuma coleção/campo novo nesta sessão; ainda assim **não** rodar `payload:push:schema` a partir desta branch sem coordenar com o PO — o `ALTER TABLE` é feito à mão, fora do fluxo de push.
 - Toda escrita composta (evento + lead; cliente + linha do tempo; upload + linha do tempo) roda em **uma transação** via `executarEmTransacao(payload, usuario, fn)`; dentro de `fn`, toda chamada da Local API passa `req` (para hooks entrarem na transação e verem `req.user`).
 - Server Actions validam a sessão **antes** de qualquer Local API (`obterUsuarioAutenticado` → `RECUSADO`); `revalidatePath("/crm")` no sucesso.
 - Pré-requisitos das ações são **avisos** (spec §5.2), nunca bloqueiam o arraste.
