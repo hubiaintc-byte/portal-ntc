@@ -381,6 +381,10 @@ export function ShellCrm({
             setModalLead(null);
             abrirCliente(id);
           }}
+          onApagado={() => {
+            setModalLead(null);
+            if (clienteDet) abrirCliente(clienteDet.id);
+          }}
         />
       )}
     </ShellPainel>

@@ -33,6 +33,16 @@ const SELO_ESTAGIO_LEAD: Record<string, string> = {
 export const seloDeEstagioLead = (estagio: string): string =>
   `pcms-selo pcms-selo--${SELO_ESTAGIO_LEAD[estagio] ?? "info"}`;
 
+/** Status do evento comercial: agendado neutro, realizado ok, cancelado erro. */
+const SELO_STATUS_EVENTO: Record<string, string> = {
+  agendado: "agendado",
+  realizado: "ok",
+  cancelado: "erro",
+};
+
+export const seloDeStatusEvento = (status: string): string =>
+  `pcms-selo pcms-selo--${SELO_STATUS_EVENTO[status] ?? "info"}`;
+
 export const seloDeProposta = (status: string): string =>
   `pcms-selo pcms-selo--${SELO_PROPOSTA[status] ?? "info"}`;
 

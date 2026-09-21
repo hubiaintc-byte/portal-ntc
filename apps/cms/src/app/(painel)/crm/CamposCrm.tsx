@@ -172,6 +172,15 @@ export function CampoArea({ rotulo, valor, onMudar }: CampoAreaProps) {
   );
 }
 
+const FMT_DATA_HORA = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
+
+/** "2026-03-10" → "10/03/2026"; ISO com hora → data e hora locais. Usado no ModalLead e na aba Ações. */
+export function dataLegivel(iso: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso.split("-").reverse().join("/");
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? iso : FMT_DATA_HORA.format(d);
+}
+
 export function AvisoForm({ erro }: { erro: string | null }) {
   if (erro === null) return null;
   return (

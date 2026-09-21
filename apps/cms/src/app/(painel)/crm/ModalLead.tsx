@@ -2,18 +2,27 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 
-import { ESTAGIOS_LEAD, MOTIVOS_PERDA, rotuloDoEstagio } from "@ntc/lib";
+import { ESTAGIOS_LEAD, MOTIVOS_PERDA, exigeConfirmacaoDupla, rotuloDoEstagio } from "@ntc/lib";
 
 import type { CatalogoCrm, ClienteCrmResumo, LeadCrmDetalhe, UsuarioCmsResumo } from "@/lib/cms/painelCrm";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
-import { adicionarNotaCrm, marcarLeadPerdidoCrm, moverLeadCrm, reabrirLeadCrm, vincularClienteCrm } from "../acoesCrm";
-import { AvisoForm } from "./CamposCrm";
+import {
+  adicionarNotaCrm,
+  apagarLeadCrm,
+  marcarLeadPerdidoCrm,
+  moverLeadCrm,
+  reabrirLeadCrm,
+  vincularClienteCrm,
+} from "../acoesCrm";
+import { AbaAcoes } from "./AbaAcoes";
+import { AvisoForm, dataLegivel } from "./CamposCrm";
 import { FormLead } from "./FormLead";
 import { LinhaDoTempo } from "./LinhaDoTempo";
 import { seloDeEstagioLead } from "./seloStatus";
 
-type Aba = "dados" | "historico";
+type Aba = "dados" | "acoes" | "historico";
+const ROTULO_ABA: Record<Aba, string> = { dados: "Dados", acoes: "Ações", historico: "Histórico" };
 
 interface ModalLeadProps {
   /** null = modo criação (Novo Lead). */
@@ -27,19 +36,12 @@ interface ModalLeadProps {
   onAbrirCliente: (id: string) => void;
   /** Novo lead aberto de dentro do cliente: pré-seleciona esse cliente no FormLead. */
   clientePreSelecionado?: string;
+  /** Lead apagado com sucesso (Zona de risco): o pai fecha o modal e recarrega o cliente, se houver. */
+  onApagado: () => void;
 }
-
-const FMT_DATA_HORA = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
 
 const FOCAVEIS =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-/** "2026-03-10" → "10/03/2026"; ISO com hora → data e hora locais. */
-function dataLegivel(iso: string): string {
-  if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso.split("-").reverse().join("/");
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? iso : FMT_DATA_HORA.format(d);
-}
 
 function Par({ rotulo, valor }: { rotulo: string; valor: React.ReactNode }) {
   return (
@@ -50,7 +52,7 @@ function Par({ rotulo, valor }: { rotulo: string; valor: React.ReactNode }) {
   );
 }
 
-/** Modal único do lead (spec §4.4): usado no kanban, em Leads e no cliente. A aba Ações chega na Sessão 2. */
+/** Modal único do lead (spec §4.4): usado no kanban, em Leads e no cliente. */
 export function ModalLead({
   lead,
   clientes,
@@ -60,6 +62,7 @@ export function ModalLead({
   onAtualizado,
   onAbrirCliente,
   clientePreSelecionado,
+  onApagado,
 }: ModalLeadProps) {
   const [aba, setAba] = useState<Aba>("dados");
   const [editando, setEditando] = useState(lead === null);
@@ -68,6 +71,8 @@ export function ModalLead({
   const [detalhe, setDetalhe] = useState("");
   const [clienteNovo, setClienteNovo] = useState("");
   const [erro, setErro] = useState<string | null>(null);
+  const [apagando, setApagando] = useState(false);
+  const [confirmacaoNome, setConfirmacaoNome] = useState("");
   // Valor otimista do select de estágio: sem ele, o controle voltava ao
   // valor antigo entre o onChange e a recarga do lead (o select é controlado
   // por `lead.estagio`). Ressincroniza quando o lead recarregado chegar.
@@ -141,6 +146,29 @@ export function ModalLead({
       if (lead) onAtualizado(lead.id);
     });
   }
+
+  /**
+   * Apagar lead (Zona de risco, spec §5.6): diferente de `executar`, o
+   * sucesso NÃO recarrega este lead (ele deixou de existir) — fecha via
+   * `onApagado`, que o pai (ShellCrm) trata fechando o modal.
+   */
+  function apagar(nome: string) {
+    if (!lead) return;
+    setErro(null);
+    iniciar(async () => {
+      const r = await apagarLeadCrm(lead.id, nome);
+      if (!montadoRef.current) return;
+      if (!r.ok) {
+        setErro(r.erro ?? "Erro.");
+        return;
+      }
+      onApagado();
+    });
+  }
+
+  const exigeDupla = lead
+    ? exigeConfirmacaoDupla({ numEventos: lead.eventos.length, numPropostas: lead.numPropostas, numEnvios: lead.numEnvios })
+    : false;
 
   const titulo = lead ? (lead.clienteNome ?? lead.instituicao) : "Novo lead";
 
@@ -271,7 +299,7 @@ export function ModalLead({
 
         {lead && (
           <div className="pcms-modal__abas" role="tablist" aria-label="Seções do lead">
-            {(["dados", "historico"] as Aba[]).map((a) => (
+            {(["dados", "acoes", "historico"] as Aba[]).map((a) => (
               <button
                 key={a}
                 type="button"
@@ -280,7 +308,7 @@ export function ModalLead({
                 className={`pcms-chip${aba === a ? " pcms-chip--ativo" : ""}`}
                 onClick={() => setAba(a)}
               >
-                {a === "dados" ? "Dados" : "Histórico"}
+                {ROTULO_ABA[a]}
               </button>
             ))}
           </div>
@@ -373,7 +401,59 @@ export function ModalLead({
                   />
                 </dl>
               </section>
+              <section className="pcms-det-bloco pcms-zona-risco">
+                <h3>Zona de risco</h3>
+                {!apagando ? (
+                  <button
+                    type="button"
+                    className="pcms-btn pcms-btn--perigo pcms-btn--mini"
+                    disabled={ocupado}
+                    onClick={() => setApagando(true)}
+                  >
+                    Apagar lead
+                  </button>
+                ) : exigeDupla ? (
+                  <div className="pcms-zona-risco__confirmar">
+                    <label>
+                      Digite o nome do contato para confirmar
+                      <input type="text" value={confirmacaoNome} onChange={(e) => setConfirmacaoNome(e.target.value)} />
+                    </label>
+                    <div className="pcms-zona-risco__botoes">
+                      <button
+                        type="button"
+                        className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+                        disabled={ocupado}
+                        onClick={() => {
+                          setApagando(false);
+                          setConfirmacaoNome("");
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        className="pcms-btn pcms-btn--perigo pcms-btn--mini"
+                        disabled={ocupado || confirmacaoNome.trim() === ""}
+                        onClick={() => apagar(confirmacaoNome)}
+                      >
+                        Confirmar exclusão
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="pcms-zona-risco__botoes">
+                    <button type="button" className="pcms-btn pcms-btn--ghost pcms-btn--mini" disabled={ocupado} onClick={() => setApagando(false)}>
+                      Cancelar
+                    </button>
+                    <button type="button" className="pcms-btn pcms-btn--perigo pcms-btn--mini" disabled={ocupado} onClick={() => apagar("")}>
+                      Confirmar
+                    </button>
+                  </div>
+                )}
+              </section>
             </>
+          ) : lead && aba === "acoes" ? (
+            <AbaAcoes lead={lead} catalogo={catalogo} ocupado={ocupado} onExecutar={executar} />
           ) : lead ? (
             <LinhaDoTempo
               itens={lead.linhaDoTempo}
