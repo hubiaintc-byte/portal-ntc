@@ -155,7 +155,13 @@ export function AbaAcoes({ lead, catalogo, ocupado, onExecutar }: AbaAcoesProps)
         <FormEvento leadId={lead.id} catalogo={catalogo} ocupado={ocupado} onExecutar={onExecutar} onFechar={fecharTudo} />
       )}
       {subform === "registrar-contrato" && eventoCorrenteCompleto && (
-        <FormContrato eventoId={eventoCorrenteCompleto.id} ocupado={ocupado} onExecutar={onExecutar} onFechar={fecharTudo} />
+        <FormContrato
+          eventoId={eventoCorrenteCompleto.id}
+          contratoAtual={eventoCorrenteCompleto.contrato}
+          ocupado={ocupado}
+          onExecutar={onExecutar}
+          onFechar={fecharTudo}
+        />
       )}
       {subform === "links" && eventoCorrenteCompleto && (
         <EditorLinks

@@ -3,9 +3,16 @@ import { rotuloDoEstagio } from "./estagios";
 
 const plural = (n: number, s: string, p: string) => `${n} ${n === 1 ? s : p}`;
 
-export function podeApagarCliente(d: { numLeads: number; numEventos: number }): { ok: true } | { ok: false; motivo: string } {
-  if (d.numLeads === 0 && d.numEventos === 0) return { ok: true };
-  return { ok: false, motivo: `Tem ${plural(d.numLeads, "negócio", "negócios")} e ${plural(d.numEventos, "evento", "eventos")} — apague ou revincule antes.` };
+export function podeApagarCliente(d: {
+  numLeads: number;
+  numEventos: number;
+  numPropostas: number;
+}): { ok: true } | { ok: false; motivo: string } {
+  if (d.numLeads === 0 && d.numEventos === 0 && d.numPropostas === 0) return { ok: true };
+  return {
+    ok: false,
+    motivo: `Tem ${plural(d.numLeads, "negócio", "negócios")}, ${plural(d.numEventos, "evento", "eventos")} e ${plural(d.numPropostas, "proposta", "propostas")} — apague ou revincule antes.`,
+  };
 }
 
 export function exigeConfirmacaoDupla(d: { numEventos: number; numPropostas: number; numEnvios: number }): boolean {

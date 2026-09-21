@@ -48,10 +48,12 @@ export function UploadDocumento({ eventoId, onEnviado }: UploadDocumentoProps) {
         ref={inputRef}
         id={idArquivo}
         type="file"
+        accept=".pdf,.png,.jpg,.jpeg,.docx,.xlsx"
         className="pcms-upload__input"
         disabled={enviando}
         aria-label="Arquivo do documento"
       />
+      <small>até 20 MB.</small>
       <div className="pcms-field pcms-field--curto">
         <label htmlFor={idDescricao}>Descrição (opcional)</label>
         <input

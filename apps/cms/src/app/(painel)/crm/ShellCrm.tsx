@@ -387,7 +387,13 @@ export function ShellCrm({
             abrirCliente(id);
           }}
           onApagado={() => {
+            // `leadsLocal` só se re-sincroniza com o prop `leads` numa nova
+            // leitura do servidor (useEffect acima) — sem tirar o id daqui,
+            // o card apagado fica no quadro até a próxima navegação, e
+            // clicar nele não faz mais nada (o modal não acha o lead).
+            const idApagado = modalLead.modo === "ver" ? modalLead.lead.id : null;
             setModalLead(null);
+            if (idApagado !== null) setLeadsLocal((ls) => ls.filter((l) => l.id !== idApagado));
             if (clienteDet) abrirCliente(clienteDet.id);
           }}
         />

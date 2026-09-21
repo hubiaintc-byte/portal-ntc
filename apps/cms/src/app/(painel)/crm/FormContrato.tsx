@@ -4,6 +4,7 @@ import { useId, useRef, useState } from "react";
 
 import { TIPOS_CONTRATO } from "@ntc/lib";
 
+import type { EventoComercialResumo } from "@/lib/cms/painelCrm";
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
 import type { DadosContrato } from "@/lib/cms/painelCrmEscrita";
 
@@ -12,16 +13,25 @@ import { CampoData, CampoNumero, CampoSelect, CampoTexto } from "./CamposCrm";
 
 interface FormContratoProps {
   eventoId: string;
+  /** Contrato já registrado no evento corrente, para não sobrescrever com campos em branco ao reabrir o formulário. */
+  contratoAtual: EventoComercialResumo["contrato"];
   ocupado: boolean;
   onExecutar: (acao: () => Promise<ResultadoEscrita>, depois?: () => void, aoFalhar?: () => void) => void;
   onFechar: () => void;
 }
 
-const VAZIO: DadosContrato = { tipo: "", numero: "", data: "", valor: "" };
+function dadosIniciais(c: EventoComercialResumo["contrato"]): DadosContrato {
+  return {
+    tipo: c?.tipo ?? "",
+    numero: c?.numero ?? "",
+    data: c?.dataISO ? c.dataISO.slice(0, 10) : "",
+    valor: c?.valor != null ? String(c.valor) : "",
+  };
+}
 
 /** Registrar contrato/empenho (aba Ações). Arquivo opcional — sem ele, o backend preserva o já registrado. */
-export function FormContrato({ eventoId, ocupado, onExecutar, onFechar }: FormContratoProps) {
-  const [dados, setDados] = useState<DadosContrato>(VAZIO);
+export function FormContrato({ eventoId, contratoAtual, ocupado, onExecutar, onFechar }: FormContratoProps) {
+  const [dados, setDados] = useState<DadosContrato>(() => dadosIniciais(contratoAtual));
   const arquivoRef = useRef<HTMLInputElement>(null);
   const idArquivo = useId();
   const m =

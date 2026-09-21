@@ -60,6 +60,8 @@ export interface ClienteCrmDetalhe extends ClienteCrmResumo {
   negocios: LeadCrmResumo[];
   linhaDoTempo: ItemLinhaDoTempoResumo[];
   eventos: EventoComercialResumo[];
+  /** Propostas com `cliente` = este, inclusive as que sobreviveram ao lead que as originou (apagarLead desvincula só o lead). */
+  numPropostas: number;
 }
 
 export interface LeadCrmResumo {
@@ -543,10 +545,13 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
   } catch {
     return null;
   }
-  const [negocios, linhaDoTempo, eventosRes] = await Promise.all([
+  const [negocios, linhaDoTempo, eventosRes, propostas] = await Promise.all([
     payload.find({ collection: "leads", depth: 1, limit: 200, sort: "-createdAt", where: { cliente: { equals: doc.id }, tipo: { equals: "proposta" } } }),
     listarLinhaDoTempo({ clienteId: id }),
     payload.find({ collection: "eventos-comerciais", depth: 1, limit: 100, sort: "-dataInicio", where: { cliente: { equals: doc.id } } }),
+    // Conta à parte dos negócios: uma proposta sobrevive à desvinculação de
+    // `apagarLead` (que só limpa `propostas.lead`, não `propostas.cliente`).
+    payload.count({ collection: "propostas", where: { cliente: { equals: doc.id } } }),
   ]);
   const eventos = await mapearEventosComDocumentos(payload, eventosRes.docs);
   const negociosMapeados = negocios.docs.map(mapearLeadCrm);
@@ -564,6 +569,7 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
     negocios: negociosMapeados,
     linhaDoTempo,
     eventos,
+    numPropostas: propostas.totalDocs,
   };
 }
 

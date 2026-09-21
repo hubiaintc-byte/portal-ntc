@@ -51,7 +51,15 @@ const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin"
 
 function payloadFalso() {
   const create = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 101, ...data }));
-  const update = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 1, ...data }));
+  // `docs`/`errors` só importam para os `update` com `where` (ManyOptions) de `apagarLead` —
+  // as chamadas por `id` (ByIDOptions) ignoram esses dois campos extras.
+  const update = vi.fn(
+    async ({ data }: { data: Record<string, unknown> }) =>
+      ({ id: 1, docs: [], errors: [], ...data }) as Record<string, unknown> & {
+        docs: unknown[];
+        errors: { id: unknown; message: string }[];
+      },
+  );
   const findByID = vi.fn();
   const deleteMock = vi.fn(async () => ({ id: 1 }));
   const count = vi.fn(async () => ({ totalDocs: 0 }));
@@ -195,6 +203,26 @@ describe("registrarContratoEmpenho", () => {
     expect(resultado).toEqual({ ok: true });
     expect(update).toHaveBeenCalledTimes(1);
   });
+
+  it("recusa envio totalmente vazio (sem campo nenhum e sem arquivo), sem tocar o banco", async () => {
+    const { findByID, update } = payloadFalso();
+    const resultado = await registrarContratoEmpenho("9", { tipo: "", numero: "", data: "", valor: "" }, null, usuario);
+    expect(resultado).toEqual({ ok: false, erro: "Informe ao menos um dado do contrato ou anexe o arquivo." });
+    expect(findByID).not.toHaveBeenCalled();
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("aceita envio só com arquivo, mesmo com os campos de texto vazios", async () => {
+    const { findByID } = payloadFalso();
+    findByID.mockResolvedValueOnce({ id: 9, lead: 7, cliente: 3, contratoEmpenho: {} });
+    const resultado = await registrarContratoEmpenho(
+      "9",
+      { tipo: "", numero: "", data: "", valor: "" },
+      arquivoFalso(1000, "application/pdf", "empenho.pdf"),
+      usuario,
+    );
+    expect(resultado).toEqual({ ok: true });
+  });
 });
 
 describe("salvarLinksInscricao", () => {
@@ -310,15 +338,15 @@ describe("removerDocumentoEvento", () => {
     expect(del).toHaveBeenCalledWith(expect.objectContaining({ collection: "documentos-comerciais", id: "55" }));
   });
 
-  it("sem evento vinculado, apaga sem gravar item na linha do tempo", async () => {
+  it("sem evento vinculado, recusa e não apaga (evita apagar um documento solto, ex.: PDF de proposta, sem rastro)", async () => {
     const { findByID, delete: del } = payloadFalso();
     findByID.mockResolvedValueOnce({ id: 55, evento: null, filename: "solto.pdf" });
 
     const resultado = await removerDocumentoEvento("55", usuario);
 
-    expect(resultado).toEqual({ ok: true });
+    expect(resultado).toEqual({ ok: false, erro: "Documento não pertence a um evento." });
     expect(registrarNaLinhaDoTempoMock).not.toHaveBeenCalled();
-    expect(del).toHaveBeenCalledWith(expect.objectContaining({ collection: "documentos-comerciais", id: "55" }));
+    expect(del).not.toHaveBeenCalled();
   });
 });
 
@@ -376,12 +404,28 @@ describe("apagarLead", () => {
     expect(registrarNaLinhaDoTempoMock).not.toHaveBeenCalled();
     expect(del).toHaveBeenCalledWith(expect.objectContaining({ collection: "leads", id: "7" }));
   });
+
+  it("se uma desvinculação falhar (errors não vazio), recusa e nunca chega a apagar o lead", async () => {
+    const { findByID, count, update, delete: del } = payloadFalso();
+    findByID.mockResolvedValueOnce({ id: 7, nome: "Bruno Silva", instituicao: null, estagio: "lead", cliente: null });
+    count.mockResolvedValue({ totalDocs: 0 });
+    // A primeira desvinculação (eventos-comerciais) falha; ex. real:
+    // `lead_id NOT NULL` em `eventos-comerciais`/`propostas` (CLAUDE.md §19.3 item 0).
+    update.mockResolvedValueOnce({ docs: [], errors: [{ id: 9, message: "null value in column \"lead_id\" violates not-null constraint" }] });
+
+    const resultado = await apagarLead("7", "", usuario);
+
+    expect(resultado.ok).toBe(false);
+    expect(del).not.toHaveBeenCalled();
+    // só a primeira desvinculação roda — a checagem sequencial interrompe antes das outras três.
+    expect(update).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("apagarCliente", () => {
   it("recusa apagar cliente com leads ou eventos vinculados", async () => {
     const { count, delete: del } = payloadFalso();
-    count.mockResolvedValueOnce({ totalDocs: 2 }).mockResolvedValueOnce({ totalDocs: 0 });
+    count.mockResolvedValueOnce({ totalDocs: 2 }).mockResolvedValueOnce({ totalDocs: 0 }).mockResolvedValueOnce({ totalDocs: 0 });
 
     const resultado = await apagarCliente("3", usuario);
 
@@ -389,9 +433,22 @@ describe("apagarCliente", () => {
     expect(del).not.toHaveBeenCalled();
   });
 
+  it("recusa apagar cliente só com proposta vinculada (lead já apagado)", async () => {
+    const { count, delete: del } = payloadFalso();
+    count.mockResolvedValueOnce({ totalDocs: 0 }).mockResolvedValueOnce({ totalDocs: 0 }).mockResolvedValueOnce({ totalDocs: 1 });
+
+    const resultado = await apagarCliente("3", usuario);
+
+    expect(resultado).toEqual({
+      ok: false,
+      erro: "Tem 0 negócios, 0 eventos e 1 proposta — apague ou revincule antes.",
+    });
+    expect(del).not.toHaveBeenCalled();
+  });
+
   it("sem dependentes, apaga a linha do tempo do cliente e o cliente", async () => {
     const { count, delete: del } = payloadFalso();
-    count.mockResolvedValueOnce({ totalDocs: 0 }).mockResolvedValueOnce({ totalDocs: 0 });
+    count.mockResolvedValueOnce({ totalDocs: 0 }).mockResolvedValueOnce({ totalDocs: 0 }).mockResolvedValueOnce({ totalDocs: 0 });
 
     const resultado = await apagarCliente("3", usuario);
 

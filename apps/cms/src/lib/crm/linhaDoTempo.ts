@@ -156,6 +156,13 @@ function tituloContratoRegistrado(c: ContratoEmpenho | undefined | null): string
   return partes.length > 0 ? `Contrato/empenho registrado · ${partes.join(" ")}` : "Contrato/empenho registrado";
 }
 
+type LinksInscricao = EventoComercial["linksInscricao"];
+
+/** Serializa rótulo+url (não só a contagem) para detectar qualquer mudança na lista de links. */
+function serializarLinksInscricao(links: LinksInscricao): string {
+  return (links ?? []).map((l) => `${l.rotulo} ${l.url}`).join("\n");
+}
+
 export interface ParametrosEntradasDoEvento {
   operation: "create" | "update";
   doc: EventoComercial;
@@ -183,9 +190,11 @@ export function entradasDoEvento(p: ParametrosEntradasDoEvento): EntradaLinhaDoT
     itens.push({ ...comum, tipo: "evento", titulo: tituloContratoRegistrado(p.doc.contratoEmpenho) });
   }
 
-  const numLinksAntes = antes.linksInscricao?.length ?? 0;
-  const numLinksAgora = p.doc.linksInscricao?.length ?? 0;
-  if (numLinksAntes !== numLinksAgora) {
+  // Serializa rótulo+url em vez de comparar só a contagem — editar um link
+  // existente (ex.: corrigir uma URL errada) não muda o tamanho da lista e
+  // por isso não gerava item nenhum na linha do tempo.
+  if (serializarLinksInscricao(antes.linksInscricao) !== serializarLinksInscricao(p.doc.linksInscricao)) {
+    const numLinksAgora = p.doc.linksInscricao?.length ?? 0;
     itens.push({ ...comum, tipo: "evento", titulo: `Links de inscrição atualizados (${numLinksAgora})` });
   }
 

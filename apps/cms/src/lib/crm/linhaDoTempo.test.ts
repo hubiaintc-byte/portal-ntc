@@ -172,6 +172,20 @@ describe("entradasDoEvento", () => {
     expect(itens).toEqual([expect.objectContaining({ tipo: "evento", titulo: "Links de inscrição atualizados (2)" })]);
   });
 
+  it("editar um link no lugar (mesma quantidade, URL diferente) também gera o item", () => {
+    const antes: EventoComercial = { ...evento, linksInscricao: [{ rotulo: "Turma A", url: "https://x.com/errado" }] };
+    const depois: EventoComercial = { ...evento, linksInscricao: [{ rotulo: "Turma A", url: "https://x.com/certo" }] };
+    const itens = entradasDoEvento({ ...baseEvento, operation: "update", doc: depois, previousDoc: antes });
+    expect(itens).toEqual([expect.objectContaining({ tipo: "evento", titulo: "Links de inscrição atualizados (1)" })]);
+  });
+
+  it("links inalterados (mesmo conteúdo) não gera item", () => {
+    const links = [{ rotulo: "Turma A", url: "https://x.com/a" }];
+    const antes: EventoComercial = { ...evento, linksInscricao: links };
+    const depois: EventoComercial = { ...evento, linksInscricao: [...links] };
+    expect(entradasDoEvento({ ...baseEvento, operation: "update", doc: depois, previousDoc: antes })).toEqual([]);
+  });
+
   it("status agendado → realizado", () => {
     const itens = entradasDoEvento({ ...baseEvento, operation: "update", doc: { ...evento, status: "realizado" }, previousDoc: evento });
     expect(itens).toEqual([expect.objectContaining({ titulo: "Evento realizado · Curso de Gestão Escolar" })]);

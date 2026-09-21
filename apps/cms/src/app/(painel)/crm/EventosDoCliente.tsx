@@ -147,7 +147,7 @@ function CardEvento({ evento: ev, onAbrirLead, onAtualizado }: CardEventoProps) 
                 </div>
               </dl>
               {ev.contrato.arquivo && (
-                <a href={ev.contrato.arquivo.url} target="_blank" rel="noopener" className="pcms-btn pcms-btn--ghost pcms-btn--mini">
+                <a href={ev.contrato.arquivo.url} target="_blank" rel="noopener noreferrer" className="pcms-btn pcms-btn--ghost pcms-btn--mini">
                   Baixar
                 </a>
               )}
@@ -165,7 +165,7 @@ function CardEvento({ evento: ev, onAbrirLead, onAtualizado }: CardEventoProps) 
             <ul className="pcms-evento-card__links">
               {ev.links.map((l, i) => (
                 <li key={`${i}-${l.url}`}>
-                  <a href={l.url} target="_blank" rel="noopener">
+                  <a href={l.url} target="_blank" rel="noopener noreferrer">
                     {l.rotulo}
                   </a>
                 </li>
@@ -187,7 +187,7 @@ function CardEvento({ evento: ev, onAbrirLead, onAtualizado }: CardEventoProps) 
                   <th>Descrição</th>
                   <th>Data</th>
                   <th>Tamanho</th>
-                  <th></th>
+                  <th className="pcms-sr-only">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -199,7 +199,7 @@ function CardEvento({ evento: ev, onAbrirLead, onAtualizado }: CardEventoProps) 
                     <td>{tamanhoLegivel(doc.tamanho)}</td>
                     <td>
                       <div className="pcms-evento-card__acoes-doc">
-                        <a href={doc.url} target="_blank" rel="noopener" className="pcms-btn pcms-btn--ghost pcms-btn--mini">
+                        <a href={doc.url} target="_blank" rel="noopener noreferrer" className="pcms-btn pcms-btn--ghost pcms-btn--mini">
                           Baixar
                         </a>
                         {confirmandoRemocao === doc.id ? (

@@ -41,7 +41,7 @@ export function DetalheCliente({
   const [enviando, iniciar] = useTransition();
   const [erroApagar, setErroApagar] = useState<string | null>(null);
 
-  const podeApagar = podeApagarCliente({ numLeads: c.negocios.length, numEventos: c.eventos.length });
+  const podeApagar = podeApagarCliente({ numLeads: c.negocios.length, numEventos: c.eventos.length, numPropostas: c.numPropostas });
 
   function confirmarExclusao() {
     setErroApagar(null);

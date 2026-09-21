@@ -843,6 +843,11 @@ export async function registrarContratoEmpenho(
     const erro = erroDoArquivo(arquivo);
     if (erro) return { ok: false, erro };
   }
+  const algumCampoPreenchido =
+    dados.tipo.trim() !== "" || dados.numero.trim() !== "" || dados.data.trim() !== "" || dados.valor.trim() !== "";
+  if (!algumCampoPreenchido && arquivo === null) {
+    return { ok: false, erro: "Informe ao menos um dado do contrato ou anexe o arquivo." };
+  }
   try {
     const payload = await obterPayload();
     return await executarEmTransacao(payload, usuario, async (req) => {
@@ -991,6 +996,9 @@ export async function subirDocumentoEvento(
  * Remove um documento comercial. O item "Documento removido" na linha do
  * tempo é responsabilidade daqui (não de um hook `afterDelete`, que não tem
  * o cliente à mão sem outra consulta — mesma nota de `registrarDocumentoNaLinhaDoTempo`).
+ * Só remove documentos vinculados a um evento — sem `evento`, este endpoint
+ * poderia apagar qualquer outro documento comercial (ex.: o PDF gerado de
+ * proposta) sem deixar rastro na linha do tempo.
  */
 export async function removerDocumentoEvento(documentoId: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
   try {
@@ -998,13 +1006,10 @@ export async function removerDocumentoEvento(documentoId: string, usuario: Usuar
     return await executarEmTransacao(payload, usuario, async (req) => {
       const documento = await payload.findByID({ collection: "documentos-comerciais", id: documentoId, depth: 0, req });
       const eventoId = idDeRelacionamento(documento.evento);
-      let clienteId: number | null = null;
-      let leadId: number | null = null;
-      if (eventoId !== null) {
-        const evento = await payload.findByID({ collection: "eventos-comerciais", id: eventoId, depth: 0, req });
-        clienteId = idDeRelacionamento(evento.cliente);
-        leadId = idDeRelacionamento(evento.lead);
-      }
+      if (eventoId === null) return { ok: false, erro: "Documento não pertence a um evento." };
+      const evento = await payload.findByID({ collection: "eventos-comerciais", id: eventoId, depth: 0, req });
+      const clienteId = idDeRelacionamento(evento.cliente);
+      const leadId = idDeRelacionamento(evento.lead);
       const entradas = entradasDoDocumento({
         operation: "delete",
         doc: documento,
@@ -1025,10 +1030,26 @@ export async function removerDocumentoEvento(documentoId: string, usuario: Usuar
 }
 
 /**
+ * `payload.update` com `where` (em vez de `id`) nunca rejeita por falha de
+ * um documento — ele devolve `{ docs, errors }` e segue em frente. Sem essa
+ * checagem, um `errors` não vazio passava batido e a transação seguia até o
+ * `delete` do lead, que aí sim falhava (ex.: `lead_id NOT NULL` em
+ * `eventos-comerciais`/`propostas` — CLAUDE.md §19.3 item 0) com uma
+ * mensagem que não dizia o que realmente deu errado.
+ */
+function lancarSeFalhouDesvinculo(resultado: { errors: { id: unknown; message: string }[] }, colecao: string): void {
+  if (resultado.errors.length > 0) {
+    throw new Error(`Falha ao desvincular lead em ${colecao}: ${resultado.errors.map((e) => e.message).join("; ")}`);
+  }
+}
+
+/**
  * Apaga o lead (spec §5.6). Com evento/proposta/envio vinculado, exige
  * digitar o nome do contato para confirmar (dupla confirmação). Desvincula
  * (não apaga) os dependentes — nenhuma cascata — e grava "Lead apagado" na
- * linha do tempo do cliente, se houver, antes de apagar.
+ * linha do tempo do cliente, se houver, antes de apagar. As quatro
+ * desvinculações rodam em sequência (não `Promise.all`) para que cada
+ * `errors[]` seja checado antes de seguir — ver `lancarSeFalhouDesvinculo`.
  */
 export async function apagarLead(leadId: string, confirmacaoNome: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
   try {
@@ -1062,12 +1083,14 @@ export async function apagarLead(leadId: string, confirmacaoNome: string, usuari
         });
       }
       const desvincula = { where: { lead: { equals: leadId } }, data: { lead: null }, req } as const;
-      await Promise.all([
-        payload.update({ collection: "eventos-comerciais", ...desvincula }),
-        payload.update({ collection: "propostas", ...desvincula }),
-        payload.update({ collection: "envios-email", ...desvincula }),
-        payload.update({ collection: "linha-do-tempo", ...desvincula }),
-      ]);
+      const resultadoEventos = await payload.update({ collection: "eventos-comerciais", ...desvincula });
+      lancarSeFalhouDesvinculo(resultadoEventos, "eventos-comerciais");
+      const resultadoPropostas = await payload.update({ collection: "propostas", ...desvincula });
+      lancarSeFalhouDesvinculo(resultadoPropostas, "propostas");
+      const resultadoEnvios = await payload.update({ collection: "envios-email", ...desvincula });
+      lancarSeFalhouDesvinculo(resultadoEnvios, "envios-email");
+      const resultadoLinhaDoTempo = await payload.update({ collection: "linha-do-tempo", ...desvincula });
+      lancarSeFalhouDesvinculo(resultadoLinhaDoTempo, "linha-do-tempo");
       await payload.delete({ collection: "leads", id: leadId, req });
       return { ok: true };
     });
@@ -1078,24 +1101,30 @@ export async function apagarLead(leadId: string, confirmacaoNome: string, usuari
 }
 
 /**
- * Apaga o cliente (spec §5.6) — só permitido sem leads (tipo proposta) nem
- * eventos vinculados. O hook `beforeDelete` de `clientes-crm` repete a
- * mesma regra (`bloquearClienteComDependentes`); a checagem aqui evita uma
- * viagem ao banco a mais quando já sabemos que vai falhar.
+ * Apaga o cliente (spec §5.6) — só permitido sem leads (tipo proposta),
+ * eventos nem propostas vinculados. Propostas contam à parte porque
+ * `propostas.cliente` sobrevive à desvinculação de `apagarLead` (que só
+ * limpa `propostas.lead`) — sem essa contagem, um cliente nessa situação
+ * passava aqui e só falhava no `delete`, contra a FK `NOT NULL` de
+ * `propostas.cliente_id`, com o erro genérico do `catch`. O hook
+ * `beforeDelete` de `clientes-crm` repete a mesma regra
+ * (`bloquearClienteComDependentes`); a checagem aqui evita uma viagem ao
+ * banco a mais quando já sabemos que vai falhar.
  */
 export async function apagarCliente(clienteId: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
   try {
     const payload = await obterPayload();
     return await executarEmTransacao(payload, usuario, async (req) => {
-      const [leads, eventos] = await Promise.all([
+      const [leads, eventos, propostas] = await Promise.all([
         payload.count({
           collection: "leads",
           where: { and: [{ cliente: { equals: clienteId } }, { tipo: { equals: "proposta" } }] },
           req,
         }),
         payload.count({ collection: "eventos-comerciais", where: { cliente: { equals: clienteId } }, req }),
+        payload.count({ collection: "propostas", where: { cliente: { equals: clienteId } }, req }),
       ]);
-      const r = podeApagarCliente({ numLeads: leads.totalDocs, numEventos: eventos.totalDocs });
+      const r = podeApagarCliente({ numLeads: leads.totalDocs, numEventos: eventos.totalDocs, numPropostas: propostas.totalDocs });
       if (!r.ok) return { ok: false, erro: r.motivo };
       await payload.delete({ collection: "linha-do-tempo", where: { cliente: { equals: clienteId } }, req });
       await payload.delete({ collection: "clientes-crm", id: clienteId, req });
