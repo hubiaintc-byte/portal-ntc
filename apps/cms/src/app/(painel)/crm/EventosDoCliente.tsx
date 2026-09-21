@@ -86,6 +86,7 @@ function CardEvento({ evento: ev, onAbrirLead, onAtualizado }: CardEventoProps) 
   const [erroRemocao, setErroRemocao] = useState<string | null>(null);
 
   function removerDocumento(id: string) {
+    setErroRemocao(null);
     iniciarRemocao(async () => {
       const r = await removerDocumentoEventoCrm(id);
       if (r.ok) {
@@ -207,7 +208,10 @@ function CardEvento({ evento: ev, onAbrirLead, onAtualizado }: CardEventoProps) 
                               type="button"
                               className="pcms-btn pcms-btn--ghost pcms-btn--mini"
                               disabled={removendo}
-                              onClick={() => setConfirmandoRemocao(null)}
+                              onClick={() => {
+                                setConfirmandoRemocao(null);
+                                setErroRemocao(null);
+                              }}
                             >
                               Cancelar
                             </button>
