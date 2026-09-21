@@ -305,6 +305,11 @@ export function ShellCrm({
             if (r.ok) abrirCliente(clienteDet.id);
             return r.ok ? null : (r.erro ?? "Erro.");
           }}
+          onAtualizado={() => abrirCliente(clienteDet.id)}
+          onApagado={() => {
+            fecharTudo();
+            setTela("clientes");
+          }}
         />
       ) : propostaDet ? (
         <>

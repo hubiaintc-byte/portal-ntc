@@ -2142,3 +2142,52 @@ body {
 .pcms-zona-risco__confirmar label { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; }
 .pcms-zona-risco__confirmar input { font: inherit; padding: 6px 10px; border: 1px solid var(--pcms-linha); }
 .pcms-zona-risco__botoes { display: flex; gap: 8px; }
+
+/* Texto explicativo ao lado do botão "Apagar cliente" desabilitado (Task 6). */
+.pcms-pagehead__aviso-apagar { margin: -14px 0 24px; color: var(--pcms-cardeal); font-size: 0.85rem; }
+
+/* Acervo de eventos do cliente (Task 6): filtro, cards expansíveis com contrato/links/documentos. */
+.pcms-eventos-cliente-bloco .pcms-filtros { margin-bottom: 14px; }
+.pcms-evento-lista { display: flex; flex-direction: column; gap: 12px; }
+.pcms-evento-card {
+  border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  background: #fff;
+  box-shadow: var(--pcms-sombra);
+}
+.pcms-evento-card summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.92rem;
+  color: var(--pcms-grafite);
+}
+.pcms-evento-card summary::-webkit-details-marker { display: none; }
+.pcms-evento-card summary:focus-visible { outline: 2px solid var(--pcms-oxford); outline-offset: -2px; }
+.pcms-evento-card__titulo { color: var(--pcms-oxford); font-weight: 600; }
+.pcms-evento-card__meta { color: var(--pcms-grafite-suave); font-size: 0.85rem; }
+.pcms-evento-card__corpo {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  padding: 0 18px 18px;
+  border-top: 1px solid var(--pcms-pergaminho);
+}
+@media (max-width: 1100px) {
+  .pcms-evento-card__corpo { grid-template-columns: 1fr; }
+}
+.pcms-evento-card__bloco { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; }
+.pcms-evento-card__bloco h4 {
+  font-family: var(--font-corpo-cond), var(--font-corpo), sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pcms-grafite-suave);
+  margin: 0;
+}
+.pcms-evento-card__links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; }
+.pcms-evento-card__acoes-doc { display: flex; flex-wrap: wrap; gap: 6px; }

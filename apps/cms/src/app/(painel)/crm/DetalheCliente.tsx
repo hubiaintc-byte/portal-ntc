@@ -1,10 +1,15 @@
 "use client";
 
-import { AREAS_CRM, ESFERAS_CRM, ORIGENS_CLIENTE, TIPOS_INSTITUICAO, rotuloDoEstagio } from "@ntc/lib";
+import { useState, useTransition } from "react";
+
+import { AREAS_CRM, ESFERAS_CRM, ORIGENS_CLIENTE, podeApagarCliente, TIPOS_INSTITUICAO, rotuloDoEstagio } from "@ntc/lib";
 
 import type { ClienteCrmDetalhe } from "@/lib/cms/painelCrm";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
+import { apagarClienteCrm } from "../acoesCrm";
+import { AvisoForm } from "./CamposCrm";
+import { EventosDoCliente } from "./EventosDoCliente";
 import { LinhaDoTempo } from "./LinhaDoTempo";
 import { rotuloDeLista, seloDeEstagioLead } from "./seloStatus";
 
@@ -15,13 +20,42 @@ interface DetalheClienteProps {
   onAbrirLead: (id: string) => void;
   onNovoLead: () => void;
   onNota: (texto: string) => Promise<string | null>;
+  onAtualizado: () => void;
+  onApagado: () => void;
 }
 
 const FMT = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
-const ROTULO_STATUS_EVENTO: Record<string, string> = { agendado: "Agendado", realizado: "Realizado", cancelado: "Cancelado" };
 
 /** Detalhe do cliente, o ativo permanente: dados + contatos, negócios, eventos e a linha do tempo com nota manual. */
-export function DetalheCliente({ cliente: c, onVoltar, onEditar, onAbrirLead, onNovoLead, onNota }: DetalheClienteProps) {
+export function DetalheCliente({
+  cliente: c,
+  onVoltar,
+  onEditar,
+  onAbrirLead,
+  onNovoLead,
+  onNota,
+  onAtualizado,
+  onApagado,
+}: DetalheClienteProps) {
+  const [apagando, setApagando] = useState(false);
+  const [enviando, iniciar] = useTransition();
+  const [erroApagar, setErroApagar] = useState<string | null>(null);
+
+  const podeApagar = podeApagarCliente({ numLeads: c.negocios.length, numEventos: c.eventos.length });
+
+  function confirmarExclusao() {
+    setErroApagar(null);
+    iniciar(async () => {
+      const r = await apagarClienteCrm(c.id);
+      if (r.ok) {
+        onApagado();
+      } else {
+        setErroApagar(r.erro ?? "Erro ao apagar o cliente.");
+        setApagando(false);
+      }
+    });
+  }
+
   const dados = [
     { rotulo: "Órgão", valor: c.orgao },
     { rotulo: "Sigla", valor: c.sigla ?? "—" },
@@ -57,8 +91,30 @@ export function DetalheCliente({ cliente: c, onVoltar, onEditar, onAbrirLead, on
           <button type="button" className="pcms-btn" onClick={onNovoLead}>
             Novo lead
           </button>
+          {!apagando ? (
+            <button
+              type="button"
+              className="pcms-btn pcms-btn--perigo"
+              disabled={!podeApagar.ok}
+              title={podeApagar.ok ? undefined : podeApagar.motivo}
+              onClick={() => setApagando(true)}
+            >
+              Apagar cliente
+            </button>
+          ) : (
+            <>
+              <button type="button" className="pcms-btn pcms-btn--ghost" disabled={enviando} onClick={() => setApagando(false)}>
+                Cancelar
+              </button>
+              <button type="button" className="pcms-btn pcms-btn--perigo" disabled={enviando} onClick={confirmarExclusao}>
+                {enviando ? "Apagando…" : "Confirmar exclusão"}
+              </button>
+            </>
+          )}
         </div>
       </div>
+      {!podeApagar.ok && <p className="pcms-pagehead__aviso-apagar">{podeApagar.motivo}</p>}
+      <AvisoForm erro={erroApagar} />
 
       <div className="pcms-det-grid">
         <div className="pcms-det-main">
@@ -164,18 +220,7 @@ export function DetalheCliente({ cliente: c, onVoltar, onEditar, onAbrirLead, on
 
           <section className="pcms-det-bloco">
             <h2>Eventos</h2>
-            {c.eventos.length === 0 ? (
-              <div className="pcms-vazio">Nenhum evento ainda. (Agendar evento chega na Sessão 4.)</div>
-            ) : (
-              <ul className="pcms-eventos-cliente">
-                {c.eventos.map((ev) => (
-                  <li key={ev.id}>
-                    <strong>{ev.titulo}</strong> · {FMT.format(new Date(ev.dataInicioISO))} · {ev.modalidade ?? "—"} ·{" "}
-                    <span className="pcms-selo pcms-selo--info">{ROTULO_STATUS_EVENTO[ev.status] ?? ev.status}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <EventosDoCliente eventos={c.eventos} onAbrirLead={onAbrirLead} onAtualizado={onAtualizado} />
           </section>
         </div>
 
