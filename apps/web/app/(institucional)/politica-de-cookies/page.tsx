@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { carregarContatos } from "@/lib/contatos";
+
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Política de Cookies · Grupo NTC",
   description:
@@ -33,7 +37,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PoliticaDeCookiesPage() {
+export default async function PoliticaDeCookiesPage() {
+  const contatos = await carregarContatos();
+
   return (
     <main id="main">
 
@@ -231,7 +237,7 @@ export default function PoliticaDeCookiesPage() {
                 <p>Esta Política de Cookies pode ser atualizada para refletir mudanças tecnológicas, regulatórias ou de governança institucional. A versão vigente, sua data de revisão e o histórico de versões estarão sempre disponíveis nesta página.</p>
                 <p>Alterações substantivas — em especial novas categorias ou novos finalidades de cookies — implicarão novo banner de consentimento, exibido ao Usuário antes da aplicação prática da alteração.</p>
                 <p><strong>Versão vigente:</strong> v1.0 · 14/05/2026.<br />
-                Dúvidas ou solicitações relacionadas a cookies: <a href="mailto:dpo@institutontc.com.br">dpo@institutontc.com.br</a>.</p>
+                Dúvidas ou solicitações relacionadas a cookies: <a href={`mailto:${contatos.emailDpo}`}>{contatos.emailDpo}</a>.</p>
               </section>
 
             </div>
@@ -246,7 +252,7 @@ export default function PoliticaDeCookiesPage() {
           <h2>Quer revisar seus consentimentos de cookies? <em>É possível ajustar a qualquer momento.</em></h2>
           <p>Use o painel de preferências nesta página, o banner exibido na primeira visita ou as configurações do seu navegador. Para qualquer dúvida, o canal oficial é o do Encarregado (DPO).</p>
           <div className="legal-cta-final-actions">
-            <a className="btn btn--gold" href="mailto:dpo@institutontc.com.br" data-cms-link="contato-dpo">Falar com o DPO →</a><Link className="btn btn--ghost-light" href="/lgpd#exercicio-direitos" data-cms-link="exercicio-direitos">Exercer direitos do titular</Link>
+            <a className="btn btn--gold" href={`mailto:${contatos.emailDpo}`} data-cms-link="contato-dpo">Falar com o DPO →</a><Link className="btn btn--ghost-light" href="/lgpd#exercicio-direitos" data-cms-link="exercicio-direitos">Exercer direitos do titular</Link>
           </div>
         </div>
       </section>

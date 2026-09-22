@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { carregarContatos } from "@/lib/contatos";
+
 import {
-  CHANNELS,
-  CTA_FINAL,
-  FAQS,
   HERO,
-  HQ,
-  LGPD,
   SLA_HORARIOS,
   SLAS,
-  VERTICAIS,
+  montarChannels,
+  montarCtaFinal,
+  montarFaqs,
+  montarHq,
+  montarLgpd,
+  montarVerticais,
 } from "./conteudoContato";
 import { EfeitosContato } from "./EfeitosContato";
 import { FaqAccordion } from "./FaqAccordion";
@@ -50,7 +52,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ContatoPage() {
+export default async function ContatoPage() {
+  const contatos = await carregarContatos();
+  const CHANNELS = montarChannels(contatos);
+  const HQ = montarHq(contatos);
+  const VERTICAIS = montarVerticais(contatos);
+  const FAQS = montarFaqs(contatos);
+  const LGPD = montarLgpd(contatos);
+  const CTA_FINAL = montarCtaFinal(contatos);
+
   return (
     <>
       <main id="main">

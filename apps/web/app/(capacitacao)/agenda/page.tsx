@@ -3,6 +3,7 @@ import { Fragment } from "react";
 
 import { derivarDatasEvento } from "@/lib/cms/derivarDatasEvento";
 import { buscarOverride } from "@/lib/cms/overrideEventoOnline";
+import { carregarContatos } from "@/lib/contatos";
 import { paraCartaoAgenda } from "@/lib/eventos/adaptarParaCard";
 
 import {
@@ -14,7 +15,7 @@ import {
   type CartaoEvento,
   CTAS_INTERMEDIARIOS,
   HERO_AGENDA,
-  RODAPE_CONTEXTUAL,
+  montarRodapeContextual,
 } from "./conteudoAgenda";
 import { PipelineAgenda } from "./PipelineAgenda";
 import { StickyMobileCTA } from "./StickyMobileCTA";
@@ -83,6 +84,8 @@ export default async function AgendaPage() {
     (e): e is EventoReal => Boolean(e),
   );
   const eventosReais = await aplicarOverrideCard(eventosBase);
+  const contatos = await carregarContatos();
+  const rodapeContextual = montarRodapeContextual(contatos);
   const eventosAgenda: CartaoEvento[] = eventosReais
     .map((e, i) => paraCartaoAgenda(e, i + 1))
     .filter((c): c is CartaoEvento => Boolean(c));
@@ -175,7 +178,7 @@ export default async function AgendaPage() {
       <section className="agenda-context" aria-label="Navegação contextual relacionada à agenda">
         <div className="container">
           <div className="agenda-context-grid">
-            {RODAPE_CONTEXTUAL.map((col) => (
+            {rodapeContextual.map((col) => (
               <div key={col.titulo} className="agenda-context-col">
                 <h5>{col.titulo}</h5>
                 <ul>

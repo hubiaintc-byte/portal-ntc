@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { carregarContatos } from "@/lib/contatos";
+
 import { HeaderHome } from "./HeaderHome";
 import { FooterHome } from "./FooterHome";
 import { InteracoesScroll } from "./InteracoesScroll";
@@ -13,12 +15,14 @@ import { InteracoesScroll } from "./InteracoesScroll";
  * do HTML aprovado, com as interações reescritas em Client Components
  * pequenos (`HeaderHome`, com megas e drawer).
  */
-export default function HomeLayout({ children }: { children: ReactNode }) {
+export default async function HomeLayout({ children }: { children: ReactNode }) {
+  const contatos = await carregarContatos();
+
   return (
     <>
       <HeaderHome />
       {children}
-      <FooterHome />
+      <FooterHome contatos={contatos} />
       <InteracoesScroll />
     </>
   );

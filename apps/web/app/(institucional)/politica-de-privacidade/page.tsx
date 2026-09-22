@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { carregarContatos } from "@/lib/contatos";
+
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Política de Privacidade · Grupo NTC",
   description:
@@ -33,7 +37,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PoliticaDePrivacidadePage() {
+export default async function PoliticaDePrivacidadePage() {
+  const contatos = await carregarContatos();
+
   return (
     <main id="main">
 
@@ -52,7 +58,7 @@ export default function PoliticaDePrivacidadePage() {
           <p className="eyebrow gold">Governança de dados · Grupo NTC · Edição 2026</p>
           <h1>Política de Privacidade<span className="accent">.</span><br />O cuidado com os dados que confiam a nós.</h1>
           <p className="hero-page-sub">Esta Política descreve, de forma transparente, quais dados pessoais o <strong style={{ color: 'var(--pergaminho)' }}>Instituto NTC do Brasil</strong> trata em seus canais, com que finalidades, sob quais bases legais, com quem podem ser compartilhados e como o titular exerce os direitos garantidos pela Lei Geral de Proteção de Dados.</p>
-          <div className="hero-meta"><span><strong>Vigência:</strong> 14/05/2026</span><span><strong>Base legal:</strong> Lei n.º 13.709/2018 (LGPD)</span><span><strong>Encarregado:</strong> dpo@institutontc.com.br</span></div>
+          <div className="hero-meta"><span><strong>Vigência:</strong> 14/05/2026</span><span><strong>Base legal:</strong> Lei n.º 13.709/2018 (LGPD)</span><span><strong>Encarregado:</strong> {contatos.emailDpo}</span></div>
         </div>
       </section>
 
@@ -251,14 +257,14 @@ export default function PoliticaDePrivacidadePage() {
                     </div>
                     <div>
                       <h3>Encarregado (DPO) — Encarregado de Tratamento de Dados</h3>
-                      <p>Canal exclusivo e prioritário para o exercício dos direitos do titular dos dados: <a href="mailto:dpo@institutontc.com.br" data-cms-link="contato-dpo">dpo@institutontc.com.br</a>. O atendimento observará os prazos previstos na LGPD e na regulamentação aplicável; quando cabível declaração completa nos termos do art. 19 da LGPD, a resposta será fornecida em até 15 dias, contados do recebimento, ressalvadas hipóteses legalmente justificadas.</p>
+                      <p>Canal exclusivo e prioritário para o exercício dos direitos do titular dos dados: <a href={`mailto:${contatos.emailDpo}`} data-cms-link="contato-dpo">{contatos.emailDpo}</a>. O atendimento observará os prazos previstos na LGPD e na regulamentação aplicável; quando cabível declaração completa nos termos do art. 19 da LGPD, a resposta será fornecida em até 15 dias, contados do recebimento, ressalvadas hipóteses legalmente justificadas.</p>
                     </div>
                   </div>
                 </div>
 
                 <p>Os canais oficiais para exercício de direitos, dúvidas ou denúncias relacionadas à proteção de dados são:</p>
                 <ul>
-                  <li><strong>E-mail do Encarregado (DPO):</strong> <a href="mailto:dpo@institutontc.com.br">dpo@institutontc.com.br</a> — canal preferencial.</li>
+                  <li><strong>E-mail do Encarregado (DPO):</strong> <a href={`mailto:${contatos.emailDpo}`}>{contatos.emailDpo}</a> — canal preferencial.</li>
                   <li><strong>Endereço postal:</strong> SCS Quadra 9, Bloco C, Ed. Parque Cidade Corporate, Sala 1001, Asa Sul · Brasília – DF · CEP 70308-200 · A/C Encarregado de Tratamento de Dados.</li>
                   <li><strong>Atendimento institucional:</strong> (63) 3212-1199 (horário comercial, dias úteis).</li>
                 </ul>
@@ -300,7 +306,7 @@ export default function PoliticaDePrivacidadePage() {
           <h2>Dúvidas, solicitações ou exercício de direitos? <em>Fale com o Encarregado (DPO).</em></h2>
           <p>O Encarregado (DPO) do Instituto NTC do Brasil é o canal oficial para qualquer questão envolvendo dados pessoais nos canais do Grupo NTC. O atendimento observará os prazos previstos na LGPD e na regulamentação aplicável.</p>
           <div className="legal-cta-final-actions">
-            <a className="btn btn--gold" href="mailto:dpo@institutontc.com.br" data-cms-link="contato-dpo">Falar com o DPO →</a><a className="btn btn--ghost-light" href="/lgpd#exercicio-direitos" data-cms-link="exercicio-direitos">Exercer direitos do titular</a>
+            <a className="btn btn--gold" href={`mailto:${contatos.emailDpo}`} data-cms-link="contato-dpo">Falar com o DPO →</a><a className="btn btn--ghost-light" href="/lgpd#exercicio-direitos" data-cms-link="exercicio-direitos">Exercer direitos do titular</a>
           </div>
         </div>
       </section>

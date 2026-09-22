@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { carregarContatos } from "@/lib/contatos";
+
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Mapa do site · Grupo NTC",
   description:
@@ -33,7 +37,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function MapaDoSitePage() {
+export default async function MapaDoSitePage() {
+  const contatos = await carregarContatos();
+
   return (
     <main id="main">
 
@@ -254,7 +260,7 @@ export default function MapaDoSitePage() {
                       <li><Link href="/politica-de-privacidade"><strong>Política de Privacidade</strong><span>Bases legais · direitos · DPO</span></Link></li>
                       <li><Link href="/lgpd"><strong>LGPD — Governança</strong><span>Programa institucional de proteção</span></Link></li>
                       <li><Link href="/lgpd#exercicio-direitos"><strong>Exercer direitos do titular</strong><span>Fluxo formal · 15 dias úteis</span></Link></li>
-                      <li><a href="mailto:dpo@institutontc.com.br"><strong>dpo@institutontc.com.br</strong><span>Canal exclusivo do Encarregado</span></a></li>
+                      <li><a href={`mailto:${contatos.emailDpo}`}><strong>{contatos.emailDpo}</strong><span>Canal exclusivo do Encarregado</span></a></li>
                     </ul>
                   </div>
                   <div className="sitemap-col">

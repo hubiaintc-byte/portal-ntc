@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { carregarContatos } from "@/lib/contatos";
+
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "LGPD — Governança Institucional · Grupo NTC",
   description:
@@ -33,7 +37,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LgpdPage() {
+export default async function LgpdPage() {
+  const contatos = await carregarContatos();
+
   return (
     <main id="main">
 
@@ -52,7 +58,7 @@ export default function LgpdPage() {
           <p className="eyebrow gold">Governança institucional · Grupo NTC · Edição 2026</p>
           <h1>LGPD<span className="accent">.</span><br />A governança institucional de proteção de dados do Grupo NTC.</h1>
           <p className="hero-page-sub">O <strong style={{ color: 'var(--pergaminho)' }}>Instituto NTC do Brasil</strong> compreende a proteção de dados pessoais como pilar inafastável da formação institucional pública. Esta página apresenta a estrutura institucional adotada para implementação da Lei n.º 13.709/2018 e os canais oficiais para o exercício dos direitos do titular.</p>
-          <div className="hero-meta"><span><strong>Base legal:</strong> Lei n.º 13.709/2018</span><span><strong>Encarregado (DPO):</strong> dpo@institutontc.com.br</span><span><strong>Prazos:</strong> conforme LGPD (art. 19)</span></div>
+          <div className="hero-meta"><span><strong>Base legal:</strong> Lei n.º 13.709/2018</span><span><strong>Encarregado (DPO):</strong> {contatos.emailDpo}</span><span><strong>Prazos:</strong> conforme LGPD (art. 19)</span></div>
         </div>
       </section>
 
@@ -112,7 +118,7 @@ export default function LgpdPage() {
                   <tbody>
                     <tr><td><strong>Controlador</strong></td><td>A quem competem as decisões sobre o tratamento de dados pessoais.</td><td>Instituto NTC do Brasil — CNPJ 10.614.200/0001-98.</td></tr>
                     <tr><td><strong>Operador</strong></td><td>Quem realiza o tratamento de dados em nome do controlador.</td><td>Prestadores de tecnologia, infraestrutura de eventos, e-mail transacional, contratualmente vinculados.</td></tr>
-                    <tr><td><strong>Encarregado (DPO)</strong></td><td>Pessoa indicada como canal de comunicação entre controlador, titulares e ANPD.</td><td>Encarregado de Tratamento de Dados do Instituto NTC do Brasil — <a href="mailto:dpo@institutontc.com.br">dpo@institutontc.com.br</a>.</td></tr>
+                    <tr><td><strong>Encarregado (DPO)</strong></td><td>Pessoa indicada como canal de comunicação entre controlador, titulares e ANPD.</td><td>Encarregado de Tratamento de Dados do Instituto NTC do Brasil — <a href={`mailto:${contatos.emailDpo}`}>{contatos.emailDpo}</a>.</td></tr>
                   </tbody>
                 </table>
                 <p>Em programas contratados por instituições públicas, é frequente o regime de <strong>controle conjunto</strong> — caso em que o Instituto NTC do Brasil e a Instituição Contratante atuam em cooperação e responsabilidade compartilhada, sempre formalizados por instrumento contratual específico.</p>
@@ -166,7 +172,7 @@ export default function LgpdPage() {
                     </div>
                     <div>
                       <h3>Encarregado (DPO) — Encarregado de Tratamento de Dados</h3>
-                      <p><strong>E-mail oficial:</strong> <a href="mailto:dpo@institutontc.com.br" data-cms-link="contato-dpo">dpo@institutontc.com.br</a><br />
+                      <p><strong>E-mail oficial:</strong> <a href={`mailto:${contatos.emailDpo}`} data-cms-link="contato-dpo">{contatos.emailDpo}</a><br />
                       <strong>Endereço postal:</strong> SCS Quadra 9, Bloco C, Ed. Parque Cidade Corporate, Sala 1001, Asa Sul — Brasília – DF · CEP 70308-200 (A/C Encarregado de Tratamento de Dados)</p>
                     </div>
                   </div>
@@ -179,7 +185,7 @@ export default function LgpdPage() {
                 <h2>Exercício de <em>direitos</em></h2>
                 <p>O titular dos dados pode exercer todos os direitos previstos no art. 18 da LGPD enviando solicitação ao Encarregado (DPO). Para garantir atendimento ágil e seguro, recomenda-se:</p>
                 <ol className="numbered">
-                  <li>Acessar o e-mail <a href="mailto:dpo@institutontc.com.br">dpo@institutontc.com.br</a>;</li>
+                  <li>Acessar o e-mail <a href={`mailto:${contatos.emailDpo}`}>{contatos.emailDpo}</a>;</li>
                   <li>Informar nome completo e e-mail vinculado ao tratamento, quando aplicável;</li>
                   <li>Indicar de forma objetiva o direito que se deseja exercer (confirmação, acesso, correção, eliminação, portabilidade, revogação de consentimento etc.);</li>
                   <li>Quando relevante, contextualizar o canal ou evento em que o tratamento ocorreu (por exemplo: &ldquo;Inscrição no Seminário Nacional EventOn de 12/04/2026&rdquo;).</li>
@@ -252,7 +258,7 @@ export default function LgpdPage() {
           <h2>Quer exercer um direito do titular? <em>Fale diretamente com o Encarregado (DPO).</em></h2>
           <p>O Encarregado (DPO) do Instituto NTC do Brasil é o canal oficial para o exercício dos direitos do titular dos dados. O atendimento será realizado nos prazos previstos na LGPD e na regulamentação aplicável, conforme o fluxo institucional documentado nesta página.</p>
           <div className="legal-cta-final-actions">
-            <a className="btn btn--gold" href="mailto:dpo@institutontc.com.br" data-cms-link="contato-dpo">Falar com o DPO →</a><Link className="btn btn--ghost-light" href="/lgpd#exercicio-direitos" data-cms-link="exercicio-direitos">Exercer direitos do titular</Link>
+            <a className="btn btn--gold" href={`mailto:${contatos.emailDpo}`} data-cms-link="contato-dpo">Falar com o DPO →</a><Link className="btn btn--ghost-light" href="/lgpd#exercicio-direitos" data-cms-link="exercicio-direitos">Exercer direitos do titular</Link>
           </div>
         </div>
       </section>

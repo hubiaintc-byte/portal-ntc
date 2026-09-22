@@ -4,6 +4,8 @@
 //  Nada de rephrasing — fidelidade 100% ao protótipo aprovado.
 // =============================================================
 
+import type { Contatos } from "@/lib/contatos";
+
 // ----------------- Slugs (espelham data-* dos cards) -----------------
 
 export type AreaSlug = "edu" | "gov" | "sau";
@@ -373,42 +375,44 @@ export interface ColunaRodape {
   itens: LinkInterno[];
 }
 
-export const RODAPE_CONTEXTUAL: ColunaRodape[] = [
-  {
-    titulo: "Áreas estratégicas",
-    itens: [
-      { texto: "NTC Educação", href: "/solucoes-estrategicas/educacao", cmsLink: "vertical-edu" },
-      { texto: "NTC Gestão Pública", href: "/solucoes-estrategicas/gestao-publica", cmsLink: "vertical-gov" },
-      { texto: "NTC Saúde", href: "/solucoes-estrategicas/saude", cmsLink: "vertical-sau" },
-    ],
-  },
-  {
-    titulo: "Plataforma e suporte",
-    itens: [
-      // TODO: âncora #eventon ainda não existe em /o-grupo
-      { texto: "EventOn · Plataforma de transmissão", href: "/o-grupo#eventon", cmsLink: "eventon" },
-      { texto: "Suporte ao participante", href: "/contato", cmsLink: "eventon-suporte" },
-      { texto: "Área do Participante", href: "/contato", cmsLink: "area-participante" },
-    ],
-  },
-  {
-    titulo: "Modelos de contratação",
-    itens: [
-      // TODO: âncora #juridico ainda não existe em /o-grupo
-      { texto: "Lei 14.133/2021 · Inexigibilidade", href: "/o-grupo#juridico", cmsLink: "contratacao-lei14133" },
-      { texto: "Soluções in company", href: "/contato", cmsLink: "contratacao-incompany" },
-      { texto: "Soluções sob medida", href: "/contato", cmsLink: "contratacao-sobmedida" },
-    ],
-  },
-  {
-    titulo: "Atendimento comercial",
-    itens: [
-      { texto: "Solicitar proposta institucional", href: "/contato", cmsLink: "proposta-institucional" },
-      { texto: "WhatsApp · (63) 98444-4040", href: "/contato", cmsLink: "whatsapp" },
-      { texto: "contato@institutontc.com.br", href: "/contato", cmsLink: "comercial-email" },
-    ],
-  },
-];
+export function montarRodapeContextual(c: Contatos): ColunaRodape[] {
+  return [
+    {
+      titulo: "Áreas estratégicas",
+      itens: [
+        { texto: "NTC Educação", href: "/solucoes-estrategicas/educacao", cmsLink: "vertical-edu" },
+        { texto: "NTC Gestão Pública", href: "/solucoes-estrategicas/gestao-publica", cmsLink: "vertical-gov" },
+        { texto: "NTC Saúde", href: "/solucoes-estrategicas/saude", cmsLink: "vertical-sau" },
+      ],
+    },
+    {
+      titulo: "Plataforma e suporte",
+      itens: [
+        // TODO: âncora #eventon ainda não existe em /o-grupo
+        { texto: "EventOn · Plataforma de transmissão", href: "/o-grupo#eventon", cmsLink: "eventon" },
+        { texto: "Suporte ao participante", href: "/contato", cmsLink: "eventon-suporte" },
+        { texto: "Área do Participante", href: "/contato", cmsLink: "area-participante" },
+      ],
+    },
+    {
+      titulo: "Modelos de contratação",
+      itens: [
+        // TODO: âncora #juridico ainda não existe em /o-grupo
+        { texto: "Lei 14.133/2021 · Inexigibilidade", href: "/o-grupo#juridico", cmsLink: "contratacao-lei14133" },
+        { texto: "Soluções in company", href: "/contato", cmsLink: "contratacao-incompany" },
+        { texto: "Soluções sob medida", href: "/contato", cmsLink: "contratacao-sobmedida" },
+      ],
+    },
+    {
+      titulo: "Atendimento comercial",
+      itens: [
+        { texto: "Solicitar proposta institucional", href: "/contato", cmsLink: "proposta-institucional" },
+        { texto: `WhatsApp · ${c.whatsapp}`, href: "/contato", cmsLink: "whatsapp" },
+        { texto: c.emailInstitucional, href: "/contato", cmsLink: "comercial-email" },
+      ],
+    },
+  ];
+}
 
 // ----------------- STICKY MOBILE CTA -----------------
 

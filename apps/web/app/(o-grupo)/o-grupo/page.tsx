@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { CONTEUDO_OGRUPO } from "./conteudoOGrupo";
+import { carregarContatos } from "@/lib/contatos";
+
+import { CONTEUDO_OGRUPO, montarEnderecoOGrupo } from "./conteudoOGrupo";
 import { NavBarAncoras } from "./NavBarAncoras";
 import {
   ICONE_DIFERENCIAIS,
@@ -27,8 +29,9 @@ function html(s: string): { __html: string } {
   return { __html: s };
 }
 
-export default function OGrupoPage() {
+export default async function OGrupoPage() {
   const C = CONTEUDO_OGRUPO;
+  const contatos = await carregarContatos();
 
   // Hero
   const heroImgUrl = C.hero.imagemFundoUrl;
@@ -135,7 +138,7 @@ export default function OGrupoPage() {
   const ctaFSub = C.ctaFinal.subtitulo;
   const ctaFCtas = C.ctaFinal.ctas;
   const ctaFTag = C.ctaFinal.tagline;
-  const ctaFEndereco = C.ctaFinal.endereco;
+  const ctaFEndereco = montarEnderecoOGrupo(contatos);
 
   return (
     <main id="main">
