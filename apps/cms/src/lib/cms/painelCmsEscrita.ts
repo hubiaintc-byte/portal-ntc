@@ -655,10 +655,19 @@ export async function enviarMidiaConteudo(
       overrideAccess: true,
     });
 
+    // Chave literal, não computada: `campo` chega como argumento de Server
+    // Action, então a união só existe em tempo de compilação. O ternário
+    // fecha a porta para um campo arbitrário chegar ao `data` em runtime — e
+    // de quebra o objeto se tipa sozinho, sem o cast duplo (§4.4).
+    const dados =
+      campo === "imagemDestaque"
+        ? { imagemDestaque: media.id }
+        : { anexoDownload: media.id };
+
     await payload.update({
       collection: "conteudos",
       id,
-      data: { [campo]: media.id } as unknown as RequiredDataFromCollectionSlug<"conteudos">,
+      data: dados,
       draft: true,
       overrideAccess: true,
     });

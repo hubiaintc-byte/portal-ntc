@@ -37,6 +37,9 @@ const CLASSE_SITUACAO: Record<SituacaoConteudo, string> = {
 /** Categorias cujo conteúdo é um arquivo para download (o campo Anexo só aparece nelas). */
 const CATEGORIAS_COM_ANEXO = ["material", "estudo"];
 
+/** Mesmo teto que `validarConteudo` aplica no servidor (painelCmsEscrita.ts). */
+const LIDE_MAXIMO = 280;
+
 function hojeISO(): string {
   const agora = new Date();
   const mes = String(agora.getMonth() + 1).padStart(2, "0");
@@ -146,9 +149,16 @@ function CampoArquivo({ conteudoId, campo, rotulo, accept, atual, onEnviado }: C
         onChange={aoEscolher}
         disabled={enviando || conteudoId === null}
       />
+      {/*
+        O input acima é `display: none` (pcms-upload__input), logo não é
+        focável nem exposto a leitor de tela: o controle operável é este
+        botão. Dois deles convivem na tela quando a categoria tem anexo, e
+        "Escolher arquivo" sozinho não os distingue (§10).
+      */}
       <button
         type="button"
         className="pcms-btn pcms-btn--ghost"
+        aria-label={`Escolher arquivo — ${rotulo}`}
         onClick={() => inputRef.current?.click()}
         disabled={enviando || conteudoId === null}
       >
@@ -416,12 +426,24 @@ export function DetalheConteudo({
             </div>
 
             <div className="pcms-field">
-              <label htmlFor="ct-lide">Lide (resumo de abertura, até 280 caracteres)</label>
+              {/*
+                Contador ao vivo ao lado do rótulo: com `maxLength` sozinho,
+                colar um texto mais longo perde o excedente em silêncio. Fica
+                fora do <label> para não entrar no nome acessível do campo —
+                é descrição (aria-describedby), não nome.
+              */}
+              <div className="pcms-field__rotulo-linha">
+                <label htmlFor="ct-lide">Lide (resumo de abertura)</label>
+                <span className="pcms-contador" id="ct-lide-contador">
+                  {campos.lide.length}/{LIDE_MAXIMO}
+                </span>
+              </div>
               <textarea
                 id="ct-lide"
                 rows={3}
-                maxLength={280}
+                maxLength={LIDE_MAXIMO}
                 value={campos.lide}
+                aria-describedby="ct-lide-contador"
                 onChange={(e) => mudar("lide", e.target.value)}
               />
             </div>
