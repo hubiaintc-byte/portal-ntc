@@ -50,12 +50,27 @@ describe("salvarConteudoCms", () => {
     expect(enviado.draft).toBe(true);
     expect(enviado.data.titulo).toBe("Nota sobre a LGPD");
     expect(enviado.data.corpo.root.children[0]).toMatchObject({ type: "heading", tag: "h2" });
+    // SEO vazio grava o grupo aninhado com os dois campos null, não a chave
+    // solta "seoTitulo"/"seoDescricao" — a coleção usa um grupo `seo`.
+    expect(enviado.data.seo).toEqual({ tituloSeo: null, descricaoSeo: null });
   });
 
-  it("atualiza preservando o estado de publicação quando há id", async () => {
+  it("atualiza preservando o estado de publicação quando há id, gravando o SEO no grupo aninhado", async () => {
     update.mockResolvedValue({ id: 12 });
-    await salvarConteudoCms("12", campos);
-    expect(update.mock.calls[0]![0]).toMatchObject({ collection: "conteudos", id: "12", draft: true });
+    await salvarConteudoCms("12", {
+      ...campos,
+      seoTitulo: "Título SEO da nota",
+      seoDescricao: "Descrição SEO da nota.",
+    });
+    const enviado = update.mock.calls[0]![0];
+    expect(enviado).toMatchObject({ collection: "conteudos", id: "12", draft: true });
+    // Grava em `seo.tituloSeo`/`seo.descricaoSeo` (grupo da coleção), não em
+    // chaves soltas `seoTitulo`/`seoDescricao` — gravar flat perderia os dois
+    // campos silenciosamente.
+    expect(enviado.data.seo).toEqual({
+      tituloSeo: "Título SEO da nota",
+      descricaoSeo: "Descrição SEO da nota.",
+    });
   });
 
   it("grava área nula quando areaId vem vazio", async () => {
