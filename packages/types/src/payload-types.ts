@@ -2763,6 +2763,19 @@ export interface Rodape {
   emailImprensa?: string | null;
   emailParcerias?: string | null;
   emailDpo?: string | null;
+  emailSuporte?: string | null;
+  emailEventos?: string | null;
+  verticais?:
+    | {
+        vertical: 'educacao' | 'gestao-publica' | 'saude';
+        email: string;
+        /**
+         * Ex.: "opção 1"
+         */
+        opcaoTelefone?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   telefoneInstitucional?: string | null;
   whatsappInstitucional?: string | null;
   redesSociais?:
@@ -3106,6 +3119,16 @@ export interface RodapeSelect<T extends boolean = true> {
   emailImprensa?: T;
   emailParcerias?: T;
   emailDpo?: T;
+  emailSuporte?: T;
+  emailEventos?: T;
+  verticais?:
+    | T
+    | {
+        vertical?: T;
+        email?: T;
+        opcaoTelefone?: T;
+        id?: T;
+      };
   telefoneInstitucional?: T;
   whatsappInstitucional?: T;
   redesSociais?:

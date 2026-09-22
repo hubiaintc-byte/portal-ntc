@@ -1,5 +1,7 @@
 import type { GlobalConfig } from "payload";
 
+import { VERTICAIS_CONTATO } from "@ntc/lib";
+
 import { editorInstitucional } from "../access/editorInstitucional";
 
 /**
@@ -10,7 +12,7 @@ import { editorInstitucional } from "../access/editorInstitucional";
  */
 export const Rodape: GlobalConfig = {
   slug: "rodape",
-  label: "Rodapé Institucional",
+  label: "Contatos institucionais",
   admin: { group: "Páginas Singleton" },
   access: { read: () => true, update: editorInstitucional },
   fields: [
@@ -24,6 +26,24 @@ export const Rodape: GlobalConfig = {
     { name: "emailImprensa", type: "email" },
     { name: "emailParcerias", type: "email" },
     { name: "emailDpo", type: "email" },
+    { name: "emailSuporte", type: "email" },
+    { name: "emailEventos", type: "email" },
+    {
+      name: "verticais",
+      type: "array",
+      label: "Coordenações por vertical",
+      maxRows: 3,
+      fields: [
+        {
+          name: "vertical",
+          type: "select",
+          required: true,
+          options: VERTICAIS_CONTATO.map((v) => ({ label: v.rotulo, value: v.valor })),
+        },
+        { name: "email", type: "email", required: true },
+        { name: "opcaoTelefone", type: "text", admin: { description: 'Ex.: "opção 1"' } },
+      ],
+    },
     { name: "telefoneInstitucional", type: "text" },
     { name: "whatsappInstitucional", type: "text" },
     {

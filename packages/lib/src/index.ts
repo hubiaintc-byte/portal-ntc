@@ -131,6 +131,13 @@ export {
   tituloLeadApagado,
 } from "./crm/exclusao";
 
+// Institucional — contatos (telefone/WhatsApp/verticais).
+export {
+  telefoneParaHref,
+  whatsappParaHref,
+  VERTICAIS_CONTATO,
+} from "./institucional/contatos";
+
 // Editorial — serialização do corpo de conteúdos.
 export { lexicalParaHtmlEditorial } from "./editorial/lexical-html";
 
