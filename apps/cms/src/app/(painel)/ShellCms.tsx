@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 
 import type {
+  ConteudoCmsDetalhe,
+  ConteudoCmsResumo,
   EventoCmsDetalhe,
   EventoCmsResumo,
   LeadCmsResumo,
@@ -12,12 +14,19 @@ import type {
 
 import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
 
-import { carregarEvento, carregarPalestrante, carregarUsuarios } from "./acoes";
+import {
+  carregarAreas,
+  carregarConteudo,
+  carregarEvento,
+  carregarPalestrante,
+  carregarUsuarios,
+} from "./acoes";
 import { ShellPainel, type GrupoNav } from "./shell/ShellPainel";
 import { TelaDashboard } from "./TelaDashboard";
 import { TelaHome } from "./TelaHome";
 import { TelaPalestrantes } from "./TelaPalestrantes";
 import { TelaEventos } from "./TelaEventos";
+import { TelaConteudos } from "./TelaConteudos";
 import { TelaConfiguracoes } from "./TelaConfiguracoes";
 import { TelaUsuarios } from "./TelaUsuarios";
 import { DetalheEvento } from "./DetalheEvento";
@@ -36,11 +45,19 @@ interface ShellCmsProps {
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
   leads: LeadCmsResumo[];
+  conteudos: ConteudoCmsResumo[];
   eventosHomeIds: string[];
   erroLeitura: boolean;
 }
 
-type TelaId = "dashboard" | "palestrantes" | "eventos" | "home" | "config" | "usuarios";
+type TelaId =
+  | "dashboard"
+  | "palestrantes"
+  | "eventos"
+  | "conteudos"
+  | "home"
+  | "config"
+  | "usuarios";
 
 interface ItemNav {
   id: TelaId;
@@ -72,6 +89,13 @@ const Ico = {
       <path d="M3.5 9.5h17M8 3v4M16 3v4" />
     </svg>
   ),
+  conteudos: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 3h9l4 4v14H6z" />
+      <path d="M15 3v4h4" />
+      <path d="M9 12h7M9 16h7" />
+    </svg>
+  ),
   home: (
     <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 11 12 4l8 7" />
@@ -99,6 +123,7 @@ const NAV_PRINCIPAL: ItemNav[] = [
   { id: "dashboard", rotulo: "Painel", icone: Ico.painel },
   { id: "palestrantes", rotulo: "Palestrantes", icone: Ico.palestrantes },
   { id: "eventos", rotulo: "Eventos", icone: Ico.eventos },
+  { id: "conteudos", rotulo: "Conteúdos", icone: Ico.conteudos },
   { id: "home", rotulo: "Home", icone: Ico.home },
 ];
 
@@ -106,6 +131,7 @@ const CRUMB: Record<TelaId, string> = {
   dashboard: "Painel",
   palestrantes: "Editorial · Palestrantes",
   eventos: "Editorial · Eventos",
+  conteudos: "Editorial · Conteúdos",
   home: "Editorial · Home",
   config: "Sistema · Configurações",
   usuarios: "Sistema · Usuários",
@@ -116,6 +142,7 @@ export function ShellCms({
   eventos,
   palestrantes,
   leads,
+  conteudos,
   eventosHomeIds,
   erroLeitura,
 }: ShellCmsProps) {
@@ -124,6 +151,13 @@ export function ShellCms({
   // true ⇒ o detalhe abre direto em edição (revisão pós-importação de PDF).
   const [eventoEmEdicao, setEventoEmEdicao] = useState(false);
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
+  const [conteudoDet, setConteudoDet] = useState<ConteudoCmsDetalhe | null>(null);
+  const [criandoConteudo, setCriandoConteudo] = useState(false);
+  // `areas` só é lida pelo <DetalheConteudo> que a Task 8 acrescenta; até lá
+  // fica carregada e pronta, sem consumidor no JSX (noUnusedLocals exige o
+  // `void` explícito para não travar o typecheck nesse meio-tempo).
+  const [areas, setAreas] = useState<{ id: string; nome: string }[]>([]);
+  void areas;
   const [carregando, iniciarCarga] = useTransition();
 
   const ehSuperAdmin = usuario.perfil === "super-admin";
@@ -161,15 +195,36 @@ export function ShellCms({
     });
   }
 
+  function abrirConteudo(id: string) {
+    iniciarCarga(async () => {
+      const [det, listaAreas] = await Promise.all([carregarConteudo(id), carregarAreas()]);
+      if (det) {
+        setAreas(listaAreas);
+        setConteudoDet(det);
+        setCriandoConteudo(false);
+      }
+    });
+  }
+
+  function novoConteudo() {
+    iniciarCarga(async () => {
+      setAreas(await carregarAreas());
+      setConteudoDet(null);
+      setCriandoConteudo(true);
+    });
+  }
+
   // Trocar de tela pela sidebar sempre fecha qualquer detalhe aberto.
   function irPara(id: TelaId) {
     setEventoDet(null);
     setPalestranteDet(null);
+    setConteudoDet(null);
+    setCriandoConteudo(false);
     setTela(id);
     if (id === "usuarios") abrirUsuarios();
   }
 
-  const detalheAberto = eventoDet ?? palestranteDet;
+  const detalheAberto = eventoDet ?? palestranteDet ?? conteudoDet ?? (criandoConteudo ? true : null);
 
   const navSistema: ItemNav[] = ehSuperAdmin
     ? [
@@ -214,6 +269,7 @@ export function ShellCms({
                 eventos={eventos}
                 palestrantes={palestrantes}
                 leads={leads}
+                conteudos={conteudos}
                 erroLeitura={erroLeitura}
               />
             )}
@@ -226,6 +282,9 @@ export function ShellCms({
                 onAbrir={abrirEvento}
                 onAbrirImportado={(id) => abrirEvento(id, true)}
               />
+            )}
+            {tela === "conteudos" && (
+              <TelaConteudos conteudos={conteudos} onAbrir={abrirConteudo} onNovo={novoConteudo} />
             )}
             {tela === "home" && <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />}
             {tela === "config" && <TelaConfiguracoes usuario={usuario} />}
