@@ -56,3 +56,47 @@ describe("carregarContatos", () => {
     expect(CONTATOS_FALLBACK.verticais).toHaveLength(3);
   });
 });
+
+describe("carregarContatos — mescla de verticais", () => {
+  it("completa a vertical ausente do CMS com a entrada real do fallback", async () => {
+    // "gestao-publica" nunca chegou a existir no array do CMS — uma linha
+    // apagada no admin, ou um seed parcial. As outras duas vêm do CMS.
+    findGlobal.mockResolvedValue({
+      verticais: [
+        { vertical: "educacao", email: "educacao@institutontc.com.br", opcaoTelefone: "opção 1" },
+        { vertical: "saude", email: "saude@institutontc.com.br", opcaoTelefone: "opção 3" },
+      ],
+    });
+    const c = await carregarContatos();
+    expect(c.verticais).toHaveLength(3);
+    const gestaoPublica = c.verticais.find((v) => v.vertical === "gestao-publica");
+    expect(gestaoPublica).toEqual(
+      CONTATOS_FALLBACK.verticais.find((v) => v.vertical === "gestao-publica"),
+    );
+  });
+
+  it("mescla sub-campo vazio de uma vertical presente contra a mesma vertical do fallback", async () => {
+    // As 3 verticais existem no CMS, mas o e-mail de "saude" foi limpo —
+    // não pode virar "", tem que cair no e-mail real de saude, não num
+    // valor genérico vazio.
+    findGlobal.mockResolvedValue({
+      verticais: [
+        { vertical: "educacao", email: "educacao@institutontc.com.br", opcaoTelefone: "opção 1" },
+        {
+          vertical: "gestao-publica",
+          email: "gestaopublica@institutontc.com.br",
+          opcaoTelefone: "opção 2",
+        },
+        { vertical: "saude", email: "", opcaoTelefone: "opção 3" },
+      ],
+    });
+    const c = await carregarContatos();
+    expect(c.verticais).toHaveLength(3);
+    const saude = c.verticais.find((v) => v.vertical === "saude");
+    expect(saude?.email).toBe(
+      CONTATOS_FALLBACK.verticais.find((v) => v.vertical === "saude")!.email,
+    );
+    // opcaoTelefone veio preenchido do CMS — não deve ser trocado pelo fallback.
+    expect(saude?.opcaoTelefone).toBe("opção 3");
+  });
+});

@@ -78,6 +78,27 @@ function campo(valorCms: string | null | undefined, valorFallback: string): stri
   return typeof valorCms === "string" && valorCms.length > 0 ? valorCms : valorFallback;
 }
 
+/**
+ * As 3 verticais de `CONTATOS_FALLBACK` são a lista canônica — o resultado
+ * sempre tem as 3, nesta ordem. Para cada uma, procura a entrada
+ * correspondente no CMS pela chave `vertical` (o array do Payload pode vir
+ * incompleto — uma linha apagada no admin, ou um seed parcial) e mescla
+ * `email`/`opcaoTelefone` campo a campo contra o fallback **daquela
+ * vertical**, com o mesmo `campo()` usado nos escalares — nunca contra
+ * `""`. Uma vertical ausente do CMS usa a entrada de fallback inteira;
+ * uma vertical presente com um sub-campo vazio só perde aquele sub-campo.
+ */
+function mesclarVerticais(cmsVerticais: Rodape["verticais"]): Contatos["verticais"] {
+  return CONTATOS_FALLBACK.verticais.map((fallback) => {
+    const cms = cmsVerticais?.find((v) => v.vertical === fallback.vertical);
+    return {
+      vertical: fallback.vertical,
+      email: campo(cms?.email, fallback.email),
+      opcaoTelefone: campo(cms?.opcaoTelefone, fallback.opcaoTelefone),
+    };
+  });
+}
+
 export const carregarContatos = cache(async (): Promise<Contatos> => {
   try {
     const payload = await obterPayload();
@@ -86,14 +107,7 @@ export const carregarContatos = cache(async (): Promise<Contatos> => {
 
     const telefone = campo(g.telefoneInstitucional, CONTATOS_FALLBACK.telefone);
     const whatsapp = campo(g.whatsappInstitucional, CONTATOS_FALLBACK.whatsapp);
-    const verticais =
-      Array.isArray(g.verticais) && g.verticais.length > 0
-        ? g.verticais.map((v) => ({
-            vertical: v.vertical,
-            email: campo(v.email, ""),
-            opcaoTelefone: campo(v.opcaoTelefone, ""),
-          }))
-        : CONTATOS_FALLBACK.verticais;
+    const verticais = mesclarVerticais(g.verticais);
 
     return {
       telefone,
