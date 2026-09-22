@@ -117,7 +117,17 @@ Sintaxe suportada (sete elementos, nada além):
 
 Linha em branco separa parágrafos. Qualquer outra sintaxe de Markdown é tratada como texto literal — não há fallback silencioso que perca conteúdo.
 
-`lexicalParaHtml` (hoje `lexicalToHtml` em `apps/cms/src/lib/cms/lexical.ts`, server-only do cms) é **movida para `packages/lib`** como função pura, para o `apps/web` renderizar o corpo na página de leitura sem importar o cms. O cms passa a reexportá-la; nenhum chamador atual muda.
+### 5.1. Renderização do corpo: função nova, não reaproveitada
+
+O `lexicalToHtml` que já existe (em duas cópias, `apps/cms/src/lib/cms/lexical.ts` e `apps/web/lib/cms/lexical.ts`) **não serve** para o corpo de um artigo: ele achata o documento em HTML **inline**, juntando parágrafos, headings e itens de lista com `<br>`. Foi desenhado para campos curtos de evento e de especialista, e é usado por eles hoje.
+
+Entra então uma função **nova**, `lexicalParaHtmlEditorial(doc): string`, em `packages/lib`, que serializa em blocos de verdade: `<h2>`/`<h3>`, `<p>`, `<ul>`/`<ol>` com `<li>`, `<blockquote>`, `<a href rel="noopener">`, `<strong>`, `<em>`. Escapa `<`, `>` e `&` do texto antes de montar as tags e só emite `href` com `http(s)://` ou `mailto:` — o corpo é renderizado com `dangerouslySetInnerHTML`, então a sanitização é da função, não do chamador.
+
+As duas cópias de `lexicalToHtml` **ficam como estão**; nenhum chamador atual muda. O painel usa a função nova na pré-visualização, e o site na página de leitura — uma implementação só, nos dois lados.
+
+### 5.2. Feature de citação no editor do campo
+
+`lexicalRestrictiveFeatures` (`apps/cms/src/shared/lexical-config.ts`) não inclui citação, e ele vale para **todas** as coleções editoriais. Em vez de mexer no global, o campo `corpo` de `conteudos` ganha `editor` próprio: `lexicalEditor({ features: () => [...lexicalRestrictiveFeatures, BlockquoteFeature()] })` — `BlockquoteFeature` existe em `@payloadcms/richtext-lexical@3.18.0` (verificado). Nenhuma outra coleção muda de comportamento.
 
 ## 6. Painel Admin (módulo Site)
 
@@ -178,7 +188,7 @@ No mesmo route group `(conteudos)` — herda CSS, header, footer e `InteracoesSc
 Estrutura:
 
 1. Breadcrumb (Grupo NTC › Conteúdos › Categoria) e hero editorial: eyebrow "Vertical · Categoria", título, lide, linha de meta (assinatura ou autores · data · X min de leitura), imagem de destaque — ou a imagem padrão da vertical quando não houver.
-2. Corpo em coluna de leitura (~68ch), Cormorant nos subtítulos e Barlow no texto, renderizado por `lexicalParaHtml`.
+2. Corpo em coluna de leitura (~68ch), Cormorant nos subtítulos e Barlow no texto, renderizado por `lexicalParaHtmlEditorial`.
 3. Bloco de anexo ou link externo, quando houver ("Baixar material" / "Assistir ao webinar").
 4. Assinatura: card de especialista com link para o corpo docente, ou o texto da assinatura institucional.
 5. "Leia também" com os relacionados.
@@ -207,7 +217,7 @@ Manual, do PO, com o dev parado, **junto com a spec irmã de contatos** (um push
 ## 10. Testes (Vitest, TDD)
 
 - Ida e volta `markdownParaLexical` / `lexicalParaMarkdown` nos sete elementos, e sintaxe não suportada preservada como texto.
-- `lexicalParaHtml` em `packages/lib` (escape de HTML incluso).
+- `lexicalParaHtmlEditorial` em `packages/lib`: blocos (h2/h3, p, ul/ol, blockquote), escape de `<`/`>`/`&` e recusa de `href` que não seja `http(s):`/`mailto:`.
 - Tempo de leitura.
 - Mapeamento categoria ↔ segmento da URL e área ↔ vertical.
 - Regras do que entra no site: publicado sempre; rascunho só com `anunciarEmPreparacao`; destaques no máximo 3.
