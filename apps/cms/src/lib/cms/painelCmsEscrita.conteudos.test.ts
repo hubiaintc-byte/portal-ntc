@@ -131,10 +131,16 @@ describe("enviarMidiaConteudo", () => {
     create.mockResolvedValue({ id: 9 });
     update.mockResolvedValue({ id: 12 });
 
-    const r = await enviarMidiaConteudo("12", "imagemDestaque", arquivoFalso());
+    const r = await enviarMidiaConteudo("12", "imagemDestaque", arquivoFalso(), "Plateia do seminário");
     expect(r).toEqual({ ok: true });
 
-    expect(create.mock.calls[0]![0]).toMatchObject({ collection: "media" });
+    // O alt escrito pelo editor é o que vai para a Media — e daí para a
+    // página pública de leitura (§10). Sem ele, a capa iria ao ar com o
+    // nome do arquivo no lugar da descrição.
+    expect(create.mock.calls[0]![0]).toMatchObject({
+      collection: "media",
+      data: { alt: "Plateia do seminário" },
+    });
     const escrita = update.mock.calls[0]![0];
     // draft: true — o arquivo entra no rascunho e vai ao ar no próximo
     // "Publicar", junto com o texto (nunca publica de carona).
@@ -146,8 +152,17 @@ describe("enviarMidiaConteudo", () => {
     create.mockResolvedValue({ id: 31 });
     update.mockResolvedValue({ id: 12 });
 
-    await enviarMidiaConteudo("12", "anexoDownload", arquivoFalso("estudo.pdf", "application/pdf"));
+    await enviarMidiaConteudo(
+      "12",
+      "anexoDownload",
+      arquivoFalso("estudo.pdf", "application/pdf"),
+      "",
+    );
     expect(update.mock.calls[0]![0].data).toEqual({ anexoDownload: 31 });
+    // Sem alt (o anexo não tem esse campo na tela: é um PDF, nunca
+    // renderizado como imagem), `media.alt` — obrigatório na coleção — cai
+    // no nome do arquivo.
+    expect(create.mock.calls[0]![0].data).toEqual({ alt: "estudo.pdf" });
   });
 
   it("não deixa um campo arbitrário chegar ao documento", async () => {
@@ -157,14 +172,14 @@ describe("enviarMidiaConteudo", () => {
     // `campo` chega como argumento de Server Action: a união é só de
     // compilação, então o cast aqui simula o que um cliente hostil mandaria
     // pelo fio. A escrita tem de cair num dos dois campos previstos.
-    await enviarMidiaConteudo("12", "slug" as "imagemDestaque", arquivoFalso());
+    await enviarMidiaConteudo("12", "slug" as "imagemDestaque", arquivoFalso(), "Capa");
     expect(update.mock.calls[0]![0].data).toEqual({ anexoDownload: 44 });
     expect(update.mock.calls[0]![0].data.slug).toBeUndefined();
   });
 
   it("devolve a mensagem do erro quando o upload falha", async () => {
     create.mockRejectedValue(new Error("Storage fora do ar"));
-    const r = await enviarMidiaConteudo("12", "imagemDestaque", arquivoFalso());
+    const r = await enviarMidiaConteudo("12", "imagemDestaque", arquivoFalso(), "Capa");
     expect(r).toEqual({ ok: false, erro: "Storage fora do ar" });
     expect(update).not.toHaveBeenCalled();
   });

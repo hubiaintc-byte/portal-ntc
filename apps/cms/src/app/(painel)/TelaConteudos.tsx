@@ -2,15 +2,11 @@
 
 import { useMemo, useState } from "react";
 
-import { CONTEUDO_CATEGORIA, rotuloCategoria } from "@ntc/lib";
+import { CONTEUDO_CATEGORIA, formatarDataBR, rotuloCategoria } from "@ntc/lib";
 
-import type { ConteudoCmsResumo, SituacaoConteudo } from "@/lib/cms/painelCms";
+import type { ConteudoCmsResumo } from "@/lib/cms/painelCms";
 
-const ROTULO_SITUACAO: Record<SituacaoConteudo, string> = {
-  publicado: "Publicado",
-  rascunho: "Rascunho",
-  "em-preparacao": "Em preparação",
-};
+import { CLASSE_DESTAQUE, CLASSE_SITUACAO, ROTULO_SITUACAO } from "./selosConteudo";
 
 interface TelaConteudosProps {
   conteudos: ConteudoCmsResumo[];
@@ -113,17 +109,13 @@ export function TelaConteudos({ conteudos, onAbrir, onNovo }: TelaConteudosProps
                   <button type="button" className="pcms-link" onClick={() => onAbrir(c.id)}>
                     {c.titulo}
                   </button>
-                  {c.destaque && <span className="pcms-selo">Destaque</span>}
+                  {c.destaque && <span className={CLASSE_DESTAQUE}>Destaque</span>}
                 </td>
                 <td>{c.categoriaRotulo}</td>
                 <td>{c.vertical}</td>
-                <td>{c.dataISO ? new Date(c.dataISO).toLocaleDateString("pt-BR") : "—"}</td>
+                <td>{c.dataISO ? formatarDataBR(c.dataISO) : "—"}</td>
                 <td>
-                  <span
-                    className={
-                      c.situacao === "publicado" ? "pcms-selo pcms-selo--ok" : "pcms-selo"
-                    }
-                  >
+                  <span className={CLASSE_SITUACAO[c.situacao]}>
                     {ROTULO_SITUACAO[c.situacao]}
                   </span>
                 </td>

@@ -1,8 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 /**
- * Gate de sessão das Server Actions de Contatos institucionais
- * (`carregarContatosCms`/`salvarContatos`, tela Configurações).
+ * Gates das Server Actions de Contatos institucionais
+ * (`carregarContatosCms`/`salvarContatos`, tela Configurações). Leitura pede
+ * sessão; escrita pede perfil editorial — a escrita usa `overrideAccess:
+ * true`, então o `access: editorInstitucional` do Global `rodape` nunca é
+ * consultado (spec de contatos §5).
  *
  * Mesmo risco das demais Server Actions do painel: sem a guarda, qualquer um
  * com a URL leria ou reescreveria telefone/e-mail/endereço institucionais —
@@ -78,5 +81,34 @@ describe("salvarContatos (Server Action)", () => {
     expect(r.ok).toBe(false);
     expect(r.erro).toMatch(/sessão/i);
     expect(updateGlobal).not.toHaveBeenCalled();
+  });
+});
+
+describe("gate de perfil de salvarContatos", () => {
+  it("editor-eventos é recusado antes de tocar o Global", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({
+      id: "7",
+      nome: "Iara Eventos",
+      perfil: "editor-eventos",
+    });
+
+    const r = await salvarContatos(campos);
+
+    expect(r).toEqual({ ok: false, erro: "Você não tem permissão para esta ação." });
+    expect(updateGlobal).not.toHaveBeenCalled();
+  });
+
+  it("editor-institucional escreve", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({
+      id: "6",
+      nome: "Rui Editor",
+      perfil: "editor-institucional",
+    });
+    updateGlobal.mockResolvedValue({});
+
+    const r = await salvarContatos(campos);
+
+    expect(r.ok).toBe(true);
+    expect(updateGlobal).toHaveBeenCalledOnce();
   });
 });

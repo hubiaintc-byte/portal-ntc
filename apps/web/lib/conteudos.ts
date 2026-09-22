@@ -14,6 +14,7 @@ import { cache } from "react";
 
 import {
   categoriaParaSegmento,
+  formatarDataBR,
   lexicalParaHtmlEditorial,
   rotuloCategoria,
   segmentoParaCategoria,
@@ -221,12 +222,6 @@ function verticalLabelDoDoc(doc: ConteudoBruto): string {
 /** Publicado, ou rascunho que pediu anúncio ("Em preparação editorial"). */
 function elegivel(doc: ConteudoBruto): boolean {
   return doc._status === "published" || Boolean(doc.anunciarEmPreparacao);
-}
-
-/** `type: "date"` do Payload guarda datetime; cortar em 10 evita deslocar o dia por fuso. */
-function formatarDataBR(iso: string): string {
-  const [ano, mes, dia] = iso.slice(0, 10).split("-");
-  return `${dia}/${mes}/${ano}`;
 }
 
 function dataLegivelDoDoc(doc: ConteudoBruto): string {

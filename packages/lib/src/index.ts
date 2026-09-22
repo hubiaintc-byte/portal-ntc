@@ -150,3 +150,4 @@ export {
   type ConteudoCategoria,
 } from "./editorial/categorias";
 export { calcularTempoLeituraMin } from "./editorial/tempo-leitura";
+export { formatarDataBR } from "./editorial/datas";

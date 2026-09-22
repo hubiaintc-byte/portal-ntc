@@ -862,6 +862,15 @@ body {
   background: rgba(30, 78, 140, 0.12);
   color: var(--pcms-oxford-claro);
 }
+/* "Destaque" na lista de Conteúdos — pílula cerimonial (Dourado, §3).
+   Contornada, para não se confundir com o selo âmbar de "Rascunho"; o texto
+   usa o dourado escurecido (mesmo do rascunho) por contraste (§10). */
+.pcms-selo--destaque {
+  margin-left: 8px;
+  background: transparent;
+  border: 1px solid rgba(181, 153, 90, 0.55);
+  color: #8a6d2f;
+}
 .pcms-selo-vert {
   font-size: 0.82rem;
   color: var(--pcms-grafite-suave);

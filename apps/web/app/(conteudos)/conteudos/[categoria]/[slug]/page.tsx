@@ -156,8 +156,9 @@ export default async function ConteudoLeituraPage({ params }: Params) {
           </div>
           {doc.capa && (
             <div className="container cont-artigo-hero-inner">
-              {/* `alt` escrito pelo editor (media.alt é obrigatório no CMS);
-                  "" quando ele a declarou decorativa. */}
+              {/* `alt` escrito pelo editor no painel (campo "Texto alternativo
+                  da imagem", ao lado do envio da capa). "" só chega de Media
+                  antiga, criada antes desse campo existir. */}
               <Image
                 className="cont-artigo-capa"
                 src={doc.capa.url}

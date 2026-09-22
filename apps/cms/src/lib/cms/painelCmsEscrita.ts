@@ -637,11 +637,18 @@ export async function excluirConteudoCms(id: string): Promise<ResultadoEscrita> 
  * rascunho e vai ao ar no próximo "Publicar", junto com o texto. Escrever
  * direto no publicado levaria ao ar, de carona, as edições de texto ainda
  * pendentes no rascunho.
+ *
+ * `alt` é o texto alternativo escrito pelo editor no painel — a página de
+ * leitura do site o publica como o `alt` da capa (WCAG 2.1 AA, §10). Vazio
+ * só acontece no anexo de download, que não tem campo de alt na tela (é um
+ * PDF, nunca renderizado como imagem) e cai no nome do arquivo, porque
+ * `media.alt` é obrigatório na coleção.
  */
 export async function enviarMidiaConteudo(
   id: string,
   campo: "imagemDestaque" | "anexoDownload",
   arquivo: File,
+  alt: string,
 ): Promise<ResultadoEscrita> {
   try {
     const payload = await obterPayload();
@@ -649,7 +656,7 @@ export async function enviarMidiaConteudo(
     const buffer = Buffer.from(await arquivo.arrayBuffer());
     const media = await payload.create({
       collection: "media",
-      data: { alt: arquivo.name },
+      data: { alt: alt.trim().length > 0 ? alt.trim() : arquivo.name },
       file: {
         data: buffer,
         name: arquivo.name,

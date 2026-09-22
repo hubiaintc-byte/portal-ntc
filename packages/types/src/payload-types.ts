@@ -2768,7 +2768,7 @@ export interface Rodape {
   verticais?:
     | {
         vertical: 'educacao' | 'gestao-publica' | 'saude';
-        email: string;
+        email?: string | null;
         /**
          * Ex.: "opção 1"
          */

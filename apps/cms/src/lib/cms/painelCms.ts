@@ -562,16 +562,32 @@ function resumoDeConteudo(doc: DocConteudo): ConteudoCmsResumo {
   };
 }
 
+/**
+ * Lista os conteúdos para o painel. Falha de banco degrada para lista vazia,
+ * logada — mesma defesa do lado do site (`apps/web/lib/conteudos.ts`).
+ *
+ * Não é zelo genérico: esta leitura é a única do painel cujas colunas ainda
+ * não existem no banco de desenvolvimento (o `payload:push:schema` desta
+ * branch é a Task 16, manual, do PO). Sem o catch, a rejeição sobe pelo
+ * `Promise.all` da rota e derruba Palestrantes, Eventos, Home e o Dashboard
+ * junto — a janela de código-novo/banco-velho vira painel inteiro vazio em
+ * vez de uma tela degradada.
+ */
 export async function listarConteudosCms(): Promise<ConteudoCmsResumo[]> {
-  const payload = await obterPayload();
-  const res = await payload.find({
-    collection: "conteudos",
-    depth: 1,
-    limit: 200,
-    draft: true,
-    sort: "-dataPublicacao",
-  });
-  return res.docs.map((d) => resumoDeConteudo(d as unknown as DocConteudo));
+  try {
+    const payload = await obterPayload();
+    const res = await payload.find({
+      collection: "conteudos",
+      depth: 1,
+      limit: 200,
+      draft: true,
+      sort: "-dataPublicacao",
+    });
+    return res.docs.map((d) => resumoDeConteudo(d as unknown as DocConteudo));
+  } catch (erro) {
+    console.error("[painelCms] Falha ao listar conteúdos.", erro);
+    return [];
+  }
 }
 
 export async function obterConteudoCms(id: string): Promise<ConteudoCmsDetalhe | null> {

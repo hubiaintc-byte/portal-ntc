@@ -289,8 +289,33 @@ export async function removerPasskeyAdminCms(passkeyId: string): Promise<Resulta
 
 /**
  * Server Actions de Conteúdos editoriais (telas de lista e detalhe do
- * painel). Mesma guarda de sessão das demais actions deste arquivo.
+ * painel) e de Contatos institucionais (tela Configurações).
+ *
+ * Leitura: basta a sessão — o spec de conteúdos §6.4 dá a lista ao
+ * `editor-eventos` ("vê a lista e não edita"), e os contatos institucionais
+ * aparecem no rodapé de toda página pública.
+ *
+ * Escrita: exige perfil editorial. Toda escrita destas telas chama a Local
+ * API com `overrideAccess: true`, então o `access: editorInstitucional`
+ * declarado em `Conteudos.ts` e em `Rodape.ts` nunca chega a ser consultado —
+ * é esta guarda que faz a regra valer (spec de conteúdos §6.4, spec de
+ * contatos §5).
  */
+
+const PERFIS_EDITORIAIS = ["super-admin", "editor-institucional"];
+
+const RECUSADO_EDITORIAL: ResultadoEscrita = {
+  ok: false,
+  erro: "Você não tem permissão para esta ação.",
+};
+
+/** `null` libera a escrita; qualquer outro retorno é a recusa a devolver. */
+async function barrarNaoEditorial(): Promise<ResultadoEscrita | null> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario) return RECUSADO;
+  if (!PERFIS_EDITORIAIS.includes(usuario.perfil)) return RECUSADO_EDITORIAL;
+  return null;
+}
 
 export async function listarConteudos(): Promise<ConteudoCmsResumo[]> {
   if (!(await obterUsuarioCms())) return [];
@@ -311,28 +336,32 @@ export async function salvarConteudo(
   id: string | null,
   campos: CamposConteudo,
 ): Promise<ResultadoEscrita & { id?: string }> {
-  if (!(await obterUsuarioCms())) return RECUSADO;
+  const barrado = await barrarNaoEditorial();
+  if (barrado) return barrado;
   const r = await salvarConteudoCms(id, campos);
   if (r.ok) revalidatePath("/");
   return r;
 }
 
 export async function publicarConteudo(id: string): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCms())) return RECUSADO;
+  const barrado = await barrarNaoEditorial();
+  if (barrado) return barrado;
   const r = await publicarConteudoCms(id);
   if (r.ok) revalidatePath("/");
   return r;
 }
 
 export async function despublicarConteudo(id: string): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCms())) return RECUSADO;
+  const barrado = await barrarNaoEditorial();
+  if (barrado) return barrado;
   const r = await despublicarConteudoCms(id);
   if (r.ok) revalidatePath("/");
   return r;
 }
 
 export async function excluirConteudo(id: string): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCms())) return RECUSADO;
+  const barrado = await barrarNaoEditorial();
+  if (barrado) return barrado;
   const r = await excluirConteudoCms(id);
   if (r.ok) revalidatePath("/");
   return r;
@@ -342,26 +371,32 @@ export async function excluirConteudo(id: string): Promise<ResultadoEscrita> {
  * Envia a imagem de destaque ou o anexo do conteúdo (File no campo "arquivo"
  * do FormData) e devolve o detalhe atualizado, com os nomes dos arquivos já
  * vinculados. Exige o conteúdo salvo — sem id não há documento para apontar.
+ *
+ * O campo "alt" do FormData é o texto alternativo escrito pelo editor, que
+ * vai para a Media e daí para a página pública de leitura (§10).
  */
 export async function enviarMidiaConteudo(
   id: string,
   campo: "imagemDestaque" | "anexoDownload",
   formData: FormData,
 ): Promise<{ resultado: ResultadoEscrita; conteudo: ConteudoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCms())) return { resultado: RECUSADO, conteudo: null };
+  const barrado = await barrarNaoEditorial();
+  if (barrado) return { resultado: barrado, conteudo: null };
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
     return { resultado: { ok: false, erro: "Nenhum arquivo selecionado." }, conteudo: null };
   }
-  const resultado = await enviarMidiaConteudoCms(id, campo, arquivo);
+  const altBruto = formData.get("alt");
+  const alt = typeof altBruto === "string" ? altBruto : "";
+  const resultado = await enviarMidiaConteudoCms(id, campo, arquivo, alt);
   if (resultado.ok) revalidatePath("/");
   const conteudo = resultado.ok ? await obterConteudoCms(id) : null;
   return { resultado, conteudo };
 }
 
 /**
- * Server Actions de Contatos institucionais (tela Configurações). Mesma
- * guarda de sessão das demais actions deste arquivo — leitura e escrita.
+ * Server Actions de Contatos institucionais (tela Configurações). A leitura
+ * exige sessão; a escrita exige perfil editorial (`barrarNaoEditorial`).
  */
 
 const CONTATOS_VAZIOS: CamposContatos = {
@@ -416,8 +451,9 @@ export async function carregarContatosCms(): Promise<CamposContatos> {
   };
 }
 
-/** Salva os contatos institucionais (gate de sessão + validação + Global). */
+/** Salva os contatos institucionais (gate de perfil + validação + Global). */
 export async function salvarContatos(campos: CamposContatos): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCms())) return RECUSADO;
+  const barrado = await barrarNaoEditorial();
+  if (barrado) return barrado;
   return salvarContatosCms(campos);
 }

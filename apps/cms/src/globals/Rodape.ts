@@ -40,7 +40,13 @@ export const Rodape: GlobalConfig = {
           required: true,
           options: VERTICAIS_CONTATO.map((v) => ({ label: v.rotulo, value: v.valor })),
         },
-        { name: "email", type: "email", required: true },
+        // Opcional de propósito: a tela de Configurações grava sempre as 3
+        // linhas de VERTICAIS_CONTATO, mesmo em branco, e o site já cobre a
+        // ausência pelo fallback (`mesclarVerticais`, apps/web/lib/contatos.ts).
+        // Com `required: true` aqui, salvar o Global antes do seed — ou
+        // limpar o e-mail de uma vertical — falharia com a mensagem crua de
+        // validação do Payload.
+        { name: "email", type: "email" },
         { name: "opcaoTelefone", type: "text", admin: { description: 'Ex.: "opção 1"' } },
       ],
     },

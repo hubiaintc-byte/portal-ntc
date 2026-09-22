@@ -20,19 +20,7 @@ import {
   salvarConteudo,
 } from "./acoes";
 import { AvisoForm } from "./crm/CamposCrm";
-
-const ROTULO_SITUACAO: Record<SituacaoConteudo, string> = {
-  publicado: "Publicado",
-  rascunho: "Rascunho",
-  "em-preparacao": "Em preparação",
-};
-
-/** "em-preparacao" não tem modificador próprio no painel.css — usa o selo informativo. */
-const CLASSE_SITUACAO: Record<SituacaoConteudo, string> = {
-  publicado: "pcms-selo pcms-selo--publicado",
-  rascunho: "pcms-selo pcms-selo--rascunho",
-  "em-preparacao": "pcms-selo pcms-selo--info",
-};
+import { CLASSE_SITUACAO, ROTULO_SITUACAO } from "./selosConteudo";
 
 /** Categorias cujo conteúdo é um arquivo para download (o campo Anexo só aparece nelas). */
 const CATEGORIAS_COM_ANEXO = ["material", "estudo"];
@@ -112,12 +100,23 @@ interface CampoArquivoProps {
  * campos são fixos na própria Server Action), então o conteúdo tem o seu.
  * Só habilita depois que o rascunho existe — sem id não há documento para
  * apontar a Media.
+ *
+ * A imagem de destaque pede o texto alternativo aqui: é o `alt` que a página
+ * de leitura publica (§10), e o painel não tem tela de Mídias para corrigi-lo
+ * depois. O anexo não pede — é um PDF, nunca renderizado como imagem.
  */
 function CampoArquivo({ conteudoId, campo, rotulo, accept, atual, onEnviado }: CampoArquivoProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, iniciar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
+  const [alt, setAlt] = useState("");
   const idInput = `ct-arquivo-${campo}`;
+  const idAlt = `ct-alt-${campo}`;
+  const pedeAlt = campo === "imagemDestaque";
+  // `media.alt` é obrigatório na coleção Media: enviar em branco seria
+  // recusado pelo Payload com a mensagem crua de validação, então o envio
+  // só libera com a descrição escrita.
+  const faltaAlt = pedeAlt && alt.trim().length === 0;
 
   function aoEscolher(e: React.ChangeEvent<HTMLInputElement>) {
     const arquivo = e.target.files?.[0];
@@ -126,6 +125,7 @@ function CampoArquivo({ conteudoId, campo, rotulo, accept, atual, onEnviado }: C
 
     const fd = new FormData();
     fd.append("arquivo", arquivo);
+    fd.append("alt", alt);
 
     iniciar(async () => {
       const { resultado, conteudo } = await enviarMidiaConteudo(conteudoId, campo, fd);
@@ -140,6 +140,25 @@ function CampoArquivo({ conteudoId, campo, rotulo, accept, atual, onEnviado }: C
         {rotulo}
       </label>
       <p className="pcms-upload__atual">{atual}</p>
+      {pedeAlt && (
+        <div className="pcms-field">
+          <label htmlFor={idAlt}>Texto alternativo da imagem</label>
+          <input
+            id={idAlt}
+            type="text"
+            value={alt}
+            maxLength={180}
+            placeholder="Ex.: Plateia do seminário, vista do palco"
+            aria-describedby={`${idAlt}-ajuda`}
+            onChange={(e) => setAlt(e.target.value)}
+            disabled={enviando || conteudoId === null}
+          />
+          <p id={`${idAlt}-ajuda`} className="pcms-editor__hint">
+            Descreve a imagem para quem usa leitor de tela e aparece quando ela não carrega.
+            Obrigatório para enviar.
+          </p>
+        </div>
+      )}
       <input
         ref={inputRef}
         id={idInput}
@@ -147,7 +166,7 @@ function CampoArquivo({ conteudoId, campo, rotulo, accept, atual, onEnviado }: C
         accept={accept}
         className="pcms-upload__input"
         onChange={aoEscolher}
-        disabled={enviando || conteudoId === null}
+        disabled={enviando || conteudoId === null || faltaAlt}
       />
       {/*
         O input acima é `display: none` (pcms-upload__input), logo não é
@@ -160,12 +179,17 @@ function CampoArquivo({ conteudoId, campo, rotulo, accept, atual, onEnviado }: C
         className="pcms-btn pcms-btn--ghost"
         aria-label={`Escolher arquivo — ${rotulo}`}
         onClick={() => inputRef.current?.click()}
-        disabled={enviando || conteudoId === null}
+        disabled={enviando || conteudoId === null || faltaAlt}
       >
         {enviando ? "Enviando…" : "Escolher arquivo"}
       </button>
       {conteudoId === null && (
         <p className="pcms-editor__hint">Salve o rascunho para habilitar o envio de arquivos.</p>
+      )}
+      {conteudoId !== null && faltaAlt && (
+        <p className="pcms-editor__hint">
+          Escreva o texto alternativo para habilitar o envio da imagem.
+        </p>
       )}
       {erro && <p className="pcms-upload__erro">{erro}</p>}
     </div>
