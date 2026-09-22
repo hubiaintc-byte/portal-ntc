@@ -5,20 +5,30 @@ import type { RequiredDataFromCollectionSlug } from "payload";
 
 import { obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
+  listarAreasCms,
+  listarConteudosCms,
+  obterConteudoCms,
   obterEventoCms,
   obterPalestranteCms,
+  type ConteudoCmsDetalhe,
+  type ConteudoCmsResumo,
   type EventoCmsDetalhe,
   type PalestranteCmsDetalhe,
 } from "@/lib/cms/painelCms";
 import {
   criarEventoDePdf,
   definirOcultarPalestrante,
+  despublicarConteudoCms,
   despublicarEvento,
   enviarMidiaEvento,
+  excluirConteudoCms,
+  publicarConteudoCms,
   publicarEvento,
   salvarCamposEvento,
+  salvarConteudoCms,
   salvarEventosHome,
   vincularPalestrantesEvento,
+  type CamposConteudo,
   type CamposEventoCompletos,
   type ResultadoEscrita,
   type ResultadoImportacao,
@@ -269,4 +279,55 @@ export async function removerPasskeyAdminCms(passkeyId: string): Promise<Resulta
   const usuario = await obterUsuarioCms();
   if (!usuario || usuario.perfil !== "super-admin") return RECUSADO_SUPER_ADMIN;
   return removerPasskey(passkeyId, usuario.id, true);
+}
+
+/**
+ * Server Actions de Conteúdos editoriais (telas de lista e detalhe do
+ * painel). Mesma guarda de sessão das demais actions deste arquivo.
+ */
+
+export async function listarConteudos(): Promise<ConteudoCmsResumo[]> {
+  if (!(await obterUsuarioCms())) return [];
+  return listarConteudosCms();
+}
+
+export async function carregarConteudo(id: string): Promise<ConteudoCmsDetalhe | null> {
+  if (!(await obterUsuarioCms())) return null;
+  return obterConteudoCms(id);
+}
+
+export async function carregarAreas(): Promise<{ id: string; nome: string }[]> {
+  if (!(await obterUsuarioCms())) return [];
+  return listarAreasCms();
+}
+
+export async function salvarConteudo(
+  id: string | null,
+  campos: CamposConteudo,
+): Promise<ResultadoEscrita & { id?: string }> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  const r = await salvarConteudoCms(id, campos);
+  if (r.ok) revalidatePath("/");
+  return r;
+}
+
+export async function publicarConteudo(id: string): Promise<ResultadoEscrita> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  const r = await publicarConteudoCms(id);
+  if (r.ok) revalidatePath("/");
+  return r;
+}
+
+export async function despublicarConteudo(id: string): Promise<ResultadoEscrita> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  const r = await despublicarConteudoCms(id);
+  if (r.ok) revalidatePath("/");
+  return r;
+}
+
+export async function excluirConteudo(id: string): Promise<ResultadoEscrita> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  const r = await excluirConteudoCms(id);
+  if (r.ok) revalidatePath("/");
+  return r;
 }

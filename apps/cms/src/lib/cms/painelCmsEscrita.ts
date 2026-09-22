@@ -5,6 +5,7 @@ import type { RequiredDataFromCollectionSlug } from "payload";
 import { casarOuCriarPalestrantes } from "@/lib/importacaoPdf/casarOuCriarPalestrantes";
 import { textoParaLexical } from "@/lib/lexicalBuilders";
 import { extrairTextoPdf } from "@/lib/importacaoPdf/extrairTextoPdf";
+import { markdownParaLexical } from "@/lib/markdownLexical";
 import { montarCamposEvento } from "@/lib/importacaoPdf/montarCamposEvento";
 import { parsearFolderEvento } from "@/lib/importacaoPdf/parsearFolderEvento";
 import { obterPayload } from "@/lib/payloadClient";
@@ -483,5 +484,139 @@ export async function criarEventoDePdf(arquivo: File): Promise<ResultadoImportac
     return { ok: true, eventoId: String(evento.id), nome, relatorio };
   } catch (e) {
     return { ok: false, erro: e instanceof Error ? e.message : "Erro ao importar o PDF." };
+  }
+}
+
+/* ---------------- Conteúdos editoriais ---------------- */
+
+export interface CamposConteudo {
+  titulo: string;
+  slug: string;
+  categoria: string;
+  areaId: string;
+  lide: string;
+  corpoMarkdown: string;
+  assinatura: string;
+  autorIds: string[];
+  dataPublicacao: string;
+  destaque: boolean;
+  anunciarEmPreparacao: boolean;
+  linkExterno: string;
+  seoTitulo: string;
+  seoDescricao: string;
+}
+
+/** Erros do Postgres/Payload que têm tradução legível para o editor. */
+function traduzirErroConteudo(e: unknown): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/duplicate key|unique constraint/i.test(msg)) {
+    return "Já existe um conteúdo com este endereço (slug).";
+  }
+  return msg || "Erro ao salvar o conteúdo.";
+}
+
+function validarConteudo(campos: CamposConteudo): string | null {
+  if (campos.titulo.trim().length === 0) return "Informe o título do conteúdo.";
+  if (campos.lide.trim().length === 0) return "Informe a lide (resumo de abertura).";
+  if (campos.lide.trim().length > 280) return "A lide deve ter no máximo 280 caracteres.";
+  if (campos.categoria.trim().length === 0) return "Escolha a categoria.";
+  return null;
+}
+
+export async function salvarConteudoCms(
+  id: string | null,
+  campos: CamposConteudo,
+): Promise<ResultadoEscrita & { id?: string }> {
+  const erro = validarConteudo(campos);
+  if (erro) return { ok: false, erro };
+
+  const data: Record<string, unknown> = {
+    titulo: campos.titulo.trim(),
+    categoria: campos.categoria,
+    area: campos.areaId.trim().length > 0 ? Number(campos.areaId) : null,
+    lide: campos.lide.trim(),
+    corpo: markdownParaLexical(campos.corpoMarkdown),
+    assinatura: ouNulo(campos.assinatura),
+    autor: campos.autorIds.map((v) => Number(v)).filter((n) => !Number.isNaN(n)),
+    dataPublicacao: campos.dataPublicacao,
+    destaque: campos.destaque,
+    anunciarEmPreparacao: campos.anunciarEmPreparacao,
+    linkExterno: ouNulo(campos.linkExterno),
+    seo: {
+      tituloSeo: ouNulo(campos.seoTitulo),
+      descricaoSeo: ouNulo(campos.seoDescricao),
+    },
+  };
+  // Slug vazio deixa o hook autoSlug("titulo") gerar a partir do título.
+  if (campos.slug.trim().length > 0) data.slug = campos.slug.trim();
+  // `data` é montado como Record (categoria/áreas/ids em runtime, validados
+  // pelo formulário) e convertido ao tipo gerado só no limite da Local API —
+  // mesmo padrão de criarEventoDePdf acima (o tipo gerado descreve o
+  // documento completo; aqui o rascunho pode nascer parcial, coberto por
+  // `versions.drafts: true` na coleção).
+  const dadosConteudo = data as unknown as RequiredDataFromCollectionSlug<"conteudos">;
+
+  try {
+    const payload = await obterPayload();
+    if (id) {
+      // draft: true preserva o estado de publicação — salvar não publica.
+      await payload.update({
+        collection: "conteudos",
+        id,
+        data: dadosConteudo,
+        draft: true,
+        overrideAccess: true,
+      });
+      return { ok: true, id };
+    }
+    const criado = await payload.create({
+      collection: "conteudos",
+      data: dadosConteudo,
+      draft: true,
+      overrideAccess: true,
+    });
+    return { ok: true, id: String((criado as { id: string | number }).id) };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroConteudo(e) };
+  }
+}
+
+export async function publicarConteudoCms(id: string): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "conteudos",
+      id,
+      data: { _status: "published" },
+      overrideAccess: true,
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroConteudo(e) };
+  }
+}
+
+export async function despublicarConteudoCms(id: string): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "conteudos",
+      id,
+      data: { _status: "draft" },
+      overrideAccess: true,
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroConteudo(e) };
+  }
+}
+
+export async function excluirConteudoCms(id: string): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.delete({ collection: "conteudos", id, overrideAccess: true });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroConteudo(e) };
   }
 }
