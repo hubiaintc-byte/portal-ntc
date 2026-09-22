@@ -538,9 +538,14 @@ body {
 }
 
 /* ===== Dashboard ======================================================== */
+/* auto-fit acomoda qualquer nº de cards sem sobrar coluna vazia na última
+   linha (5 métricas desde "Conteúdos publicados"); o piso de 170px (não os
+   200px mais óbvios) é o que ainda garante 4 colunas cheias logo acima do
+   breakpoint de 1100px abaixo, onde o container só tem ~773px — ver o
+   raciocínio completo no relatório da Task 7. */
 .pcms-metricas {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 18px;
   margin-bottom: 30px;
 }
