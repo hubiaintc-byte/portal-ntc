@@ -60,4 +60,7 @@ async function principal(): Promise<void> {
   process.exit(0);
 }
 
-void principal();
+void principal().catch((err) => {
+  console.error("[seed:contatos] Falha:", err);
+  process.exit(1);
+});
