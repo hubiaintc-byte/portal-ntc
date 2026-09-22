@@ -2,6 +2,8 @@ import "server-only";
 
 import type { RequiredDataFromCollectionSlug } from "payload";
 
+import type { Rodape } from "@ntc/types";
+
 import { casarOuCriarPalestrantes } from "@/lib/importacaoPdf/casarOuCriarPalestrantes";
 import { textoParaLexical } from "@/lib/lexicalBuilders";
 import { extrairTextoPdf } from "@/lib/importacaoPdf/extrairTextoPdf";
@@ -23,6 +25,8 @@ import { obterPayload } from "@/lib/payloadClient";
 export interface ResultadoEscrita {
   ok: boolean;
   erro?: string;
+  /** Escrita OK, mas algo posterior (ex.: revalidação do site) falhou. */
+  aviso?: string;
 }
 
 export interface CamposEventoCompletos {
@@ -676,4 +680,133 @@ export async function enviarMidiaConteudo(
   } catch (e) {
     return { ok: false, erro: e instanceof Error ? e.message : "Erro no upload." };
   }
+}
+
+/* ---------------- Contatos institucionais (Global Rodapé) ---------------- */
+
+export interface CamposContatos {
+  telefoneInstitucional: string;
+  whatsappInstitucional: string;
+  emailInstitucional: string;
+  emailImprensa: string;
+  emailParcerias: string;
+  emailDpo: string;
+  emailSuporte: string;
+  emailEventos: string;
+  enderecoCompleto: string;
+  razaoSocial: string;
+  cnpj: string;
+  verticais: { vertical: string; email: string; opcaoTelefone: string }[];
+}
+
+const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validarEmailObrigatorio(valor: string, rotulo: string): string | null {
+  if (valor.trim().length === 0) return `Informe o e-mail (${rotulo}).`;
+  if (!REGEX_EMAIL.test(valor.trim())) return `E-mail inválido (${rotulo}).`;
+  return null;
+}
+
+function validarEmailOpcional(valor: string, rotulo: string): string | null {
+  if (valor.trim().length === 0) return null;
+  if (!REGEX_EMAIL.test(valor.trim())) return `E-mail inválido (${rotulo}).`;
+  return null;
+}
+
+/** Ao menos 10 dígitos (DDD + número), descartando parênteses/traços/espaços. */
+function validarTelefone(valor: string, rotulo: string): string | null {
+  const digitos = valor.replace(/\D/g, "");
+  if (digitos.length < 10) return `${rotulo}: informe o número com DDD (mínimo 10 dígitos).`;
+  return null;
+}
+
+function validarContatos(campos: CamposContatos): string | null {
+  const validacoes = [
+    validarEmailObrigatorio(campos.emailInstitucional, "institucional"),
+    validarEmailOpcional(campos.emailImprensa, "imprensa"),
+    validarEmailOpcional(campos.emailParcerias, "parcerias"),
+    validarEmailOpcional(campos.emailDpo, "DPO"),
+    validarEmailOpcional(campos.emailSuporte, "suporte"),
+    validarEmailOpcional(campos.emailEventos, "eventos"),
+    ...campos.verticais.map((v) => validarEmailOpcional(v.email, `vertical ${v.vertical}`)),
+    validarTelefone(campos.telefoneInstitucional, "Telefone institucional"),
+    validarTelefone(campos.whatsappInstitucional, "WhatsApp institucional"),
+  ];
+  if (campos.enderecoCompleto.trim().length === 0) {
+    validacoes.push("Informe o endereço completo.");
+  }
+  return validacoes.find((e): e is string => e !== null) ?? null;
+}
+
+const AVISO_REVALIDACAO =
+  "Os contatos foram salvos, mas a atualização no site pode levar alguns minutos.";
+
+/**
+ * Melhor esforço: pede ao front que revalide o layout inteiro (o rodapé
+ * aparece em toda página, não só em "/"). Nunca lança — falha vira `aviso`
+ * no retorno de `salvarContatosCms`, não `erro` (o dado já está salvo).
+ */
+async function revalidarLayoutDoSite(): Promise<boolean> {
+  const frontUrl = process.env.PAYLOAD_PUBLIC_FRONT_URL ?? "http://localhost:3000";
+  const secret = process.env.REVALIDATE_SECRET ?? "";
+  try {
+    const resposta = await fetch(`${frontUrl}/api/revalidate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Revalidate-Secret": secret },
+      body: JSON.stringify({ path: "/", escopo: "layout" }),
+    });
+    return resposta.ok;
+  } catch (e) {
+    console.error("[salvarContatosCms] Falha ao revalidar o site.", e);
+    return false;
+  }
+}
+
+/**
+ * Grava os contatos institucionais no Global `rodape` — o rodapé (presente
+ * em todas as páginas do site) e as páginas de Contato/O Grupo/legais leem
+ * daqui (Task 13, `apps/web/lib/contatos.ts`). Depois de salvar, pede a
+ * revalidação do layout inteiro do site (não só um path) — falha nessa
+ * segunda etapa vira `aviso`, o dado já está persistido.
+ */
+export async function salvarContatosCms(campos: CamposContatos): Promise<ResultadoEscrita> {
+  const erro = validarContatos(campos);
+  if (erro) return { ok: false, erro };
+
+  try {
+    const payload = await obterPayload();
+    await payload.updateGlobal({
+      slug: "rodape",
+      data: {
+        telefoneInstitucional: campos.telefoneInstitucional.trim(),
+        whatsappInstitucional: campos.whatsappInstitucional.trim(),
+        emailInstitucional: campos.emailInstitucional.trim(),
+        emailImprensa: ouNulo(campos.emailImprensa),
+        emailParcerias: ouNulo(campos.emailParcerias),
+        emailDpo: ouNulo(campos.emailDpo),
+        emailSuporte: ouNulo(campos.emailSuporte),
+        emailEventos: ouNulo(campos.emailEventos),
+        enderecoCompleto: campos.enderecoCompleto.trim(),
+        razaoSocial: ouNulo(campos.razaoSocial),
+        cnpj: ouNulo(campos.cnpj),
+        // `vertical` chega como string do formulário; o schema do Global
+        // tipa a coluna como union literal ("educacao"/"gestao-publica"/
+        // "saude") — a tela de Configurações renderiza as 3 linhas fixas de
+        // VERTICAIS_CONTATO e não deixa editar a chave `vertical` em si, só
+        // e-mail/opção de telefone, então o cast reflete uma garantia da UI,
+        // não uma checagem nova.
+        verticais: campos.verticais.map((v) => ({
+          vertical: v.vertical as NonNullable<Rodape["verticais"]>[number]["vertical"],
+          email: v.email.trim(),
+          opcaoTelefone: v.opcaoTelefone.trim(),
+        })),
+      },
+      overrideAccess: true,
+    });
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao salvar os contatos." };
+  }
+
+  const revalidou = await revalidarLayoutDoSite();
+  return revalidou ? { ok: true } : { ok: true, aviso: AVISO_REVALIDACAO };
 }

@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import type { RequiredDataFromCollectionSlug } from "payload";
 
+import { VERTICAIS_CONTATO } from "@ntc/lib";
+import type { Rodape } from "@ntc/types";
+
 import { obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
   listarAreasCms,
@@ -26,9 +29,11 @@ import {
   publicarConteudoCms,
   publicarEvento,
   salvarCamposEvento,
+  salvarContatosCms,
   salvarConteudoCms,
   salvarEventosHome,
   vincularPalestrantesEvento,
+  type CamposContatos,
   type CamposConteudo,
   type CamposEventoCompletos,
   type ResultadoEscrita,
@@ -352,4 +357,67 @@ export async function enviarMidiaConteudo(
   if (resultado.ok) revalidatePath("/");
   const conteudo = resultado.ok ? await obterConteudoCms(id) : null;
   return { resultado, conteudo };
+}
+
+/**
+ * Server Actions de Contatos institucionais (tela Configurações). Mesma
+ * guarda de sessão das demais actions deste arquivo — leitura e escrita.
+ */
+
+const CONTATOS_VAZIOS: CamposContatos = {
+  telefoneInstitucional: "",
+  whatsappInstitucional: "",
+  emailInstitucional: "",
+  emailImprensa: "",
+  emailParcerias: "",
+  emailDpo: "",
+  emailSuporte: "",
+  emailEventos: "",
+  enderecoCompleto: "",
+  razaoSocial: "",
+  cnpj: "",
+  verticais: VERTICAIS_CONTATO.map((v) => ({ vertical: v.valor, email: "", opcaoTelefone: "" })),
+};
+
+/**
+ * Lê o Global `rodape` e devolve os campos editáveis, com "" no lugar de
+ * `null`/`undefined` (o formulário controla inputs de texto, não aceita
+ * `null`). `verticais` sempre traz as 3 linhas fixas de `VERTICAIS_CONTATO`,
+ * na mesma ordem canônica — uma vertical ainda sem registro no Global
+ * aparece com os campos em branco, não é omitida.
+ */
+export async function carregarContatosCms(): Promise<CamposContatos> {
+  if (!(await obterUsuarioCms())) return CONTATOS_VAZIOS;
+
+  const payload = await obterPayload();
+  const g = (await payload.findGlobal({ slug: "rodape" }).catch(() => null)) as Rodape | null;
+  if (!g) return CONTATOS_VAZIOS;
+
+  return {
+    telefoneInstitucional: g.telefoneInstitucional ?? "",
+    whatsappInstitucional: g.whatsappInstitucional ?? "",
+    emailInstitucional: g.emailInstitucional ?? "",
+    emailImprensa: g.emailImprensa ?? "",
+    emailParcerias: g.emailParcerias ?? "",
+    emailDpo: g.emailDpo ?? "",
+    emailSuporte: g.emailSuporte ?? "",
+    emailEventos: g.emailEventos ?? "",
+    enderecoCompleto: g.enderecoCompleto ?? "",
+    razaoSocial: g.razaoSocial ?? "",
+    cnpj: g.cnpj ?? "",
+    verticais: VERTICAIS_CONTATO.map((v) => {
+      const existente = g.verticais?.find((x) => x.vertical === v.valor);
+      return {
+        vertical: v.valor,
+        email: existente?.email ?? "",
+        opcaoTelefone: existente?.opcaoTelefone ?? "",
+      };
+    }),
+  };
+}
+
+/** Salva os contatos institucionais (gate de sessão + validação + Global). */
+export async function salvarContatos(campos: CamposContatos): Promise<ResultadoEscrita> {
+  if (!(await obterUsuarioCms())) return RECUSADO;
+  return salvarContatosCms(campos);
 }
