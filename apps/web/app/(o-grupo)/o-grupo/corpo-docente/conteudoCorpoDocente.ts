@@ -8,6 +8,8 @@
  * neste arquivo local; CMS só entra quando explicitamente solicitado.
  */
 
+import { escapar } from "@ntc/lib";
+
 import type { Contatos } from "@/lib/contatos";
 
 /* ============================================================
@@ -1812,7 +1814,7 @@ export function montarFaq(c: Contatos): FaqItem[] {
       titulo: "Como o Grupo NTC trata os dados pessoais dos especialistas (LGPD)?",
       parags: [
         "O cadastro institucional do especialista é tratado conforme a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018). Os dados são coletados apenas para a finalidade declarada (avaliação pela curadoria + composição operacional de turmas), retidos pelo período necessário ao vínculo contratual ou enquanto o especialista mantiver interesse em ser considerado, e nunca compartilhados com terceiros sem consentimento explícito.",
-        `O Encarregado de Dados (DPO) do Grupo NTC é <strong>${c.emailDpo}</strong> · qualquer especialista pode solicitar acesso, correção ou exclusão dos próprios dados a qualquer tempo.`,
+        `O Encarregado de Dados (DPO) do Grupo NTC é <strong>${escapar(c.emailDpo)}</strong> · qualquer especialista pode solicitar acesso, correção ou exclusão dos próprios dados a qualquer tempo.`,
       ],
     },
   ];

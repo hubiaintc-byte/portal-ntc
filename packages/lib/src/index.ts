@@ -139,7 +139,7 @@ export {
 } from "./institucional/contatos";
 
 // Editorial — serialização do corpo de conteúdos.
-export { lexicalParaHtmlEditorial } from "./editorial/lexical-html";
+export { escapar, lexicalParaHtmlEditorial } from "./editorial/lexical-html";
 
 export {
   CONTEUDO_CATEGORIA,

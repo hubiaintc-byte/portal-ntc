@@ -4,6 +4,8 @@
 //  Nada de rephrasing — fidelidade 100% ao protótipo aprovado.
 // =============================================================
 
+import { escapar } from "@ntc/lib";
+
 import type { Contatos } from "@/lib/contatos";
 
 // ----------------- Slugs -----------------
@@ -822,7 +824,7 @@ export function montarFaqSolucoes(c: Contatos): ItemFaq[] {
       id: "faq-8",
       pergunta: "Como o Grupo NTC trata os dados dos participantes (LGPD)?",
       respostaHtml:
-        `<p>Os dados dos participantes são tratados conforme a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018), com finalidade declarada (inscrição, certificação, suporte à plataforma EventOn), retenção pelo período necessário ao vínculo contratual e nunca compartilhados com terceiros sem consentimento explícito.</p><p>O Encarregado de Dados (DPO) do Grupo NTC é <strong>${c.emailDpo}</strong>. Para inscrições em grupo institucional acima de 50 participantes, há consentimento LGPD específico sobre o compartilhamento de dados pela instituição demandante.</p>`,
+        `<p>Os dados dos participantes são tratados conforme a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018), com finalidade declarada (inscrição, certificação, suporte à plataforma EventOn), retenção pelo período necessário ao vínculo contratual e nunca compartilhados com terceiros sem consentimento explícito.</p><p>O Encarregado de Dados (DPO) do Grupo NTC é <strong>${escapar(c.emailDpo)}</strong>. Para inscrições em grupo institucional acima de 50 participantes, há consentimento LGPD específico sobre o compartilhamento de dados pela instituição demandante.</p>`,
     },
   ];
 }

@@ -12,6 +12,8 @@
  * `carregarContatos()` da página (global `rodape`, editável no painel).
  */
 
+import { escapar } from "@ntc/lib";
+
 import type { Contatos } from "@/lib/contatos";
 
 /* ============================================================
@@ -110,90 +112,92 @@ export interface FormAsideConfig {
   };
 }
 
-export const FORMS_ASIDES: readonly FormAsideConfig[] = [
-  {
-    tab: "atendimento",
-    formId: "form-contato-atendimento",
-    cmsLink: "submit-atendimento-geral",
-    endpoint: "/api/contato/atendimento",
-    aside: {
-      eyebrow: "Canal · Atendimento geral",
-      titulo: "Fale com a NTC",
-      descricaoHtml:
-        "Canal aberto para dúvidas, sugestões, parcerias e qualquer demanda que não se encaixe nos canais especializados.",
-      bulletsHtml: [
-        "Retorno em até <strong>1 dia útil</strong>",
-        "Atendimento humano direcionado",
-        "Encaminhamento interno conforme o tema",
-        "Confidencialidade institucional",
-      ],
-      rodapeHtml: "Prefere e-mail? <strong>contato@institutontc.com.br</strong>",
+export function montarFormsAsides(c: Contatos): readonly FormAsideConfig[] {
+  return [
+    {
+      tab: "atendimento",
+      formId: "form-contato-atendimento",
+      cmsLink: "submit-atendimento-geral",
+      endpoint: "/api/contato/atendimento",
+      aside: {
+        eyebrow: "Canal · Atendimento geral",
+        titulo: "Fale com a NTC",
+        descricaoHtml:
+          "Canal aberto para dúvidas, sugestões, parcerias e qualquer demanda que não se encaixe nos canais especializados.",
+        bulletsHtml: [
+          "Retorno em até <strong>1 dia útil</strong>",
+          "Atendimento humano direcionado",
+          "Encaminhamento interno conforme o tema",
+          "Confidencialidade institucional",
+        ],
+        rodapeHtml: `Prefere e-mail? <strong>${escapar(c.emailInstitucional)}</strong>`,
+      },
     },
-  },
-  {
-    tab: "proposta",
-    formId: "form-contato-proposta",
-    cmsLink: "submit-proposta-institucional",
-    endpoint: "/api/contato/proposta",
-    aside: {
-      eyebrow: "Canal · Proposta institucional",
-      titulo: "Contratar formação para a sua instituição",
-      descricaoHtml:
-        "Para órgãos públicos, redes de ensino, sistemas de saúde e organizações que buscam programas <strong>in company</strong>, turmas fechadas, soluções sob medida ou trilhas estruturadas.",
-      bulletsHtml: [
-        "Diagnóstico institucional inicial",
-        "Proposta técnica e comercial em até 5 dias úteis",
-        "Documentação para Lei 14.133, dispensa e convênios",
-        "Coordenação científica dedicada por vertical",
-        "Faturamento por empenho, NF, convênio ou pactuação",
-      ],
-      rodapeHtml: "Atendimento comercial · <strong>(63) 3212-1199</strong>",
+    {
+      tab: "proposta",
+      formId: "form-contato-proposta",
+      cmsLink: "submit-proposta-institucional",
+      endpoint: "/api/contato/proposta",
+      aside: {
+        eyebrow: "Canal · Proposta institucional",
+        titulo: "Contratar formação para a sua instituição",
+        descricaoHtml:
+          "Para órgãos públicos, redes de ensino, sistemas de saúde e organizações que buscam programas <strong>in company</strong>, turmas fechadas, soluções sob medida ou trilhas estruturadas.",
+        bulletsHtml: [
+          "Diagnóstico institucional inicial",
+          "Proposta técnica e comercial em até 5 dias úteis",
+          "Documentação para Lei 14.133, dispensa e convênios",
+          "Coordenação científica dedicada por vertical",
+          "Faturamento por empenho, NF, convênio ou pactuação",
+        ],
+        rodapeHtml: `Atendimento comercial · <strong>${escapar(c.telefone)}</strong>`,
+      },
     },
-  },
-  {
-    tab: "equipe",
-    formId: "form-contato-equipe",
-    cmsLink: "submit-inscricao-equipe",
-    endpoint: "/api/contato/equipe",
-    aside: {
-      eyebrow: "Canal · Equipe ou grupo institucional",
-      titulo: "Inscrever equipe ou grupo institucional",
-      descricaoHtml:
-        "Atendimento único para inscrições coletivas — de equipes pequenas a partir de <strong>3 participantes</strong> até inscrições em lote acima de mil participantes, com faturamento institucional.",
-      bulletsHtml: [
-        "Condições especiais a partir de 3 inscrições",
-        "Faturamento por empenho, NF, convênio ou centralizado",
-        "Reserva de vagas garantida em até 48h",
-        "Coordenação dedicada para cadastros e certificação",
-        "Inscrição em lote por planilha (acima de 50 participantes)",
-        "Material de divulgação interna sob demanda",
-      ],
-      // TODO: rota /agenda ainda não criada — manter href literal do protótipo
-      rodapeHtml:
-        "Inscrições individuais? Acesse a <strong><a href=\"./09_Pagina_Agenda_v2.html\" style=\"color: var(--dourado-soft);\">Agenda Geral NTC →</a></strong>",
+    {
+      tab: "equipe",
+      formId: "form-contato-equipe",
+      cmsLink: "submit-inscricao-equipe",
+      endpoint: "/api/contato/equipe",
+      aside: {
+        eyebrow: "Canal · Equipe ou grupo institucional",
+        titulo: "Inscrever equipe ou grupo institucional",
+        descricaoHtml:
+          "Atendimento único para inscrições coletivas — de equipes pequenas a partir de <strong>3 participantes</strong> até inscrições em lote acima de mil participantes, com faturamento institucional.",
+        bulletsHtml: [
+          "Condições especiais a partir de 3 inscrições",
+          "Faturamento por empenho, NF, convênio ou centralizado",
+          "Reserva de vagas garantida em até 48h",
+          "Coordenação dedicada para cadastros e certificação",
+          "Inscrição em lote por planilha (acima de 50 participantes)",
+          "Material de divulgação interna sob demanda",
+        ],
+        // TODO: rota /agenda ainda não criada — manter href literal do protótipo
+        rodapeHtml:
+          "Inscrições individuais? Acesse a <strong><a href=\"./09_Pagina_Agenda_v2.html\" style=\"color: var(--dourado-soft);\">Agenda Geral NTC →</a></strong>",
+      },
     },
-  },
-  {
-    tab: "imprensa",
-    formId: "form-contato-imprensa",
-    cmsLink: "submit-imprensa",
-    endpoint: "/api/contato/imprensa",
-    aside: {
-      eyebrow: "Canal · Imprensa e relações institucionais",
-      titulo: "Pautas, entrevistas e parcerias editoriais",
-      descricaoHtml:
-        "Canal dedicado a jornalistas, veículos, assessorias e entidades parceiras. Acesso a porta-vozes, especialistas das três verticais, dados consolidados e materiais editoriais.",
-      bulletsHtml: [
-        "Retorno em até <strong>4 horas úteis</strong>",
-        "Coordenação científica e porta-vozes oficiais",
-        "Releases, banco de imagens e logos",
-        "Dados consolidados das três verticais",
-        "Sala de imprensa por solicitação",
-      ],
-      rodapeHtml: "Apoio direto · <strong>imprensa@institutontc.com.br</strong>",
+    {
+      tab: "imprensa",
+      formId: "form-contato-imprensa",
+      cmsLink: "submit-imprensa",
+      endpoint: "/api/contato/imprensa",
+      aside: {
+        eyebrow: "Canal · Imprensa e relações institucionais",
+        titulo: "Pautas, entrevistas e parcerias editoriais",
+        descricaoHtml:
+          "Canal dedicado a jornalistas, veículos, assessorias e entidades parceiras. Acesso a porta-vozes, especialistas das três verticais, dados consolidados e materiais editoriais.",
+        bulletsHtml: [
+          "Retorno em até <strong>4 horas úteis</strong>",
+          "Coordenação científica e porta-vozes oficiais",
+          "Releases, banco de imagens e logos",
+          "Dados consolidados das três verticais",
+          "Sala de imprensa por solicitação",
+        ],
+        rodapeHtml: `Apoio direto · <strong>${escapar(c.emailImprensa)}</strong>`,
+      },
     },
-  },
-] as const;
+  ];
+}
 
 /* ============================================================
  * SELECT OPTIONS
@@ -439,13 +443,13 @@ export interface HqConfig {
 }
 
 export function montarHq(c: Contatos): HqConfig {
-  const [razao, ...resto] = c.endereco.split("\n");
+  const [razao, ...resto] = c.endereco.split(/\r?\n/);
 
   return {
     cidade: "Brasília · DF",
-    enderecoHtml: `<strong>${razao ?? ""}</strong>${resto
-      .map((linha) => `<br>${linha}`)
-      .join("")}<br>${c.telefone} · ${c.emailInstitucional}`,
+    enderecoHtml: `<strong>${escapar(razao ?? "")}</strong>${resto
+      .map((linha) => `<br>${escapar(linha)}`)
+      .join("")}<br>${escapar(c.telefone)} · ${escapar(c.emailInstitucional)}`,
     mapaIframeSrc:
       "https://www.google.com/maps?q=Setor%20Comercial%20Sul%2C%20Quadra%209%2C%20Bloco%20C%2C%20Ed.%20Parque%20Cidade%20Corporate%2C%20Bras%C3%ADlia%20-%20DF&output=embed",
     mapaIframeTitle: "Localização da sede do Instituto NTC do Brasil em Brasília — DF",
@@ -478,10 +482,11 @@ export interface VerticalCard {
  */
 function canaisDaVertical(c: Contatos, vertical: VerticalCard["vertical"]): string {
   const v = c.verticais.find((item) => item.vertical === vertical);
-  const email = v?.email ?? c.emailInstitucional;
+  const email = escapar(v?.email ?? c.emailInstitucional);
+  const telefone = escapar(c.telefone);
   return v?.opcaoTelefone
-    ? `${email}<br>${c.telefone} · ${v.opcaoTelefone}`
-    : `${email}<br>${c.telefone}`;
+    ? `${email}<br>${telefone} · ${escapar(v.opcaoTelefone)}`
+    : `${email}<br>${telefone}`;
 }
 
 export function montarVerticais(c: Contatos): readonly VerticalCard[] {
@@ -624,13 +629,13 @@ export function montarFaqs(c: Contatos): readonly FaqItem[] {
       id: "faq-reuniao",
       pergunta: "Posso solicitar uma reunião antes de enviar a proposta?",
       respostaHtml:
-        `Sim. Podemos agendar reunião presencial na sede em Brasília, virtual ou na sede da sua instituição. Use o canal de <a href="#tab-proposta">Proposta institucional</a> indicando "Solicito reunião prévia" no campo de contexto, ou acione diretamente o ${c.telefone}.`,
+        `Sim. Podemos agendar reunião presencial na sede em Brasília, virtual ou na sede da sua instituição. Use o canal de <a href="#tab-proposta">Proposta institucional</a> indicando "Solicito reunião prévia" no campo de contexto, ou acione diretamente o ${escapar(c.telefone)}.`,
     },
     {
       id: "faq-dados",
       pergunta: "Como meus dados pessoais e institucionais são tratados?",
       respostaHtml:
-        `O tratamento segue a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018). Coletamos apenas o necessário para atender sua solicitação, sob base legal definida, e não compartilhamos com terceiros para fins comerciais. Para exercer seus direitos como titular, escreva ao nosso DPO em <strong>${c.emailDpo}</strong>.`,
+        `O tratamento segue a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018). Coletamos apenas o necessário para atender sua solicitação, sob base legal definida, e não compartilhamos com terceiros para fins comerciais. Para exercer seus direitos como titular, escreva ao nosso DPO em <strong>${escapar(c.emailDpo)}</strong>.`,
     },
   ];
 }
@@ -646,7 +651,7 @@ export function montarLgpd(c: Contatos) {
       "Seus dados são tratados com a mesma seriedade do nosso compromisso institucional.",
     paragrafosHtml: [
       "O Instituto NTC do Brasil é controlador dos dados pessoais coletados nos formulários institucionais desta página. O tratamento segue a Lei Geral de Proteção de Dados (Lei 13.709/2018) e princípios de finalidade, adequação, necessidade, transparência, segurança e responsabilização.",
-      `Para exercer seus direitos como titular (acesso, correção, anonimização, portabilidade, eliminação), acione nosso encarregado de proteção de dados pelo e-mail <strong style="color: var(--dourado-soft);">${c.emailDpo}</strong>.`,
+      `Para exercer seus direitos como titular (acesso, correção, anonimização, portabilidade, eliminação), acione nosso encarregado de proteção de dados pelo e-mail <strong style="color: var(--dourado-soft);">${escapar(c.emailDpo)}</strong>.`,
     ],
     ctaPrivacidadeHref: "/politica-de-privacidade",
     ctaPrivacidadeTexto: "Política de Privacidade completa",

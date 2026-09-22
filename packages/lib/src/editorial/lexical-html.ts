@@ -12,7 +12,16 @@
 
 const TAGS_HEADING = new Set(["h2", "h3", "h4"]);
 
-function escapar(texto: string): string {
+/**
+ * Escapa `& < > "` antes de interpolar texto livre em HTML que vai ser
+ * injetado com dangerouslySetInnerHTML. Exportado porque o site monta
+ * alguns trechos de HTML à mão a partir de campos livres do CMS
+ * (endereço, telefone e opção de telefone das verticais, em
+ * apps/web/app/(institucional)/contato/conteudoContato.ts): sem isso, um
+ * editor-institucional que digitasse markup no painel viraria XSS
+ * armazenado para todo visitante anônimo.
+ */
+export function escapar(texto: string): string {
   return texto
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

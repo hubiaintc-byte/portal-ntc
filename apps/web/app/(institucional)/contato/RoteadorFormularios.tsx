@@ -15,7 +15,6 @@ import { CampoTurnstile } from "@ntc/ui";
 
 import {
   BULK_INSCRITOS_RANGES,
-  FORMS_ASIDES,
   OPTION_PROGRAMA_CUSTOMIZADO,
   OPTIONS_ASSUNTO_ATENDIMENTO,
   OPTIONS_FATURAMENTO,
@@ -64,10 +63,6 @@ const HEADER_OFFSET = 88;
 const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ACCEPTED_BULK_EXT = ["xlsx", "xls", "csv"] as const;
 const MAX_BULK_FILE_SIZE = 5 * 1024 * 1024;
-
-const ASIDE_POR_TAB: Record<TabId, FormAsideConfig> = Object.fromEntries(
-  FORMS_ASIDES.map((f) => [f.tab, f]),
-) as Record<TabId, FormAsideConfig>;
 
 /* ============================================================
  * Helpers de validação (compartilhados pelos 4 forms)
@@ -121,7 +116,17 @@ const STATUS_INICIAL: FormStatusState = { kind: "idle", mensagem: "" };
  * RoteadorFormularios — entrada do componente
  * ============================================================ */
 
-export function RoteadorFormularios() {
+export interface RoteadorFormulariosProps {
+  /** Asides dos 4 formulários, já montados com os contatos do CMS. */
+  asides: readonly FormAsideConfig[];
+}
+
+export function RoteadorFormularios({ asides }: RoteadorFormulariosProps) {
+  const asidePorTab = Object.fromEntries(asides.map((f) => [f.tab, f])) as Record<
+    TabId,
+    FormAsideConfig
+  >;
+
   const [tabAtiva, setTabAtiva] = useState<TabId>("atendimento");
   const [bulkAtivo, setBulkAtivo] = useState(false);
   const [statusAtendimento, setStatusAtendimento] = useState<FormStatusState>(STATUS_INICIAL);
@@ -513,12 +518,14 @@ export function RoteadorFormularios() {
           <PainelAtendimento
             tabAtiva={tabAtiva}
             status={statusAtendimento}
+            cfg={asidePorTab.atendimento}
             onSubmit={handleSubmit("atendimento", setStatusAtendimento)}
           />
 
           <PainelProposta
             tabAtiva={tabAtiva}
             status={statusProposta}
+            cfg={asidePorTab.proposta}
             refSelectVertical={refSelectVerticalProp}
             onSubmit={handleSubmit("proposta", setStatusProposta)}
           />
@@ -526,6 +533,7 @@ export function RoteadorFormularios() {
           <PainelEquipe
             tabAtiva={tabAtiva}
             status={statusEquipe}
+            cfg={asidePorTab.equipe}
             bulkAtivo={bulkAtivo}
             nomeArquivoBulk={nomeArquivoBulk}
             refInputEvento={refInputEvento}
@@ -543,6 +551,7 @@ export function RoteadorFormularios() {
           <PainelImprensa
             tabAtiva={tabAtiva}
             status={statusImprensa}
+            cfg={asidePorTab.imprensa}
             onSubmit={handleSubmit("imprensa", setStatusImprensa)}
           />
         </div>
@@ -558,6 +567,7 @@ export function RoteadorFormularios() {
 interface PainelBaseProps {
   tabAtiva: TabId;
   status: FormStatusState;
+  cfg: FormAsideConfig;
 }
 
 function PanelShell({
@@ -623,8 +633,7 @@ interface PainelAtendimentoProps extends PainelBaseProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
-function PainelAtendimento({ tabAtiva, status, onSubmit }: PainelAtendimentoProps) {
-  const cfg = ASIDE_POR_TAB.atendimento;
+function PainelAtendimento({ tabAtiva, status, cfg, onSubmit }: PainelAtendimentoProps) {
   return (
     <PanelShell tab="atendimento" ativa={tabAtiva === "atendimento"}>
       <AsideForm aside={cfg.aside} />
@@ -752,10 +761,10 @@ interface PainelPropostaProps extends PainelBaseProps {
 function PainelProposta({
   tabAtiva,
   status,
+  cfg,
   refSelectVertical,
   onSubmit,
 }: PainelPropostaProps) {
-  const cfg = ASIDE_POR_TAB.proposta;
   return (
     <PanelShell tab="proposta" ativa={tabAtiva === "proposta"}>
       <AsideForm aside={cfg.aside} />
@@ -1000,6 +1009,7 @@ interface PainelEquipeProps extends PainelBaseProps {
 function PainelEquipe({
   tabAtiva,
   status,
+  cfg,
   bulkAtivo,
   nomeArquivoBulk,
   refInputEvento,
@@ -1011,7 +1021,6 @@ function PainelEquipe({
   onChangePlanilha,
   onSubmit,
 }: PainelEquipeProps) {
-  const cfg = ASIDE_POR_TAB.equipe;
   return (
     <PanelShell tab="equipe" ativa={tabAtiva === "equipe"}>
       <AsideForm aside={cfg.aside} />
@@ -1289,8 +1298,7 @@ interface PainelImprensaProps extends PainelBaseProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
-function PainelImprensa({ tabAtiva, status, onSubmit }: PainelImprensaProps) {
-  const cfg = ASIDE_POR_TAB.imprensa;
+function PainelImprensa({ tabAtiva, status, cfg, onSubmit }: PainelImprensaProps) {
   return (
     <PanelShell tab="imprensa" ativa={tabAtiva === "imprensa"}>
       <AsideForm aside={cfg.aside} />

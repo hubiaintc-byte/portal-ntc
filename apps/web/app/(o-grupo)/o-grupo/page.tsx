@@ -12,6 +12,8 @@ import {
   ICONE_MVV,
 } from "./icones";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "O Grupo NTC · Inteligência institucional. Impacto real.",
   description:

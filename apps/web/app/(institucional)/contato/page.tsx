@@ -10,6 +10,7 @@ import {
   montarChannels,
   montarCtaFinal,
   montarFaqs,
+  montarFormsAsides,
   montarHq,
   montarLgpd,
   montarVerticais,
@@ -60,6 +61,7 @@ export default async function ContatoPage() {
   const FAQS = montarFaqs(contatos);
   const LGPD = montarLgpd(contatos);
   const CTA_FINAL = montarCtaFinal(contatos);
+  const FORMS_ASIDES = montarFormsAsides(contatos);
 
   return (
     <>
@@ -97,7 +99,7 @@ export default async function ContatoPage() {
         {/* ============================================================
             2 + 3) ROTEADOR DE FORMULÁRIOS · TABS + 4 PAINÉIS
             ============================================================ */}
-        <RoteadorFormularios />
+        <RoteadorFormularios asides={FORMS_ASIDES} />
 
         {/* ============================================================
             4) CANAIS DIRETOS + SEDE + MAPA

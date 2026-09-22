@@ -20,7 +20,7 @@ export interface FooterHomeProps {
  * group) — o mesmo dado que a tela Configurações do painel edita.
  */
 export function FooterHome({ contatos }: FooterHomeProps) {
-  const linhasEndereco = contatos.endereco.split("\n");
+  const linhasEndereco = contatos.endereco.split(/\r?\n/);
 
   return (
     <footer className="site-footer">
