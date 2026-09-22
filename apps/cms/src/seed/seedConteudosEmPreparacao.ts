@@ -180,6 +180,7 @@ async function principal(): Promise<void> {
       where: { slug: { equals: semente.slug } },
       limit: 1,
       draft: true,
+      overrideAccess: true,
     });
     if (existente.docs.length > 0) {
       pulados += 1;
@@ -220,4 +221,7 @@ async function principal(): Promise<void> {
   process.exit(0);
 }
 
-void principal();
+void principal().catch((err) => {
+  console.error("[seed:conteudos-em-preparacao] Falha:", err);
+  process.exit(1);
+});
