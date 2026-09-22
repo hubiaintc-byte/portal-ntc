@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import type { ConteudoCard } from "@/lib/conteudos";
+
 import {
-  type CardBiblioteca,
   type OpcaoTab,
   type OpcaoTipo,
   type TipoConteudo,
@@ -14,6 +15,13 @@ import {
   FILTROS_TIPO,
   TABS_VERTICAL,
 } from "./conteudoConteudos";
+
+/** Selo "Em preparação editorial" — mesmo texto usado por todo card em rascunho anunciado. */
+const TEXTO_EM_PREPARACAO = "Em preparação editorial";
+/** Texto do link de leitura de um card já publicado. */
+const TEXTO_LER = "Ler conteúdo";
+/** Selo do card ainda sem link — mesmo texto que a biblioteca sempre mostrou. */
+const TEXTO_EM_BREVE = "Em breve";
 
 /**
  * Biblioteca filtrável de /conteudos. Espelha o IIFE do protótipo
@@ -44,7 +52,7 @@ const norm = (s: string): string =>
     .replace(/[̀-ͯ]/g, "");
 
 interface BibliotecaConteudosProps {
-  cards: CardBiblioteca[];
+  cards: ConteudoCard[];
   head: {
     eyebrow: string;
     tituloHtml: string;
@@ -131,8 +139,8 @@ export function BibliotecaConteudos({ cards, head }: BibliotecaConteudosProps) {
     const q = norm(state.busca.trim());
     return cards.map((card) => {
       const vOk = state.vert === "all" || card.vert === state.vert;
-      const tOk = state.tipo === "all" || card.tipo === state.tipo;
-      const haystack = norm(`${card.search} ${card.titulo} ${card.descricao}`);
+      const tOk = state.tipo === "all" || card.categoria === state.tipo;
+      const haystack = norm(`${card.search} ${card.titulo} ${card.lide}`);
       const qOk = q.length < 2 || haystack.includes(q);
       return { card, visible: vOk && tOk && qOk };
     });
@@ -221,12 +229,12 @@ export function BibliotecaConteudos({ cards, head }: BibliotecaConteudosProps) {
         </div>
 
         <div className="cont-grid" id="contGrid">
-          {visiveis.map(({ card, visible }, i) => (
+          {visiveis.map(({ card, visible }) => (
             <article
-              key={i}
+              key={card.id}
               className={`cont-card${visible ? "" : " is-hidden"}`}
               data-vert={card.vert}
-              data-type={card.tipo}
+              data-type={card.categoria}
               data-search={card.search}
             >
               <div className="cont-card-band" aria-hidden="true" />
@@ -235,24 +243,26 @@ export function BibliotecaConteudos({ cards, head }: BibliotecaConteudosProps) {
                   <span className="cont-card-tag">{card.verticalLabel}</span>
                   <span className="cont-card-tag type">{card.tipoLabel}</span>
                 </div>
-                <span className="cont-card-prep">{card.prep}</span>
+                {card.emPreparacao && (
+                  <span className="cont-card-prep">{TEXTO_EM_PREPARACAO}</span>
+                )}
                 <h3>{card.titulo}</h3>
-                <p>{card.descricao}</p>
+                <p>{card.lide}</p>
                 <div className="cont-card-meta">
-                  <span>{card.meta[0]}</span>
-                  <span>{card.meta[1]}</span>
+                  <span>{card.dataLegivel}</span>
                 </div>
               </div>
               <div className="cont-card-foot">
                 <div className="author">
-                  {card.authorPrefix}<strong>{card.authorBold}</strong>
+                  <strong>{card.assinatura}</strong>
                 </div>
-                <span
-                  className="cont-card-link is-soon"
-                  data-cms-link={card.linkSoon.cmsLink}
-                >
-                  {card.linkSoon.texto}
-                </span>
+                {card.href ? (
+                  <a className="cont-card-link" href={card.href}>
+                    {TEXTO_LER}
+                  </a>
+                ) : (
+                  <span className="cont-card-link is-soon">{TEXTO_EM_BREVE}</span>
+                )}
               </div>
             </article>
           ))}

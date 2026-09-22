@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
 
+import { listarConteudosPublicados, listarDestaques } from "@/lib/conteudos";
+
 import {
   BIBLIOTECA_HEAD,
-  CARDS_BIBLIOTECA,
   CTA_FINAL_HEAD,
   CTA_FINAL_PONTES,
-  DESTAQUES,
   DESTAQUES_HEAD,
   FAQ_CONTEUDOS,
   FAQ_HEAD,
@@ -29,7 +29,8 @@ import { NewsletterForm } from "./NewsletterForm";
 import { StickyCtaConteudos } from "./StickyCtaConteudos";
 import { SubnavSticky } from "./SubnavSticky";
 
-export const revalidate = 3600;
+// doc 13 (Mapa Página-a-Página) fixa 600s para /conteudos*.
+export const revalidate = 600;
 
 export const metadata: Metadata = {
   title:
@@ -37,6 +38,13 @@ export const metadata: Metadata = {
   description:
     "Artigos, estudos, notas técnicas, webinars e materiais didáticos produzidos pela curadoria científica das três verticais NTC — para servidores, dirigentes, juristas, pesquisadores e equipes técnicas da administração pública brasileira.",
 };
+
+/** Texto do selo de destaque ainda sem publicação — mesmo texto do card da Biblioteca. */
+const DESTAQUE_TEXTO_PREP = "Em preparação editorial";
+/** Texto do link "Em breve" de um destaque sem link — literal do protótipo (idêntico nos 3 cards estáticos). */
+const DESTAQUE_TEXTO_EM_BREVE = "Em breve · curadoria em andamento";
+/** Texto do link de leitura de um destaque já publicado. */
+const DESTAQUE_TEXTO_LER = "Ler conteúdo";
 
 /**
  * Página /conteudos — porta literal de 28_Pagina_Conteudos_v1.html.
@@ -47,8 +55,8 @@ export const metadata: Metadata = {
  *   3. <SubnavSticky /> com 6 âncoras + sticky + active anchor.
  *   4. Manifesto editorial.
  *   5. Tese editorial (3 pilares).
- *   6. 3 destaques editoriais.
- *   7. <BibliotecaConteudos /> com 9 cards filtráveis + URL sync.
+ *   6. Destaques editoriais (até 3, do CMS — listarDestaques()).
+ *   7. <BibliotecaConteudos /> com os cards filtráveis do CMS + URL sync.
  *   8. 5 tipos editoriais.
  *   9. Curadoria por vertical (3).
  *   10. <NewsletterForm /> com validação inline mock.
@@ -59,7 +67,12 @@ export const metadata: Metadata = {
  *
  * Header/Footer/InteracoesScroll vêm do layout do route group (conteudos).
  */
-export default function ConteudosPage() {
+export default async function ConteudosPage() {
+  const [cards, destaques] = await Promise.all([
+    listarConteudosPublicados(),
+    listarDestaques(),
+  ]);
+
   return (
     <>
       <main id="main">
@@ -161,7 +174,7 @@ export default function ConteudosPage() {
           </div>
         </section>
 
-        {/* 6. 3 DESTAQUES EDITORIAIS */}
+        {/* 6. DESTAQUES EDITORIAIS (até 3, do CMS) */}
         <section
           className="cont-featured"
           id="destaques"
@@ -174,34 +187,36 @@ export default function ConteudosPage() {
               <p className="intro">{DESTAQUES_HEAD.intro}</p>
             </div>
             <div className="cont-featured-list fade-in">
-              {DESTAQUES.map((d, i) => (
+              {destaques.map((d) => (
                 <article
-                  key={i}
+                  key={d.id}
                   className="cont-featured-card"
                   data-vert={d.vert}
                 >
                   <div
                     className="cont-featured-figura"
-                    style={{ backgroundImage: `url('${d.imagemUrl}')` }}
+                    style={d.imagemUrl ? { backgroundImage: `url('${d.imagemUrl}')` } : undefined}
                   >
-                    <span className="cont-featured-figura-tag">{d.tipoTag}</span>
+                    <span className="cont-featured-figura-tag">{d.tipoLabel}</span>
                   </div>
                   <div className="cont-featured-body">
-                    <span className="cont-featured-prep">{d.prep}</span>
-                    <p className="cont-featured-eyebrow">{d.eyebrow}</p>
+                    {d.emPreparacao && (
+                      <span className="cont-featured-prep">{DESTAQUE_TEXTO_PREP}</span>
+                    )}
+                    <p className="cont-featured-eyebrow">{d.verticalLabel}</p>
                     <h3>{d.titulo}</h3>
-                    <p>{d.descricao}</p>
+                    <p>{d.lide}</p>
                     <div className="cont-featured-meta">
-                      <span>{d.meta[0]}</span>
-                      <span>{d.meta[1]}</span>
-                      <span>{d.meta[2]}</span>
+                      <span>{d.dataLegivel}</span>
+                      <span>{d.assinatura}</span>
                     </div>
-                    <span
-                      className="cont-featured-soon"
-                      data-cms-link={d.soonTag.cmsLink}
-                    >
-                      {d.soonTag.texto}
-                    </span>
+                    {d.href ? (
+                      <a className="link-arrow" href={d.href}>
+                        {DESTAQUE_TEXTO_LER}
+                      </a>
+                    ) : (
+                      <span className="cont-featured-soon">{DESTAQUE_TEXTO_EM_BREVE}</span>
+                    )}
                   </div>
                 </article>
               ))}
@@ -210,7 +225,7 @@ export default function ConteudosPage() {
         </section>
 
         {/* 7. BIBLIOTECA FILTRÁVEL */}
-        <BibliotecaConteudos cards={CARDS_BIBLIOTECA} head={BIBLIOTECA_HEAD} />
+        <BibliotecaConteudos cards={cards} head={BIBLIOTECA_HEAD} />
 
         {/* 8. 5 TIPOS EDITORIAIS */}
         <section
