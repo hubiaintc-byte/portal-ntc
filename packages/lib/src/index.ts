@@ -133,3 +133,13 @@ export {
 
 // Editorial — serialização do corpo de conteúdos.
 export { lexicalParaHtmlEditorial } from "./editorial/lexical-html";
+
+export {
+  CONTEUDO_CATEGORIA,
+  SEGMENTOS_CATEGORIA,
+  categoriaParaSegmento,
+  rotuloCategoria,
+  segmentoParaCategoria,
+  type ConteudoCategoria,
+} from "./editorial/categorias";
+export { calcularTempoLeituraMin } from "./editorial/tempo-leitura";
