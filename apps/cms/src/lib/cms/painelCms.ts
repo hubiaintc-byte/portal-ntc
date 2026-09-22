@@ -1,7 +1,10 @@
 import "server-only";
 
+import { rotuloCategoria, type ConteudoCategoria } from "@ntc/lib";
+
 import { obterPayload } from "@/lib/payloadClient";
 import { lexicalParaTexto, lexicalToHtml } from "@/lib/cms/lexical";
+import { lexicalParaMarkdown } from "@/lib/markdownLexical";
 
 /**
  * Leitura de dados reais para o Painel Admin (rota /).
@@ -466,6 +469,144 @@ export async function listarLeadsCms(): Promise<LeadCmsResumo[]> {
       data: doc.createdAt ? FMT_DATA.format(new Date(doc.createdAt)) : "—",
       dataISO: doc.createdAt ?? "",
     };
+  });
+}
+
+// ============================================================
+// Conteúdos editoriais (leitura para lista e detalhe do painel)
+// ============================================================
+
+export type SituacaoConteudo = "publicado" | "rascunho" | "em-preparacao";
+
+export interface ConteudoCmsResumo {
+  id: string;
+  titulo: string;
+  categoria: ConteudoCategoria;
+  categoriaRotulo: string;
+  /** Nome da área vinculada, ou "Transversal" quando o conteúdo não tem área. */
+  vertical: string;
+  dataISO: string | null;
+  situacao: SituacaoConteudo;
+  destaque: boolean;
+}
+
+export interface ConteudoCmsDetalhe extends ConteudoCmsResumo {
+  slug: string;
+  lide: string;
+  /** Corpo já convertido de Lexical para Markdown leve, pronto para o textarea do editor. */
+  corpoMarkdown: string;
+  assinatura: string;
+  autorIds: string[];
+  areaId: string | null;
+  imagemDestaqueUrl: string | null;
+  imagemDestaqueId: string | null;
+  anexoId: string | null;
+  anexoNome: string | null;
+  linkExterno: string;
+  anunciarEmPreparacao: boolean;
+  seoTitulo: string;
+  seoDescricao: string;
+}
+
+interface DocConteudo {
+  id: string | number;
+  titulo?: string;
+  slug?: string;
+  categoria?: string;
+  area?: unknown;
+  lide?: string;
+  corpo?: unknown;
+  assinatura?: string | null;
+  autor?: unknown[];
+  dataPublicacao?: string | null;
+  destaque?: boolean | null;
+  anunciarEmPreparacao?: boolean | null;
+  imagemDestaque?: unknown;
+  anexoDownload?: unknown;
+  linkExterno?: string | null;
+  seo?: { tituloSeo?: string | null; descricaoSeo?: string | null } | null;
+  _status?: string;
+}
+
+/** Deriva a situação editorial: publicado, rascunho, ou rascunho "em preparação" anunciado no site. */
+function situacaoDoConteudo(doc: DocConteudo): SituacaoConteudo {
+  if (doc._status === "published") return "publicado";
+  return doc.anunciarEmPreparacao ? "em-preparacao" : "rascunho";
+}
+
+/** Nome da área resolvida (depth: 1), ou "Transversal" quando o conteúdo não tem área. */
+function verticalDoConteudo(area: unknown): string {
+  return nomeDeRelacao(area) ?? "Transversal";
+}
+
+/** Id de uma relação que pode vir crua (número/string) ou resolvida ({ id }) conforme o depth. */
+function idDaRelacao(valor: unknown): string | null {
+  if (typeof valor === "number" || typeof valor === "string") return String(valor);
+  if (typeof valor === "object" && valor !== null && "id" in valor) {
+    return String((valor as { id: string | number }).id);
+  }
+  return null;
+}
+
+function resumoDeConteudo(doc: DocConteudo): ConteudoCmsResumo {
+  const categoria = (doc.categoria ?? "artigo") as ConteudoCategoria;
+  return {
+    id: String(doc.id),
+    titulo: doc.titulo ?? "(sem título)",
+    categoria,
+    categoriaRotulo: rotuloCategoria(categoria),
+    vertical: verticalDoConteudo(doc.area),
+    dataISO: doc.dataPublicacao ?? null,
+    situacao: situacaoDoConteudo(doc),
+    destaque: Boolean(doc.destaque),
+  };
+}
+
+export async function listarConteudosCms(): Promise<ConteudoCmsResumo[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "conteudos",
+    depth: 1,
+    limit: 200,
+    draft: true,
+    sort: "-dataPublicacao",
+  });
+  return res.docs.map((d) => resumoDeConteudo(d as unknown as DocConteudo));
+}
+
+export async function obterConteudoCms(id: string): Promise<ConteudoCmsDetalhe | null> {
+  const payload = await obterPayload();
+  const doc = (await payload
+    .findByID({ collection: "conteudos", id, depth: 1, draft: true })
+    .catch(() => null)) as DocConteudo | null;
+  if (!doc) return null;
+
+  return {
+    ...resumoDeConteudo(doc),
+    slug: doc.slug ?? "",
+    lide: doc.lide ?? "",
+    corpoMarkdown: lexicalParaMarkdown(doc.corpo),
+    assinatura: doc.assinatura ?? "",
+    autorIds: (doc.autor ?? []).map(idDaRelacao).filter((v): v is string => v !== null),
+    areaId: idDaRelacao(doc.area),
+    imagemDestaqueUrl: urlDeMidia(doc.imagemDestaque),
+    imagemDestaqueId: idDaRelacao(doc.imagemDestaque),
+    anexoId: idDaRelacao(doc.anexoDownload),
+    anexoNome: nomeDeMidia(doc.anexoDownload),
+    linkExterno: doc.linkExterno ?? "",
+    anunciarEmPreparacao: Boolean(doc.anunciarEmPreparacao),
+    seoTitulo: doc.seo?.tituloSeo ?? "",
+    seoDescricao: doc.seo?.descricaoSeo ?? "",
+  };
+}
+
+/** Áreas para o select de vertical do formulário de conteúdo. */
+export async function listarAreasCms(): Promise<{ id: string; nome: string }[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({ collection: "areas", limit: 50, sort: "nome" });
+  return res.docs.map((d) => {
+    const doc = d as unknown as { id: string | number; nome?: string };
+    return { id: String(doc.id), nome: doc.nome ?? "(sem nome)" };
   });
 }
 
