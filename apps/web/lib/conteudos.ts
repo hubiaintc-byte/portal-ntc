@@ -38,8 +38,24 @@ export interface ConteudoCard {
   search: string; // texto normalizado para a busca client-side
 }
 
+/**
+ * Capa do conteúdo nas três formas de que a página de leitura precisa.
+ * Separadas de propósito: o que a página renderiza não serve ao crawler.
+ */
+export interface CapaConteudo {
+  /** Variante `hero` (800×920) do Sharp — o que a página de leitura renderiza. */
+  url: string;
+  /** `media.alt`, obrigatório no CMS; "" quando o editor a declarou decorativa. */
+  alt: string;
+  /** Upload original + dimensões — só para `openGraph`, que quer imagem grande. */
+  ogUrl: string;
+  ogLargura: number | null;
+  ogAltura: number | null;
+}
+
 export interface ConteudoLeitura extends ConteudoCard {
   slug: string;
+  capa: CapaConteudo | null;
   corpoHtml: string;
   tempoLeituraMin: number;
   autores: { nome: string; titulacao: string; fotoUrl: string | null }[];
@@ -78,6 +94,9 @@ interface AreaBruta {
 
 interface MediaBruta {
   url?: string | null;
+  alt?: string | null;
+  width?: number | null;
+  height?: number | null;
   sizes?: {
     card?: { url?: string | null } | null;
     hero?: { url?: string | null } | null;
@@ -137,6 +156,32 @@ function urlImagemCard(media: unknown): string | null {
   if (!m) return null;
   const candidato = m.sizes?.card?.url ?? m.sizes?.hero?.url ?? m.sizes?.thumbnail?.url ?? m.url;
   return typeof candidato === "string" && candidato.length > 0 ? candidato : null;
+}
+
+/**
+ * Capa da página de leitura. Prioriza a variante `hero` (800×920) — a maior
+ * que o Sharp gera (apps/cms/src/collections/Media.ts) e a única que cobre o
+ * bloco de ~760px sem o otimizador do Next reamostrar para cima a partir da
+ * `card` de 600px. Cai para `card`/`thumbnail` e só usa a url crua se o Sharp
+ * não gerou variante nenhuma (CLAUDE.md §11).
+ *
+ * `ogUrl` é o upload **original** de propósito: `openGraph` é lido por
+ * crawler, não por visitante, e Facebook/LinkedIn/X pedem ≥1200×630 — um
+ * recorte 20:23 de 600px seria rejeitado ou enquadrado com tarja.
+ */
+function capaDoDoc(media: unknown): CapaConteudo | null {
+  const m = objetoOuNulo<MediaBruta>(media);
+  if (!m) return null;
+  const candidato = m.sizes?.hero?.url ?? m.sizes?.card?.url ?? m.sizes?.thumbnail?.url ?? m.url;
+  if (typeof candidato !== "string" || candidato.length === 0) return null;
+  const original = typeof m.url === "string" && m.url.length > 0 ? m.url : candidato;
+  return {
+    url: candidato,
+    alt: typeof m.alt === "string" ? m.alt : "",
+    ogUrl: original,
+    ogLargura: typeof m.width === "number" ? m.width : null,
+    ogAltura: typeof m.height === "number" ? m.height : null,
+  };
 }
 
 /**
@@ -236,6 +281,7 @@ function paraLeitura(doc: ConteudoBruto): ConteudoLeitura {
   return {
     ...paraCard(doc),
     slug: doc.slug ?? "",
+    capa: capaDoDoc(doc.imagemDestaque),
     corpoHtml: lexicalParaHtmlEditorial(doc.corpo),
     tempoLeituraMin: doc.tempoLeituraMin ?? 1,
     autores,

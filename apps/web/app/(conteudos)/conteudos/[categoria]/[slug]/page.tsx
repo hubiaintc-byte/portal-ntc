@@ -62,6 +62,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!doc) return { title: "Conteúdo não encontrado · Grupo NTC" };
 
   const descricao = doc.seoDescricao || doc.lide;
+  const autores = doc.autores.map((a) => a.nome).filter((nome) => nome.length > 0);
   return {
     title: doc.seoTitulo || `${doc.titulo} · ${doc.tipoLabel} · Grupo NTC`,
     description: descricao,
@@ -69,7 +70,20 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       title: doc.titulo,
       description: descricao,
       type: "article",
-      images: doc.imagemUrl ? [{ url: doc.imagemUrl }] : undefined,
+      publishedTime: doc.dataISO ?? undefined,
+      authors: autores.length > 0 ? autores : [doc.assinatura || "Instituto NTC do Brasil"],
+      // Upload original, não a variante da página: o openGraph é lido por
+      // crawler, e as redes querem ≥1200×630 — o recorte 20:23 de 600px da
+      // variante seria enquadrado com tarja ou recusado.
+      images: doc.capa
+        ? [
+            {
+              url: doc.capa.ogUrl,
+              width: doc.capa.ogLargura ?? undefined,
+              height: doc.capa.ogAltura ?? undefined,
+            },
+          ]
+        : undefined,
     },
   };
 }
@@ -140,15 +154,16 @@ export default async function ConteudoLeituraPage({ params }: Params) {
               <span>{doc.tempoLeituraMin} min de leitura</span>
             </p>
           </div>
-          {doc.imagemUrl && (
+          {doc.capa && (
             <div className="container cont-artigo-hero-inner">
-              {/* Decorativa: o título e o lide já dizem do que se trata. */}
+              {/* `alt` escrito pelo editor (media.alt é obrigatório no CMS);
+                  "" quando ele a declarou decorativa. */}
               <Image
                 className="cont-artigo-capa"
-                src={doc.imagemUrl}
-                alt=""
-                width={600}
-                height={690}
+                src={doc.capa.url}
+                alt={doc.capa.alt}
+                width={800}
+                height={920}
                 sizes="(max-width: 900px) 100vw, 760px"
                 priority
               />
@@ -243,6 +258,9 @@ export default async function ConteudoLeituraPage({ params }: Params) {
                     {r.href ? <a href={r.href}>{r.titulo}</a> : r.titulo}
                   </h3>
                   <p>{r.lide}</p>
+                  {/* "Em preparação editorial" explica o card sem link —
+                      mesmo texto que o card equivalente de /conteudos usa. */}
+                  <span className="cont-artigo-relacionado-data">{r.dataLegivel}</span>
                 </li>
               ))}
             </ul>

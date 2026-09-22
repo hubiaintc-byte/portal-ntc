@@ -106,6 +106,62 @@ describe("carregarConteudo", () => {
     expect(await carregarConteudo("estudos", "cinco-anos-de-lei-14133")).toBeNull();
   });
 
+  it("usa a variante hero na capa e leva o alt do editor", async () => {
+    find.mockResolvedValue({
+      docs: [
+        {
+          ...publicado,
+          corpo: { root: { children: [] } },
+          imagemDestaque: {
+            url: "/media/capa.jpg",
+            alt: "Plenário do TCU durante sessão",
+            width: 2400,
+            height: 1600,
+            sizes: {
+              card: { url: "/media/capa-600x690.jpg" },
+              hero: { url: "/media/capa-800x920.jpg" },
+              thumbnail: { url: "/media/capa-400x460.jpg" },
+            },
+          },
+        },
+      ],
+    });
+    const doc = await carregarConteudo("estudos", "cinco-anos-de-lei-14133");
+    // A página renderiza a maior variante do Sharp, nunca o upload cru.
+    expect(doc!.capa!.url).toBe("/media/capa-800x920.jpg");
+    expect(doc!.capa!.alt).toBe("Plenário do TCU durante sessão");
+    // openGraph é lido por crawler: original, com as dimensões reais.
+    expect(doc!.capa!.ogUrl).toBe("/media/capa.jpg");
+    expect(doc!.capa!.ogLargura).toBe(2400);
+    expect(doc!.capa!.ogAltura).toBe(1600);
+  });
+
+  it("aceita capa sem alt e sem variante gerada", async () => {
+    find.mockResolvedValue({
+      docs: [
+        {
+          ...publicado,
+          corpo: { root: { children: [] } },
+          imagemDestaque: { url: "/media/capa.svg" },
+        },
+      ],
+    });
+    const doc = await carregarConteudo("estudos", "cinco-anos-de-lei-14133");
+    expect(doc!.capa).toEqual({
+      url: "/media/capa.svg",
+      alt: "",
+      ogUrl: "/media/capa.svg",
+      ogLargura: null,
+      ogAltura: null,
+    });
+  });
+
+  it("devolve capa nula quando não há imagem de destaque", async () => {
+    find.mockResolvedValue({ docs: [{ ...publicado, corpo: { root: { children: [] } } }] });
+    const doc = await carregarConteudo("estudos", "cinco-anos-de-lei-14133");
+    expect(doc!.capa).toBeNull();
+  });
+
   it("consulta filtrando por slug e categoria", async () => {
     find.mockResolvedValue({ docs: [{ ...publicado, corpo: { root: { children: [] } } }] });
     await carregarConteudo("estudos", "cinco-anos-de-lei-14133");
@@ -144,6 +200,7 @@ describe("listarRelacionados", () => {
       imagemUrl: null,
       search: "cinco anos de lei 14.133 leitura tecnica longa.",
       slug: publicado.slug,
+      capa: null,
       corpoHtml: "",
       tempoLeituraMin: 7,
       autores: [],
