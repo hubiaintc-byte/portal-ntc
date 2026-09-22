@@ -376,14 +376,20 @@ function mapearEventoComercial(doc: EventoComercial, documentos: DocumentoEvento
   const arquivo = arquivoDoContrato(c?.arquivo);
   const tipo = c?.tipo ?? null;
   const numero = c?.numero ?? null;
-  const dataISO = c?.data ?? null;
+  const dataISO = soData(c?.data);
   const valor = c?.valor ?? null;
   const contratoVazio = tipo === null && numero === null && dataISO === null && valor === null && arquivo === null;
   return {
     id: String(doc.id),
     titulo: doc.titulo,
-    dataInicioISO: doc.dataInicio,
-    dataFimISO: doc.dataFim ?? null,
+    // `dataInicio`/`dataFim`/`contratoEmpenho.data` são `type: "date"` do
+    // Payload: o formulário manda "2026-10-01" e o banco guarda
+    // `timestamp with time zone` ("2026-10-01T00:00:00.000Z"). Entregar o
+    // datetime cru faria `dataLegivel` cair no ramo com fuso e mostrar
+    // "30/09/2026, 21:00" em São Paulo — dia errado e hora que ninguém
+    // digitou. Mesmo corte de `dataPrevistaEventoISO` em `obterLeadCrm`.
+    dataInicioISO: soData(doc.dataInicio) ?? doc.dataInicio,
+    dataFimISO: soData(doc.dataFim),
     status: doc.status,
     modalidade: doc.modalidade ?? null,
     local: doc.local ?? null,
