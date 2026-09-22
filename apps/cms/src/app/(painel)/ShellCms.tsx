@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import type {
   ConteudoCmsDetalhe,
@@ -29,6 +30,7 @@ import { TelaEventos } from "./TelaEventos";
 import { TelaConteudos } from "./TelaConteudos";
 import { TelaConfiguracoes } from "./TelaConfiguracoes";
 import { TelaUsuarios } from "./TelaUsuarios";
+import { DetalheConteudo } from "./DetalheConteudo";
 import { DetalheEvento } from "./DetalheEvento";
 import { DetalhePalestrante } from "./DetalhePalestrante";
 
@@ -153,12 +155,9 @@ export function ShellCms({
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
   const [conteudoDet, setConteudoDet] = useState<ConteudoCmsDetalhe | null>(null);
   const [criandoConteudo, setCriandoConteudo] = useState(false);
-  // `areas` só é lida pelo <DetalheConteudo> que a Task 8 acrescenta; até lá
-  // fica carregada e pronta, sem consumidor no JSX (noUnusedLocals exige o
-  // `void` explícito para não travar o typecheck nesse meio-tempo).
   const [areas, setAreas] = useState<{ id: string; nome: string }[]>([]);
-  void areas;
   const [carregando, iniciarCarga] = useTransition();
+  const router = useRouter();
 
   const ehSuperAdmin = usuario.perfil === "super-admin";
 
@@ -258,6 +257,18 @@ export function ShellCms({
             setEventoDet(null);
             setEventoEmEdicao(false);
           }}
+        />
+      ) : conteudoDet || criandoConteudo ? (
+        <DetalheConteudo
+          key={conteudoDet?.id ?? "novo"}
+          conteudo={conteudoDet}
+          areas={areas}
+          palestrantes={palestrantes}
+          onVoltar={() => {
+            setConteudoDet(null);
+            setCriandoConteudo(false);
+          }}
+          onSalvou={() => router.refresh()}
         />
       ) : palestranteDet ? (
         <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />

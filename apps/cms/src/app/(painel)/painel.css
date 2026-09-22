@@ -2196,3 +2196,34 @@ body {
 }
 .pcms-evento-card__links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; }
 .pcms-evento-card__acoes-doc { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Editor de corpo com pré-visualização lado a lado (Conteúdos). */
+.pcms-editor-duplo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+.pcms-editor-duplo textarea {
+  min-height: 28rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.pcms-editor-duplo__preview {
+  min-height: 28rem;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--pcms-linha);
+  border-radius: var(--pcms-radius);
+  background: #fff;
+}
+.pcms-editor-duplo__preview:focus-visible {
+  outline: 2px solid var(--pcms-oxford);
+  outline-offset: -1px;
+}
+@media (max-width: 900px) {
+  .pcms-editor-duplo {
+    grid-template-columns: 1fr;
+  }
+}

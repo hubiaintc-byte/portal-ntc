@@ -20,6 +20,7 @@ import {
   definirOcultarPalestrante,
   despublicarConteudoCms,
   despublicarEvento,
+  enviarMidiaConteudo as enviarMidiaConteudoCms,
   enviarMidiaEvento,
   excluirConteudoCms,
   publicarConteudoCms,
@@ -330,4 +331,25 @@ export async function excluirConteudo(id: string): Promise<ResultadoEscrita> {
   const r = await excluirConteudoCms(id);
   if (r.ok) revalidatePath("/");
   return r;
+}
+
+/**
+ * Envia a imagem de destaque ou o anexo do conteúdo (File no campo "arquivo"
+ * do FormData) e devolve o detalhe atualizado, com os nomes dos arquivos já
+ * vinculados. Exige o conteúdo salvo — sem id não há documento para apontar.
+ */
+export async function enviarMidiaConteudo(
+  id: string,
+  campo: "imagemDestaque" | "anexoDownload",
+  formData: FormData,
+): Promise<{ resultado: ResultadoEscrita; conteudo: ConteudoCmsDetalhe | null }> {
+  if (!(await obterUsuarioCms())) return { resultado: RECUSADO, conteudo: null };
+  const arquivo = formData.get("arquivo");
+  if (!(arquivo instanceof File) || arquivo.size === 0) {
+    return { resultado: { ok: false, erro: "Nenhum arquivo selecionado." }, conteudo: null };
+  }
+  const resultado = await enviarMidiaConteudoCms(id, campo, arquivo);
+  if (resultado.ok) revalidatePath("/");
+  const conteudo = resultado.ok ? await obterConteudoCms(id) : null;
+  return { resultado, conteudo };
 }

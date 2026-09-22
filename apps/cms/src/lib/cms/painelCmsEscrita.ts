@@ -620,3 +620,51 @@ export async function excluirConteudoCms(id: string): Promise<ResultadoEscrita> 
     return { ok: false, erro: traduzirErroConteudo(e) };
   }
 }
+
+/**
+ * Upload da imagem de destaque ou do anexo de download de um conteúdo.
+ *
+ * O <CampoUpload> do painel é específico do evento — coleção e par de campos
+ * são fixos em `enviarMidiaEvento` —, então o conteúdo precisa do seu próprio
+ * caminho de escrita. Mesma mecânica: cria a Media pela Local API (variantes
+ * + Supabase Storage) e aponta o campo.
+ *
+ * Grava com `draft: true`, como `salvarConteudoCms`: o arquivo entra no
+ * rascunho e vai ao ar no próximo "Publicar", junto com o texto. Escrever
+ * direto no publicado levaria ao ar, de carona, as edições de texto ainda
+ * pendentes no rascunho.
+ */
+export async function enviarMidiaConteudo(
+  id: string,
+  campo: "imagemDestaque" | "anexoDownload",
+  arquivo: File,
+): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+
+    const buffer = Buffer.from(await arquivo.arrayBuffer());
+    const media = await payload.create({
+      collection: "media",
+      data: { alt: arquivo.name },
+      file: {
+        data: buffer,
+        name: arquivo.name,
+        mimetype: arquivo.type,
+        size: arquivo.size,
+      },
+      overrideAccess: true,
+    });
+
+    await payload.update({
+      collection: "conteudos",
+      id,
+      data: { [campo]: media.id } as unknown as RequiredDataFromCollectionSlug<"conteudos">,
+      draft: true,
+      overrideAccess: true,
+    });
+
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro no upload." };
+  }
+}
