@@ -5,8 +5,6 @@ import { listarConteudosPublicados, listarDestaques } from "@/lib/conteudos";
 
 import {
   BIBLIOTECA_HEAD,
-  CTA_FINAL_HEAD,
-  CTA_FINAL_PONTES,
   DESTAQUES_HEAD,
   FAQ_CONTEUDOS,
   FAQ_HEAD,
@@ -24,6 +22,7 @@ import {
   VERT_CARDS,
 } from "./conteudoConteudos";
 import { BibliotecaConteudos } from "./BibliotecaConteudos";
+import { CtaFinalConteudos } from "./CtaFinalConteudos";
 import { FaqAcordeao } from "./FaqAcordeao";
 import { NewsletterForm } from "./NewsletterForm";
 import { StickyCtaConteudos } from "./StickyCtaConteudos";
@@ -340,39 +339,7 @@ export default async function ConteudosPage() {
         </section>
 
         {/* 12. CTA FINAL 3 PONTES */}
-        <section
-          className="cont-cta-final"
-          id="cta-final"
-          aria-label="CTA institucional final"
-        >
-          <div className="container cont-cta-final-inner fade-in">
-            <p className="eyebrow gold">{CTA_FINAL_HEAD.eyebrow}</p>
-            <h2 dangerouslySetInnerHTML={{ __html: CTA_FINAL_HEAD.tituloHtml }} />
-            <p>{CTA_FINAL_HEAD.intro}</p>
-
-            <div className="cont-cta-final-grid">
-              {CTA_FINAL_PONTES.map((p) => (
-                <div
-                  key={p.ponte}
-                  className="cont-cta-final-card"
-                  data-ponte={p.ponte}
-                >
-                  <p className="eyebrow">{p.eyebrow}</p>
-                  <h4>{p.titulo}</h4>
-                  <p>{p.descricao}</p>
-                  <a
-                    className="link-arrow light"
-                    href={p.link.href}
-                    data-cms-link={p.link.cmsLink}
-                    data-track={p.link.track}
-                  >
-                    {p.link.texto}
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <CtaFinalConteudos />
       </main>
 
       <StickyCtaConteudos />
