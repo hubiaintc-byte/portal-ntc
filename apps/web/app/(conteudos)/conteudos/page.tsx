@@ -207,7 +207,9 @@ export default async function ConteudosPage() {
                     <h3>{d.titulo}</h3>
                     <p>{d.lide}</p>
                     <div className="cont-featured-meta">
-                      <span>{d.dataLegivel}</span>
+                      {/* Rascunho: o selo cont-featured-prep já diz "Em preparação
+                          editorial" — dataLegivel repetiria a mesma frase aqui. */}
+                      {!d.emPreparacao && <span>{d.dataLegivel}</span>}
                       <span>{d.assinatura}</span>
                     </div>
                     {d.href ? (

@@ -99,7 +99,10 @@ describe("carregarConteudo", () => {
   });
 
   it("devolve null quando o documento está em rascunho", async () => {
-    find.mockResolvedValue({ docs: [] });
+    // draft: false na query já deveria bastar, mas find() é mockado — este
+    // teste trava a 2ª camada de defesa (o guard explícito `_status !==
+    // "published"` em carregarConteudo), não a ausência de resultado.
+    find.mockResolvedValue({ docs: [{ ...publicado, _status: "draft" }] });
     expect(await carregarConteudo("estudos", "cinco-anos-de-lei-14133")).toBeNull();
   });
 

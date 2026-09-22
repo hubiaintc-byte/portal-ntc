@@ -78,6 +78,11 @@ interface AreaBruta {
 
 interface MediaBruta {
   url?: string | null;
+  sizes?: {
+    card?: { url?: string | null } | null;
+    hero?: { url?: string | null } | null;
+    thumbnail?: { url?: string | null } | null;
+  } | null;
 }
 
 interface EspecialistaBruta {
@@ -113,9 +118,42 @@ function objetoOuNulo<T>(valor: unknown): T | null {
   return valor && typeof valor === "object" ? (valor as T) : null;
 }
 
+/** URL crua do upload — para anexo (download) e foto de autor, nunca redimensionadas aqui. */
 function urlDeMidia(media: unknown): string | null {
   const m = objetoOuNulo<MediaBruta>(media);
   return typeof m?.url === "string" && m.url.length > 0 ? m.url : null;
+}
+
+/**
+ * URL de uma variante otimizada (Sharp, apps/cms/src/collections/Media.ts
+ * — imageSizes thumbnail/card/hero) para usar como `background-image` de
+ * card/destaque — nunca o upload original em resolução plena (CLAUDE.md
+ * §11, não-negociável). Prioriza "card" (600px), a mais próxima da largura
+ * real do bloco na página; cai para "hero" e "thumbnail" e só usa a url
+ * crua como último recurso, se o Sharp não gerou nenhuma variante.
+ */
+function urlImagemCard(media: unknown): string | null {
+  const m = objetoOuNulo<MediaBruta>(media);
+  if (!m) return null;
+  const candidato = m.sizes?.card?.url ?? m.sizes?.hero?.url ?? m.sizes?.thumbnail?.url ?? m.url;
+  return typeof candidato === "string" && candidato.length > 0 ? candidato : null;
+}
+
+/**
+ * `assinatura` é opcional — a descrição do campo no Payload diz "use
+ * quando o conteúdo não é assinado por um especialista do corpo docente",
+ * ou seja, o modelo é assinatura OU autor. Sem este fallback, um conteúdo
+ * assinado só por `autor[]` mostra o rodapé do card vazio.
+ */
+function assinaturaDoDoc(doc: ConteudoBruto): string {
+  if (doc.assinatura) return doc.assinatura;
+  if (!Array.isArray(doc.autor)) return "";
+  const nomes = doc.autor
+    .map((a) => objetoOuNulo<EspecialistaBruta>(a))
+    .filter((a): a is EspecialistaBruta => a !== null)
+    .map((a) => a.nome)
+    .filter((nome): nome is string => Boolean(nome));
+  return nomes.join(", ");
 }
 
 // ============================================================
@@ -177,8 +215,8 @@ function paraCard(doc: ConteudoBruto): ConteudoCard {
     href: emPreparacao ? null : `/conteudos/${categoriaParaSegmento(categoria)}/${slug}`,
     emPreparacao,
     dataLegivel: dataLegivelDoDoc(doc),
-    assinatura: doc.assinatura ?? "",
-    imagemUrl: urlDeMidia(doc.imagemDestaque),
+    assinatura: assinaturaDoDoc(doc),
+    imagemUrl: urlImagemCard(doc.imagemDestaque),
     search: normalizarBusca(`${titulo} ${lide}`),
   };
 }
@@ -218,8 +256,15 @@ function paraLeitura(doc: ConteudoBruto): ConteudoLeitura {
  * também) e filtra para o que o site pode mostrar. Base compartilhada de
  * `listarConteudosPublicados`, `listarDestaques` e do fallback de
  * `listarRelacionados`. Falha do banco degrada para lista vazia, logada.
+ *
+ * `cache()` aqui (não só nas funções exportadas) é o que garante a
+ * deduplicação de verdade: `page.tsx` chama `listarConteudosPublicados()`
+ * e `listarDestaques()` no mesmo request, e ambas passam por aqui — sem
+ * este `cache()`, seriam duas leituras (`find` com `limit: 200, depth: 2`)
+ * das mesmas linhas por render, e uma terceira em qualquer página de
+ * conteúdo via o fallback de `listarRelacionados`.
  */
-async function buscarDocsElegiveis(): Promise<ConteudoBruto[]> {
+const buscarDocsElegiveis = cache(async (): Promise<ConteudoBruto[]> => {
   try {
     const payload = await obterPayload();
     const res = await payload.find({
@@ -234,7 +279,7 @@ async function buscarDocsElegiveis(): Promise<ConteudoBruto[]> {
     console.error("[conteudos] Falha ao listar conteúdos.", erro);
     return [];
   }
-}
+});
 
 export const listarConteudosPublicados = cache(async (): Promise<ConteudoCard[]> => {
   const docs = await buscarDocsElegiveis();

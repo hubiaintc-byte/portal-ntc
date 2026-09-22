@@ -248,9 +248,11 @@ export function BibliotecaConteudos({ cards, head }: BibliotecaConteudosProps) {
                 )}
                 <h3>{card.titulo}</h3>
                 <p>{card.lide}</p>
-                <div className="cont-card-meta">
-                  <span>{card.dataLegivel}</span>
-                </div>
+                {!card.emPreparacao && (
+                  <div className="cont-card-meta">
+                    <span>{card.dataLegivel}</span>
+                  </div>
+                )}
               </div>
               <div className="cont-card-foot">
                 <div className="author">
