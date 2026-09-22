@@ -3572,6 +3572,8 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 
 Esta task **não é executada por agente**. É o roteiro que o PO segue. O agente só o entrega e, depois, registra o resultado no `CLAUDE.md`.
 
+> **Ordem obrigatória: o push de schema vem ANTES de qualquer deploy.** Este roteiro pressupõe checkout de desenvolvimento, mas a regra vale igual em produção: **não faça deploy da branch antes do Step 3**. Entre o deploy e o push, o código novo lê colunas que o banco ainda não tem — a tela de Conteúdos do painel fica vazia (degradação prevista, `listarConteudosCms` captura a falha), `/conteudos` fica vazia no site, e o primeiro "Salvar" em Configurações → Contatos institucionais falha porque `rodape_verticais` não existe. Sequência correta: Step 1 → Step 3 → Step 4 → deploy → Step 5 (seeds) → Step 6.
+
 **Files:**
 - Modify: `CLAUDE.md` (histórico de revisões e §19), ao final
 
@@ -3634,7 +3636,7 @@ pnpm --filter @ntc/cms contatos:seed
 Com `pnpm dev` no ar, em 1440 e 375:
 
 **Conteúdos**
-1. Painel → Conteúdos: os 9 rascunhos aparecem como "Em preparação".
+1. Painel → Conteúdos: os 9 rascunhos aparecem como "Em preparação". Abrir um deles e conferir que o textarea do corpo traz o texto-guia que o seed gravou — é a prova de que `lexicalParaMarkdown` lê **pelo banco** o que `markdownParaLexical` escreveu, ida e volta que nenhum teste unitário cobre.
 2. Novo conteúdo: título, lide, corpo com `##`, `**negrito**`, `[link](url)` e `- item`; a pré-visualização acompanha; salvar rascunho; reabrir e conferir que o textarea traz o mesmo Markdown.
 3. Publicar: a situação muda; `/conteudos` mostra o card com data real e link.
 4. Abrir a página de leitura: hero, corpo formatado, assinatura, "Leia também", CTA final.
