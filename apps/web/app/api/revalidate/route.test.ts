@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// "next/cache" é um pacote externalizado (node_modules), não um arquivo do
-// projeto transformado pelo Vite — o mock não tolera a referência ingênua a
-// uma const de fora da factory (TDZ: "Cannot access 'revalidatePath' before
-// initialization"), diferente do padrão usado para módulos locais (ex.:
-// "@/lib/payloadClient" em painelCmsEscrita.contatos.test.ts). vi.hoisted()
-// é a forma correta e documentada de expor a variável à factory hoistada.
+// `route.ts` faz `import { revalidatePath } from "next/cache"` estaticamente,
+// então a factory deste mock roda ANTES de `const revalidatePath = vi.fn()`
+// executar (TDZ: "Cannot access 'revalidatePath' before initialization") —
+// interação normal entre semântica de módulos ES e o hoisting do `vi.mock`
+// do Vitest, não um bug do framework. O teste-irmão em
+// painelCmsEscrita.contatos.test.ts escapa dessa ordem com a forma ingênua
+// porque `obterPayload()` só é invocado de forma preguiçosa, dentro de um
+// corpo assíncrono — a referência à const nunca é avaliada antes dela
+// existir. vi.hoisted() é a forma documentada de expor a variável à factory
+// hoistada quando o import estático força essa ordem.
 const { revalidatePath } = vi.hoisted(() => ({ revalidatePath: vi.fn() }));
 vi.mock("next/cache", () => ({ revalidatePath }));
 
