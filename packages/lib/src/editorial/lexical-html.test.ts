@@ -70,6 +70,35 @@ describe("lexicalParaHtmlEditorial", () => {
     expect(html).toBe("<ul><li>um</li><li>dois</li></ul><ol><li>passo</li></ol>");
   });
 
+  it("emite start no <ol> quando o primeiro item não começa em 1", () => {
+    const html = lexicalParaHtmlEditorial(
+      doc([
+        {
+          type: "list",
+          listType: "number",
+          children: [
+            { type: "listitem", value: 5, children: [texto("five")] },
+            { type: "listitem", value: 6, children: [texto("six")] },
+          ],
+        },
+      ]),
+    );
+    expect(html).toBe('<ol start="5"><li>five</li><li>six</li></ol>');
+  });
+
+  it("não emite start quando a lista ordenada começa em 1", () => {
+    const html = lexicalParaHtmlEditorial(
+      doc([
+        {
+          type: "list",
+          listType: "number",
+          children: [{ type: "listitem", value: 1, children: [texto("passo")] }],
+        },
+      ]),
+    );
+    expect(html).toBe("<ol><li>passo</li></ol>");
+  });
+
   it("serializa citação em <blockquote>", () => {
     const html = lexicalParaHtmlEditorial(
       doc([{ type: "quote", children: [texto("A citação.")] }]),
@@ -120,7 +149,10 @@ describe("lexicalParaHtmlEditorial", () => {
 
   it("ignora bloco vazio em vez de emitir tag vazia", () => {
     const html = lexicalParaHtmlEditorial(
-      doc([{ type: "paragraph", children: [texto("")] }, { type: "paragraph", children: [texto("ok")] }]),
+      doc([
+        { type: "paragraph", children: [texto("")] },
+        { type: "paragraph", children: [texto("ok")] },
+      ]),
     );
     expect(html).toBe("<p>ok</p>");
   });

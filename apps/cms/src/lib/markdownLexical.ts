@@ -8,6 +8,17 @@ import type { DocumentoLexical } from "./lexicalBuilders";
  * de Markdown é texto literal — não há fallback silencioso que perca o
  * que foi digitado.
  *
+ * Linha em branco separa parágrafos: linhas comuns consecutivas (sem
+ * linha em branco entre elas) formam UM parágrafo só, unidas por espaço —
+ * é assim que Markdown canônico funciona. A garantia de ida e volta é
+ * exata para Markdown canônico (blocos separados por linha em branco);
+ * entrada não canônica é normalizada para a forma canônica sem nunca
+ * perder texto.
+ *
+ * Listas ordenadas preservam o número inicial digitado (inclusive quando
+ * não é 1 — "1988. Ano de fundação…" não pode virar "1. Ano de fundação…",
+ * perda de conteúdo institucional real) no campo `value` do `listitem`.
+ *
  * O formato gravado continua sendo o Lexical do Payload, então trocar
  * este editor por um WYSIWYG depois não exige converter conteúdo.
  */
@@ -81,10 +92,18 @@ function inlineParaNos(linha: string): NoInline[] {
   return nos.length > 0 ? nos : [noTexto("")];
 }
 
-function itemDeLista(linha: string): { tipo: "bullet" | "number"; texto: string } | null {
+interface ItemDeLista {
+  tipo: "bullet" | "number";
+  texto: string;
+  numero?: number;
+}
+
+function itemDeLista(linha: string): ItemDeLista | null {
   if (linha.startsWith("- ")) return { tipo: "bullet", texto: linha.slice(2).trim() };
   const ordenada = /^(\d+)\.\s+(.*)$/.exec(linha);
-  if (ordenada) return { tipo: "number", texto: ordenada[2]!.trim() };
+  if (ordenada) {
+    return { tipo: "number", texto: ordenada[2]!.trim(), numero: Number(ordenada[1]) };
+  }
   return null;
 }
 
@@ -92,16 +111,27 @@ export function markdownParaLexical(md: string): DocumentoLexical {
   const linhas = md.replace(/\r\n/g, "\n").split("\n");
   const children: unknown[] = [];
 
-  let itens: string[] = [];
+  let itens: { texto: string; numero?: number }[] = [];
   let tipoLista: "bullet" | "number" | null = null;
+  let paragrafoAtual: string[] = [];
+
+  function fecharParagrafo() {
+    if (paragrafoAtual.length > 0) {
+      children.push(bloco("paragraph", inlineParaNos(paragrafoAtual.join(" "))));
+      paragrafoAtual = [];
+    }
+  }
 
   function fecharLista() {
     if (itens.length > 0 && tipoLista) {
+      const inicio = itens[0]?.numero ?? 1;
       children.push(
         bloco(
           "list",
-          itens.map((t, i) => bloco("listitem", inlineParaNos(t), { value: i + 1 })),
-          { listType: tipoLista, tag: tipoLista === "number" ? "ol" : "ul", start: 1 },
+          itens.map((it, i) =>
+            bloco("listitem", inlineParaNos(it.texto), { value: it.numero ?? i + 1 }),
+          ),
+          { listType: tipoLista, tag: tipoLista === "number" ? "ol" : "ul", start: inicio },
         ),
       );
     }
@@ -114,26 +144,34 @@ export function markdownParaLexical(md: string): DocumentoLexical {
 
     const item = itemDeLista(linha);
     if (item) {
+      fecharParagrafo();
       if (tipoLista && tipoLista !== item.tipo) fecharLista();
       tipoLista = item.tipo;
-      itens.push(item.texto);
+      itens.push({ texto: item.texto, numero: item.numero });
       continue;
     }
     fecharLista();
 
-    if (linha.length === 0) continue;
+    if (linha.length === 0) {
+      fecharParagrafo();
+      continue;
+    }
 
     if (linha.startsWith("### ")) {
+      fecharParagrafo();
       children.push(bloco("heading", inlineParaNos(linha.slice(4).trim()), { tag: "h3" }));
     } else if (linha.startsWith("## ")) {
+      fecharParagrafo();
       children.push(bloco("heading", inlineParaNos(linha.slice(3).trim()), { tag: "h2" }));
     } else if (linha.startsWith("> ")) {
+      fecharParagrafo();
       children.push(bloco("quote", inlineParaNos(linha.slice(2).trim())));
     } else {
-      children.push(bloco("paragraph", inlineParaNos(linha)));
+      paragrafoAtual.push(linha);
     }
   }
   fecharLista();
+  fecharParagrafo();
 
   return {
     root: {
@@ -188,12 +226,12 @@ export function lexicalParaMarkdown(doc: unknown): string {
         const ordenada = n.listType === "number";
         return filhos
           .map((item, i) => {
+            const it = item as Record<string, unknown>;
             const conteudo = inlineParaMarkdown(
-              Array.isArray((item as Record<string, unknown>)?.children)
-                ? ((item as Record<string, unknown>).children as unknown[])
-                : [],
+              Array.isArray(it?.children) ? (it.children as unknown[]) : [],
             );
-            return ordenada ? `${i + 1}. ${conteudo}` : `- ${conteudo}`;
+            const numero = ordenada ? Number(it?.value ?? i + 1) : i + 1;
+            return ordenada ? `${numero}. ${conteudo}` : `- ${conteudo}`;
           })
           .join("\n");
       }

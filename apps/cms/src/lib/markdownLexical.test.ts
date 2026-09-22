@@ -71,6 +71,8 @@ describe("ida e volta", () => {
     ["link", "Veja o [portal](https://institutontc.com.br) hoje."],
     ["lista", "- um\n- dois"],
     ["lista ordenada", "1. um\n2. dois"],
+    ["lista ordenada que não começa em 1", "5. five\n6. six"],
+    ["lista ordenada de um item cujo número é um ano", "1988. Ano de fundação do Instituto."],
     ["citação", "> Uma citação."],
     ["combinado", "## Seção\n\nTexto com **peso**.\n\n- item\n\n> nota"],
   ])("preserva %s", (_nome, md) => {
@@ -84,5 +86,19 @@ describe("ida e volta", () => {
 
   it("colapsa linhas em branco repetidas numa separação só", () => {
     expect(idaEVolta("Um.\n\n\n\nDois.")).toBe("Um.\n\nDois.");
+  });
+
+  it("não perde o número de uma lista ordenada que não começa em 1", () => {
+    expect(idaEVolta("5. five\n6. six")).toBe("5. five\n6. six");
+  });
+
+  it("não confunde '1988. Texto' com o início de uma lista renumerada", () => {
+    expect(idaEVolta("1988. Ano de fundação do Instituto.")).toBe(
+      "1988. Ano de fundação do Instituto.",
+    );
+  });
+
+  it("junta linhas comuns consecutivas (sem linha em branco entre elas) num parágrafo só", () => {
+    expect(idaEVolta("Primeiro.\nSegundo.")).toBe("Primeiro. Segundo.");
   });
 });

@@ -80,7 +80,17 @@ function serializarBloco(node: unknown): string {
         return conteudo.length > 0 ? `<li>${conteudo}</li>` : "";
       })
       .join("");
-    return itens.length > 0 ? `<${tag}>${itens}</${tag}>` : "";
+    if (itens.length === 0) return "";
+    // Uma lista ordenada que não começa em 1 ("1988. Ano de fundação…")
+    // precisa do atributo start, senão a leitura renumera a partir de 1 e
+    // apaga o número digitado — a mesma perda de conteúdo que o parser de
+    // Markdown leve evita ao gravar o value do listitem.
+    const primeiroValor = Number((filhos[0] as Record<string, unknown> | undefined)?.value);
+    const start =
+      tag === "ol" && Number.isFinite(primeiroValor) && primeiroValor !== 1
+        ? ` start="${primeiroValor}"`
+        : "";
+    return `<${tag}${start}>${itens}</${tag}>`;
   }
 
   const conteudo = inline(filhos);
