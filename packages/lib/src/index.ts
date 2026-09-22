@@ -130,3 +130,6 @@ export {
   exigeConfirmacaoDupla,
   tituloLeadApagado,
 } from "./crm/exclusao";
+
+// Editorial — serialização do corpo de conteúdos.
+export { lexicalParaHtmlEditorial } from "./editorial/lexical-html";
