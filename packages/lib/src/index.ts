@@ -151,3 +151,5 @@ export {
 } from "./editorial/categorias";
 export { calcularTempoLeituraMin } from "./editorial/tempo-leitura";
 export { formatarDataBR } from "./editorial/datas";
+export { aplicarAcaoMarkdown } from "./editorial/markdown-acoes";
+export type { AcaoMarkdown, SelecaoTexto } from "./editorial/markdown-acoes";

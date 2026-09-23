@@ -12,6 +12,8 @@ import type {
 import type { CamposConteudo } from "@/lib/cms/painelCmsEscrita";
 import { markdownParaLexical } from "@/lib/markdownLexical";
 
+import { BarraFormatacao, aplicarNoTextarea, atalhoDaTecla } from "./BarraFormatacao";
+
 import {
   despublicarConteudo,
   enviarMidiaConteudo,
@@ -210,6 +212,8 @@ export function DetalheConteudo({
 }: DetalheConteudoProps) {
   const [id, setId] = useState<string | null>(conteudo?.id ?? null);
   const [campos, setCampos] = useState<CamposConteudo>(() => camposDe(conteudo));
+  /** A barra de formatação lê a seleção daqui e devolve o foco. */
+  const corpoRef = useRef<HTMLTextAreaElement>(null);
   const [situacao, setSituacao] = useState<SituacaoConteudo>(conteudo?.situacao ?? "rascunho");
   const [imagemNome, setImagemNome] = useState<string | null>(
     conteudo?.imagemDestaqueUrl ? "Imagem vinculada" : null,
@@ -482,10 +486,26 @@ export function DetalheConteudo({
             <div className="pcms-editor-duplo">
               <div className="pcms-field">
                 <label htmlFor="ct-corpo">Corpo do texto</label>
+                <BarraFormatacao
+                  textareaRef={corpoRef}
+                  valor={campos.corpoMarkdown}
+                  onMudar={(novo) => mudar("corpoMarkdown", novo)}
+                />
                 <textarea
                   id="ct-corpo"
+                  ref={corpoRef}
                   value={campos.corpoMarkdown}
                   onChange={(e) => mudar("corpoMarkdown", e.target.value)}
+                  onKeyDown={(e) => {
+                    const acao = atalhoDaTecla(e);
+                    if (!acao) return;
+                    // Sem isto o navegador aplica o negrito/itálico dele no
+                    // textarea, que não formata nada e só rouba o atalho.
+                    e.preventDefault();
+                    aplicarNoTextarea(corpoRef.current, campos.corpoMarkdown, acao, (novo) =>
+                      mudar("corpoMarkdown", novo),
+                    );
+                  }}
                 />
               </div>
               <div className="pcms-field">
