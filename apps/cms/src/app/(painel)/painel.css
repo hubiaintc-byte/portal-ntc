@@ -18,6 +18,17 @@ body {
   margin: 0;
 }
 
+/* Sem isto, todo controle com `width: 100%` soma o próprio padding e a borda
+ * por fora da largura do pai e transborda o card: os campos vazavam a caixa e,
+ * em grade de duas colunas, comiam o `gap` e encostavam no vizinho. O reset
+ * fica aqui porque este arquivo é a única folha do app (carregada só pelo
+ * layout de `(painel)`, que também abriga `/entrar` — fora do `.pcms-root`). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 .pcms-root {
   /* Tokens Soberana — espelho de packages/ui/src/tokens.ts */
   --pcms-oxford: #11365e;
