@@ -5,7 +5,7 @@
  * listitem/text com version: 1.
  */
 
-interface NoTextoLexical {
+export interface NoTextoLexical {
   type: "text";
   format: number;
   mode: "normal";
@@ -15,7 +15,7 @@ interface NoTextoLexical {
   detail: 0;
 }
 
-interface NoBlocoLexical {
+export interface NoBlocoLexical {
   type: string;
   format: "";
   indent: 0;

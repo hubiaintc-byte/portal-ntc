@@ -20,32 +20,26 @@
  * vez, na ordem em que foi encontrada. Isso cobre o caso real dos
  * `corpoHtml` dos programas: `<div class="results-grid">`/`<span
  * class="r-num">` ao redor de conteúdo que deve ser preservado.
+ *
+ * Tipos reaproveitados de `@/lib/lexicalBuilders` (mesmo shape de nó em
+ * todo o CMS). Os construtores de nó (`noTexto`/`noParagrafo`/`noLista`/
+ * `noListItem` logo abaixo) ficam locais e privados — parecidos de nome
+ * com os de lá, mas de forma diferente e não reaproveitáveis: o `noTexto`
+ * daqui recebe `format` (negrito/itálico, que `<strong>`/`<em>` exigem);
+ * o `noParagrafo` daqui recebe children já montados (um parágrafo pode
+ * misturar texto normal, negrito e itálico no mesmo bloco); e o `noLista`
+ * daqui distingue `ul`/`ol` e roda parsing inline dentro de cada `<li>` —
+ * nenhuma dessas formas existe no `lexicalBuilders.ts` de hoje, que serve
+ * a um trabalho diferente (texto simples e sessões digitadas no painel).
  */
 
-export interface DocumentoLexical {
-  root: {
-    type: "root";
-    format: "";
-    indent: 0;
-    version: 1;
-    direction: "ltr";
-    children: unknown[];
-  };
-}
+import type { DocumentoLexical, NoBlocoLexical, NoTextoLexical } from "@/lib/lexicalBuilders";
+
+export type { DocumentoLexical };
 
 export interface ResultadoConversao {
   doc: DocumentoLexical;
   tagsIgnoradas: string[];
-}
-
-interface NoTextoLexical {
-  type: "text";
-  format: number;
-  mode: "normal";
-  style: "";
-  text: string;
-  version: 1;
-  detail: 0;
 }
 
 const TAGS_SUPORTADAS = new Set(["p", "strong", "b", "em", "i", "br", "ul", "ol", "li"]);
@@ -86,7 +80,7 @@ function noTexto(texto: string, format: number): NoTextoLexical {
   return { type: "text", format, mode: "normal", style: "", text: texto, version: 1, detail: 0 };
 }
 
-function noParagrafo(children: unknown[]): unknown {
+function noParagrafo(children: unknown[]): NoBlocoLexical {
   return {
     type: "paragraph",
     format: "",
@@ -97,7 +91,7 @@ function noParagrafo(children: unknown[]): unknown {
   };
 }
 
-function noListItem(children: unknown[], indice: number): unknown {
+function noListItem(children: unknown[], indice: number): NoBlocoLexical {
   return {
     type: "listitem",
     value: indice,
@@ -109,7 +103,7 @@ function noListItem(children: unknown[], indice: number): unknown {
   };
 }
 
-function noLista(itensHtml: string[], ordenada: boolean): unknown {
+function noLista(itensHtml: string[], ordenada: boolean): NoBlocoLexical {
   return {
     type: "list",
     listType: ordenada ? "number" : "bullet",
@@ -239,11 +233,6 @@ export function htmlParaLexical(html: string): ResultadoConversao {
   const htmlLimpo = removerTagsDesconhecidas(html, ignoradas);
   const children = paraBlocos(htmlLimpo);
   return { doc: documento(children), tagsIgnoradas: Array.from(ignoradas) };
-}
-
-/** Embrulha texto puro (sem markup) num único parágrafo Lexical. */
-export function textoParaLexical(texto: string): DocumentoLexical {
-  return documento([noParagrafo([noTexto(texto, 0)])]);
 }
 
 /**

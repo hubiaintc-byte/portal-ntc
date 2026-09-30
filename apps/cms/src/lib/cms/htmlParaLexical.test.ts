@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { extrairCartoesDeResultado, htmlParaLexical, listaParaLexical, textoParaLexical } from "./htmlParaLexical";
+import { extrairCartoesDeResultado, htmlParaLexical, listaParaLexical } from "./htmlParaLexical";
 
 const textoDo = (doc: { root: { children: unknown[] } }): string =>
   JSON.stringify(doc.root.children).replace(/[^ -~À-ÿ]/g, "");
@@ -48,6 +48,22 @@ describe("htmlParaLexical", () => {
     const { doc } = htmlParaLexical("<p>Gest&atilde;o &amp; Inova&ccedil;&atilde;o</p>");
     expect(textoDo(doc)).toContain("Gestão & Inovação");
   });
+
+  it("converte ol em lista ordenada", () => {
+    const { doc } = htmlParaLexical("<ol><li>um</li><li>dois</li></ol>");
+    const lista = doc.root.children[0] as { type: string; listType: string; tag: string; children: unknown[] };
+    expect(lista.type).toBe("list");
+    expect(lista.listType).toBe("number");
+    expect(lista.tag).toBe("ol");
+    expect(lista.children).toHaveLength(2);
+  });
+
+  it("aplica formatação inline dentro do item de lista", () => {
+    const { doc } = htmlParaLexical("<ul><li>a <strong>b</strong></li></ul>");
+    const lista = doc.root.children[0] as { children: { children: { text: string; format: number }[] }[] };
+    const item = lista.children[0]!;
+    expect(item.children.find((n) => n.text === "b")?.format).toBe(1);
+  });
 });
 
 describe("extrairCartoesDeResultado", () => {
@@ -74,13 +90,5 @@ describe("listaParaLexical", () => {
   it("sem itens, devolve só o corpo", () => {
     const { doc } = listaParaLexical("<p>Para quem:</p>", []);
     expect(doc.root.children).toHaveLength(1);
-  });
-});
-
-describe("textoParaLexical", () => {
-  it("embrulha texto puro num parágrafo", () => {
-    const doc = textoParaLexical("Metodologia aplicada.");
-    expect(doc.root.children).toHaveLength(1);
-    expect(textoDo(doc)).toContain("Metodologia aplicada.");
   });
 });
