@@ -1,8 +1,13 @@
 # Seed assets — Portal Grupo NTC
 
-Esta pasta guarda os arquivos binários (jpg/png) usados pelos scripts
-de seed do CMS. Os arquivos **não são versionados** no git (ver
-`.gitignore`); apenas este README e o `.gitkeep`.
+Esta pasta guarda os arquivos usados pelos scripts de seed do CMS. Os
+binários (jpg/png) **não são versionados** no git (ver `.gitignore`);
+a exceção é `programas.json` — o instantâneo do conteúdo editorial dos
+15 programas gerado por `scripts/gerar-instantaneo-programas.mjs`, que
+**é versionado**, porque `seed/importarProgramas.ts` o lê em produção/CI
+(não é um artefato de máquina local como as fotos abaixo) e porque
+versionado o diff de uma regeneração mostra exatamente o que mudou no
+conteúdo de origem.
 
 Os arquivos vivem definitivamente no **Supabase Storage** (bucket
 `ntc-portal-media`, prefixo `home/`) depois que `pnpm payload:seed:imagens-home`
