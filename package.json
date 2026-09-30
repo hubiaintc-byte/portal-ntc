@@ -5,7 +5,7 @@
   "description": "Portal Grupo NTC — monorepo (Next.js + Payload CMS).",
   "packageManager": "pnpm@9.15.0",
   "engines": {
-    "node": ">=22.0.0",
+    "node": ">=22.18.0",
     "pnpm": ">=9.0.0"
   },
   "scripts": {

@@ -17,6 +17,7 @@ const BASE: ProgramaInstantaneo = {
   diferenciais: [{ titulo: "Dif 1", descricao: "Desc" }],
   faq: [{ pergunta: "Posso cursar um módulo?", resposta: "Sim." }],
   modulos: [{ numero: "I", titulo: "Módulo um", cargaHoraria: "8h", descricao: "Desc do módulo.", topicos: ["Tópico A", "Tópico B"] }],
+  cargaHorariaTotal: "64 horas",
 };
 
 describe("romanoParaInteiro", () => {
@@ -112,5 +113,23 @@ describe("mapearPrograma", () => {
   it("tag fora do subconjunto no corpo vira aviso do campo", () => {
     const { avisos } = mapearPrograma({ ...BASE, visaoGeralHtml: '<div class="x"><p>a</p></div>' });
     expect(avisos).toContainEqual({ campo: "visaoGeral", motivo: "tag ignorada: div" });
+  });
+
+  it("resultadosHtml sem cartão nenhum é avisado, não só um array vazio silencioso", () => {
+    const { campos, avisos } = mapearPrograma({ ...BASE, resultadosHtml: "<p>sem cartões aqui</p>" });
+    expect(campos.resultadosEsperados).toEqual([]);
+    expect(avisos).toContainEqual({ campo: "resultadosEsperados", motivo: "ausente na origem" });
+  });
+
+  it("copia cargaHorariaTotal quando a origem tem", () => {
+    const { campos, avisos } = mapearPrograma(BASE);
+    expect(campos.cargaHorariaTotal).toBe("64 horas");
+    expect(avisos).not.toContainEqual(expect.objectContaining({ campo: "cargaHorariaTotal" }));
+  });
+
+  it("cargaHorariaTotal vazia não vira campo vazio (não sobrescreve o banco) e é avisada", () => {
+    const { campos, avisos } = mapearPrograma({ ...BASE, cargaHorariaTotal: "" });
+    expect(campos.cargaHorariaTotal).toBeUndefined();
+    expect(avisos).toContainEqual({ campo: "cargaHorariaTotal", motivo: "ausente na origem" });
   });
 });

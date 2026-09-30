@@ -26,9 +26,15 @@ export interface ProgramaInstantaneo {
   diferenciais: { titulo: string; descricao: string }[];
   faq: { pergunta: string; resposta: string }[];
   modulos: ModuloInstantaneo[];
+  /**
+   * Carga horária total, lida verbatim do `metaBar` da origem (ex.: "64
+   * horas"). String vazia quando nenhuma entrada do `metaBar` bate com
+   * `/^\d+\s+horas$/` — quem mapeia (mapear.ts) trata isso como ausente e
+   * não sobrescreve o valor já existente no banco.
+   */
+  cargaHorariaTotal: string;
 }
 
 export interface Instantaneo {
-  geradoEm: string;
   programas: ProgramaInstantaneo[];
 }

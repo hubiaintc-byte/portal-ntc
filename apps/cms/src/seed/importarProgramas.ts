@@ -58,8 +58,14 @@ export interface LinhaRelatorio {
 export function planejarImportacao(
   instantaneo: Instantaneo,
   programasNoBanco: { id: number; sigla: string }[],
-): { paraImportar: { sigla: string; id: number }[]; semCorrespondencia: string[] } {
+): {
+  paraImportar: { sigla: string; id: number }[];
+  semCorrespondencia: string[];
+  /** Programas que existem no banco mas não têm sigla no instantâneo — spec §4, "ou o contrário". */
+  noBancoSemCorrespondencia: string[];
+} {
   const idPorSigla = new Map(programasNoBanco.map((p) => [p.sigla.toUpperCase(), p.id]));
+  const siglasNoInstantaneo = new Set(instantaneo.programas.map((p) => p.sigla.toUpperCase()));
 
   const paraImportar: { sigla: string; id: number }[] = [];
   const semCorrespondencia: string[] = [];
@@ -73,7 +79,11 @@ export function planejarImportacao(
     }
   }
 
-  return { paraImportar, semCorrespondencia };
+  const noBancoSemCorrespondencia = programasNoBanco
+    .filter((p) => !siglasNoInstantaneo.has(p.sigla.toUpperCase()))
+    .map((p) => p.sigla);
+
+  return { paraImportar, semCorrespondencia, noBancoSemCorrespondencia };
 }
 
 /**
@@ -125,7 +135,6 @@ async function main(): Promise<void> {
   payload.logger.info(
     `[programas:importar] ${APLICAR ? "APLICANDO — gravando no banco" : "DRY-RUN — nada será gravado"}`,
   );
-  payload.logger.info(`[programas:importar] Instantâneo gerado em ${instantaneo.geradoEm}`);
 
   const resultadoProgramas = await payload.find({
     collection: "programas",
@@ -163,6 +172,29 @@ async function main(): Promise<void> {
         const resultado = await processarModulo(payload, id, modulo);
         if (resultado === "criado") modulosCriados += 1;
         else modulosAtualizados += 1;
+      }
+
+      // Módulo órfão: existe no banco sob este programa, mas a origem não
+      // tem mais o `numero` correspondente. Nunca apagado aqui — só
+      // relatado, para `modulosQuantidade` (contagem da origem) não ficar
+      // silenciosamente em desacordo com as linhas reais da tabela.
+      const modulosNoBanco = await payload.find({
+        collection: "modulos",
+        where: { programa: { equals: id } },
+        limit: 0,
+        depth: 0,
+        overrideAccess: true,
+      });
+      const numerosMapeados = new Set(modulos.map((m) => m.numero));
+      const numerosOrfaos = modulosNoBanco.docs
+        .map((d) => d.numero)
+        .filter((numero) => !numerosMapeados.has(numero))
+        .sort((a, b) => a - b);
+      for (const numero of numerosOrfaos) {
+        avisos.push({
+          campo: "modulos",
+          motivo: `órfão no banco (numero ${numero}), sem correspondência na origem — não apagado`,
+        });
       }
 
       if (APLICAR) {
@@ -205,6 +237,11 @@ async function main(): Promise<void> {
       ? `[programas:importar] Siglas sem correspondência no banco (${plano.semCorrespondencia.length}): ${plano.semCorrespondencia.join(", ")}`
       : "[programas:importar] Siglas sem correspondência: nenhuma.",
   );
+  payload.logger.info(
+    plano.noBancoSemCorrespondencia.length > 0
+      ? `[programas:importar] Programas no banco sem sigla no instantâneo (${plano.noBancoSemCorrespondencia.length}): ${plano.noBancoSemCorrespondencia.join(", ")}`
+      : "[programas:importar] Programas no banco sem sigla no instantâneo: nenhum.",
+  );
 
   const tagsIgnoradas = [
     ...new Set(
@@ -243,10 +280,19 @@ async function main(): Promise<void> {
     `[programas:importar] Concluído. ${linhas.filter((l) => l.acao === "atualizado").length}/${linhas.length} programas ${APLICAR ? "atualizados" : "seriam atualizados"}.`,
   );
 
+  // Falha fechado e relata (spec §4): uma linha "erro" ou uma sigla do
+  // instantâneo sem correspondência no banco não pode passar como sucesso
+  // só porque o relatório foi impresso por cima. O relatório inteiro já
+  // foi impresso acima antes desta checagem decidir o código de saída.
+  const houveFalha = linhas.some((l) => l.acao === "erro") || plano.semCorrespondencia.length > 0;
+  if (houveFalha) {
+    payload.logger.error("[programas:importar] Encerrando com falha — ver linhas/siglas acima.");
+  }
+
   // O adapter Postgres mantém o pool de conexões aberto — sem isso o
   // processo nunca sai sozinho (mesmo padrão de todo seed script deste
   // diretório: seedCorpoDocente.ts, vincularFotosEspecialistas.ts, etc.).
-  process.exit(0);
+  process.exit(houveFalha ? 1 : 0);
 }
 
 // process.env.VITEST é setado pelo próprio Vitest em todo runner (mesma

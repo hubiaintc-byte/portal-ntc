@@ -27,6 +27,12 @@ export interface CamposPrograma {
   diferenciais: { titulo: string; descricao: string }[];
   faq: { pergunta: string; resposta: DocumentoLexical }[];
   modulosQuantidade: number;
+  /**
+   * Omitido (em vez de `""`) quando a origem não tem carga horária total
+   * reconhecível — assim o `payload.update` (que faz merge parcial) nunca
+   * apaga um valor real já gravado no banco com uma string vazia.
+   */
+  cargaHorariaTotal?: string;
 }
 
 export interface CamposModulo {
@@ -120,10 +126,21 @@ export function mapearPrograma(p: ProgramaInstantaneo): MapeamentoPrograma {
   const publico = listaParaLexical(p.publicoHtml, p.publicoChips);
   for (const tag of publico.tagsIgnoradas) avisos.push({ campo: "publicoAlvo", motivo: `tag ignorada: ${tag}` });
 
-  const resultadosEsperados = extrairCartoesDeResultado(p.resultadosHtml).map((resultado) => ({ resultado }));
+  const cartoesDeResultado = extrairCartoesDeResultado(p.resultadosHtml);
+  if (cartoesDeResultado.length === 0) {
+    avisos.push({ campo: "resultadosEsperados", motivo: "ausente na origem" });
+  }
+  const resultadosEsperados = cartoesDeResultado.map((resultado) => ({ resultado }));
 
   if (p.diferenciais.length === 0) {
     avisos.push({ campo: "diferenciais", motivo: "ausente na origem" });
+  }
+
+  let cargaHorariaTotal: string | undefined;
+  if (p.cargaHorariaTotal === "") {
+    avisos.push({ campo: "cargaHorariaTotal", motivo: "ausente na origem" });
+  } else {
+    cargaHorariaTotal = p.cargaHorariaTotal;
   }
 
   const faq = p.faq.map((item) => ({ pergunta: item.pergunta, resposta: textoParaLexical(item.resposta) }));
@@ -144,6 +161,7 @@ export function mapearPrograma(p: ProgramaInstantaneo): MapeamentoPrograma {
     diferenciais: p.diferenciais,
     faq,
     modulosQuantidade: modulos.length,
+    ...(cargaHorariaTotal !== undefined ? { cargaHorariaTotal } : {}),
   };
 
   return { campos, modulos, avisos };
