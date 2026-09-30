@@ -29,7 +29,8 @@
     "contatos:seed": "pnpm payload run src/seed/seedContatos.ts",
     "fotos:especialistas": "pnpm payload run src/seed/vincularFotosEspecialistas.ts",
     "senha:admin": "pnpm payload run src/seed/trocarSenhaAdmin.ts",
-    "clean": "rm -rf .next .turbo node_modules"
+    "clean": "rm -rf .next .turbo node_modules",
+    "test:integracao": "vitest run --config vitest.integracao.config.ts"
   },
   "dependencies": {
     "@ntc/lib": "workspace:*",
