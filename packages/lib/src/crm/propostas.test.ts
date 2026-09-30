@@ -4,6 +4,7 @@ import {
   calcularValoresProposta,
   codigoDaVersao,
   gerarCodigoBase,
+  modulosDoPrograma,
   proximaVersao,
   siglaCanonica,
 } from "./propostas";
@@ -54,5 +55,30 @@ describe("codigoDaVersao", () => {
 describe("siglaCanonica", () => {
   it("remove não-alfanuméricos e faz upper", () => {
     expect(siglaCanonica("Câmara 3")).toBe("CAMARA3");
+  });
+});
+
+describe("modulosDoPrograma", () => {
+  const modulos = [
+    { id: "1", programaId: "p1" },
+    { id: "2", programaId: "p2" },
+    { id: "3", programaId: "p1" },
+    { id: "4", programaId: null },
+  ];
+
+  it("sem programa escolhido, não oferece módulo nenhum", () => {
+    expect(modulosDoPrograma(modulos, "")).toEqual([]);
+  });
+
+  it("devolve só os módulos do programa escolhido", () => {
+    expect(modulosDoPrograma(modulos, "p1").map((m) => m.id)).toEqual(["1", "3"]);
+  });
+
+  it("programa sem módulos devolve vazio", () => {
+    expect(modulosDoPrograma(modulos, "p9")).toEqual([]);
+  });
+
+  it("módulo sem programa nunca aparece", () => {
+    expect(modulosDoPrograma(modulos, "p2").map((m) => m.id)).toEqual(["2"]);
   });
 });

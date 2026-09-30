@@ -61,3 +61,19 @@ export function proximaVersao(codigosExistentes: string[]): number {
 export function codigoDaVersao(codigoBase: string, versao: number): string {
   return `${codigoBase}-v${String(versao).padStart(2, "0")}`;
 }
+
+/**
+ * Módulos que a proposta pode oferecer, dado o programa escolhido.
+ *
+ * Sem programa a lista é **vazia**, não completa: antes de 30/09/2026 a tela
+ * caía para "todos os módulos" enquanto ninguém tivesse escolhido programa —
+ * invisível enquanto a coleção `modulos` estava vazia, e gritante depois que
+ * a importação dos 15 programas trouxe 112. Módulo sem programa nunca aparece.
+ */
+export function modulosDoPrograma<T extends { programaId: string | null }>(
+  modulos: T[],
+  programaId: string,
+): T[] {
+  if (programaId === "") return [];
+  return modulos.filter((m) => m.programaId === programaId);
+}

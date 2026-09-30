@@ -74,6 +74,7 @@ export {
   gerarCodigoBase,
   proximaVersao,
   codigoDaVersao,
+  modulosDoPrograma,
 } from "./crm/propostas";
 
 export {

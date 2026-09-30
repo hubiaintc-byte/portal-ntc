@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 
-import { calcularValoresProposta, STATUS_PROPOSTA, TIPOS_PROPOSTA } from "@ntc/lib";
+import { calcularValoresProposta, modulosDoPrograma, STATUS_PROPOSTA, TIPOS_PROPOSTA } from "@ntc/lib";
 
 import type {
   CatalogoCrm,
@@ -88,9 +88,7 @@ export function FormProposta({
   const m = <K extends keyof DadosProposta>(campo: K) => (v: DadosProposta[K]) =>
     setDados((d) => ({ ...d, [campo]: v }));
 
-  const modulosDisponiveis = catalogo.modulos.filter(
-    (mod) => dados.programa === "" || mod.programaId === dados.programa,
-  );
+  const modulosDisponiveis = modulosDoPrograma(catalogo.modulos, dados.programa);
 
   const resumo = useMemo(
     () =>
@@ -156,6 +154,7 @@ export function FormProposta({
         <CampoSelect
           rotulo="Programa"
           valor={dados.programa}
+          obrigatorio
           onMudar={(v) => setDados((d) => ({ ...d, programa: v, modulos: [] }))}
           opcoes={catalogo.programas.map((p) => ({ label: `${p.sigla} — ${p.nome}`, value: p.id }))}
         />
@@ -167,7 +166,9 @@ export function FormProposta({
       <div className="pcms-editor__head--sub">Módulos</div>
       {modulosDisponiveis.length === 0 ? (
         <p className="pcms-editor__hint">
-          Nenhum módulo disponível{dados.programa !== "" ? " para o programa selecionado" : ""}.
+          {dados.programa === ""
+            ? "Selecione um programa para ver os módulos."
+            : "Nenhum módulo cadastrado para este programa."}
         </p>
       ) : (
         <div className="pcms-editor__grid">

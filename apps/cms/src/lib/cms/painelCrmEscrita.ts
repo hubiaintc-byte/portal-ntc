@@ -261,6 +261,10 @@ export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscr
   if (leadId === null) return { ok: false, erro: "Selecione o lead." };
   const clienteId = idOuNulo(dados.cliente);
   if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
+  // Programa obrigatório nos 4 tipos de proposta (decisão do PO, 30/09/2026 —
+  // antes era opcional para a Customizada/In Company). A tela também marca o
+  // select como `required`; esta é a defesa que vale para quem não passa por ela.
+  if (idOuNulo(dados.programa) === null) return { ok: false, erro: "Selecione o programa." };
   try {
     const payload = await obterPayload();
     const [programaDoc, clienteDoc] = await Promise.all([
@@ -311,12 +315,11 @@ export async function atualizarProposta(
   if (leadId === null) return { ok: false, erro: "Selecione o lead." };
   const clienteId = idOuNulo(dados.cliente);
   if (clienteId === null) return { ok: false, erro: "Selecione o cliente." };
-  // Programa vazio = sem programa (proposta customizada), permitido. Valor
-  // não vazio que não resolve para um id válido é erro — falha fechado, não
-  // grava null silenciosamente por cima de um programa já vinculado.
-  if (dados.programa.trim() !== "" && idOuNulo(dados.programa) === null) {
-    return { ok: false, erro: "Selecione um programa válido." };
-  }
+  // Programa obrigatório desde 30/09/2026 (decisão do PO): vale para os 4
+  // tipos, inclusive Customizada/In Company, que antes podia ficar sem. Vazio
+  // ou id que não resolve são o mesmo erro — falha fechado, e nunca grava null
+  // por cima de um programa já vinculado.
+  if (idOuNulo(dados.programa) === null) return { ok: false, erro: "Selecione o programa." };
   try {
     const payload = await obterPayload();
     // Recarrega para preservar codigoBase/codigo/versao — não são reeditáveis
