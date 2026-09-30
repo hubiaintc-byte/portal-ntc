@@ -71,20 +71,28 @@ Os campos de corpo no estático são **strings de HTML**, não texto puro: `<p>`
 - Classes de apresentação são descartadas; o CMS não as usa.
 - Se aparecer uma tag fora do subconjunto, o script **relata** o programa e a tag, e não silencia.
 
-### 2.2. Docentes
+### 2.2. Docentes — fora do escopo, e por quê
 
-`docentes` no estático são nomes em texto; no CMS, `coordenacaoCientifica` e `docentes` são relações com `especialistas` (63 cadastrados). O script **casa por nome normalizado** (sem acento, caixa baixa, espaços colapsados) e:
+**Verificado em 30/09, carregando os 15 arquivos:** o campo `docentes` do conteúdo estático **não contém pessoas**. Contém rótulos de espaço reservado, 10 distintos repetidos nos 15 programas:
 
-- vincula quando há correspondência exata e única;
-- **não vincula** e reporta quando não há correspondência ou há mais de uma.
+```
+Curadoria em confirmação · Nome em validação institucional
+Especialista convidado / convidada · Jurista convidado
+Autoridade em validação institucional · Representante de órgão de controle
+```
 
-Nenhum especialista é criado pelo import. A lista de não casados vai no relatório final, para o PO resolver à mão.
+No CMS, `coordenacaoCientifica` e `docentes` são **relações** com `especialistas` (63 pessoas reais). Casar rótulo com pessoa daria zero correspondências, e importar os rótulos exigiria criar 10 especialistas falsos — que poluiriam a base e apareceriam no site.
+
+**Decisão do PO (30/09): o import não toca docentes.** O vínculo programa↔especialista é feito à mão no painel, quando se souber quem leciona o quê. O relatório final lista os programas sem docente vinculado, para que a pendência fique visível.
+
+**Consequência para a Sessão 2:** a seção "Corpo Docente e Curadoria" do documento de proposta depende desse vínculo. Enquanto ele não existir, a seção sai vazia — registrado no apêndice.
 
 ## 3. Como roda
 
 Dois passos, para que `apps/cms` não passe a depender de `apps/web` em runtime (o monorepo não comporta: `apps/cms/tsconfig.json` resolve só `@/*`, `@ntc/lib` e `@ntc/types`).
 
 1. **Gerador de instantâneo** — importa os 15 `conteudo*.ts` e emite `apps/cms/src/seed/assets/programas.json`. O JSON é **versionado em git**: o diff mostra o que mudou, e a importação deixa de depender da árvore do site.
+   **Verificado em 30/09:** o Node 24 remove tipos nativamente, então o script lê os `.ts` **sem dependência nova** (§5.4). Precisa importar cada `conteudo<SIGLA>.ts` **direto** — pelo `conteudoIndex.ts` falha, porque o índice importa os irmãos sem extensão e o resolver do Node exige. O `import type` do índice é apagado na remoção de tipos e não atrapalha. Os 15 carregam, 112 módulos no total, numerais de I a VIII.
 2. **Script de import** — `apps/cms/src/seed/importarProgramas.ts`, rodado por `pnpm --filter @ntc/cms programas:importar`, lendo o JSON e gravando pela Local API.
 
 Segue o precedente de `seed/seedContatos.ts`, que já copia para o CMS o que está escrito no site, de forma idempotente.
@@ -114,13 +122,13 @@ Sigla presente no estático que não existe em `programas` (ou o contrário) é 
 
 ## 5. Testes
 
-- **Puro, com Vitest, sem banco:** o mapeamento `ConteudoPrograma` → forma do Payload; o conversor HTML→Lexical (incluindo a extração dos cartões de resultados e a tag fora do subconjunto); a normalização de nome para casar docentes.
+- **Puro, com Vitest, sem banco:** o mapeamento `ConteudoPrograma` → forma do Payload; o conversor HTML→Lexical (incluindo a extração dos cartões de resultados e a tag fora do subconjunto); a conversão de numeral romano.
 - **Contra o banco:** o dry-run, que imprime o plano de escrita sem aplicar.
 - Telas: não há tela nesta entrega. O checkpoint visual é conferir, no painel, um programa importado (EDUTEC) com as seções preenchidas.
 
 ## 6. Fora do escopo
 
-Site passar a ler do CMS; campos de apresentação (`hero`, `sidebar`, `detalhamento`, `modalidades`, `modulosAbertos`, `ctaFinal`); dados comerciais do módulo; criar especialista que não exista; qualquer mudança nas páginas de `/programas/[slug]`.
+Site passar a ler do CMS; campos de apresentação (`hero`, `sidebar`, `modalidades`, `modulosAbertos`, `ctaFinal`); dados comerciais do módulo; **docentes e coordenação científica** (§2.2); criar especialista que não exista; qualquer mudança nas páginas de `/programas/[slug]`.
 
 ---
 
@@ -134,4 +142,5 @@ Registradas aqui para que o brainstorming da Sessão 2 comece delas, não do zer
 4. **Paleta: a do modelo, à risca** — `--navy:#0E2A47`, `--gold:#B68B40`, `--offwhite:#F5EDD8`. Diverge da Soberana (`#11365E`/`#B5995A`/`#F4EFE6`), que não aparece nenhuma vez no modelo. É **exceção deliberada ao §3 do CLAUDE.md**, na mesma linha da exceção já aceita para o painel admin, e deve ser registrada no CLAUDE.md quando a Sessão 2 entrar.
 5. **Cabeçalho corrido:** o modelo usa `@page { @top-left { content: … } }`. Chromium **não implementa** margin boxes de paged media — isso não renderiza no Playwright. O cabeçalho vai pelo `headerTemplate`, que `gerarPdfDeHtml` já usa.
 6. **"Dirigente" no PDF:** mantém o contato principal do cliente sob esse rótulo (o campo `dirigente` morreu na Sessão 1).
-7. **Escopo da Sessão 2:** documento + fluxo numa sessão só — wizard aberto do modal já preenchido, "Criar proposta" na aba Ações (move o card para *Proposta em produção*) e o KPI "Valor em negociação" somando `valorLiquido` da proposta vigente.
+7. **"Corpo Docente e Curadoria" nasce vazia.** O import não traz docentes (§2.2) e o vínculo programa↔especialista é manual. A Sessão 2 precisa decidir o que a seção faz sem vínculo: sair vazia, sumir do documento, ou bloquear a geração.
+8. **Escopo da Sessão 2:** documento + fluxo numa sessão só — wizard aberto do modal já preenchido, "Criar proposta" na aba Ações (move o card para *Proposta em produção*) e o KPI "Valor em negociação" somando `valorLiquido` da proposta vigente.
