@@ -63,6 +63,10 @@ uploads/
 apps/cms/src/seed/assets/*
 !apps/cms/src/seed/assets/.gitkeep
 !apps/cms/src/seed/assets/README.md
+# Exceção: instantâneo JSON do conteúdo editorial dos 15 programas
+# (gerado por `pnpm programas:instantaneo`) é um snapshot revisável,
+# não um binário efêmero de seed — fica versionado.
+!apps/cms/src/seed/assets/programas.json
 # Brainstorming visual companion (superpowers)
 .superpowers/
 
