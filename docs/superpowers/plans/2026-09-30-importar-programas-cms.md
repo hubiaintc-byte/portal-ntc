@@ -523,7 +523,7 @@ Esperado: falha por módulo inexistente.
 
 - [ ] **Step 3: Implementar**
 
-Estrutura, seguindo `seed/seedContatos.ts`:
+Estrutura, seguindo `seed/seedFoldersEventos.ts`/`seed/vincularFotosEspecialistas.ts`:
 
 ```ts
 const APLICAR = process.env.PROGRAMAS_IMPORTAR_APLICAR === "1";

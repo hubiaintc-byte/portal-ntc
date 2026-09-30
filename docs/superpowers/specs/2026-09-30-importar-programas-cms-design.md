@@ -95,7 +95,7 @@ Dois passos, para que `apps/cms` não passe a depender de `apps/web` em runtime 
    **Verificado em 30/09:** o Node 24 remove tipos nativamente, então o script lê os `.ts` **sem dependência nova** (§5.4). Precisa importar cada `conteudo<SIGLA>.ts` **direto** — pelo `conteudoIndex.ts` falha, porque o índice importa os irmãos sem extensão e o resolver do Node exige. O `import type` do índice é apagado na remoção de tipos e não atrapalha. Os 15 carregam, 112 módulos no total, numerais de I a VIII.
 2. **Script de import** — `apps/cms/src/seed/importarProgramas.ts`, rodado por `pnpm --filter @ntc/cms programas:importar`, lendo o JSON e gravando pela Local API.
 
-Segue o precedente de `seed/seedContatos.ts`, que já copia para o CMS o que está escrito no site, de forma idempotente.
+Segue o precedente de `seed/seedFoldersEventos.ts`/`seed/vincularFotosEspecialistas.ts`, que já copiam para o CMS o que está escrito no site, de forma idempotente.
 
 **Idempotência:** a chave é `sigla`. Programa que já existe é atualizado; que não existe é criado. Módulo é identificado por `(programa, numero)`. Rodar de novo depois de corrigir um `conteudo*.ts` não duplica nada.
 
