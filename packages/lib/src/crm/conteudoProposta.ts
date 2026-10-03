@@ -41,7 +41,7 @@ export function conteudoInicialProposta(p: {
       ? programa.diferenciais.map((d) => ({ titulo: d.titulo, descricao: d.descricao }))
       : [],
     resultados: programa ? programa.resultados.map((texto) => ({ texto })) : [],
-    modulosDetalhados: programa ? modulos.map((m) => ({ modulo: m.id, tituloExibido: m.titulo })) : [],
+    modulosDetalhados: modulos.map((m) => ({ modulo: m.id, tituloExibido: m.titulo })),
     textos: textosPadraoProposta(contextoTextos),
   };
 }

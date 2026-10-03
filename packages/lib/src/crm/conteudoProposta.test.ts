@@ -49,4 +49,15 @@ describe("conteudoInicialProposta", () => {
     expect(c.modulosDetalhados).toEqual([]);
     expect(Object.keys(c.textos)).toHaveLength(7);
   });
+
+  it("sem programa, os módulos escolhidos ainda viram modulosDetalhados", () => {
+    const c = conteudoInicialProposta({ programa: null, modulos: MODULOS, contextoTextos: CTX });
+    expect(c.modulosDetalhados).toEqual([
+      { modulo: "9", tituloExibido: "Módulo um" },
+      { modulo: "10", tituloExibido: "Módulo dois" },
+    ]);
+    expect(c.eixos).toEqual([]);
+    expect(c.diferenciais).toEqual([]);
+    expect(c.resultados).toEqual([]);
+  });
 });
