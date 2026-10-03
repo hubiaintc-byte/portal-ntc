@@ -7,8 +7,9 @@
  * subtítulos e listas de verdade — e o CSS do documento estiliza `p`, `h3`,
  * `ul` e `ol`. Este conversor percorre só os blocos de topo e delega o
  * conteúdo *inline* de cada um a `lexicalToHtml`, para que as regras de
- * `<strong>`/`<em>` continuem num lugar só. `lexicalToHtml` NÃO é alterada:
- * ela é compartilhada com corpo-docente e eventos.
+ * `<strong>`/`<em>` continuem num lugar só. `lexicalToHtml` não teve a
+ * serialização alterada (só ganhou a opção `escapar`, default desligada): ela
+ * é compartilhada com corpo-docente e eventos.
  *
  * Contrato que importa: documento ausente, vazio ou cujos blocos todos saem
  * vazios devolve `""` — nunca `<p></p>`. A montagem do documento
@@ -16,9 +17,13 @@
  * `trim()`, e um `<p></p>` passaria por "preenchido", imprimindo um título com
  * nada embaixo num documento que vai ao cliente.
  *
- * Escape: segue `lexicalToHtml`, que não escapa — o texto vem do editor
- * restritivo do painel (sem HTML livre) e é consumido por quem monta o
- * documento. Não há escape duplo aqui.
+ * Escape: `&`, `<` e `>` do texto são escapados via `lexicalToHtml(doc,
+ * { escapar: true })` — o escape acontece no nó de texto, antes de
+ * `<strong>`/`<em>`, então não há dupla-escapagem nem tag corrompida. O
+ * documento é contratual e o PO digita esses textos em campo livre: um
+ * "Prazo < 30 dias" não pode quebrar o layout da proposta que vai ao cliente.
+ * Os outros chamadores de `lexicalToHtml` (corpo-docente, eventos) não passam
+ * a opção e continuam com a saída de hoje.
  */
 
 import { lexicalToHtml } from "@/lib/cms/lexical";
@@ -65,5 +70,5 @@ function blocoParaHtml(node: unknown): string {
 
 /** Conteúdo inline de um único nó, reusando a serialização compartilhada. */
 function inline(node: unknown): string {
-  return lexicalToHtml({ root: { children: [node] } });
+  return lexicalToHtml({ root: { children: [node] } }, { escapar: true });
 }

@@ -12,45 +12,68 @@
  * eventos.ts e corpoDocente.ts). Mudanças de serialização: replicar nos dois.
  */
 
-export function lexicalToHtml(doc: unknown): string {
+export interface OpcoesLexicalHtml {
+  /**
+   * Escapa `&`, `<` e `>` no nó de TEXTO, antes de aplicar `<strong>`/`<em>`
+   * (nunca na saída, que já contém tags). Default `false`: corpo-docente e
+   * eventos dependem da serialização de hoje, byte a byte. O documento da
+   * proposta passa `true` — é texto de campo livre do usuário num documento
+   * contratual, e um "Prazo < 30 dias" não pode quebrar o layout.
+   */
+  escapar?: boolean;
+}
+
+export function lexicalToHtml(doc: unknown, opcoes?: OpcoesLexicalHtml): string {
   if (!doc || typeof doc !== "object" || !("root" in doc)) return "";
   const root = (doc as { root?: { children?: unknown[] } }).root;
   if (!root?.children) return "";
+  const escapar = opcoes?.escapar === true;
   // Blocos (parágrafos, headings, itens de lista) separados por <br> — sem
   // separador, documentos multi-bloco (import de PDF) viram texto colado.
   return root.children
-    .map(blocoParaHtml)
+    .map((n) => blocoParaHtml(n, escapar))
     .filter((b) => b.length > 0)
     .join("<br>");
 }
 
-function blocoParaHtml(node: unknown): string {
+function blocoParaHtml(node: unknown, escapar: boolean): string {
   if (!node || typeof node !== "object") return "";
   const n = node as Record<string, unknown>;
   if (n.type === "list" && Array.isArray(n.children)) {
     return n.children
-      .map(serializarNode)
+      .map((item) => serializarNode(item, escapar))
       .filter((item) => item.length > 0)
       .join("<br>");
   }
-  return serializarNode(node);
+  return serializarNode(node, escapar);
 }
 
-function serializarNode(node: unknown): string {
+function serializarNode(node: unknown, escapar: boolean): string {
   if (!node || typeof node !== "object") return "";
   const n = node as Record<string, unknown>;
   const tipo = n.type;
 
   if (tipo === "linebreak") return "<br>";
-  if (tipo === "text") return aplicarFormato(String(n.text ?? ""), Number(n.format ?? 0));
+  if (tipo === "text") {
+    const texto = String(n.text ?? "");
+    return aplicarFormato(escapar ? escaparTexto(texto) : texto, Number(n.format ?? 0));
+  }
 
   if (tipo === "paragraph" || tipo === "heading") {
-    const children = Array.isArray(n.children) ? n.children.map(serializarNode).join("") : "";
+    const children = Array.isArray(n.children)
+      ? n.children.map((c) => serializarNode(c, escapar)).join("")
+      : "";
     return children;
   }
 
-  if (Array.isArray(n.children)) return n.children.map(serializarNode).join("");
+  if (Array.isArray(n.children))
+    return n.children.map((c) => serializarNode(c, escapar)).join("");
   return "";
+}
+
+/** `&` primeiro, senão as entidades geradas aqui seriam re-escapadas. */
+function escaparTexto(texto: string): string {
+  return texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function aplicarFormato(texto: string, format: number): string {

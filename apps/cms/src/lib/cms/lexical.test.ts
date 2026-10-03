@@ -20,6 +20,18 @@ describe("lexicalToHtml", () => {
   it("doc de um parágrafo continua inline, sem <br> extra", () => {
     expect(lexicalToHtml(paragrafosParaLexical(["Só um parágrafo."]))).toBe("Só um parágrafo.");
   });
+
+  it("sem o parâmetro, a saída não escapa nada (comportamento de corpo-docente e eventos)", () => {
+    const doc = paragrafosParaLexical(["Prazo < 30 dias & cia > tudo"]);
+    expect(lexicalToHtml(doc)).toBe("Prazo < 30 dias & cia > tudo");
+  });
+
+  it("com escapar: true, escapa &, < e > no nó de texto", () => {
+    const doc = paragrafosParaLexical(["Prazo < 30 dias & cia > tudo"]);
+    expect(lexicalToHtml(doc, { escapar: true })).toBe(
+      "Prazo &lt; 30 dias &amp; cia &gt; tudo",
+    );
+  });
 });
 
 describe("lexicalParaTexto", () => {

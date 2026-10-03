@@ -29,6 +29,18 @@ describe("lexicalDocumentoParaHtml", () => {
     expect(html).toBe("<p>Carga de <strong>24h</strong> por turma.</p>");
   });
 
+  it("escapa &, < e > do texto do PO (documento contratual, campo livre)", () => {
+    const html = lexicalDocumentoParaHtml(doc([paragrafo(texto("Prazo < 30 dias & cia > tudo"))]));
+    expect(html).toBe("<p>Prazo &lt; 30 dias &amp; cia &gt; tudo</p>");
+  });
+
+  it("escapar o texto não escapa as tags de formatação", () => {
+    const html = lexicalDocumentoParaHtml(
+      doc([paragrafo(texto("Prazo "), texto("< 30 dias", 1), texto(" & cia", 2))]),
+    );
+    expect(html).toBe("<p>Prazo <strong>&lt; 30 dias</strong><em> &amp; cia</em></p>");
+  });
+
   it("heading vira <h3>", () => {
     const html = lexicalDocumentoParaHtml(
       doc([{ type: "heading", tag: "h3", children: [texto("Eixos")], version: 1 }]),
