@@ -1,13 +1,65 @@
 import "server-only";
 
-import type { ClienteCrm, Evento, Modulo, Programa, Proposta, User } from "@ntc/types";
+import type {
+  ClienteCrm,
+  Especialista,
+  Evento,
+  Modulo,
+  Programa,
+  Proposta,
+  User,
+} from "@ntc/types";
 
 import { obterPayload } from "@/lib/payloadClient";
+
+import { subtituloProposta } from "./capa";
+import { lexicalDocumentoParaHtml } from "./lexicalDocumento";
+import type { PosicaoExtra } from "./montar";
 
 export interface ItemDocumento {
   rotulo: string;
   cargaHoraria: string;
   valorUnitario: number;
+}
+
+/** Os 12 textos corridos do documento, já convertidos de Lexical para HTML. */
+export interface ConteudoHtmlProposta {
+  apresentacao: string;
+  contexto: string;
+  objetivos: string;
+  publicoAlvo: string;
+  metodologia: string;
+  eventon: string;
+  certificacaoReplay: string;
+  cancelamento: string;
+  protecaoConteudo: string;
+  fundamentacaoLegal: string;
+  proximosPassos: string;
+  fechamento: string;
+}
+
+export interface ParTituladoDocumento {
+  titulo: string;
+  descricao: string;
+}
+
+export interface DocenteDocumento {
+  nome: string;
+  credencial: string;
+  eixo: string;
+}
+
+export interface ModuloDetalhadoDocumento {
+  codigo: string;
+  titulo: string;
+  cargaHoraria: string | null;
+  ementaHtml: string;
+}
+
+export interface SecaoExtraDocumento {
+  titulo: string;
+  corpoHtml: string;
+  posicao: PosicaoExtra;
 }
 
 export interface DadosDocumentoProposta {
@@ -16,6 +68,7 @@ export interface DadosDocumentoProposta {
   codigoBase: string;
   versao: number;
   tipoTexto: string;
+  subtitulo: string;
   modalidade: string;
   replay: string;
   condPagto: string;
@@ -31,6 +84,14 @@ export interface DadosDocumentoProposta {
   programaNome: string;
   programaSigla: string;
   itens: ItemDocumento[];
+  cargaHorariaTotalModulos: string;
+  conteudoHtml: ConteudoHtmlProposta;
+  eixos: ParTituladoDocumento[];
+  diferenciais: ParTituladoDocumento[];
+  resultados: string[];
+  docentes: DocenteDocumento[];
+  modulosDetalhados: ModuloDetalhadoDocumento[];
+  secoesExtras: SecaoExtraDocumento[];
   valorUnitario: number;
   qtdPagantes: number;
   cortesias: number;
@@ -47,8 +108,69 @@ const TIPO_TEXTO: Record<string, string> = {
   customizada: "Solução Customizada · In Company",
 };
 
+/** Rótulo de exibição da titulação da ficha do especialista (select slug). */
+const TITULACAO_TEXTO: Record<string, string> = {
+  doutorado: "Doutorado",
+  "pos-doutorado": "Pós-doutorado",
+  mestrado: "Mestrado",
+  especializacao: "Especialização",
+  graduacao: "Graduação",
+};
+
+const POSICOES_EXTRA: PosicaoExtra[] = [
+  "antes-quadro-comercial",
+  "apos-condicoes-comerciais",
+  "fim",
+];
+
 function ehObjeto<T>(v: number | T | null | undefined): v is T {
   return typeof v === "object" && v !== null;
+}
+
+function texto(v: string | null | undefined): string {
+  return v ?? "";
+}
+
+/**
+ * Horas de uma carga horária legível como número puro ("8h", "8 horas").
+ * Valores compostos do catálogo ("16h · 2 dias") devolvem null de propósito:
+ * somar formatos heterogêneos num documento contratual inventaria total.
+ */
+function horasDe(carga: string | null | undefined): number | null {
+  if (!carga) return null;
+  const casou = /^(\d+)\s*(?:h|horas?)$/i.exec(carga.trim());
+  const bruto = casou?.[1];
+  if (!bruto) return null;
+  const n = Number(bruto);
+  return Number.isInteger(n) && n > 0 ? n : null;
+}
+
+/**
+ * "24h · 3 módulos · 8h por módulo" quando todos os módulos têm a mesma carga
+ * legível; cargas diferentes, ausentes ou ilegíveis caem para "3 módulos".
+ * Sem módulos, string vazia.
+ */
+function cargaHorariaTotalDosModulos(modulos: Modulo[]): string {
+  const n = modulos.length;
+  if (n === 0) return "";
+  const contagem = n === 1 ? "1 módulo" : `${n} módulos`;
+  const horas = modulos.map((m) => horasDe(m.cargaHoraria));
+  const primeira = horas[0];
+  if (primeira == null || horas.some((h) => h !== primeira)) return contagem;
+  if (n === 1) return `${primeira}h · ${contagem}`;
+  return `${primeira * n}h · ${contagem} · ${primeira}h por módulo`;
+}
+
+/** Credencial derivada da ficha: titulação · instituição · cargo atual. */
+function credencialDaFicha(e: Especialista): string {
+  return [TITULACAO_TEXTO[e.titulacao] ?? "", texto(e.instituicao), texto(e.cargoAtual)]
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0)
+    .join(" · ");
+}
+
+function posicaoDeExtra(v: string | null | undefined): PosicaoExtra {
+  return POSICOES_EXTRA.find((p) => p === v) ?? "fim";
 }
 
 export async function obterDadosDocumentoProposta(
@@ -57,6 +179,11 @@ export async function obterDadosDocumentoProposta(
   const payload = await obterPayload();
   let doc: Proposta;
   try {
+    // depth 2: o nível 1 popula as relações diretas da proposta — inclusive as
+    // que vivem dentro de arrays (`docentes.especialista`,
+    // `modulosDetalhados.modulo`), porque array e group não consomem depth —, e
+    // o nível 2 cobre as relações dentro desses documentos. Nenhum campo lido
+    // aqui declara maxDepth, então não há nada a elevar.
     doc = await payload.findByID({ collection: "propostas", id, depth: 2 });
   } catch (e) {
     console.error("[obterDadosDocumentoProposta]", e);
@@ -68,6 +195,9 @@ export async function obterDadosDocumentoProposta(
   // do documento é o contato principal, ou o primeiro cadastrado.
   const contatos = cliente?.contatos ?? [];
   const contatoPrincipal = contatos.find((c) => c.principal === true) ?? contatos[0] ?? null;
+  // O programa só entra na capa e no cabeçalho (nome e sigla). Desde a Sessão 2
+  // todo o CONTEÚDO do documento vive na própria proposta — ler o programa aqui
+  // reintroduziria a divergência que os campos de texto resolveram.
   const programa = ehObjeto<Programa>(doc.programa) ? doc.programa : null;
   const elaborador = ehObjeto<User>(doc.elaborador) ? doc.elaborador : null;
 
@@ -88,12 +218,70 @@ export async function obterDadosDocumentoProposta(
     })),
   ];
 
+  const conteudoHtml: ConteudoHtmlProposta = {
+    apresentacao: lexicalDocumentoParaHtml(doc.textoApresentacao),
+    contexto: lexicalDocumentoParaHtml(doc.textoContexto),
+    objetivos: lexicalDocumentoParaHtml(doc.textoObjetivos),
+    publicoAlvo: lexicalDocumentoParaHtml(doc.textoPublicoAlvo),
+    metodologia: lexicalDocumentoParaHtml(doc.textoMetodologia),
+    eventon: lexicalDocumentoParaHtml(doc.textoEventon),
+    certificacaoReplay: lexicalDocumentoParaHtml(doc.textoCertificacaoReplay),
+    cancelamento: lexicalDocumentoParaHtml(doc.textoCancelamento),
+    protecaoConteudo: lexicalDocumentoParaHtml(doc.textoProtecaoConteudo),
+    fundamentacaoLegal: lexicalDocumentoParaHtml(doc.textoFundamentacaoLegal),
+    proximosPassos: lexicalDocumentoParaHtml(doc.textoProximosPassos),
+    fechamento: lexicalDocumentoParaHtml(doc.textoFechamento),
+  };
+
+  const eixos: ParTituladoDocumento[] = (doc.eixos ?? []).map((e) => ({
+    titulo: texto(e.titulo),
+    descricao: texto(e.descricao),
+  }));
+  const diferenciais: ParTituladoDocumento[] = (doc.diferenciais ?? []).map((d) => ({
+    titulo: texto(d.titulo),
+    descricao: texto(d.descricao),
+  }));
+  const resultados: string[] = (doc.resultados ?? []).map((r) => texto(r.texto));
+
+  // Campo livre vence a ficha: o seletor da tela pré-preenche nome e
+  // credencial a partir do especialista, então deixar a ficha vencer apagaria
+  // a edição do usuário a cada leitura.
+  const docentes: DocenteDocumento[] = (doc.docentes ?? []).map((d) => {
+    const ficha = ehObjeto<Especialista>(d.especialista) ? d.especialista : null;
+    const nomeLivre = texto(d.nome).trim();
+    const credencialLivre = texto(d.credencial).trim();
+    return {
+      nome: nomeLivre || texto(ficha?.nome),
+      credencial: credencialLivre || (ficha ? credencialDaFicha(ficha) : ""),
+      eixo: texto(d.eixo),
+    };
+  });
+
+  // `codigo` repete o formato de `linhasDoQuadro` (M + numero com 2 dígitos).
+  // Sem a relação populada (só o id), fica vazio em vez de inventar número.
+  const modulosDetalhados: ModuloDetalhadoDocumento[] = (doc.modulosDetalhados ?? []).map((m) => {
+    const catalogo = ehObjeto<Modulo>(m.modulo) ? m.modulo : null;
+    return {
+      codigo: catalogo ? `M${String(catalogo.numero).padStart(2, "0")}` : "",
+      titulo: texto(m.tituloExibido).trim() || texto(catalogo?.titulo),
+      cargaHoraria: catalogo?.cargaHoraria ?? null,
+      ementaHtml: lexicalDocumentoParaHtml(m.ementa),
+    };
+  });
+
+  const secoesExtras: SecaoExtraDocumento[] = (doc.secoesExtras ?? []).map((s) => ({
+    titulo: texto(s.titulo),
+    corpoHtml: lexicalDocumentoParaHtml(s.corpo),
+    posicao: posicaoDeExtra(s.posicao),
+  }));
+
   return {
     id: String(doc.id),
     codigo: doc.codigo,
     codigoBase: doc.codigoBase,
     versao: doc.versao ?? 1,
     tipoTexto: TIPO_TEXTO[doc.tipo ?? ""] ?? "Proposta Técnico-Comercial",
+    subtitulo: subtituloProposta(doc.tipo ?? "", modulos.length, programa?.sigla ?? ""),
     modalidade: doc.modalidade ?? "A definir",
     replay: doc.replay ?? "90 dias",
     condPagto: doc.condPagto ?? "À vista após emissão da Nota Fiscal · 15 dias",
@@ -109,6 +297,14 @@ export async function obterDadosDocumentoProposta(
     programaNome: programa?.nomeCompleto ?? "Programa Estratégico NTC",
     programaSigla: programa?.sigla ?? "",
     itens,
+    cargaHorariaTotalModulos: cargaHorariaTotalDosModulos(modulos),
+    conteudoHtml,
+    eixos,
+    diferenciais,
+    resultados,
+    docentes,
+    modulosDetalhados,
+    secoesExtras,
     valorUnitario,
     qtdPagantes: doc.qtdPagantes ?? 0,
     cortesias: doc.cortesias ?? 0,
