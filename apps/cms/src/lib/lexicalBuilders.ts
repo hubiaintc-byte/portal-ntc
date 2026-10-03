@@ -167,3 +167,66 @@ export function sessoesParaLexical(
   }
   return documento(children);
 }
+
+/* ------------------------------------------------------------------------ *
+ * Caminho de volta: Lexical -> texto puro editável
+ * ------------------------------------------------------------------------ */
+
+/** Blocos de topo de um documento Lexical; `[]` para documento ausente/inválido. */
+function blocosDeTopo(documento: unknown): unknown[] {
+  if (documento === null || typeof documento !== "object" || !("root" in documento)) return [];
+  const root = (documento as { root?: { children?: unknown[] } }).root;
+  return Array.isArray(root?.children) ? root.children : [];
+}
+
+/** Texto corrido de um nó, descendo nos filhos. Formatação inline se perde. */
+function textoInline(no: unknown): string {
+  if (no === null || typeof no !== "object") return "";
+  const n = no as Record<string, unknown>;
+  if (n.type === "text") return String(n.text ?? "");
+  // Mesma escolha de `lexicalParaTexto` (lib/cms/lexical.ts): soft break vira
+  // espaço, nunca "\n" — uma quebra dentro do parágrafo não pode virar
+  // parágrafo novo ao reconverter.
+  if (n.type === "linebreak") return " ";
+  if (Array.isArray(n.children)) return n.children.map(textoInline).join("");
+  return "";
+}
+
+/** Um bloco de topo como uma ou mais linhas de texto puro. */
+function blocoParaTextoComSubtitulos(no: unknown): string {
+  if (no === null || typeof no !== "object") return "";
+  const n = no as Record<string, unknown>;
+  if (n.type === "list") {
+    // Itens em linhas CONSECUTIVAS: uma linha em branco entre eles faria
+    // `converterLinhas` fechar a lista e abrir outra.
+    return (Array.isArray(n.children) ? n.children : [])
+      .map((item) => textoInline(item).trim())
+      .filter((t) => t.length > 0)
+      .map((t) => `- ${t}`)
+      .join("\n");
+  }
+  const texto = textoInline(no).trim();
+  if (texto.length === 0) return "";
+  return n.type === "heading" ? `## ${texto}` : texto;
+}
+
+/**
+ * Inverso fiel de `textoComSubtitulosParaLexical`, para a tela editar o
+ * conteúdo do documento da proposta como texto puro (Task 13 da Sessão 2):
+ *
+ * - parágrafo vira uma linha, e os blocos são separados por LINHA EM BRANCO;
+ * - item de lista vira uma linha `- item`, itens em linhas consecutivas;
+ * - heading (`h3` dos subtítulos) vira uma linha `## Subtítulo`.
+ *
+ * Reconverter a saída com `textoComSubtitulosParaLexical` devolve o mesmo
+ * documento, bloco a bloco — é o que mantém o ciclo editar → salvar → editar
+ * sem corromper o texto. O que NÃO sobrevive é a formatação inline
+ * (negrito/itálico) e o nó de tabela/bloco não previsto: mesma troca aceita
+ * por `lexicalParaTexto` no editor de eventos.
+ */
+export function lexicalParaTextoComSubtitulos(documento: unknown): string {
+  return blocosDeTopo(documento)
+    .map(blocoParaTextoComSubtitulos)
+    .filter((b) => b.length > 0)
+    .join("\n\n");
+}

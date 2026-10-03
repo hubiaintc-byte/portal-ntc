@@ -15,6 +15,9 @@ import type {
 } from "@ntc/types";
 import type { Payload, Where } from "payload";
 
+import { credencialDaFicha } from "@/lib/documentoProposta/dados";
+import { modalidadeEhOnline } from "@/lib/documentoProposta/secoes/institucional";
+import { lexicalParaTextoComSubtitulos } from "@/lib/lexicalBuilders";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
@@ -91,6 +94,12 @@ export interface CatalogoCrm {
   programas: { id: string; sigla: string; nome: string }[];
   modulos: { id: string; titulo: string; numero: number; programaId: string | null }[];
   eventos: { id: string; nome: string }[];
+  /**
+   * Fichas para o seletor de docente do conteúdo da proposta. A `credencial`
+   * vem de `credencialDaFicha` — a mesma usada na criação da proposta e na
+   * leitura do documento, para o que a tela pré-preenche não divergir do PDF.
+   */
+  especialistas: { id: string; nome: string; credencial: string }[];
 }
 
 export interface UsuarioCmsResumo {
@@ -136,6 +145,70 @@ export interface PropostaResumo {
   leadId: string | null;
 }
 
+export interface ParTituladoProposta {
+  titulo: string;
+  descricao: string;
+}
+
+export interface DocenteProposta {
+  /** id do especialista da coleção, ou "" para docente digitado à mão. */
+  especialistaId: string;
+  nome: string;
+  credencial: string;
+  eixo: string;
+}
+
+export interface ModuloDetalhadoProposta {
+  /** id do módulo do catálogo (a seleção é do wizard; a tela não troca o módulo). */
+  moduloId: string;
+  tituloExibido: string;
+  /** Ementa como texto puro editável (ver ConteudoPropostaEditavel). */
+  ementa: string;
+}
+
+export interface SecaoExtraProposta {
+  titulo: string;
+  /** Corpo como texto puro editável. */
+  corpo: string;
+  posicao: string;
+}
+
+/**
+ * O conteúdo do documento da proposta em forma EDITÁVEL, para a tela
+ * (`ConteudoProposta.tsx`). Os 12 textos corridos chegam como texto puro —
+ * convertidos de Lexical por `lexicalParaTextoComSubtitulos`, o inverso de
+ * `textoComSubtitulosParaLexical` usado na escrita —, e as listas como arrays
+ * simples, com relação como id em string.
+ *
+ * NÃO confundir com `DadosDocumentoProposta` (lib/documentoProposta/dados.ts):
+ * aquela é a forma para o PDF, com os textos já em HTML pronto.
+ */
+export interface ConteudoPropostaEditavel {
+  apresentacao: string;
+  contexto: string;
+  objetivos: string;
+  publicoAlvo: string;
+  metodologia: string;
+  eventon: string;
+  certificacaoReplay: string;
+  cancelamento: string;
+  protecaoConteudo: string;
+  fundamentacaoLegal: string;
+  proximosPassos: string;
+  fechamento: string;
+  eixos: ParTituladoProposta[];
+  diferenciais: ParTituladoProposta[];
+  resultados: string[];
+  docentes: DocenteProposta[];
+  modulosDetalhados: ModuloDetalhadoProposta[];
+  secoesExtras: SecaoExtraProposta[];
+  /**
+   * `modalidadeEhOnline` da modalidade gravada — mesma função que o documento
+   * usa (spec §7). Falso faz a tela avisar que a seção EventON não sai.
+   */
+  modalidadeOnline: boolean;
+}
+
 export interface PropostaDetalhe extends PropostaResumo {
   itens: { rotulo: string; detalhe: string }[];
   envios: EnvioResumo[];
@@ -161,6 +234,8 @@ export interface PropostaDetalhe extends PropostaResumo {
   elaboradorId: string | null;
   aprovadorId: string | null;
   pdfGeradoUrl: string | null;
+  /** Conteúdo do documento em forma editável (Sessão 2 · Task 13). */
+  conteudo: ConteudoPropostaEditavel;
 }
 
 export interface VersaoResumo {
@@ -581,15 +656,21 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
 
 export async function obterCatalogoCrm(): Promise<CatalogoCrm> {
   const payload = await obterPayload();
-  const [programas, modulos, eventos] = await Promise.all([
+  const [programas, modulos, eventos, especialistas] = await Promise.all([
     payload.find({ collection: "programas", depth: 0, limit: 100, draft: true, sort: "sigla" }),
     payload.find({ collection: "modulos", depth: 0, limit: 500, draft: true, sort: "numero" }),
     payload.find({ collection: "eventos", depth: 0, limit: 500, draft: true, sort: "nome" }),
+    payload.find({ collection: "especialistas", depth: 0, limit: 500, draft: true, sort: "nome" }),
   ]);
   return {
     programas: programas.docs.map((p) => ({ id: String(p.id), sigla: p.sigla ?? "", nome: p.nomeCompleto ?? "" })),
     modulos: modulos.docs.map((m) => ({ id: String(m.id), titulo: m.titulo, numero: m.numero, programaId: idRel(m.programa) })),
     eventos: eventos.docs.map((e) => ({ id: String(e.id), nome: e.nome })),
+    especialistas: especialistas.docs.map((e) => ({
+      id: String(e.id),
+      nome: e.nome,
+      credencial: credencialDaFicha(e),
+    })),
   };
 }
 
@@ -677,6 +758,53 @@ export async function listarPropostasCrm(): Promise<PropostaResumo[]> {
   return [...porBase.values()].sort((a, b) => b.codigo.localeCompare(a.codigo));
 }
 
+/**
+ * O conteúdo do documento da proposta na forma que a tela edita. Os textos
+ * passam por `lexicalParaTextoComSubtitulos` (inverso do conversor da
+ * escrita); as relações saem como id em string, para casar com os `value` dos
+ * selects.
+ */
+function conteudoEditavelDaProposta(doc: Proposta): ConteudoPropostaEditavel {
+  const txt = (v: unknown): string => lexicalParaTextoComSubtitulos(v);
+  return {
+    apresentacao: txt(doc.textoApresentacao),
+    contexto: txt(doc.textoContexto),
+    objetivos: txt(doc.textoObjetivos),
+    publicoAlvo: txt(doc.textoPublicoAlvo),
+    metodologia: txt(doc.textoMetodologia),
+    eventon: txt(doc.textoEventon),
+    certificacaoReplay: txt(doc.textoCertificacaoReplay),
+    cancelamento: txt(doc.textoCancelamento),
+    protecaoConteudo: txt(doc.textoProtecaoConteudo),
+    fundamentacaoLegal: txt(doc.textoFundamentacaoLegal),
+    proximosPassos: txt(doc.textoProximosPassos),
+    fechamento: txt(doc.textoFechamento),
+    eixos: (doc.eixos ?? []).map((e) => ({ titulo: e.titulo ?? "", descricao: e.descricao ?? "" })),
+    diferenciais: (doc.diferenciais ?? []).map((d) => ({
+      titulo: d.titulo ?? "",
+      descricao: d.descricao ?? "",
+    })),
+    resultados: (doc.resultados ?? []).map((r) => r.texto ?? ""),
+    docentes: (doc.docentes ?? []).map((d) => ({
+      especialistaId: idRel(d.especialista) ?? "",
+      nome: d.nome ?? "",
+      credencial: d.credencial ?? "",
+      eixo: d.eixo ?? "",
+    })),
+    modulosDetalhados: (doc.modulosDetalhados ?? []).map((m) => ({
+      moduloId: idRel(m.modulo) ?? "",
+      tituloExibido: m.tituloExibido ?? "",
+      ementa: txt(m.ementa),
+    })),
+    secoesExtras: (doc.secoesExtras ?? []).map((s) => ({
+      titulo: s.titulo ?? "",
+      corpo: txt(s.corpo),
+      posicao: s.posicao ?? "fim",
+    })),
+    modalidadeOnline: modalidadeEhOnline(doc.modalidade ?? ""),
+  };
+}
+
 export async function obterPropostaCrm(id: string): Promise<PropostaDetalhe | null> {
   const payload = await obterPayload();
   let doc: Proposta;
@@ -734,6 +862,7 @@ export async function obterPropostaCrm(id: string): Promise<PropostaDetalhe | nu
       doc.pdfGerado && typeof doc.pdfGerado === "object" && "url" in doc.pdfGerado
         ? ((doc.pdfGerado as { url?: string | null }).url ?? null)
         : null,
+    conteudo: conteudoEditavelDaProposta(doc),
   };
 }
 

@@ -34,7 +34,7 @@ export default async function PainelCrmPage() {
 
   let clientes: ClienteCrmResumo[] = [];
   let leads: LeadCrmResumo[] = [];
-  let catalogo: CatalogoCrm = { programas: [], modulos: [], eventos: [] };
+  let catalogo: CatalogoCrm = { programas: [], modulos: [], eventos: [], especialistas: [] };
   let usuarios: UsuarioCmsResumo[] = [];
   let programas: ProgramaCrmResumo[] = [];
   let modulos: ModuloCrmResumo[] = [];
