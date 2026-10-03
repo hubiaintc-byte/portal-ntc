@@ -160,14 +160,16 @@ interface CampoAreaProps {
   rotulo: string;
   valor: string;
   onMudar: (v: string) => void;
+  /** Altura do textarea. Default 3, como nos formulários do CRM; o conteúdo do documento pede mais. */
+  linhas?: number;
 }
 
-export function CampoArea({ rotulo, valor, onMudar }: CampoAreaProps) {
+export function CampoArea({ rotulo, valor, onMudar, linhas = 3 }: CampoAreaProps) {
   const id = useId();
   return (
     <div className="pcms-field">
       <label htmlFor={id}>{rotulo}</label>
-      <textarea id={id} rows={3} value={valor} onChange={(e) => onMudar(e.target.value)} />
+      <textarea id={id} rows={linhas} value={valor} onChange={(e) => onMudar(e.target.value)} />
     </div>
   );
 }

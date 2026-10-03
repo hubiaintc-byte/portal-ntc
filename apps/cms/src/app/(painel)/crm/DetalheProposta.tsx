@@ -4,21 +4,25 @@ import { useState } from "react";
 
 import { CANAIS_ENVIO, STATUS_ENVIO, STATUS_PROPOSTA } from "@ntc/lib";
 
-import type { PropostaDetalhe } from "@/lib/cms/painelCrm";
+import type { CatalogoCrm, PropostaDetalhe } from "@/lib/cms/painelCrm";
 import type { DadosEnvio } from "@/lib/cms/painelCrmEscrita";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
 import { CampoData, CampoSelect, CampoTexto } from "./CamposCrm";
+import { ConteudoProposta } from "./ConteudoProposta";
 import { rotuloDeLista, seloDeEnvio, seloDeProposta } from "./seloStatus";
 
 interface DetalheStatusProps {
   proposta: PropostaDetalhe;
+  catalogo: CatalogoCrm;
   onVoltar: () => void;
   onEditar: () => void;
   onNovaVersao: (codBase: string, motivo: string) => void;
   onRegistrarEnvio: (dados: DadosEnvio) => void;
   onGerarPdf: (id: string) => void;
   gerandoPdf: boolean;
+  /** Recarrega a proposta — o bloco de conteúdo pede isso depois de restaurar o padrão. */
+  onAtualizado: () => void;
 }
 
 /** dd/mm/aaaa a partir de uma data ISO (yyyy-mm-dd); "—" para nulo. */
@@ -31,12 +35,14 @@ function formatarDataBR(iso: string | null): string {
 /** Tela cheia de detalhe de uma proposta — leitura, com nova versão e registro de envio inline. */
 export function DetalheProposta({
   proposta: p,
+  catalogo,
   onVoltar,
   onEditar,
   onNovaVersao,
   onRegistrarEnvio,
   onGerarPdf,
   gerandoPdf,
+  onAtualizado,
 }: DetalheStatusProps) {
   const [novaVersaoAberta, setNovaVersaoAberta] = useState(false);
   const [motivo, setMotivo] = useState("");
@@ -195,6 +201,13 @@ export function DetalheProposta({
           </table>
         )}
       </section>
+
+      <ConteudoProposta
+        propostaId={p.id}
+        conteudo={p.conteudo}
+        catalogo={catalogo}
+        onAtualizado={onAtualizado}
+      />
 
       <section className="pcms-det-bloco">
         <div className="pcms-editor__head--sub">

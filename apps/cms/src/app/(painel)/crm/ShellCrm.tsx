@@ -316,12 +316,14 @@ export function ShellCrm({
           <AvisoForm erro={erroAcao} />
           <DetalheProposta
             proposta={propostaDet}
+            catalogo={catalogo}
             onVoltar={fecharTudo}
             onEditar={() => setFormAberto({ entidade: "proposta", inicial: propostaDet })}
             onNovaVersao={novaVersao}
             onRegistrarEnvio={registrarEnvio}
             onGerarPdf={gerarPdf}
             gerandoPdf={carregando}
+            onAtualizado={() => abrirProposta(propostaDet.id)}
           />
         </>
       ) : (
