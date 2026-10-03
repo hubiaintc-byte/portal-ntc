@@ -104,10 +104,10 @@ export function paragrafosParaLexical(paragrafos: string[]): DocumentoLexical {
 }
 
 /**
- * Texto livre do editor → Lexical: linhas viram parágrafos; sequências de
- * linhas iniciadas com "- " viram lista com marcadores.
+ * Núcleo de conversão linha a linha. Com `subtitulos`, uma linha iniciada
+ * por "## " vira heading h3; sem ela, "## " é texto comum de parágrafo.
  */
-export function textoParaLexical(texto: string): DocumentoLexical {
+function converterLinhas(texto: string, subtitulos: boolean): DocumentoLexical {
   const linhas = texto.split("\n").map((l) => l.trim());
   const children: unknown[] = [];
   let itensLista: string[] = [];
@@ -122,13 +122,37 @@ export function textoParaLexical(texto: string): DocumentoLexical {
   for (const linha of linhas) {
     if (linha.startsWith("- ")) {
       itensLista.push(linha.slice(2).trim());
+      continue;
+    }
+    fecharLista();
+    if (linha.length === 0) continue;
+    if (subtitulos && linha.startsWith("## ")) {
+      children.push(noHeading(linha.slice(3).trim()));
     } else {
-      fecharLista();
-      if (linha.length > 0) children.push(noParagrafo(linha));
+      children.push(noParagrafo(linha));
     }
   }
   fecharLista();
   return documento(children);
+}
+
+/**
+ * Texto livre do editor → Lexical: linhas viram parágrafos; sequências de
+ * linhas iniciadas com "- " viram lista com marcadores.
+ */
+export function textoParaLexical(texto: string): DocumentoLexical {
+  return converterLinhas(texto, false);
+}
+
+/**
+ * Como `textoParaLexical`, mas reconhecendo a convenção dos textos
+ * institucionais da proposta (`packages/lib/src/crm/textosProposta.ts`):
+ * uma linha iniciada por "## " é um subtítulo e vira heading h3. Função
+ * separada de propósito — `textoParaLexical` serve a importação de PDF e ao
+ * salvar do painel, onde "## " é texto literal do editor.
+ */
+export function textoComSubtitulosParaLexical(texto: string): DocumentoLexical {
+  return converterLinhas(texto, true);
 }
 
 /** Sessões (título + itens) → heading h3 seguido de lista, por sessão. */

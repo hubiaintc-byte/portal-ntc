@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { paragrafosParaLexical, sessoesParaLexical, textoParaLexical } from "./lexicalBuilders";
+import {
+  paragrafosParaLexical,
+  sessoesParaLexical,
+  textoComSubtitulosParaLexical,
+  textoParaLexical,
+} from "./lexicalBuilders";
 
 interface NoGenerico {
   type: string;
+  tag?: string;
   children?: NoGenerico[];
   text?: string;
   listType?: string;
@@ -39,6 +45,37 @@ describe("textoParaLexical", () => {
     expect(lista?.listType).toBe("bullet");
     expect(lista?.children).toHaveLength(2);
     expect(lista?.children?.[0]?.children?.[0]?.text).toBe("item um");
+  });
+});
+
+describe("textoComSubtitulosParaLexical", () => {
+  it("'## ' vira heading h3, o resto segue a regra de textoParaLexical", () => {
+    const doc = textoComSubtitulosParaLexical(
+      "## Certificação\n\nPrimeiro parágrafo.\n- item um\n- item dois\n\n## Replay\n\nFecho.",
+    );
+    const nos = filhos(doc);
+    expect(nos.map((n) => n.type)).toEqual([
+      "heading",
+      "paragraph",
+      "list",
+      "heading",
+      "paragraph",
+    ]);
+    expect(nos[0]?.tag).toBe("h3");
+    expect(nos[0]?.children?.[0]?.text).toBe("Certificação");
+    expect(nos[3]?.children?.[0]?.text).toBe("Replay");
+    expect(nos[2]?.children).toHaveLength(2);
+  });
+
+  it("texto sem '## ' sai igual ao de textoParaLexical", () => {
+    const texto = "Intro.\n- item um\n- item dois\nFecho.";
+    expect(textoComSubtitulosParaLexical(texto)).toEqual(textoParaLexical(texto));
+  });
+
+  it("entrada vazia produz um parágrafo vazio (root nunca sem filhos)", () => {
+    const nos = filhos(textoComSubtitulosParaLexical("   "));
+    expect(nos).toHaveLength(1);
+    expect(nos[0]?.type).toBe("paragraph");
   });
 });
 
