@@ -3,7 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
-const { atualizarProposta, criarProposta, dadosProposta } = await import("./painelCrmEscrita");
+const { atualizarProposta, criarProposta, criarVersaoProposta, dadosProposta } = await import(
+  "./painelCrmEscrita",
+);
 
 afterEach(() => vi.clearAllMocks());
 
@@ -90,6 +92,8 @@ const especialista: Record<string, unknown> = {
 
 interface OpcoesPayloadFalso {
   programa?: Record<string, unknown> | null;
+  /** Versão vigente devolvida pelo `find` de propostas (criarVersaoProposta). */
+  vigente?: Record<string, unknown>;
   cliente?: Record<string, unknown>;
   modulos?: Record<string, unknown>[];
   especialistas?: Record<string, unknown>[];
@@ -116,7 +120,7 @@ function payloadFalso(opcoes: OpcoesPayloadFalso = {}) {
     throw new Error(`findByID inesperado: ${collection}`);
   });
   const find = vi.fn(async ({ collection }: { collection: string }) => {
-    if (collection === "propostas") return { docs: [] };
+    if (collection === "propostas") return { docs: opcoes.vigente ? [opcoes.vigente] : [] };
     if (collection === "modulos") return { docs: opcoes.modulos ?? [] };
     if (collection === "especialistas") return { docs: opcoes.especialistas ?? [] };
     throw new Error(`find inesperado: ${collection}`);
@@ -413,5 +417,109 @@ describe("atualizarProposta e os módulos detalhados", () => {
     const { update } = payloadFalso({ proposta: propostaComM1 });
     expect(await atualizarProposta("9", { ...base, modulos: ["10"], qtdPagantes: "10" })).toEqual({ ok: true });
     expect("modulosDetalhados" in dadosDaChamada(update)).toBe(false);
+  });
+});
+
+const CAMPOS_TEXTO = [
+  "textoApresentacao",
+  "textoContexto",
+  "textoObjetivos",
+  "textoPublicoAlvo",
+  "textoMetodologia",
+  "textoEventon",
+  "textoCertificacaoReplay",
+  "textoCancelamento",
+  "textoProtecaoConteudo",
+  "textoFundamentacaoLegal",
+  "textoProximosPassos",
+  "textoFechamento",
+];
+
+describe("criarVersaoProposta copia o conteudo da versao vigente", () => {
+  /** Vigente com conteúdo revisado à mão, relações populadas e ids de array. */
+  const vigente: Record<string, unknown> = {
+    id: 9,
+    codigoBase: "NTC-PROP-2026-EDUTEC-SP-SME",
+    codigo: "NTC-PROP-2026-EDUTEC-SP-SME-v01",
+    versao: 1,
+    validadeDias: 30,
+    lead: 7,
+    cliente: 1,
+    programa: 2,
+    tipo: "programa-completo",
+    ...Object.fromEntries(CAMPOS_TEXTO.map((c) => [c, lex(`${c} revisado à mão.`)])),
+    eixos: [{ id: "e1", titulo: "Eixo revisado", descricao: "Descrição revisada." }],
+    diferenciais: [{ id: "d1", titulo: "Diferencial revisado", descricao: "Descrição." }],
+    resultados: [{ id: "r1", texto: "Resultado revisado." }],
+    docentes: [
+      {
+        id: "x1",
+        especialista: { id: 11, nome: "Ana Ribeiro" },
+        nome: "Ana Ribeiro",
+        credencial: "Doutorado · USP · Pesquisadora",
+        eixo: "Eixo revisado",
+      },
+    ],
+    modulosDetalhados: [
+      {
+        id: "m1",
+        modulo: { id: 10, titulo: "Módulo 1 do catálogo" },
+        tituloExibido: "Título editado à mão",
+        ementa: lex("Ementa editada à mão."),
+      },
+    ],
+  };
+
+  it("a nova versão nasce com os 12 textos e as 5 listas da vigente", async () => {
+    const { create } = payloadFalso({ vigente });
+    expect(await criarVersaoProposta("NTC-PROP-2026-EDUTEC-SP-SME", "Ajuste de preço")).toEqual({
+      ok: true,
+    });
+    const data = dadosDaChamada(create);
+    for (const campo of CAMPOS_TEXTO) {
+      expect(data[campo], campo).toEqual(vigente[campo]);
+    }
+    // Listas copiadas sem os ids internos de item de array e com as relações
+    // como id, nunca o objeto populado.
+    expect(data.eixos).toEqual([{ titulo: "Eixo revisado", descricao: "Descrição revisada." }]);
+    expect(data.diferenciais).toEqual([
+      { titulo: "Diferencial revisado", descricao: "Descrição." },
+    ]);
+    expect(data.resultados).toEqual([{ texto: "Resultado revisado." }]);
+    expect(data.docentes).toEqual([
+      {
+        especialista: 11,
+        nome: "Ana Ribeiro",
+        credencial: "Doutorado · USP · Pesquisadora",
+        eixo: "Eixo revisado",
+      },
+    ]);
+    expect(data.modulosDetalhados).toEqual([
+      { modulo: 10, tituloExibido: "Título editado à mão", ementa: lex("Ementa editada à mão.") },
+    ]);
+  });
+
+  it("vigente sem conteúdo gera versão nova sem os campos, sem erro", async () => {
+    const semConteudo: Record<string, unknown> = {
+      id: 9,
+      codigoBase: "NTC-PROP-2026-EDUTEC-SP-SME",
+      codigo: "NTC-PROP-2026-EDUTEC-SP-SME-v01",
+      versao: 1,
+      validadeDias: 30,
+      cliente: 1,
+    };
+    const { create } = payloadFalso({ vigente: semConteudo });
+    expect(await criarVersaoProposta("NTC-PROP-2026-EDUTEC-SP-SME", "Revisão")).toEqual({ ok: true });
+    const data = dadosDaChamada(create);
+    for (const campo of [
+      ...CAMPOS_TEXTO,
+      "eixos",
+      "diferenciais",
+      "resultados",
+      "docentes",
+      "modulosDetalhados",
+    ]) {
+      expect(campo in data, campo).toBe(false);
+    }
   });
 });

@@ -427,6 +427,62 @@ function conteudoParaGravar(p: {
 }
 
 /**
+ * `{ campo: itens }` quando a lista existe na origem (mesmo vazia); `{}`
+ * quando é `null`/ausente — campo ausente na vigente continua ausente na
+ * versão nova.
+ */
+function seLista<K extends string, T, U>(
+  campo: K,
+  valor: T[] | null | undefined,
+  mapear: (item: T) => U,
+): Partial<Record<K, U[]>> {
+  if (!valor) return {};
+  return { [campo]: valor.map(mapear) } as Record<K, U[]>;
+}
+
+/**
+ * Conteúdo do documento copiado da versão que está sendo substituída — nunca
+ * recalculado a partir do programa: a nova versão nasce com o que foi
+ * revisado e enviado àquele cliente (quem quiser o padrão de volta usa
+ * "Restaurar padrão"). As relações são gravadas como id (`idDeRelacionamento`
+ * cobre a vigente lida com relação populada) e os `id` que o Payload gera
+ * para item de array ficam de fora, para a nova versão ter linhas próprias.
+ */
+function conteudoDaVersaoAnterior(vigente: Proposta): Partial<PropostaData> {
+  return {
+    ...seTemTexto("textoApresentacao", vigente.textoApresentacao),
+    ...seTemTexto("textoContexto", vigente.textoContexto),
+    ...seTemTexto("textoObjetivos", vigente.textoObjetivos),
+    ...seTemTexto("textoPublicoAlvo", vigente.textoPublicoAlvo),
+    ...seTemTexto("textoMetodologia", vigente.textoMetodologia),
+    ...seTemTexto("textoEventon", vigente.textoEventon),
+    ...seTemTexto("textoCertificacaoReplay", vigente.textoCertificacaoReplay),
+    ...seTemTexto("textoCancelamento", vigente.textoCancelamento),
+    ...seTemTexto("textoProtecaoConteudo", vigente.textoProtecaoConteudo),
+    ...seTemTexto("textoFundamentacaoLegal", vigente.textoFundamentacaoLegal),
+    ...seTemTexto("textoProximosPassos", vigente.textoProximosPassos),
+    ...seTemTexto("textoFechamento", vigente.textoFechamento),
+    ...seLista("eixos", vigente.eixos, (e) => ({ titulo: e.titulo, descricao: e.descricao })),
+    ...seLista("diferenciais", vigente.diferenciais, (d) => ({
+      titulo: d.titulo,
+      descricao: d.descricao,
+    })),
+    ...seLista("resultados", vigente.resultados, (r) => ({ texto: r.texto })),
+    ...seLista("docentes", vigente.docentes, (d) => ({
+      especialista: idDeRelacionamento(d.especialista),
+      nome: d.nome,
+      credencial: d.credencial,
+      eixo: d.eixo,
+    })),
+    ...seLista("modulosDetalhados", vigente.modulosDetalhados, (m) => ({
+      modulo: idDeRelacionamento(m.modulo),
+      tituloExibido: m.tituloExibido,
+      ementa: m.ementa,
+    })),
+  };
+}
+
+/**
  * Merge dos módulos detalhados na edição: entrada já existente **nunca** é
  * sobrescrita (a edição manual do PO sobrevive a cada salvar), módulo
  * acrescentado entra com título e ementa do catálogo naquele momento, módulo
@@ -650,6 +706,10 @@ export async function criarVersaoProposta(
         condPagto: vigente.condPagto,
         condEspecificas: vigente.condEspecificas,
         observacoes: vigente.observacoes,
+        // Conteúdo do documento: copiado da vigente, nunca recalculado do
+        // programa — sem isto a nova versão nasceria sem texto nenhum e o
+        // documento sairia quase vazio (a regra do PDF omite seção sem corpo).
+        ...conteudoDaVersaoAnterior(vigente),
         elaborador: vigente.elaborador,
         aprovador: vigente.aprovador,
         validadeDias,
