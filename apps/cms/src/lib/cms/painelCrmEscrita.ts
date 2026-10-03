@@ -479,6 +479,13 @@ function conteudoDaVersaoAnterior(vigente: Proposta): Partial<PropostaData> {
       tituloExibido: m.tituloExibido,
       ementa: m.ementa,
     })),
+    // Seção livre do PO: não há "Restaurar padrão" que a traga de volta —
+    // perder um anexo textual escrito à mão é irreversível.
+    ...seLista("secoesExtras", vigente.secoesExtras, (s) => ({
+      titulo: s.titulo,
+      corpo: s.corpo,
+      posicao: s.posicao,
+    })),
   };
 }
 

@@ -468,6 +468,10 @@ describe("criarVersaoProposta copia o conteudo da versao vigente", () => {
         ementa: lex("Ementa editada à mão."),
       },
     ],
+    secoesExtras: [
+      { id: "s1", titulo: "Anexo I", corpo: lex("Corpo do anexo I."), posicao: "antes-quadro-comercial" },
+      { id: "s2", titulo: "Anexo II", corpo: lex("Corpo do anexo II."), posicao: "fim" },
+    ],
   };
 
   it("a nova versão nasce com os 12 textos e as 5 listas da vigente", async () => {
@@ -499,6 +503,15 @@ describe("criarVersaoProposta copia o conteudo da versao vigente", () => {
     ]);
   });
 
+  it("as seções extras escritas à mão vêm com as posições preservadas", async () => {
+    const { create } = payloadFalso({ vigente });
+    expect(await criarVersaoProposta("NTC-PROP-2026-EDUTEC-SP-SME", "Ajuste")).toEqual({ ok: true });
+    expect(dadosDaChamada(create).secoesExtras).toEqual([
+      { titulo: "Anexo I", corpo: lex("Corpo do anexo I."), posicao: "antes-quadro-comercial" },
+      { titulo: "Anexo II", corpo: lex("Corpo do anexo II."), posicao: "fim" },
+    ]);
+  });
+
   it("vigente sem conteúdo gera versão nova sem os campos, sem erro", async () => {
     const semConteudo: Record<string, unknown> = {
       id: 9,
@@ -518,6 +531,7 @@ describe("criarVersaoProposta copia o conteudo da versao vigente", () => {
       "resultados",
       "docentes",
       "modulosDetalhados",
+      "secoesExtras",
     ]) {
       expect(campo in data, campo).toBe(false);
     }
