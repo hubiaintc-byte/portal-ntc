@@ -204,6 +204,50 @@ describe("programa obrigatório na proposta (decisão do PO, 30/09/2026)", () =>
   });
 });
 
+describe("módulos e produtos/eventos na mesma proposta", () => {
+  // Esta versão do documento não modela quantitativo por evento: a contagem de
+  // módulos-evento conta só os módulos, e imprimir a tabela de itens com o
+  // evento ao lado produziria dois quantitativos incompatíveis no mesmo PDF.
+  const erro =
+    "Esta versão do documento não suporta módulos e produtos/eventos na mesma proposta: os quantitativos por módulo-evento sairiam contraditórios. Separe em duas propostas — uma com os módulos, outra com os produtos/eventos.";
+
+  it("criarProposta recusa, sem tocar o banco", async () => {
+    const { create } = payloadFalso({ modulos: [moduloM1] });
+    expect(
+      await criarProposta({ ...base, modulos: ["10"], eventos: ["50"], qtdPagantes: "10" }),
+    ).toEqual({ ok: false, erro });
+    expect(create).not.toHaveBeenCalled();
+    expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+
+  it("atualizarProposta recusa, sem tocar o banco", async () => {
+    const { update } = payloadFalso({ modulos: [moduloM1] });
+    expect(
+      await atualizarProposta("9", { ...base, modulos: ["10"], eventos: ["50"], qtdPagantes: "10" }),
+    ).toEqual({ ok: false, erro });
+    expect(update).not.toHaveBeenCalled();
+    expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+
+  it("recusa antes da regra de múltiplos (a mistura é o erro mais à mão)", async () => {
+    payloadFalso({ modulos: [moduloM1] });
+    const r = await criarProposta({ ...base, modulos: ["10"], eventos: ["50"], qtdPagantes: "7" });
+    expect(r.erro).toBe(erro);
+  });
+
+  it("só módulos é aceito", async () => {
+    const { create } = payloadFalso({ modulos: [moduloM1] });
+    expect(await criarProposta({ ...base, modulos: ["10"], eventos: [] })).toEqual({ ok: true });
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it("só produtos/eventos é aceito", async () => {
+    const { create } = payloadFalso();
+    expect(await criarProposta({ ...base, modulos: [], eventos: ["50"] })).toEqual({ ok: true });
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("pagantes e cortesias múltiplos do número de módulos", () => {
   const erro = "Pagantes e cortesias precisam ser múltiplos de 2 (número de módulos).";
 

@@ -89,6 +89,7 @@ export function FormProposta({
     setDados((d) => ({ ...d, [campo]: v }));
 
   const modulosDisponiveis = modulosDoPrograma(catalogo.modulos, dados.programa);
+  const misturaProibida = dados.modulos.length > 0 && dados.eventos.length > 0;
 
   const resumo = useMemo(
     () =>
@@ -185,6 +186,12 @@ export function FormProposta({
 
       {/* Bloco 3 — Produtos/Eventos */}
       <div className="pcms-editor__head--sub">Produtos / Eventos</div>
+      {/* A escrita recusa as duas coisas juntas (`erroDeModulosComEventos`):
+          esta versão do documento não modela quantitativo por evento. O aviso
+          aqui é para o PO ver antes de salvar, não substitui a recusa. */}
+      {misturaProibida && (
+        <AvisoForm erro="Módulos e produtos/eventos não podem ir na mesma proposta: os quantitativos por módulo-evento sairiam contraditórios no documento. Separe em duas propostas." />
+      )}
       {catalogo.eventos.length === 0 ? (
         <p className="pcms-editor__hint">Nenhum produto/evento disponível.</p>
       ) : (

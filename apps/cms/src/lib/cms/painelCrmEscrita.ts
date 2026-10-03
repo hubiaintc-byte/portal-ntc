@@ -283,6 +283,19 @@ function erroDeMultiplos(dados: DadosProposta): string | null {
   return `Pagantes e cortesias precisam ser múltiplos de ${n} (número de módulos).`;
 }
 
+/**
+ * Módulos e produtos/eventos na MESMA proposta são recusados: esta versão do
+ * documento não modelou quantitativo por evento, então a contagem de
+ * módulos-evento (fonte única em `documentoProposta/modulos.ts`) conta só os
+ * módulos, enquanto a tabela de itens da Fase B2 nomearia também o evento —
+ * pagantes e cortesias ficariam sem base declarada para ele. Recusar é melhor
+ * que imprimir número contraditório num documento contratual.
+ */
+function erroDeModulosComEventos(dados: DadosProposta): string | null {
+  if (idsLista(dados.modulos).length === 0 || idsLista(dados.eventos).length === 0) return null;
+  return "Esta versão do documento não suporta módulos e produtos/eventos na mesma proposta: os quantitativos por módulo-evento sairiam contraditórios. Separe em duas propostas — uma com os módulos, outra com os produtos/eventos.";
+}
+
 /** Há algum texto fora de espaços em branco neste nó Lexical (ou descendentes)? */
 function noLexicalTemTexto(no: unknown): boolean {
   if (no === null || typeof no !== "object") return false;
@@ -562,6 +575,8 @@ export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscr
   // antes era opcional para a Customizada/In Company). A tela também marca o
   // select como `required`; esta é a defesa que vale para quem não passa por ela.
   if (idOuNulo(dados.programa) === null) return { ok: false, erro: "Selecione o programa." };
+  const erroMistura = erroDeModulosComEventos(dados);
+  if (erroMistura !== null) return { ok: false, erro: erroMistura };
   const erroMultiplos = erroDeMultiplos(dados);
   if (erroMultiplos !== null) return { ok: false, erro: erroMultiplos };
   try {
@@ -627,6 +642,8 @@ export async function atualizarProposta(
   // ou id que não resolve são o mesmo erro — falha fechado, e nunca grava null
   // por cima de um programa já vinculado.
   if (idOuNulo(dados.programa) === null) return { ok: false, erro: "Selecione o programa." };
+  const erroMistura = erroDeModulosComEventos(dados);
+  if (erroMistura !== null) return { ok: false, erro: erroMistura };
   const erroMultiplos = erroDeMultiplos(dados);
   if (erroMultiplos !== null) return { ok: false, erro: erroMultiplos };
   try {
