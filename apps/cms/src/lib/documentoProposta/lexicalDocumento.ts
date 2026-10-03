@@ -1,0 +1,69 @@
+/**
+ * Lexical → HTML *por bloco*, para o documento da proposta.
+ *
+ * `lexicalToHtml` (@/lib/cms/lexical) é inline: junta os blocos de topo com
+ * `<br>`, o que basta para as linhas curtas do site, mas o modelo aprovado do
+ * documento (docs/prototipos/proposta-modelo-v1.html) imprime parágrafos,
+ * subtítulos e listas de verdade — e o CSS do documento estiliza `p`, `h3`,
+ * `ul` e `ol`. Este conversor percorre só os blocos de topo e delega o
+ * conteúdo *inline* de cada um a `lexicalToHtml`, para que as regras de
+ * `<strong>`/`<em>` continuem num lugar só. `lexicalToHtml` NÃO é alterada:
+ * ela é compartilhada com corpo-docente e eventos.
+ *
+ * Contrato que importa: documento ausente, vazio ou cujos blocos todos saem
+ * vazios devolve `""` — nunca `<p></p>`. A montagem do documento
+ * (`montarSecoes`) decide a omissão de cada seção pelo corpo vazio depois de
+ * `trim()`, e um `<p></p>` passaria por "preenchido", imprimindo um título com
+ * nada embaixo num documento que vai ao cliente.
+ *
+ * Escape: segue `lexicalToHtml`, que não escapa — o texto vem do editor
+ * restritivo do painel (sem HTML livre) e é consumido por quem monta o
+ * documento. Não há escape duplo aqui.
+ */
+
+import { lexicalToHtml } from "@/lib/cms/lexical";
+
+export function lexicalDocumentoParaHtml(doc: unknown): string {
+  const blocos = blocosDeTopo(doc);
+  if (!blocos) return "";
+  return blocos
+    .map(blocoParaHtml)
+    .filter((b) => b.length > 0)
+    .join("");
+}
+
+function blocosDeTopo(doc: unknown): unknown[] | null {
+  if (!doc || typeof doc !== "object" || !("root" in doc)) return null;
+  const root = (doc as { root?: { children?: unknown[] } }).root;
+  if (!root || !Array.isArray(root.children)) return null;
+  return root.children;
+}
+
+function blocoParaHtml(node: unknown): string {
+  if (!node || typeof node !== "object") return "";
+  const n = node as Record<string, unknown>;
+
+  if (n.type === "list") {
+    const tag = n.listType === "number" ? "ol" : "ul";
+    const itens = (Array.isArray(n.children) ? n.children : [])
+      .map((item) => inline(item))
+      .filter((i) => i.length > 0)
+      .map((i) => `<li>${i}</li>`)
+      .join("");
+    return itens ? `<${tag}>${itens}</${tag}>` : "";
+  }
+
+  const conteudo = inline(node);
+  if (!conteudo) return "";
+  // Headings do editor restritivo são h2–h4; no documento o nível h2 pertence
+  // ao título da seção, então todo heading do corpo entra como h3 (o modelo
+  // só tem esse nível dentro das seções).
+  if (n.type === "heading") return `<h3>${conteudo}</h3>`;
+  // Parágrafo e qualquer bloco não previsto: o texto nunca se perde.
+  return `<p>${conteudo}</p>`;
+}
+
+/** Conteúdo inline de um único nó, reusando a serialização compartilhada. */
+function inline(node: unknown): string {
+  return lexicalToHtml({ root: { children: [node] } });
+}
