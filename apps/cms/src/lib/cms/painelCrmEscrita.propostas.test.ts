@@ -649,6 +649,38 @@ describe("restaurarConteudoProposta", () => {
   };
   const opcoes = { proposta: propostaAtual, modulos: [moduloM1], especialistas: [especialista] };
 
+  it("alvo desconhecido é recusado, sem tocar o banco", async () => {
+    // Server Action é endpoint público, e `campoDoAlvo` é um switch sem default:
+    // antes um alvo fora da união gravava `data["undefined"]` e respondia ok.
+    const { update } = payloadFalso(opcoes);
+    expect(
+      await restaurarConteudoProposta("9", "inventado" as never, usuario),
+    ).toEqual({ ok: false, erro: "Seção desconhecida." });
+    expect(update).not.toHaveBeenCalled();
+    expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+
+  it("secoesExtras não é alvo restaurável (não tem padrão a repor)", async () => {
+    const { update } = payloadFalso(opcoes);
+    expect(
+      await restaurarConteudoProposta("9", "secoesExtras" as never, usuario),
+    ).toEqual({ ok: false, erro: "Seção desconhecida." });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("todos os alvos da união são aceitos pela guarda", async () => {
+    for (const alvo of [
+      "tudo", "apresentacao", "contexto", "objetivos", "publicoAlvo", "metodologia",
+      "eixos", "diferenciais", "resultados", "docentes", "modulos",
+      "eventon", "certificacaoReplay", "cancelamento", "protecaoConteudo",
+      "fundamentacaoLegal", "proximosPassos", "fechamento",
+    ] as const) {
+      vi.clearAllMocks();
+      payloadFalso(opcoes);
+      expect(await restaurarConteudoProposta("9", alvo, usuario)).toEqual({ ok: true });
+    }
+  });
+
   it("fechamento grava só textoFechamento", async () => {
     const { update } = payloadFalso(opcoes);
     expect(await restaurarConteudoProposta("9", "fechamento", usuario)).toEqual({ ok: true });

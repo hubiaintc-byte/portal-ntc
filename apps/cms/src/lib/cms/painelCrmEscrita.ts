@@ -782,6 +782,8 @@ export async function restaurarConteudoProposta(
   alvo: AlvoRestauracao,
   usuario: UsuarioAutenticado,
 ): Promise<ResultadoEscrita> {
+  // Mesma guarda que `salvarSecaoConteudoProposta` aplica ao par alvo/valor.
+  if (!ALVOS_RESTAURACAO.includes(alvo)) return { ok: false, erro: "Seção desconhecida." };
   try {
     const payload = await obterPayload();
     const atual = await payload.findByID({ collection: "propostas", id, depth: 0 });
@@ -869,6 +871,19 @@ const TIPO_DE_ALVO: Record<AlvoConteudoProposta, ValorSecaoProposta["tipo"]> = {
   modulos: "modulos",
   secoesExtras: "extras",
 };
+
+/**
+ * Guarda de runtime do `alvo` de "Restaurar padrão". Server Action é endpoint
+ * público e `campoDoAlvo` é um `switch` sem `default`: um alvo fora da união
+ * devolveria `undefined`, o laço gravaria `data["undefined"]` e a action
+ * responderia `ok: true` sem fazer nada. Derivado de `TIPO_DE_ALVO` (que o
+ * TypeScript obriga a cobrir a união inteira) para os dois nunca divergirem —
+ * `secoesExtras` não é restaurável, por não ter padrão a repor.
+ */
+const ALVOS_RESTAURACAO: readonly string[] = [
+  "tudo",
+  ...Object.keys(TIPO_DE_ALVO).filter((a) => a !== "secoesExtras"),
+];
 
 /** As três posições da seção extra (coleção `propostas`); valor estranho cai em "fim". */
 const POSICOES_EXTRA: readonly string[] = [
