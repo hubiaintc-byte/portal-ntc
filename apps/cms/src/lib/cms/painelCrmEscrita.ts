@@ -17,8 +17,8 @@ import {
   tituloLeadApagado,
   urlValida,
   type AcaoEvento,
+  type ChaveTextoInstitucional,
   type ConteudoInicialProposta,
-  type ContextoTextosProposta,
   type ProgramaParaConteudo,
 } from "@ntc/lib";
 import type { Especialista, Modulo, Programa, Proposta } from "@ntc/types";
@@ -516,6 +516,42 @@ function mesclarModulosDetalhados(
   return [...mantidas, ...novas] as PropostaModulosDetalhados;
 }
 
+/**
+ * Composição única do conteúdo do documento a partir do estado atual
+ * (programa, cliente, módulos selecionados, modalidade, replay). Usada pela
+ * criação da proposta e por "Restaurar conteúdo padrão" — as duas precisam
+ * calcular exatamente o mesmo, então não há segunda cópia desta lógica.
+ */
+async function calcularConteudoProposta(
+  payload: Payload,
+  p: {
+    programa: Programa | null;
+    cliente: { orgao: string; sigla?: string | null };
+    moduloIds: number[];
+    modalidade: string;
+    replay: string;
+  },
+): Promise<Partial<PropostaData>> {
+  // O programa vem com depth 0: `docentes` são ids e precisam da consulta própria.
+  const [modulosCatalogo, docentes] = await Promise.all([
+    modulosDoCatalogo(payload, p.moduloIds),
+    fichasDosDocentes(payload, p.programa?.docentes ?? []),
+  ]);
+  const conteudo = conteudoInicialProposta({
+    programa: programaParaConteudo(p.programa),
+    modulos: modulosCatalogo.map((m) => ({ id: String(m.id), titulo: m.titulo })),
+    contextoTextos: {
+      clienteOrgao: p.cliente.orgao,
+      clienteSigla: p.cliente.sigla ?? p.cliente.orgao,
+      programaSigla: p.programa?.sigla ?? "",
+      modalidade: p.modalidade.trim(),
+      replay: p.replay.trim(),
+      numModulos: modulosCatalogo.length,
+    },
+  });
+  return conteudoParaGravar({ conteudo, programa: p.programa, modulos: modulosCatalogo, docentes });
+}
+
 export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscrita> {
   // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
   const leadId = idOuNulo(dados.lead);
@@ -536,13 +572,6 @@ export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscr
         : null,
       payload.findByID({ collection: "clientes-crm", id: clienteId, depth: 0 }),
     ]);
-    // Módulos e docentes em paralelo: o programa veio com depth 0, então
-    // `docentes` são ids e precisam da consulta própria (hoje nenhum dos 15
-    // programas tem vínculo — a lista nasce vazia).
-    const [modulosCatalogo, docentes] = await Promise.all([
-      modulosDoCatalogo(payload, idsLista(dados.modulos)),
-      fichasDosDocentes(payload, programaDoc?.docentes ?? []),
-    ]);
     const ano = new Date().getFullYear();
     const codigoBase = gerarCodigoBase({
       ano,
@@ -562,29 +591,18 @@ export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscr
     const codigo = codigoDaVersao(codigoBase, versao);
     const agora = new Date();
     const validadeDias = numeroOuNulo(dados.validadeDias) ?? 30;
-    const contextoTextos: ContextoTextosProposta = {
-      clienteOrgao: clienteDoc.orgao,
-      clienteSigla: clienteDoc.sigla ?? clienteDoc.orgao,
-      programaSigla: programaDoc?.sigla ?? "",
-      modalidade: dados.modalidade.trim(),
-      replay: dados.replay.trim(),
-      numModulos: modulosCatalogo.length,
-    };
-    const conteudo = conteudoInicialProposta({
-      programa: programaParaConteudo(programaDoc),
-      modulos: modulosCatalogo.map((m) => ({ id: String(m.id), titulo: m.titulo })),
-      contextoTextos,
+    const conteudo = await calcularConteudoProposta(payload, {
+      programa: programaDoc,
+      cliente: clienteDoc,
+      moduloIds: idsLista(dados.modulos),
+      modalidade: dados.modalidade,
+      replay: dados.replay,
     });
     await payload.create({
       collection: "propostas",
       data: {
         ...dadosProposta(dados, clienteId, leadId, { codigoBase, codigo, versao }),
-        ...conteudoParaGravar({
-          conteudo,
-          programa: programaDoc,
-          modulos: modulosCatalogo,
-          docentes,
-        }),
+        ...conteudo,
         dataCriacao: agora.toISOString(),
         validade: dataValidade(validadeDias),
       },
@@ -653,6 +671,114 @@ export async function atualizarProposta(
     return { ok: true };
   } catch (e) {
     console.error("[atualizarProposta]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+export type AlvoRestauracao =
+  | "tudo"
+  | ChaveTextoInstitucional
+  | "apresentacao"
+  | "contexto"
+  | "objetivos"
+  | "publicoAlvo"
+  | "metodologia"
+  | "eixos"
+  | "diferenciais"
+  | "resultados"
+  | "modulos";
+
+const CAMPOS_TEXTO_RESTAURAVEIS = [
+  "textoApresentacao", "textoContexto", "textoObjetivos", "textoPublicoAlvo", "textoMetodologia",
+  "textoEventon", "textoCertificacaoReplay", "textoCancelamento", "textoProtecaoConteudo",
+  "textoFundamentacaoLegal", "textoProximosPassos", "textoFechamento",
+] as const;
+const CAMPOS_LISTA_RESTAURAVEIS = [
+  "eixos", "diferenciais", "resultados", "docentes", "modulosDetalhados",
+] as const;
+type CampoRestauravel =
+  | (typeof CAMPOS_TEXTO_RESTAURAVEIS)[number]
+  | (typeof CAMPOS_LISTA_RESTAURAVEIS)[number];
+
+/** Alvo do botão -> campos que ele toca. "tudo" cobre todos, inclusive docentes. */
+function camposDoAlvo(alvo: AlvoRestauracao): readonly CampoRestauravel[] {
+  switch (alvo) {
+    case "tudo": return [...CAMPOS_TEXTO_RESTAURAVEIS, ...CAMPOS_LISTA_RESTAURAVEIS];
+    case "apresentacao": return ["textoApresentacao"];
+    case "contexto": return ["textoContexto"];
+    case "objetivos": return ["textoObjetivos"];
+    case "publicoAlvo": return ["textoPublicoAlvo"];
+    case "metodologia": return ["textoMetodologia"];
+    case "eixos": return ["eixos"];
+    case "diferenciais": return ["diferenciais"];
+    case "resultados": return ["resultados"];
+    case "modulos": return ["modulosDetalhados"];
+    case "eventon": return ["textoEventon"];
+    case "certificacaoReplay": return ["textoCertificacaoReplay"];
+    case "cancelamento": return ["textoCancelamento"];
+    case "protecaoConteudo": return ["textoProtecaoConteudo"];
+    case "fundamentacaoLegal": return ["textoFundamentacaoLegal"];
+    case "proximosPassos": return ["textoProximosPassos"];
+    case "fechamento": return ["textoFechamento"];
+  }
+}
+
+/**
+ * "Restaurar conteúdo padrão": recalcula o conteúdo a partir do estado atual
+ * da proposta (mesma composição da criação) e grava SÓ o alvo pedido.
+ *
+ * - Alvo cujo recálculo vem vazio (texto sem conteúdo no programa, ou
+ *   institucional vazio) vira `null`, nunca documento Lexical vazio: o padrão
+ *   ali é "sem conteúdo", e é o campo ausente que faz o documento omitir a
+ *   seção. Lista vazia grava `[]`.
+ * - "modulos" SOBRESCREVE `modulosDetalhados` com o catálogo atual, ao
+ *   contrário do merge preservador de `atualizarProposta`: desfazer a edição
+ *   manual é justamente o objetivo do botão.
+ * - Uma única escrita, então sem `executarEmTransacao`; `usuario` vai no
+ *   `user` do update (autoria para os hooks), como nas ações do lead.
+ */
+export async function restaurarConteudoProposta(
+  id: string,
+  alvo: AlvoRestauracao,
+  usuario: UsuarioAutenticado,
+): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    const atual = await payload.findByID({ collection: "propostas", id, depth: 0 });
+    const clienteId = idDeRelacionamento(atual.cliente);
+    if (clienteId === null) return { ok: false, erro: "Proposta sem cliente vinculado." };
+    const programaId = idDeRelacionamento(atual.programa);
+    const [programa, cliente] = await Promise.all([
+      programaId === null
+        ? null
+        : payload.findByID({ collection: "programas", id: programaId, depth: 0 }),
+      payload.findByID({ collection: "clientes-crm", id: clienteId, depth: 0 }),
+    ]);
+    const calculado = await calcularConteudoProposta(payload, {
+      programa,
+      cliente,
+      moduloIds: (atual.modulos ?? [])
+        .map((m) => idDeRelacionamento(m))
+        .filter((n): n is number => n !== null),
+      modalidade: atual.modalidade ?? "",
+      replay: atual.replay ?? "",
+    });
+    const data: Record<string, unknown> = {};
+    for (const campo of camposDoAlvo(alvo)) {
+      const valor: unknown = calculado[campo];
+      const ehTexto = (CAMPOS_TEXTO_RESTAURAVEIS as readonly string[]).includes(campo);
+      if (ehTexto) data[campo] = temTextoLexical(valor) ? valor : null;
+      else data[campo] = valor ?? [];
+    }
+    await payload.update({
+      collection: "propostas",
+      id,
+      data: data as Partial<PropostaData>,
+      user: usuario,
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[restaurarConteudoProposta]", e);
     return { ok: false, erro: ERRO_GENERICO };
   }
 }

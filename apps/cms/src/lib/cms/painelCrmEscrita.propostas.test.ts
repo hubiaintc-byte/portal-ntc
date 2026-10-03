@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
-const { atualizarProposta, criarProposta, criarVersaoProposta, dadosProposta } = await import(
+const { atualizarProposta, criarProposta, criarVersaoProposta, dadosProposta, restaurarConteudoProposta } = await import(
   "./painelCrmEscrita",
 );
 
@@ -577,5 +577,91 @@ describe("criarVersaoProposta copia o conteudo da versao vigente", () => {
     ]) {
       expect(campo in data, campo).toBe(false);
     }
+  });
+});
+
+describe("restaurarConteudoProposta", () => {
+  const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
+  const TEXTOS = [
+    "textoApresentacao", "textoContexto", "textoObjetivos", "textoPublicoAlvo", "textoMetodologia",
+    "textoEventon", "textoCertificacaoReplay", "textoCancelamento", "textoProtecaoConteudo",
+    "textoFundamentacaoLegal", "textoProximosPassos", "textoFechamento",
+  ];
+  const LISTAS = ["eixos", "diferenciais", "resultados", "docentes", "modulosDetalhados"];
+  const propostaAtual = {
+    id: 9,
+    programa: 2,
+    cliente: 1,
+    modulos: [10],
+    modalidade: "online",
+    replay: "30 dias",
+    modulosDetalhados: [{ modulo: 10, tituloExibido: "Título editado à mão" }],
+  };
+  const opcoes = { proposta: propostaAtual, modulos: [moduloM1], especialistas: [especialista] };
+
+  it("fechamento grava só textoFechamento", async () => {
+    const { update } = payloadFalso(opcoes);
+    expect(await restaurarConteudoProposta("9", "fechamento", usuario)).toEqual({ ok: true });
+    expect(update).toHaveBeenCalledTimes(1);
+    const data = dadosDaChamada(update);
+    expect(Object.keys(data)).toEqual(["textoFechamento"]);
+    for (const k of [...TEXTOS.filter((t) => t !== "textoFechamento"), ...LISTAS]) {
+      expect(data).not.toHaveProperty(k);
+    }
+  });
+
+  it("eixos grava só a lista de eixos", async () => {
+    const { update } = payloadFalso(opcoes);
+    await restaurarConteudoProposta("9", "eixos", usuario);
+    expect(dadosDaChamada(update)).toEqual({
+      eixos: [
+        { titulo: "Eixo 1", descricao: "Descrição do eixo 1." },
+        { titulo: "Eixo 2", descricao: "Descrição do eixo 2." },
+      ],
+    });
+  });
+
+  it("modulos sobrescreve a edição manual com o catálogo", async () => {
+    const { update } = payloadFalso(opcoes);
+    await restaurarConteudoProposta("9", "modulos", usuario);
+    const data = dadosDaChamada(update);
+    expect(Object.keys(data)).toEqual(["modulosDetalhados"]);
+    const itens = data.modulosDetalhados as { modulo: number; tituloExibido: string }[];
+    expect(itens).toHaveLength(1);
+    expect(itens[0]!.tituloExibido).toBe("Módulo 1 do catálogo");
+  });
+
+  it("tudo grava todos os textos e listas", async () => {
+    const { update } = payloadFalso(opcoes);
+    await restaurarConteudoProposta("9", "tudo", usuario);
+    const data = dadosDaChamada(update);
+    for (const k of [...TEXTOS, ...LISTAS]) expect(data).toHaveProperty(k);
+    expect(data.textoApresentacao).toEqual(lex("Visão geral do programa."));
+  });
+
+  it("alvo vazio grava null, nunca Lexical vazio", async () => {
+    const { update } = payloadFalso({ ...opcoes, programa: { ...programaCompleto, metodologia: null } });
+    await restaurarConteudoProposta("9", "metodologia", usuario);
+    expect(dadosDaChamada(update)).toEqual({ textoMetodologia: null });
+  });
+
+  it("proposta sem programa restaura institucionais e deixa listas do programa vazias", async () => {
+    const { update } = payloadFalso({ ...opcoes, proposta: { ...propostaAtual, programa: null } });
+    expect(await restaurarConteudoProposta("9", "tudo", usuario)).toEqual({ ok: true });
+    const data = dadosDaChamada(update);
+    expect(data.eixos).toEqual([]);
+    expect(data.diferenciais).toEqual([]);
+    expect(data.resultados).toEqual([]);
+    expect(data.textoApresentacao).toBeNull();
+    expect(data.textoFechamento).toHaveProperty("root");
+    expect((data.modulosDetalhados as unknown[]).length).toBe(1);
+  });
+
+  it("leitura que falha devolve erro sem lançar", async () => {
+    const p = payloadFalso(opcoes);
+    p.findByID.mockRejectedValueOnce(new Error("não achou"));
+    const r = await restaurarConteudoProposta("999", "tudo", usuario);
+    expect(r.ok).toBe(false);
+    expect(p.update).not.toHaveBeenCalled();
   });
 });

@@ -33,7 +33,7 @@ const executarEmTransacaoMock = vi.fn(
 );
 vi.mock("@/lib/crm/transacao", () => ({ executarEmTransacao: executarEmTransacaoMock }));
 
-const { moverLeadCrm, salvarClienteCrm, agendarEventoCrm, apagarLeadCrm } = await import("./acoesCrm");
+const { moverLeadCrm, salvarClienteCrm, agendarEventoCrm, apagarLeadCrm, restaurarConteudoPropostaCrm } = await import("./acoesCrm");
 type DadosClienteCrm = Parameters<typeof salvarClienteCrm>[1];
 type DadosEvento = Parameters<typeof agendarEventoCrm>[1];
 
@@ -155,5 +155,14 @@ describe("apagarLeadCrm", () => {
     montarPayloadFalso();
     expect(await apagarLeadCrm("7", "Ana Contato")).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
     expect(executarEmTransacaoMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("restaurarConteudoPropostaCrm", () => {
+  it("sem sessão recusa sem tocar o banco", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(null);
+    montarPayloadFalso();
+    expect(await restaurarConteudoPropostaCrm("9", "tudo")).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(obterPayloadMock).not.toHaveBeenCalled();
   });
 });

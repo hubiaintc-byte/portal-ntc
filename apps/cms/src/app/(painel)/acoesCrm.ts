@@ -29,12 +29,14 @@ import {
   marcarLeadPerdido,
   moverLead,
   reabrirLead,
+  restaurarConteudoProposta,
   registrarContratoEmpenho,
   registrarEnvio,
   removerDocumentoEvento,
   salvarLinksInscricao,
   subirDocumentoEvento,
   vincularClienteAoLead,
+  type AlvoRestauracao,
   type DadosClienteCrm,
   type DadosContrato,
   type DadosEnvio,
@@ -90,6 +92,17 @@ export async function novaVersaoPropostaCrm(
   const resultado = await criarVersaoProposta(codBase, motivo);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
+}
+
+export async function restaurarConteudoPropostaCrm(
+  id: string,
+  alvo: AlvoRestauracao,
+): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await restaurarConteudoProposta(id, alvo, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
 }
 
 export async function registrarEnvioCrm(dados: DadosEnvio): Promise<ResultadoEscrita> {
