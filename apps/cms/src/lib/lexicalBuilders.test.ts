@@ -4,6 +4,7 @@ import {
   lexicalParaTextoComSubtitulos,
   paragrafosParaLexical,
   sessoesParaLexical,
+  temFormatacaoPerdidaNoTextoPuro,
   textoComSubtitulosParaLexical,
   textoParaLexical,
 } from "./lexicalBuilders";
@@ -144,5 +145,56 @@ describe("lexicalParaTextoComSubtitulos", () => {
       },
     };
     expect(lexicalParaTextoComSubtitulos(doc)).toBe("Prazo de 15 dias após a NF.");
+  });
+});
+
+describe("temFormatacaoPerdidaNoTextoPuro", () => {
+  /** Nó de texto cru, como o Payload grava (format é bitfield: 1 = bold, 2 = italic). */
+  const txt = (text: string, format = 0) => ({ type: "text", text, format });
+  const doc = (children: unknown[]) => ({ root: { children } });
+
+  it("texto sem formatação: falso", () => {
+    expect(
+      temFormatacaoPerdidaNoTextoPuro(
+        textoComSubtitulosParaLexical("## Sub\n\nParágrafo.\n- item"),
+      ),
+    ).toBe(false);
+  });
+
+  it("negrito e itálico: verdadeiro", () => {
+    expect(
+      temFormatacaoPerdidaNoTextoPuro(doc([{ type: "paragraph", children: [txt("a"), txt("b", 1)] }])),
+    ).toBe(true);
+    expect(
+      temFormatacaoPerdidaNoTextoPuro(doc([{ type: "paragraph", children: [txt("b", 2)] }])),
+    ).toBe(true);
+  });
+
+  it("negrito dentro de item de lista: verdadeiro", () => {
+    const lista = {
+      type: "list",
+      listType: "bullet",
+      children: [{ type: "listitem", children: [txt("forte", 1)] }],
+    };
+    expect(temFormatacaoPerdidaNoTextoPuro(doc([lista]))).toBe(true);
+  });
+
+  it("lista numerada, heading fora de h3 e linebreak: verdadeiro", () => {
+    expect(
+      temFormatacaoPerdidaNoTextoPuro(
+        doc([{ type: "list", listType: "number", children: [{ type: "listitem", children: [txt("um")] }] }]),
+      ),
+    ).toBe(true);
+    expect(
+      temFormatacaoPerdidaNoTextoPuro(doc([{ type: "heading", tag: "h2", children: [txt("Título")] }])),
+    ).toBe(true);
+    expect(
+      temFormatacaoPerdidaNoTextoPuro(doc([{ type: "paragraph", children: [txt("a"), { type: "linebreak" }] }])),
+    ).toBe(true);
+  });
+
+  it("documento ausente ou vazio: falso", () => {
+    expect(temFormatacaoPerdidaNoTextoPuro(null)).toBe(false);
+    expect(temFormatacaoPerdidaNoTextoPuro({})).toBe(false);
   });
 });

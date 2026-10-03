@@ -230,3 +230,38 @@ export function lexicalParaTextoComSubtitulos(documento: unknown): string {
     .filter((b) => b.length > 0)
     .join("\n\n");
 }
+
+/**
+ * O documento Lexical tem algo que o texto puro NÃO carrega — isto é, algo que
+ * `lexicalParaTextoComSubtitulos` + `textoComSubtitulosParaLexical` não
+ * devolvem igual? Hoje:
+ *
+ * - nó de texto com `format` ≠ 0 (negrito, itálico, sublinhado…);
+ * - lista numerada (`listType: "number"`), que volta como lista com marcadores;
+ * - heading de nível diferente de h3, que volta como h3 (a convenção "## ");
+ * - `linebreak`, que volta como espaço.
+ *
+ * Serve para a tela avisar, ANTES de alguém salvar, que salvar aquela seção
+ * remove os destaques — o conteúdo importado dos 15 programas (v3.2) tem
+ * dezenas de `<strong>` convertidos em `format: 1`. Editor com formatação é
+ * escopo da Sessão 5 (spec §5.2); aqui só se avisa.
+ */
+export function temFormatacaoPerdidaNoTextoPuro(documento: unknown): boolean {
+  return blocosDeTopo(documento).some((bloco) => blocoPerdeFormatacao(bloco));
+}
+
+function blocoPerdeFormatacao(no: unknown): boolean {
+  if (no === null || typeof no !== "object") return false;
+  const n = no as Record<string, unknown>;
+  if (n.type === "list" && n.listType === "number") return true;
+  if (n.type === "heading" && typeof n.tag === "string" && n.tag !== "h3") return true;
+  return noPerdeFormatacao(n);
+}
+
+function noPerdeFormatacao(no: unknown): boolean {
+  if (no === null || typeof no !== "object") return false;
+  const n = no as Record<string, unknown>;
+  if (n.type === "linebreak") return true;
+  if (n.type === "text" && Number(n.format ?? 0) !== 0) return true;
+  return Array.isArray(n.children) && n.children.some((f) => noPerdeFormatacao(f));
+}

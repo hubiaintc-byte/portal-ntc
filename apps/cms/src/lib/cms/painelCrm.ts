@@ -17,7 +17,10 @@ import type { Payload, Where } from "payload";
 
 import { credencialDaFicha } from "@/lib/documentoProposta/dados";
 import { modalidadeEhOnline } from "@/lib/documentoProposta/secoes/institucional";
-import { lexicalParaTextoComSubtitulos } from "@/lib/lexicalBuilders";
+import {
+  lexicalParaTextoComSubtitulos,
+  temFormatacaoPerdidaNoTextoPuro,
+} from "@/lib/lexicalBuilders";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
@@ -164,6 +167,8 @@ export interface ModuloDetalhadoProposta {
   tituloExibido: string;
   /** Ementa como texto puro editável (ver ConteudoPropostaEditavel). */
   ementa: string;
+  /** A ementa de origem tem formatação que o texto puro não carrega (ver `textosComFormatacao`). */
+  ementaComFormatacao: boolean;
 }
 
 export interface SecaoExtraProposta {
@@ -183,6 +188,21 @@ export interface SecaoExtraProposta {
  * NÃO confundir com `DadosDocumentoProposta` (lib/documentoProposta/dados.ts):
  * aquela é a forma para o PDF, com os textos já em HTML pronto.
  */
+/** As 12 seções de texto corrido do documento — chave do conteúdo e alvo da escrita. */
+export type ChaveTextoProposta =
+  | "apresentacao"
+  | "contexto"
+  | "objetivos"
+  | "publicoAlvo"
+  | "metodologia"
+  | "eventon"
+  | "certificacaoReplay"
+  | "cancelamento"
+  | "protecaoConteudo"
+  | "fundamentacaoLegal"
+  | "proximosPassos"
+  | "fechamento";
+
 export interface ConteudoPropostaEditavel {
   apresentacao: string;
   contexto: string;
@@ -207,6 +227,14 @@ export interface ConteudoPropostaEditavel {
    * usa (spec §7). Falso faz a tela avisar que a seção EventON não sai.
    */
   modalidadeOnline: boolean;
+  /**
+   * Seções cujo Lexical de origem tem formatação que o texto puro NÃO carrega
+   * (negrito/itálico, lista numerada, heading fora de h3, quebra de linha) — o
+   * conteúdo importado dos 15 programas (v3.2) tem dezenas de `<strong>`. A
+   * tela avisa, SÓ nessas seções, que salvar remove os destaques; editor com
+   * formatação é da Sessão 5 (spec §5.2).
+   */
+  textosComFormatacao: ChaveTextoProposta[];
 }
 
 export interface PropostaDetalhe extends PropostaResumo {
@@ -766,6 +794,21 @@ export async function listarPropostasCrm(): Promise<PropostaResumo[]> {
  */
 function conteudoEditavelDaProposta(doc: Proposta): ConteudoPropostaEditavel {
   const txt = (v: unknown): string => lexicalParaTextoComSubtitulos(v);
+  const origem: Record<ChaveTextoProposta, unknown> = {
+    apresentacao: doc.textoApresentacao,
+    contexto: doc.textoContexto,
+    objetivos: doc.textoObjetivos,
+    publicoAlvo: doc.textoPublicoAlvo,
+    metodologia: doc.textoMetodologia,
+    eventon: doc.textoEventon,
+    certificacaoReplay: doc.textoCertificacaoReplay,
+    cancelamento: doc.textoCancelamento,
+    protecaoConteudo: doc.textoProtecaoConteudo,
+    fundamentacaoLegal: doc.textoFundamentacaoLegal,
+    proximosPassos: doc.textoProximosPassos,
+    fechamento: doc.textoFechamento,
+  };
+  const chaves = Object.keys(origem) as ChaveTextoProposta[];
   return {
     apresentacao: txt(doc.textoApresentacao),
     contexto: txt(doc.textoContexto),
@@ -795,6 +838,7 @@ function conteudoEditavelDaProposta(doc: Proposta): ConteudoPropostaEditavel {
       moduloId: idRel(m.modulo) ?? "",
       tituloExibido: m.tituloExibido ?? "",
       ementa: txt(m.ementa),
+      ementaComFormatacao: temFormatacaoPerdidaNoTextoPuro(m.ementa),
     })),
     secoesExtras: (doc.secoesExtras ?? []).map((s) => ({
       titulo: s.titulo ?? "",
@@ -802,6 +846,7 @@ function conteudoEditavelDaProposta(doc: Proposta): ConteudoPropostaEditavel {
       posicao: s.posicao ?? "fim",
     })),
     modalidadeOnline: modalidadeEhOnline(doc.modalidade ?? ""),
+    textosComFormatacao: chaves.filter((k) => temFormatacaoPerdidaNoTextoPuro(origem[k])),
   };
 }
 

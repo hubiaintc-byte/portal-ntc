@@ -83,7 +83,7 @@ describe("obterPropostaCrm — conteudo editável", () => {
       { especialistaId: "", nome: "Especialista convidado", credencial: "", eixo: "" },
     ]);
     expect(p?.conteudo.modulosDetalhados).toEqual([
-      { moduloId: "10", tituloExibido: "M1", ementa: "Ementa do módulo." },
+      { moduloId: "10", tituloExibido: "M1", ementa: "Ementa do módulo.", ementaComFormatacao: false },
     ]);
   });
 
@@ -125,5 +125,47 @@ describe("obterPropostaCrm — conteudo editável", () => {
     vi.clearAllMocks();
     payloadFalso(propostaNoBanco({ modalidade: "" }));
     expect((await obterPropostaCrm("9"))?.conteudo.modalidadeOnline).toBe(false);
+  });
+});
+
+describe("obterPropostaCrm — aviso de formatação perdida", () => {
+  /** Lexical com negrito, como o `htmlParaLexical` da importação dos programas gravou. */
+  const comNegrito = {
+    root: {
+      children: [
+        {
+          type: "paragraph",
+          children: [
+            { type: "text", text: "Prazo de ", format: 0 },
+            { type: "text", text: "15 dias", format: 1 },
+          ],
+        },
+      ],
+    },
+  };
+
+  it("lista só as seções cujo texto de origem tem formatação", async () => {
+    payloadFalso(propostaNoBanco({ textoContexto: comNegrito }));
+    const p = await obterPropostaCrm("9");
+    expect(p?.conteudo.textosComFormatacao).toEqual(["contexto"]);
+  });
+
+  it("sem formatação em nenhuma seção, a lista vem vazia (nada de aviso genérico)", async () => {
+    payloadFalso(propostaNoBanco());
+    const p = await obterPropostaCrm("9");
+    expect(p?.conteudo.textosComFormatacao).toEqual([]);
+  });
+
+  it("ementa de módulo com formatação é sinalizada por item", async () => {
+    payloadFalso(
+      propostaNoBanco({
+        modulosDetalhados: [
+          { modulo: { id: 10, numero: 1, titulo: "M1" }, tituloExibido: "M1", ementa: comNegrito, id: "e1" },
+          { modulo: { id: 11, numero: 2, titulo: "M2" }, tituloExibido: "M2", ementa: null, id: "e2" },
+        ],
+      }),
+    );
+    const p = await obterPropostaCrm("9");
+    expect(p?.conteudo.modulosDetalhados.map((m) => m.ementaComFormatacao)).toEqual([true, false]);
   });
 });
