@@ -5,6 +5,8 @@ import { randomBytes } from "node:crypto";
 import {
   calcularValoresProposta,
   codigoDaVersao,
+  conteudoInicialProposta,
+  divisaoExata,
   ehEstagioLead,
   estagioDaAcaoEvento,
   exigeConfirmacaoDupla,
@@ -15,15 +17,20 @@ import {
   tituloLeadApagado,
   urlValida,
   type AcaoEvento,
+  type ConteudoInicialProposta,
+  type ContextoTextosProposta,
+  type ProgramaParaConteudo,
 } from "@ntc/lib";
-import type { RequiredDataFromCollectionSlug } from "payload";
+import type { Especialista, Modulo, Programa, Proposta } from "@ntc/types";
+import type { Payload, RequiredDataFromCollectionSlug } from "payload";
 
 import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
 import { ESFERA_LEAD_PARA_CLIENTE } from "@/lib/crm/casamento";
 import { entradasDoDocumento, registrarNaLinhaDoTempo } from "@/lib/crm/linhaDoTempo";
 import { executarEmTransacao } from "@/lib/crm/transacao";
-import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
+import { credencialDaFicha, obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
+import { textoComSubtitulosParaLexical } from "@/lib/lexicalBuilders";
 import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
 import { obterPayload } from "@/lib/payloadClient";
 
@@ -255,6 +262,196 @@ export function dadosProposta(
   };
 }
 
+// --- Conteúdo do documento da proposta (spec 2026-10-03 · Sessão 2) -------
+
+type PropostaRichText = PropostaData["textoApresentacao"];
+type PropostaModulosDetalhados = PropostaData["modulosDetalhados"];
+type ModulosDetalhadosNoBanco = NonNullable<Proposta["modulosDetalhados"]>;
+
+/**
+ * Pagantes e cortesias são distribuídos igualmente pelos módulos no quadro
+ * comercial (`linhasDoQuadro`), que devolve [] — e omite a tabela — quando a
+ * divisão não é exata. Aqui a escrita recusa antes de gravar, para o documento
+ * nunca nascer sem o quadro. Sem módulos não há o que dividir.
+ */
+function erroDeMultiplos(dados: DadosProposta): string | null {
+  const n = idsLista(dados.modulos).length;
+  if (n === 0) return null;
+  const qtdPagantes = numeroOuNulo(dados.qtdPagantes) ?? 0;
+  const cortesias = numeroOuNulo(dados.cortesias) ?? 0;
+  if (divisaoExata(qtdPagantes, n) && divisaoExata(cortesias, n)) return null;
+  return `Pagantes e cortesias precisam ser múltiplos de ${n} (número de módulos).`;
+}
+
+/** Há algum texto fora de espaços em branco neste nó Lexical (ou descendentes)? */
+function noLexicalTemTexto(no: unknown): boolean {
+  if (no === null || typeof no !== "object") return false;
+  const registro = no as Record<string, unknown>;
+  if (typeof registro.text === "string" && registro.text.trim().length > 0) return true;
+  const filhos = registro.children;
+  return Array.isArray(filhos) && filhos.some((f) => noLexicalTemTexto(f));
+}
+
+/**
+ * Documento richText com conteúdo de fato. Campo ausente, `null` e documento
+ * só com parágrafo vazio (o que o editor grava ao limpar o campo) contam
+ * todos como vazios.
+ */
+function temTextoLexical(documento: unknown): boolean {
+  if (documento === null || typeof documento !== "object") return false;
+  return noLexicalTemTexto((documento as { root?: unknown }).root);
+}
+
+/**
+ * `{ campo: documento }` quando há texto; `{}` quando não — campo ausente no
+ * objeto gravado faz o documento omitir a seção (em vez de imprimir um
+ * título com corpo vazio).
+ */
+function seTemTexto<K extends string>(
+  campo: K,
+  valor: unknown,
+): Partial<Record<K, PropostaRichText>> {
+  if (!temTextoLexical(valor)) return {};
+  return { [campo]: valor as PropostaRichText } as Record<K, PropostaRichText>;
+}
+
+/**
+ * Os cinco textos que vêm do programa, copiados tal e qual (nunca
+ * reserializados — o documento Lexical do catálogo vale como está).
+ */
+function textosDoPrograma(programa: Programa | null): Partial<PropostaData> {
+  if (programa === null) return {};
+  return {
+    ...seTemTexto("textoApresentacao", programa.visaoGeral),
+    ...seTemTexto("textoContexto", programa.problema),
+    ...seTemTexto("textoObjetivos", programa.objetivo),
+    ...seTemTexto("textoPublicoAlvo", programa.publicoAlvo),
+    ...seTemTexto("textoMetodologia", programa.metodologia),
+  };
+}
+
+/** Arrays do programa para a função pura — `?? []`, porque todos são opcionais. */
+function programaParaConteudo(programa: Programa | null): ProgramaParaConteudo | null {
+  if (programa === null) return null;
+  return {
+    eixos: (programa.eixosTematicos ?? []).map((e) => ({ titulo: e.titulo, descricao: e.descricao })),
+    diferenciais: (programa.diferenciais ?? []).map((d) => ({
+      titulo: d.titulo,
+      descricao: d.descricao ?? "",
+    })),
+    resultados: (programa.resultadosEsperados ?? []).map((r) => r.resultado),
+  };
+}
+
+/** Módulos do catálogo na ordem dos ids pedidos (o `find` não garante ordem). */
+async function modulosDoCatalogo(payload: Payload, ids: number[]): Promise<Modulo[]> {
+  if (ids.length === 0) return [];
+  const achados = await payload.find({
+    collection: "modulos",
+    where: { id: { in: ids } },
+    depth: 0,
+    limit: ids.length,
+  });
+  const porId = new Map(achados.docs.map((m) => [Number(m.id), m]));
+  return ids.map((id) => porId.get(id)).filter((m): m is Modulo => m !== undefined);
+}
+
+/**
+ * Fichas dos especialistas vinculados ao programa. O programa é buscado com
+ * `depth: 0` (ver `criarProposta`), então `docentes` chega como ids e precisa
+ * desta consulta; referências já populadas são aproveitadas sem ir ao banco.
+ */
+async function fichasDosDocentes(
+  payload: Payload,
+  refs: (number | Especialista)[],
+): Promise<Especialista[]> {
+  if (refs.length === 0) return [];
+  const porId = new Map<number, Especialista>();
+  for (const ref of refs) {
+    if (typeof ref !== "number") porId.set(Number(ref.id), ref);
+  }
+  const pendentes = refs.filter((r): r is number => typeof r === "number");
+  if (pendentes.length > 0) {
+    const achados = await payload.find({
+      collection: "especialistas",
+      where: { id: { in: pendentes } },
+      depth: 0,
+      limit: pendentes.length,
+    });
+    for (const doc of achados.docs) porId.set(Number(doc.id), doc);
+  }
+  return refs
+    .map((ref) => porId.get(typeof ref === "number" ? ref : Number(ref.id)))
+    .filter((e): e is Especialista => e !== undefined);
+}
+
+/**
+ * Tudo que a criação da proposta grava de conteúdo: os 5 textos do programa,
+ * os 7 institucionais (convertidos de texto puro para Lexical com a convenção
+ * de subtítulo "## " dos textos padrão), as 3 listas, os docentes e os módulos
+ * detalhados com a ementa do catálogo.
+ */
+function conteudoParaGravar(p: {
+  conteudo: ConteudoInicialProposta;
+  programa: Programa | null;
+  modulos: Modulo[];
+  docentes: Especialista[];
+}): Partial<PropostaData> {
+  const titulos = new Map(p.conteudo.modulosDetalhados.map((m) => [m.modulo, m.tituloExibido]));
+  const lexical = (texto: string): PropostaRichText =>
+    textoComSubtitulosParaLexical(texto) as PropostaRichText;
+  return {
+    ...textosDoPrograma(p.programa),
+    textoEventon: lexical(p.conteudo.textos.eventon),
+    textoCertificacaoReplay: lexical(p.conteudo.textos.certificacaoReplay),
+    textoCancelamento: lexical(p.conteudo.textos.cancelamento),
+    textoProtecaoConteudo: lexical(p.conteudo.textos.protecaoConteudo),
+    textoFundamentacaoLegal: lexical(p.conteudo.textos.fundamentacaoLegal),
+    textoProximosPassos: lexical(p.conteudo.textos.proximosPassos),
+    textoFechamento: lexical(p.conteudo.textos.fechamento),
+    eixos: p.conteudo.eixos,
+    diferenciais: p.conteudo.diferenciais,
+    resultados: p.conteudo.resultados,
+    docentes: p.docentes.map((ficha) => ({
+      especialista: Number(ficha.id),
+      nome: ficha.nome,
+      credencial: credencialDaFicha(ficha),
+      eixo: null,
+    })),
+    modulosDetalhados: p.modulos.map((m) => ({
+      modulo: Number(m.id),
+      tituloExibido: titulos.get(String(m.id)) ?? m.titulo,
+      ementa: m.ementa as PropostaRichText,
+    })),
+  };
+}
+
+/**
+ * Merge dos módulos detalhados na edição: entrada já existente **nunca** é
+ * sobrescrita (a edição manual do PO sobrevive a cada salvar), módulo
+ * acrescentado entra com título e ementa do catálogo naquele momento, módulo
+ * removido da seleção tem a entrada descartada. Entrada sem módulo vinculado
+ * (texto livre do PO) é preservada.
+ */
+function mesclarModulosDetalhados(
+  existentes: ModulosDetalhadosNoBanco,
+  selecionados: number[],
+  novosDoCatalogo: Modulo[],
+): PropostaModulosDetalhados {
+  const mantidas = existentes
+    .filter((e) => {
+      const id = idDeRelacionamento(e.modulo);
+      return id === null || selecionados.includes(id);
+    })
+    .map((e) => ({ ...e, modulo: idDeRelacionamento(e.modulo) }));
+  const novas = novosDoCatalogo.map((m) => ({
+    modulo: Number(m.id),
+    tituloExibido: m.titulo,
+    ementa: m.ementa as PropostaRichText,
+  }));
+  return [...mantidas, ...novas] as PropostaModulosDetalhados;
+}
+
 export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscrita> {
   // Falha fechado: id não numérico não pode chegar ao Payload como NaN.
   const leadId = idOuNulo(dados.lead);
@@ -265,6 +462,8 @@ export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscr
   // antes era opcional para a Customizada/In Company). A tela também marca o
   // select como `required`; esta é a defesa que vale para quem não passa por ela.
   if (idOuNulo(dados.programa) === null) return { ok: false, erro: "Selecione o programa." };
+  const erroMultiplos = erroDeMultiplos(dados);
+  if (erroMultiplos !== null) return { ok: false, erro: erroMultiplos };
   try {
     const payload = await obterPayload();
     const [programaDoc, clienteDoc] = await Promise.all([
@@ -272,6 +471,13 @@ export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscr
         ? payload.findByID({ collection: "programas", id: dados.programa, depth: 0 })
         : null,
       payload.findByID({ collection: "clientes-crm", id: clienteId, depth: 0 }),
+    ]);
+    // Módulos e docentes em paralelo: o programa veio com depth 0, então
+    // `docentes` são ids e precisam da consulta própria (hoje nenhum dos 15
+    // programas tem vínculo — a lista nasce vazia).
+    const [modulosCatalogo, docentes] = await Promise.all([
+      modulosDoCatalogo(payload, idsLista(dados.modulos)),
+      fichasDosDocentes(payload, programaDoc?.docentes ?? []),
     ]);
     const ano = new Date().getFullYear();
     const codigoBase = gerarCodigoBase({
@@ -292,10 +498,29 @@ export async function criarProposta(dados: DadosProposta): Promise<ResultadoEscr
     const codigo = codigoDaVersao(codigoBase, versao);
     const agora = new Date();
     const validadeDias = numeroOuNulo(dados.validadeDias) ?? 30;
+    const contextoTextos: ContextoTextosProposta = {
+      clienteOrgao: clienteDoc.orgao,
+      clienteSigla: clienteDoc.sigla ?? clienteDoc.orgao,
+      programaSigla: programaDoc?.sigla ?? "",
+      modalidade: dados.modalidade.trim(),
+      replay: dados.replay.trim(),
+      numModulos: modulosCatalogo.length,
+    };
+    const conteudo = conteudoInicialProposta({
+      programa: programaParaConteudo(programaDoc),
+      modulos: modulosCatalogo.map((m) => ({ id: String(m.id), titulo: m.titulo })),
+      contextoTextos,
+    });
     await payload.create({
       collection: "propostas",
       data: {
         ...dadosProposta(dados, clienteId, leadId, { codigoBase, codigo, versao }),
+        ...conteudoParaGravar({
+          conteudo,
+          programa: programaDoc,
+          modulos: modulosCatalogo,
+          docentes,
+        }),
         dataCriacao: agora.toISOString(),
         validade: dataValidade(validadeDias),
       },
@@ -320,19 +545,46 @@ export async function atualizarProposta(
   // ou id que não resolve são o mesmo erro — falha fechado, e nunca grava null
   // por cima de um programa já vinculado.
   if (idOuNulo(dados.programa) === null) return { ok: false, erro: "Selecione o programa." };
+  const erroMultiplos = erroDeMultiplos(dados);
+  if (erroMultiplos !== null) return { ok: false, erro: erroMultiplos };
   try {
     const payload = await obterPayload();
     // Recarrega para preservar codigoBase/codigo/versao — não são reeditáveis
     // pelo formulário (mudam só via criarVersaoProposta).
     const atual = await payload.findByID({ collection: "propostas", id, depth: 0 });
+    // Os 12 textos e as listas de conteúdo (eixos/diferenciais/resultados/
+    // docentes) ficam fora do objeto de propósito: `payload.update` é parcial,
+    // e campo ausente não é tocado — é isso que preserva o que o PO editou à
+    // mão. Só `modulosDetalhados` acompanha a seleção de módulos, e só quando
+    // ela muda.
+    const existentes: ModulosDetalhadosNoBanco = atual.modulosDetalhados ?? [];
+    const selecionados = idsLista(dados.modulos);
+    const idsExistentes = existentes
+      .map((e) => idDeRelacionamento(e.modulo))
+      .filter((n): n is number => n !== null);
+    const acrescentados = selecionados.filter((s) => !idsExistentes.includes(s));
+    const removidos = idsExistentes.filter((e) => !selecionados.includes(e));
+    const novosDoCatalogo = await modulosDoCatalogo(payload, acrescentados);
+    const mudouSelecao = acrescentados.length > 0 || removidos.length > 0;
     await payload.update({
       collection: "propostas",
       id,
-      data: dadosProposta(dados, clienteId, leadId, {
-        codigoBase: atual.codigoBase,
-        codigo: atual.codigo,
-        versao: atual.versao ?? 1,
-      }),
+      data: {
+        ...dadosProposta(dados, clienteId, leadId, {
+          codigoBase: atual.codigoBase,
+          codigo: atual.codigo,
+          versao: atual.versao ?? 1,
+        }),
+        ...(mudouSelecao
+          ? {
+              modulosDetalhados: mesclarModulosDetalhados(
+                existentes,
+                selecionados,
+                novosDoCatalogo,
+              ),
+            }
+          : {}),
+      },
     });
     return { ok: true };
   } catch (e) {

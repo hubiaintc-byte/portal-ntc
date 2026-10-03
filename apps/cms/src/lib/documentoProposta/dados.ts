@@ -162,7 +162,12 @@ function cargaHorariaTotalDosModulos(modulos: Modulo[]): string {
 }
 
 /** Credencial derivada da ficha: titulação · instituição · cargo atual. */
-function credencialDaFicha(e: Especialista): string {
+/**
+ * Credencial derivada da ficha do especialista — fallback da leitura e valor
+ * gravado na criação da proposta (`painelCrmEscrita.criarProposta`). Exportada
+ * para que as duas pontas não divirjam no formato.
+ */
+export function credencialDaFicha(e: Especialista): string {
   return [TITULACAO_TEXTO[e.titulacao] ?? "", texto(e.instituicao), texto(e.cargoAtual)]
     .map((p) => p.trim())
     .filter((p) => p.length > 0)

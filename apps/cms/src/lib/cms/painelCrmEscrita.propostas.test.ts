@@ -16,6 +16,121 @@ const base = {
   validadeDias: "30", status: "rascunho",
 };
 
+/** Documento Lexical mínimo, no shape que o Payload grava em campo richText. */
+function lex(texto: string): Record<string, unknown> {
+  return {
+    root: {
+      type: "root",
+      format: "",
+      indent: 0,
+      version: 1,
+      direction: "ltr",
+      children: [
+        {
+          type: "paragraph",
+          format: "",
+          indent: 0,
+          version: 1,
+          direction: "ltr",
+          children: [{ type: "text", format: 0, mode: "normal", style: "", text: texto, version: 1, detail: 0 }],
+        },
+      ],
+    },
+  };
+}
+
+const programaCompleto: Record<string, unknown> = {
+  id: 2,
+  sigla: "EDUTEC",
+  nomeCompleto: "Programa EDUTEC",
+  visaoGeral: lex("Visão geral do programa."),
+  problema: lex("O problema que o programa enfrenta."),
+  objetivo: lex("O objetivo do programa."),
+  publicoAlvo: lex("Gestores da rede."),
+  metodologia: lex("Metodologia do programa."),
+  eixosTematicos: [
+    { titulo: "Eixo 1", descricao: "Descrição do eixo 1." },
+    { titulo: "Eixo 2", descricao: "Descrição do eixo 2." },
+  ],
+  diferenciais: [{ titulo: "Diferencial 1", descricao: "Descrição do diferencial." }],
+  resultadosEsperados: [{ resultado: "Resultado A." }, { resultado: "Resultado B." }],
+  docentes: [11],
+};
+
+const clienteBase: Record<string, unknown> = {
+  id: 1,
+  orgao: "Secretaria Municipal de Educação de Exemplo",
+  sigla: "SME-EX",
+  uf: "SP",
+};
+
+const moduloM1: Record<string, unknown> = {
+  id: 10,
+  numero: 1,
+  titulo: "Módulo 1 do catálogo",
+  cargaHoraria: "8 horas",
+  ementa: lex("Ementa do módulo 1."),
+};
+
+const moduloM2: Record<string, unknown> = {
+  id: 11,
+  numero: 2,
+  titulo: "Módulo 2 do catálogo",
+  cargaHoraria: "8 horas",
+  ementa: lex("Ementa do módulo 2."),
+};
+
+const especialista: Record<string, unknown> = {
+  id: 11,
+  nome: "Ana Ribeiro",
+  titulacao: "doutorado",
+  instituicao: "USP",
+  cargoAtual: "Pesquisadora",
+};
+
+interface OpcoesPayloadFalso {
+  programa?: Record<string, unknown> | null;
+  cliente?: Record<string, unknown>;
+  modulos?: Record<string, unknown>[];
+  especialistas?: Record<string, unknown>[];
+  proposta?: Record<string, unknown>;
+}
+
+function payloadFalso(opcoes: OpcoesPayloadFalso = {}) {
+  const create = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 1, ...data }));
+  const update = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 9, ...data }));
+  const findByID = vi.fn(async ({ collection }: { collection: string }) => {
+    if (collection === "programas") return opcoes.programa ?? programaCompleto;
+    if (collection === "clientes-crm") return opcoes.cliente ?? clienteBase;
+    if (collection === "propostas") {
+      return (
+        opcoes.proposta ?? {
+          id: 9,
+          codigoBase: "NTC-PROP-2026-EDUTEC-SP-SME",
+          codigo: "NTC-PROP-2026-EDUTEC-SP-SME-v01",
+          versao: 1,
+          modulosDetalhados: [],
+        }
+      );
+    }
+    throw new Error(`findByID inesperado: ${collection}`);
+  });
+  const find = vi.fn(async ({ collection }: { collection: string }) => {
+    if (collection === "propostas") return { docs: [] };
+    if (collection === "modulos") return { docs: opcoes.modulos ?? [] };
+    if (collection === "especialistas") return { docs: opcoes.especialistas ?? [] };
+    throw new Error(`find inesperado: ${collection}`);
+  });
+  obterPayloadMock.mockResolvedValue({ create, update, findByID, find });
+  return { create, update, findByID, find };
+}
+
+/** Dados do `payload.create`/`payload.update` da primeira chamada. */
+function dadosDaChamada(mock: ReturnType<typeof vi.fn>): Record<string, unknown> {
+  const chamada = mock.mock.calls[0]![0] as { data: Record<string, unknown> };
+  return chamada.data;
+}
+
 describe("dadosProposta", () => {
   it("grava derivados calculados", () => {
     const d = dadosProposta(
@@ -76,5 +191,227 @@ describe("programa obrigatório na proposta (decisão do PO, 30/09/2026)", () =>
       erro: "Selecione o programa.",
     });
     expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("pagantes e cortesias múltiplos do número de módulos", () => {
+  const erro = "Pagantes e cortesias precisam ser múltiplos de 2 (número de módulos).";
+
+  it("criarProposta recusa pagantes não múltiplo, sem tocar o banco", async () => {
+    const { create } = payloadFalso({ modulos: [moduloM1, moduloM2] });
+    expect(await criarProposta({ ...base, modulos: ["10", "11"], qtdPagantes: "5", cortesias: "0" })).toEqual({
+      ok: false,
+      erro,
+    });
+    expect(create).not.toHaveBeenCalled();
+    expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+
+  it("criarProposta recusa cortesias não múltiplo, sem tocar o banco", async () => {
+    const { create } = payloadFalso({ modulos: [moduloM1, moduloM2] });
+    expect(await criarProposta({ ...base, modulos: ["10", "11"], qtdPagantes: "10", cortesias: "3" })).toEqual({
+      ok: false,
+      erro,
+    });
+    expect(create).not.toHaveBeenCalled();
+    expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+
+  it("atualizarProposta recusa pagantes não múltiplo, sem tocar o banco", async () => {
+    const { update } = payloadFalso({ modulos: [moduloM1, moduloM2] });
+    expect(await atualizarProposta("9", { ...base, modulos: ["10", "11"], qtdPagantes: "7" })).toEqual({
+      ok: false,
+      erro,
+    });
+    expect(update).not.toHaveBeenCalled();
+    expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+
+  it("atualizarProposta recusa cortesias não múltiplo, sem tocar o banco", async () => {
+    const { update } = payloadFalso({ modulos: [moduloM1, moduloM2] });
+    expect(await atualizarProposta("9", { ...base, modulos: ["10", "11"], qtdPagantes: "10", cortesias: "1" })).toEqual({
+      ok: false,
+      erro,
+    });
+    expect(update).not.toHaveBeenCalled();
+    expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+
+  it("sem módulos a regra não se aplica", async () => {
+    const { create } = payloadFalso();
+    expect(await criarProposta({ ...base, modulos: [], qtdPagantes: "5", cortesias: "3" })).toEqual({ ok: true });
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it("múltiplo exato é aceito", async () => {
+    const { create } = payloadFalso({ modulos: [moduloM1, moduloM2] });
+    expect(
+      await criarProposta({ ...base, modulos: ["10", "11"], qtdPagantes: "10", cortesias: "2" }),
+    ).toEqual({ ok: true });
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("criarProposta grava o conteúdo do documento", () => {
+  it("copia os 5 textos do programa tal e qual", async () => {
+    const { create } = payloadFalso({ especialistas: [especialista] });
+    expect(await criarProposta({ ...base })).toEqual({ ok: true });
+    const data = dadosDaChamada(create);
+    expect(data.textoApresentacao).toEqual(programaCompleto.visaoGeral);
+    expect(data.textoContexto).toEqual(programaCompleto.problema);
+    expect(data.textoObjetivos).toEqual(programaCompleto.objetivo);
+    expect(data.textoPublicoAlvo).toEqual(programaCompleto.publicoAlvo);
+    expect(data.textoMetodologia).toEqual(programaCompleto.metodologia);
+  });
+
+  it("grava os 7 institucionais em Lexical, com subtítulo h3 na certificação", async () => {
+    const { create } = payloadFalso({ especialistas: [especialista] });
+    await criarProposta({ ...base, replay: "30 dias" });
+    const data = dadosDaChamada(create);
+    const chaves = [
+      "textoEventon",
+      "textoCertificacaoReplay",
+      "textoCancelamento",
+      "textoProtecaoConteudo",
+      "textoFundamentacaoLegal",
+      "textoProximosPassos",
+      "textoFechamento",
+    ];
+    for (const chave of chaves) {
+      const doc = data[chave] as { root: { children: { type: string }[] } };
+      expect(doc.root.children.length, chave).toBeGreaterThan(0);
+      expect(doc.root.children[0]!.type, chave).toBeTypeOf("string");
+    }
+    const certificacao = data.textoCertificacaoReplay as {
+      root: { children: { type: string; tag?: string; children?: { text?: string }[] }[] };
+    };
+    expect(certificacao.root.children[0]?.type).toBe("heading");
+    expect(certificacao.root.children[0]?.tag).toBe("h3");
+    expect(certificacao.root.children[0]?.children?.[0]?.text).toBe("Certificação");
+    // Interpolação do contexto chegou ao texto gravado.
+    const fechamento = data.textoFechamento as { root: { children: { children?: { text?: string }[] }[] } };
+    expect(fechamento.root.children[0]?.children?.[0]?.text).toContain(
+      "Secretaria Municipal de Educação de Exemplo",
+    );
+  });
+
+  it("grava eixos, diferenciais, resultados e docentes", async () => {
+    const { create } = payloadFalso({ especialistas: [especialista] });
+    await criarProposta({ ...base });
+    const data = dadosDaChamada(create);
+    expect(data.eixos).toEqual([
+      { titulo: "Eixo 1", descricao: "Descrição do eixo 1." },
+      { titulo: "Eixo 2", descricao: "Descrição do eixo 2." },
+    ]);
+    expect(data.diferenciais).toEqual([
+      { titulo: "Diferencial 1", descricao: "Descrição do diferencial." },
+    ]);
+    expect(data.resultados).toEqual([{ texto: "Resultado A." }, { texto: "Resultado B." }]);
+    expect(data.docentes).toEqual([
+      { especialista: 11, nome: "Ana Ribeiro", credencial: "Doutorado · USP · Pesquisadora", eixo: null },
+    ]);
+  });
+
+  it("programa sem conteúdo não grava os campos correspondentes", async () => {
+    const { create } = payloadFalso({ programa: { id: 2, sigla: "FUTURA", nomeCompleto: "Futura" } });
+    expect(await criarProposta({ ...base })).toEqual({ ok: true });
+    const data = dadosDaChamada(create);
+    for (const chave of [
+      "textoApresentacao",
+      "textoContexto",
+      "textoObjetivos",
+      "textoPublicoAlvo",
+      "textoMetodologia",
+    ]) {
+      expect(chave in data, chave).toBe(false);
+    }
+    expect(data.eixos).toEqual([]);
+    expect(data.diferenciais).toEqual([]);
+    expect(data.resultados).toEqual([]);
+    expect(data.docentes).toEqual([]);
+    // Os institucionais não dependem do programa.
+    expect(data.textoFechamento).toBeDefined();
+  });
+
+  it("modulosDetalhados nasce com um item por módulo, com ementa do catálogo", async () => {
+    const { create } = payloadFalso({ modulos: [moduloM1, moduloM2] });
+    await criarProposta({ ...base, modulos: ["10", "11"], qtdPagantes: "10", cortesias: "0" });
+    const data = dadosDaChamada(create);
+    expect(data.modulosDetalhados).toEqual([
+      { modulo: 10, tituloExibido: "Módulo 1 do catálogo", ementa: moduloM1.ementa },
+      { modulo: 11, tituloExibido: "Módulo 2 do catálogo", ementa: moduloM2.ementa },
+    ]);
+  });
+});
+
+describe("atualizarProposta e os módulos detalhados", () => {
+  const propostaComM1: Record<string, unknown> = {
+    id: 9,
+    codigoBase: "NTC-PROP-2026-EDUTEC-SP-SME",
+    codigo: "NTC-PROP-2026-EDUTEC-SP-SME-v01",
+    versao: 1,
+    modulosDetalhados: [
+      { id: "a1", modulo: 10, tituloExibido: "Título editado à mão", ementa: lex("Ementa editada à mão.") },
+    ],
+  };
+
+  it("módulo acrescentado entra sem mexer nas entradas existentes", async () => {
+    const { update } = payloadFalso({ proposta: propostaComM1, modulos: [moduloM2] });
+    expect(
+      await atualizarProposta("9", { ...base, modulos: ["10", "11"], qtdPagantes: "10", cortesias: "0" }),
+    ).toEqual({ ok: true });
+    const data = dadosDaChamada(update);
+    expect(data.modulosDetalhados).toEqual([
+      { id: "a1", modulo: 10, tituloExibido: "Título editado à mão", ementa: lex("Ementa editada à mão.") },
+      { modulo: 11, tituloExibido: "Módulo 2 do catálogo", ementa: moduloM2.ementa },
+    ]);
+  });
+
+  it("módulo removido tem a entrada descartada", async () => {
+    const proposta: Record<string, unknown> = {
+      ...propostaComM1,
+      modulosDetalhados: [
+        { id: "a1", modulo: 10, tituloExibido: "Título editado à mão", ementa: lex("Ementa editada à mão.") },
+        { id: "a2", modulo: 11, tituloExibido: "Módulo 2 do catálogo", ementa: moduloM2.ementa },
+      ],
+    };
+    const { update } = payloadFalso({ proposta });
+    expect(await atualizarProposta("9", { ...base, modulos: ["10"], qtdPagantes: "10" })).toEqual({ ok: true });
+    const data = dadosDaChamada(update);
+    expect(data.modulosDetalhados).toEqual([
+      { id: "a1", modulo: 10, tituloExibido: "Título editado à mão", ementa: lex("Ementa editada à mão.") },
+    ]);
+  });
+
+  it("não inclui os 12 textos nem as outras listas no update", async () => {
+    const { update } = payloadFalso({ proposta: propostaComM1, modulos: [moduloM2] });
+    await atualizarProposta("9", { ...base, modulos: ["10", "11"], qtdPagantes: "10" });
+    const data = dadosDaChamada(update);
+    for (const chave of [
+      "textoApresentacao",
+      "textoContexto",
+      "textoObjetivos",
+      "textoPublicoAlvo",
+      "textoMetodologia",
+      "textoEventon",
+      "textoCertificacaoReplay",
+      "textoCancelamento",
+      "textoProtecaoConteudo",
+      "textoFundamentacaoLegal",
+      "textoProximosPassos",
+      "textoFechamento",
+      "eixos",
+      "diferenciais",
+      "resultados",
+      "docentes",
+    ]) {
+      expect(chave in data, chave).toBe(false);
+    }
+  });
+
+  it("seleção de módulos inalterada não reescreve modulosDetalhados", async () => {
+    const { update } = payloadFalso({ proposta: propostaComM1 });
+    expect(await atualizarProposta("9", { ...base, modulos: ["10"], qtdPagantes: "10" })).toEqual({ ok: true });
+    expect("modulosDetalhados" in dadosDaChamada(update)).toBe(false);
   });
 });
