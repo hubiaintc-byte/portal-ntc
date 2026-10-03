@@ -2220,6 +2220,24 @@ body {
   color: var(--pcms-grafite);
 }
 .pcms-conteudo__secao summary::-webkit-details-marker { display: none; }
+/* Indicador próprio de abrir/fechar: o marcador nativo foi suprimido acima, e
+   18 seções fechadas sem nada no lugar não dizem que expandem. Chevron linear
+   de peso 1.5 (CLAUDE.md §3), apontando para a direita fechado e para baixo
+   aberto. */
+.pcms-conteudo__secao summary::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--pcms-oxford);
+  border-bottom: 1.5px solid var(--pcms-oxford);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+}
+.pcms-conteudo__secao[open] summary::before { transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) {
+  .pcms-conteudo__secao summary::before { transition: none; }
+}
 .pcms-conteudo__secao summary:focus-visible { outline: 2px solid var(--pcms-oxford); outline-offset: -2px; }
 .pcms-conteudo__titulo { color: var(--pcms-oxford); font-weight: 600; }
 .pcms-conteudo__selo {
@@ -2232,6 +2250,8 @@ body {
   background: var(--pcms-pergaminho);
 }
 .pcms-conteudo__selo--sujo { color: var(--pcms-cardeal); border-color: var(--pcms-cardeal); background: #fff; }
+/* Seção cujo texto de origem tem negrito: salvar em texto puro o remove. */
+.pcms-conteudo__selo--formatacao { color: var(--pcms-dourado); border-color: var(--pcms-dourado); background: #fff; }
 .pcms-conteudo__corpo {
   display: flex;
   flex-direction: column;
@@ -2247,6 +2267,7 @@ body {
   background: var(--pcms-pergaminho);
   font-size: 0.85rem;
 }
+.pcms-conteudo__aviso--formatacao { border-left-color: var(--pcms-cardeal); }
 .pcms-conteudo__itens { display: flex; flex-direction: column; gap: 10px; }
 .pcms-conteudo__item {
   display: flex;

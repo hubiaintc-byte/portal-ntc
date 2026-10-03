@@ -45,6 +45,11 @@ export function DetalheProposta({
   onAtualizado,
 }: DetalheStatusProps) {
   const [novaVersaoAberta, setNovaVersaoAberta] = useState(false);
+  // Seções do bloco de conteúdo com alteração não salva — "Editar" e "Voltar"
+  // desmontam o detalhe inteiro, e sem este guarda a prosa digitada e não
+  // salva ia embora sem aviso.
+  const [secoesSujas, setSecoesSujas] = useState(0);
+  const [saidaPendente, setSaidaPendente] = useState<"voltar" | "editar" | null>(null);
   const [motivo, setMotivo] = useState("");
   const [envioAberto, setEnvioAberto] = useState(false);
   const [envio, setEnvio] = useState<DadosEnvio>({
@@ -63,6 +68,18 @@ export function DetalheProposta({
     { rotulo: "Envios registrados", valor: String(p.envios.length) },
   ];
 
+  function sair(tipo: "voltar" | "editar") {
+    setSaidaPendente(null);
+    if (tipo === "voltar") onVoltar();
+    else onEditar();
+  }
+
+  /** Com rascunho pendente, o primeiro clique só pede confirmação (sem window.confirm). */
+  function tentarSair(tipo: "voltar" | "editar") {
+    if (secoesSujas > 0) setSaidaPendente(tipo);
+    else sair(tipo);
+  }
+
   function confirmarNovaVersao() {
     if (motivo.trim() === "") return;
     onNovaVersao(p.codigoBase, motivo.trim());
@@ -79,7 +96,7 @@ export function DetalheProposta({
 
   return (
     <>
-      <button type="button" className="pcms-breadcrumb" onClick={onVoltar}>
+      <button type="button" className="pcms-breadcrumb" onClick={() => tentarSair("voltar")}>
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M15 18l-6-6 6-6" />
         </svg>
@@ -109,11 +126,44 @@ export function DetalheProposta({
           >
             {gerandoPdf ? "Gerando…" : "Gerar PDF"}
           </button>
-          <button type="button" className="pcms-btn pcms-btn--ghost" onClick={onEditar}>
+          <button
+            type="button"
+            className="pcms-btn pcms-btn--ghost"
+            onClick={() => tentarSair("editar")}
+          >
             Editar
           </button>
         </div>
       </div>
+
+      {saidaPendente !== null && (
+        <div className="pcms-conteudo__confirmar pcms-conteudo__confirmar--tudo" role="alert">
+          <p>
+            {secoesSujas === 1
+              ? "1 seção do conteúdo do documento tem alteração não salva."
+              : `${secoesSujas} seções do conteúdo do documento têm alteração não salva.`}{" "}
+            {saidaPendente === "voltar"
+              ? "Voltar para a lista agora descarta o que você digitou."
+              : "Abrir o formulário agora descarta o que você digitou."}
+          </p>
+          <div className="pcms-conteudo__acoes">
+            <button
+              type="button"
+              className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+              onClick={() => setSaidaPendente(null)}
+            >
+              Continuar editando
+            </button>
+            <button
+              type="button"
+              className="pcms-btn pcms-btn--perigo pcms-btn--mini"
+              onClick={() => sair(saidaPendente)}
+            >
+              {saidaPendente === "voltar" ? "Sair sem salvar" : "Editar sem salvar"}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="pcms-metricas">
         {metricas.map((m) => (
@@ -207,6 +257,7 @@ export function DetalheProposta({
         conteudo={p.conteudo}
         catalogo={catalogo}
         onAtualizado={onAtualizado}
+        onSujasMudou={setSecoesSujas}
       />
 
       <section className="pcms-det-bloco">
