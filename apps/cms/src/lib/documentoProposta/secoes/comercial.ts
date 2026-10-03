@@ -12,6 +12,7 @@ import type { DadosDocumentoProposta } from "../dados";
 import {
   esc,
   formatarDataDocumentoOpcional,
+  horasDoTotalDosModulos,
   formatarInteiroDocumento,
   formatarMoedaDocumento,
   formatarPercentualDocumento,
@@ -82,8 +83,9 @@ function montarObjeto(d: DadosDocumentoProposta): string {
   const lista = legiveis.map((m) => `Módulo ${esc(m.num)} · ${esc(m.titulo)}`);
   const especificamente = lista.length > 0 ? `, especificamente: ${lista.join(", ")}` : "";
 
-  const horas = /^(\d+)h\b/.exec(d.cargaHorariaTotalModulos.trim())?.[1];
-  const totalizando = horas ? `, totalizando <strong>${esc(horas)} horas formativas</strong>` : "";
+  const horas = horasDoTotalDosModulos(d.cargaHorariaTotalModulos);
+  const totalizando =
+    horas === null ? "" : `, totalizando <strong>${horas} horas formativas</strong>`;
 
   const modalidade = util(d.modalidade);
   const emModalidade = modalidade ? `, em modalidade <strong>${esc(modalidade)}</strong>` : "";

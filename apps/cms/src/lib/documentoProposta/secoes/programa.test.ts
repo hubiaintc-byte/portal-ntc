@@ -155,6 +155,22 @@ describe("secoesDeConteudo", () => {
     expect(html).not.toContain('<div class="grid2">');
   });
 
+  it("Arquitetura imprime a carga horária total só quando ela começa por horas", () => {
+    const html = porChave(BASE, "arquitetura");
+    expect(html).toContain("carga horária total de <strong>24h</strong>");
+    expect(html).toContain("Carga Horária Total");
+  });
+
+  it("contagem de módulos sem horas NÃO é impressa como carga horária", () => {
+    // "3 módulos" é o que dados.ts devolve quando as cargas dos módulos são
+    // heterogêneas ("8h" e "16h") ou compostas ("16h · 2 dias"): não há total
+    // a afirmar, então a caixa e o trecho do parágrafo somem.
+    const html = porChave({ ...BASE, cargaHorariaTotalModulos: "3 módulos" }, "arquitetura");
+    expect(html).not.toContain("Carga Horária Total");
+    expect(html).not.toContain("carga horária total de");
+    expect(html).toContain("<strong>3 módulos-evento</strong>");
+  });
+
   it("Arquitetura sem nenhum dado sai com corpo vazio, em vez de prosa sem informação", () => {
     expect(porChave(VAZIO, "arquitetura")).toBe("");
   });

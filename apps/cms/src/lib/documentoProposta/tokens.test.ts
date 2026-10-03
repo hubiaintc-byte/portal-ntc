@@ -32,4 +32,22 @@ describe("cssBaseProposta", () => {
     expect(css).not.toContain("@top-left");
     expect(css).not.toContain("@bottom-right");
   });
+
+  // As duas regras abaixo divergem do modelo DE PROPÓSITO, e a divergência tem
+  // de sobreviver a uma futura passada de "fidelidade ao modelo":
+  // o Chromium não implementa `@page :first`, então as margens de 22mm (topo) e
+  // 20mm (base) que o gerador aplica valem para TODAS as páginas, inclusive a
+  // capa. No modelo é o `@page` que dá a altura cheia e o recuo horizontal.
+  it("desconta do altura da capa a margem que o PDF aplica em todas as páginas", () => {
+    // Capa com 297mm cheios transborda 42mm para uma segunda página quase em
+    // branco — bug corrigido na Fase B2 e que a Task 10 reencontrou.
+    expect(cssBaseProposta()).toContain("calc(297mm - 42mm)");
+    expect(cssBaseProposta()).not.toContain("height:297mm;padding:22mm");
+  });
+
+  it("recua o corpo do documento, já que a margem left/right do PDF é zero", () => {
+    // left/right = 0 existe para a capa sangrar de borda a borda; sem este
+    // padding o texto das seções encostaria na borda do papel.
+    expect(cssBaseProposta()).toContain(".body-wrap{padding:0 18mm}");
+  });
 });

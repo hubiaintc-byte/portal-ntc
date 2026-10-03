@@ -82,6 +82,12 @@ describe("montarCapa", () => {
       expect(html).toContain(t);
   });
   it("não vaza undefined/NaN/null", () => expect(html).not.toMatch(SUJO));
+  it("contagem de módulos sem horas NÃO é impressa como carga horária", () => {
+    const h = montarCapa({ ...BASE, cargaHorariaTotalModulos: "3 módulos" });
+    expect(h).not.toContain("Carga Horária");
+    expect(h).not.toContain("3 módulos");
+    expect(h).not.toMatch(SUJO);
+  });
   it("sem sigla, não imprime 'Programa ' solto nem subtitulo vazio", () => {
     const h = montarCapa({ ...BASE, programaSigla: "", subtitulo: "" });
     expect(h).not.toContain("Programa </div>");
@@ -108,6 +114,19 @@ describe("montarResumoExecutivo", () => {
   it("sem módulos não imprime decomposição por módulo", () => {
     const h = montarResumoExecutivo({ ...BASE, itens: [], cargaHorariaTotalModulos: "" });
     expect(h).not.toContain("por módulo");
+    expect(h).not.toContain("Carga Horária Total");
+    expect(h).not.toMatch(SUJO);
+  });
+  it("imprime a carga horária total quando ela começa por horas", () => {
+    const h = montarResumoExecutivo(BASE);
+    expect(h).toContain("Carga Horária Total");
+    expect(h).toContain("24h");
+  });
+  it("contagem de módulos sem horas NÃO é impressa como carga horária", () => {
+    // dados.ts devolve só a contagem ("3 módulos") quando as cargas dos
+    // módulos são heterogêneas ou ilegíveis; imprimir isso sob o rótulo
+    // "Carga Horária Total" num documento contratual seria afirmar o errado.
+    const h = montarResumoExecutivo({ ...BASE, cargaHorariaTotalModulos: "3 módulos" });
     expect(h).not.toContain("Carga Horária Total");
     expect(h).not.toMatch(SUJO);
   });

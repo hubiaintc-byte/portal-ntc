@@ -25,7 +25,7 @@ import type {
   DocenteDocumento,
   ModuloDetalhadoDocumento,
 } from "../dados";
-import { esc } from "../formato";
+import { cargaHorariaTotalCurta, esc } from "../formato";
 import type { SecaoDocumento } from "../montar";
 
 /** Valor útil para imprimir: não vazio, sem o marcador "—" nem "A definir". */
@@ -48,16 +48,13 @@ function caixa(rotulo: string, valor: string, classeValor: "value" | "text"): st
 
 // --- Arquitetura da Solução (9) ---------------------------------------------
 
-/** "24h" a partir de "24h · 3 módulos · 8h por módulo"; senão, o texto inteiro. */
-function cargaHorariaCurta(v: string): string {
-  const t = util(v);
-  return /^(\d+\s*h)\b/.exec(t)?.[1] ?? t;
-}
-
 function montarArquitetura(d: DadosDocumentoProposta): string {
   const n = d.modulosDetalhados.length;
   const sigla = d.programaSigla.trim();
-  const carga = cargaHorariaCurta(d.cargaHorariaTotalModulos);
+  // Só horas legíveis entram: "3 módulos" (cargas heterogêneas) não é carga
+  // horária, então a caixa e o trecho do parágrafo somem — ver
+  // `horasDoTotalDosModulos` em ../formato.
+  const carga = cargaHorariaTotalCurta(d.cargaHorariaTotalModulos);
   const modalidade = util(d.modalidade);
   const replay = util(d.replay);
   const eixos = d.eixos.filter((e) => e.titulo.trim() || e.descricao.trim());

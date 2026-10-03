@@ -10,6 +10,7 @@ import { divisaoExata } from "@ntc/lib";
 
 import type { DadosDocumentoProposta } from "./dados";
 import {
+  cargaHorariaTotalLegivel,
   esc,
   formatarDataDocumentoOpcional,
   formatarInteiroDocumento,
@@ -90,7 +91,9 @@ export function montarCapa(d: DadosDocumentoProposta): string {
     itemMeta("UF · Município", ufMunicipio),
     itemMeta("Dirigente", d.clienteDirigente),
     itemMeta("Modalidade", d.modalidade),
-    itemMeta("Carga Horária", d.cargaHorariaTotalModulos),
+    // Sem horas legíveis no campo não há carga horária a imprimir: "3 módulos"
+    // sob o rótulo "Carga Horária" afirmaria o que o dado não diz.
+    itemMeta("Carga Horária", cargaHorariaTotalLegivel(d.cargaHorariaTotalModulos)),
     itemMeta("Participantes", participantes),
     itemMeta("Emissão", formatarDataDocumentoOpcional(d.dataCriacaoISO)),
     itemMeta("Validade", formatarDataDocumentoOpcional(d.validadeISO)),
@@ -211,8 +214,8 @@ export function montarResumoExecutivo(d: DadosDocumentoProposta): string {
     card("Programa", sigla || d.programaNome, "", true),
     card("Escopo Contratado", escopo, n > 0 ? `${n} ${n === 1 ? "módulo-evento" : "módulos-evento"} institucionais` : ""),
     presente(d.modalidade) ? card("Modalidade", d.modalidade, "", true) : "",
-    presente(d.cargaHorariaTotalModulos)
-      ? card("Carga Horária Total", d.cargaHorariaTotalModulos, "")
+    cargaHorariaTotalLegivel(d.cargaHorariaTotalModulos)
+      ? card("Carga Horária Total", cargaHorariaTotalLegivel(d.cargaHorariaTotalModulos), "")
       : "",
     d.qtdPagantes > 0
       ? card(
