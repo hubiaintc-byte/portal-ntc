@@ -131,3 +131,9 @@ export {
   exigeConfirmacaoDupla,
   tituloLeadApagado,
 } from "./crm/exclusao";
+
+export {
+  textosPadraoProposta,
+  type ContextoTextosProposta,
+  type ChaveTextoInstitucional,
+} from "./crm/textosProposta";
