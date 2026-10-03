@@ -20,7 +20,7 @@ describe("montarSecoes", () => {
     const r = montarSecoes([base[0]!, { chave: "docentes", titulo: "Corpo Docente", corpoHtml: "" }, ...base.slice(1)], []);
     expect(r.secoes.map((s) => s.chave)).toEqual(["identificacao", "quadro-comercial", "condicoes-comerciais", "fechamento"]);
     expect(r.secoes.map((s) => s.numero)).toEqual([3, 4, 5, 6]);
-    expect(r.omitidas).toEqual(["docentes"]);
+    expect(r.omitidas).toEqual([{ chave: "docentes", titulo: "Corpo Docente" }]);
   });
 
   it("insere antes do Quadro Comercial", () => {
@@ -55,8 +55,34 @@ describe("montarSecoes", () => {
     expect(t[t.length - 2]).toBe("Órfã");
   });
 
-  it("extra de corpo vazio é descartada", () => {
-    expect(montarSecoes(base, [{ titulo: "Vazia", corpoHtml: "", posicao: "fim" }]).secoes.map((s) => s.titulo)).not.toContain("Vazia");
+  it("extra de corpo vazio é descartada e relatada", () => {
+    const r = montarSecoes(base, [{ titulo: "Vazia", corpoHtml: "", posicao: "fim" }]);
+    expect(r.secoes.map((s) => s.titulo)).not.toContain("Vazia");
+    expect(r.omitidas).toEqual([{ chave: "", titulo: "Vazia" }]);
+  });
+
+  it("extra com corpo e SEM título não entra: cabeçalho numerado sem título é proibido", () => {
+    const r = montarSecoes(base, [{ titulo: "   ", corpoHtml: "<p>texto digitado</p>", posicao: "fim" }]);
+    expect(r.secoes.map((s) => s.titulo)).toEqual(base.map((s) => s.titulo));
+    expect(r.secoes.map((s) => s.numero)).toEqual([3, 4, 5, 6]);
+    expect(r.omitidas).toEqual([{ chave: "", titulo: "Seção extra sem título" }]);
+  });
+
+  it("relata as omitidas com o título, para o relatório de geração", () => {
+    const r = montarSecoes(
+      [
+        base[0]!,
+        { chave: "docentes", titulo: "Corpo Docente e Curadoria", corpoHtml: "" },
+        { chave: "eventon", titulo: "Condições de Participação", corpoHtml: "   " },
+        ...base.slice(1),
+      ],
+      [{ titulo: "Anexo", corpoHtml: "", posicao: "fim" }],
+    );
+    expect(r.omitidas.map((o) => o.titulo)).toEqual([
+      "Corpo Docente e Curadoria",
+      "Condições de Participação",
+      "Anexo",
+    ]);
   });
 
   it("lista vazia não quebra", () => {

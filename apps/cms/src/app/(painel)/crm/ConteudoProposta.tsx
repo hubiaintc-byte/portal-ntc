@@ -45,7 +45,7 @@ const POSICOES_EXTRA: OpcaoLista[] = [
 
 const AVISO_RESTAURO = "Isso sobrescreve o que você editou nesta seção.";
 const AVISO_RESTAURO_TUDO =
-  "Isso sobrescreve o que você editou em todas as seções, voltando ao texto padrão do programa e aos textos institucionais. O Corpo Docente e as Seções extras não são tocados — o corpo docente tem o botão próprio dele.";
+  "Isso sobrescreve o que você editou em todas as seções, voltando ao texto padrão do programa e aos textos institucionais — inclusive os Módulos contratados, cujo título exibido e ementa editados à mão voltam ao texto do catálogo. O Corpo Docente e as Seções extras não são tocados — o corpo docente tem o botão próprio dele.";
 const AVISO_FORMATACAO =
   "O texto de origem desta seção tem formatação (negrito, itálico ou lista numerada) que este editor de texto puro não carrega: SALVAR ESTA SEÇÃO REMOVE ESSES DESTAQUES no documento. Enquanto você não salvar, o PDF continua saindo com eles. Editor com formatação é escopo da Sessão 5.";
 
@@ -879,8 +879,11 @@ function SecaoExtras({ propostaId, valorInicial, onAtualizado }: SecaoExtrasProp
   const { salvando, erro, salvar } = useSalvarSecao(propostaId, "secoesExtras");
   const novaChave = useProximaChave();
 
+  // Título E corpo: o documento omite a extra sem título (`montarSecoes`),
+  // porque um cabeçalho numerado sem título é o que o spec §1.1 proíbe. O selo
+  // tem de dizer a verdade — antes mostrava "vai sair" para corpo sem título.
   const comConteudo = valor.filter(
-    (s) => s.titulo.trim().length > 0 || s.corpo.trim().length > 0,
+    (s) => s.titulo.trim().length > 0 && s.corpo.trim().length > 0,
   );
 
   return (
@@ -894,7 +897,7 @@ function SecaoExtras({ propostaId, valorInicial, onAtualizado }: SecaoExtrasProp
       sujo={sujo}
       salvando={salvando}
       erro={erro}
-      aviso="Seções livres do documento (observações, anexos textuais). Não têm padrão: 'Restaurar tudo' nunca as apaga."
+      aviso="Seções livres do documento (observações, anexos textuais). Precisam de título E corpo para sair no documento. Não têm padrão: 'Restaurar tudo' nunca as apaga."
       onDesfazer={desfazer}
       onSalvar={() =>
         salvar(

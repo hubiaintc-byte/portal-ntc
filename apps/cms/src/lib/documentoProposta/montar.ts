@@ -23,9 +23,19 @@ export interface SecaoNumerada extends SecaoDocumento {
   numero: number;
 }
 
+/**
+ * Seção que ficou FORA do documento, para o relatório de geração (spec §1.1:
+ * "a omissão sai no relatório de geração"). `chave` é vazia na seção extra, que
+ * não tem chave do modelo.
+ */
+export interface SecaoOmitida {
+  chave: string;
+  titulo: string;
+}
+
 export interface ResultadoMontagem {
   secoes: SecaoNumerada[];
-  omitidas: string[];
+  omitidas: SecaoOmitida[];
 }
 
 const PRIMEIRO_NUMERO = 3;
@@ -53,19 +63,30 @@ function indiceDeInsercao(secoes: SecaoDocumento[], posicao: PosicaoExtra): numb
 }
 
 export function montarSecoes(base: SecaoDocumento[], extras: SecaoExtra[]): ResultadoMontagem {
-  const omitidas: string[] = [];
+  const omitidas: SecaoOmitida[] = [];
   const presentes: SecaoDocumento[] = [];
   for (const s of base) {
     if (temCorpo(s.corpoHtml)) presentes.push(s);
-    else omitidas.push(s.chave);
+    else omitidas.push({ chave: s.chave, titulo: s.titulo });
+  }
+
+  // Extra entra so com titulo E corpo. Titulo vazio renderizaria um cabecalho
+  // numerado sem titulo (`<h2><span class="num">N</span></h2>`), exatamente o
+  // que o spec §1.1 proibe; omitir aqui preserva o que foi digitado, em vez de
+  // a escrita descartar a linha. A tela mostra o selo "nao sai no documento".
+  const entram: SecaoExtra[] = [];
+  for (const e of extras) {
+    if (temCorpo(e.corpoHtml) && e.titulo.trim().length > 0) entram.push(e);
+    else omitidas.push({ chave: "", titulo: e.titulo.trim() || "Seção extra sem título" });
   }
 
   // Ancoras sao resolvidas sobre a lista base ja filtrada; cada extra e
   // inserida depois das anteriores da mesma posicao (ordem de cadastro).
   const lista: SecaoDocumento[] = [...presentes];
-  const plano = extras
-    .filter((e) => temCorpo(e.corpoHtml))
-    .map((e) => ({ extra: e, indice: indiceDeInsercao(presentes, e.posicao) }));
+  const plano = entram.map((e) => ({
+    extra: e,
+    indice: indiceDeInsercao(presentes, e.posicao),
+  }));
 
   // Agrupa por indice base, preservando a ordem de cadastro dentro do grupo.
   const porIndice = new Map<number, SecaoDocumento[]>();
