@@ -337,6 +337,47 @@ describe("criarProposta grava o conteúdo do documento", () => {
     expect(data.textoFechamento).toBeDefined();
   });
 
+  it("campo richText presente mas vazio conta como vazio e não é gravado", async () => {
+    // O que o editor grava quando alguém limpa o campo: documento com um
+    // parágrafo sem texto. `visaoGeral` tem texto de verdade e PRECISA ser
+    // gravada — sem isso o teste passaria por vacuidade.
+    const programa: Record<string, unknown> = {
+      id: 2,
+      sigla: "EDUTEC",
+      nomeCompleto: "Programa EDUTEC",
+      visaoGeral: lex("Visão geral com texto de verdade."),
+      problema: {
+        root: { type: "root", children: [{ type: "paragraph", children: [{ type: "text", text: "" }] }] },
+      },
+      objetivo: {
+        root: { type: "root", children: [{ type: "paragraph", children: [{ type: "text", text: "   " }] }] },
+      },
+      publicoAlvo: { root: { type: "root", children: [] } },
+    };
+    const { create } = payloadFalso({ programa });
+    expect(await criarProposta({ ...base })).toEqual({ ok: true });
+    const data = dadosDaChamada(create);
+    expect(data.textoApresentacao).toEqual(programa.visaoGeral);
+    expect("textoContexto" in data).toBe(false);
+    expect("textoObjetivos" in data).toBe(false);
+    expect("textoPublicoAlvo" in data).toBe(false);
+  });
+
+  it("ementa vazia do módulo do catálogo não é gravada", async () => {
+    const semEmenta: Record<string, unknown> = {
+      id: 12,
+      numero: 3,
+      titulo: "Módulo sem ementa",
+      ementa: { root: { type: "root", children: [{ type: "paragraph", children: [{ type: "text", text: " " }] }] } },
+    };
+    const { create } = payloadFalso({ modulos: [moduloM1, semEmenta] });
+    await criarProposta({ ...base, modulos: ["10", "12"], qtdPagantes: "10", cortesias: "0" });
+    expect(dadosDaChamada(create).modulosDetalhados).toEqual([
+      { modulo: 10, tituloExibido: "Módulo 1 do catálogo", ementa: moduloM1.ementa },
+      { modulo: 12, tituloExibido: "Módulo sem ementa" },
+    ]);
+  });
+
   it("modulosDetalhados nasce com um item por módulo, com ementa do catálogo", async () => {
     const { create } = payloadFalso({ modulos: [moduloM1, moduloM2] });
     await criarProposta({ ...base, modulos: ["10", "11"], qtdPagantes: "10", cortesias: "0" });
@@ -408,6 +449,7 @@ describe("atualizarProposta e os módulos detalhados", () => {
       "diferenciais",
       "resultados",
       "docentes",
+      "secoesExtras",
     ]) {
       expect(chave in data, chave).toBe(false);
     }

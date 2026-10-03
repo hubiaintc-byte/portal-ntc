@@ -397,7 +397,6 @@ function conteudoParaGravar(p: {
   modulos: Modulo[];
   docentes: Especialista[];
 }): Partial<PropostaData> {
-  const titulos = new Map(p.conteudo.modulosDetalhados.map((m) => [m.modulo, m.tituloExibido]));
   const lexical = (texto: string): PropostaRichText =>
     textoComSubtitulosParaLexical(texto) as PropostaRichText;
   return {
@@ -420,8 +419,10 @@ function conteudoParaGravar(p: {
     })),
     modulosDetalhados: p.modulos.map((m) => ({
       modulo: Number(m.id),
-      tituloExibido: titulos.get(String(m.id)) ?? m.titulo,
-      ementa: m.ementa as PropostaRichText,
+      tituloExibido: m.titulo,
+      // Mesma regra dos textos: ementa vazia ou ausente não é gravada, para o
+      // documento omitir o corpo do módulo em vez de imprimir um bloco branco.
+      ...seTemTexto("ementa", m.ementa),
     })),
   };
 }
@@ -510,7 +511,7 @@ function mesclarModulosDetalhados(
   const novas = novosDoCatalogo.map((m) => ({
     modulo: Number(m.id),
     tituloExibido: m.titulo,
-    ementa: m.ementa as PropostaRichText,
+    ...seTemTexto("ementa", m.ementa),
   }));
   return [...mantidas, ...novas] as PropostaModulosDetalhados;
 }
