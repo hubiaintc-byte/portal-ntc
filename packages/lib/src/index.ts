@@ -144,3 +144,10 @@ export {
   type LinhaQuadro,
   type EntradaQuadro,
 } from "./crm/quadroComercial";
+
+export {
+  conteudoInicialProposta,
+  type ProgramaParaConteudo,
+  type ModuloParaConteudo,
+  type ConteudoInicialProposta,
+} from "./crm/conteudoProposta";
