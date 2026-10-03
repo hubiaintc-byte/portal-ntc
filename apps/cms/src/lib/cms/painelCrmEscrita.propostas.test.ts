@@ -659,7 +659,7 @@ describe("restaurarConteudoProposta", () => {
   it("repassa o usuário ao update", async () => {
     const { update } = payloadFalso(opcoes);
     await restaurarConteudoProposta("9", "fechamento", usuario);
-    expect((update.mock.calls[0]![0] as { user: unknown }).user).toBe(usuario);
+    expect((update.mock.calls[0]![0] as unknown as { user: unknown }).user).toBe(usuario);
   });
 
   it("alvo vazio grava null, nunca Lexical vazio", async () => {
