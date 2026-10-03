@@ -5,6 +5,7 @@ import type { DadosDocumentoProposta } from "./dados";
 import { esc, formatarDataDocumentoOpcional } from "./formato";
 import { FONTES_EMBUTIDAS_CSS } from "./fontsEmbutidas";
 import { montarSecoes, type SecaoDocumento, type SecaoNumerada } from "./montar";
+import { ORDEM_MODELO } from "./ordem";
 import { secoesComerciais } from "./secoes/comercial";
 import { secoesInstitucionais } from "./secoes/institucional";
 import { secoesDeConteudo } from "./secoes/programa";
@@ -26,37 +27,6 @@ import { cssBaseProposta, cssVariaveisProposta } from "./tokens";
  * - o `<link>` do Google Fonts do modelo é descartado: as fontes da marca vão
  *   embutidas em base64 (`fontsEmbutidas.ts`), sem chamada de rede.
  */
-
-/**
- * Ordem das seções no modelo. A base é montada POR ESTA LISTA, não pela
- * concatenação dos três módulos de seção: "Objeto da Proposta" é a seção 6 do
- * modelo mas nasce em `secoes/comercial.ts`, e concatenar jogaria ela para
- * depois de "Resultados Esperados". Montar por chave também garante que uma
- * seção omitida (corpo vazio) não desloque as outras.
- */
-const ORDEM_MODELO: string[] = [
-  "identificacao",
-  "apresentacao",
-  "contexto",
-  "objeto",
-  "objetivos",
-  "publico-alvo",
-  "arquitetura",
-  "modulos",
-  "metodologia",
-  "docentes",
-  "diferenciais",
-  "resultados",
-  "quadro-comercial",
-  "condicoes-comerciais",
-  "eventon",
-  "certificacao-replay",
-  "cancelamento",
-  "protecao-conteudo",
-  "fundamentacao-legal",
-  "proximos-passos",
-  "fechamento",
-];
 
 /**
  * Seção 3 do modelo (linhas 245-259). Fica aqui, onde já vivia antes desta
