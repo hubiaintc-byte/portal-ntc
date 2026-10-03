@@ -26,6 +26,38 @@ describe("textosPadraoProposta", () => {
     expect(textosPadraoProposta(CTX).certificacaoReplay).toContain("180 dias");
   });
 
+  it("1 módulo: concordância no singular, sem 'dos 1 módulos'", () => {
+    const t = textosPadraoProposta({ ...CTX, numModulos: 1 });
+    expect(t.certificacaoReplay).toContain("carga horária somada do módulo contratado");
+    expect(t.certificacaoReplay).not.toMatch(/\bdos 1 módulos?\b/);
+  });
+
+  it("0 módulos: a frase não afirma contagem nenhuma", () => {
+    const t = textosPadraoProposta({ ...CTX, numModulos: 0 });
+    expect(t.certificacaoReplay).toContain("carga horária somada dos módulos contratados");
+    expect(t.certificacaoReplay).not.toContain("dos 0 módulos");
+  });
+
+  it("vários módulos mantêm a contagem do modelo", () => {
+    expect(textosPadraoProposta(CTX).certificacaoReplay).toContain("somada dos 3 módulos contratados");
+  });
+
+  it("sem replay, o parágrafo e o subtítulo do replay somem (sem lacuna)", () => {
+    const t = textosPadraoProposta({ ...CTX, replay: "" });
+    expect(t.certificacaoReplay).not.toContain("Replay Institucional Ampliado");
+    expect(t.certificacaoReplay).not.toContain("replay institucional ampliado de");
+    expect(t.certificacaoReplay).not.toMatch(/ampliado de\s{2,}/);
+    // A Certificação continua inteira.
+    expect(t.certificacaoReplay).toContain("## Certificação");
+    expect(t.certificacaoReplay.trim().endsWith(".")).toBe(true);
+  });
+
+  it("replay só com espaços conta como ausente", () => {
+    expect(textosPadraoProposta({ ...CTX, replay: "   " }).certificacaoReplay).not.toContain(
+      "Replay Institucional Ampliado",
+    );
+  });
+
   it("não deixa marcador sem substituir", () => {
     for (const texto of Object.values(textosPadraoProposta(CTX))) {
       expect(texto).not.toMatch(/\{\{|\}\}|\$\{/);

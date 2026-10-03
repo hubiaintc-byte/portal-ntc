@@ -1,7 +1,22 @@
 /**
  * Textos institucionais padrão da proposta (seções 17 a 23 do modelo aprovado,
- * `docs/prototipos/proposta-modelo-v1.html`), transcritos literalmente e
+ * `docs/prototipos/proposta-modelo-v1.html`), transcritos do modelo e
  * interpolados com os dados do cliente. Módulo puro: sem I/O.
+ *
+ * **Não são transcrição literal palavra por palavra.** Quatro trechos são
+ * parametrizados por REESCRITA MÍNIMA do modelo, e cada um está marcado com
+ * `PARAMETRIZADO` no corpo, para que uma revisão não os tome por transcrição:
+ * 1. seção 18 (Certificação) — "dos 3 módulos contratados" do modelo vira
+ *    `dosModulosContratados`, que concorda com a contagem (1 módulo é rotineiro: é
+ *    um dos quatro tipos de proposta);
+ * 2. seção 18 (Replay) — o prazo vem de `replay`, campo livre NÃO obrigatório;
+ *    sem ele o parágrafo inteiro é omitido, porque interpolar vazio gravaria
+ *    uma cláusula contratual com lacuna ("ampliado de  após cada ...");
+ * 3. seção 18 (Replay) — "para a rede municipal" do modelo vira
+ *    `para ${clienteSigla}`;
+ * 4. seção 23 (Fechamento) — "da rede municipal de educação de Palmas" vira
+ *    `da ${clienteSigla}`, padrão do próprio modelo nas outras seções.
+ * Nenhum outro texto é redigido aqui (CLAUDE.md §5.3).
  *
  * Formato do texto devolvido (puro, sem HTML):
  * - parágrafos separados por uma linha em branco (`\n\n`);
@@ -30,8 +45,21 @@ export type ChaveTextoInstitucional =
   | "proximosPassos"
   | "fechamento";
 
+/** Parágrafos separados por linha em branco; entrada vazia é descartada. */
 function paragrafos(...linhas: string[]): string {
-  return linhas.join("\n\n");
+  return linhas.filter((l) => l.trim().length > 0).join("\n\n");
+}
+
+/**
+ * "dos 3 módulos contratados" / "do módulo contratado" / "dos módulos
+ * contratados" (sem contagem). Concordância do trecho PARAMETRIZADO da seção
+ * 18: com 1 módulo o modelo sairia "dos 1 módulos contratados", e "Módulo
+ * Avulso" é um dos quatro tipos de proposta.
+ */
+function dosModulosContratados(n: number): string {
+  if (n === 1) return "do módulo contratado";
+  if (n <= 0) return "dos módulos contratados";
+  return `dos ${n} módulos contratados`;
 }
 
 export function textosPadraoProposta(
@@ -48,9 +76,19 @@ export function textosPadraoProposta(
     ),
     certificacaoReplay: paragrafos(
       "## Certificação",
-      `A emissão de certificado pelo Instituto NTC observará os critérios institucionais definidos para cada módulo-evento, podendo considerar presença, acesso à plataforma, participação e cumprimento de requisitos mínimos. Os certificados serão emitidos de forma nominal, com identificação do participante, nome da atividade, carga horária de cada módulo, período de realização e demais elementos de registro. A certificação total do combo formativo contemplará a carga horária somada dos ${c.numModulos} módulos contratados.`,
-      "## Replay Institucional Ampliado",
-      `Para a presente proposta, foi pactuado replay institucional ampliado de ${c.replay} após cada módulo-evento — condição negociada especificamente para ${c.clienteSigla}, superando o padrão institucional de 7 dias dos eventos abertos. O replay constitui facilidade adicional oferecida ao participante regularmente inscrito, sendo pessoal, individual, temporário e intransferível.`,
+      // PARAMETRIZADO (1): `dosModulosContratados` em vez do "dos 3 módulos
+      // contratados" do modelo.
+      `A emissão de certificado pelo Instituto NTC observará os critérios institucionais definidos para cada módulo-evento, podendo considerar presença, acesso à plataforma, participação e cumprimento de requisitos mínimos. Os certificados serão emitidos de forma nominal, com identificação do participante, nome da atividade, carga horária de cada módulo, período de realização e demais elementos de registro. A certificação total do combo formativo contemplará a carga horária somada ${dosModulosContratados(c.numModulos)}.`,
+      // PARAMETRIZADO (2 e 3): sem prazo de replay, o subtítulo e o parágrafo
+      // somem juntos — `paragrafos` descarta a string vazia. Uma cláusula
+      // contratual com lacuna ("ampliado de  após cada módulo-evento") é pior
+      // que a ausência da cláusula.
+      ...(c.replay.trim().length > 0
+        ? [
+            "## Replay Institucional Ampliado",
+            `Para a presente proposta, foi pactuado replay institucional ampliado de ${c.replay.trim()} após cada módulo-evento — condição negociada especificamente para ${c.clienteSigla}, superando o padrão institucional de 7 dias dos eventos abertos. O replay constitui facilidade adicional oferecida ao participante regularmente inscrito, sendo pessoal, individual, temporário e intransferível.`,
+          ]
+        : []),
     ),
     cancelamento: paragrafos(
       "A solicitação de cancelamento ou substituição de participante deverá ser formalizada por escrito, por meio dos canais oficiais indicados na proposta ou informados pela Coordenação de Eventos do Instituto NTC, preferencialmente até 2 dias úteis antes da realização da atividade.",
@@ -74,6 +112,8 @@ export function textosPadraoProposta(
       "Após a confirmação, o Instituto NTC adotará as providências necessárias para organização das atividades: validação dos dados dos participantes, alinhamento operacional com a Coordenação de Eventos NTC, emissão dos documentos complementares, disponibilização das orientações de acesso à plataforma EventON e demais medidas necessárias à execução do combo formativo contratado.",
       "As orientações operacionais detalhadas de acesso ao ambiente digital serão encaminhadas em documento próprio (Documento Complementar de Orientações EventON), após a formalização da inscrição ou contratação.",
     ),
+    // PARAMETRIZADO (4): "da rede municipal de educação de Palmas" do modelo
+    // vira a sigla do cliente, padrão do próprio modelo nas outras seções.
     fechamento: paragrafos(
       `O Instituto NTC do Brasil agradece a oportunidade de apresentar esta proposta a ${c.clienteOrgao} e renova sua disposição institucional de contribuir para o fortalecimento das capacidades técnicas, gerenciais e pedagógicas da ${c.clienteSigla}.`,
       "Mais do que realizar eventos, cursos ou capacitações, o Instituto NTC estrutura experiências formativas com densidade técnica, aplicabilidade prática, curadoria especializada e excelência docente, comprometidas com a melhoria efetiva da aprendizagem e da gestão das escolas públicas brasileiras.",
