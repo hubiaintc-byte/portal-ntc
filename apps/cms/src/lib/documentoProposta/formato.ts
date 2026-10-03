@@ -1,7 +1,7 @@
 /**
  * Formatação compartilhada do documento da proposta. Puro, sem server-only.
- * `html.ts` ainda guarda cópias de `esc`/moeda/data até a Task 10 compor o
- * documento final e passar a importar daqui.
+ * Fonte única: capa, resumo executivo, seções e o cabeçalho/rodapé do PDF
+ * importam daqui — `html.ts` não guarda mais cópia de `esc`/moeda/data.
  */
 
 export function esc(v: string): string {

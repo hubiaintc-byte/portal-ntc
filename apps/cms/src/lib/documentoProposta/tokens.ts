@@ -51,7 +51,12 @@ li{margin-bottom:2.5pt;text-align:justify}
 strong{color:var(--navy);font-weight:600}
 
 /* ===== CAPA ===== */
-.cover{width:210mm;height:297mm;padding:22mm 22mm 24mm;background:linear-gradient(135deg,var(--navy) 0%,#08182B 100%);color:var(--offwhite);page-break-after:always;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-sizing:border-box}
+/* 297mm (A4) - 42mm (margin top 22mm + bottom 20mm de pdf/gerarPdfDeHtml.ts,
+   aplicada em TODAS as páginas, inclusive a capa) = 255mm. No modelo a capa
+   tem 297mm porque lá o @page :first zera a margem — o Chromium não suporta
+   isso, e deixar 297mm aqui transborda 42mm para uma segunda página quase em
+   branco (lição registrada na Fase B2 e mantida). */
+.cover{width:210mm;height:calc(297mm - 42mm);padding:22mm 22mm 24mm;background:linear-gradient(135deg,var(--navy) 0%,#08182B 100%);color:var(--offwhite);page-break-after:always;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-sizing:border-box}
 .cover::before{content:"";position:absolute;top:-55mm;right:-55mm;width:170mm;height:170mm;border:1.5pt solid var(--gold);border-radius:50%;opacity:.14}
 .cover::after{content:"";position:absolute;bottom:-38mm;left:-38mm;width:115mm;height:115mm;border:1.5pt solid var(--gold-light);border-radius:50%;opacity:.1}
 .cover-top,.cover-mid,.cover-bot{position:relative;z-index:2}
@@ -109,7 +114,10 @@ strong{color:var(--navy);font-weight:600}
 .cards-resumo .card .desc{font-size:8.4pt;color:var(--ink-mid);margin-top:3pt;line-height:1.35}
 
 /* ===== SEÇÕES ===== */
-.body-wrap{padding:0}
+/* No modelo a margem horizontal de 18mm vem do @page, descartado aqui; e a
+   margem left/right do PDF é 0 para a capa sangrar de borda a borda. Logo o
+   recuo do corpo precisa vir desta classe, senão o texto encosta no papel. */
+.body-wrap{padding:0 18mm}
 .sec{page-break-inside:auto;margin-bottom:10pt}
 .sec p,.sec ul,.sec ol,.sec .grid2,.sec .grid3,.sec table.qc,.sec .modulo-premium,.sec .docente-card,.sec .box,.sec .quote{page-break-inside:avoid}
 .quote{background:var(--bg-suave);border-left:3pt solid var(--gold);padding:8pt 13pt;font-style:italic;color:var(--ink);margin:8pt 0;font-family:'Cormorant Garamond',serif;font-size:12pt;line-height:1.4}
