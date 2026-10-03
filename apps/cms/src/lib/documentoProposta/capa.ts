@@ -18,6 +18,7 @@ import {
   formatarPercentualDocumento,
 } from "./formato";
 import { LOGO_PROPOSTA_HTML } from "./logoProposta";
+import { contagemDeItensDoDocumento, modulosContadosDoDocumento } from "./modulos";
 
 /** Dois a dez por extenso; acima disso o algarismo lê melhor que a palavra. */
 const POR_EXTENSO: Record<number, string> = {
@@ -123,15 +124,16 @@ export function montarCapa(d: DadosDocumentoProposta): string {
 </div>`;
 }
 
-/** Códigos "M01 · M02" a partir dos rótulos "M1 · Título"; vazio se algum não casa. */
-function codigosDosItens(d: DadosDocumentoProposta): string {
-  const codigos: string[] = [];
-  for (const i of d.itens) {
-    const n = /^M(\d+)\b/.exec(i.rotulo)?.[1];
-    if (!n) return "";
-    codigos.push(`M${n.padStart(2, "0")}`);
-  }
-  return codigos.join(" · ");
+/**
+ * Enumeração "M01 · M02" dos módulos contados — a mesma fonte única do Quadro
+ * Comercial (`modulos.ts`). Antes era derivada dos rótulos de `itens`, e o
+ * primeiro rótulo que não casasse `/^M\d+/` (o nome de um evento, por exemplo)
+ * fazia a enumeração desaparecer em silêncio.
+ */
+function codigosDosModulos(d: DadosDocumentoProposta): string {
+  return modulosContadosDoDocumento(d.modulosDetalhados)
+    .map((m) => `M${m.digitos.padStart(2, "0")}`)
+    .join(" · ");
 }
 
 function card(rotulo: string, valor: string, desc: string, menor = false): string {
@@ -147,20 +149,24 @@ function itemNegociado(rotulo: string, valor: string, desc: string): string {
 }
 
 export function montarResumoExecutivo(d: DadosDocumentoProposta): string {
-  const n = d.itens.length;
+  // `n` é o que a PROSA afirma vender (módulos contados ou, sem eles, os itens
+  // contratados); `nModulos` é a base de TODA divisão por módulo. São iguais
+  // sempre que há módulo de código legível — ver `modulos.ts`.
+  const nModulos = modulosContadosDoDocumento(d.modulosDetalhados).length;
+  const n = contagemDeItensDoDocumento(d);
   const sigla = d.programaSigla.trim();
   const orgao = presente(d.clienteOrgao);
   const clienteSigla = presente(d.clienteSigla);
   // Divisão por zero: sem pagante não existe valor por inscrição.
   const porInscricao = d.qtdPagantes > 0 ? d.valorLiquido / d.qtdPagantes : null;
   const valorPorInscricao = porInscricao === null ? "" : formatarMoedaDocumento(porInscricao);
-  const porModulo = n > 1 && divisaoExata(d.qtdPagantes, n);
-  const cortesiasPorModulo = n > 1 && divisaoExata(d.cortesias, n);
+  const porModulo = nModulos > 1 && divisaoExata(d.qtdPagantes, nModulos);
+  const cortesiasPorModulo = nModulos > 1 && divisaoExata(d.cortesias, nModulos);
   const comDesconto = d.percDesconto > 0;
   const tabela = d.valorUnitario > 0 ? formatarMoedaDocumento(d.valorUnitario) : "";
 
   // Objeto: frase do modelo (linha 203), parametrizada; cláusulas sem dado caem.
-  const codigos = codigosDosItens(d);
+  const codigos = codigosDosModulos(d);
   const objeto = [
     "<strong>Objeto</strong> · Realização de formação institucional",
     n > 0 ? ` composta por <strong>${n} ${n === 1 ? "módulo-evento" : "módulos-evento"}</strong>` : "",
@@ -191,7 +197,9 @@ export function montarResumoExecutivo(d: DadosDocumentoProposta): string {
           "Cortesias Institucionais",
           `${formatarInteiroDocumento(d.cortesias)} cortesias`,
           [
-            cortesiasPorModulo ? `${formatarInteiroDocumento(d.cortesias / n)} por módulo` : "",
+            cortesiasPorModulo
+              ? `${formatarInteiroDocumento(d.cortesias / nModulos)} por módulo`
+              : "",
             clienteSigla ? `destinadas por ${clienteSigla}` : "",
           ]
             .filter((p) => p.length > 0)
@@ -221,7 +229,9 @@ export function montarResumoExecutivo(d: DadosDocumentoProposta): string {
       ? card(
           "Inscrições Pagantes",
           formatarInteiroDocumento(d.qtdPagantes),
-          porModulo ? `${formatarInteiroDocumento(d.qtdPagantes / n)} por módulo × ${n} módulos` : "",
+          porModulo
+            ? `${formatarInteiroDocumento(d.qtdPagantes / nModulos)} por módulo × ${nModulos} módulos`
+            : "",
         )
       : "",
     valorPorInscricao

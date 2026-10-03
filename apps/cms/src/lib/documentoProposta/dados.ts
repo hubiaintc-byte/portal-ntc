@@ -14,6 +14,10 @@ import { obterPayload } from "@/lib/payloadClient";
 
 import { subtituloProposta } from "./capa";
 import { lexicalDocumentoParaHtml } from "./lexicalDocumento";
+import {
+  cargaHorariaTotalDosModulos,
+  modulosContadosDoDocumento,
+} from "./modulos";
 import type { PosicaoExtra } from "./montar";
 
 export interface ItemDocumento {
@@ -131,36 +135,6 @@ function texto(v: string | null | undefined): string {
   return v ?? "";
 }
 
-/**
- * Horas de uma carga horária legível como número puro ("8h", "8 horas").
- * Valores compostos do catálogo ("16h · 2 dias") devolvem null de propósito:
- * somar formatos heterogêneos num documento contratual inventaria total.
- */
-function horasDe(carga: string | null | undefined): number | null {
-  if (!carga) return null;
-  const casou = /^(\d+)\s*(?:h|horas?)$/i.exec(carga.trim());
-  const bruto = casou?.[1];
-  if (!bruto) return null;
-  const n = Number(bruto);
-  return Number.isInteger(n) && n > 0 ? n : null;
-}
-
-/**
- * "24h · 3 módulos · 8h por módulo" quando todos os módulos têm a mesma carga
- * legível; cargas diferentes, ausentes ou ilegíveis caem para "3 módulos".
- * Sem módulos, string vazia.
- */
-function cargaHorariaTotalDosModulos(modulos: Modulo[]): string {
-  const n = modulos.length;
-  if (n === 0) return "";
-  const contagem = n === 1 ? "1 módulo" : `${n} módulos`;
-  const horas = modulos.map((m) => horasDe(m.cargaHoraria));
-  const primeira = horas[0];
-  if (primeira == null || horas.some((h) => h !== primeira)) return contagem;
-  if (n === 1) return `${primeira}h · ${contagem}`;
-  return `${primeira * n}h · ${contagem} · ${primeira}h por módulo`;
-}
-
 /** Credencial derivada da ficha: titulação · instituição · cargo atual. */
 /**
  * Credencial derivada da ficha do especialista — fallback da leitura e valor
@@ -274,6 +248,10 @@ export async function obterDadosDocumentoProposta(
     };
   });
 
+  // Fonte única da contagem (ver `modulos.ts`): subtítulo, carga horária, capa,
+  // Resumo, Arquitetura e Quadro Comercial falam todos deste conjunto.
+  const contados = modulosContadosDoDocumento(modulosDetalhados);
+
   const secoesExtras: SecaoExtraDocumento[] = (doc.secoesExtras ?? []).map((s) => ({
     titulo: texto(s.titulo),
     corpoHtml: lexicalDocumentoParaHtml(s.corpo),
@@ -286,7 +264,7 @@ export async function obterDadosDocumentoProposta(
     codigoBase: doc.codigoBase,
     versao: doc.versao ?? 1,
     tipoTexto: TIPO_TEXTO[doc.tipo ?? ""] ?? "Proposta Técnico-Comercial",
-    subtitulo: subtituloProposta(doc.tipo ?? "", modulos.length, programa?.sigla ?? ""),
+    subtitulo: subtituloProposta(doc.tipo ?? "", contados.length, programa?.sigla ?? ""),
     modalidade: doc.modalidade ?? "A definir",
     replay: doc.replay ?? "90 dias",
     condPagto: doc.condPagto ?? "À vista após emissão da Nota Fiscal · 15 dias",
@@ -302,7 +280,7 @@ export async function obterDadosDocumentoProposta(
     programaNome: programa?.nomeCompleto ?? "Programa Estratégico NTC",
     programaSigla: programa?.sigla ?? "",
     itens,
-    cargaHorariaTotalModulos: cargaHorariaTotalDosModulos(modulos),
+    cargaHorariaTotalModulos: cargaHorariaTotalDosModulos(contados),
     conteudoHtml,
     eixos,
     diferenciais,

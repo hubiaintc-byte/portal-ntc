@@ -26,6 +26,7 @@ import type {
   ModuloDetalhadoDocumento,
 } from "../dados";
 import { cargaHorariaTotalCurta, esc } from "../formato";
+import { modulosContadosDoDocumento } from "../modulos";
 import type { SecaoDocumento } from "../montar";
 
 /** Valor útil para imprimir: não vazio, sem o marcador "—" nem "A definir". */
@@ -49,7 +50,9 @@ function caixa(rotulo: string, valor: string, classeValor: "value" | "text"): st
 // --- Arquitetura da Solução (9) ---------------------------------------------
 
 function montarArquitetura(d: DadosDocumentoProposta): string {
-  const n = d.modulosDetalhados.length;
+  // Contagem única do documento (`modulos.ts`), não `modulosDetalhados.length`:
+  // o número daqui tem de ser o mesmo que o Quadro Comercial divide.
+  const n = modulosContadosDoDocumento(d.modulosDetalhados).length;
   const sigla = d.programaSigla.trim();
   // Só horas legíveis entram: "3 módulos" (cargas heterogêneas) não é carga
   // horária, então a caixa e o trecho do parágrafo somem — ver

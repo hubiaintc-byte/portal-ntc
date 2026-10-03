@@ -162,16 +162,70 @@ describe("secoesComerciais", () => {
     expect(h).toContain("1 módulo-evento do Programa");
   });
 
-  it("objeto: contagem acompanha a enumeração quando falta código", () => {
+  it("objeto: módulo sem código legível zera a contagem (todo-ou-nada)", () => {
+    // Regra única do documento (documentoProposta/modulos.ts): contar só os
+    // legíveis mudaria a base da divisão do Quadro e produziria números que não
+    // fecham. Sem contagem, a frase não afirma quantidade nenhuma.
+    const d = {
+      ...BASE,
+      modulosDetalhados: [
+        BASE.modulosDetalhados[0]!,
+        { codigo: "", titulo: "Sem", cargaHoraria: null, ementaHtml: "" },
+      ],
+    };
+    const o = porChave(d, "objeto");
+    expect(o).toContain("<strong>módulos-evento do Programa Estratégico PTE</strong>");
+    expect(o).not.toMatch(/\b\d+ módulos?-evento\b/);
+    expect(o).not.toContain("Módulo 01");
+    // E o Quadro Comercial continua sem tabela por módulo, como antes.
+    expect(porChave(d, "quadro-comercial")).not.toContain("Pagantes + Cortesias");
+  });
+
+  it("objeto: sem módulo legível e com item contratado, NOMEIA o item", () => {
+    // Proposta de produto/evento avulso: antes da fix wave o nome do evento não
+    // aparecia em lugar nenhum do PDF (regressão em relação à Fase B2).
     const o = porChave(
       {
         ...BASE,
-        modulosDetalhados: [BASE.modulosDetalhados[0]!, { codigo: "", titulo: "Sem", cargaHoraria: null, ementaHtml: "" }],
+        modulosDetalhados: [],
+        itens: [{ rotulo: "Seminário Nacional de Gestão", cargaHoraria: "4h", valorUnitario: 1470 }],
       },
       "objeto",
     );
+    expect(o).toContain("Seminário Nacional de Gestão");
     expect(o).toContain("1 módulo-evento");
-    expect(o).not.toContain("2 módulos-evento");
+  });
+
+  it("quadro: sem módulo legível e com item contratado, imprime a tabela de itens", () => {
+    const q = porChave(
+      {
+        ...BASE,
+        modulosDetalhados: [],
+        itens: [
+          { rotulo: "Seminário Nacional de Gestão", cargaHoraria: "4h", valorUnitario: 1470 },
+          { rotulo: "Oficina de Indicadores", cargaHoraria: "", valorUnitario: 1470 },
+        ],
+      },
+      "quadro-comercial",
+    );
+    expect(q).toContain("Seminário Nacional de Gestão");
+    expect(q).toContain("Oficina de Indicadores");
+    expect(q).toContain("<th>Item</th><th>CH</th>");
+    // Sem quantitativo por item: distribuir pagantes por evento não foi modelado.
+    expect(q).not.toContain("Pagantes + Cortesias");
+    expect(q).not.toMatch(SUJO);
+  });
+
+  it("quadro: sem pagantes, omite tabela por módulo e as linhas de pagantes", () => {
+    // Decisão da fix wave: o caso zero omite nos DOIS lados — o Resumo
+    // Executivo já omitia os cards de pagantes e de valor por inscrição.
+    const q = porChave({ ...BASE, qtdPagantes: 0, valorBruto: 0, desconto: 0, valorLiquido: 0 }, "quadro-comercial");
+    expect(q).not.toContain("Pagantes + Cortesias");
+    expect(q).not.toContain("Inscrições pagantes total");
+    expect(q).not.toContain("Valor com desconto institucional por inscrição");
+    expect(q).toContain("Apresentamos o quadro de investimento da presente proposta.");
+    expect(q).toContain("Cortesias institucionais total");
+    expect(q).not.toMatch(SUJO);
   });
 
   it("condições específicas: parágrafos por linha em branco", () => {

@@ -196,12 +196,20 @@ describe("obterDadosDocumentoProposta · conteúdo do documento", () => {
     expect(dados?.resultados).toEqual(["Resultado", ""]);
   });
 
+  // A carga horária e o subtítulo contam `modulosDetalhados` de código legível —
+  // a MESMA fonte do Quadro Comercial (ver documentoProposta/modulos.ts). Antes
+  // da fix wave contavam `doc.modulos`, e uma proposta com evento fazia a capa
+  // e o Resumo falarem de um número de módulos que o Quadro não dividia.
+  const detalhado = (numero: number, titulo: string, cargaHoraria: string | null) => ({
+    modulo: { id: numero, numero, titulo, cargaHoraria },
+  });
+
   it("carga horária total: módulos de mesma carga somam", async () => {
     const { dados } = await lerProposta({
-      modulos: [
-        { id: 1, numero: 1, titulo: "A", cargaHoraria: "8h" },
-        { id: 2, numero: 2, titulo: "B", cargaHoraria: "8 horas" },
-        { id: 3, numero: 3, titulo: "C", cargaHoraria: "8h" },
+      modulosDetalhados: [
+        detalhado(1, "A", "8h"),
+        detalhado(2, "B", "8 horas"),
+        detalhado(3, "C", "8h"),
       ],
     });
 
@@ -211,10 +219,10 @@ describe("obterDadosDocumentoProposta · conteúdo do documento", () => {
 
   it("carga horária total: cargas diferentes não inventam total", async () => {
     const { dados } = await lerProposta({
-      modulos: [
-        { id: 1, numero: 1, titulo: "A", cargaHoraria: "8h" },
-        { id: 2, numero: 2, titulo: "B", cargaHoraria: "16h · 2 dias" },
-        { id: 3, numero: 3, titulo: "C", cargaHoraria: null },
+      modulosDetalhados: [
+        detalhado(1, "A", "8h"),
+        detalhado(2, "B", "16h · 2 dias"),
+        detalhado(3, "C", null),
       ],
     });
 
@@ -223,7 +231,7 @@ describe("obterDadosDocumentoProposta · conteúdo do documento", () => {
 
   it("carga horária total: um módulo não repete 'por módulo'", async () => {
     const { dados } = await lerProposta({
-      modulos: [{ id: 1, numero: 4, titulo: "A", cargaHoraria: "40h" }],
+      modulosDetalhados: [detalhado(4, "A", "40h")],
     });
 
     expect(dados?.cargaHorariaTotalModulos).toBe("40h · 1 módulo");
@@ -232,10 +240,37 @@ describe("obterDadosDocumentoProposta · conteúdo do documento", () => {
 
   it("carga horária total: módulo único sem carga legível cai para o singular", async () => {
     const { dados } = await lerProposta({
-      modulos: [{ id: 1, numero: 4, titulo: "A", cargaHoraria: "dia único" }],
+      modulosDetalhados: [detalhado(4, "A", "dia único")],
     });
 
     expect(dados?.cargaHorariaTotalModulos).toBe("1 módulo");
+  });
+
+  it("evento na proposta NÃO entra na contagem de módulos do documento", async () => {
+    const { dados } = await lerProposta({
+      modulos: [
+        { id: 1, numero: 1, titulo: "A", cargaHoraria: "8h" },
+        { id: 2, numero: 2, titulo: "B", cargaHoraria: "8h" },
+        { id: 3, numero: 3, titulo: "C", cargaHoraria: "8h" },
+      ],
+      eventos: [{ id: 50, nome: "Seminário", cargaHoraria: "4h" }],
+      modulosDetalhados: [detalhado(1, "A", "8h"), detalhado(2, "B", "8h"), detalhado(3, "C", "8h")],
+    });
+
+    // `itens` continua somando módulos + eventos (é a linha da Fase B2)...
+    expect(dados?.itens).toHaveLength(4);
+    // ...mas o subtítulo e a carga horária falam dos 3 módulos, como o Quadro.
+    expect(dados?.subtitulo).toBe("Combo de Três Módulos · EDUTEC");
+    expect(dados?.cargaHorariaTotalModulos).toBe("24h · 3 módulos · 8h por módulo");
+  });
+
+  it("módulo sem relação populada zera a contagem (todo-ou-nada)", async () => {
+    const { dados } = await lerProposta({
+      modulosDetalhados: [detalhado(1, "A", "8h"), { modulo: 99, tituloExibido: "Órfão" }],
+    });
+
+    expect(dados?.cargaHorariaTotalModulos).toBe("");
+    expect(dados?.subtitulo).toBe("EDUTEC");
   });
 
   it("docente vinculado sem campos livres usa a ficha do especialista", async () => {

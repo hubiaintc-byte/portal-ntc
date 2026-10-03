@@ -54,7 +54,13 @@ const BASE: DadosDocumentoProposta = {
     certificacaoReplay: "", cancelamento: "", protecaoConteudo: "", fundamentacaoLegal: "",
     proximosPassos: "", fechamento: "",
   },
-  eixos: [], diferenciais: [], resultados: [], docentes: [], modulosDetalhados: [], secoesExtras: [],
+  eixos: [], diferenciais: [], resultados: [], docentes: [],
+  modulosDetalhados: [
+    { codigo: "M01", titulo: "A", cargaHoraria: "8h", ementaHtml: "" },
+    { codigo: "M02", titulo: "B", cargaHoraria: "8h", ementaHtml: "" },
+    { codigo: "M04", titulo: "C", cargaHoraria: "8h", ementaHtml: "" },
+  ],
+  secoesExtras: [],
   valorUnitario: 1470,
   qtdPagantes: 1800,
   cortesias: 180,
@@ -112,7 +118,12 @@ describe("montarResumoExecutivo", () => {
     expect(h).not.toContain("Valor por Inscrição");
   });
   it("sem módulos não imprime decomposição por módulo", () => {
-    const h = montarResumoExecutivo({ ...BASE, itens: [], cargaHorariaTotalModulos: "" });
+    const h = montarResumoExecutivo({
+      ...BASE,
+      itens: [],
+      modulosDetalhados: [],
+      cargaHorariaTotalModulos: "",
+    });
     expect(h).not.toContain("por módulo");
     expect(h).not.toContain("Carga Horária Total");
     expect(h).not.toMatch(SUJO);
@@ -130,6 +141,32 @@ describe("montarResumoExecutivo", () => {
     expect(h).not.toContain("Carga Horária Total");
     expect(h).not.toMatch(SUJO);
   });
+  it("evento na proposta não muda a contagem que o Resumo afirma", () => {
+    // 3 módulos + 1 evento: antes da fix wave o Resumo dizia "4 módulos-evento"
+    // e "450 por módulo × 4 módulos" enquanto o Quadro Comercial dividia por 3.
+    const h = montarResumoExecutivo({
+      ...BASE,
+      itens: [...BASE.itens, { rotulo: "Seminário Nacional", cargaHoraria: "4h", valorUnitario: 1470 }],
+    });
+    expect(h).toContain("3 módulos-evento");
+    expect(h).not.toContain("4 módulos-evento");
+    expect(h).toContain("600 por módulo × 3 módulos");
+    // O rótulo do evento não casa /^M\d+/ e antes zerava a enumeração inteira.
+    expect(h).toContain("(M01 · M02 · M04)");
+  });
+
+  it("sem módulo legível, a contagem da prosa cai nos itens contratados", () => {
+    const h = montarResumoExecutivo({
+      ...BASE,
+      modulosDetalhados: [],
+      itens: [{ rotulo: "Seminário Nacional", cargaHoraria: "4h", valorUnitario: 1470 }],
+      cargaHorariaTotalModulos: "",
+    });
+    expect(h).toContain("1 módulo-evento");
+    expect(h).not.toContain("por módulo ×");
+    expect(h).not.toMatch(SUJO);
+  });
+
   it("divisão inexata não imprime por módulo", () => {
     expect(montarResumoExecutivo({ ...BASE, qtdPagantes: 1000, cortesias: 100 })).not.toContain("por módulo ×");
   });
