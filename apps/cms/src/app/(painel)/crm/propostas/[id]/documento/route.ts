@@ -19,6 +19,6 @@ export async function GET(
     return NextResponse.json({ erro: "Proposta não encontrada." }, { status: 404 });
   }
 
-  const html = montarHtmlDocumentoProposta(dados);
+  const { html } = montarHtmlDocumentoProposta(dados);
   return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
 }

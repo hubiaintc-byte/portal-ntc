@@ -1090,12 +1090,21 @@ function formatarDataCurta(iso: string | null): string {
   return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "UTC" });
 }
 
-export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscrita> {
+/**
+ * Resultado da geração do PDF: como `ResultadoEscrita`, mais o relatório de
+ * omissão do spec §1.1 — os títulos das seções que ficaram fora do documento.
+ * O botão "Gerar PDF" do detalhe mostra essa lista ao PO.
+ */
+export interface ResultadoGeracaoPdf extends ResultadoEscrita {
+  omitidas?: string[];
+}
+
+export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoGeracaoPdf> {
   const dados = await obterDadosDocumentoProposta(id);
   if (!dados) return { ok: false, erro: "Proposta não encontrada." };
 
   try {
-    const html = montarHtmlDocumentoProposta(dados);
+    const { html, omitidas } = montarHtmlDocumentoProposta(dados);
     const pdf = await gerarPdfDeHtml(html, {
       codigo: dados.codigo,
       siglaPrograma: dados.programaSigla,
@@ -1131,7 +1140,7 @@ export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscr
       }
     }
 
-    return { ok: true };
+    return { ok: true, omitidas: omitidas.map((o) => o.titulo) };
   } catch (e) {
     console.error("[gerarESalvarPdfProposta]", e);
     return { ok: false, erro: "Não foi possível gerar o PDF. Tente novamente." };

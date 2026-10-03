@@ -46,6 +46,7 @@ import {
   type DadosLeadManual,
   type DadosLink,
   type DadosProposta,
+  type ResultadoGeracaoPdf,
   type ValorSecaoProposta,
 } from "@/lib/cms/painelCrmEscrita";
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
@@ -128,7 +129,7 @@ export async function registrarEnvioCrm(dados: DadosEnvio): Promise<ResultadoEsc
   return resultado;
 }
 
-export async function gerarPdfPropostaCrm(id: string): Promise<ResultadoEscrita> {
+export async function gerarPdfPropostaCrm(id: string): Promise<ResultadoGeracaoPdf> {
   if (!(await obterUsuarioCms())) return RECUSADO;
   const resultado = await gerarESalvarPdfProposta(id);
   if (resultado.ok) revalidatePath("/crm");

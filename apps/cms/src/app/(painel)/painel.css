@@ -2298,3 +2298,15 @@ body {
 .pcms-conteudo__confirmar p { margin: 0; font-size: 0.88rem; }
 /* No cabeçalho do bloco a confirmação de "Restaurar tudo" ganha largura própria. */
 .pcms-conteudo__confirmar--tudo { max-width: 520px; }
+/* Relatório de geração do PDF: informação, não risco — borda Oxford, não Cardeal. */
+.pcms-conteudo__confirmar--relatorio {
+  border-left-color: var(--pcms-oxford);
+  max-width: 640px;
+}
+.pcms-conteudo__omitidas {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.85rem;
+  color: var(--pcms-grafite-suave);
+}
+.pcms-conteudo__omitidas li { margin: 2px 0; }

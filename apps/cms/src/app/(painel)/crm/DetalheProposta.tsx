@@ -21,6 +21,12 @@ interface DetalheStatusProps {
   onRegistrarEnvio: (dados: DadosEnvio) => void;
   onGerarPdf: (id: string) => void;
   gerandoPdf: boolean;
+  /**
+   * Relatório da última geração de PDF (spec §1.1): títulos das seções que
+   * ficaram fora do documento. `null` enquanto nada foi gerado nesta visita;
+   * `[]` depois de uma geração sem omissão nenhuma.
+   */
+  omitidasNoPdf: string[] | null;
   /** Recarrega a proposta — o bloco de conteúdo pede isso depois de restaurar o padrão. */
   onAtualizado: () => void;
 }
@@ -42,6 +48,7 @@ export function DetalheProposta({
   onRegistrarEnvio,
   onGerarPdf,
   gerandoPdf,
+  omitidasNoPdf,
   onAtualizado,
 }: DetalheStatusProps) {
   const [novaVersaoAberta, setNovaVersaoAberta] = useState(false);
@@ -135,6 +142,33 @@ export function DetalheProposta({
           </button>
         </div>
       </div>
+
+      {/* Relatório de geração: o que ficou FORA do PDF que acabou de ser gerado.
+          `role="status"` porque é resultado de uma ação do usuário, não erro. */}
+      {omitidasNoPdf !== null && !gerandoPdf && (
+        <div
+          className="pcms-conteudo__confirmar pcms-conteudo__confirmar--relatorio"
+          role="status"
+        >
+          {omitidasNoPdf.length === 0 ? (
+            <p>PDF gerado com todas as seções do documento.</p>
+          ) : (
+            <>
+              <p>
+                PDF gerado.{" "}
+                {omitidasNoPdf.length === 1
+                  ? "1 seção ficou fora do documento, por estar vazia:"
+                  : `${omitidasNoPdf.length} seções ficaram fora do documento, por estarem vazias:`}
+              </p>
+              <ul className="pcms-conteudo__omitidas">
+                {omitidasNoPdf.map((titulo) => (
+                  <li key={titulo}>{titulo}</li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
 
       {saidaPendente !== null && (
         <div className="pcms-conteudo__confirmar pcms-conteudo__confirmar--tudo" role="alert">

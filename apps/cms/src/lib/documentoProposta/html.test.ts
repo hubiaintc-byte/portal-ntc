@@ -115,6 +115,11 @@ interface SecaoLida {
   titulo: string;
 }
 
+/** O HTML do documento; `montarHtmlDocumentoProposta` devolve também as omitidas. */
+function htmlDe(d: DadosDocumentoProposta): string {
+  return montarHtmlDocumentoProposta(d).html;
+}
+
 function secoesDo(html: string): SecaoLida[] {
   return [...html.matchAll(/<h2><span class="num">(\d+)<\/span>([^<]*)<\/h2>/g)].map((m) => ({
     numero: Number(m[1]),
@@ -124,7 +129,7 @@ function secoesDo(html: string): SecaoLida[] {
 
 describe("montarHtmlDocumentoProposta", () => {
   it("monta as 21 seções do modelo, na ordem e numeradas de 3 a 23", () => {
-    const secoes = secoesDo(montarHtmlDocumentoProposta(DADOS_COMPLETOS));
+    const secoes = secoesDo(htmlDe(DADOS_COMPLETOS));
     expect(secoes.map((s) => s.titulo)).toEqual([
       "Dados de Identificação da Proposta",
       "Apresentação Executiva",
@@ -154,7 +159,7 @@ describe("montarHtmlDocumentoProposta", () => {
   });
 
   it("traz a capa e o Resumo Executivo antes das seções numeradas", () => {
-    const html = montarHtmlDocumentoProposta(DADOS_COMPLETOS);
+    const html = htmlDe(DADOS_COMPLETOS);
     expect(html.indexOf('class="cover"')).toBeGreaterThan(-1);
     expect(html.indexOf('class="cover"')).toBeLessThan(html.indexOf('class="resumo-exec"'));
     expect(html.indexOf('class="resumo-exec"')).toBeLessThan(html.indexOf('class="num"'));
@@ -163,7 +168,7 @@ describe("montarHtmlDocumentoProposta", () => {
   });
 
   it("usa a paleta do modelo, nunca a Soberana", () => {
-    const html = montarHtmlDocumentoProposta(DADOS_COMPLETOS);
+    const html = htmlDe(DADOS_COMPLETOS);
     expect(html).toContain("#0E2A47");
     expect(html).toContain("#B68B40");
     expect(html).not.toContain("#11365E");
@@ -171,7 +176,7 @@ describe("montarHtmlDocumentoProposta", () => {
   });
 
   it("não busca fonte na rede nem usa margin boxes de paged media", () => {
-    const html = montarHtmlDocumentoProposta(DADOS_COMPLETOS);
+    const html = htmlDe(DADOS_COMPLETOS);
     expect(html).not.toContain("fonts.googleapis");
     expect(html).not.toContain("fonts.gstatic");
     expect(html).not.toContain("@top-left");
@@ -181,7 +186,7 @@ describe("montarHtmlDocumentoProposta", () => {
 
   it("em Presencial, omite a seção de EventON e fecha a numeração sem buraco", () => {
     const secoes = secoesDo(
-      montarHtmlDocumentoProposta({ ...DADOS_COMPLETOS, modalidade: "Presencial" }),
+      htmlDe({ ...DADOS_COMPLETOS, modalidade: "Presencial" }),
     );
     expect(secoes).toHaveLength(20);
     expect(secoes.map((s) => s.titulo)).not.toContain(
@@ -193,7 +198,7 @@ describe("montarHtmlDocumentoProposta", () => {
   });
 
   it("proposta vazia gera documento sem undefined/NaN, com numeração contígua", () => {
-    const html = montarHtmlDocumentoProposta(DADOS_VAZIOS);
+    const html = htmlDe(DADOS_VAZIOS);
     const secoes = secoesDo(html);
     expect(secoes.length).toBeGreaterThan(0);
     expect(secoes.map((s) => s.numero)).toEqual(secoes.map((_, i) => 3 + i));
@@ -207,7 +212,7 @@ describe("montarHtmlDocumentoProposta", () => {
   });
 
   it("seção 3: imprime as 13 caixas do modelo, com os rótulos dele", () => {
-    const html = montarHtmlDocumentoProposta(DADOS_COMPLETOS);
+    const html = htmlDe(DADOS_COMPLETOS);
     const secao = html.slice(html.indexOf("Dados de Identificação da Proposta"));
     const corpo = secao.slice(0, secao.indexOf("</section>"));
     for (const rotulo of [
@@ -240,7 +245,7 @@ describe("montarHtmlDocumentoProposta", () => {
   });
 
   it("seção 3: caixa sem dado é omitida, nunca impressa vazia", () => {
-    const html = montarHtmlDocumentoProposta(DADOS_VAZIOS);
+    const html = htmlDe(DADOS_VAZIOS);
     const secao = html.slice(html.indexOf("Dados de Identificação da Proposta"));
     const corpo = secao.slice(0, secao.indexOf("</section>"));
     for (const rotulo of [
@@ -261,7 +266,7 @@ describe("montarHtmlDocumentoProposta", () => {
   });
 
   it("intercala a seção extra em cada uma das 3 posições previstas", () => {
-    const extras = montarHtmlDocumentoProposta({
+    const extras = htmlDe({
       ...DADOS_COMPLETOS,
       secoesExtras: [
         { titulo: "Antes do Quadro", corpoHtml: "<p>a</p>", posicao: "antes-quadro-comercial" },
@@ -277,8 +282,39 @@ describe("montarHtmlDocumentoProposta", () => {
     expect(secoesDo(extras).map((s) => s.numero)).toEqual(titulos.map((_, i) => 3 + i));
   });
 
+  it("devolve o relatório de omissão junto com o HTML", () => {
+    const r = montarHtmlDocumentoProposta({
+      ...DADOS_COMPLETOS,
+      docentes: [],
+      conteudoHtml: { ...DADOS_COMPLETOS.conteudoHtml, metodologia: "" },
+      secoesExtras: [{ titulo: "", corpoHtml: "<p>rascunho</p>", posicao: "fim" }],
+    });
+    expect(r.html).toContain("<!DOCTYPE html>");
+    expect(r.omitidas.map((o) => o.titulo)).toEqual([
+      "Metodologia",
+      "Corpo Docente e Curadoria",
+      "Seção extra sem título",
+    ]);
+    expect(r.omitidas.map((o) => o.chave)).toEqual(["metodologia", "docentes", ""]);
+  });
+
+  it("EventON omitida pela modalidade não entra no relatório (a tela já sinaliza)", () => {
+    // `secoesInstitucionais` nem produz a seção fora de online, então ela não
+    // chega a `montarSecoes`. Quem avisa é o selo "não sai no documento" do
+    // editor daquela seção (prop `omitida` de `ConteudoProposta`).
+    const r = montarHtmlDocumentoProposta({ ...DADOS_COMPLETOS, modalidade: "Presencial" });
+    expect(r.omitidas).toEqual([]);
+    expect(secoesDo(r.html).map((s) => s.titulo)).not.toContain(
+      "Condições de Participação · Evento Online EventON",
+    );
+  });
+
+  it("documento completo não omite nada", () => {
+    expect(montarHtmlDocumentoProposta(DADOS_COMPLETOS).omitidas).toEqual([]);
+  });
+
   it("escapa HTML nos campos de texto livre (evita injeção no PDF)", () => {
-    const html = montarHtmlDocumentoProposta({
+    const html = htmlDe({
       ...DADOS_COMPLETOS,
       clienteOrgao: "<script>alert(1)</script>",
     });
@@ -287,7 +323,7 @@ describe("montarHtmlDocumentoProposta", () => {
   });
 
   it("formata valores em BRL com centavos e datas em dd/mm/aaaa", () => {
-    const html = montarHtmlDocumentoProposta(DADOS_COMPLETOS);
+    const html = htmlDe(DADOS_COMPLETOS);
     // normaliza espaço não-quebrável (U+00A0) que o Intl.NumberFormat pt-BR
     // pode emitir entre "R$" e o valor, dependendo do ICU do runtime.
     expect(html.replace(/\s/g, " ")).toContain("R$ 900,00");

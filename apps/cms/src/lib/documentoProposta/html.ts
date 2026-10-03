@@ -9,7 +9,12 @@ import {
 } from "./formato";
 import { FONTES_EMBUTIDAS_CSS } from "./fontsEmbutidas";
 import { contagemDeItensDoDocumento } from "./modulos";
-import { montarSecoes, type SecaoDocumento, type SecaoNumerada } from "./montar";
+import {
+  montarSecoes,
+  type SecaoDocumento,
+  type SecaoNumerada,
+  type SecaoOmitida,
+} from "./montar";
 import { ORDEM_MODELO } from "./ordem";
 import { secoesComerciais } from "./secoes/comercial";
 import { secoesInstitucionais } from "./secoes/institucional";
@@ -171,10 +176,27 @@ ${cssBaseProposta()}
 </style>`;
 }
 
-export function montarHtmlDocumentoProposta(dados: DadosDocumentoProposta): string {
-  const { secoes } = montarSecoes(baseDoDocumento(dados), dados.secoesExtras);
+export interface DocumentoPropostaMontado {
+  html: string;
+  /**
+   * Seções que ficaram fora — o "relatório de geração" do spec §1.1. Era
+   * calculado por `montarSecoes` e jogado fora aqui: ninguém lia, e a informação
+   * importa justamente no momento em que o PO gera o PDF.
+   *
+   * Cobre o que `montarSecoes` descarta: seção base de corpo vazio e seção
+   * extra sem título ou sem corpo. **Não** cobre a seção 17 (EventON) quando a
+   * modalidade não é online — `secoesInstitucionais` nem a produz, e a tela já
+   * marca aquele editor com o selo "não sai no documento".
+   */
+  omitidas: SecaoOmitida[];
+}
 
-  return `<!DOCTYPE html><html lang="pt-BR"><head>
+export function montarHtmlDocumentoProposta(
+  dados: DadosDocumentoProposta,
+): DocumentoPropostaMontado {
+  const { secoes, omitidas } = montarSecoes(baseDoDocumento(dados), dados.secoesExtras);
+
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <title>${esc(dados.codigo)} · Proposta Instituto NTC</title>
 ${estilosDocumento()}
@@ -186,4 +208,6 @@ ${montarResumoExecutivo(dados)}
 ${renderizarSecoes(secoes)}
 </div>
 </body></html>`;
+
+  return { html, omitidas };
 }

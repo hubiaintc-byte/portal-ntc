@@ -168,6 +168,9 @@ export function ShellCrm({
   const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [carregando, iniciarCarga] = useTransition();
   const [leadsLocal, setLeadsLocal] = useState<LeadCrmResumo[]>(leads);
+  // Relatório de geração do PDF (spec §1.1): títulos das seções que ficaram
+  // fora do documento. `null` = nenhuma geração nesta visita do detalhe.
+  const [omitidasPdf, setOmitidasPdf] = useState<string[] | null>(null);
 
   useEffect(() => setLeadsLocal(leads), [leads]);
 
@@ -177,6 +180,7 @@ export function ShellCrm({
     setPropostaDet(null);
     setFormAberto(null);
     setErroAcao(null);
+    setOmitidasPdf(null);
   }
 
   function irPara(id: string) {
@@ -252,9 +256,11 @@ export function ShellCrm({
     iniciarCarga(async () => {
       const r = await gerarPdfPropostaCrm(id);
       if (r.ok) {
+        setOmitidasPdf(r.omitidas ?? []);
         const det = await carregarPropostaCrm(id);
         if (det) setPropostaDet(det);
       } else {
+        setOmitidasPdf(null);
         setErroAcao(r.erro ?? "Erro ao gerar PDF.");
       }
     });
@@ -323,6 +329,7 @@ export function ShellCrm({
             onRegistrarEnvio={registrarEnvio}
             onGerarPdf={gerarPdf}
             gerandoPdf={carregando}
+            omitidasNoPdf={omitidasPdf}
             onAtualizado={() => abrirProposta(propostaDet.id)}
           />
         </>

@@ -8,8 +8,9 @@ vi.mock("@/lib/documentoProposta/dados", () => ({
   obterDadosDocumentoProposta: obterDadosDocumentoPropostaMock,
 }));
 
+const montarHtmlMock = vi.fn().mockReturnValue({ html: "<html></html>", omitidas: [] });
 vi.mock("@/lib/documentoProposta/html", () => ({
-  montarHtmlDocumentoProposta: vi.fn().mockReturnValue("<html></html>"),
+  montarHtmlDocumentoProposta: montarHtmlMock,
 }));
 
 const gerarPdfDeHtmlMock = vi.fn();
@@ -20,6 +21,7 @@ const { gerarESalvarPdfProposta } = await import("./painelCrmEscrita");
 describe("gerarESalvarPdfProposta", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    montarHtmlMock.mockReturnValue({ html: "<html></html>", omitidas: [] });
   });
 
   afterEach(() => {
@@ -114,5 +116,57 @@ describe("gerarESalvarPdfProposta", () => {
 
     expect(resultado.ok).toBe(false);
     if (!resultado.ok) expect(resultado.erro).toBe("Não foi possível gerar o PDF. Tente novamente.");
+  });
+
+  it("devolve o relatório de omissão (títulos) ao chamador", async () => {
+    // spec §1.1: "a omissão sai no relatório de geração". Antes `omitidas` era
+    // calculado por `montarSecoes` e descartado — ninguém lia.
+    montarHtmlMock.mockReturnValue({
+      html: "<html></html>",
+      omitidas: [
+        { chave: "docentes", titulo: "Corpo Docente e Curadoria" },
+        { chave: "", titulo: "Seção extra sem título" },
+      ],
+    });
+    obterDadosDocumentoPropostaMock.mockResolvedValue({
+      id: "42",
+      codigo: "C-v01",
+      programaSigla: "PROGE",
+      validadeISO: null,
+      dataCriacaoISO: null,
+    });
+    gerarPdfDeHtmlMock.mockResolvedValue(Buffer.from("pdf"));
+    obterPayloadMock.mockResolvedValue({
+      findByID: vi.fn().mockResolvedValue({ pdfGerado: null }),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      update: vi.fn().mockResolvedValue({}),
+      delete: vi.fn().mockResolvedValue({}),
+    });
+
+    const resultado = await gerarESalvarPdfProposta("42");
+
+    expect(resultado).toEqual({
+      ok: true,
+      omitidas: ["Corpo Docente e Curadoria", "Seção extra sem título"],
+    });
+  });
+
+  it("documento sem omissão devolve lista vazia, não ausente", async () => {
+    obterDadosDocumentoPropostaMock.mockResolvedValue({
+      id: "42",
+      codigo: "C-v01",
+      programaSigla: "PROGE",
+      validadeISO: null,
+      dataCriacaoISO: null,
+    });
+    gerarPdfDeHtmlMock.mockResolvedValue(Buffer.from("pdf"));
+    obterPayloadMock.mockResolvedValue({
+      findByID: vi.fn().mockResolvedValue({ pdfGerado: null }),
+      create: vi.fn().mockResolvedValue({ id: 1 }),
+      update: vi.fn().mockResolvedValue({}),
+      delete: vi.fn().mockResolvedValue({}),
+    });
+
+    expect(await gerarESalvarPdfProposta("42")).toEqual({ ok: true, omitidas: [] });
   });
 });
