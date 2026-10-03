@@ -80,11 +80,16 @@ export interface DadosDocumentoProposta {
   dataCriacaoISO: string | null;
   validadeISO: string | null;
   elaboradorNome: string;
+  aprovadorNome: string;
   clienteOrgao: string;
   clienteSigla: string;
   clienteUf: string;
   clienteMunicipio: string;
+  clienteCnpj: string;
   clienteDirigente: string;
+  clienteDirigenteCargo: string;
+  /** "Contato Institucional" da seção 3: e-mail do órgão, ou do contato principal. */
+  clienteContatoEmail: string;
   programaNome: string;
   programaSigla: string;
   itens: ItemDocumento[];
@@ -179,6 +184,7 @@ export async function obterDadosDocumentoProposta(
   // reintroduziria a divergência que os campos de texto resolveram.
   const programa = ehObjeto<Programa>(doc.programa) ? doc.programa : null;
   const elaborador = ehObjeto<User>(doc.elaborador) ? doc.elaborador : null;
+  const aprovador = ehObjeto<User>(doc.aprovador) ? doc.aprovador : null;
 
   const modulos = (doc.modulos ?? []).filter((m): m is Modulo => ehObjeto<Modulo>(m));
   const eventos = (doc.eventos ?? []).filter((e): e is Evento => ehObjeto<Evento>(e));
@@ -272,11 +278,17 @@ export async function obterDadosDocumentoProposta(
     dataCriacaoISO: doc.dataCriacao ?? null,
     validadeISO: doc.validade ?? null,
     elaboradorNome: elaborador?.nome ?? "Comercial NTC",
+    aprovadorNome: aprovador?.nome ?? "",
     clienteOrgao: cliente?.orgao ?? "—",
     clienteSigla: cliente?.sigla ?? cliente?.orgao ?? "—",
     clienteUf: cliente?.uf ?? "",
     clienteMunicipio: cliente?.municipio ?? "—",
+    clienteCnpj: texto(cliente?.cnpj),
     clienteDirigente: contatoPrincipal?.nome ?? "—",
+    clienteDirigenteCargo: texto(contatoPrincipal?.cargo),
+    // O e-mail institucional do órgão vem primeiro; sem ele, o do contato
+    // principal. É o que o modelo imprime em "Contato Institucional".
+    clienteContatoEmail: texto(cliente?.email) || texto(contatoPrincipal?.email),
     programaNome: programa?.nomeCompleto ?? "Programa Estratégico NTC",
     programaSigla: programa?.sigla ?? "",
     itens,

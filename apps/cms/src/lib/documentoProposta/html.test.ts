@@ -18,11 +18,15 @@ const DADOS_COMPLETOS: DadosDocumentoProposta = {
   dataCriacaoISO: "2026-08-29T12:00:00.000Z",
   validadeISO: "2026-09-28T12:00:00.000Z",
   elaboradorNome: "Ana Comercial",
+  aprovadorNome: "Direção Executiva NTC",
   clienteOrgao: "Secretaria de Educação de São Paulo",
   clienteSigla: "SEDUC-SP",
   clienteUf: "SP",
   clienteMunicipio: "São Paulo",
+  clienteCnpj: "24.851.511/0001-85",
   clienteDirigente: "Fulano de Tal",
+  clienteDirigenteCargo: "Secretária Municipal de Educação",
+  clienteContatoEmail: "gabinete@orgao.gov.br",
   programaNome: "Programa de Gestão Estratégica",
   programaSigla: "PROGE",
   itens: [{ rotulo: "M1 · Gestão Democrática", cargaHoraria: "40h", valorUnitario: 100 }],
@@ -70,7 +74,11 @@ const DADOS_VAZIOS: DadosDocumentoProposta = {
   clienteSigla: "—",
   clienteUf: "",
   clienteMunicipio: "—",
+  clienteCnpj: "",
   clienteDirigente: "—",
+  clienteDirigenteCargo: "",
+  clienteContatoEmail: "",
+  aprovadorNome: "",
   dataCriacaoISO: null,
   validadeISO: null,
   itens: [],
@@ -196,6 +204,60 @@ describe("montarHtmlDocumentoProposta", () => {
     // só o corpo do documento, depois do </style>.
     const corpo = html.slice(html.indexOf("</style>"));
     expect(corpo).not.toMatch(/undefined|NaN|Infinity/);
+  });
+
+  it("seção 3: imprime as 13 caixas do modelo, com os rótulos dele", () => {
+    const html = montarHtmlDocumentoProposta(DADOS_COMPLETOS);
+    const secao = html.slice(html.indexOf("Dados de Identificação da Proposta"));
+    const corpo = secao.slice(0, secao.indexOf("</section>"));
+    for (const rotulo of [
+      "Código da Proposta",
+      "Versão",
+      "Cliente",
+      "UF · Município",
+      "CNPJ",
+      "Dirigente",
+      "Contato Institucional",
+      "Programa",
+      "Escopo",
+      "Modalidade",
+      "Replay",
+      "Emissão · Validade",
+      "Elaborador · Aprovador",
+    ])
+      expect(corpo).toContain(`<div class="label">${rotulo}</div>`);
+    expect(corpo.match(/<div class="box">/g)).toHaveLength(13);
+    // O dado de cada caixa que a Fase B2 não imprimia.
+    expect(corpo).toContain("24.851.511/0001-85");
+    expect(corpo).toContain("Secretária Municipal de Educação");
+    expect(corpo).toContain("gabinete@orgao.gov.br");
+    expect(corpo).toContain("SP · São Paulo");
+    expect(corpo).toContain("1 módulo-evento · 40h totais");
+    // A autoria, que a Fase B2 trazia na capa e esta branch havia perdido.
+    expect(corpo).toContain("Ana Comercial");
+    expect(corpo).toContain("Direção Executiva NTC");
+    expect(corpo).toContain("29/08/2026 · 28/09/2026");
+  });
+
+  it("seção 3: caixa sem dado é omitida, nunca impressa vazia", () => {
+    const html = montarHtmlDocumentoProposta(DADOS_VAZIOS);
+    const secao = html.slice(html.indexOf("Dados de Identificação da Proposta"));
+    const corpo = secao.slice(0, secao.indexOf("</section>"));
+    for (const rotulo of [
+      "UF · Município",
+      "CNPJ",
+      "Dirigente",
+      "Contato Institucional",
+      "Escopo",
+      "Modalidade",
+      "Replay",
+      "Emissão · Validade",
+    ])
+      expect(corpo).not.toContain(`<div class="label">${rotulo}</div>`);
+    // Sobram as caixas que sempre têm dado (código, versão, cliente, programa)
+    // mais Elaborador · Aprovador, que cai no default "Comercial NTC".
+    expect(corpo.match(/<div class="box">/g)).toHaveLength(5);
+    expect(corpo).not.toMatch(/<div class="text"[^>]*><\/div>/);
   });
 
   it("intercala a seção extra em cada uma das 3 posições previstas", () => {

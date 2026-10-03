@@ -60,6 +60,69 @@ describe("obterDadosDocumentoProposta", () => {
     expect(dados?.elaboradorNome).toBe("Ana Comercial");
   });
 
+  it("carrega os campos da seção 3 que a Fase B2 não imprimia", async () => {
+    obterPayloadMock.mockResolvedValue({
+      findByID: vi.fn().mockResolvedValue({
+        id: 1,
+        codigo: "C-v01",
+        codigoBase: "C",
+        versao: 1,
+        tipo: "customizada",
+        cliente: {
+          id: 3,
+          orgao: "Secretaria Municipal de Educação de Palmas",
+          sigla: "SEMED-Palmas",
+          cnpj: "24.851.511/0001-85",
+          email: "gabinete@semed.palmas.to.gov.br",
+          contatos: [
+            {
+              nome: "Profa. Anice Moura",
+              cargo: "Secretária Municipal de Educação",
+              email: "anice@semed.palmas.to.gov.br",
+              principal: true,
+            },
+          ],
+        },
+        programa: null,
+        modulos: [],
+        eventos: [],
+        elaborador: { id: 5, nome: "Nicolas Coelho" },
+        aprovador: { id: 6, nome: "Direção Executiva NTC" },
+      }),
+    });
+
+    const dados = await obterDadosDocumentoProposta("1");
+
+    expect(dados?.clienteCnpj).toBe("24.851.511/0001-85");
+    expect(dados?.clienteDirigenteCargo).toBe("Secretária Municipal de Educação");
+    // O e-mail do órgão vence o do contato principal.
+    expect(dados?.clienteContatoEmail).toBe("gabinete@semed.palmas.to.gov.br");
+    expect(dados?.aprovadorNome).toBe("Direção Executiva NTC");
+  });
+
+  it("sem e-mail no órgão, o contato institucional cai no contato principal", async () => {
+    obterPayloadMock.mockResolvedValue({
+      findByID: vi.fn().mockResolvedValue({
+        id: 1,
+        codigo: "C-v01",
+        codigoBase: "C",
+        versao: 1,
+        tipo: "customizada",
+        cliente: { id: 3, orgao: "Órgão", contatos: [{ nome: "Pessoa", email: "p@org.gov.br", principal: true }] },
+        programa: null,
+        modulos: [],
+        eventos: [],
+        elaborador: null,
+      }),
+    });
+
+    const dados = await obterDadosDocumentoProposta("1");
+
+    expect(dados?.clienteContatoEmail).toBe("p@org.gov.br");
+    expect(dados?.clienteCnpj).toBe("");
+    expect(dados?.aprovadorNome).toBe("");
+  });
+
   it("devolve null quando a proposta não existe", async () => {
     obterPayloadMock.mockResolvedValue({
       findByID: vi.fn().mockRejectedValue(new Error("not found")),
