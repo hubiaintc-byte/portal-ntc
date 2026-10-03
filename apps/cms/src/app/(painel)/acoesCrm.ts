@@ -34,8 +34,10 @@ import {
   registrarEnvio,
   removerDocumentoEvento,
   salvarLinksInscricao,
+  salvarSecaoConteudoProposta,
   subirDocumentoEvento,
   vincularClienteAoLead,
+  type AlvoConteudoProposta,
   type AlvoRestauracao,
   type DadosClienteCrm,
   type DadosContrato,
@@ -44,6 +46,7 @@ import {
   type DadosLeadManual,
   type DadosLink,
   type DadosProposta,
+  type ValorSecaoProposta,
 } from "@/lib/cms/painelCrmEscrita";
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
 
@@ -101,6 +104,19 @@ export async function restaurarConteudoPropostaCrm(
   const usuario = await obterUsuarioAutenticado();
   if (!usuario) return RECUSADO;
   const r = await restaurarConteudoProposta(id, alvo, usuario);
+  if (r.ok) revalidatePath("/crm");
+  return r;
+}
+
+/** Salva uma seção do conteúdo do documento (bloco "Conteúdo do documento"). */
+export async function salvarSecaoConteudoPropostaCrm(
+  id: string,
+  alvo: AlvoConteudoProposta,
+  valor: ValorSecaoProposta,
+): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return RECUSADO;
+  const r = await salvarSecaoConteudoProposta(id, alvo, valor, usuario);
   if (r.ok) revalidatePath("/crm");
   return r;
 }

@@ -33,7 +33,7 @@ const executarEmTransacaoMock = vi.fn(
 );
 vi.mock("@/lib/crm/transacao", () => ({ executarEmTransacao: executarEmTransacaoMock }));
 
-const { moverLeadCrm, salvarClienteCrm, agendarEventoCrm, apagarLeadCrm, restaurarConteudoPropostaCrm } = await import("./acoesCrm");
+const { moverLeadCrm, salvarClienteCrm, agendarEventoCrm, apagarLeadCrm, restaurarConteudoPropostaCrm, salvarSecaoConteudoPropostaCrm } = await import("./acoesCrm");
 type DadosClienteCrm = Parameters<typeof salvarClienteCrm>[1];
 type DadosEvento = Parameters<typeof agendarEventoCrm>[1];
 
@@ -164,5 +164,29 @@ describe("restaurarConteudoPropostaCrm", () => {
     montarPayloadFalso();
     expect(await restaurarConteudoPropostaCrm("9", "tudo")).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
     expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("salvarSecaoConteudoPropostaCrm", () => {
+  it("sem sessão recusa sem tocar o banco", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(null);
+    montarPayloadFalso();
+    expect(
+      await salvarSecaoConteudoPropostaCrm("9", "apresentacao", { tipo: "texto", texto: "Oi." }),
+    ).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+
+  it("com sessão grava o campo da seção, com o usuário como autor", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(usuarioFalso);
+    const { update } = montarPayloadFalso();
+    expect(
+      await salvarSecaoConteudoPropostaCrm("9", "fechamento", { tipo: "texto", texto: "Fecho." }),
+    ).toEqual({ ok: true });
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ collection: "propostas", id: "9", user: usuarioFalso }),
+    );
+    const data = (update.mock.calls[0]![0] as { data: Record<string, unknown> }).data;
+    expect(Object.keys(data)).toEqual(["textoFechamento"]);
   });
 });

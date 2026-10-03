@@ -708,32 +708,42 @@ type CampoRestauravel =
   | (typeof CAMPOS_TEXTO_RESTAURAVEIS)[number]
   | (typeof CAMPOS_LISTA_RESTAURAVEIS)[number];
 
+/**
+ * Alvo de uma seção -> o único campo que ele toca. Primitivo do mapa:
+ * `camposDoAlvo` ("tudo" incluído) e `salvarSecaoConteudoProposta` leem daqui,
+ * para restaurar e salvar nunca divergirem sobre qual campo é qual seção.
+ */
+function campoDoAlvo(alvo: Exclude<AlvoRestauracao, "tudo">): CampoRestauravel {
+  switch (alvo) {
+    case "docentes": return "docentes";
+    case "apresentacao": return "textoApresentacao";
+    case "contexto": return "textoContexto";
+    case "objetivos": return "textoObjetivos";
+    case "publicoAlvo": return "textoPublicoAlvo";
+    case "metodologia": return "textoMetodologia";
+    case "eixos": return "eixos";
+    case "diferenciais": return "diferenciais";
+    case "resultados": return "resultados";
+    case "modulos": return "modulosDetalhados";
+    case "eventon": return "textoEventon";
+    case "certificacaoReplay": return "textoCertificacaoReplay";
+    case "cancelamento": return "textoCancelamento";
+    case "protecaoConteudo": return "textoProtecaoConteudo";
+    case "fundamentacaoLegal": return "textoFundamentacaoLegal";
+    case "proximosPassos": return "textoProximosPassos";
+    case "fechamento": return "textoFechamento";
+  }
+}
+
 /** Alvo do botão -> campos que ele toca. "tudo" não inclui docentes (ver LISTAS_FORA_DO_TUDO). */
 function camposDoAlvo(alvo: AlvoRestauracao): readonly CampoRestauravel[] {
-  switch (alvo) {
-    case "tudo":
-      return [
-        ...CAMPOS_TEXTO_RESTAURAVEIS,
-        ...CAMPOS_LISTA_RESTAURAVEIS.filter((c) => !LISTAS_FORA_DO_TUDO.includes(c)),
-      ];
-    case "docentes": return ["docentes"];
-    case "apresentacao": return ["textoApresentacao"];
-    case "contexto": return ["textoContexto"];
-    case "objetivos": return ["textoObjetivos"];
-    case "publicoAlvo": return ["textoPublicoAlvo"];
-    case "metodologia": return ["textoMetodologia"];
-    case "eixos": return ["eixos"];
-    case "diferenciais": return ["diferenciais"];
-    case "resultados": return ["resultados"];
-    case "modulos": return ["modulosDetalhados"];
-    case "eventon": return ["textoEventon"];
-    case "certificacaoReplay": return ["textoCertificacaoReplay"];
-    case "cancelamento": return ["textoCancelamento"];
-    case "protecaoConteudo": return ["textoProtecaoConteudo"];
-    case "fundamentacaoLegal": return ["textoFundamentacaoLegal"];
-    case "proximosPassos": return ["textoProximosPassos"];
-    case "fechamento": return ["textoFechamento"];
+  if (alvo === "tudo") {
+    return [
+      ...CAMPOS_TEXTO_RESTAURAVEIS,
+      ...CAMPOS_LISTA_RESTAURAVEIS.filter((c) => !LISTAS_FORA_DO_TUDO.includes(c)),
+    ];
   }
+  return [campoDoAlvo(alvo)];
 }
 
 /**
@@ -792,6 +802,149 @@ export async function restaurarConteudoProposta(
     return { ok: true };
   } catch (e) {
     console.error("[restaurarConteudoProposta]", e);
+    return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/**
+ * Alvo de uma seção EDITÁVEL do conteúdo do documento: os mesmos alvos de
+ * `AlvoRestauracao` menos "tudo" (que não é uma seção, e por isso não se
+ * salva), mais `secoesExtras` — seção livre do PO, que não tem padrão a
+ * restaurar e por isso nunca entrou em `AlvoRestauracao`.
+ */
+export type AlvoConteudoProposta = Exclude<AlvoRestauracao, "tudo"> | "secoesExtras";
+
+/**
+ * O que a tela manda para uma seção. Discriminado por `tipo` e conferido
+ * contra o alvo (`TIPO_DE_ALVO`) antes de qualquer escrita: Server Action é
+ * endpoint público, e um par alvo/valor trocado gravaria lista em campo de
+ * texto. Texto chega PURO (convenção de `textoComSubtitulosParaLexical`:
+ * parágrafos por linha, "- " item de lista, "## " subtítulo).
+ */
+export type ValorSecaoProposta =
+  | { tipo: "texto"; texto: string }
+  | { tipo: "pares"; itens: { titulo: string; descricao: string }[] }
+  | { tipo: "resultados"; itens: string[] }
+  | {
+      tipo: "docentes";
+      itens: { especialistaId: string; nome: string; credencial: string; eixo: string }[];
+    }
+  | { tipo: "modulos"; itens: { moduloId: string; tituloExibido: string; ementa: string }[] }
+  | { tipo: "extras"; itens: { titulo: string; corpo: string; posicao: string }[] };
+
+const TIPO_DE_ALVO: Record<AlvoConteudoProposta, ValorSecaoProposta["tipo"]> = {
+  apresentacao: "texto",
+  contexto: "texto",
+  objetivos: "texto",
+  publicoAlvo: "texto",
+  metodologia: "texto",
+  eventon: "texto",
+  certificacaoReplay: "texto",
+  cancelamento: "texto",
+  protecaoConteudo: "texto",
+  fundamentacaoLegal: "texto",
+  proximosPassos: "texto",
+  fechamento: "texto",
+  eixos: "pares",
+  diferenciais: "pares",
+  resultados: "resultados",
+  docentes: "docentes",
+  modulos: "modulos",
+  secoesExtras: "extras",
+};
+
+/** As três posições da seção extra (coleção `propostas`); valor estranho cai em "fim". */
+const POSICOES_EXTRA: readonly string[] = [
+  "antes-quadro-comercial",
+  "apos-condicoes-comerciais",
+  "fim",
+];
+
+const posicaoDeExtra = (v: string): string => (POSICOES_EXTRA.includes(v) ? v : "fim");
+
+/**
+ * Texto puro -> Lexical, com `null` para texto vazio. Mesma regra das Tasks 11
+ * e 12 (`seTemTexto`/`restaurarConteudoProposta`): é o campo ausente ou nulo
+ * que faz o documento OMITIR a seção, e um Lexical com parágrafo vazio
+ * imprimiria um título sem corpo num documento contratual.
+ */
+function lexicalOuNulo(texto: string): PropostaRichText | null {
+  if (texto.trim().length === 0) return null;
+  const documento = textoComSubtitulosParaLexical(texto) as PropostaRichText;
+  return temTextoLexical(documento) ? documento : null;
+}
+
+/** O valor da seção na forma que o Payload grava. Item sem conteúdo é descartado. */
+function valorGravavelDaSecao(valor: ValorSecaoProposta): unknown {
+  switch (valor.tipo) {
+    case "texto":
+      return lexicalOuNulo(valor.texto);
+    case "pares":
+      return valor.itens
+        .filter((i) => i.titulo.trim().length > 0 || i.descricao.trim().length > 0)
+        .map((i) => ({ titulo: ouNulo(i.titulo), descricao: ouNulo(i.descricao) }));
+    case "resultados":
+      return valor.itens
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0)
+        .map((texto) => ({ texto }));
+    case "docentes":
+      // Docente é guardado se tem nome OU ficha: o modelo traz "Especialista
+      // convidado", que não é pessoa cadastrada (decisão do PO).
+      return valor.itens
+        .filter((d) => d.nome.trim().length > 0 || idOuNulo(d.especialistaId) !== null)
+        .map((d) => ({
+          especialista: idOuNulo(d.especialistaId),
+          nome: ouNulo(d.nome),
+          credencial: ouNulo(d.credencial),
+          eixo: ouNulo(d.eixo),
+        }));
+    case "modulos":
+      // A seleção de módulos é do wizard: a tela só edita título e ementa,
+      // então nada é descartado aqui (perder a linha perderia o módulo).
+      return valor.itens.map((m) => ({
+        modulo: idOuNulo(m.moduloId),
+        tituloExibido: ouNulo(m.tituloExibido),
+        ementa: lexicalOuNulo(m.ementa),
+      }));
+    case "extras":
+      return valor.itens
+        .filter((s) => s.titulo.trim().length > 0 || s.corpo.trim().length > 0)
+        .map((s) => ({
+          titulo: ouNulo(s.titulo),
+          corpo: lexicalOuNulo(s.corpo),
+          posicao: posicaoDeExtra(s.posicao),
+        }));
+  }
+}
+
+/**
+ * Salva UMA seção do conteúdo do documento, vinda da tela em texto puro/arrays
+ * simples. Grava só o campo daquele alvo (`campoDoAlvo`, o mesmo mapa de
+ * "Restaurar padrão"), numa única escrita — sem transação, como
+ * `restaurarConteudoProposta` —, com `usuario` no `user` do update.
+ */
+export async function salvarSecaoConteudoProposta(
+  id: string,
+  alvo: AlvoConteudoProposta,
+  valor: ValorSecaoProposta,
+  usuario: UsuarioAutenticado,
+): Promise<ResultadoEscrita> {
+  if (valor.tipo !== TIPO_DE_ALVO[alvo]) {
+    return { ok: false, erro: "Conteúdo incompatível com a seção." };
+  }
+  const campo = alvo === "secoesExtras" ? "secoesExtras" : campoDoAlvo(alvo);
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "propostas",
+      id,
+      data: { [campo]: valorGravavelDaSecao(valor) } as Partial<PropostaData>,
+      user: usuario,
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[salvarSecaoConteudoProposta]", e);
     return { ok: false, erro: ERRO_GENERICO };
   }
 }

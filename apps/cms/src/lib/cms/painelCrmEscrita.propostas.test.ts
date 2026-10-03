@@ -4,9 +4,14 @@ const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
 const { credencialDaFicha } = await import("@/lib/documentoProposta/dados");
-const { atualizarProposta, criarProposta, criarVersaoProposta, dadosProposta, restaurarConteudoProposta } = await import(
-  "./painelCrmEscrita",
-);
+const {
+  atualizarProposta,
+  criarProposta,
+  criarVersaoProposta,
+  dadosProposta,
+  restaurarConteudoProposta,
+  salvarSecaoConteudoProposta,
+} = await import("./painelCrmEscrita");
 
 afterEach(() => vi.clearAllMocks());
 
@@ -686,5 +691,180 @@ describe("restaurarConteudoProposta", () => {
     const r = await restaurarConteudoProposta("999", "tudo", usuario);
     expect(r.ok).toBe(false);
     expect(p.update).not.toHaveBeenCalled();
+  });
+});
+
+describe("salvarSecaoConteudoProposta", () => {
+  const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
+  type Alvo = Parameters<typeof salvarSecaoConteudoProposta>[1];
+
+  it("texto grava SÓ o campo do alvo, convertido para Lexical", async () => {
+    const { update } = payloadFalso();
+    const r = await salvarSecaoConteudoProposta(
+      "9",
+      "apresentacao",
+      { tipo: "texto", texto: "## Sub\n\nUm parágrafo.\n- item" },
+      usuario,
+    );
+    expect(r).toEqual({ ok: true });
+    const data = dadosDaChamada(update);
+    expect(Object.keys(data)).toEqual(["textoApresentacao"]);
+    const blocos = (data.textoApresentacao as { root: { children: { type: string }[] } }).root.children;
+    expect(blocos.map((b) => b.type)).toEqual(["heading", "paragraph", "list"]);
+  });
+
+  it("texto vazio (ou só espaços) grava null, nunca Lexical vazio", async () => {
+    const { update } = payloadFalso();
+    await salvarSecaoConteudoProposta("9", "fechamento", { tipo: "texto", texto: "   \n  " }, usuario);
+    expect(dadosDaChamada(update)).toEqual({ textoFechamento: null });
+  });
+
+  it("os 12 alvos de texto escrevem cada um no seu campo", async () => {
+    const pares: [Alvo, string][] = [
+      ["apresentacao", "textoApresentacao"],
+      ["contexto", "textoContexto"],
+      ["objetivos", "textoObjetivos"],
+      ["publicoAlvo", "textoPublicoAlvo"],
+      ["metodologia", "textoMetodologia"],
+      ["eventon", "textoEventon"],
+      ["certificacaoReplay", "textoCertificacaoReplay"],
+      ["cancelamento", "textoCancelamento"],
+      ["protecaoConteudo", "textoProtecaoConteudo"],
+      ["fundamentacaoLegal", "textoFundamentacaoLegal"],
+      ["proximosPassos", "textoProximosPassos"],
+      ["fechamento", "textoFechamento"],
+    ];
+    for (const [alvo, campo] of pares) {
+      vi.clearAllMocks();
+      const { update } = payloadFalso();
+      await salvarSecaoConteudoProposta("9", alvo, { tipo: "texto", texto: "Conteúdo." }, usuario);
+      expect(Object.keys(dadosDaChamada(update))).toEqual([campo]);
+    }
+  });
+
+  it("eixos e diferenciais gravam pares, descartando item totalmente vazio", async () => {
+    const { update } = payloadFalso();
+    await salvarSecaoConteudoProposta(
+      "9",
+      "eixos",
+      {
+        tipo: "pares",
+        itens: [
+          { titulo: " Eixo 1 ", descricao: "Base." },
+          { titulo: "  ", descricao: "  " },
+          { titulo: "Eixo 2", descricao: "" },
+        ],
+      },
+      usuario,
+    );
+    expect(dadosDaChamada(update)).toEqual({
+      eixos: [
+        { titulo: "Eixo 1", descricao: "Base." },
+        { titulo: "Eixo 2", descricao: null },
+      ],
+    });
+  });
+
+  it("resultados grava { texto } por item, sem os vazios", async () => {
+    const { update } = payloadFalso();
+    await salvarSecaoConteudoProposta(
+      "9",
+      "resultados",
+      { tipo: "resultados", itens: ["Resultado A.", "   ", " Resultado B. "] },
+      usuario,
+    );
+    expect(dadosDaChamada(update)).toEqual({
+      resultados: [{ texto: "Resultado A." }, { texto: "Resultado B." }],
+    });
+  });
+
+  it("docentes aceita entrada livre e ficha, e descarta linha sem nome nem ficha", async () => {
+    const { update } = payloadFalso();
+    await salvarSecaoConteudoProposta(
+      "9",
+      "docentes",
+      {
+        tipo: "docentes",
+        itens: [
+          { especialistaId: "11", nome: "Ana Ribeiro", credencial: "Doutorado · USP", eixo: "Eixo 1" },
+          { especialistaId: "", nome: "Especialista convidado", credencial: "", eixo: "" },
+          { especialistaId: "", nome: "   ", credencial: "", eixo: "" },
+        ],
+      },
+      usuario,
+    );
+    expect(dadosDaChamada(update)).toEqual({
+      docentes: [
+        { especialista: 11, nome: "Ana Ribeiro", credencial: "Doutorado · USP", eixo: "Eixo 1" },
+        { especialista: null, nome: "Especialista convidado", credencial: null, eixo: null },
+      ],
+    });
+  });
+
+  it("modulos preserva todas as linhas (a seleção é do wizard) e ementa vazia vira null", async () => {
+    const { update } = payloadFalso();
+    await salvarSecaoConteudoProposta(
+      "9",
+      "modulos",
+      {
+        tipo: "modulos",
+        itens: [
+          { moduloId: "10", tituloExibido: "M1 editado", ementa: "Ementa nova." },
+          { moduloId: "11", tituloExibido: "", ementa: "" },
+        ],
+      },
+      usuario,
+    );
+    const itens = dadosDaChamada(update).modulosDetalhados as Record<string, unknown>[];
+    expect(itens).toHaveLength(2);
+    expect(itens[0]).toMatchObject({ modulo: 10, tituloExibido: "M1 editado" });
+    expect(itens[0]!.ementa).toHaveProperty("root");
+    expect(itens[1]).toEqual({ modulo: 11, tituloExibido: null, ementa: null });
+  });
+
+  it("secoesExtras grava título, corpo e posição, com posição inválida caindo em 'fim'", async () => {
+    const { update } = payloadFalso();
+    await salvarSecaoConteudoProposta(
+      "9",
+      "secoesExtras",
+      {
+        tipo: "extras",
+        itens: [
+          { titulo: "Anexo A", corpo: "Texto do anexo.", posicao: "antes-quadro-comercial" },
+          { titulo: "Anexo B", corpo: "Outro.", posicao: "inventada" },
+          { titulo: " ", corpo: "  ", posicao: "fim" },
+        ],
+      },
+      usuario,
+    );
+    const itens = dadosDaChamada(update).secoesExtras as Record<string, unknown>[];
+    expect(itens).toHaveLength(2);
+    expect(itens[0]!.posicao).toBe("antes-quadro-comercial");
+    expect(itens[1]!.posicao).toBe("fim");
+  });
+
+  it("recusa valor incompatível com o alvo, sem tocar o banco", async () => {
+    const { update } = payloadFalso();
+    const r = await salvarSecaoConteudoProposta(
+      "9",
+      "apresentacao",
+      { tipo: "resultados", itens: ["x"] },
+      usuario,
+    );
+    expect(r).toEqual({ ok: false, erro: "Conteúdo incompatível com a seção." });
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("repassa o usuário ao update (autoria para os hooks)", async () => {
+    const { update } = payloadFalso();
+    await salvarSecaoConteudoProposta("9", "fechamento", { tipo: "texto", texto: "Fecho." }, usuario);
+    expect((update.mock.calls[0]![0] as unknown as { user: unknown }).user).toBe(usuario);
+  });
+
+  it("escrita que falha devolve erro sem lançar", async () => {
+    const { update } = payloadFalso();
+    update.mockRejectedValueOnce(new Error("banco fora"));
+    const r = await salvarSecaoConteudoProposta("9", "fechamento", { tipo: "texto", texto: "Fecho." }, usuario);
+    expect(r.ok).toBe(false);
   });
 });
