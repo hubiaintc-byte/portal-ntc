@@ -469,6 +469,7 @@ export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoEscr
     const html = montarHtmlDocumentoProposta(dados);
     const pdf = await gerarPdfDeHtml(html, {
       codigo: dados.codigo,
+      siglaPrograma: dados.programaSigla,
       validadeFormatada: formatarDataCurta(dados.validadeISO),
       emitidaFormatada: formatarDataCurta(dados.dataCriacaoISO),
     });

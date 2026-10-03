@@ -30,6 +30,7 @@ describe("gerarESalvarPdfProposta", () => {
     obterDadosDocumentoPropostaMock.mockResolvedValue({
       id: "42",
       codigo: "NTC-PROP-2026-PROGE-SP-X-v01",
+      programaSigla: "PROGE",
       validadeISO: "2026-09-28T12:00:00.000Z",
       dataCriacaoISO: "2026-08-29T12:00:00.000Z",
     });
@@ -44,6 +45,14 @@ describe("gerarESalvarPdfProposta", () => {
     const resultado = await gerarESalvarPdfProposta("42");
 
     expect(resultado.ok).toBe(true);
+    // O cabeçalho do PDF imprime "Instituto NTC do Brasil · <SIGLA>" (margin
+    // boxes do modelo), então a sigla do programa tem de chegar ao gerador.
+    expect(gerarPdfDeHtmlMock).toHaveBeenCalledWith("<html></html>", {
+      codigo: "NTC-PROP-2026-PROGE-SP-X-v01",
+      siglaPrograma: "PROGE",
+      validadeFormatada: "28/09/2026",
+      emitidaFormatada: "29/08/2026",
+    });
     expect(criarMedia).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: "documentos-comerciais",

@@ -2,8 +2,12 @@ import "server-only";
 
 import type { Browser } from "playwright-core";
 
+import { esc } from "@/lib/documentoProposta/formato";
+
 export interface MetaCabecalhoPdf {
   codigo: string;
+  /** Sigla do programa, como o `@top-left` do modelo a imprime. Vazia some. */
+  siglaPrograma: string;
   validadeFormatada: string;
   emitidaFormatada: string;
 }
@@ -34,17 +38,33 @@ async function abrirBrowser(): Promise<Browser> {
   });
 }
 
+/**
+ * Cabeçalho e rodapé seguem os margin boxes do modelo aprovado
+ * (docs/prototipos/proposta-modelo-v1.html, linhas 15-18), que o Chromium não
+ * implementa como paged media — daí vir pelo header/footerTemplate. Tipografia
+ * e cores são as de lá: Cormorant Garamond 9pt dourado `#B68B40` à esquerda do
+ * cabeçalho, Barlow 8pt `#6B6B6B` nos outros três cantos. NÃO voltar ao
+ * dourado da paleta Soberana (`#B5995A`): o documento da proposta é a exceção
+ * de paleta registrada em documentoProposta/tokens.ts.
+ */
+const ESTILO_LINHA =
+  "width:100%;font-family:Barlow,sans-serif;font-size:8pt;color:#6B6B6B;padding:0 18mm;display:flex;justify-content:space-between;";
+
 function headerTemplate(meta: MetaCabecalhoPdf): string {
-  return `<div style="width:100%;font-family:Barlow,sans-serif;font-size:8px;color:#5A5A5A;padding:0 18mm;display:flex;justify-content:space-between;">
-    <span style="font-family:'Cormorant Garamond',serif;color:#B5995A;font-weight:600;letter-spacing:0.5px;">Instituto NTC do Brasil</span>
-    <span>${meta.codigo}</span>
+  const sigla = meta.siglaPrograma.trim();
+  const esquerda = sigla
+    ? `Instituto NTC do Brasil · ${esc(sigla)}`
+    : "Instituto NTC do Brasil";
+  return `<div style="${ESTILO_LINHA}">
+    <span style="font-family:'Cormorant Garamond',serif;font-size:9pt;color:#B68B40;font-weight:600;letter-spacing:1pt;">${esquerda}</span>
+    <span style="letter-spacing:0.5pt;">${esc(meta.codigo)}</span>
   </div>`;
 }
 
 function footerTemplate(meta: MetaCabecalhoPdf): string {
-  return `<div style="width:100%;font-family:Barlow,sans-serif;font-size:8px;color:#5A5A5A;padding:0 18mm;display:flex;justify-content:space-between;">
-    <span>Validade: ${meta.validadeFormatada} · Emitida: ${meta.emitidaFormatada}</span>
-    <span>Página <span class="pageNumber"></span> de <span class="totalPages"></span></span>
+  return `<div style="${ESTILO_LINHA}">
+    <span style="letter-spacing:0.4pt;">Validade: ${esc(meta.validadeFormatada)} · Emitida: ${esc(meta.emitidaFormatada)}</span>
+    <span style="letter-spacing:0.4pt;">Página <span class="pageNumber"></span> de <span class="totalPages"></span></span>
   </div>`;
 }
 
