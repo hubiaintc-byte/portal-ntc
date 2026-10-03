@@ -91,3 +91,59 @@ describe("estadoInicialRascunho", () => {
     expect(e).toEqual({ marcaProp: JSON.stringify(V0), valor: V0, ultimoSalvo: V0, sujo: false });
   });
 });
+
+describe("reduzirRascunho — prop que alcança o último salvo (fix round 2)", () => {
+  it("salvar, digitar de novo e receber a prop com o valor SALVO preserva o rascunho posterior", () => {
+    let e = estadoInicialRascunho(V0);
+    e = reduzirRascunho(e, { tipo: "mudar", valor: V1 });
+    e = reduzirRascunho(e, { tipo: "salvo", valor: V1 });
+    e = reduzirRascunho(e, { tipo: "mudar", valor: V2 });
+
+    // Recarregamento do detalhe disparado por OUTRA seção ("Restaurar padrão"
+    // lá) traz esta seção como V1 — o que ela já havia salvo.
+    const depois = reduzirRascunho(e, { tipo: "prop", valorInicial: V1 });
+
+    expect(depois.valor).toBe(V2);
+    expect(depois.sujo).toBe(true);
+    expect(depois.ultimoSalvo).toBe(V1);
+    expect(depois.marcaProp).toBe(JSON.stringify(V1));
+  });
+
+  it("a marca avançou, então a mesma prop de novo não muda mais nada (sem laço)", () => {
+    let e = estadoInicialRascunho(V0);
+    e = reduzirRascunho(e, { tipo: "mudar", valor: V1 });
+    e = reduzirRascunho(e, { tipo: "salvo", valor: V1 });
+    e = reduzirRascunho(e, { tipo: "mudar", valor: V2 });
+    const primeira = reduzirRascunho(e, { tipo: "prop", valorInicial: V1 });
+    const segunda = reduzirRascunho(primeira, { tipo: "prop", valorInicial: V1 });
+    expect(segunda).toBe(primeira);
+  });
+
+  it("prop com valor DIFERENTE do último salvo reseta, como antes (restaurar esta seção)", () => {
+    let e = estadoInicialRascunho(V0);
+    e = reduzirRascunho(e, { tipo: "mudar", valor: V1 });
+    e = reduzirRascunho(e, { tipo: "salvo", valor: V1 });
+    e = reduzirRascunho(e, { tipo: "mudar", valor: V2 });
+
+    const padrao = "Texto padrão do programa.";
+    const depois = reduzirRascunho(e, { tipo: "prop", valorInicial: padrao });
+
+    expect(depois.valor).toBe(padrao);
+    expect(depois.ultimoSalvo).toBe(padrao);
+    expect(depois.sujo).toBe(false);
+    expect(depois.marcaProp).toBe(JSON.stringify(padrao));
+  });
+
+  it("vale para lista, comparando conteúdo e não identidade", () => {
+    const inicial = [{ titulo: "Eixo 1", descricao: "Base." }];
+    const salvo = [{ titulo: "Eixo 1 salvo", descricao: "Base." }];
+    const posterior = [{ titulo: "Eixo 1 em edição", descricao: "Base." }];
+    let e = estadoInicialRascunho(inicial);
+    e = reduzirRascunho(e, { tipo: "salvo", valor: salvo });
+    e = reduzirRascunho(e, { tipo: "mudar", valor: posterior });
+    // Objeto novo, mesmo conteúdo do salvo: é a leitura do servidor chegando.
+    const depois = reduzirRascunho(e, { tipo: "prop", valorInicial: [{ titulo: "Eixo 1 salvo", descricao: "Base." }] });
+    expect(depois.valor).toBe(posterior);
+    expect(depois.sujo).toBe(true);
+  });
+});

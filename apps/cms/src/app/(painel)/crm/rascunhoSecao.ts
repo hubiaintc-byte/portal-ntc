@@ -19,7 +19,10 @@ import { useState } from "react";
  *    "Restaurar padrão") e o CONTEÚDO que chega é outro, o rascunho volta ao
  *    valor do servidor. Prop com o mesmo conteúdo e identidade nova não
  *    reseta nada — é o que evita que restaurar uma seção descarte o que está
- *    sendo digitado nas outras.
+ *    sendo digitado nas outras. Prop que apenas **alcança o último salvo**
+ *    desta seção também não reseta (fix round 2): depois de salvar, a marca da
+ *    prop fica para trás de propósito, e o recarregamento disparado por outra
+ *    seção descartaria, sem aviso, o que o PO digitou depois de salvar.
  * 3. **desfazer volta ao último salvo**, não à prop original.
  */
 
@@ -58,8 +61,14 @@ export function reduzirRascunho<T>(
     case "prop": {
       const marca = serialRascunho(acao.valorInicial);
       // Mesmo conteúdo: nada a fazer (identidade nova a cada leitura do
-      // servidor não pode descartar rascunho).
+      // servidor não pode descartar rascunho). Devolve o MESMO objeto — o
+      // ajuste em renderização depende disso para não laçar.
       if (marca === estado.marcaProp) return estado;
+      // A prop alcançou o que esta seção já tinha salvo (salvar não recarrega
+      // o detalhe, então `marcaProp` ficou para trás; o recarregamento vem
+      // depois, disparado por outra seção). Não é conteúdo novo de fora: só a
+      // marca avança, e o rascunho posterior do PO sobrevive.
+      if (marca === serialRascunho(estado.ultimoSalvo)) return { ...estado, marcaProp: marca };
       return { marcaProp: marca, valor: acao.valorInicial, ultimoSalvo: acao.valorInicial, sujo: false };
     }
     case "mudar":
