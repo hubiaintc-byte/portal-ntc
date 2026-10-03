@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
+const { credencialDaFicha } = await import("@/lib/documentoProposta/dados");
 const { atualizarProposta, criarProposta, criarVersaoProposta, dadosProposta, restaurarConteudoProposta } = await import(
   "./painelCrmEscrita",
 );
@@ -635,8 +636,30 @@ describe("restaurarConteudoProposta", () => {
     const { update } = payloadFalso(opcoes);
     await restaurarConteudoProposta("9", "tudo", usuario);
     const data = dadosDaChamada(update);
-    for (const k of [...TEXTOS, ...LISTAS]) expect(data).toHaveProperty(k);
+    for (const k of [...TEXTOS, ...LISTAS.filter((l) => l !== "docentes")]) expect(data).toHaveProperty(k);
+    expect(data).not.toHaveProperty("docentes");
+    expect(data).not.toHaveProperty("secoesExtras");
     expect(data.textoApresentacao).toEqual(lex("Visão geral do programa."));
+  });
+
+  it("docentes grava só docentes, vindos da ficha do especialista", async () => {
+    const { update } = payloadFalso(opcoes);
+    await restaurarConteudoProposta("9", "docentes", usuario);
+    const data = dadosDaChamada(update);
+    expect(Object.keys(data)).toEqual(["docentes"]);
+    const lista = data.docentes as { especialista: number; nome: string; credencial: string }[];
+    expect(lista).toHaveLength(1);
+    expect(lista[0]).toMatchObject({
+      especialista: 11,
+      nome: "Ana Ribeiro",
+      credencial: credencialDaFicha(especialista as never),
+    });
+  });
+
+  it("repassa o usuário ao update", async () => {
+    const { update } = payloadFalso(opcoes);
+    await restaurarConteudoProposta("9", "fechamento", usuario);
+    expect((update.mock.calls[0]![0] as { user: unknown }).user).toBe(usuario);
   });
 
   it("alvo vazio grava null, nunca Lexical vazio", async () => {

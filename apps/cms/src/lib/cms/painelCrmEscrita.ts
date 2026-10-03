@@ -686,6 +686,7 @@ export type AlvoRestauracao =
   | "eixos"
   | "diferenciais"
   | "resultados"
+  | "docentes"
   | "modulos";
 
 const CAMPOS_TEXTO_RESTAURAVEIS = [
@@ -696,14 +697,26 @@ const CAMPOS_TEXTO_RESTAURAVEIS = [
 const CAMPOS_LISTA_RESTAURAVEIS = [
   "eixos", "diferenciais", "resultados", "docentes", "modulosDetalhados",
 ] as const;
+/**
+ * Listas que "tudo" NÃO toca. `docentes`: hoje nenhum programa tem especialista
+ * vinculado, então o recálculo devolve [] e "tudo" apagaria, de forma
+ * irreversível, os docentes que o PO digitou à mão; ele tem alvo próprio. Mesmo
+ * princípio de `secoesExtras`, que nem é restaurável. Não "corrigir" isto.
+ */
+const LISTAS_FORA_DO_TUDO: readonly string[] = ["docentes"];
 type CampoRestauravel =
   | (typeof CAMPOS_TEXTO_RESTAURAVEIS)[number]
   | (typeof CAMPOS_LISTA_RESTAURAVEIS)[number];
 
-/** Alvo do botão -> campos que ele toca. "tudo" cobre todos, inclusive docentes. */
+/** Alvo do botão -> campos que ele toca. "tudo" não inclui docentes (ver LISTAS_FORA_DO_TUDO). */
 function camposDoAlvo(alvo: AlvoRestauracao): readonly CampoRestauravel[] {
   switch (alvo) {
-    case "tudo": return [...CAMPOS_TEXTO_RESTAURAVEIS, ...CAMPOS_LISTA_RESTAURAVEIS];
+    case "tudo":
+      return [
+        ...CAMPOS_TEXTO_RESTAURAVEIS,
+        ...CAMPOS_LISTA_RESTAURAVEIS.filter((c) => !LISTAS_FORA_DO_TUDO.includes(c)),
+      ];
+    case "docentes": return ["docentes"];
     case "apresentacao": return ["textoApresentacao"];
     case "contexto": return ["textoContexto"];
     case "objetivos": return ["textoObjetivos"];
