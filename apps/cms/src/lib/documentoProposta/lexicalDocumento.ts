@@ -52,20 +52,32 @@ function blocoParaHtml(node: unknown): string {
     const tag = n.listType === "number" ? "ol" : "ul";
     const itens = (Array.isArray(n.children) ? n.children : [])
       .map((item) => inline(item))
-      .filter((i) => i.length > 0)
+      .filter((i) => !emBranco(i))
       .map((i) => `<li>${i}</li>`)
       .join("");
     return itens ? `<${tag}>${itens}</${tag}>` : "";
   }
 
   const conteudo = inline(node);
-  if (!conteudo) return "";
+  if (emBranco(conteudo)) return "";
   // Headings do editor restritivo são h2–h4; no documento o nível h2 pertence
   // ao título da seção, então todo heading do corpo entra como h3 (o modelo
   // só tem esse nível dentro das seções).
   if (n.type === "heading") return `<h3>${conteudo}</h3>`;
   // Parágrafo e qualquer bloco não previsto: o texto nunca se perde.
   return `<p>${conteudo}</p>`;
+}
+
+/**
+ * Inline sem conteúdo de verdade. Não basta `!conteudo`: um parágrafo com um
+ * espaço digitado sai `" "` e um com soft break (shift+Enter) sai `"<br>"` —
+ * os dois são estados reais do editor e virariam `<p> </p>`/`<p><br></p>`,
+ * que `temCorpo` (montar.ts) conta como preenchido. A seção fantasma
+ * imprimiria o título sem corpo e, por a numeração ser posicional,
+ * deslocaria o número de todas as seções seguintes.
+ */
+function emBranco(inlineHtml: string): boolean {
+  return inlineHtml.replace(/<br>/g, "").trim().length === 0;
 }
 
 /** Conteúdo inline de um único nó, reusando a serialização compartilhada. */

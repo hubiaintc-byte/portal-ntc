@@ -169,9 +169,12 @@ describe("obterDadosDocumentoProposta · conteúdo do documento", () => {
 
     expect(dados?.conteudoHtml.apresentacao).toBe("<p>Apresentação.</p><p>Segundo parágrafo.</p>");
     expect(dados?.conteudoHtml.contexto).toBe("<p>Contexto.</p>");
+    expect(dados?.conteudoHtml.objetivos).toBe("<p>Objetivos.</p>");
     expect(dados?.conteudoHtml.publicoAlvo).toBe("<p>Público.</p>");
+    expect(dados?.conteudoHtml.metodologia).toBe("<p>Metodologia.</p>");
     expect(dados?.conteudoHtml.eventon).toBe("<p>EventON.</p>");
     expect(dados?.conteudoHtml.certificacaoReplay).toBe("<p>Certificação.</p>");
+    expect(dados?.conteudoHtml.cancelamento).toBe("<p>Cancelamento.</p>");
     expect(dados?.conteudoHtml.protecaoConteudo).toBe("<p>Proteção.</p>");
     expect(dados?.conteudoHtml.fundamentacaoLegal).toBe("<p>Fundamentação.</p>");
     expect(dados?.conteudoHtml.proximosPassos).toBe("<p>Passos.</p>");

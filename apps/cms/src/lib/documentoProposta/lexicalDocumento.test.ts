@@ -92,6 +92,54 @@ describe("lexicalDocumentoParaHtml", () => {
     ).toBe("");
   });
 
+  it("bloco em branco (espaço ou só <br>) não vira <p> </p> nem <p><br></p>", () => {
+    // Estados reais do editor: um espaço digitado e um soft break (shift+Enter).
+    expect(lexicalDocumentoParaHtml(doc([paragrafo(texto(" "))]))).toBe("");
+    expect(lexicalDocumentoParaHtml(doc([paragrafo({ type: "linebreak", version: 1 })]))).toBe("");
+    expect(
+      lexicalDocumentoParaHtml(
+        doc([paragrafo({ type: "linebreak", version: 1 }, { type: "linebreak", version: 1 })]),
+      ),
+    ).toBe("");
+    expect(
+      lexicalDocumentoParaHtml(doc([paragrafo(texto("  "), { type: "linebreak", version: 1 })])),
+    ).toBe("");
+  });
+
+  it("heading em branco não vira <h3> </h3>", () => {
+    expect(
+      lexicalDocumentoParaHtml(
+        doc([{ type: "heading", tag: "h3", version: 1, children: [texto(" ")] }]),
+      ),
+    ).toBe("");
+  });
+
+  it("item de lista em branco não vira <li> </li>", () => {
+    expect(
+      lexicalDocumentoParaHtml(
+        doc([
+          {
+            type: "list",
+            listType: "bullet",
+            version: 1,
+            children: [
+              { type: "listitem", version: 1, children: [texto(" ")] },
+              { type: "listitem", version: 1, children: [{ type: "linebreak", version: 1 }] },
+              { type: "listitem", version: 1, children: [texto("Vale")] },
+            ],
+          },
+        ]),
+      ),
+    ).toBe("<ul><li>Vale</li></ul>");
+  });
+
+  it("parágrafo com texto e <br> no meio continua inteiro", () => {
+    const html = lexicalDocumentoParaHtml(
+      doc([paragrafo(texto("Primeira linha"), { type: "linebreak", version: 1 }, texto("segunda"))]),
+    );
+    expect(html).toBe("<p>Primeira linha<br>segunda</p>");
+  });
+
   it("descarta só os blocos vazios, mantendo os preenchidos", () => {
     const html = lexicalDocumentoParaHtml(
       doc([paragrafo(), paragrafo(texto("Vale.")), paragrafo(texto(""))]),

@@ -10,6 +10,13 @@
  *
  * Cópia de apps/web/lib/cms/lexical.ts (o site continua com a dele —
  * eventos.ts e corpoDocente.ts). Mudanças de serialização: replicar nos dois.
+ *
+ * ATENÇÃO — as duas cópias DIVERGEM de assinatura desde 03/10/2026: só esta,
+ * do cms, tem o parâmetro `opcoes` (`OpcoesLexicalHtml`, com `escapar`), usado
+ * pelo documento da proposta (lib/documentoProposta/lexicalDocumento.ts). Um
+ * sync futuro NÃO pode sobrescrever este arquivo com o do web: derrubaria o
+ * escape de `&`/`<`/`>` do documento contratual. A serialização default é
+ * idêntica nos dois — é só a assinatura que difere.
  */
 
 export interface OpcoesLexicalHtml {
