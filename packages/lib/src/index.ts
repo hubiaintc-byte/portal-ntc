@@ -137,3 +137,10 @@ export {
   type ContextoTextosProposta,
   type ChaveTextoInstitucional,
 } from "./crm/textosProposta";
+
+export {
+  divisaoExata,
+  linhasDoQuadro,
+  type LinhaQuadro,
+  type EntradaQuadro,
+} from "./crm/quadroComercial";
