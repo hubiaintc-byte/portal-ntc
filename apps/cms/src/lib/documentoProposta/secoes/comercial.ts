@@ -24,11 +24,31 @@ function util(v: string): string {
   return t === "—" || t === "A definir" ? "" : t;
 }
 
-/** Módulos detalhados com número legível; null se algum não tiver código. */
+/** Dígitos do código ("M01" -> "01"); null se o código não é legível. */
+function digitosDoCodigo(codigo: string): string | null {
+  return /\d+/.exec(codigo)?.[0] ?? null;
+}
+
+/** "1 módulo" / "N módulos". */
+function contagemModulos(n: number): string {
+  return `${n} ${n === 1 ? "módulo" : "módulos"}`;
+}
+
+/** Texto livre: linha em branco separa parágrafos; quebra simples vira <br>. */
+function paragrafosLivres(texto: string): string {
+  return texto
+    .split(/\r?\n\s*\r?\n/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0)
+    .map((p) => `<p>${esc(p).replace(/\r?\n/g, "<br>")}</p>`)
+    .join("\n");
+}
+
+/** Módulos detalhados com número legível; [] se algum não tiver código. */
 function modulosParaQuadro(d: DadosDocumentoProposta) {
   const saida: { numero: number; titulo: string; cargaHoraria: string | null }[] = [];
   for (const m of d.modulosDetalhados) {
-    const digitos = /\d+/.exec(m.codigo)?.[0];
+    const digitos = digitosDoCodigo(m.codigo);
     if (!digitos) return [];
     saida.push({
       numero: Number(digitos),
@@ -43,7 +63,12 @@ function modulosParaQuadro(d: DadosDocumentoProposta) {
 // --- Objeto -----------------------------------------------------------------
 
 function montarObjeto(d: DadosDocumentoProposta): string {
-  const n = d.modulosDetalhados.length;
+  // Contagem e enumeração falam do mesmo conjunto: só módulos de código legível.
+  const legiveis = d.modulosDetalhados.flatMap((m) => {
+    const num = digitosDoCodigo(m.codigo);
+    return num ? [{ num, titulo: m.titulo }] : [];
+  });
+  const n = legiveis.length;
   const orgao = util(d.clienteOrgao);
   const sigla = d.programaSigla.trim();
   const programa = sigla ? ` do Programa Estratégico ${esc(sigla)}` : "";
@@ -54,12 +79,7 @@ function montarObjeto(d: DadosDocumentoProposta): string {
         ? `<strong>módulos-evento${programa}</strong>`
         : "<strong>módulos-evento</strong>";
 
-  const lista = d.modulosDetalhados
-    .filter((m) => /\d+/.test(m.codigo))
-    .map((m) => {
-      const num = /\d+/.exec(m.codigo)?.[0] ?? "";
-      return `Módulo ${esc(num)} · ${esc(m.titulo)}`;
-    });
+  const lista = legiveis.map((m) => `Módulo ${esc(m.num)} · ${esc(m.titulo)}`);
   const especificamente = lista.length > 0 ? `, especificamente: ${lista.join(", ")}` : "";
 
   const horas = /^(\d+)h\b/.exec(d.cargaHorariaTotalModulos.trim())?.[1];
@@ -94,7 +114,7 @@ function montarQuadro(d: DadosDocumentoProposta): string {
   const cort = formatarInteiroDocumento(d.cortesias);
 
   const intro = exata
-    ? `<p>Apresentamos o quadro de investimento da presente proposta, fundamentado em <strong>${formatarInteiroDocumento(d.qtdPagantes / n)} inscrições pagantes</strong> e <strong>${formatarInteiroDocumento(d.cortesias / n)} cortesias institucionais por módulo-evento</strong>, totalizando <strong>${pag} inscrições pagantes e ${cort} cortesias</strong> ao longo dos ${n} módulos contratados.</p>`
+    ? `<p>Apresentamos o quadro de investimento da presente proposta, fundamentado em <strong>${formatarInteiroDocumento(d.qtdPagantes / n)} inscrições pagantes</strong> e <strong>${formatarInteiroDocumento(d.cortesias / n)} cortesias institucionais por módulo-evento</strong>, totalizando <strong>${pag} inscrições pagantes e ${cort} cortesias</strong> ao longo ${n === 1 ? "do 1 módulo contratado" : `dos ${n} módulos contratados`}.</p>`
     : `<p>Apresentamos o quadro de investimento da presente proposta, fundamentado em <strong>${pag} inscrições pagantes</strong> e <strong>${cort} cortesias institucionais</strong>.</p>`;
 
   const tabelaModulos =
@@ -107,8 +127,8 @@ function montarQuadro(d: DadosDocumentoProposta): string {
           .join("")}</tbody></table>`
       : "";
 
-  const descPag = exata ? ` (${formatarInteiroDocumento(d.qtdPagantes / n)} × ${n} módulos)` : "";
-  const descCort = exata ? ` (${formatarInteiroDocumento(d.cortesias / n)} × ${n} módulos)` : "";
+  const descPag = exata ? ` (${formatarInteiroDocumento(d.qtdPagantes / n)} × ${contagemModulos(n)})` : "";
+  const descCort = exata ? ` (${formatarInteiroDocumento(d.cortesias / n)} × ${contagemModulos(n)})` : "";
   const linhaDesconto =
     d.qtdPagantes > 0
       ? `<tr><td>Valor com desconto institucional por inscrição</td><td class="qc-right"><strong>${formatarMoedaDocumento(d.valorLiquido / d.qtdPagantes)}</strong></td></tr>\n`
@@ -136,7 +156,7 @@ const CLAUSULAS_COMPLEMENTARES =
 function montarCondicoes(d: DadosDocumentoProposta): string {
   const validade = formatarDataDocumentoOpcional(d.validadeISO) || "—";
   const especificas = d.condEspecificas.trim()
-    ? `\n<h3>Condições Específicas</h3>\n<p>${esc(d.condEspecificas)}</p>`
+    ? `\n<h3>Condições Específicas</h3>\n${paragrafosLivres(d.condEspecificas)}`
     : "";
   return `<div class="grid2">
 <div class="box"><div class="label">Forma de Pagamento</div><div class="text">${esc(d.condPagto)}</div></div>

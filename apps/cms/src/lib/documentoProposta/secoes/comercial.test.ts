@@ -147,6 +147,39 @@ describe("secoesComerciais", () => {
     expect(c2).toContain("Texto &lt;b&gt;x&lt;/b&gt;");
   });
 
+  it("1 módulo: singular em todas as seções", () => {
+    const d = {
+      ...BASE,
+      modulosDetalhados: [BASE.modulosDetalhados[0]!],
+      qtdPagantes: 600,
+      cortesias: 60,
+      valorLiquido: 570042,
+    };
+    const h = todo(d).replace(/\u00a0/g, " ");
+    expect(h).not.toMatch(/\b1 módulos\b/);
+    expect(h).toContain("ao longo do 1 módulo contratado");
+    expect(h).toContain("(600 × 1 módulo)");
+    expect(h).toContain("1 módulo-evento do Programa");
+  });
+
+  it("objeto: contagem acompanha a enumeração quando falta código", () => {
+    const o = porChave(
+      {
+        ...BASE,
+        modulosDetalhados: [BASE.modulosDetalhados[0]!, { codigo: "", titulo: "Sem", cargaHoraria: null, ementaHtml: "" }],
+      },
+      "objeto",
+    );
+    expect(o).toContain("1 módulo-evento");
+    expect(o).not.toContain("2 módulos-evento");
+  });
+
+  it("condições específicas: parágrafos por linha em branco", () => {
+    const c = porChave({ ...BASE, condEspecificas: "Um\n\nDois\nainda dois" }, "condicoes-comerciais");
+    expect(c).toContain("<p>Um</p>");
+    expect(c).toContain("<p>Dois<br>ainda dois</p>");
+  });
+
   it("nenhum literal do caso do modelo vaza", () => {
     expect(todo(BASE)).not.toMatch(/Palmas|SEMED|EDUTEC|1\.470 |180 dias|1,800/);
   });
