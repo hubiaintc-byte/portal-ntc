@@ -71,6 +71,7 @@ export const Programas: CollectionConfig = {
             { name: "visaoGeral", type: "richText", required: true },
             { name: "problema", type: "richText" },
             { name: "objetivo", type: "richText" },
+            { name: "metodologia", type: "richText" },
             { name: "publicoAlvo", type: "richText" },
           ],
         },

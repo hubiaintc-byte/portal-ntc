@@ -340,6 +340,21 @@ export interface Programa {
     };
     [k: string]: unknown;
   } | null;
+  metodologia?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   publicoAlvo?: {
     root: {
       type: string;
@@ -1078,6 +1093,265 @@ export interface Proposta {
   condPagto?: string | null;
   condEspecificas?: string | null;
   observacoes?: string | null;
+  textoApresentacao?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoContexto?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoObjetivos?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoPublicoAlvo?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoMetodologia?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoEventon?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoCertificacaoReplay?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoCancelamento?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoProtecaoConteudo?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoFundamentacaoLegal?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoProximosPassos?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  textoFechamento?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  eixos?:
+    | {
+        titulo?: string | null;
+        descricao?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  diferenciais?:
+    | {
+        titulo?: string | null;
+        descricao?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  resultados?:
+    | {
+        texto?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Escolher da coleção preenche nome e credencial; entrada livre é permitida.
+   */
+  docentes?:
+    | {
+        especialista?: (number | null) | Especialista;
+        nome?: string | null;
+        credencial?: string | null;
+        eixo?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  modulosDetalhados?:
+    | {
+        modulo?: (number | null) | Modulo;
+        tituloExibido?: string | null;
+        ementa?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Seções livres do documento (observações, anexos textuais).
+   */
+  secoesExtras?:
+    | {
+        titulo?: string | null;
+        corpo?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        posicao?: ('antes-quadro-comercial' | 'apos-condicoes-comerciais' | 'fim') | null;
+        id?: string | null;
+      }[]
+    | null;
   elaborador?: (number | null) | User;
   aprovador?: (number | null) | User;
   validadeDias?: number | null;
@@ -1576,6 +1850,7 @@ export interface ProgramasSelect<T extends boolean = true> {
   visaoGeral?: T;
   problema?: T;
   objetivo?: T;
+  metodologia?: T;
   publicoAlvo?: T;
   eixosTematicos?:
     | T
@@ -1957,6 +2232,63 @@ export interface PropostasSelect<T extends boolean = true> {
   condPagto?: T;
   condEspecificas?: T;
   observacoes?: T;
+  textoApresentacao?: T;
+  textoContexto?: T;
+  textoObjetivos?: T;
+  textoPublicoAlvo?: T;
+  textoMetodologia?: T;
+  textoEventon?: T;
+  textoCertificacaoReplay?: T;
+  textoCancelamento?: T;
+  textoProtecaoConteudo?: T;
+  textoFundamentacaoLegal?: T;
+  textoProximosPassos?: T;
+  textoFechamento?: T;
+  eixos?:
+    | T
+    | {
+        titulo?: T;
+        descricao?: T;
+        id?: T;
+      };
+  diferenciais?:
+    | T
+    | {
+        titulo?: T;
+        descricao?: T;
+        id?: T;
+      };
+  resultados?:
+    | T
+    | {
+        texto?: T;
+        id?: T;
+      };
+  docentes?:
+    | T
+    | {
+        especialista?: T;
+        nome?: T;
+        credencial?: T;
+        eixo?: T;
+        id?: T;
+      };
+  modulosDetalhados?:
+    | T
+    | {
+        modulo?: T;
+        tituloExibido?: T;
+        ementa?: T;
+        id?: T;
+      };
+  secoesExtras?:
+    | T
+    | {
+        titulo?: T;
+        corpo?: T;
+        posicao?: T;
+        id?: T;
+      };
   elaborador?: T;
   aprovador?: T;
   validadeDias?: T;
