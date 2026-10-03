@@ -75,7 +75,7 @@ export function textosPadraoProposta(
       "As orientações operacionais detalhadas de acesso ao ambiente digital serão encaminhadas em documento próprio (Documento Complementar de Orientações EventON), após a formalização da inscrição ou contratação.",
     ),
     fechamento: paragrafos(
-      `O Instituto NTC do Brasil agradece a oportunidade de apresentar esta proposta a ${c.clienteOrgao} e renova sua disposição institucional de contribuir para o fortalecimento das capacidades técnicas, gerenciais e pedagógicas da rede municipal de educação de Palmas.`,
+      `O Instituto NTC do Brasil agradece a oportunidade de apresentar esta proposta a ${c.clienteOrgao} e renova sua disposição institucional de contribuir para o fortalecimento das capacidades técnicas, gerenciais e pedagógicas da ${c.clienteSigla}.`,
       "Mais do que realizar eventos, cursos ou capacitações, o Instituto NTC estrutura experiências formativas com densidade técnica, aplicabilidade prática, curadoria especializada e excelência docente, comprometidas com a melhoria efetiva da aprendizagem e da gestão das escolas públicas brasileiras.",
       `A presente proposta encontra-se aberta ao diálogo, ajustes e adequações às especificidades operacionais da ${c.clienteSigla}.`,
     ),

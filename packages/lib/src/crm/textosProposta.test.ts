@@ -35,4 +35,15 @@ describe("textosPadraoProposta", () => {
   it("separa parágrafos por linha em branco", () => {
     expect(textosPadraoProposta(CTX).eventon).toContain("\n\n");
   });
+
+  it("não vaza o cliente do modelo (Palmas/SEMED) para outro cliente", () => {
+    const outro: ContextoTextosProposta = {
+      ...CTX,
+      clienteOrgao: "Secretaria de Estado da Saúde do Tocantins",
+      clienteSigla: "SES-TO",
+    };
+    for (const texto of Object.values(textosPadraoProposta(outro))) {
+      expect(texto).not.toMatch(/Palmas|SEMED/);
+    }
+  });
 });
