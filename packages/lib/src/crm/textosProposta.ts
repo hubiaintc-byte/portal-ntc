@@ -16,7 +16,10 @@
  *    `para ${clienteSigla}`;
  * 4. seção 23 (Fechamento) — "da rede municipal de educação de Palmas" vira
  *    `da ${clienteSigla}`, padrão do próprio modelo nas outras seções.
- * Nenhum outro texto é redigido aqui (CLAUDE.md §5.3).
+ * Nenhum outro texto é redigido aqui (CLAUDE.md §5.3). A lista acima cobre só
+ * as parametrizações; o modelo tem ainda duas menções de carga horária que
+ * foram transcritas SEM parâmetro, de propósito, porque descrevem a regra
+ * institucional e não o caso do cliente.
  *
  * Formato do texto devolvido (puro, sem HTML):
  * - parágrafos separados por uma linha em branco (`\n\n`);

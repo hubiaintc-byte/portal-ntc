@@ -157,12 +157,14 @@ export function DetalheProposta({
               <p>
                 PDF gerado.{" "}
                 {omitidasNoPdf.length === 1
-                  ? "1 seção ficou fora do documento, por estar vazia:"
-                  : `${omitidasNoPdf.length} seções ficaram fora do documento, por estarem vazias:`}
+                  ? "1 seção ficou fora do documento, por estar vazia ou por ser uma seção extra sem título:"
+                  : `${omitidasNoPdf.length} seções ficaram fora do documento, por estarem vazias ou por serem seções extras sem título:`}
               </p>
               <ul className="pcms-conteudo__omitidas">
-                {omitidasNoPdf.map((titulo) => (
-                  <li key={titulo}>{titulo}</li>
+                {/* Chave pelo índice: dois títulos podem repetir ("Seção extra
+                    sem título"), e a lista é só leitura, sem reordenação. */}
+                {omitidasNoPdf.map((titulo, i) => (
+                  <li key={`${i}-${titulo}`}>{titulo}</li>
                 ))}
               </ul>
             </>

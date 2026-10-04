@@ -291,9 +291,12 @@ function erroDeMultiplos(dados: DadosProposta): string | null {
  * pagantes e cortesias ficariam sem base declarada para ele. Recusar é melhor
  * que imprimir número contraditório num documento contratual.
  */
+const ERRO_MODULOS_COM_EVENTOS =
+  "Esta versão do documento não suporta módulos e produtos/eventos na mesma proposta: os quantitativos por módulo-evento sairiam contraditórios. Separe em duas propostas — uma com os módulos, outra com os produtos/eventos.";
+
 function erroDeModulosComEventos(dados: DadosProposta): string | null {
   if (idsLista(dados.modulos).length === 0 || idsLista(dados.eventos).length === 0) return null;
-  return "Esta versão do documento não suporta módulos e produtos/eventos na mesma proposta: os quantitativos por módulo-evento sairiam contraditórios. Separe em duas propostas — uma com os módulos, outra com os produtos/eventos.";
+  return ERRO_MODULOS_COM_EVENTOS;
 }
 
 /** Há algum texto fora de espaços em branco neste nó Lexical (ou descendentes)? */
@@ -996,6 +999,13 @@ export async function criarVersaoProposta(
     });
     const vigente = vigentes.docs[0];
     if (!vigente) return { ok: false, erro: "Proposta não encontrada." };
+    // A v02 HERDA `modulos` e `eventos` da vigente, então uma proposta mista
+    // anterior à guarda de criar/atualizar propagaria a mistura — justo o estado
+    // que o documento passou a recusar. Mesma mensagem, e antes da primeira
+    // escrita: nada é marcado como substituído se a recusa vale.
+    if ((vigente.modulos ?? []).length > 0 && (vigente.eventos ?? []).length > 0) {
+      return { ok: false, erro: ERRO_MODULOS_COM_EVENTOS };
+    }
 
     const versao = (vigente.versao ?? 1) + 1;
     const codigo = codigoDaVersao(codBase, versao);

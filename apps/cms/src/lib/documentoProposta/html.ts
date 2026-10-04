@@ -61,11 +61,20 @@ function secaoIdentificacao(d: DadosDocumentoProposta): SecaoDocumento {
     "font-family:'Barlow';font-size:10pt;color:var(--navy);font-weight:600";
   const estiloCargo = "font-size:8.5pt;color:var(--ink-mid)";
 
-  /** Caixa de conteúdo HTML já montado; vazio omite a caixa inteira. */
-  const caixa = (rotulo: string, html: string, estilo = ""): string =>
+  /**
+   * Caixa de conteúdo HTML já montado; vazio omite a caixa inteira. `classe`
+   * segue o modelo caixa por caixa (linhas 246-258): das 13, só a de Versão usa
+   * `value` (Cormorant 14pt `--navy`); as outras 12 usam `text` (corpo 9.8pt).
+   */
+  const caixa = (
+    rotulo: string,
+    html: string,
+    estilo = "",
+    classe: "text" | "value" = "text",
+  ): string =>
     html.trim().length === 0
       ? ""
-      : `<div class="box"><div class="label">${esc(rotulo)}</div><div class="text"${estilo ? ` style="${estilo}"` : ""}>${html}</div></div>`;
+      : `<div class="box"><div class="label">${esc(rotulo)}</div><div class="${classe}"${estilo ? ` style="${estilo}"` : ""}>${html}</div></div>`;
   /** Caixa de texto simples; "—" e vazio contam como ausência. */
   const caixaTexto = (rotulo: string, valor: string, estilo = ""): string =>
     caixa(rotulo, esc(presenteNaIdentificacao(valor)), estilo);
@@ -90,7 +99,7 @@ function secaoIdentificacao(d: DadosDocumentoProposta): SecaoDocumento {
 
   const caixas = [
     caixa("Código da Proposta", esc(d.codigo), estiloCodigo),
-    caixa("Versão", `v${String(d.versao).padStart(2, "0")}`),
+    caixa("Versão", `v${String(d.versao).padStart(2, "0")}`, "", "value"),
     caixa(
       "Cliente",
       `<strong>${esc(d.clienteOrgao)}</strong>${siglaPropria ? `<br>${esc(siglaPropria)}` : ""}`,

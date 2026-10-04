@@ -242,6 +242,11 @@ describe("montarHtmlDocumentoProposta", () => {
     expect(corpo).toContain("Ana Comercial");
     expect(corpo).toContain("Direção Executiva NTC");
     expect(corpo).toContain("29/08/2026 · 28/09/2026");
+    // Classe por caixa, como o modelo (linhas 246-258): das 13, só Versão usa
+    // `value` (Cormorant 14pt), as outras 12 usam `text` (corpo 9.8pt).
+    expect(corpo).toContain('<div class="label">Versão</div><div class="value">v01</div>');
+    expect(corpo.match(/<div class="value"/g)).toHaveLength(1);
+    expect(corpo.match(/<div class="text"/g)).toHaveLength(12);
   });
 
   it("seção 3: caixa sem dado é omitida, nunca impressa vazia", () => {

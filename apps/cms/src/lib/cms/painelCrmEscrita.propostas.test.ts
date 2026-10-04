@@ -604,6 +604,21 @@ describe("criarVersaoProposta copia o conteudo da versao vigente", () => {
     ]);
   });
 
+  it("vigente mista (módulos E eventos) é recusada, sem marcar a anterior", async () => {
+    // A v02 herda `modulos`/`eventos`: sem esta guarda, uma proposta anterior à
+    // regra propagaria a mistura que o documento passou a recusar.
+    const { create, update } = payloadFalso({
+      vigente: { ...vigente, modulos: [10], eventos: [50] },
+    });
+    const r = await criarVersaoProposta("NTC-PROP-2026-EDUTEC-SP-SME", "Ajuste");
+    expect(r.ok).toBe(false);
+    expect(r.erro).toBe(
+      "Esta versão do documento não suporta módulos e produtos/eventos na mesma proposta: os quantitativos por módulo-evento sairiam contraditórios. Separe em duas propostas — uma com os módulos, outra com os produtos/eventos.",
+    );
+    expect(create).not.toHaveBeenCalled();
+    expect(update).not.toHaveBeenCalled();
+  });
+
   it("vigente sem conteúdo gera versão nova sem os campos, sem erro", async () => {
     const semConteudo: Record<string, unknown> = {
       id: 9,
