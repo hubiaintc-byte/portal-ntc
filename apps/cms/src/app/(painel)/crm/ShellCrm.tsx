@@ -36,6 +36,7 @@ import { carregarModuloCatalogoCrm, carregarProgramaCatalogoCrm } from "../acoes
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { AvisoForm } from "./CamposCrm";
 import { DetalheCliente } from "./DetalheCliente";
+import { DetalheModuloCatalogo } from "./DetalheModuloCatalogo";
 import { DetalheProgramaCatalogo } from "./DetalheProgramaCatalogo";
 import { DetalheProposta } from "./DetalheProposta";
 import { FormCliente } from "./FormCliente";
@@ -321,6 +322,19 @@ export function ShellCrm({
           }}
           onAbrirModulo={abrirModuloCatalogo}
           onNovoModulo={(programaId) => setCatalogoDet({ tipo: "modulo", modulo: null, programaIdInicial: programaId })}
+        />
+      ) : catalogoDet?.tipo === "modulo" ? (
+        <DetalheModuloCatalogo
+          key={`${catalogoDet.modulo?.id ?? `novo-${catalogoDet.programaIdInicial ?? ""}`}:${versaoDet}`}
+          modulo={catalogoDet.modulo}
+          programaIdInicial={catalogoDet.programaIdInicial}
+          programas={programas}
+          onVoltar={fecharTudo}
+          onSalvo={abrirModuloCatalogo}
+          onExcluido={() => {
+            fecharTudo();
+            setTela("modulos");
+          }}
         />
       ) : formAberto?.entidade === "cliente" ? (
         <FormCliente
