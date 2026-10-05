@@ -152,6 +152,33 @@ export {
   type ConteudoInicialProposta,
 } from "./crm/conteudoProposta";
 
+export {
+  SITUACOES_PROGRAMA,
+  CAMPOS_TEXTO_PROGRAMA,
+  rotuloSituacaoPrograma,
+  situacaoPrograma,
+  filtrarProgramas,
+  filtrarModulos,
+  faltasParaRascunho,
+  faltasParaPublicar,
+  semItensVazios,
+  semResultadosVazios,
+  lerNumeroModulo,
+  podeExcluirPrograma,
+  podeExcluirModulo,
+  quantidadeModulosVaiPublicado,
+  type SituacaoPrograma,
+  type CampoTextoPrograma,
+  type ItemTituloDescricao,
+  type FiltroProgramas,
+  type ProgramaFiltravel,
+  type FiltroModulos,
+  type ModuloFiltravel,
+  type ProgramaParaPublicar,
+  type DependentesPrograma,
+  type DependentesModulo,
+} from "./crm/catalogo";
+
 // Institucional — contatos (telefone/WhatsApp/verticais).
 export {
   telefoneParaHref,
