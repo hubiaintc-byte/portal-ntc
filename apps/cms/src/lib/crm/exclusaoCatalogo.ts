@@ -19,7 +19,8 @@ export async function contarDependentesPrograma(
   const [modulos, propostas, leads, eventos, especialistas] = await Promise.all([
     payload.count({ collection: "modulos", where: { programa: { equals: id } }, req }),
     payload.count({ collection: "propostas", where: { programa: { equals: id } }, req }),
-    payload.count({ collection: "leads", where: { programa: { equals: id } }, req }),
+    // Em leads o campo mora no grupo `detalhesProposta`.
+    payload.count({ collection: "leads", where: { "detalhesProposta.programa": { equals: id } }, req }),
     payload.count({ collection: "eventos", where: { programa: { equals: id } }, req }),
     payload.count({ collection: "especialistas", where: { programasRelacionados: { equals: id } }, req }),
   ]);

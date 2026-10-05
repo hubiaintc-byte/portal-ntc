@@ -23,6 +23,11 @@ describe("contarDependentesPrograma", () => {
     expect(payload.count).toHaveBeenCalledWith(
       expect.objectContaining({ collection: "especialistas", where: { programasRelacionados: { equals: 7 } } }),
     );
+    // Em leads, `programa` mora no grupo `detalhesProposta` — o caminho na raiz
+    // dá QueryError e derrubava a abertura do detalhe do programa.
+    expect(payload.count).toHaveBeenCalledWith(
+      expect.objectContaining({ collection: "leads", where: { "detalhesProposta.programa": { equals: 7 } } }),
+    );
   });
 });
 
