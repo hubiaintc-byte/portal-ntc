@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { editorInstitucional } from "../access/editorInstitucional";
+import { bloquearModuloComDependentes } from "../lib/crm/exclusaoCatalogo";
 
 /**
  * Módulos (doc 11 §6).
@@ -22,6 +23,7 @@ export const Modulos: CollectionConfig = {
     update: editorInstitucional,
     delete: editorInstitucional,
   },
+  hooks: { beforeDelete: [bloquearModuloComDependentes] },
   fields: [
     {
       name: "programa",

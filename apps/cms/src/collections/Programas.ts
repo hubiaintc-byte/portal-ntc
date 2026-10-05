@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { editorInstitucional } from "../access/editorInstitucional";
 import { autoSlug } from "../hooks/autoSlug";
+import { bloquearProgramaComDependentes } from "../lib/crm/exclusaoCatalogo";
 import { seoFields } from "../shared/seoFields";
 
 /**
@@ -27,6 +28,7 @@ export const Programas: CollectionConfig = {
     delete: editorInstitucional,
   },
   versions: { drafts: true, maxPerDoc: 30 },
+  hooks: { beforeDelete: [bloquearProgramaComDependentes] },
   fields: [
     {
       type: "tabs",
