@@ -10,13 +10,12 @@ import type {
   EnvioResumo,
   LeadCrmDetalhe,
   LeadCrmResumo,
-  ModuloCrmResumo,
   ProdutoCrmResumo,
-  ProgramaCrmResumo,
   PropostaDetalhe,
   PropostaResumo,
   UsuarioCmsResumo,
 } from "@/lib/cms/painelCrm";
+import type { ModuloCrmResumo, ProgramaCrmResumo } from "@/lib/cms/catalogoCrm";
 
 import {
   adicionarNotaCrm,

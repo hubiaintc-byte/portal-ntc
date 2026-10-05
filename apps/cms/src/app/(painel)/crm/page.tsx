@@ -4,8 +4,6 @@ import {
   listarLeadsCrm,
   listarUsuariosCms,
   obterCatalogoCrm,
-  listarProgramasCrm,
-  listarModulosCrm,
   listarProdutosCrm,
   listarPropostasCrm,
   todosEnviosCrm,
@@ -13,12 +11,16 @@ import {
   type ClienteCrmResumo,
   type LeadCrmResumo,
   type UsuarioCmsResumo,
-  type ProgramaCrmResumo,
-  type ModuloCrmResumo,
   type ProdutoCrmResumo,
   type PropostaResumo,
   type EnvioResumo,
 } from "@/lib/cms/painelCrm";
+import {
+  listarModulosCrm,
+  listarProgramasCrm,
+  type ModuloCrmResumo,
+  type ProgramaCrmResumo,
+} from "@/lib/cms/catalogoCrm";
 
 import { ShellCrm } from "./ShellCrm";
 

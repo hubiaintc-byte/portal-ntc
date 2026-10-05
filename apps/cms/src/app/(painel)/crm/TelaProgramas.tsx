@@ -1,6 +1,6 @@
 "use client";
 
-import type { ProgramaCrmResumo } from "@/lib/cms/painelCrm";
+import type { ProgramaCrmResumo } from "@/lib/cms/catalogoCrm";
 
 interface TelaProgramasProps {
   programas: ProgramaCrmResumo[];

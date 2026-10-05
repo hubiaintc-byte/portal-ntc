@@ -1,6 +1,6 @@
 "use client";
 
-import type { ModuloCrmResumo } from "@/lib/cms/painelCrm";
+import type { ModuloCrmResumo } from "@/lib/cms/catalogoCrm";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
 interface TelaModulosProps {

@@ -8,8 +8,6 @@ import type {
   EventoComercial,
   Lead,
   LinhaDoTempo,
-  Modulo,
-  Programa,
   Proposta,
   VersaoProposta,
 } from "@ntc/types";
@@ -108,24 +106,6 @@ export interface CatalogoCrm {
 export interface UsuarioCmsResumo {
   id: string;
   nome: string;
-}
-
-export interface ProgramaCrmResumo {
-  id: string;
-  sigla: string;
-  nome: string;
-  area: string | null;
-}
-
-export interface ModuloCrmResumo {
-  id: string;
-  numero: number;
-  titulo: string;
-  tituloComercial: string | null;
-  programaSigla: string | null;
-  valor: number | null;
-  replay: string | null;
-  certificacao: string | null;
 }
 
 export interface ProdutoCrmResumo {
@@ -685,14 +665,29 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
 export async function obterCatalogoCrm(): Promise<CatalogoCrm> {
   const payload = await obterPayload();
   const [programas, modulos, eventos, especialistas] = await Promise.all([
-    payload.find({ collection: "programas", depth: 0, limit: 100, draft: true, sort: "sigla" }),
-    payload.find({ collection: "modulos", depth: 0, limit: 500, draft: true, sort: "numero" }),
+    // Só publicados (spec catálogo §3.2): `criarProposta` lê a versão publicada,
+    // então um rascunho no wizard criaria proposta com conteúdo vazio/antigo.
+    payload.find({
+      collection: "programas",
+      depth: 0,
+      limit: 200,
+      draft: false,
+      where: { _status: { equals: "published" } },
+      sort: "sigla",
+    }),
+    payload.find({ collection: "modulos", depth: 0, limit: 2000, draft: true, sort: "numero" }),
     payload.find({ collection: "eventos", depth: 0, limit: 500, draft: true, sort: "nome" }),
     payload.find({ collection: "especialistas", depth: 0, limit: 500, draft: true, sort: "nome" }),
   ]);
+  const publicados = new Set(programas.docs.map((p) => String(p.id)));
   return {
     programas: programas.docs.map((p) => ({ id: String(p.id), sigla: p.sigla ?? "", nome: p.nomeCompleto ?? "" })),
-    modulos: modulos.docs.map((m) => ({ id: String(m.id), titulo: m.titulo, numero: m.numero, programaId: idRel(m.programa) })),
+    modulos: modulos.docs
+      .filter((m) => {
+        const pid = idRel(m.programa);
+        return pid !== null && publicados.has(pid);
+      })
+      .map((m) => ({ id: String(m.id), titulo: m.titulo, numero: m.numero, programaId: idRel(m.programa) })),
     eventos: eventos.docs.map((e) => ({ id: String(e.id), nome: e.nome })),
     especialistas: especialistas.docs.map((e) => ({
       id: String(e.id),
@@ -706,32 +701,6 @@ export async function listarUsuariosCms(): Promise<UsuarioCmsResumo[]> {
   const payload = await obterPayload();
   const res = await payload.find({ collection: "users", depth: 0, limit: 100, sort: "nome" });
   return res.docs.map((u) => ({ id: String(u.id), nome: u.nome ?? u.email }));
-}
-
-export async function listarProgramasCrm(): Promise<ProgramaCrmResumo[]> {
-  const payload = await obterPayload();
-  const res = await payload.find({ collection: "programas", depth: 1, limit: 100, draft: true, sort: "sigla" });
-  return res.docs.map((p: Programa) => ({
-    id: String(p.id),
-    sigla: p.sigla ?? "",
-    nome: p.nomeCompleto ?? "",
-    area: campoRel(p.area, "nome"),
-  }));
-}
-
-export async function listarModulosCrm(): Promise<ModuloCrmResumo[]> {
-  const payload = await obterPayload();
-  const res = await payload.find({ collection: "modulos", depth: 1, limit: 500, draft: true, sort: "numero" });
-  return res.docs.map((m: Modulo) => ({
-    id: String(m.id),
-    numero: m.numero,
-    titulo: m.titulo,
-    tituloComercial: m.comercial?.tituloComercial ?? null,
-    programaSigla: campoRel(m.programa, "sigla"),
-    valor: m.comercial?.valor ?? null,
-    replay: m.comercial?.replay ?? null,
-    certificacao: m.comercial?.certificacao ?? null,
-  }));
 }
 
 export async function listarProdutosCrm(): Promise<ProdutoCrmResumo[]> {
