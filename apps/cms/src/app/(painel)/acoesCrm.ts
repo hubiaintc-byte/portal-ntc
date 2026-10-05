@@ -24,7 +24,6 @@ import {
   criarLeadManual,
   criarProposta,
   criarVersaoProposta,
-  gerarESalvarPdfProposta,
   marcarEventoRealizado,
   marcarLeadPerdido,
   moverLead,
@@ -46,7 +45,6 @@ import {
   type DadosLeadManual,
   type DadosLink,
   type DadosProposta,
-  type ResultadoGeracaoPdf,
   type ValorSecaoProposta,
 } from "@/lib/cms/painelCrmEscrita";
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
@@ -125,13 +123,6 @@ export async function salvarSecaoConteudoPropostaCrm(
 export async function registrarEnvioCrm(dados: DadosEnvio): Promise<ResultadoEscrita> {
   if (!(await obterUsuarioCms())) return RECUSADO;
   const resultado = await registrarEnvio(dados);
-  if (resultado.ok) revalidatePath("/crm");
-  return resultado;
-}
-
-export async function gerarPdfPropostaCrm(id: string): Promise<ResultadoGeracaoPdf> {
-  if (!(await obterUsuarioCms())) return RECUSADO;
-  const resultado = await gerarESalvarPdfProposta(id);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
 }

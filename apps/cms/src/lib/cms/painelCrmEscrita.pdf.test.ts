@@ -148,6 +148,9 @@ describe("gerarESalvarPdfProposta", () => {
     expect(resultado).toEqual({
       ok: true,
       omitidas: ["Corpo Docente e Curadoria", "Seção extra sem título"],
+      // Os bytes voltam junto: a rota do documento os serve na mesma
+      // requisição, sem reler o bucket privado.
+      pdf: Buffer.from("pdf"),
     });
   });
 
@@ -167,6 +170,10 @@ describe("gerarESalvarPdfProposta", () => {
       delete: vi.fn().mockResolvedValue({}),
     });
 
-    expect(await gerarESalvarPdfProposta("42")).toEqual({ ok: true, omitidas: [] });
+    expect(await gerarESalvarPdfProposta("42")).toEqual({
+      ok: true,
+      omitidas: [],
+      pdf: Buffer.from("pdf"),
+    });
   });
 });

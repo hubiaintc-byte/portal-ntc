@@ -1122,6 +1122,9 @@ function formatarDataCurta(iso: string | null): string {
  */
 export interface ResultadoGeracaoPdf extends ResultadoEscrita {
   omitidas?: string[];
+  /** Os bytes recém-gerados, para quem precisa servi-los na mesma requisição
+   * (a rota do documento) sem uma segunda viagem ao bucket privado. */
+  pdf?: Buffer;
 }
 
 export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoGeracaoPdf> {
@@ -1165,7 +1168,7 @@ export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoGera
       }
     }
 
-    return { ok: true, omitidas: omitidas.map((o) => o.titulo) };
+    return { ok: true, omitidas: omitidas.map((o) => o.titulo), pdf };
   } catch (e) {
     console.error("[gerarESalvarPdfProposta]", e);
     return { ok: false, erro: "Não foi possível gerar o PDF. Tente novamente." };

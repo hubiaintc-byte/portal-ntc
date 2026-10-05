@@ -19,14 +19,6 @@ interface DetalheStatusProps {
   onEditar: () => void;
   onNovaVersao: (codBase: string, motivo: string) => void;
   onRegistrarEnvio: (dados: DadosEnvio) => void;
-  onGerarPdf: (id: string) => void;
-  gerandoPdf: boolean;
-  /**
-   * Relatório da última geração de PDF (spec §1.1): títulos das seções que
-   * ficaram fora do documento. `null` enquanto nada foi gerado nesta visita;
-   * `[]` depois de uma geração sem omissão nenhuma.
-   */
-  omitidasNoPdf: string[] | null;
   /** Recarrega a proposta — o bloco de conteúdo pede isso depois de restaurar o padrão. */
   onAtualizado: () => void;
 }
@@ -46,9 +38,6 @@ export function DetalheProposta({
   onEditar,
   onNovaVersao,
   onRegistrarEnvio,
-  onGerarPdf,
-  gerandoPdf,
-  omitidasNoPdf,
   onAtualizado,
 }: DetalheStatusProps) {
   const [novaVersaoAberta, setNovaVersaoAberta] = useState(false);
@@ -120,19 +109,19 @@ export function DetalheProposta({
           <button type="button" className="pcms-btn pcms-btn--ghost" onClick={() => setNovaVersaoAberta(true)}>
             Nova versão
           </button>
-          {p.pdfGeradoUrl && (
-            <a href={p.pdfGeradoUrl} target="_blank" rel="noreferrer" className="pcms-btn pcms-btn--ghost">
-              Baixar PDF
-            </a>
-          )}
-          <button
-            type="button"
+          {/* Porta única do documento: a rota gera a partir do conteúdo atual,
+              salva o PDF de registro e devolve os bytes, que o navegador abre
+              no visualizador — onde se baixa. Antes eram dois botões, e o de
+              baixar servia o arquivo da geração anterior, que podia estar
+              velho em relação ao que acabara de ser editado. */}
+          <a
+            href={`/crm/propostas/${p.id}/documento`}
+            target="_blank"
+            rel="noreferrer"
             className="pcms-btn pcms-btn--ghost"
-            disabled={gerandoPdf}
-            onClick={() => onGerarPdf(p.id)}
           >
-            {gerandoPdf ? "Gerando…" : "Gerar PDF"}
-          </button>
+            Baixar PDF
+          </a>
           <button
             type="button"
             className="pcms-btn pcms-btn--ghost"
@@ -142,35 +131,6 @@ export function DetalheProposta({
           </button>
         </div>
       </div>
-
-      {/* Relatório de geração: o que ficou FORA do PDF que acabou de ser gerado.
-          `role="status"` porque é resultado de uma ação do usuário, não erro. */}
-      {omitidasNoPdf !== null && !gerandoPdf && (
-        <div
-          className="pcms-conteudo__confirmar pcms-conteudo__confirmar--relatorio"
-          role="status"
-        >
-          {omitidasNoPdf.length === 0 ? (
-            <p>PDF gerado com todas as seções do documento.</p>
-          ) : (
-            <>
-              <p>
-                PDF gerado.{" "}
-                {omitidasNoPdf.length === 1
-                  ? "1 seção ficou fora do documento, por estar vazia ou por ser uma seção extra sem título:"
-                  : `${omitidasNoPdf.length} seções ficaram fora do documento, por estarem vazias ou por serem seções extras sem título:`}
-              </p>
-              <ul className="pcms-conteudo__omitidas">
-                {/* Chave pelo índice: dois títulos podem repetir ("Seção extra
-                    sem título"), e a lista é só leitura, sem reordenação. */}
-                {omitidasNoPdf.map((titulo, i) => (
-                  <li key={`${i}-${titulo}`}>{titulo}</li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
-      )}
 
       {saidaPendente !== null && (
         <div className="pcms-conteudo__confirmar pcms-conteudo__confirmar--tudo" role="alert">
