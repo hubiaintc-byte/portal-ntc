@@ -51,6 +51,7 @@ export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo,
   const podeExcluir = p ? podeExcluirPrograma(p.dependentes) : { ok: false as const, motivo: "" };
 
   function mudarTexto(chave: CampoTextoPrograma, v: string) {
+    if (v === textos[chave]) return;
     setTextos((t) => ({ ...t, [chave]: v }));
     setAlterados((s) => new Set(s).add(chave));
   }
@@ -71,8 +72,9 @@ export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo,
     };
     iniciar(async () => {
       const r = await salvarProgramaCatalogoCrm(p?.id ?? null, dados, publicar);
-      if (r.ok && r.id) onSalvo(r.id);
-      else setErro(r.erro ?? "Erro ao salvar o programa.");
+      if (r.ok) {
+        if (r.id) onSalvo(r.id);
+      } else setErro(r.erro ?? "Erro ao salvar o programa.");
     });
   }
 

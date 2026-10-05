@@ -180,6 +180,8 @@ export function ShellCrm({
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
   // As Tasks 7/8 passam a ler o primeiro item para renderizar os detalhes do catálogo.
   const [catalogoDet, setCatalogoDet] = useState<DetalheCatalogoAberto | null>(null);
+  /** Sobe a cada detalhe do catálogo recarregado, para o formulário remontar com os dados novos. */
+  const [versaoDet, setVersaoDet] = useState(0);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [carregando, iniciarCarga] = useTransition();
   const [leadsLocal, setLeadsLocal] = useState<LeadCrmResumo[]>(leads);
@@ -251,6 +253,7 @@ export function ShellCrm({
       if (det) {
         setErroAcao(null);
         setCatalogoDet({ tipo: "programa", programa: det });
+        setVersaoDet((v) => v + 1);
       }
       else setErroAcao("Não foi possível abrir o programa.");
     });
@@ -262,6 +265,7 @@ export function ShellCrm({
       if (det) {
         setErroAcao(null);
         setCatalogoDet({ tipo: "modulo", modulo: det });
+        setVersaoDet((v) => v + 1);
       }
       else setErroAcao("Não foi possível abrir o módulo.");
     });
@@ -306,7 +310,7 @@ export function ShellCrm({
       {/* Detalhes e formulários em tela cheia têm precedência sobre a tela ativa. */}
       {catalogoDet?.tipo === "programa" ? (
         <DetalheProgramaCatalogo
-          key={catalogoDet.programa?.id ?? "novo"}
+          key={`${catalogoDet.programa?.id ?? "novo"}:${versaoDet}`}
           programa={catalogoDet.programa}
           areas={areas}
           onVoltar={fecharTudo}
