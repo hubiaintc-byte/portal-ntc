@@ -2,9 +2,12 @@ import "server-only";
 
 import type { RequiredDataFromCollectionSlug } from "payload";
 
+import type { Rodape } from "@ntc/types";
+
 import { casarOuCriarPalestrantes } from "@/lib/importacaoPdf/casarOuCriarPalestrantes";
 import { textoParaLexical } from "@/lib/lexicalBuilders";
 import { extrairTextoPdf } from "@/lib/importacaoPdf/extrairTextoPdf";
+import { markdownParaLexical } from "@/lib/markdownLexical";
 import { montarCamposEvento } from "@/lib/importacaoPdf/montarCamposEvento";
 import { parsearFolderEvento } from "@/lib/importacaoPdf/parsearFolderEvento";
 import { obterPayload } from "@/lib/payloadClient";
@@ -22,6 +25,8 @@ import { obterPayload } from "@/lib/payloadClient";
 export interface ResultadoEscrita {
   ok: boolean;
   erro?: string;
+  /** Escrita OK, mas algo posterior (ex.: revalidação do site) falhou. */
+  aviso?: string;
 }
 
 export interface CamposEventoCompletos {
@@ -484,4 +489,331 @@ export async function criarEventoDePdf(arquivo: File): Promise<ResultadoImportac
   } catch (e) {
     return { ok: false, erro: e instanceof Error ? e.message : "Erro ao importar o PDF." };
   }
+}
+
+/* ---------------- Conteúdos editoriais ---------------- */
+
+export interface CamposConteudo {
+  titulo: string;
+  slug: string;
+  categoria: string;
+  areaId: string;
+  lide: string;
+  corpoMarkdown: string;
+  assinatura: string;
+  autorIds: string[];
+  dataPublicacao: string;
+  destaque: boolean;
+  anunciarEmPreparacao: boolean;
+  linkExterno: string;
+  seoTitulo: string;
+  seoDescricao: string;
+}
+
+/** Erros do Postgres/Payload que têm tradução legível para o editor. */
+function traduzirErroConteudo(e: unknown): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/duplicate key|unique constraint/i.test(msg)) {
+    return "Já existe um conteúdo com este endereço (slug).";
+  }
+  return msg || "Erro ao salvar o conteúdo.";
+}
+
+function validarConteudo(campos: CamposConteudo): string | null {
+  if (campos.titulo.trim().length === 0) return "Informe o título do conteúdo.";
+  if (campos.lide.trim().length === 0) return "Informe a lide (resumo de abertura).";
+  if (campos.lide.trim().length > 280) return "A lide deve ter no máximo 280 caracteres.";
+  if (campos.categoria.trim().length === 0) return "Escolha a categoria.";
+  return null;
+}
+
+export async function salvarConteudoCms(
+  id: string | null,
+  campos: CamposConteudo,
+): Promise<ResultadoEscrita & { id?: string }> {
+  const erro = validarConteudo(campos);
+  if (erro) return { ok: false, erro };
+
+  const data: Record<string, unknown> = {
+    titulo: campos.titulo.trim(),
+    categoria: campos.categoria,
+    area: campos.areaId.trim().length > 0 ? Number(campos.areaId) : null,
+    lide: campos.lide.trim(),
+    corpo: markdownParaLexical(campos.corpoMarkdown),
+    assinatura: ouNulo(campos.assinatura),
+    autor: campos.autorIds.map((v) => Number(v)).filter((n) => !Number.isNaN(n)),
+    dataPublicacao: campos.dataPublicacao,
+    destaque: campos.destaque,
+    anunciarEmPreparacao: campos.anunciarEmPreparacao,
+    linkExterno: ouNulo(campos.linkExterno),
+    seo: {
+      tituloSeo: ouNulo(campos.seoTitulo),
+      descricaoSeo: ouNulo(campos.seoDescricao),
+    },
+  };
+  // Slug vazio deixa o hook autoSlug("titulo") gerar a partir do título.
+  if (campos.slug.trim().length > 0) data.slug = campos.slug.trim();
+  // `data` é montado como Record (categoria/áreas/ids em runtime, validados
+  // pelo formulário) e convertido ao tipo gerado só no limite da Local API —
+  // mesmo padrão de criarEventoDePdf acima (o tipo gerado descreve o
+  // documento completo; aqui o rascunho pode nascer parcial, coberto por
+  // `versions.drafts: true` na coleção).
+  const dadosConteudo = data as unknown as RequiredDataFromCollectionSlug<"conteudos">;
+
+  try {
+    const payload = await obterPayload();
+    if (id) {
+      // draft: true preserva o estado de publicação — salvar não publica.
+      await payload.update({
+        collection: "conteudos",
+        id,
+        data: dadosConteudo,
+        draft: true,
+        overrideAccess: true,
+      });
+      return { ok: true, id };
+    }
+    const criado = await payload.create({
+      collection: "conteudos",
+      data: dadosConteudo,
+      draft: true,
+      overrideAccess: true,
+    });
+    return { ok: true, id: String((criado as { id: string | number }).id) };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroConteudo(e) };
+  }
+}
+
+export async function publicarConteudoCms(id: string): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "conteudos",
+      id,
+      data: { _status: "published" },
+      overrideAccess: true,
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroConteudo(e) };
+  }
+}
+
+export async function despublicarConteudoCms(id: string): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.update({
+      collection: "conteudos",
+      id,
+      data: { _status: "draft" },
+      overrideAccess: true,
+    });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroConteudo(e) };
+  }
+}
+
+export async function excluirConteudoCms(id: string): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+    await payload.delete({ collection: "conteudos", id, overrideAccess: true });
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroConteudo(e) };
+  }
+}
+
+/**
+ * Upload da imagem de destaque ou do anexo de download de um conteúdo.
+ *
+ * O <CampoUpload> do painel é específico do evento — coleção e par de campos
+ * são fixos em `enviarMidiaEvento` —, então o conteúdo precisa do seu próprio
+ * caminho de escrita. Mesma mecânica: cria a Media pela Local API (variantes
+ * + Supabase Storage) e aponta o campo.
+ *
+ * Grava com `draft: true`, como `salvarConteudoCms`: o arquivo entra no
+ * rascunho e vai ao ar no próximo "Publicar", junto com o texto. Escrever
+ * direto no publicado levaria ao ar, de carona, as edições de texto ainda
+ * pendentes no rascunho.
+ *
+ * `alt` é o texto alternativo escrito pelo editor no painel — a página de
+ * leitura do site o publica como o `alt` da capa (WCAG 2.1 AA, §10). Vazio
+ * só acontece no anexo de download, que não tem campo de alt na tela (é um
+ * PDF, nunca renderizado como imagem) e cai no nome do arquivo, porque
+ * `media.alt` é obrigatório na coleção.
+ */
+export async function enviarMidiaConteudo(
+  id: string,
+  campo: "imagemDestaque" | "anexoDownload",
+  arquivo: File,
+  alt: string,
+): Promise<ResultadoEscrita> {
+  try {
+    const payload = await obterPayload();
+
+    const buffer = Buffer.from(await arquivo.arrayBuffer());
+    const media = await payload.create({
+      collection: "media",
+      data: { alt: alt.trim().length > 0 ? alt.trim() : arquivo.name },
+      file: {
+        data: buffer,
+        name: arquivo.name,
+        mimetype: arquivo.type,
+        size: arquivo.size,
+      },
+      overrideAccess: true,
+    });
+
+    // Chave literal, não computada: `campo` chega como argumento de Server
+    // Action, então a união só existe em tempo de compilação. O ternário
+    // fecha a porta para um campo arbitrário chegar ao `data` em runtime — e
+    // de quebra o objeto se tipa sozinho, sem o cast duplo (§4.4).
+    const dados =
+      campo === "imagemDestaque"
+        ? { imagemDestaque: media.id }
+        : { anexoDownload: media.id };
+
+    await payload.update({
+      collection: "conteudos",
+      id,
+      data: dados,
+      draft: true,
+      overrideAccess: true,
+    });
+
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro no upload." };
+  }
+}
+
+/* ---------------- Contatos institucionais (Global Rodapé) ---------------- */
+
+export interface CamposContatos {
+  telefoneInstitucional: string;
+  whatsappInstitucional: string;
+  emailInstitucional: string;
+  emailImprensa: string;
+  emailParcerias: string;
+  emailDpo: string;
+  emailSuporte: string;
+  emailEventos: string;
+  enderecoCompleto: string;
+  razaoSocial: string;
+  cnpj: string;
+  verticais: { vertical: string; email: string; opcaoTelefone: string }[];
+}
+
+const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validarEmailObrigatorio(valor: string, rotulo: string): string | null {
+  if (valor.trim().length === 0) return `Informe o e-mail (${rotulo}).`;
+  if (!REGEX_EMAIL.test(valor.trim())) return `E-mail inválido (${rotulo}).`;
+  return null;
+}
+
+function validarEmailOpcional(valor: string, rotulo: string): string | null {
+  if (valor.trim().length === 0) return null;
+  if (!REGEX_EMAIL.test(valor.trim())) return `E-mail inválido (${rotulo}).`;
+  return null;
+}
+
+/** Ao menos 10 dígitos (DDD + número), descartando parênteses/traços/espaços. */
+function validarTelefone(valor: string, rotulo: string): string | null {
+  const digitos = valor.replace(/\D/g, "");
+  if (digitos.length < 10) return `${rotulo}: informe o número com DDD (mínimo 10 dígitos).`;
+  return null;
+}
+
+function validarContatos(campos: CamposContatos): string | null {
+  const validacoes = [
+    validarEmailObrigatorio(campos.emailInstitucional, "institucional"),
+    validarEmailOpcional(campos.emailImprensa, "imprensa"),
+    validarEmailOpcional(campos.emailParcerias, "parcerias"),
+    validarEmailOpcional(campos.emailDpo, "DPO"),
+    validarEmailOpcional(campos.emailSuporte, "suporte"),
+    validarEmailOpcional(campos.emailEventos, "eventos"),
+    ...campos.verticais.map((v) => validarEmailOpcional(v.email, `vertical ${v.vertical}`)),
+    validarTelefone(campos.telefoneInstitucional, "Telefone institucional"),
+    validarTelefone(campos.whatsappInstitucional, "WhatsApp institucional"),
+  ];
+  if (campos.enderecoCompleto.trim().length === 0) {
+    validacoes.push("Informe o endereço completo.");
+  }
+  return validacoes.find((e): e is string => e !== null) ?? null;
+}
+
+const AVISO_REVALIDACAO =
+  "Os contatos foram salvos, mas a atualização no site pode levar alguns minutos.";
+
+/**
+ * Melhor esforço: pede ao front que revalide o layout inteiro (o rodapé
+ * aparece em toda página, não só em "/"). Nunca lança — falha vira `aviso`
+ * no retorno de `salvarContatosCms`, não `erro` (o dado já está salvo).
+ */
+async function revalidarLayoutDoSite(): Promise<boolean> {
+  const frontUrl = process.env.PAYLOAD_PUBLIC_FRONT_URL ?? "http://localhost:3000";
+  const secret = process.env.REVALIDATE_SECRET ?? "";
+  try {
+    const resposta = await fetch(`${frontUrl}/api/revalidate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Revalidate-Secret": secret },
+      body: JSON.stringify({ path: "/", escopo: "layout" }),
+    });
+    return resposta.ok;
+  } catch (e) {
+    console.error("[salvarContatosCms] Falha ao revalidar o site.", e);
+    return false;
+  }
+}
+
+/**
+ * Grava os contatos institucionais no Global `rodape` — o rodapé (presente
+ * em todas as páginas do site) e as páginas de Contato/O Grupo/legais leem
+ * daqui (Task 13, `apps/web/lib/contatos.ts`). Depois de salvar, pede a
+ * revalidação do layout inteiro do site (não só um path) — falha nessa
+ * segunda etapa vira `aviso`, o dado já está persistido.
+ */
+export async function salvarContatosCms(campos: CamposContatos): Promise<ResultadoEscrita> {
+  const erro = validarContatos(campos);
+  if (erro) return { ok: false, erro };
+
+  try {
+    const payload = await obterPayload();
+    await payload.updateGlobal({
+      slug: "rodape",
+      data: {
+        telefoneInstitucional: campos.telefoneInstitucional.trim(),
+        whatsappInstitucional: campos.whatsappInstitucional.trim(),
+        emailInstitucional: campos.emailInstitucional.trim(),
+        emailImprensa: ouNulo(campos.emailImprensa),
+        emailParcerias: ouNulo(campos.emailParcerias),
+        emailDpo: ouNulo(campos.emailDpo),
+        emailSuporte: ouNulo(campos.emailSuporte),
+        emailEventos: ouNulo(campos.emailEventos),
+        enderecoCompleto: campos.enderecoCompleto.trim(),
+        razaoSocial: ouNulo(campos.razaoSocial),
+        cnpj: ouNulo(campos.cnpj),
+        // `vertical` chega como string do formulário; o schema do Global
+        // tipa a coluna como union literal ("educacao"/"gestao-publica"/
+        // "saude") — a tela de Configurações renderiza as 3 linhas fixas de
+        // VERTICAIS_CONTATO e não deixa editar a chave `vertical` em si, só
+        // e-mail/opção de telefone, então o cast reflete uma garantia da UI,
+        // não uma checagem nova.
+        verticais: campos.verticais.map((v) => ({
+          vertical: v.vertical as NonNullable<Rodape["verticais"]>[number]["vertical"],
+          email: v.email.trim(),
+          opcaoTelefone: v.opcaoTelefone.trim(),
+        })),
+      },
+      overrideAccess: true,
+    });
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao salvar os contatos." };
+  }
+
+  const revalidou = await revalidarLayoutDoSite();
+  return revalidou ? { ok: true } : { ok: true, aviso: AVISO_REVALIDACAO };
 }

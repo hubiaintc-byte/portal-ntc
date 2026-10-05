@@ -4,7 +4,14 @@
  * loader CMS retorna. Usado pelo page.tsx quando o fetch do Payload falha.
  *
  * Não altera o arquivo conteudoCorpoDocente.ts — apenas re-exporta.
+ *
+ * O bloco de FAQ traz o e-mail do DPO, que sai do global de contatos —
+ * por isso o barrel é montado por função. `conteudoFallback` continua
+ * exportado, com os contatos literais, para quem só precisa dos textos
+ * (lib/cms/corpoDocente.ts lê `HERO.crumb`).
  */
+
+import { CONTATOS_FALLBACK, type Contatos } from "@/lib/contatos";
 
 import {
   CARDS_AXIS_SAUDE,
@@ -13,11 +20,11 @@ import {
   CREDENCIAMENTO,
   CREDIBILIDADE,
   CTA_FINAL,
-  FAQ,
   HERO,
   MANIFESTO,
   METRICAS,
   STICKY_CTA,
+  montarFaq,
   type CardAxis,
   type CardExpert,
   type CardFeatured,
@@ -39,16 +46,20 @@ export interface ConteudoCorpoDocente {
   STICKY_CTA: typeof STICKY_CTA;
 }
 
-export const conteudoFallback: ConteudoCorpoDocente = {
-  HERO,
-  METRICAS,
-  MANIFESTO,
-  CARDS_FEATURED,
-  CARDS_EXPERTS,
-  CARDS_AXIS_SAUDE,
-  CREDIBILIDADE,
-  CREDENCIAMENTO,
-  FAQ,
-  CTA_FINAL,
-  STICKY_CTA,
-};
+export function montarConteudoFallback(c: Contatos): ConteudoCorpoDocente {
+  return {
+    HERO,
+    METRICAS,
+    MANIFESTO,
+    CARDS_FEATURED,
+    CARDS_EXPERTS,
+    CARDS_AXIS_SAUDE,
+    CREDIBILIDADE,
+    CREDENCIAMENTO,
+    FAQ: montarFaq(c),
+    CTA_FINAL,
+    STICKY_CTA,
+  };
+}
+
+export const conteudoFallback: ConteudoCorpoDocente = montarConteudoFallback(CONTATOS_FALLBACK);

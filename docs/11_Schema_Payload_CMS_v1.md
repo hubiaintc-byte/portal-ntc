@@ -193,6 +193,11 @@ export const CONTEUDO_CATEGORIA = [
 ] as const
 ```
 
+> **`CONTEUDO_CATEGORIA` está desatualizado (22/09/2026)** — a lista vigente
+> mora em `packages/lib/src/editorial/categorias.ts` e é definida pelo spec
+> `docs/superpowers/specs/2026-09-22-cms-conteudos-editoriais-design.md`.
+> Ver a nota no topo da §9.
+
 `apps/cms/src/shared/lexical-config.ts`
 
 ```typescript
@@ -815,6 +820,16 @@ export const Especialistas: CollectionConfig = {
 ---
 
 ## 9. Coleção `Conteudos`
+
+> **Parcialmente substituído (22/09/2026).** A modelagem vigente de
+> `conteudos` está em
+> `docs/superpowers/specs/2026-09-22-cms-conteudos-editoriais-design.md`.
+> O que mudou e **não** deve ser executado a partir daqui: as categorias
+> `insight`, `publicacao` e `material-download` deixaram de existir (o enum
+> vigente é `artigo`/`estudo`/`nota-tecnica`/`webinar`/`material`/`noticia`,
+> em `packages/lib/src/editorial/categorias.ts`), e a condição de
+> `anexoDownload` passou a olhar as categorias novas. O restante da seção
+> segue valendo.
 
 Artigos, insights, publicações, notícias, materiais para download.
 

@@ -6,7 +6,15 @@
  *
  * Campos com sufixo "Html" contêm tags inline (<strong>, <em>, <br>, <a>)
  * e devem ser renderizados com dangerouslySetInnerHTML.
+ *
+ * Telefone, WhatsApp, e-mails e endereço não são literais: os blocos que
+ * os usam viraram funções `montar*(c: Contatos)`, alimentadas pelo
+ * `carregarContatos()` da página (global `rodape`, editável no painel).
  */
+
+import { escapar } from "@ntc/lib";
+
+import type { Contatos } from "@/lib/contatos";
 
 /* ============================================================
  * HERO
@@ -104,90 +112,92 @@ export interface FormAsideConfig {
   };
 }
 
-export const FORMS_ASIDES: readonly FormAsideConfig[] = [
-  {
-    tab: "atendimento",
-    formId: "form-contato-atendimento",
-    cmsLink: "submit-atendimento-geral",
-    endpoint: "/api/contato/atendimento",
-    aside: {
-      eyebrow: "Canal · Atendimento geral",
-      titulo: "Fale com a NTC",
-      descricaoHtml:
-        "Canal aberto para dúvidas, sugestões, parcerias e qualquer demanda que não se encaixe nos canais especializados.",
-      bulletsHtml: [
-        "Retorno em até <strong>1 dia útil</strong>",
-        "Atendimento humano direcionado",
-        "Encaminhamento interno conforme o tema",
-        "Confidencialidade institucional",
-      ],
-      rodapeHtml: "Prefere e-mail? <strong>contato@institutontc.com.br</strong>",
+export function montarFormsAsides(c: Contatos): readonly FormAsideConfig[] {
+  return [
+    {
+      tab: "atendimento",
+      formId: "form-contato-atendimento",
+      cmsLink: "submit-atendimento-geral",
+      endpoint: "/api/contato/atendimento",
+      aside: {
+        eyebrow: "Canal · Atendimento geral",
+        titulo: "Fale com a NTC",
+        descricaoHtml:
+          "Canal aberto para dúvidas, sugestões, parcerias e qualquer demanda que não se encaixe nos canais especializados.",
+        bulletsHtml: [
+          "Retorno em até <strong>1 dia útil</strong>",
+          "Atendimento humano direcionado",
+          "Encaminhamento interno conforme o tema",
+          "Confidencialidade institucional",
+        ],
+        rodapeHtml: `Prefere e-mail? <strong>${escapar(c.emailInstitucional)}</strong>`,
+      },
     },
-  },
-  {
-    tab: "proposta",
-    formId: "form-contato-proposta",
-    cmsLink: "submit-proposta-institucional",
-    endpoint: "/api/contato/proposta",
-    aside: {
-      eyebrow: "Canal · Proposta institucional",
-      titulo: "Contratar formação para a sua instituição",
-      descricaoHtml:
-        "Para órgãos públicos, redes de ensino, sistemas de saúde e organizações que buscam programas <strong>in company</strong>, turmas fechadas, soluções sob medida ou trilhas estruturadas.",
-      bulletsHtml: [
-        "Diagnóstico institucional inicial",
-        "Proposta técnica e comercial em até 5 dias úteis",
-        "Documentação para Lei 14.133, dispensa e convênios",
-        "Coordenação científica dedicada por vertical",
-        "Faturamento por empenho, NF, convênio ou pactuação",
-      ],
-      rodapeHtml: "Atendimento comercial · <strong>(63) 3212-1199</strong>",
+    {
+      tab: "proposta",
+      formId: "form-contato-proposta",
+      cmsLink: "submit-proposta-institucional",
+      endpoint: "/api/contato/proposta",
+      aside: {
+        eyebrow: "Canal · Proposta institucional",
+        titulo: "Contratar formação para a sua instituição",
+        descricaoHtml:
+          "Para órgãos públicos, redes de ensino, sistemas de saúde e organizações que buscam programas <strong>in company</strong>, turmas fechadas, soluções sob medida ou trilhas estruturadas.",
+        bulletsHtml: [
+          "Diagnóstico institucional inicial",
+          "Proposta técnica e comercial em até 5 dias úteis",
+          "Documentação para Lei 14.133, dispensa e convênios",
+          "Coordenação científica dedicada por vertical",
+          "Faturamento por empenho, NF, convênio ou pactuação",
+        ],
+        rodapeHtml: `Atendimento comercial · <strong>${escapar(c.telefone)}</strong>`,
+      },
     },
-  },
-  {
-    tab: "equipe",
-    formId: "form-contato-equipe",
-    cmsLink: "submit-inscricao-equipe",
-    endpoint: "/api/contato/equipe",
-    aside: {
-      eyebrow: "Canal · Equipe ou grupo institucional",
-      titulo: "Inscrever equipe ou grupo institucional",
-      descricaoHtml:
-        "Atendimento único para inscrições coletivas — de equipes pequenas a partir de <strong>3 participantes</strong> até inscrições em lote acima de mil participantes, com faturamento institucional.",
-      bulletsHtml: [
-        "Condições especiais a partir de 3 inscrições",
-        "Faturamento por empenho, NF, convênio ou centralizado",
-        "Reserva de vagas garantida em até 48h",
-        "Coordenação dedicada para cadastros e certificação",
-        "Inscrição em lote por planilha (acima de 50 participantes)",
-        "Material de divulgação interna sob demanda",
-      ],
-      // TODO: rota /agenda ainda não criada — manter href literal do protótipo
-      rodapeHtml:
-        "Inscrições individuais? Acesse a <strong><a href=\"./09_Pagina_Agenda_v2.html\" style=\"color: var(--dourado-soft);\">Agenda Geral NTC →</a></strong>",
+    {
+      tab: "equipe",
+      formId: "form-contato-equipe",
+      cmsLink: "submit-inscricao-equipe",
+      endpoint: "/api/contato/equipe",
+      aside: {
+        eyebrow: "Canal · Equipe ou grupo institucional",
+        titulo: "Inscrever equipe ou grupo institucional",
+        descricaoHtml:
+          "Atendimento único para inscrições coletivas — de equipes pequenas a partir de <strong>3 participantes</strong> até inscrições em lote acima de mil participantes, com faturamento institucional.",
+        bulletsHtml: [
+          "Condições especiais a partir de 3 inscrições",
+          "Faturamento por empenho, NF, convênio ou centralizado",
+          "Reserva de vagas garantida em até 48h",
+          "Coordenação dedicada para cadastros e certificação",
+          "Inscrição em lote por planilha (acima de 50 participantes)",
+          "Material de divulgação interna sob demanda",
+        ],
+        // TODO: rota /agenda ainda não criada — manter href literal do protótipo
+        rodapeHtml:
+          "Inscrições individuais? Acesse a <strong><a href=\"./09_Pagina_Agenda_v2.html\" style=\"color: var(--dourado-soft);\">Agenda Geral NTC →</a></strong>",
+      },
     },
-  },
-  {
-    tab: "imprensa",
-    formId: "form-contato-imprensa",
-    cmsLink: "submit-imprensa",
-    endpoint: "/api/contato/imprensa",
-    aside: {
-      eyebrow: "Canal · Imprensa e relações institucionais",
-      titulo: "Pautas, entrevistas e parcerias editoriais",
-      descricaoHtml:
-        "Canal dedicado a jornalistas, veículos, assessorias e entidades parceiras. Acesso a porta-vozes, especialistas das três verticais, dados consolidados e materiais editoriais.",
-      bulletsHtml: [
-        "Retorno em até <strong>4 horas úteis</strong>",
-        "Coordenação científica e porta-vozes oficiais",
-        "Releases, banco de imagens e logos",
-        "Dados consolidados das três verticais",
-        "Sala de imprensa por solicitação",
-      ],
-      rodapeHtml: "Apoio direto · <strong>imprensa@institutontc.com.br</strong>",
+    {
+      tab: "imprensa",
+      formId: "form-contato-imprensa",
+      cmsLink: "submit-imprensa",
+      endpoint: "/api/contato/imprensa",
+      aside: {
+        eyebrow: "Canal · Imprensa e relações institucionais",
+        titulo: "Pautas, entrevistas e parcerias editoriais",
+        descricaoHtml:
+          "Canal dedicado a jornalistas, veículos, assessorias e entidades parceiras. Acesso a porta-vozes, especialistas das três verticais, dados consolidados e materiais editoriais.",
+        bulletsHtml: [
+          "Retorno em até <strong>4 horas úteis</strong>",
+          "Coordenação científica e porta-vozes oficiais",
+          "Releases, banco de imagens e logos",
+          "Dados consolidados das três verticais",
+          "Sala de imprensa por solicitação",
+        ],
+        rodapeHtml: `Apoio direto · <strong>${escapar(c.emailImprensa)}</strong>`,
+      },
     },
-  },
-] as const;
+  ];
+}
 
 /* ============================================================
  * SELECT OPTIONS
@@ -362,76 +372,91 @@ export interface ChannelCard {
   acaoCrimson?: boolean;
 }
 
-export const CHANNELS: readonly ChannelCard[] = [
-  {
-    data: "email",
-    destaque: false,
-    iconeChar: "@",
-    label: "E-mail institucional",
-    valor: "contato@institutontc.com.br",
-    nota: "Atendimento geral · resposta em até 1 dia útil",
-    acaoHref: "mailto:contato@institutontc.com.br",
-    acaoTexto: "Enviar",
-    acaoCmsLink: "mailto-contato",
-  },
-  {
-    data: "comercial",
-    destaque: true,
-    iconeChar: "☎",
-    label: "Atendimento comercial",
-    valor: "(63) 3212-1199",
-    nota: "Propostas institucionais e contratação por órgão público",
-    acaoHref: "tel:+556332121199",
-    acaoTexto: "Ligar",
-    acaoCmsLink: "tel-comercial",
-  },
-  {
-    data: "whatsapp",
-    destaque: true,
-    iconeChar: "W",
-    label: "WhatsApp comercial",
-    valor: "(63) 98444-4040",
-    nota: "Mensagens · seg–sex · 8h às 18h",
-    acaoHref: "https://wa.me/5563984444040",
-    acaoTexto: "Conversar",
-    acaoCmsLink: "whatsapp-comercial",
-    acaoTarget: "_blank",
-  },
-  {
-    data: "imprensa",
-    destaque: false,
-    iconeChar: "¶",
-    label: "Imprensa e AssCom",
-    valor: "imprensa@institutontc.com.br",
-    nota: "Pauta · entrevista · dados consolidados",
-    acaoHref: "mailto:imprensa@institutontc.com.br",
-    acaoTexto: "Falar com AssCom",
-    acaoCmsLink: "mailto-imprensa",
-    acaoCrimson: true,
-  },
-  {
-    data: "suporte",
-    destaque: false,
-    iconeChar: "⚙",
-    label: "Suporte EventOn (participante)",
-    valor: "suporte@eventon.institutontc.com.br",
-    nota: "Acesso · certificado · replay · materiais",
-    acaoHref: "mailto:suporte@eventon.institutontc.com.br",
-    acaoTexto: "Acionar suporte",
-    acaoCmsLink: "mailto-suporte",
-  },
-];
+export function montarChannels(c: Contatos): readonly ChannelCard[] {
+  return [
+    {
+      data: "email",
+      destaque: false,
+      iconeChar: "@",
+      label: "E-mail institucional",
+      valor: c.emailInstitucional,
+      nota: "Atendimento geral · resposta em até 1 dia útil",
+      acaoHref: `mailto:${c.emailInstitucional}`,
+      acaoTexto: "Enviar",
+      acaoCmsLink: "mailto-contato",
+    },
+    {
+      data: "comercial",
+      destaque: true,
+      iconeChar: "☎",
+      label: "Atendimento comercial",
+      valor: c.telefone,
+      nota: "Propostas institucionais e contratação por órgão público",
+      acaoHref: c.telefoneHref,
+      acaoTexto: "Ligar",
+      acaoCmsLink: "tel-comercial",
+    },
+    {
+      data: "whatsapp",
+      destaque: true,
+      iconeChar: "W",
+      label: "WhatsApp comercial",
+      valor: c.whatsapp,
+      nota: "Mensagens · seg–sex · 8h às 18h",
+      acaoHref: c.whatsappHref,
+      acaoTexto: "Conversar",
+      acaoCmsLink: "whatsapp-comercial",
+      acaoTarget: "_blank",
+    },
+    {
+      data: "imprensa",
+      destaque: false,
+      iconeChar: "¶",
+      label: "Imprensa e AssCom",
+      valor: c.emailImprensa,
+      nota: "Pauta · entrevista · dados consolidados",
+      acaoHref: `mailto:${c.emailImprensa}`,
+      acaoTexto: "Falar com AssCom",
+      acaoCmsLink: "mailto-imprensa",
+      acaoCrimson: true,
+    },
+    {
+      data: "suporte",
+      destaque: false,
+      iconeChar: "⚙",
+      label: "Suporte EventOn (participante)",
+      valor: c.emailSuporte,
+      nota: "Acesso · certificado · replay · materiais",
+      acaoHref: `mailto:${c.emailSuporte}`,
+      acaoTexto: "Acionar suporte",
+      acaoCmsLink: "mailto-suporte",
+    },
+  ];
+}
 
-export const HQ = {
-  cidade: "Brasília · DF",
-  enderecoHtml:
-    "<strong>Instituto NTC do Brasil</strong><br>SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001<br>Asa Sul · CEP 70308-200 · Brasília – DF<br>(63) 3212-1199 · contato@institutontc.com.br",
-  mapaIframeSrc:
-    "https://www.google.com/maps?q=Setor%20Comercial%20Sul%2C%20Quadra%209%2C%20Bloco%20C%2C%20Ed.%20Parque%20Cidade%20Corporate%2C%20Bras%C3%ADlia%20-%20DF&output=embed",
-  mapaIframeTitle: "Localização da sede do Instituto NTC do Brasil em Brasília — DF",
-  mapsBotaoHref:
-    "https://www.google.com/maps/search/?api=1&query=SCS+Quadra+9+Bloco+C+Ed+Parque+Cidade+Corporate+Asa+Sul+Brasília",
-};
+export interface HqConfig {
+  cidade: string;
+  enderecoHtml: string;
+  mapaIframeSrc: string;
+  mapaIframeTitle: string;
+  mapsBotaoHref: string;
+}
+
+export function montarHq(c: Contatos): HqConfig {
+  const [razao, ...resto] = c.endereco.split(/\r?\n/);
+
+  return {
+    cidade: "Brasília · DF",
+    enderecoHtml: `<strong>${escapar(razao ?? "")}</strong>${resto
+      .map((linha) => `<br>${escapar(linha)}`)
+      .join("")}<br>${escapar(c.telefone)} · ${escapar(c.emailInstitucional)}`,
+    mapaIframeSrc:
+      "https://www.google.com/maps?q=Setor%20Comercial%20Sul%2C%20Quadra%209%2C%20Bloco%20C%2C%20Ed.%20Parque%20Cidade%20Corporate%2C%20Bras%C3%ADlia%20-%20DF&output=embed",
+    mapaIframeTitle: "Localização da sede do Instituto NTC do Brasil em Brasília — DF",
+    mapsBotaoHref:
+      "https://www.google.com/maps/search/?api=1&query=SCS+Quadra+9+Bloco+C+Ed+Parque+Cidade+Corporate+Asa+Sul+Brasília",
+  };
+}
 
 /* ============================================================
  * VERTICAIS (seção 5)
@@ -450,47 +475,63 @@ export interface VerticalCard {
   propostaCmsLink: string;
 }
 
-export const VERTICAIS: readonly VerticalCard[] = [
-  {
-    vertical: "educacao",
-    eyebrow: "NTC Educação",
-    titulo: "Coordenação NTC Educação",
-    lede:
-      "Secretarias de Educação, redes municipais e estaduais, escolas e fundações — alfabetização, gestão escolar, educação digital, inclusão e ensino integral.",
-    programas: "EDUTEC · PEAR · PEI · PROGE · PROGIR · EGIDE · VIVAESCOLA · PINEI · FUTURA",
-    canaisHtml: "educacao@institutontc.com.br<br>(63) 3212-1199 · opção 1",
-    // TODO: rota /educacao (vertical) ainda não criada
-    conhecerHref: "./07_Pagina_Vertical_NTC_Educacao_v1.html",
-    conhecerCmsLink: "vertical-edu",
-    propostaCmsLink: "proposta-edu",
-  },
-  {
-    vertical: "gestao-publica",
-    eyebrow: "NTC Gestão Pública",
-    titulo: "Coordenação NTC Gestão Pública",
-    lede:
-      "Executivo, Judiciário, Legislativo, Tribunais de Contas e estatais — contratações públicas, governança, integridade e liderança institucional.",
-    programas: "AGIP · LIDERA · SIGA",
-    canaisHtml: "gestaopublica@institutontc.com.br<br>(63) 3212-1199 · opção 2",
-    // TODO: rota /gestao-publica (vertical) ainda não criada
-    conhecerHref: "./07_Pagina_Vertical_NTC_GestaoPublica_v1.html",
-    conhecerCmsLink: "vertical-gov",
-    propostaCmsLink: "proposta-gov",
-  },
-  {
-    vertical: "saude",
-    eyebrow: "NTC Saúde",
-    titulo: "Coordenação NTC Saúde",
-    lede:
-      "Secretarias de Saúde, hospitais públicos, redes do SUS e consórcios — atenção primária, governança digital, financiamento e gestão integrada.",
-    programas: "SIGS · PROAPS+ · PROSUS+",
-    canaisHtml: "saude@institutontc.com.br<br>(63) 3212-1199 · opção 3",
-    // TODO: rota /saude (vertical) ainda não criada
-    conhecerHref: "./07_Pagina_Vertical_NTC_Saude_v1.html",
-    conhecerCmsLink: "vertical-sau",
-    propostaCmsLink: "proposta-sau",
-  },
-];
+/**
+ * Canais da coordenação de uma vertical: e-mail próprio + telefone
+ * institucional com a opção do menu. Se o CMS não trouxer a vertical,
+ * cai no e-mail institucional — o telefone é o mesmo das três.
+ */
+function canaisDaVertical(c: Contatos, vertical: VerticalCard["vertical"]): string {
+  const v = c.verticais.find((item) => item.vertical === vertical);
+  const email = escapar(v?.email ?? c.emailInstitucional);
+  const telefone = escapar(c.telefone);
+  return v?.opcaoTelefone
+    ? `${email}<br>${telefone} · ${escapar(v.opcaoTelefone)}`
+    : `${email}<br>${telefone}`;
+}
+
+export function montarVerticais(c: Contatos): readonly VerticalCard[] {
+  return [
+    {
+      vertical: "educacao",
+      eyebrow: "NTC Educação",
+      titulo: "Coordenação NTC Educação",
+      lede:
+        "Secretarias de Educação, redes municipais e estaduais, escolas e fundações — alfabetização, gestão escolar, educação digital, inclusão e ensino integral.",
+      programas: "EDUTEC · PEAR · PEI · PROGE · PROGIR · EGIDE · VIVAESCOLA · PINEI · FUTURA",
+      canaisHtml: canaisDaVertical(c, "educacao"),
+      // TODO: rota /educacao (vertical) ainda não criada
+      conhecerHref: "./07_Pagina_Vertical_NTC_Educacao_v1.html",
+      conhecerCmsLink: "vertical-edu",
+      propostaCmsLink: "proposta-edu",
+    },
+    {
+      vertical: "gestao-publica",
+      eyebrow: "NTC Gestão Pública",
+      titulo: "Coordenação NTC Gestão Pública",
+      lede:
+        "Executivo, Judiciário, Legislativo, Tribunais de Contas e estatais — contratações públicas, governança, integridade e liderança institucional.",
+      programas: "AGIP · LIDERA · SIGA",
+      canaisHtml: canaisDaVertical(c, "gestao-publica"),
+      // TODO: rota /gestao-publica (vertical) ainda não criada
+      conhecerHref: "./07_Pagina_Vertical_NTC_GestaoPublica_v1.html",
+      conhecerCmsLink: "vertical-gov",
+      propostaCmsLink: "proposta-gov",
+    },
+    {
+      vertical: "saude",
+      eyebrow: "NTC Saúde",
+      titulo: "Coordenação NTC Saúde",
+      lede:
+        "Secretarias de Saúde, hospitais públicos, redes do SUS e consórcios — atenção primária, governança digital, financiamento e gestão integrada.",
+      programas: "SIGS · PROAPS+ · PROSUS+",
+      canaisHtml: canaisDaVertical(c, "saude"),
+      // TODO: rota /saude (vertical) ainda não criada
+      conhecerHref: "./07_Pagina_Vertical_NTC_Saude_v1.html",
+      conhecerCmsLink: "vertical-sau",
+      propostaCmsLink: "proposta-sau",
+    },
+  ];
+}
 
 /* ============================================================
  * SLA BAR (seção 6)
@@ -544,96 +585,100 @@ export interface FaqItem {
   abertaPorDefault?: boolean;
 }
 
-export const FAQS: readonly FaqItem[] = [
-  {
-    id: "faq-prazo-proposta",
-    pergunta: "Qual é o prazo para receber uma proposta institucional?",
-    respostaHtml:
-      "Até <strong>5 dias úteis</strong> após o envio do formulário de proposta. Em demandas urgentes vinculadas a ciclo orçamentário ou agenda de governo, o prazo pode ser antecipado mediante contato comercial direto.",
-    abertaPorDefault: true,
-  },
-  {
-    id: "faq-lei-14133",
-    pergunta:
-      "O Grupo NTC atende contratação por dispensa, inexigibilidade ou Lei 14.133?",
-    respostaHtml:
-      "Sim. Emitimos a documentação necessária para contratações por <strong>Lei 14.133/2021</strong> (dispensa, inexigibilidade, pregão, credenciamento), adesão a atas de registro de preços, convênios e pactuação interfederativa no SUS. Atendemos os três Poderes, Tribunais de Contas, autarquias, estatais e fundações públicas.",
-  },
-  {
-    id: "faq-equipes-pequenas",
-    pergunta: "É possível inscrever equipes pequenas com condições especiais?",
-    respostaHtml:
-      "Sim. A partir de <strong>3 inscrições</strong>, sua instituição já acessa o canal de Inscrição em Grupo, com condição comercial diferenciada, faturamento institucional (empenho, NF ou boleto) e reserva de vagas garantida em até 48 horas.",
-  },
-  {
-    id: "faq-formatos",
-    pergunta: "Quais formatos de capacitação estão disponíveis?",
-    respostaHtml:
-      "Cinco formatos: <strong>in company</strong> (presencial, online ou híbrido), <strong>turma fechada</strong>, <strong>solução sob medida</strong>, <strong>trilhas e jornadas</strong> e <strong>contratação institucional integrada</strong> — combinação de múltiplas frentes para órgãos públicos.",
-  },
-  {
-    id: "faq-certificado",
-    pergunta: "O participante recebe certificado? Qual a validade?",
-    respostaHtml:
-      "Sim. Cada participante recebe certificado do Instituto NTC do Brasil com carga horária, código único e QR code de autenticação. Os certificados têm validade nacional e podem ser usados em progressão funcional, editais e RH institucional. Emissão em até 5 dias úteis após a conclusão.",
-  },
-  {
-    id: "faq-replay",
-    pergunta: "Como funciona o acesso ao replay e aos materiais de apoio?",
-    respostaHtml:
-      "Replay disponível na <strong>Área do Participante (EventOn)</strong> em até 48 horas após o evento. Acesso por 90 dias (ou prazo definido por evento) a replay, slides, ementa e bibliografia. Em contratações in company, os prazos são acordados em contrato.",
-  },
-  {
-    id: "faq-reuniao",
-    pergunta: "Posso solicitar uma reunião antes de enviar a proposta?",
-    respostaHtml:
-      "Sim. Podemos agendar reunião presencial na sede em Brasília, virtual ou na sede da sua instituição. Use o canal de <a href=\"#tab-proposta\">Proposta institucional</a> indicando \"Solicito reunião prévia\" no campo de contexto, ou acione diretamente o (63) 3212-1199.",
-  },
-  {
-    id: "faq-dados",
-    pergunta: "Como meus dados pessoais e institucionais são tratados?",
-    respostaHtml:
-      "O tratamento segue a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018). Coletamos apenas o necessário para atender sua solicitação, sob base legal definida, e não compartilhamos com terceiros para fins comerciais. Para exercer seus direitos como titular, escreva ao nosso DPO em <strong>dpo@institutontc.com.br</strong>.",
-  },
-];
+export function montarFaqs(c: Contatos): readonly FaqItem[] {
+  return [
+    {
+      id: "faq-prazo-proposta",
+      pergunta: "Qual é o prazo para receber uma proposta institucional?",
+      respostaHtml:
+        "Até <strong>5 dias úteis</strong> após o envio do formulário de proposta. Em demandas urgentes vinculadas a ciclo orçamentário ou agenda de governo, o prazo pode ser antecipado mediante contato comercial direto.",
+      abertaPorDefault: true,
+    },
+    {
+      id: "faq-lei-14133",
+      pergunta:
+        "O Grupo NTC atende contratação por dispensa, inexigibilidade ou Lei 14.133?",
+      respostaHtml:
+        "Sim. Emitimos a documentação necessária para contratações por <strong>Lei 14.133/2021</strong> (dispensa, inexigibilidade, pregão, credenciamento), adesão a atas de registro de preços, convênios e pactuação interfederativa no SUS. Atendemos os três Poderes, Tribunais de Contas, autarquias, estatais e fundações públicas.",
+    },
+    {
+      id: "faq-equipes-pequenas",
+      pergunta: "É possível inscrever equipes pequenas com condições especiais?",
+      respostaHtml:
+        "Sim. A partir de <strong>3 inscrições</strong>, sua instituição já acessa o canal de Inscrição em Grupo, com condição comercial diferenciada, faturamento institucional (empenho, NF ou boleto) e reserva de vagas garantida em até 48 horas.",
+    },
+    {
+      id: "faq-formatos",
+      pergunta: "Quais formatos de capacitação estão disponíveis?",
+      respostaHtml:
+        "Cinco formatos: <strong>in company</strong> (presencial, online ou híbrido), <strong>turma fechada</strong>, <strong>solução sob medida</strong>, <strong>trilhas e jornadas</strong> e <strong>contratação institucional integrada</strong> — combinação de múltiplas frentes para órgãos públicos.",
+    },
+    {
+      id: "faq-certificado",
+      pergunta: "O participante recebe certificado? Qual a validade?",
+      respostaHtml:
+        "Sim. Cada participante recebe certificado do Instituto NTC do Brasil com carga horária, código único e QR code de autenticação. Os certificados têm validade nacional e podem ser usados em progressão funcional, editais e RH institucional. Emissão em até 5 dias úteis após a conclusão.",
+    },
+    {
+      id: "faq-replay",
+      pergunta: "Como funciona o acesso ao replay e aos materiais de apoio?",
+      respostaHtml:
+        "Replay disponível na <strong>Área do Participante (EventOn)</strong> em até 48 horas após o evento. Acesso por 90 dias (ou prazo definido por evento) a replay, slides, ementa e bibliografia. Em contratações in company, os prazos são acordados em contrato.",
+    },
+    {
+      id: "faq-reuniao",
+      pergunta: "Posso solicitar uma reunião antes de enviar a proposta?",
+      respostaHtml:
+        `Sim. Podemos agendar reunião presencial na sede em Brasília, virtual ou na sede da sua instituição. Use o canal de <a href="#tab-proposta">Proposta institucional</a> indicando "Solicito reunião prévia" no campo de contexto, ou acione diretamente o ${escapar(c.telefone)}.`,
+    },
+    {
+      id: "faq-dados",
+      pergunta: "Como meus dados pessoais e institucionais são tratados?",
+      respostaHtml:
+        `O tratamento segue a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018). Coletamos apenas o necessário para atender sua solicitação, sob base legal definida, e não compartilhamos com terceiros para fins comerciais. Para exercer seus direitos como titular, escreva ao nosso DPO em <strong>${escapar(c.emailDpo)}</strong>.`,
+    },
+  ];
+}
 
 /* ============================================================
  * LGPD (seção 8)
  * ============================================================ */
 
-export const LGPD = {
-  eyebrow: "Tratamento de dados · LGPD",
-  titulo:
-    "Seus dados são tratados com a mesma seriedade do nosso compromisso institucional.",
-  paragrafosHtml: [
-    "O Instituto NTC do Brasil é controlador dos dados pessoais coletados nos formulários institucionais desta página. O tratamento segue a Lei Geral de Proteção de Dados (Lei 13.709/2018) e princípios de finalidade, adequação, necessidade, transparência, segurança e responsabilização.",
-    "Para exercer seus direitos como titular (acesso, correção, anonimização, portabilidade, eliminação), acione nosso encarregado de proteção de dados pelo e-mail <strong style=\"color: var(--dourado-soft);\">dpo@institutontc.com.br</strong>.",
-  ],
-  ctaPrivacidadeHref: "/politica-de-privacidade",
-  ctaPrivacidadeTexto: "Política de Privacidade completa",
-  cells: [
-    {
-      titulo: "Finalidade",
-      texto:
-        "Atendimento da demanda institucional informada, elaboração de proposta comercial, processamento de inscrição ou resposta editorial.",
-    },
-    {
-      titulo: "Base legal",
-      texto:
-        "Procedimentos preliminares ao contrato (art. 7º, V), legítimo interesse institucional (art. 7º, IX) ou consentimento expresso (art. 7º, I), conforme o canal.",
-    },
-    {
-      titulo: "Retenção",
-      texto:
-        "Período proporcional ao ciclo de relacionamento institucional, com revisão periódica e descarte após o cumprimento da finalidade.",
-    },
-    {
-      titulo: "Compartilhamento",
-      texto:
-        "Não há compartilhamento com terceiros para fins comerciais. Apenas com prestadores essenciais (e-mail, hospedagem) sob contrato de confidencialidade.",
-    },
-  ],
-};
+export function montarLgpd(c: Contatos) {
+  return {
+    eyebrow: "Tratamento de dados · LGPD",
+    titulo:
+      "Seus dados são tratados com a mesma seriedade do nosso compromisso institucional.",
+    paragrafosHtml: [
+      "O Instituto NTC do Brasil é controlador dos dados pessoais coletados nos formulários institucionais desta página. O tratamento segue a Lei Geral de Proteção de Dados (Lei 13.709/2018) e princípios de finalidade, adequação, necessidade, transparência, segurança e responsabilização.",
+      `Para exercer seus direitos como titular (acesso, correção, anonimização, portabilidade, eliminação), acione nosso encarregado de proteção de dados pelo e-mail <strong style="color: var(--dourado-soft);">${escapar(c.emailDpo)}</strong>.`,
+    ],
+    ctaPrivacidadeHref: "/politica-de-privacidade",
+    ctaPrivacidadeTexto: "Política de Privacidade completa",
+    cells: [
+      {
+        titulo: "Finalidade",
+        texto:
+          "Atendimento da demanda institucional informada, elaboração de proposta comercial, processamento de inscrição ou resposta editorial.",
+      },
+      {
+        titulo: "Base legal",
+        texto:
+          "Procedimentos preliminares ao contrato (art. 7º, V), legítimo interesse institucional (art. 7º, IX) ou consentimento expresso (art. 7º, I), conforme o canal.",
+      },
+      {
+        titulo: "Retenção",
+        texto:
+          "Período proporcional ao ciclo de relacionamento institucional, com revisão periódica e descarte após o cumprimento da finalidade.",
+      },
+      {
+        titulo: "Compartilhamento",
+        texto:
+          "Não há compartilhamento com terceiros para fins comerciais. Apenas com prestadores essenciais (e-mail, hospedagem) sob contrato de confidencialidade.",
+      },
+    ],
+  };
+}
 
 /* ============================================================
  * CTA FINAL (seção 9)
@@ -647,33 +692,35 @@ export interface CtaFinalAction {
   comArrow: boolean;
 }
 
-export const CTA_FINAL = {
-  eyebrow: "Pronto para começar?",
-  tituloHtml:
-    "Vamos transformar a formação da sua instituição em <em>impacto institucional real</em>.",
-  paragrafo:
-    "Use o canal mais adequado à sua demanda — a equipe do Instituto NTC do Brasil retorna em horário comercial com a coordenação técnica e comercial dedicada à sua vertical.",
-  acoes: [
-    {
-      href: "#tab-proposta",
-      texto: "Solicitar proposta institucional",
-      variant: "gold" as const,
-      cmsLink: "cta-final-proposta",
-      comArrow: true,
-    },
-    {
-      href: "#tab-equipe",
-      texto: "Inscrever minha equipe",
-      variant: "ghost-light" as const,
-      cmsLink: "cta-final-equipe",
-      comArrow: false,
-    },
-    {
-      href: "mailto:contato@institutontc.com.br",
-      texto: "Escrever para contato@institutontc.com.br",
-      variant: "ghost-light" as const,
-      cmsLink: "cta-final-email",
-      comArrow: false,
-    },
-  ] satisfies CtaFinalAction[],
-};
+export function montarCtaFinal(c: Contatos) {
+  return {
+    eyebrow: "Pronto para começar?",
+    tituloHtml:
+      "Vamos transformar a formação da sua instituição em <em>impacto institucional real</em>.",
+    paragrafo:
+      "Use o canal mais adequado à sua demanda — a equipe do Instituto NTC do Brasil retorna em horário comercial com a coordenação técnica e comercial dedicada à sua vertical.",
+    acoes: [
+      {
+        href: "#tab-proposta",
+        texto: "Solicitar proposta institucional",
+        variant: "gold" as const,
+        cmsLink: "cta-final-proposta",
+        comArrow: true,
+      },
+      {
+        href: "#tab-equipe",
+        texto: "Inscrever minha equipe",
+        variant: "ghost-light" as const,
+        cmsLink: "cta-final-equipe",
+        comArrow: false,
+      },
+      {
+        href: `mailto:${c.emailInstitucional}`,
+        texto: `Escrever para ${c.emailInstitucional}`,
+        variant: "ghost-light" as const,
+        cmsLink: "cta-final-email",
+        comArrow: false,
+      },
+    ] satisfies CtaFinalAction[],
+  };
+}

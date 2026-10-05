@@ -3,7 +3,15 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  test: { include: ["src/**/*.test.ts"], environment: "node" },
+  test: {
+    include: ["src/**/*.test.ts"],
+    // Os testes de integração batem em Postgres e no site no ar; rodam
+    // pelo `test:integracao`, com config própria. Sem esta exclusão o
+    // `pnpm test` os coletaria (o nome termina em `.test.ts`) e eles
+    // falhariam contra o stub de @payload-config.
+    exclude: ["**/node_modules/**", "src/**/*.integracao.test.ts"],
+    environment: "node",
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

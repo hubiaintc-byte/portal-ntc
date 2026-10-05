@@ -1,4 +1,11 @@
+import { Fragment } from "react";
 import Link from "next/link";
+
+import type { Contatos } from "@/lib/contatos";
+
+export interface FooterHomeProps {
+  contatos: Contatos;
+}
 
 /**
  * `FooterHome` — rodapé institucional literal do protótipo
@@ -7,8 +14,14 @@ import Link from "next/link";
  * Server Component sem interações. Links seguem os mesmos anchors do
  * HTML; à medida que outras rotas forem portadas, serão substituídos
  * por `/programas`, `/agenda`, etc.
+ *
+ * Endereço, telefone, e-mail institucional e WhatsApp vêm do global de
+ * contatos (`carregarContatos`, chamado pelo layout de cada route
+ * group) — o mesmo dado que a tela Configurações do painel edita.
  */
-export function FooterHome() {
+export function FooterHome({ contatos }: FooterHomeProps) {
+  const linhasEndereco = contatos.endereco.split(/\r?\n/);
+
   return (
     <footer className="site-footer">
       <div className="container">
@@ -17,13 +30,13 @@ export function FooterHome() {
             <img src="/logos/logo-dark.svg" alt="Grupo NTC" />
             <span className="footer-tagline">O novo padrão da formação institucional.</span>
             <p className="footer-address">
-              <strong>Instituto NTC do Brasil</strong>
-              <br />
-              SCS Quadra 9, Bloco C — Ed. Parque Cidade Corporate, Sala 1001
-              <br />
-              Asa Sul · CEP 70308-200 · Brasília – DF
-              <br />
-              (63) 3212-1199 · contato@institutontc.com.br
+              {linhasEndereco.map((linha, i) => (
+                <Fragment key={`${i}-${linha}`}>
+                  {i === 0 ? <strong>{linha}</strong> : linha}
+                  <br />
+                </Fragment>
+              ))}
+              {`${contatos.telefone} · ${contatos.emailInstitucional}`}
             </p>
           </div>
 
@@ -63,7 +76,7 @@ export function FooterHome() {
               <li><Link href="/contato">Atendimento comercial</Link></li>
               <li><Link href="/#eventon">Suporte ao participante</Link></li>
               <li><Link href="/#eventon">Área do Participante</Link></li>
-              <li><Link href="/contato">WhatsApp · (63) 98444-4040</Link></li>
+              <li><Link href="/contato">{`WhatsApp · ${contatos.whatsapp}`}</Link></li>
             </ul>
           </div>
         </div>

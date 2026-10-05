@@ -1,14 +1,19 @@
 import type { CollectionConfig } from "payload";
 
+import { BlockquoteFeature, lexicalEditor } from "@payloadcms/richtext-lexical";
+
+import { categoriaParaSegmento, CONTEUDO_CATEGORIA, rotuloCategoria } from "@ntc/lib";
+
 import { editorInstitucional } from "../access/editorInstitucional";
 import { autoSlug } from "../hooks/autoSlug";
+import { derivarTempoLeitura } from "../hooks/tempoLeitura";
+import { lexicalRestrictiveFeatures } from "../shared/lexical-config";
 import { seoFields } from "../shared/seoFields";
-import { CONTEUDO_CATEGORIA } from "../shared/types";
 
 /**
  * Conteúdos editoriais (doc 11 §9).
  *
- * Artigos, insights, publicações, notícias e materiais para download.
+ * Artigos, estudos, notas técnicas, webinars, materiais e notícias.
  * Categoria define a renderização no front e disponibilidade do anexo.
  */
 export const Conteudos: CollectionConfig = {
@@ -16,7 +21,7 @@ export const Conteudos: CollectionConfig = {
   labels: { singular: "Conteúdo", plural: "Conteúdos" },
   admin: {
     useAsTitle: "titulo",
-    defaultColumns: ["titulo", "categoria", "area", "dataPublicacao", "_status"],
+    defaultColumns: ["titulo", "categoria", "area", "dataPublicacao", "destaque", "_status"],
     group: "Editorial",
     listSearchableFields: ["titulo", "slug"],
   },
@@ -27,6 +32,40 @@ export const Conteudos: CollectionConfig = {
     delete: editorInstitucional,
   },
   versions: { drafts: true, maxPerDoc: 30 },
+  hooks: {
+    beforeChange: [derivarTempoLeitura],
+    afterChange: [
+      async ({ doc }) => {
+        if (process.env.NODE_ENV !== "production") return doc;
+        const frontUrl = process.env.PAYLOAD_PUBLIC_FRONT_URL;
+        const secret = process.env.REVALIDATE_SECRET;
+        if (!frontUrl || !secret) {
+          console.warn("[Conteudos] PAYLOAD_PUBLIC_FRONT_URL ou REVALIDATE_SECRET ausentes.");
+          return doc;
+        }
+        // O caminho da página de leitura depende da categoria, então este
+        // hook monta o path em vez de usar revalidatePage(":slug").
+        const paths = ["/conteudos"];
+        if (typeof doc?.categoria === "string" && typeof doc?.slug === "string") {
+          paths.push(`/conteudos/${categoriaParaSegmento(doc.categoria)}/${doc.slug}`);
+        }
+        await Promise.allSettled(
+          paths.map(async (path) => {
+            try {
+              await fetch(`${frontUrl}/api/revalidate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-Revalidate-Secret": secret },
+                body: JSON.stringify({ path }),
+              });
+            } catch (e) {
+              console.error(`[Conteudos] Falha ao revalidar ${path}`, e);
+            }
+          }),
+        );
+        return doc;
+      },
+    ],
+  },
   fields: [
     { name: "titulo", type: "text", required: true },
     {
@@ -40,13 +79,21 @@ export const Conteudos: CollectionConfig = {
     {
       name: "categoria",
       type: "select",
-      options: CONTEUDO_CATEGORIA.map((c) => ({ label: c, value: c })),
+      options: CONTEUDO_CATEGORIA.map((c) => ({ label: rotuloCategoria(c), value: c })),
       required: true,
+      index: true,
     },
     { name: "area", type: "relationship", relationTo: "areas" },
     { name: "lide", type: "textarea", required: true, maxLength: 280 },
-    { name: "imagemDestaque", type: "upload", relationTo: "media", required: true },
-    { name: "corpo", type: "richText", required: true },
+    { name: "imagemDestaque", type: "upload", relationTo: "media" },
+    {
+      name: "corpo",
+      type: "richText",
+      required: true,
+      editor: lexicalEditor({
+        features: () => [...lexicalRestrictiveFeatures, BlockquoteFeature()],
+      }),
+    },
     {
       name: "autor",
       type: "relationship",
@@ -60,12 +107,49 @@ export const Conteudos: CollectionConfig = {
       defaultValue: () => new Date(),
     },
     {
+      name: "assinatura",
+      type: "text",
+      admin: {
+        description:
+          "Assinatura institucional (ex.: Curadoria NTC Saúde). Use quando o conteúdo não é assinado por um especialista do corpo docente.",
+      },
+    },
+    {
+      name: "destaque",
+      type: "checkbox",
+      defaultValue: false,
+      admin: { description: "Aparece na seção Destaques de /conteudos (os 3 mais recentes)." },
+    },
+    {
+      name: "anunciarEmPreparacao",
+      type: "checkbox",
+      defaultValue: false,
+      admin: {
+        description:
+          'Enquanto rascunho, aparece no site como "Em preparação editorial", sem link. Ignorado depois de publicado.',
+      },
+    },
+    {
+      name: "tempoLeituraMin",
+      type: "number",
+      admin: { readOnly: true, description: "Calculado a partir do corpo." },
+    },
+    {
+      name: "linkExterno",
+      type: "text",
+      admin: { description: "URL do webinar gravado ou do material hospedado fora (opcional)." },
+      validate: (valor: unknown) => {
+        if (valor === null || valor === undefined || valor === "") return true;
+        if (typeof valor === "string" && /^https?:\/\//i.test(valor.trim())) return true;
+        return "Informe uma URL começando com http:// ou https://.";
+      },
+    },
+    {
       name: "anexoDownload",
       type: "upload",
       relationTo: "media",
       admin: {
-        condition: (d) =>
-          d?.categoria === "material-download" || d?.categoria === "publicacao",
+        condition: (d) => d?.categoria === "material" || d?.categoria === "estudo",
       },
     },
     {

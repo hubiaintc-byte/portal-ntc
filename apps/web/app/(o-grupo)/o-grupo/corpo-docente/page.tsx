@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 import { fetchCorpoDocente } from "@/lib/cms/corpoDocente";
+import { carregarContatos } from "@/lib/contatos";
 
-import { conteudoFallback } from "./conteudoFallback";
+import { montarConteudoFallback } from "./conteudoFallback";
 import { CorpoDocenteProvider } from "./CorpoDocenteContext";
 import { FadeInObserver } from "./FadeInObserver";
 import { FaqAcordeao } from "./FaqAcordeao";
@@ -23,11 +24,12 @@ function html(s: string) {
 }
 
 export default async function CorpoDocentePage() {
+  const contatos = await carregarContatos();
   const dados =
     (await fetchCorpoDocente().catch((err) => {
       console.error("[corpo-docente] fetch CMS falhou, usando fallback:", err);
       return null;
-    })) ?? conteudoFallback;
+    })) ?? montarConteudoFallback(contatos);
 
   const {
     HERO,

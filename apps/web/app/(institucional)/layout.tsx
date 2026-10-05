@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { carregarContatos } from "@/lib/contatos";
+
 import { HeaderHome } from "../(home)/HeaderHome";
 import { FooterHome } from "../(home)/FooterHome";
 import { InteracoesScroll } from "../(home)/InteracoesScroll";
@@ -29,12 +31,14 @@ import "../contato-prototipo.css";
  * adicionada via JS para revelar os elementos. Sem ele, blocos como
  * hero-page-content e cta-final-inner ficam invisíveis.
  */
-export default function LayoutInstitucional({ children }: { children: ReactNode }) {
+export default async function LayoutInstitucional({ children }: { children: ReactNode }) {
+  const contatos = await carregarContatos();
+
   return (
     <>
       <HeaderHome />
       {children}
-      <FooterHome />
+      <FooterHome contatos={contatos} />
       <InteracoesScroll />
     </>
   );

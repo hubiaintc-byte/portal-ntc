@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { carregarContatos } from "@/lib/contatos";
+
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Termos de Uso · Grupo NTC",
   description:
@@ -33,7 +37,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TermosDeUsoPage() {
+export default async function TermosDeUsoPage() {
+  const contatos = await carregarContatos();
+
   return (
     <main id="main">
 
@@ -131,7 +137,7 @@ export default function TermosDeUsoPage() {
                 <p>Para acesso a recursos restritos — em especial a Área do Participante — o Usuário deverá realizar cadastro fornecendo informações verdadeiras, completas e atualizadas. É de responsabilidade do Usuário:</p>
                 <ul>
                   <li>Manter sob sigilo a credencial de acesso (CPF e senha pessoal), respondendo integralmente por toda atividade realizada com sua identidade;</li>
-                  <li>Notificar imediatamente o suporte (<a href="mailto:suporte@institutontc.com.br">suporte@institutontc.com.br</a>) em caso de suspeita de uso não autorizado;</li>
+                  <li>Notificar imediatamente o suporte (<a href={`mailto:${contatos.emailSuporte}`}>{contatos.emailSuporte}</a>) em caso de suspeita de uso não autorizado;</li>
                   <li>Não compartilhar acessos, mesmo com colegas da mesma instituição contratante — a certificação é nominal e está atrelada a uma única identidade.</li>
                 </ul>
                 <p>O Grupo NTC pode, a qualquer momento, exigir comprovação documental do vínculo institucional declarado, especialmente em programas reservados a categorias específicas de servidores.</p>
@@ -248,7 +254,7 @@ export default function TermosDeUsoPage() {
           <h2>Dúvidas sobre uso, contratação ou certificação? <em>A equipe institucional está pronta para responder.</em></h2>
           <p>Para questões comerciais, contratuais ou de relacionamento institucional, consulte os canais oficiais do Instituto NTC do Brasil. Para questões relacionadas a dados pessoais, o canal exclusivo é o do Encarregado (DPO).</p>
           <div className="legal-cta-final-actions">
-            <a className="btn btn--gold" href="mailto:dpo@institutontc.com.br" data-cms-link="contato-dpo">Falar com o DPO →</a><Link className="btn btn--ghost-light" href="/lgpd#exercicio-direitos" data-cms-link="exercicio-direitos">Exercer direitos do titular</Link>
+            <a className="btn btn--gold" href={`mailto:${contatos.emailDpo}`} data-cms-link="contato-dpo">Falar com o DPO →</a><Link className="btn btn--ghost-light" href="/lgpd#exercicio-direitos" data-cms-link="exercicio-direitos">Exercer direitos do titular</Link>
           </div>
         </div>
       </section>

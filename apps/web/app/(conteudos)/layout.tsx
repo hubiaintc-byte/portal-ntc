@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { carregarContatos } from "@/lib/contatos";
+
 import { HeaderHome } from "../(home)/HeaderHome";
 import { FooterHome } from "../(home)/FooterHome";
 import { InteracoesScroll } from "../(home)/InteracoesScroll";
@@ -23,12 +25,14 @@ import "../conteudos-prototipo.css";
  *
  * CSS específico vem do root layout (conteudos-prototipo.css).
  */
-export default function ConteudosLayout({ children }: { children: ReactNode }) {
+export default async function ConteudosLayout({ children }: { children: ReactNode }) {
+  const contatos = await carregarContatos();
+
   return (
     <>
       <HeaderHome />
       {children}
-      <FooterHome />
+      <FooterHome contatos={contatos} />
       <InteracoesScroll />
     </>
   );

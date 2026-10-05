@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { carregarContatos } from "@/lib/contatos";
+
 import { HeaderHome } from "../(home)/HeaderHome";
 import { FooterHome } from "../(home)/FooterHome";
 import { InteracoesScroll } from "../(home)/InteracoesScroll";
@@ -23,12 +25,14 @@ import "../corpo-docente-prototipo.css";
  * (`o-grupo-prototipo.css`). Tokens base e regras de header/footer
  * vêm de `home-prototipo.css`, também no root.
  */
-export default function OGrupoLayout({ children }: { children: ReactNode }) {
+export default async function OGrupoLayout({ children }: { children: ReactNode }) {
+  const contatos = await carregarContatos();
+
   return (
     <>
       <HeaderHome />
       {children}
-      <FooterHome />
+      <FooterHome contatos={contatos} />
       <InteracoesScroll />
     </>
   );

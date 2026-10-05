@@ -33,14 +33,8 @@ export const TITULACAO_DOCENTE = [
 ] as const;
 export type TitulacaoDocente = (typeof TITULACAO_DOCENTE)[number];
 
-export const CONTEUDO_CATEGORIA = [
-  "artigo",
-  "insight",
-  "publicacao",
-  "material-download",
-  "noticia",
-] as const;
-export type ConteudoCategoria = (typeof CONTEUDO_CATEGORIA)[number];
+// Categorias editoriais: fonte única em @ntc/lib (usada por painel e site).
+export { CONTEUDO_CATEGORIA, type ConteudoCategoria } from "@ntc/lib";
 
 /** Perfis administrativos do admin Payload (DAB §10.1). */
 export const PERFIL_ADMIN = [

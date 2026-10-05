@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { carregarContatos } from "@/lib/contatos";
+
 import { HeaderHome } from "../(home)/HeaderHome";
 import { FooterHome } from "../(home)/FooterHome";
 import { InteracoesScroll } from "../(home)/InteracoesScroll";
@@ -19,12 +21,14 @@ import "../verticais-prototipo.css";
  * .vert-nav, .vert-programs etc.) vem de verticais-prototipo.css,
  * importado no root layout.
  */
-export default function VerticalLayout({ children }: { children: ReactNode }) {
+export default async function VerticalLayout({ children }: { children: ReactNode }) {
+  const contatos = await carregarContatos();
+
   return (
     <>
       <HeaderHome />
       {children}
-      <FooterHome />
+      <FooterHome contatos={contatos} />
       <InteracoesScroll />
     </>
   );

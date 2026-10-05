@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
 
+import { carregarContatos } from "@/lib/contatos";
+
 import {
   CTA_FINAL,
   DETALHES_MODALIDADES,
   FAQ_HEAD,
-  FAQ_SOLUCOES,
   HERO_SOLUCOES,
   JURIDICO,
   MANIFESTO,
@@ -20,6 +21,7 @@ import {
   PROCESSO_PASSOS,
   VITRINE,
   VITRINE_HEAD,
+  montarFaqSolucoes,
   type BlocoDetalhe,
 } from "./conteudoSolucoes";
 import { FaqAcordeao } from "./FaqAcordeao";
@@ -55,7 +57,10 @@ export const metadata: Metadata = {
  *
  * Header/Footer/InteracoesScroll vêm do layout do route group (solucoes).
  */
-export default function SolucoesPage() {
+export default async function SolucoesPage() {
+  const contatos = await carregarContatos();
+  const faqSolucoes = montarFaqSolucoes(contatos);
+
   return (
     <>
       <main id="main">
@@ -364,7 +369,7 @@ export default function SolucoesPage() {
                 <p className="eyebrow">{FAQ_HEAD.eyebrow}</p>
                 <h2 dangerouslySetInnerHTML={{ __html: FAQ_HEAD.tituloHtml }} />
               </div>
-              <FaqAcordeao itens={FAQ_SOLUCOES} />
+              <FaqAcordeao itens={faqSolucoes} />
             </div>
           </div>
         </section>

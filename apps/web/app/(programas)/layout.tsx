@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { carregarContatos } from "@/lib/contatos";
+
 import { HeaderHome } from "../(home)/HeaderHome";
 import { FooterHome } from "../(home)/FooterHome";
 import { InteracoesScroll } from "../(home)/InteracoesScroll";
@@ -18,12 +20,14 @@ import "../modulo-prototipo.css";
  * CSS específico (.prog-hero, .prog-nav, .prog-section etc.) vem
  * de programas-prototipo.css, importado no root layout.
  */
-export default function ProgramasLayout({ children }: { children: ReactNode }) {
+export default async function ProgramasLayout({ children }: { children: ReactNode }) {
+  const contatos = await carregarContatos();
+
   return (
     <>
       <HeaderHome />
       {children}
-      <FooterHome />
+      <FooterHome contatos={contatos} />
       <InteracoesScroll />
     </>
   );

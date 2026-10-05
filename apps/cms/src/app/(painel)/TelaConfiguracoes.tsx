@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { Fragment, useEffect, useRef, useState, useTransition } from "react";
 
 import { startRegistration, browserSupportsWebAuthn } from "@simplewebauthn/browser";
 
+import { VERTICAIS_CONTATO } from "@ntc/lib";
+
+import type { CamposContatos } from "@/lib/cms/painelCmsEscrita";
 import { SENHA_MINIMO } from "@/lib/validarNovaSenha";
 
+import { carregarContatosCms, salvarContatos } from "./acoes";
 import {
   listarMinhasPasskeysCms,
   obterOpcoesCadastroPasskeyCms,
@@ -13,7 +17,7 @@ import {
   trocarMinhaSenha,
   verificarCadastroPasskeyCms,
 } from "./acoesAuth";
-import { AvisoForm, CampoSenha } from "./crm/CamposCrm";
+import { AvisoForm, CampoArea, CampoSenha, CampoTexto } from "./crm/CamposCrm";
 
 interface TelaConfiguracoesProps {
   /** Usuário logado — usado só para exibir o e-mail da conta na seção real. */
@@ -114,6 +118,54 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
         formRef.current?.reset();
       } else {
         setErro(resultado.erro ?? "Não foi possível alterar a senha.");
+      }
+    });
+  }
+
+  /**
+   * Contatos institucionais (Global Rodapé). `null` = ainda carregando — a
+   * seção mostra "Carregando…" até a primeira leitura resolver, em vez de
+   * renderizar o formulário com campos vazios por um instante.
+   */
+  const [contatos, setContatos] = useState<CamposContatos | null>(null);
+  const [erroContatos, setErroContatos] = useState<string | null>(null);
+  const [sucessoContatos, setSucessoContatos] = useState<string | null>(null);
+  const [avisoContatos, setAvisoContatos] = useState<string | null>(null);
+  const [salvandoContatos, iniciarSalvarContatos] = useTransition();
+
+  useEffect(() => {
+    carregarContatosCms().then(setContatos);
+  }, []);
+
+  function atualizarContato<K extends keyof CamposContatos>(campo: K) {
+    return (valor: CamposContatos[K]) =>
+      setContatos((c) => (c === null ? c : { ...c, [campo]: valor }));
+  }
+
+  function atualizarVertical(indice: number, campo: "email" | "opcaoTelefone") {
+    return (valor: string) =>
+      setContatos((c) => {
+        if (c === null) return c;
+        const verticais = c.verticais.map((linha, i) =>
+          i === indice ? { ...linha, [campo]: valor } : linha,
+        );
+        return { ...c, verticais };
+      });
+  }
+
+  function enviarContatos(e: React.FormEvent) {
+    e.preventDefault();
+    if (salvandoContatos || contatos === null) return;
+    setErroContatos(null);
+    setSucessoContatos(null);
+    setAvisoContatos(null);
+    iniciarSalvarContatos(async () => {
+      const resultado = await salvarContatos(contatos);
+      if (resultado.ok) {
+        setSucessoContatos("Contatos institucionais salvos.");
+        setAvisoContatos(resultado.aviso ?? null);
+      } else {
+        setErroContatos(resultado.erro ?? "Não foi possível salvar os contatos.");
       }
     });
   }
@@ -228,6 +280,141 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
                 {cadastrandoPasskey ? "Cadastrando…" : "Adicionar passkey"}
               </button>
             </>
+          )}
+        </section>
+
+        <section className="pcms-config-card pcms-config-card--ativa">
+          <h3>
+            Contatos institucionais
+            <span className="pcms-selo pcms-selo--ok">Funcional</span>
+          </h3>
+          <p>
+            Telefone, e-mails, endereço e coordenações por vertical exibidos no rodapé de todas as
+            páginas do site, na página de Contato, em O Grupo e nas páginas legais.
+          </p>
+          {contatos === null ? (
+            <p>Carregando…</p>
+          ) : (
+            <form onSubmit={enviarContatos}>
+              <AvisoForm erro={erroContatos} />
+              {sucessoContatos && (
+                <p className="pcms-form-aviso" role="status">
+                  {sucessoContatos}
+                </p>
+              )}
+              {avisoContatos && (
+                <p className="pcms-form-aviso" role="status">
+                  {avisoContatos}
+                </p>
+              )}
+
+              <h4>Atendimento</h4>
+              <div className="pcms-editor__grid">
+                <CampoTexto
+                  rotulo="Telefone institucional"
+                  valor={contatos.telefoneInstitucional}
+                  onMudar={atualizarContato("telefoneInstitucional")}
+                  obrigatorio
+                />
+                <CampoTexto
+                  rotulo="WhatsApp institucional"
+                  valor={contatos.whatsappInstitucional}
+                  onMudar={atualizarContato("whatsappInstitucional")}
+                  obrigatorio
+                />
+                <CampoTexto
+                  rotulo="E-mail institucional"
+                  tipo="email"
+                  valor={contatos.emailInstitucional}
+                  onMudar={atualizarContato("emailInstitucional")}
+                  obrigatorio
+                />
+              </div>
+
+              <hr className="pcms-editor__hr" />
+              <h4>Canais específicos</h4>
+              <div className="pcms-editor__grid">
+                <CampoTexto
+                  rotulo="E-mail de imprensa"
+                  tipo="email"
+                  valor={contatos.emailImprensa}
+                  onMudar={atualizarContato("emailImprensa")}
+                />
+                <CampoTexto
+                  rotulo="E-mail do DPO (LGPD)"
+                  tipo="email"
+                  valor={contatos.emailDpo}
+                  onMudar={atualizarContato("emailDpo")}
+                />
+                <CampoTexto
+                  rotulo="E-mail de parcerias"
+                  tipo="email"
+                  valor={contatos.emailParcerias}
+                  onMudar={atualizarContato("emailParcerias")}
+                />
+                <CampoTexto
+                  rotulo="E-mail de suporte"
+                  tipo="email"
+                  valor={contatos.emailSuporte}
+                  onMudar={atualizarContato("emailSuporte")}
+                />
+                <CampoTexto
+                  rotulo="E-mail de eventos"
+                  tipo="email"
+                  valor={contatos.emailEventos}
+                  onMudar={atualizarContato("emailEventos")}
+                />
+              </div>
+
+              <hr className="pcms-editor__hr" />
+              <h4>Coordenações por vertical</h4>
+              <div className="pcms-editor__grid">
+                {contatos.verticais.map((linha, indice) => {
+                  const rotuloVertical =
+                    VERTICAIS_CONTATO.find((v) => v.valor === linha.vertical)?.rotulo ?? linha.vertical;
+                  return (
+                    <Fragment key={linha.vertical}>
+                      <CampoTexto
+                        rotulo={`E-mail — ${rotuloVertical}`}
+                        tipo="email"
+                        valor={linha.email}
+                        onMudar={atualizarVertical(indice, "email")}
+                      />
+                      <CampoTexto
+                        rotulo={`Opção no telefone — ${rotuloVertical}`}
+                        valor={linha.opcaoTelefone}
+                        onMudar={atualizarVertical(indice, "opcaoTelefone")}
+                        curto
+                      />
+                    </Fragment>
+                  );
+                })}
+              </div>
+
+              <hr className="pcms-editor__hr" />
+              <h4>Endereço e identificação</h4>
+              <CampoArea
+                rotulo="Endereço completo"
+                valor={contatos.enderecoCompleto}
+                onMudar={atualizarContato("enderecoCompleto")}
+              />
+              <div className="pcms-editor__grid">
+                <CampoTexto
+                  rotulo="Razão social"
+                  valor={contatos.razaoSocial}
+                  onMudar={atualizarContato("razaoSocial")}
+                />
+                <CampoTexto rotulo="CNPJ" valor={contatos.cnpj} onMudar={atualizarContato("cnpj")} curto />
+              </div>
+
+              <button type="submit" className="pcms-btn" disabled={salvandoContatos}>
+                {salvandoContatos ? "Salvando…" : "Salvar contatos"}
+              </button>
+              <p className="pcms-editor__hint">
+                Estes dados aparecem no rodapé de todas as páginas, na página de Contato, em O Grupo e
+                nas páginas legais. A atualização no site pode levar alguns minutos.
+              </p>
+            </form>
           )}
         </section>
 

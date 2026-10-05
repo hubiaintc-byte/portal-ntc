@@ -1,9 +1,11 @@
 import { exigirUsuarioCms } from "@/lib/cms/autenticacao";
 import {
+  listarConteudosCms,
   listarEventosCms,
   listarLeadsCms,
   listarPalestrantesCms,
   obterEventosHomeIds,
+  type ConteudoCmsResumo,
   type EventoCmsResumo,
   type LeadCmsResumo,
   type PalestranteCmsResumo,
@@ -29,14 +31,16 @@ export default async function PainelPage() {
   let eventos: EventoCmsResumo[] = [];
   let palestrantes: PalestranteCmsResumo[] = [];
   let leads: LeadCmsResumo[] = [];
+  let conteudos: ConteudoCmsResumo[] = [];
   let eventosHomeIds: string[] = [];
   let erroLeitura = false;
 
   try {
-    [eventos, palestrantes, leads, eventosHomeIds] = await Promise.all([
+    [eventos, palestrantes, leads, conteudos, eventosHomeIds] = await Promise.all([
       listarEventosCms(),
       listarPalestrantesCms(),
       listarLeadsCms(),
+      listarConteudosCms(),
       obterEventosHomeIds(),
     ]);
   } catch (e) {
@@ -50,6 +54,7 @@ export default async function PainelPage() {
       eventos={eventos}
       palestrantes={palestrantes}
       leads={leads}
+      conteudos={conteudos}
       eventosHomeIds={eventosHomeIds}
       erroLeitura={erroLeitura}
     />

@@ -4,6 +4,10 @@
 //  Nada de rephrasing — fidelidade 100% ao protótipo aprovado.
 // =============================================================
 
+import { escapar } from "@ntc/lib";
+
+import type { Contatos } from "@/lib/contatos";
+
 // ----------------- Slugs -----------------
 
 export type ModalidadeSlug = "in-company" | "turmas-fechadas" | "sob-medida" | "trilhas";
@@ -771,57 +775,59 @@ export const FAQ_HEAD = {
   tituloHtml: "Perguntas <em>frequentes</em>",
 };
 
-export const FAQ_SOLUCOES: ItemFaq[] = [
-  {
-    id: "faq-1",
-    pergunta: "Qual é o prazo médio entre o briefing inicial e a proposta institucional?",
-    arrancaAberto: true,
-    respostaHtml:
-      "<p>Para <strong>turmas fechadas</strong> e <strong>in company</strong> com programa-mãe canon, a proposta institucional é apresentada em até <strong>5 dias úteis</strong> a partir do briefing. Para <strong>soluções sob medida</strong> e <strong>trilhas curadas</strong>, o prazo é de até <strong>10 dias úteis</strong> em razão do diagnóstico aprofundado e da curadoria docente específica.</p><p>Em situações de urgência institucional, a NTC pode acelerar o processo — basta sinalizar no briefing inicial.</p>",
-  },
-  {
-    id: "faq-2",
-    pergunta: "A NTC apoia a formalização da contratação por inexigibilidade ou dispensa?",
-    respostaHtml:
-      "<p>Sim. A equipe comercial NTC apoia desde a <strong>elaboração do termo de referência</strong>, a <strong>justificativa de inexigibilidade</strong> (Lei 14.133/2021 · art. 74, III) e a <strong>especificação técnica</strong>, até a emissão de certidões, declarações de notória especialização e nota fiscal direta no CNPJ do órgão.</p><p>A NTC tem mais de 20 anos de atuação em contratações públicas, com trajetória consolidada em órgãos federais, governos estaduais, municípios, tribunais e autarquias.</p>",
-  },
-  {
-    id: "faq-3",
-    pergunta: "Posso personalizar o programa para a realidade da minha instituição?",
-    respostaHtml:
-      "<p>Sim, com diferentes níveis de customização conforme a modalidade contratada:</p><p><strong>Turmas fechadas</strong>: ementa do programa-mãe preservada · personalização limitada a datas, formato e carga horária.</p><p><strong>In company</strong>: ementa do programa-mãe + personalização de casos, exemplos e cargas horárias para a realidade da instituição.</p><p><strong>Sob medida</strong>: desenho completo de ementa nova ou híbrida · personalização profunda.</p><p><strong>Trilhas</strong>: curadoria de módulos entre programas · personalização da arquitetura formativa.</p>",
-  },
-  {
-    id: "faq-4",
-    pergunta: "Há nota fiscal direta no CNPJ do órgão e empenho?",
-    respostaHtml:
-      "<p>Sim. O Instituto NTC do Brasil emite nota fiscal direta no CNPJ do órgão contratante, com empenho conforme rito previsto na Lei 14.133/2021, em quaisquer das hipóteses cabíveis (inexigibilidade, dispensa, convênio, parceria ou instrumento de cooperação).</p><p>O CNPJ do Instituto NTC do Brasil, certidões de regularidade fiscal e declarações de notória especialização são apresentados na fase de contratação.</p>",
-  },
-  {
-    id: "faq-5",
-    pergunta: "É possível combinar mais de uma modalidade na mesma contratação?",
-    respostaHtml:
-      "<p>Sim, com frequência. Algumas combinações canon que entregamos:</p><p><strong>Trilha + in company</strong>: jornada plurianual customizada com módulos de diferentes programas, entregue dedicadamente para a instituição.</p><p><strong>Sob medida + turmas fechadas</strong>: arquitetura nova entregue para grupos institucionais dedicados em rodadas sequenciais.</p><p><strong>In company + materiais autorais sob medida</strong>: programa canon entregue à instituição com material adicional autoral específico.</p>",
-  },
-  {
-    id: "faq-6",
-    pergunta: "Como funciona a curadoria docente nas modalidades institucionais?",
-    respostaHtml:
-      '<p>A NTC mantém uma curadoria nacional validada com mais de 120 referências em Educação, Gestão Pública, Contratações e Saúde (ver <a href="/o-grupo/corpo-docente" data-cms-link="corpo-docente-faq" style="color: var(--oxford); border-bottom: 1px solid var(--dourado);">página Corpo Docente</a>). A composição docente para cada contratação é definida caso a caso pela curadoria científica, considerando:</p><p>Eixo formativo · perfil dos participantes · objetivo institucional · disponibilidade da equipe na agenda · formato (presencial · online · híbrido).</p><p>A instituição contratante pode validar a composição docente sugerida e indicar nomes complementares para análise.</p>',
-  },
-  {
-    id: "faq-7",
-    pergunta: "O que acontece se a instituição precisar cancelar ou remarcar a entrega?",
-    respostaHtml:
-      "<p>O contrato de prestação de serviços contempla cláusulas específicas para remarcação e cancelamento, com prazos e condições adequados à dinâmica institucional. Em situações de força maior ou alteração de calendário institucional, a NTC trabalha com flexibilidade para reagendar a entrega preservando o investimento do órgão.</p><p>Detalhes específicos são acordados na proposta institucional, conforme a modalidade contratada.</p>",
-  },
-  {
-    id: "faq-8",
-    pergunta: "Como o Grupo NTC trata os dados dos participantes (LGPD)?",
-    respostaHtml:
-      "<p>Os dados dos participantes são tratados conforme a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018), com finalidade declarada (inscrição, certificação, suporte à plataforma EventOn), retenção pelo período necessário ao vínculo contratual e nunca compartilhados com terceiros sem consentimento explícito.</p><p>O Encarregado de Dados (DPO) do Grupo NTC é <strong>dpo@institutontc.com.br</strong>. Para inscrições em grupo institucional acima de 50 participantes, há consentimento LGPD específico sobre o compartilhamento de dados pela instituição demandante.</p>",
-  },
-];
+export function montarFaqSolucoes(c: Contatos): ItemFaq[] {
+  return [
+    {
+      id: "faq-1",
+      pergunta: "Qual é o prazo médio entre o briefing inicial e a proposta institucional?",
+      arrancaAberto: true,
+      respostaHtml:
+        "<p>Para <strong>turmas fechadas</strong> e <strong>in company</strong> com programa-mãe canon, a proposta institucional é apresentada em até <strong>5 dias úteis</strong> a partir do briefing. Para <strong>soluções sob medida</strong> e <strong>trilhas curadas</strong>, o prazo é de até <strong>10 dias úteis</strong> em razão do diagnóstico aprofundado e da curadoria docente específica.</p><p>Em situações de urgência institucional, a NTC pode acelerar o processo — basta sinalizar no briefing inicial.</p>",
+    },
+    {
+      id: "faq-2",
+      pergunta: "A NTC apoia a formalização da contratação por inexigibilidade ou dispensa?",
+      respostaHtml:
+        "<p>Sim. A equipe comercial NTC apoia desde a <strong>elaboração do termo de referência</strong>, a <strong>justificativa de inexigibilidade</strong> (Lei 14.133/2021 · art. 74, III) e a <strong>especificação técnica</strong>, até a emissão de certidões, declarações de notória especialização e nota fiscal direta no CNPJ do órgão.</p><p>A NTC tem mais de 20 anos de atuação em contratações públicas, com trajetória consolidada em órgãos federais, governos estaduais, municípios, tribunais e autarquias.</p>",
+    },
+    {
+      id: "faq-3",
+      pergunta: "Posso personalizar o programa para a realidade da minha instituição?",
+      respostaHtml:
+        "<p>Sim, com diferentes níveis de customização conforme a modalidade contratada:</p><p><strong>Turmas fechadas</strong>: ementa do programa-mãe preservada · personalização limitada a datas, formato e carga horária.</p><p><strong>In company</strong>: ementa do programa-mãe + personalização de casos, exemplos e cargas horárias para a realidade da instituição.</p><p><strong>Sob medida</strong>: desenho completo de ementa nova ou híbrida · personalização profunda.</p><p><strong>Trilhas</strong>: curadoria de módulos entre programas · personalização da arquitetura formativa.</p>",
+    },
+    {
+      id: "faq-4",
+      pergunta: "Há nota fiscal direta no CNPJ do órgão e empenho?",
+      respostaHtml:
+        "<p>Sim. O Instituto NTC do Brasil emite nota fiscal direta no CNPJ do órgão contratante, com empenho conforme rito previsto na Lei 14.133/2021, em quaisquer das hipóteses cabíveis (inexigibilidade, dispensa, convênio, parceria ou instrumento de cooperação).</p><p>O CNPJ do Instituto NTC do Brasil, certidões de regularidade fiscal e declarações de notória especialização são apresentados na fase de contratação.</p>",
+    },
+    {
+      id: "faq-5",
+      pergunta: "É possível combinar mais de uma modalidade na mesma contratação?",
+      respostaHtml:
+        "<p>Sim, com frequência. Algumas combinações canon que entregamos:</p><p><strong>Trilha + in company</strong>: jornada plurianual customizada com módulos de diferentes programas, entregue dedicadamente para a instituição.</p><p><strong>Sob medida + turmas fechadas</strong>: arquitetura nova entregue para grupos institucionais dedicados em rodadas sequenciais.</p><p><strong>In company + materiais autorais sob medida</strong>: programa canon entregue à instituição com material adicional autoral específico.</p>",
+    },
+    {
+      id: "faq-6",
+      pergunta: "Como funciona a curadoria docente nas modalidades institucionais?",
+      respostaHtml:
+        '<p>A NTC mantém uma curadoria nacional validada com mais de 120 referências em Educação, Gestão Pública, Contratações e Saúde (ver <a href="/o-grupo/corpo-docente" data-cms-link="corpo-docente-faq" style="color: var(--oxford); border-bottom: 1px solid var(--dourado);">página Corpo Docente</a>). A composição docente para cada contratação é definida caso a caso pela curadoria científica, considerando:</p><p>Eixo formativo · perfil dos participantes · objetivo institucional · disponibilidade da equipe na agenda · formato (presencial · online · híbrido).</p><p>A instituição contratante pode validar a composição docente sugerida e indicar nomes complementares para análise.</p>',
+    },
+    {
+      id: "faq-7",
+      pergunta: "O que acontece se a instituição precisar cancelar ou remarcar a entrega?",
+      respostaHtml:
+        "<p>O contrato de prestação de serviços contempla cláusulas específicas para remarcação e cancelamento, com prazos e condições adequados à dinâmica institucional. Em situações de força maior ou alteração de calendário institucional, a NTC trabalha com flexibilidade para reagendar a entrega preservando o investimento do órgão.</p><p>Detalhes específicos são acordados na proposta institucional, conforme a modalidade contratada.</p>",
+    },
+    {
+      id: "faq-8",
+      pergunta: "Como o Grupo NTC trata os dados dos participantes (LGPD)?",
+      respostaHtml:
+        `<p>Os dados dos participantes são tratados conforme a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018), com finalidade declarada (inscrição, certificação, suporte à plataforma EventOn), retenção pelo período necessário ao vínculo contratual e nunca compartilhados com terceiros sem consentimento explícito.</p><p>O Encarregado de Dados (DPO) do Grupo NTC é <strong>${escapar(c.emailDpo)}</strong>. Para inscrições em grupo institucional acima de 50 participantes, há consentimento LGPD específico sobre o compartilhamento de dados pela instituição demandante.</p>`,
+    },
+  ];
+}
 
 // ----------------- CTA FINAL -----------------
 

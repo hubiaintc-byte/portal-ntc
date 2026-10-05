@@ -12,6 +12,8 @@
  * livremente (CLAUDE.md §5.3).
  */
 
+import type { Contatos } from "@/lib/contatos";
+
 export const CONTEUDO_OGRUPO = {
   hero: {
     eyebrow: "O Grupo NTC · Edição 2026",
@@ -581,10 +583,19 @@ export const CONTEUDO_OGRUPO = {
       },
     ],
     tagline: "— Inteligência institucional. Impacto real. —",
-    endereco:
-      "Instituto NTC do Brasil · SCS Quadra 9, Bloco C · Ed. Parque Cidade Corporate · Sala 1001 · Asa Sul · CEP 70308-200 · Brasília — DF · (63) 3212-1199 · contato@institutontc.com.br",
   },
 };
+
+/**
+ * Linha de endereço do encerramento institucional. Telefone e e-mail
+ * saem do global de contatos; o endereço em si continua literal porque
+ * o protótipo desta página o escreve com outra pontuação ("·" entre
+ * todas as partes, "Brasília — DF" com travessão) que não é a do
+ * `endereco` do CMS, usado no rodapé e em /contato.
+ */
+export function montarEnderecoOGrupo(c: Contatos): string {
+  return `Instituto NTC do Brasil · SCS Quadra 9, Bloco C · Ed. Parque Cidade Corporate · Sala 1001 · Asa Sul · CEP 70308-200 · Brasília — DF · ${c.telefone} · ${c.emailInstitucional}`;
+}
 
 export type IconeDiferencial = "medalha" | "edificio" | "modulos" | "regua" | "lampada" | "mapa";
 export type IconeMetodologia = "lupa" | "grafico" | "lista" | "play" | "escudo" | "documento";

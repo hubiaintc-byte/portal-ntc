@@ -8,6 +8,10 @@
  * neste arquivo local; CMS só entra quando explicitamente solicitado.
  */
 
+import { escapar } from "@ntc/lib";
+
+import type { Contatos } from "@/lib/contatos";
+
 /* ============================================================
    TIPOS
    ============================================================ */
@@ -1734,85 +1738,87 @@ export interface FaqItem {
   parags: string[];
 }
 
-export const FAQ: FaqItem[] = [
-  {
-    id: "faq-1",
-    titulo: "Por que Contratações Públicas aparece separada de Gestão Pública?",
-    parags: [
-      "Contratações Públicas <strong>integra a área NTC Gestão Pública</strong>, mas possui núcleo próprio de curadoria em razão de sua densidade técnica, volume de especialistas, relevância jurídica e importância programática no AGIP. Por isso, a página apresenta essa frente separadamente — <strong>sem tratá-la como uma quarta vertical institucional</strong>.",
-      "A arquitetura-mãe do Grupo NTC permanece composta por três áreas estratégicas: Educação, Gestão Pública e Saúde. Contratações Públicas é uma frente especializada da NTC Gestão Pública.",
-    ],
-  },
-  {
-    id: "faq-2",
-    titulo: "A composição docente é fixa?",
-    parags: [
-      "Não. A composição docente é definida <strong>conforme programa, eixo, formato, perfil da instituição contratante e objetivo da formação</strong>. O Grupo NTC trabalha com uma rede de autoridades, especialistas e consultores mobilizados de forma estratégica para cada entrega.",
-      "Cada turma fechada, in company ou jornada executiva recebe uma equipe operacional dimensionada caso a caso, com nomes reais e currículos completos apresentados em proposta formal.",
-    ],
-  },
-  {
-    id: "faq-3",
-    titulo: "Como o Grupo NTC seleciona os especialistas?",
-    parags: [
-      "A curadoria científica é orientada por três critérios cumulativos: <strong>autoridade técnica comprovada</strong> (produção acadêmica, atuação em rede, publicações), <strong>experiência aplicada</strong> em políticas públicas brasileiras (gestão de Estado, controle, redes públicas, organismos multilaterais) e <strong>capacidade pedagógica</strong> de formação de quadros executivos. Cada eixo formativo tem critérios específicos validados pelo conselho científico do Grupo.",
-      "A curadoria é dinâmica — os especialistas são convocados por programa, eixo e demanda institucional, sem corpo docente fixo permanente.",
-    ],
-  },
-  {
-    id: "faq-4-camadas",
-    titulo: "Quais são as 5 camadas de curadoria do Grupo NTC?",
-    parags: [
-      "<strong>1 · Autoridades de referência</strong>: ministros, conselheiros, ex-presidentes de órgãos nacionais, autoridades de Estado, grandes nomes institucionais e lideranças de alta projeção.",
-      "<strong>2 · Palestrantes e pensadores nacionais</strong>: nomes voltados à liderança, ética, comportamento, cultura institucional, comunicação, propósito e alta performance pública.",
-      "<strong>3 · Especialistas técnicos e doutrinadores</strong>: juristas, professores, autores, pareceristas, auditores, especialistas setoriais e referências técnicas de cada campo.",
-      "<strong>4 · Consultores sêniores</strong>: profissionais com atuação prática em redes públicas, órgãos, secretarias, tribunais, sistemas de saúde, escolas de governo e projetos institucionais.",
-      "<strong>5 · Pesquisadores associados e coordenação científica</strong>: perfis acadêmicos, pesquisadores, coordenadores científicos, especialistas em metodologia, produção técnica e curadoria pedagógica.",
-    ],
-  },
-  {
-    id: "faq-4",
-    titulo:
-      "Posso escolher os especialistas que vão atuar na turma in company da minha instituição?",
-    parags: [
-      "Sim, parcialmente. Em contratações in company, a curadoria do Grupo NTC apresenta uma <strong>composição docente sugerida</strong> calibrada para a instituição contratante, o eixo formativo e os resultados esperados. A instituição pode validar essa composição, sugerir substituições por especialistas equivalentes da curadoria ou indicar nomes complementares — desde que estes passem pela validação científica do Grupo.",
-      "Não há cobrança adicional por escolha de docentes da curadoria — a calibragem da equipe está incluída no escopo da contratação institucional.",
-    ],
-  },
-  {
-    id: "faq-5",
-    titulo: "Como me cadastrar para integrar o corpo docente do Grupo NTC?",
-    parags: [
-      "O credenciamento ocorre em três passos: <strong>(1)</strong> envio do cadastro institucional com currículo Lattes, áreas de atuação e referências; <strong>(2)</strong> análise pela curadoria científica em até 10 dias úteis; <strong>(3)</strong> conversa de alinhamento institucional caso haja adequação aos eixos formativos. Após o credenciamento formal, o especialista entra no banco da curadoria e pode ser convocado por programa ou demanda institucional.",
-      "O cadastro é feito pelo canal de credenciamento desta página ou pelo formulário institucional da página de Contato.",
-    ],
-  },
-  {
-    id: "faq-6",
-    titulo: "O Grupo NTC remunera os especialistas convidados? Há exclusividade?",
-    parags: [
-      "Sim — toda atuação docente no Grupo NTC é remunerada conforme tabela institucional, escopo da contratação (in company · turma fechada · sob medida) e tipo de vínculo (curadoria · convidado · consultor · pesquisador). Os valores são acordados em contrato individual antes da entrega.",
-      "Não há cláusula de exclusividade. O especialista pode atuar no Grupo NTC e em outras frentes acadêmicas, consultivas ou institucionais simultaneamente, desde que não haja conflito de interesse explícito com um programa em curso.",
-    ],
-  },
-  {
-    id: "faq-7",
-    titulo:
-      "Como funciona a propriedade intelectual de materiais produzidos pelos especialistas?",
-    parags: [
-      "Materiais didáticos, slides, apostilas, mentorias e atividades produzidos especificamente para um programa do Grupo NTC ficam regulados por contrato individual. Em regra: o Grupo NTC licencia o material para uso no programa, evento ou jornada contratada; o especialista preserva os direitos autorais para uso em sua atuação independente (publicações próprias, cursos próprios, atuação acadêmica).",
-      "Quando há produção autoral (livros, capítulos, artigos), os créditos seguem o padrão acadêmico, com menção institucional do Grupo NTC quando o material for fruto da atuação contratada.",
-    ],
-  },
-  {
-    id: "faq-8",
-    titulo: "Como o Grupo NTC trata os dados pessoais dos especialistas (LGPD)?",
-    parags: [
-      "O cadastro institucional do especialista é tratado conforme a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018). Os dados são coletados apenas para a finalidade declarada (avaliação pela curadoria + composição operacional de turmas), retidos pelo período necessário ao vínculo contratual ou enquanto o especialista mantiver interesse em ser considerado, e nunca compartilhados com terceiros sem consentimento explícito.",
-      "O Encarregado de Dados (DPO) do Grupo NTC é <strong>dpo@institutontc.com.br</strong> · qualquer especialista pode solicitar acesso, correção ou exclusão dos próprios dados a qualquer tempo.",
-    ],
-  },
-];
+export function montarFaq(c: Contatos): FaqItem[] {
+  return [
+    {
+      id: "faq-1",
+      titulo: "Por que Contratações Públicas aparece separada de Gestão Pública?",
+      parags: [
+        "Contratações Públicas <strong>integra a área NTC Gestão Pública</strong>, mas possui núcleo próprio de curadoria em razão de sua densidade técnica, volume de especialistas, relevância jurídica e importância programática no AGIP. Por isso, a página apresenta essa frente separadamente — <strong>sem tratá-la como uma quarta vertical institucional</strong>.",
+        "A arquitetura-mãe do Grupo NTC permanece composta por três áreas estratégicas: Educação, Gestão Pública e Saúde. Contratações Públicas é uma frente especializada da NTC Gestão Pública.",
+      ],
+    },
+    {
+      id: "faq-2",
+      titulo: "A composição docente é fixa?",
+      parags: [
+        "Não. A composição docente é definida <strong>conforme programa, eixo, formato, perfil da instituição contratante e objetivo da formação</strong>. O Grupo NTC trabalha com uma rede de autoridades, especialistas e consultores mobilizados de forma estratégica para cada entrega.",
+        "Cada turma fechada, in company ou jornada executiva recebe uma equipe operacional dimensionada caso a caso, com nomes reais e currículos completos apresentados em proposta formal.",
+      ],
+    },
+    {
+      id: "faq-3",
+      titulo: "Como o Grupo NTC seleciona os especialistas?",
+      parags: [
+        "A curadoria científica é orientada por três critérios cumulativos: <strong>autoridade técnica comprovada</strong> (produção acadêmica, atuação em rede, publicações), <strong>experiência aplicada</strong> em políticas públicas brasileiras (gestão de Estado, controle, redes públicas, organismos multilaterais) e <strong>capacidade pedagógica</strong> de formação de quadros executivos. Cada eixo formativo tem critérios específicos validados pelo conselho científico do Grupo.",
+        "A curadoria é dinâmica — os especialistas são convocados por programa, eixo e demanda institucional, sem corpo docente fixo permanente.",
+      ],
+    },
+    {
+      id: "faq-4-camadas",
+      titulo: "Quais são as 5 camadas de curadoria do Grupo NTC?",
+      parags: [
+        "<strong>1 · Autoridades de referência</strong>: ministros, conselheiros, ex-presidentes de órgãos nacionais, autoridades de Estado, grandes nomes institucionais e lideranças de alta projeção.",
+        "<strong>2 · Palestrantes e pensadores nacionais</strong>: nomes voltados à liderança, ética, comportamento, cultura institucional, comunicação, propósito e alta performance pública.",
+        "<strong>3 · Especialistas técnicos e doutrinadores</strong>: juristas, professores, autores, pareceristas, auditores, especialistas setoriais e referências técnicas de cada campo.",
+        "<strong>4 · Consultores sêniores</strong>: profissionais com atuação prática em redes públicas, órgãos, secretarias, tribunais, sistemas de saúde, escolas de governo e projetos institucionais.",
+        "<strong>5 · Pesquisadores associados e coordenação científica</strong>: perfis acadêmicos, pesquisadores, coordenadores científicos, especialistas em metodologia, produção técnica e curadoria pedagógica.",
+      ],
+    },
+    {
+      id: "faq-4",
+      titulo:
+        "Posso escolher os especialistas que vão atuar na turma in company da minha instituição?",
+      parags: [
+        "Sim, parcialmente. Em contratações in company, a curadoria do Grupo NTC apresenta uma <strong>composição docente sugerida</strong> calibrada para a instituição contratante, o eixo formativo e os resultados esperados. A instituição pode validar essa composição, sugerir substituições por especialistas equivalentes da curadoria ou indicar nomes complementares — desde que estes passem pela validação científica do Grupo.",
+        "Não há cobrança adicional por escolha de docentes da curadoria — a calibragem da equipe está incluída no escopo da contratação institucional.",
+      ],
+    },
+    {
+      id: "faq-5",
+      titulo: "Como me cadastrar para integrar o corpo docente do Grupo NTC?",
+      parags: [
+        "O credenciamento ocorre em três passos: <strong>(1)</strong> envio do cadastro institucional com currículo Lattes, áreas de atuação e referências; <strong>(2)</strong> análise pela curadoria científica em até 10 dias úteis; <strong>(3)</strong> conversa de alinhamento institucional caso haja adequação aos eixos formativos. Após o credenciamento formal, o especialista entra no banco da curadoria e pode ser convocado por programa ou demanda institucional.",
+        "O cadastro é feito pelo canal de credenciamento desta página ou pelo formulário institucional da página de Contato.",
+      ],
+    },
+    {
+      id: "faq-6",
+      titulo: "O Grupo NTC remunera os especialistas convidados? Há exclusividade?",
+      parags: [
+        "Sim — toda atuação docente no Grupo NTC é remunerada conforme tabela institucional, escopo da contratação (in company · turma fechada · sob medida) e tipo de vínculo (curadoria · convidado · consultor · pesquisador). Os valores são acordados em contrato individual antes da entrega.",
+        "Não há cláusula de exclusividade. O especialista pode atuar no Grupo NTC e em outras frentes acadêmicas, consultivas ou institucionais simultaneamente, desde que não haja conflito de interesse explícito com um programa em curso.",
+      ],
+    },
+    {
+      id: "faq-7",
+      titulo:
+        "Como funciona a propriedade intelectual de materiais produzidos pelos especialistas?",
+      parags: [
+        "Materiais didáticos, slides, apostilas, mentorias e atividades produzidos especificamente para um programa do Grupo NTC ficam regulados por contrato individual. Em regra: o Grupo NTC licencia o material para uso no programa, evento ou jornada contratada; o especialista preserva os direitos autorais para uso em sua atuação independente (publicações próprias, cursos próprios, atuação acadêmica).",
+        "Quando há produção autoral (livros, capítulos, artigos), os créditos seguem o padrão acadêmico, com menção institucional do Grupo NTC quando o material for fruto da atuação contratada.",
+      ],
+    },
+    {
+      id: "faq-8",
+      titulo: "Como o Grupo NTC trata os dados pessoais dos especialistas (LGPD)?",
+      parags: [
+        "O cadastro institucional do especialista é tratado conforme a Lei Geral de Proteção de Dados (LGPD · Lei 13.709/2018). Os dados são coletados apenas para a finalidade declarada (avaliação pela curadoria + composição operacional de turmas), retidos pelo período necessário ao vínculo contratual ou enquanto o especialista mantiver interesse em ser considerado, e nunca compartilhados com terceiros sem consentimento explícito.",
+        `O Encarregado de Dados (DPO) do Grupo NTC é <strong>${escapar(c.emailDpo)}</strong> · qualquer especialista pode solicitar acesso, correção ou exclusão dos próprios dados a qualquer tempo.`,
+      ],
+    },
+  ];
+}
 
 /* ============================================================
    CTA FINAL

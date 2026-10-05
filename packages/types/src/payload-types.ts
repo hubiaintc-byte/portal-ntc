@@ -789,10 +789,10 @@ export interface Conteudo {
   id: number;
   titulo: string;
   slug: string;
-  categoria: 'artigo' | 'insight' | 'publicacao' | 'material-download' | 'noticia';
+  categoria: 'artigo' | 'estudo' | 'nota-tecnica' | 'webinar' | 'material' | 'noticia';
   area?: (number | null) | Area;
   lide: string;
-  imagemDestaque: number | Media;
+  imagemDestaque?: (number | null) | Media;
   corpo: {
     root: {
       type: string;
@@ -810,6 +810,26 @@ export interface Conteudo {
   };
   autor?: (number | Especialista)[] | null;
   dataPublicacao: string;
+  /**
+   * Assinatura institucional (ex.: Curadoria NTC Saúde). Use quando o conteúdo não é assinado por um especialista do corpo docente.
+   */
+  assinatura?: string | null;
+  /**
+   * Aparece na seção Destaques de /conteudos (os 3 mais recentes).
+   */
+  destaque?: boolean | null;
+  /**
+   * Enquanto rascunho, aparece no site como "Em preparação editorial", sem link. Ignorado depois de publicado.
+   */
+  anunciarEmPreparacao?: boolean | null;
+  /**
+   * Calculado a partir do corpo.
+   */
+  tempoLeituraMin?: number | null;
+  /**
+   * URL do webinar gravado ou do material hospedado fora (opcional).
+   */
+  linkExterno?: string | null;
   anexoDownload?: (number | null) | Media;
   conteudosRelacionados?: (number | Conteudo)[] | null;
   /**
@@ -2064,6 +2084,11 @@ export interface ConteudosSelect<T extends boolean = true> {
   corpo?: T;
   autor?: T;
   dataPublicacao?: T;
+  assinatura?: T;
+  destaque?: T;
+  anunciarEmPreparacao?: T;
+  tempoLeituraMin?: T;
+  linkExterno?: T;
   anexoDownload?: T;
   conteudosRelacionados?: T;
   seo?:
@@ -3070,6 +3095,19 @@ export interface Rodape {
   emailImprensa?: string | null;
   emailParcerias?: string | null;
   emailDpo?: string | null;
+  emailSuporte?: string | null;
+  emailEventos?: string | null;
+  verticais?:
+    | {
+        vertical: 'educacao' | 'gestao-publica' | 'saude';
+        email?: string | null;
+        /**
+         * Ex.: "opção 1"
+         */
+        opcaoTelefone?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   telefoneInstitucional?: string | null;
   whatsappInstitucional?: string | null;
   redesSociais?:
@@ -3413,6 +3451,16 @@ export interface RodapeSelect<T extends boolean = true> {
   emailImprensa?: T;
   emailParcerias?: T;
   emailDpo?: T;
+  emailSuporte?: T;
+  emailEventos?: T;
+  verticais?:
+    | T
+    | {
+        vertical?: T;
+        email?: T;
+        opcaoTelefone?: T;
+        id?: T;
+      };
   telefoneInstitucional?: T;
   whatsappInstitucional?: T;
   redesSociais?:

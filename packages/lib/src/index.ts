@@ -151,3 +151,26 @@ export {
   type ModuloParaConteudo,
   type ConteudoInicialProposta,
 } from "./crm/conteudoProposta";
+
+// Institucional — contatos (telefone/WhatsApp/verticais).
+export {
+  telefoneParaHref,
+  whatsappParaHref,
+  VERTICAIS_CONTATO,
+} from "./institucional/contatos";
+
+// Editorial — serialização do corpo de conteúdos.
+export { escapar, lexicalParaHtmlEditorial } from "./editorial/lexical-html";
+
+export {
+  CONTEUDO_CATEGORIA,
+  SEGMENTOS_CATEGORIA,
+  categoriaParaSegmento,
+  rotuloCategoria,
+  segmentoParaCategoria,
+  type ConteudoCategoria,
+} from "./editorial/categorias";
+export { calcularTempoLeituraMin } from "./editorial/tempo-leitura";
+export { formatarDataBR } from "./editorial/datas";
+export { aplicarAcaoMarkdown } from "./editorial/markdown-acoes";
+export type { AcaoMarkdown, SelecaoTexto } from "./editorial/markdown-acoes";
