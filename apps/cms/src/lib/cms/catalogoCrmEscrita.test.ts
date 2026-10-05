@@ -79,6 +79,17 @@ describe("salvarPrograma", () => {
     expect("problema" in data).toBe(false);
   });
 
+  it("ignora chaves de textos fora da lista de campos de texto", async () => {
+    const p = payloadFalso();
+    obterPayloadMock.mockResolvedValue(p);
+    const forjado = { sigla: "x", slug: "y", objetivo: "Texto" } as unknown as DadosPrograma["textos"];
+    await salvarPrograma("4", { ...programaBase, textos: forjado }, false, usuario);
+    const data = (p.update.mock.calls[0]![0] as { data: Record<string, unknown> }).data;
+    expect(data.objetivo).not.toBeNull();
+    expect("slug" in data).toBe(false);
+    expect(data.sigla).toBe("EDU");
+  });
+
   it("publicar envia os dados do formulário com _status published numa só escrita", async () => {
     const p = payloadFalso();
     obterPayloadMock.mockResolvedValue(p);
@@ -181,6 +192,25 @@ describe("salvarModulo", () => {
       .filter((c) => (c[0] as { collection: string }).collection === "programas")
       .map((c) => String((c[0] as { id: unknown }).id));
     expect(recalculados.sort()).toEqual(["4", "8"]);
+  });
+
+  it("atualizar sem ementa não reescreve a ementa", async () => {
+    const p = payloadFalso({ numeroEmUso: false });
+    obterPayloadMock.mockResolvedValue(p);
+    const semEmenta: DadosModulo = { ...moduloBase };
+    delete semEmenta.ementa;
+    const r = await salvarModulo("9", semEmenta, usuario);
+    expect(r.ok).toBe(true);
+    const data = (p.update.mock.calls.find((c) => (c[0] as { collection: string }).collection === "modulos")![0] as { data: Record<string, unknown> }).data;
+    expect("ementa" in data).toBe(false);
+  });
+
+  it("criar sem ementa e atualizar com ementa vazia recusam", async () => {
+    obterPayloadMock.mockResolvedValue(payloadFalso({ numeroEmUso: false }));
+    const semEmenta: DadosModulo = { ...moduloBase };
+    delete semEmenta.ementa;
+    expect(await salvarModulo(null, semEmenta, usuario)).toEqual({ ok: false, erro: "Preencha: Ementa." });
+    expect(await salvarModulo("9", { ...moduloBase, ementa: " " }, usuario)).toEqual({ ok: false, erro: "Preencha: Ementa." });
   });
 
   it("valida número, obrigatórios e valor", async () => {

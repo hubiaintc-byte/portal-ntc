@@ -179,7 +179,6 @@ export function ShellCrm({
   const [modalLead, setModalLead] = useState<ModalLeadAberto | null>(null);
   const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
-  // As Tasks 7/8 passam a ler o primeiro item para renderizar os detalhes do catálogo.
   const [catalogoDet, setCatalogoDet] = useState<DetalheCatalogoAberto | null>(null);
   /** Sobe a cada detalhe do catálogo recarregado, para o formulário remontar com os dados novos. */
   const [versaoDet, setVersaoDet] = useState(0);
@@ -310,6 +309,8 @@ export function ShellCrm({
     >
       {/* Detalhes e formulários em tela cheia têm precedência sobre a tela ativa. */}
       {catalogoDet?.tipo === "programa" ? (
+        <>
+        <AvisoForm erro={erroAcao} />
         <DetalheProgramaCatalogo
           key={`${catalogoDet.programa?.id ?? "novo"}:${versaoDet}`}
           programa={catalogoDet.programa}
@@ -323,7 +324,10 @@ export function ShellCrm({
           onAbrirModulo={abrirModuloCatalogo}
           onNovoModulo={(programaId) => setCatalogoDet({ tipo: "modulo", modulo: null, programaIdInicial: programaId })}
         />
+        </>
       ) : catalogoDet?.tipo === "modulo" ? (
+        <>
+        <AvisoForm erro={erroAcao} />
         <DetalheModuloCatalogo
           key={`${catalogoDet.modulo?.id ?? `novo-${catalogoDet.programaIdInicial ?? ""}`}:${versaoDet}`}
           modulo={catalogoDet.modulo}
@@ -336,6 +340,7 @@ export function ShellCrm({
             setTela("modulos");
           }}
         />
+        </>
       ) : formAberto?.entidade === "cliente" ? (
         <FormCliente
           inicial={formAberto.inicial}

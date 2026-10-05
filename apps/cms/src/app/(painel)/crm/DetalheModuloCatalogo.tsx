@@ -44,7 +44,9 @@ export function DetalheModuloCatalogo({ modulo: m, programaIdInicial, programas,
   function salvar() {
     setErro(null);
     iniciar(async () => {
-      const r = await salvarModuloCatalogoCrm(m?.id ?? null, dados);
+      const { ementa, ...resto } = dados;
+      const ementaMudou = novo || ementa !== (m?.ementa ?? "");
+      const r = await salvarModuloCatalogoCrm(m?.id ?? null, ementaMudou ? { ...resto, ementa } : resto);
       if (r.ok) {
         if (r.id) onSalvo(r.id);
       } else setErro(r.erro ?? "Erro ao salvar o módulo.");
@@ -103,7 +105,7 @@ export function DetalheModuloCatalogo({ modulo: m, programaIdInicial, programas,
         />
         <CampoNumero rotulo="Número" valor={dados.numero} onMudar={mudar("numero")} curto />
         <CampoTexto rotulo="Título" valor={dados.titulo} onMudar={mudar("titulo")} obrigatorio />
-        <CampoMarkdown rotulo="Ementa" valor={dados.ementa} onMudar={mudar("ementa")} avisoPerda={!novo && m.ementaComPerda} />
+        <CampoMarkdown rotulo="Ementa" valor={dados.ementa ?? ""} onMudar={mudar("ementa")} avisoPerda={!novo && m.ementaComPerda} />
         <CampoTexto rotulo="Carga horária (ex.: 8h)" valor={dados.cargaHoraria} onMudar={mudar("cargaHoraria")} curto />
       </section>
 

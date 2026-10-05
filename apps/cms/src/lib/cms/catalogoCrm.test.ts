@@ -31,8 +31,8 @@ describe("listarProgramasCrm", () => {
 
 describe("situacaoDoPrograma", () => {
   it("lê os dois status do mesmo programa", async () => {
-    const findByID = vi.fn(async (a: { draft?: boolean }) => ({ _status: a.draft ? "published" : "published" }));
-    expect(await situacaoDoPrograma({ findByID } as never, 3)).toBe("publicado");
+    const findByID = vi.fn(async (a: { draft?: boolean }) => ({ _status: a.draft ? "draft" : "published" }));
+    expect(await situacaoDoPrograma({ findByID } as never, 3)).toBe("alteracoes-pendentes");
   });
 });
 

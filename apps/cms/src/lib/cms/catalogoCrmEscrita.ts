@@ -2,6 +2,7 @@ import "server-only";
 
 import {
   faltasParaPublicar,
+  CAMPOS_TEXTO_PROGRAMA,
   faltasParaRascunho,
   lerNumeroModulo,
   podeExcluirModulo,
@@ -48,7 +49,8 @@ export interface DadosModulo {
   programaId: string;
   numero: string;
   titulo: string;
-  ementa: string;
+  /** Ausente = não tocar (obrigatória só na criação) — preserva formatação que o editor não representa. */
+  ementa?: string;
   cargaHoraria: string;
   tituloComercial: string;
   valor: string;
@@ -123,7 +125,8 @@ export async function salvarPrograma(
       if (repetida.docs.length > 0) return { ok: false, erro: `Já existe um programa com a sigla ${sigla}.` };
 
       const textos: Record<string, unknown> = {};
-      for (const [chave, md] of Object.entries(dados.textos)) {
+      for (const { chave } of CAMPOS_TEXTO_PROGRAMA) {
+        const md = dados.textos[chave];
         if (md !== undefined) textos[chave] = richOuNulo(md);
       }
       const bruto: Record<string, unknown> = {
@@ -181,7 +184,7 @@ export async function salvarModulo(id: string | null, dados: DadosModulo, usuari
       const faltas = [
         dados.programaId === "" ? "Programa" : null,
         dados.titulo.trim() === "" ? "Título" : null,
-        dados.ementa.trim() === "" ? "Ementa" : null,
+        (id === null || dados.ementa !== undefined) && (dados.ementa ?? "").trim() === "" ? "Ementa" : null,
       ].filter((f): f is string => f !== null);
       if (faltas.length > 0) return { ok: false, erro: `Preencha: ${faltas.join(", ")}.` };
       const valor = numeroOuNulo(dados.valor);
@@ -211,7 +214,7 @@ export async function salvarModulo(id: string | null, dados: DadosModulo, usuari
         programa: Number(dados.programaId),
         numero,
         titulo: dados.titulo.trim(),
-        ementa: markdownParaLexical(dados.ementa),
+        ...(dados.ementa !== undefined ? { ementa: markdownParaLexical(dados.ementa) } : {}),
         cargaHoraria: textoOuNulo(dados.cargaHoraria),
         comercial: {
           tituloComercial: textoOuNulo(dados.tituloComercial),
