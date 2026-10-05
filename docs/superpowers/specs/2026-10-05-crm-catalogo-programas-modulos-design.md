@@ -55,7 +55,7 @@ Tela cheia dentro do `ShellCrm` (mesmo mecanismo de `DetalheCliente`/`DetalhePro
 
 ### 3.1. Rascunho e publicação
 
-- **Salvar rascunho** grava com `draft: true`. Sem validação de obrigatórios além da sigla (para que o rascunho exista e seja encontrável).
+- **Salvar rascunho** grava com `draft: true`. Exige só **sigla e nome completo** — a sigla para o rascunho ser encontrável, o nome porque o `slug` (único) é derivado dele pelo hook `autoSlug`.
 - **Publicar** valida, antes de qualquer escrita, os campos exigidos pela publicação: sigla, nome completo, área, carga horária total e visão geral não-vazia. Falha lista os campos faltantes. Sucesso grava `_status: "published"`.
 - Selo de situação no cabeçalho: *Rascunho* · *Publicado* · *Alterações não publicadas*.
 - **Programa novo nasce rascunho.** Aviso fixo na tela enquanto não publicado: "Rascunho não aparece no wizard de proposta."
@@ -65,13 +65,9 @@ Tela cheia dentro do `ShellCrm` (mesmo mecanismo de `DetalheCliente`/`DetalhePro
 
 Hoje `obterCatalogoCrm` lê `programas` com `draft: true` e sem filtro de status — rascunhos aparecem no wizard, mas `criarProposta` lê a versão publicada (`findByID` sem `draft`). Com a criação pelo painel isso deixa de ser teórico. **Mudança:** `obterCatalogoCrm` filtra `programas` por `_status = published` e lê sem `draft` (versão publicada); os `modulos` do catálogo ficam restritos aos de programas publicados. O detalhe de propostas já existentes continua mostrando o programa vinculado mesmo que ele volte a rascunho.
 
-### 3.3. Mudança de schema
+### 3.3. Imagem de capa opcional — sem push de schema
 
-`programas.imagemCapa` deixa de ser `required` (o CRM não usa imagem; exigir upload para criar um programa seria atrito sem propósito). No adapter drizzle, isso **é** mudança de schema (`required: true` emite `NOT NULL` — lição da Sessão 4). Consequência:
-
-- **`pnpm --filter @ntc/cms payload:push:schema` é passo manual do PO**, dev parado, `git worktree list` conferido (regra da v1.9). O diff esperado contém **só** `ALTER TABLE programas ALTER COLUMN imagem_capa_id DROP NOT NULL` (e o equivalente em `_programas_v`, se existir). Qualquer `DROP` é `N` e volta para o agente.
-- `payload:generate` roda na branch (tipos commitados).
-- Até o push, **criar** programa pelo painel falha no banco (atualizar os 15 existentes funciona, eles têm capa). A tela trata o erro com mensagem clara, não genérica.
+`programas.imagemCapa` deixa de ser `required` (o CRM não usa imagem; exigir upload para criar um programa seria atrito sem propósito). **Isto NÃO exige `payload:push:schema`** (corrigido em 05/10, ao escrever o plano): `programas` tem `versions.drafts`, e o adapter drizzle já não emite `NOT NULL` para coleção com rascunho — verificado por `psql`: `imagem_capa_id`, `area_id`, `carga_horaria_total`, `visao_geral`, `nome_completo`, `sigla` e `slug` estão todos `is_nullable = YES`. A mudança é só de validação do Payload (que roda na publicação; ao salvar rascunho o Payload pula a validação de obrigatórios — `skipValidation` em `create.js`/`update.js` do Payload 3.18). `payload:generate` roda na branch (o tipo `Programa.imagemCapa` passa a opcional).
 
 ## 4. Detalhe do módulo
 
@@ -98,9 +94,9 @@ Aviso fixo no detalhe: "Editar um módulo não altera propostas já criadas."
 - `numeroDeModuloEmUso(modulos, programaId, numero, ignorarId?)`.
 - `bloqueiosExclusaoPrograma(contagens)` / `bloqueiosExclusaoModulo(contagens)` → lista de motivos legíveis (vazia = pode excluir).
 
-**Leitura** — `apps/cms/src/lib/cms/painelCrm.ts`: `listarProgramasCrm` e `listarModulosCrm` ganham os campos de filtro e situação; novos `carregarProgramaCatalogo(id)` e `carregarModuloCatalogo(id)` (Lexical → Markdown, contagem de dependentes para o estado do botão Excluir).
+**Leitura** — arquivo novo `apps/cms/src/lib/cms/catalogoCrm.ts`: `listarProgramasCrm` e `listarModulosCrm` saem de `painelCrm.ts` para ele e ganham os campos de filtro e situação; novos `carregarProgramaCatalogo(id)` e `carregarModuloCatalogo(id)` (Lexical → Markdown, contagem de dependentes para o estado do botão Excluir).
 
-**Escrita** — `apps/cms/src/lib/cms/painelCrmEscrita.ts` + Server Actions em `acoesCrm.ts` (gate de sessão como as demais): `salvarProgramaCrm` (cria/atualiza rascunho), `publicarProgramaCrm`, `excluirProgramaCrm`, `salvarModuloCrm`, `excluirModuloCrm`. Toda escrita composta via `executarEmTransacao`.
+**Escrita** — arquivo novo `apps/cms/src/lib/cms/catalogoCrmEscrita.ts` (o `painelCrmEscrita.ts` já passa de 1.800 linhas) + Server Actions num arquivo novo `app/(painel)/acoesCatalogo.ts` (gate de sessão como as demais): `salvarProgramaCrm` (cria/atualiza rascunho), `publicarProgramaCrm`, `excluirProgramaCrm`, `salvarModuloCrm`, `excluirModuloCrm`. Toda escrita composta via `executarEmTransacao`.
 
 **Hooks** — `apps/cms/src/lib/crm/exclusaoCatalogo.ts`: `beforeDelete` em `programas` e `modulos` repetindo a regra do §6, falha fechado mesmo se a UI for contornada (padrão `bloquearClienteComDependentes`).
 
@@ -118,7 +114,7 @@ Exclusões **não** gravam na linha do tempo (catálogo não pertence a cliente)
 
 ## 7. Erros
 
-- Toda Server Action devolve `{ ok: false, erro }` com mensagem em português; nada de erro genérico para validação conhecida (sigla duplicada, número em uso, faltas para publicar, bloqueios de exclusão, schema ainda não pushado).
+- Toda Server Action devolve `{ ok: false, erro }` com mensagem em português; nada de erro genérico para validação conhecida (sigla duplicada, número em uso, faltas para publicar, bloqueios de exclusão).
 - Conversão Markdown: Markdown fora do subconjunto vira texto literal (comportamento atual de `markdownParaLexical`), sem perda silenciosa de conteúdo.
 - **Round-trip do conteúdo importado:** o conteúdo dos 15 programas veio de `htmlParaLexical`. Se algum nó não for representável em Markdown (ex. negrito+itálico juntos — `inlineParaMarkdown` mantém só o negrito), a tela avisa por campo antes de salvar, no mesmo espírito do aviso de negrito da proposta. O teste do §8 mede se isso ocorre no instantâneo real.
 
@@ -131,7 +127,7 @@ Exclusões **não** gravam na linha do tempo (catálogo não pertence a cliente)
 - `obterCatalogoCrm` não devolve programa em rascunho.
 - Telas: sem teste de componente (suíte em `node`); cobertura pelo checkpoint visual.
 
-## 9. Checkpoint visual (PO, depois do push)
+## 9. Checkpoint visual (PO)
 
 1. Programas: buscar "edu", filtrar por área e por situação; Módulos: filtrar por programa.
 2. Novo programa → salvar rascunho → aparece com selo *Rascunho*; wizard de proposta **não** o lista.
