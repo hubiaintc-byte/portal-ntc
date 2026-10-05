@@ -15,7 +15,13 @@ import type {
   PropostaResumo,
   UsuarioCmsResumo,
 } from "@/lib/cms/painelCrm";
-import type { ModuloCrmResumo, ProgramaCrmResumo } from "@/lib/cms/catalogoCrm";
+import type {
+  AreaOpcao,
+  ModuloCatalogoDetalhe,
+  ModuloCrmResumo,
+  ProgramaCatalogoDetalhe,
+  ProgramaCrmResumo,
+} from "@/lib/cms/catalogoCrm";
 
 import {
   adicionarNotaCrm,
@@ -26,6 +32,7 @@ import {
   novaVersaoPropostaCrm,
   registrarEnvioCrm,
 } from "../acoesCrm";
+import { carregarModuloCatalogoCrm, carregarProgramaCatalogoCrm } from "../acoesCatalogo";
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { AvisoForm } from "./CamposCrm";
 import { DetalheCliente } from "./DetalheCliente";
@@ -49,6 +56,7 @@ interface ShellCrmProps {
   catalogo: CatalogoCrm;
   usuarios: UsuarioCmsResumo[];
   programas: ProgramaCrmResumo[];
+  areas: AreaOpcao[];
   modulos: ModuloCrmResumo[];
   produtos: ProdutoCrmResumo[];
   propostas: PropostaResumo[];
@@ -68,6 +76,11 @@ type FormCrmAberto =
 
 /** Modal do lead: sobreposição à tela ativa (spec §4.4) — ver um lead ou criar um novo. */
 type ModalLeadAberto = { modo: "ver"; lead: LeadCrmDetalhe } | { modo: "novo" };
+
+/** Detalhe/criação de programa ou módulo do catálogo, aberto em tela cheia. */
+type DetalheCatalogoAberto =
+  | { tipo: "programa"; programa: ProgramaCatalogoDetalhe | null }
+  | { tipo: "modulo"; modulo: ModuloCatalogoDetalhe | null; programaIdInicial?: string };
 
 /* Ícones lineares funcionais, peso 1.5 (CLAUDE.md §3). */
 const Ico = {
@@ -151,6 +164,7 @@ export function ShellCrm({
   catalogo,
   usuarios,
   programas,
+  areas,
   modulos,
   produtos,
   propostas,
@@ -163,6 +177,8 @@ export function ShellCrm({
   const [modalLead, setModalLead] = useState<ModalLeadAberto | null>(null);
   const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
+  // As Tasks 7/8 passam a ler o primeiro item para renderizar os detalhes do catálogo.
+  const [, setCatalogoDet] = useState<DetalheCatalogoAberto | null>(null);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [carregando, iniciarCarga] = useTransition();
   const [leadsLocal, setLeadsLocal] = useState<LeadCrmResumo[]>(leads);
@@ -176,6 +192,7 @@ export function ShellCrm({
     setModalLead(null);
     setPropostaDet(null);
     setFormAberto(null);
+    setCatalogoDet(null);
     setErroAcao(null);
   }
 
@@ -224,6 +241,22 @@ export function ShellCrm({
         setErroAcao(null);
         setPropostaDet(det);
       }
+    });
+  }
+
+  function abrirProgramaCatalogo(id: string) {
+    iniciarCarga(async () => {
+      const det = await carregarProgramaCatalogoCrm(id);
+      if (det) setCatalogoDet({ tipo: "programa", programa: det });
+      else setErroAcao("Não foi possível abrir o programa.");
+    });
+  }
+
+  function abrirModuloCatalogo(id: string) {
+    iniciarCarga(async () => {
+      const det = await carregarModuloCatalogoCrm(id);
+      if (det) setCatalogoDet({ tipo: "modulo", modulo: det });
+      else setErroAcao("Não foi possível abrir o módulo.");
     });
   }
 
@@ -340,8 +373,22 @@ export function ShellCrm({
               onNovo={() => setFormAberto({ entidade: "cliente", inicial: null })}
             />
           )}
-          {tela === "programas" && <TelaProgramas programas={programas} />}
-          {tela === "modulos" && <TelaModulos modulos={modulos} />}
+          {tela === "programas" && (
+            <TelaProgramas
+              programas={programas}
+              areas={areas}
+              onAbrir={abrirProgramaCatalogo}
+              onNovo={() => setCatalogoDet({ tipo: "programa", programa: null })}
+            />
+          )}
+          {tela === "modulos" && (
+            <TelaModulos
+              modulos={modulos}
+              programas={programas}
+              onAbrir={abrirModuloCatalogo}
+              onNovo={() => setCatalogoDet({ tipo: "modulo", modulo: null })}
+            />
+          )}
           {tela === "produtos" && <TelaProdutos produtos={produtos} />}
           {tela === "propostas" && (
             <TelaPropostas

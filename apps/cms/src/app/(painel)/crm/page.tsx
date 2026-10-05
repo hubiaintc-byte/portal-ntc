@@ -16,8 +16,10 @@ import {
   type EnvioResumo,
 } from "@/lib/cms/painelCrm";
 import {
+  listarAreasCrm,
   listarModulosCrm,
   listarProgramasCrm,
+  type AreaOpcao,
   type ModuloCrmResumo,
   type ProgramaCrmResumo,
 } from "@/lib/cms/catalogoCrm";
@@ -43,10 +45,11 @@ export default async function PainelCrmPage() {
   let produtos: ProdutoCrmResumo[] = [];
   let propostas: PropostaResumo[] = [];
   let envios: EnvioResumo[] = [];
+  let areas: AreaOpcao[] = [];
   let erroLeitura = false;
 
   try {
-    [clientes, leads, catalogo, usuarios, programas, modulos, produtos, propostas, envios] =
+    [clientes, leads, catalogo, usuarios, programas, modulos, produtos, propostas, envios, areas] =
       await Promise.all([
         listarClientesCrm(),
         listarLeadsCrm(),
@@ -57,6 +60,7 @@ export default async function PainelCrmPage() {
         listarProdutosCrm(),
         listarPropostasCrm(),
         todosEnviosCrm(),
+        listarAreasCrm(),
       ]);
   } catch (e) {
     console.error("[PainelCrmPage] Erro ao ler banco:", e);
@@ -73,6 +77,7 @@ export default async function PainelCrmPage() {
       catalogo={catalogo}
       usuarios={usuarios}
       programas={programas}
+      areas={areas}
       modulos={modulos}
       produtos={produtos}
       propostas={propostas}

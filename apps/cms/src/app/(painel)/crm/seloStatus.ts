@@ -1,3 +1,5 @@
+import type { SituacaoPrograma } from "@ntc/lib";
+
 /** Classe de selo (pcms-selo--*) por status de proposta, envio e estágio do lead. */
 const SELO_PROPOSTA: Record<string, string> = {
   rascunho: "info",
@@ -54,3 +56,12 @@ export function rotuloDeLista(opcoes: { label: string; value: string }[], value:
   if (value === null) return "—";
   return opcoes.find((o) => o.value === value)?.label ?? value;
 }
+
+const SELO_SITUACAO_PROGRAMA: Record<SituacaoPrograma, string> = {
+  publicado: "publicado",
+  rascunho: "rascunho",
+  "alteracoes-pendentes": "atencao",
+};
+
+/** Situação editorial do programa do catálogo (rascunho/publicado/pendente). */
+export const seloDeSituacaoPrograma = (s: SituacaoPrograma): string => `pcms-selo pcms-selo--${SELO_SITUACAO_PROGRAMA[s]}`;
