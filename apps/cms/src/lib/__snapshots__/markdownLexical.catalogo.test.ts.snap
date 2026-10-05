@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`conteúdo real dos 15 programas (instantâneo de 30/09) > enumera os campos com perda no round-trip (decide se o aviso da tela aparece na prática) 1`] = `[]`;

@@ -246,3 +246,74 @@ export function lexicalParaMarkdown(doc: unknown): string {
 
   return blocos.join("\n\n");
 }
+
+interface Trecho {
+  t: string;
+  f: number;
+  url: string;
+}
+
+/** Trechos de texto de um bloco, com só os formatos que o Markdown leve representa. */
+function trechosDe(nos: unknown[], url = ""): Trecho[] {
+  const saida: Trecho[] = [];
+  for (const no of nos) {
+    if (!no || typeof no !== "object") continue;
+    const n = no as Record<string, unknown>;
+    if (n.type === "text") {
+      saida.push({ t: String(n.text ?? ""), f: Number(n.format ?? 0) & (FORMATO_BOLD | FORMATO_ITALIC), url });
+    } else if (n.type === "linebreak") {
+      saida.push({ t: " ", f: 0, url });
+    } else if (n.type === "link") {
+      const destino = (n.fields as { url?: string } | undefined)?.url ?? "";
+      saida.push(...trechosDe(Array.isArray(n.children) ? n.children : [], destino));
+    } else if (Array.isArray(n.children)) {
+      saida.push(...trechosDe(n.children, url));
+    }
+  }
+  const juntos: Trecho[] = [];
+  for (const tr of saida) {
+    const ultimo = juntos[juntos.length - 1];
+    if (ultimo && ultimo.f === tr.f && ultimo.url === tr.url) ultimo.t += tr.t;
+    else juntos.push({ ...tr });
+  }
+  return juntos
+    .map((j) => ({ ...j, t: j.t.replace(/\s+/g, " ") }))
+    .filter((j) => j.t.trim() !== "")
+    .map((j, i, arr) => ({
+      ...j,
+      t: i === 0 ? j.t.trimStart() : i === arr.length - 1 ? j.t.trimEnd() : j.t,
+    }));
+}
+
+/** Projeção comparável de um documento: um item por bloco (ou por item de lista). */
+function projecao(doc: unknown): string {
+  if (!doc || typeof doc !== "object" || !("root" in doc)) return "[]";
+  const filhos = (doc as { root?: { children?: unknown[] } }).root?.children ?? [];
+  const blocos: unknown[] = [];
+  for (const no of filhos) {
+    if (!no || typeof no !== "object") continue;
+    const n = no as Record<string, unknown>;
+    const netos = Array.isArray(n.children) ? n.children : [];
+    if (n.type === "list") {
+      for (const item of netos) {
+        const it = item as Record<string, unknown>;
+        blocos.push({ tipo: `li-${String(n.listType)}`, trechos: trechosDe(Array.isArray(it?.children) ? it.children : []) });
+      }
+      continue;
+    }
+    const trechos = trechosDe(netos);
+    const conhecido = n.type === "paragraph" || n.type === "heading" || n.type === "quote";
+    if (conhecido && trechos.length === 0) continue;
+    blocos.push({ tipo: n.type, tag: n.type === "heading" ? n.tag : undefined, trechos });
+  }
+  return JSON.stringify(blocos);
+}
+
+/**
+ * O documento sobrevive à ida e volta pelo editor do painel (Lexical →
+ * Markdown leve → Lexical)? `false` = salvar o campo descartaria algo
+ * (ex.: negrito+itálico no mesmo trecho, bloco de tipo desconhecido).
+ */
+export function idaEVoltaPreserva(doc: unknown): boolean {
+  return projecao(doc) === projecao(markdownParaLexical(lexicalParaMarkdown(doc)));
+}

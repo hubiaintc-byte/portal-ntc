@@ -53,7 +53,9 @@ export const Programas: CollectionConfig = {
               name: "imagemCapa",
               type: "upload",
               relationTo: "media",
-              required: true,
+              // Opcional desde 05/10/2026: o CRM cria programas sem imagem, e o
+              // site não lê programas do CMS. Sem push de schema — coleção com
+              // drafts já tem a coluna nullable no banco.
             },
             {
               name: "lockupSvg",

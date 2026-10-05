@@ -288,7 +288,7 @@ export interface Programa {
   nomeCompleto: string;
   eyebrow?: string | null;
   area: number | Area;
-  imagemCapa: number | Media;
+  imagemCapa?: (number | null) | Media;
   /**
    * Lockup SVG vertical do programa.
    */
