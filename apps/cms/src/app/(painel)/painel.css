@@ -2418,3 +2418,9 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+/* Lista editável do catálogo (Programas → eixos, diferenciais, resultados). */
+.pcms-lista-catalogo { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 12px; }
+.pcms-lista-catalogo__item { border: 1px solid var(--pcms-linha); padding: 12px; border-radius: 8px; }
+.pcms-lista-catalogo__titulo { margin: 0 0 8px; font-weight: 600; }
+.pcms-lista-catalogo__acoes { display: flex; gap: 8px; flex-wrap: wrap; }

@@ -36,6 +36,7 @@ import { carregarModuloCatalogoCrm, carregarProgramaCatalogoCrm } from "../acoes
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { AvisoForm } from "./CamposCrm";
 import { DetalheCliente } from "./DetalheCliente";
+import { DetalheProgramaCatalogo } from "./DetalheProgramaCatalogo";
 import { DetalheProposta } from "./DetalheProposta";
 import { FormCliente } from "./FormCliente";
 import { FormProposta } from "./FormProposta";
@@ -178,7 +179,7 @@ export function ShellCrm({
   const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
   // As Tasks 7/8 passam a ler o primeiro item para renderizar os detalhes do catálogo.
-  const [, setCatalogoDet] = useState<DetalheCatalogoAberto | null>(null);
+  const [catalogoDet, setCatalogoDet] = useState<DetalheCatalogoAberto | null>(null);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [carregando, iniciarCarga] = useTransition();
   const [leadsLocal, setLeadsLocal] = useState<LeadCrmResumo[]>(leads);
@@ -247,7 +248,10 @@ export function ShellCrm({
   function abrirProgramaCatalogo(id: string) {
     iniciarCarga(async () => {
       const det = await carregarProgramaCatalogoCrm(id);
-      if (det) setCatalogoDet({ tipo: "programa", programa: det });
+      if (det) {
+        setErroAcao(null);
+        setCatalogoDet({ tipo: "programa", programa: det });
+      }
       else setErroAcao("Não foi possível abrir o programa.");
     });
   }
@@ -255,7 +259,10 @@ export function ShellCrm({
   function abrirModuloCatalogo(id: string) {
     iniciarCarga(async () => {
       const det = await carregarModuloCatalogoCrm(id);
-      if (det) setCatalogoDet({ tipo: "modulo", modulo: det });
+      if (det) {
+        setErroAcao(null);
+        setCatalogoDet({ tipo: "modulo", modulo: det });
+      }
       else setErroAcao("Não foi possível abrir o módulo.");
     });
   }
@@ -297,7 +304,21 @@ export function ShellCrm({
       carregando={carregando}
     >
       {/* Detalhes e formulários em tela cheia têm precedência sobre a tela ativa. */}
-      {formAberto?.entidade === "cliente" ? (
+      {catalogoDet?.tipo === "programa" ? (
+        <DetalheProgramaCatalogo
+          key={catalogoDet.programa?.id ?? "novo"}
+          programa={catalogoDet.programa}
+          areas={areas}
+          onVoltar={fecharTudo}
+          onSalvo={abrirProgramaCatalogo}
+          onExcluido={() => {
+            fecharTudo();
+            setTela("programas");
+          }}
+          onAbrirModulo={abrirModuloCatalogo}
+          onNovoModulo={(programaId) => setCatalogoDet({ tipo: "modulo", modulo: null, programaIdInicial: programaId })}
+        />
+      ) : formAberto?.entidade === "cliente" ? (
         <FormCliente
           inicial={formAberto.inicial}
           usuarios={usuarios}
