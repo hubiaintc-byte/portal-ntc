@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { montarCapa, montarResumoExecutivo, subtituloProposta } from "./capa";
+import { montarCapa, montarContracapa, montarResumoExecutivo, subtituloProposta } from "./capa";
 import type { DadosDocumentoProposta } from "./dados";
 
 describe("subtituloProposta", () => {
@@ -47,6 +47,7 @@ const BASE: DadosDocumentoProposta = {
   clienteContatoEmail: "gabinete@orgao.gov.br",
   programaNome: "Educação Digital, Inovação e Tecnologias",
   programaSigla: "EDUTEC",
+  programaTemas: "",
   itens: [
     { rotulo: "M1 · A", cargaHoraria: "8h", valorUnitario: 1470 },
     { rotulo: "M2 · B", cargaHoraria: "8h", valorUnitario: 1470 },
@@ -105,6 +106,31 @@ describe("montarCapa", () => {
     expect(h).not.toContain('class="subtitulo"');
     expect(h).not.toContain("selo-tipo");
     expect(h).toContain(BASE.programaNome);
+  });
+  it("linha de temas do programa sai abaixo do selo, quando preenchida", () => {
+    const h = montarCapa({ ...BASE, programaTemas: "Cultura Digital · IA <&>" });
+    expect(h).toContain('<div class="tagline-programa">Cultura Digital · IA &lt;&amp;&gt;</div>');
+    expect(h.indexOf("tagline-programa")).toBeGreaterThan(h.indexOf("selo-programa"));
+  });
+  it("sem linha de temas, a capa não imprime a tagline", () => {
+    expect(montarCapa({ ...BASE, programaTemas: "  " })).not.toContain("tagline-programa");
+  });
+});
+
+describe("montarResumoExecutivo · faixa e temas", () => {
+  it("abre com a faixa do modelo: logo e 'Resumo Executivo' com a sigla", () => {
+    const h = montarResumoExecutivo(BASE);
+    expect(h).toMatch(/<section class="resumo-exec">\s*<div class="header-pag">/);
+    expect(h).toContain("<svg");
+    expect(h).toContain('<div class="programa-id">Resumo Executivo<span class="sigla">EDUTEC</span></div>');
+  });
+  it("sem sigla, a faixa fica só com 'Resumo Executivo'", () => {
+    const h = montarResumoExecutivo({ ...BASE, programaSigla: "" });
+    expect(h).toContain('<div class="programa-id">Resumo Executivo</div>');
+  });
+  it("o cartão Programa traz a linha de temas como descrição, quando preenchida", () => {
+    const h = montarResumoExecutivo({ ...BASE, programaTemas: "Cultura Digital · IA" });
+    expect(h).toContain('<div class="label">Programa</div><div class="value menor">EDUTEC</div><div class="desc">Cultura Digital · IA</div>');
   });
 });
 
@@ -174,4 +200,32 @@ describe("montarResumoExecutivo", () => {
   it("divisão inexata não imprime por módulo", () => {
     expect(montarResumoExecutivo({ ...BASE, qtdPagantes: 1000, cortesias: 100 })).not.toContain("por módulo ×");
   });
+});
+
+describe("montarContracapa", () => {
+  const h = montarContracapa({ ...BASE, versao: 1, programaTemas: "Cultura Digital · IA" });
+  it("é a seção .contracapa do modelo, com logo, slogan e dados institucionais", () => {
+    expect(h).toMatch(/^<section class="contracapa">/);
+    // O degradê fica numa camada interna, não no fundo da seção — ver tokens.ts.
+    expect(h).toContain('<div class="contracapa-fundo"></div>');
+    expect(h).toContain('<div class="logo-grande"><svg');
+    expect(h).toContain("Inteligência institucional.<br>Impacto real.");
+    expect(h).toContain("SCS Quadra 9 · Bloco C · Ed. Parque Cidade Corporate · Sala 1001 · Asa Sul");
+    expect(h).toContain("contato@institutontc.com.br");
+  });
+  it("traz a sigla e a linha de temas do programa", () => {
+    expect(h).toContain("Programas Estratégicos do Instituto NTC do Brasil &nbsp;·&nbsp; EDUTEC");
+    expect(h).toContain(">Cultura Digital · IA</span>");
+  });
+  it("fecha com código, versão com dois dígitos e sigla", () => {
+    expect(h).toContain(`<div class="selo-final">Proposta ${BASE.codigo} · Versão v01 · EDUTEC</div>`);
+  });
+  it("sem sigla nem temas, não sobra separador nem linha vazia", () => {
+    const v = montarContracapa({ ...BASE, programaSigla: "", programaTemas: "" });
+    expect(v).toContain("Programas Estratégicos do Instituto NTC do Brasil\n");
+    expect(v).not.toContain("&nbsp;·&nbsp;");
+    expect(v).not.toContain("<br>\n      <span");
+    expect(v).toMatch(/Versão v\d\d<\/div>/);
+  });
+  it("não vaza undefined/NaN/null", () => expect(h).not.toMatch(SUJO));
 });

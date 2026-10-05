@@ -29,11 +29,53 @@ export function cssVariaveisProposta(): string {
   return `:root {\n${linhas.join("\n")}\n}`;
 }
 
+/** Dados que o cabeçalho e o rodapé de cada página imprimem. */
+export interface MetaPaginasProposta {
+  codigo: string;
+  sigla: string;
+  /** dd/mm/aaaa, ou "" sem data. */
+  validade: string;
+  emissao: string;
+}
+
+/** Texto como string CSS (para `content:`): escapa aspas, barra e quebra de linha. */
+function stringCss(texto: string): string {
+  return `"${texto.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\r?\n/g, "\\A ")}"`;
+}
+
+/**
+ * O `@page` do modelo (linhas 13-21), com o conteúdo das margin boxes vindo da
+ * proposta. O Chromium atual (149, local e `@sparticuz/chromium` na Vercel)
+ * implementa margin boxes, `@page :first` e páginas nomeadas: a capa (primeira
+ * página) e a contracapa (`page: contracapa`) saem sem margem, cabeçalho nem
+ * rodapé, e o cabeçalho usa as fontes embutidas do documento.
+ */
+export function cssPaginasProposta(meta: MetaPaginasProposta): string {
+  const sigla = meta.sigla.trim();
+  const datas = [
+    meta.validade ? `Validade: ${meta.validade}` : "",
+    meta.emissao ? `Emitida: ${meta.emissao}` : "",
+  ]
+    .filter((p) => p.length > 0)
+    .join(" · ");
+  const semCaixas = `margin:0; @top-left{content:""} @top-right{content:""} @bottom-left{content:""} @bottom-right{content:""}`;
+  return `
+@page {
+  size: A4 portrait; margin: 20mm 18mm 22mm 18mm;
+  @top-left { content: ${stringCss(sigla ? `Instituto NTC do Brasil · ${sigla}` : "Instituto NTC do Brasil")}; font-family:'Cormorant Garamond',serif; font-size:9pt; color:#B68B40; font-weight:600; letter-spacing:1pt; }
+  @top-right { content: ${stringCss(meta.codigo)}; font-family:'Barlow',sans-serif; font-size:8pt; color:#6B6B6B; letter-spacing:.5pt; }
+  @bottom-left { content: ${stringCss(datas)}; font-family:'Barlow',sans-serif; font-size:8pt; color:#6B6B6B; letter-spacing:.4pt; }
+  @bottom-right { content: "Página " counter(page) " de " counter(pages); font-family:'Barlow',sans-serif; font-size:8pt; color:#6B6B6B; letter-spacing:.4pt; }
+}
+@page :first { ${semCaixas} }
+@page contracapa { ${semCaixas} }
+`;
+}
+
 /**
  * Reset, tipografia e classes de layout transcritos do modelo. Sem @font-face
- * (FONTES_EMBUTIDAS_CSS e composto na montagem final), sem @page (a margem e
- * aplicada ao gerar o PDF) e sem margin boxes (o Chromium nao os implementa;
- * cabecalho e rodape vem do headerTemplate/footerTemplate do Playwright).
+ * (FONTES_EMBUTIDAS_CSS é composto na montagem final) e sem @page, que depende
+ * da proposta — ver `cssPaginasProposta`.
  */
 export function cssBaseProposta(): string {
   return `
@@ -51,12 +93,7 @@ li{margin-bottom:2.5pt;text-align:justify}
 strong{color:var(--navy);font-weight:600}
 
 /* ===== CAPA ===== */
-/* 297mm (A4) - 42mm (margin top 22mm + bottom 20mm de pdf/gerarPdfDeHtml.ts,
-   aplicada em TODAS as páginas, inclusive a capa) = 255mm. No modelo a capa
-   tem 297mm porque lá o @page :first zera a margem — o Chromium não suporta
-   isso, e deixar 297mm aqui transborda 42mm para uma segunda página quase em
-   branco (lição registrada na Fase B2 e mantida). */
-.cover{width:210mm;height:calc(297mm - 42mm);padding:22mm 22mm 24mm;background:linear-gradient(135deg,var(--navy) 0%,#08182B 100%);color:var(--offwhite);page-break-after:always;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-sizing:border-box}
+.cover{width:210mm;height:297mm;padding:22mm 22mm 24mm;background:linear-gradient(135deg,var(--navy) 0%,#08182B 100%);color:var(--offwhite);page-break-after:always;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-sizing:border-box}
 .cover::before{content:"";position:absolute;top:-55mm;right:-55mm;width:170mm;height:170mm;border:1.5pt solid var(--gold);border-radius:50%;opacity:.14}
 .cover::after{content:"";position:absolute;bottom:-38mm;left:-38mm;width:115mm;height:115mm;border:1.5pt solid var(--gold-light);border-radius:50%;opacity:.1}
 .cover-top,.cover-mid,.cover-bot{position:relative;z-index:2}
@@ -114,15 +151,14 @@ strong{color:var(--navy);font-weight:600}
 .cards-resumo .card .desc{font-size:8.4pt;color:var(--ink-mid);margin-top:3pt;line-height:1.35}
 
 /* ===== SEÇÕES ===== */
-/* No modelo a margem horizontal de 18mm vem do @page, descartado aqui; e a
-   margem left/right do PDF é 0 para a capa sangrar de borda a borda. Logo o
-   recuo do corpo precisa vir desta classe, senão o texto encosta no papel. */
-.body-wrap{padding:0 18mm}
 .sec{page-break-inside:auto;margin-bottom:10pt}
 .sec p,.sec ul,.sec ol,.sec .grid2,.sec .grid3,.sec table.qc,.sec .modulo-premium,.sec .docente-card,.sec .box,.sec .quote{page-break-inside:avoid}
 .quote{background:var(--bg-suave);border-left:3pt solid var(--gold);padding:8pt 13pt;font-style:italic;color:var(--ink);margin:8pt 0;font-family:'Cormorant Garamond',serif;font-size:12pt;line-height:1.4}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:9pt}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8pt}
+/* Fora do modelo: na Arquitetura os eixos (grid2) vêm logo abaixo do grid3 e,
+   sem esta margem, as duas grades ficam coladas. */
+.grid3 + .grid2{margin-top:9pt}
 .box{background:var(--bg-suave);border:1pt solid #E2DCCC;border-radius:5pt;padding:9pt 12pt}
 .box .label{font-size:7.8pt;letter-spacing:1.4pt;text-transform:uppercase;color:var(--ink-mid);font-weight:600;line-height:1.2}
 .box .value{font-family:'Cormorant Garamond',serif;font-size:14pt;color:var(--navy);font-weight:600;margin-top:2pt;line-height:1.15}
@@ -159,14 +195,20 @@ table.qc tr{page-break-inside:avoid}
 table.qc th{background:var(--navy);color:var(--gold-light);padding:6.5pt 9pt;text-align:left;font-size:8.5pt;letter-spacing:1pt;text-transform:uppercase;font-weight:600}
 table.qc td{padding:6.5pt 9pt;border-bottom:1pt solid #E2DCCC}
 table.qc tr:nth-child(even) td{background:var(--bg-suave)}
-table.qc .total td{background:var(--navy);color:var(--offwhite);font-weight:600;font-size:11pt;padding:8pt 9pt}
-table.qc .total td:last-child{color:var(--gold-light)}
+/* Desvio deliberado do modelo: lá o seletor é "table.qc .total td", que perde
+   para a zebra acima por especificidade e deixava o valor líquido ilegível. */
+table.qc tr.total td{background:var(--navy);color:var(--offwhite);font-weight:600;font-size:11pt;padding:8pt 9pt}
+table.qc tr.total td:last-child{color:var(--gold-light)}
 .qc-right{text-align:right}
 
 /* ===== CONTRACAPA ===== */
-.contracapa{page:contracapa;width:210mm;height:297mm;background:linear-gradient(135deg,var(--navy) 0%,#08182B 100%);color:var(--offwhite);padding:26mm 22mm;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-sizing:border-box;page-break-before:always}
+.contracapa{page:contracapa;width:210mm;height:297mm;background:var(--navy);color:var(--offwhite);padding:26mm 22mm;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-sizing:border-box;page-break-before:always}
 .contracapa::before{content:"";position:absolute;top:-45mm;left:-45mm;width:140mm;height:140mm;border:1.5pt solid var(--gold);border-radius:50%;opacity:.13}
 .contracapa::after{content:"";position:absolute;bottom:-50mm;right:-50mm;width:160mm;height:160mm;border:1.5pt solid var(--gold-light);border-radius:50%;opacity:.1}
+/* Desvio do modelo: lá o degradê fica no fundo da própria .contracapa, e o
+   Chromium pinta um fio dele no pé da página anterior (o modelo tem o mesmo
+   fio). Numa camada interna o degradê fica preso à página da contracapa. */
+.contracapa-fundo{position:absolute;inset:0;background:linear-gradient(135deg,var(--navy) 0%,#08182B 100%);z-index:0}
 .contracapa-top, .contracapa-mid, .contracapa-bot{position:relative;z-index:2}
 .contracapa-top{text-align:center}
 .contracapa-top .selo-cima{font-family:'Cormorant Garamond',serif;font-size:10pt;letter-spacing:3pt;color:var(--gold-light);text-transform:uppercase;margin-bottom:6pt}

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { montarCapa, montarResumoExecutivo } from "./capa";
+import { montarCapa, montarContracapa, montarResumoExecutivo } from "./capa";
 import type { DadosDocumentoProposta } from "./dados";
 import {
   cargaHorariaTotalCurta,
@@ -19,23 +19,18 @@ import { ORDEM_MODELO } from "./ordem";
 import { secoesComerciais } from "./secoes/comercial";
 import { secoesInstitucionais } from "./secoes/institucional";
 import { secoesDeConteudo } from "./secoes/programa";
-import { cssBaseProposta, cssVariaveisProposta } from "./tokens";
+import { cssBaseProposta, cssPaginasProposta, cssVariaveisProposta } from "./tokens";
 
 /**
  * Montagem final do documento da proposta: capa + Resumo Executivo + as 21
- * seções numeradas do modelo aprovado (docs/prototipos/proposta-modelo-v1.html).
+ * seções numeradas + contracapa, como o modelo aprovado
+ * (docs/prototipos/proposta-modelo-v1.html). Cabeçalho, rodapé e as páginas
+ * sem margem (capa e contracapa) vêm do `@page` do modelo, montado com os
+ * dados da proposta por `cssPaginasProposta`.
  *
- * Simplificações deliberadas em relação ao modelo, todas registradas:
- * - o `@page` do modelo é descartado inteiro. As margin boxes (`@top-*`,
- *   `@bottom-*`) não são implementadas pelo Chromium; cabeçalho e rodapé vêm
- *   do `headerTemplate`/`footerTemplate` de `pdf/gerarPdfDeHtml.ts`, que segue
- *   o conteúdo e a tipografia das margin boxes do modelo.
- * - como o Playwright aplica cabeçalho/rodapé em TODAS as páginas, o
- *   `@page :first` do modelo (capa sem cabeçalho) não é reproduzido.
- * - a `<section class="contracapa">` do modelo está fora do escopo do spec
- *   (capa + Resumo Executivo + 21 seções) e não é montada aqui.
- * - o `<link>` do Google Fonts do modelo é descartado: as fontes da marca vão
- *   embutidas em base64 (`fontsEmbutidas.ts`), sem chamada de rede.
+ * Simplificação deliberada em relação ao modelo: o `<link>` do Google Fonts é
+ * descartado — as fontes da marca vão embutidas em base64
+ * (`fontsEmbutidas.ts`), sem chamada de rede.
  */
 
 /**
@@ -177,10 +172,17 @@ function renderizarSecoes(secoes: SecaoNumerada[]): string {
     .join("\n");
 }
 
-function estilosDocumento(): string {
+function estilosDocumento(d: DadosDocumentoProposta): string {
+  const paginas = cssPaginasProposta({
+    codigo: d.codigo,
+    sigla: d.programaSigla,
+    validade: formatarDataDocumentoOpcional(d.validadeISO),
+    emissao: formatarDataDocumentoOpcional(d.dataCriacaoISO),
+  });
   return `<style>
 ${FONTES_EMBUTIDAS_CSS}
 ${cssVariaveisProposta()}
+${paginas}
 ${cssBaseProposta()}
 </style>`;
 }
@@ -208,14 +210,13 @@ export function montarHtmlDocumentoProposta(
   const html = `<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <title>${esc(dados.codigo)} · Proposta Instituto NTC</title>
-${estilosDocumento()}
+${estilosDocumento(dados)}
 </head>
 <body>
 ${montarCapa(dados)}
-<div class="body-wrap">
 ${montarResumoExecutivo(dados)}
 ${renderizarSecoes(secoes)}
-</div>
+${montarContracapa(dados)}
 </body></html>`;
 
   return { html, omitidas };

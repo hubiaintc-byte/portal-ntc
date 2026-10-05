@@ -47,14 +47,9 @@ describe("gerarESalvarPdfProposta", () => {
     const resultado = await gerarESalvarPdfProposta("42");
 
     expect(resultado.ok).toBe(true);
-    // O cabeçalho do PDF imprime "Instituto NTC do Brasil · <SIGLA>" (margin
-    // boxes do modelo), então a sigla do programa tem de chegar ao gerador.
-    expect(gerarPdfDeHtmlMock).toHaveBeenCalledWith("<html></html>", {
-      codigo: "NTC-PROP-2026-PROGE-SP-X-v01",
-      siglaPrograma: "PROGE",
-      validadeFormatada: "28/09/2026",
-      emitidaFormatada: "29/08/2026",
-    });
+    // Cabeçalho e rodapé vão no próprio HTML (@page do modelo): o gerador de
+    // PDF recebe só o documento.
+    expect(gerarPdfDeHtmlMock).toHaveBeenCalledWith("<html></html>");
     expect(criarMedia).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: "documentos-comerciais",

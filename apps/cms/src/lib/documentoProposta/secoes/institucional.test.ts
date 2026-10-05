@@ -28,6 +28,7 @@ const BASE: DadosDocumentoProposta = {
   clienteContatoEmail: "gabinete@orgao.gov.br",
   programaNome: "Programa de Teste",
   programaSigla: "PTE",
+  programaTemas: "",
   itens: [],
   cargaHorariaTotalModulos: "8h · 1 módulo",
   conteudoHtml: {

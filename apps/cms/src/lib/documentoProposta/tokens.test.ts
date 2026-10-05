@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { cssBaseProposta, cssVariaveisProposta, PALETA_PROPOSTA } from "./tokens";
+import { cssBaseProposta, cssPaginasProposta, cssVariaveisProposta, PALETA_PROPOSTA } from "./tokens";
 
 describe("PALETA_PROPOSTA", () => {
   it("usa as cores do modelo", () => {
@@ -27,27 +27,63 @@ describe("cssVariaveisProposta", () => {
 
 describe("cssBaseProposta", () => {
   it("não traz fonte externa", () => expect(cssBaseProposta()).not.toContain("fonts.googleapis"));
-  it("não usa margin boxes, que o Chromium ignora", () => {
+  // No modelo, `table.qc .total td` (0,2,2) perde para a zebra
+  // `table.qc tr:nth-child(even) td` (0,2,3): a linha "VALOR LÍQUIDO DA
+  // PROPOSTA" saía creme sobre creme, ilegível. A regra do total precisa ter
+  // especificidade pelo menos igual à da zebra e vir depois dela.
+  it("a linha de total do quadro comercial vence a zebra das linhas pares", () => {
     const css = cssBaseProposta();
-    expect(css).not.toContain("@top-left");
-    expect(css).not.toContain("@bottom-right");
+    const zebra = css.indexOf("table.qc tr:nth-child(even) td{");
+    const total = css.indexOf("table.qc tr.total td{");
+    expect(zebra).toBeGreaterThanOrEqual(0);
+    expect(total).toBeGreaterThan(zebra);
+    expect(css).toContain("table.qc tr.total td:last-child{");
+  });
+  // O Chromium atual (149, local e @sparticuz/chromium na Vercel) implementa
+  // margin boxes, `@page :first` e páginas nomeadas — o PDF segue o @page do
+  // modelo, e capa e contracapa sangram sem cabeçalho nem rodapé.
+  it("capa com a altura cheia do A4, como no modelo", () => {
+    expect(cssBaseProposta()).toContain(".cover{width:210mm;height:297mm;");
+    expect(cssBaseProposta()).not.toContain("calc(297mm - 42mm)");
   });
 
-  // As duas regras abaixo divergem do modelo DE PROPÓSITO, e a divergência tem
-  // de sobreviver a uma futura passada de "fidelidade ao modelo":
-  // o Chromium não implementa `@page :first`, então as margens de 22mm (topo) e
-  // 20mm (base) que o gerador aplica valem para TODAS as páginas, inclusive a
-  // capa. No modelo é o `@page` que dá a altura cheia e o recuo horizontal.
-  it("desconta do altura da capa a margem que o PDF aplica em todas as páginas", () => {
-    // Capa com 297mm cheios transborda 42mm para uma segunda página quase em
-    // branco — bug corrigido na Fase B2 e que a Task 10 reencontrou.
-    expect(cssBaseProposta()).toContain("calc(297mm - 42mm)");
-    expect(cssBaseProposta()).not.toContain("height:297mm;padding:22mm");
+  it("o corpo não tem recuo próprio: o recuo lateral vem da margem do @page", () => {
+    expect(cssBaseProposta()).not.toContain(".body-wrap{padding");
   });
 
-  it("recua o corpo do documento, já que a margem left/right do PDF é zero", () => {
-    // left/right = 0 existe para a capa sangrar de borda a borda; sem este
-    // padding o texto das seções encostaria na borda do papel.
-    expect(cssBaseProposta()).toContain(".body-wrap{padding:0 18mm}");
+  it("o degradê da contracapa fica numa camada interna, não no fundo da seção", () => {
+    // No fundo da própria seção, o Chromium pinta um fio do degradê no pé da
+    // página anterior (o modelo tem esse fio).
+    const css = cssBaseProposta();
+    expect(css).toMatch(/\.contracapa\{page:contracapa;[^}]*background:var\(--navy\);/);
+    expect(css).toMatch(/\.contracapa-fundo\{[^}]*linear-gradient/);
+  });
+
+  it("separa os eixos da Arquitetura da grade de cima", () => {
+    expect(cssBaseProposta()).toMatch(/\.grid3 \+ \.grid2\{margin-top:\d/);
+  });
+});
+
+describe("cssPaginasProposta", () => {
+  const css = cssPaginasProposta({ codigo: "NTC-PROP-1-v01", sigla: "EDUTEC", validade: "04/11/2026", emissao: "05/10/2026" });
+  it("transcreve o @page do modelo, com margens e as quatro margin boxes", () => {
+    expect(css).toContain("size: A4 portrait; margin: 20mm 18mm 22mm 18mm;");
+    expect(css).toContain('@top-left { content: "Instituto NTC do Brasil · EDUTEC";');
+    expect(css).toContain('@top-right { content: "NTC-PROP-1-v01";');
+    expect(css).toContain('@bottom-left { content: "Validade: 04/11/2026 · Emitida: 05/10/2026";');
+    expect(css).toContain('@bottom-right { content: "Página " counter(page) " de " counter(pages);');
+  });
+  it("capa (primeira página) e contracapa (página nomeada) sem margem nem margin boxes", () => {
+    expect(css).toContain('@page :first { margin:0; @top-left{content:""}');
+    expect(css).toContain('@page contracapa { margin:0; @top-left{content:""}');
+  });
+  it("sem sigla nem datas, não sobra separador", () => {
+    const vazio = cssPaginasProposta({ codigo: "C", sigla: "", validade: "", emissao: "" });
+    expect(vazio).toContain('@top-left { content: "Instituto NTC do Brasil";');
+    expect(vazio).toContain('@bottom-left { content: "";');
+  });
+  it("escapa aspas, barra invertida e quebra de linha no conteúdo das margin boxes", () => {
+    const c = cssPaginasProposta({ codigo: 'A"B\\C\nD', sigla: "S", validade: "", emissao: "" });
+    expect(c).toContain('content: "A\\"B\\\\C\\A D";');
   });
 });

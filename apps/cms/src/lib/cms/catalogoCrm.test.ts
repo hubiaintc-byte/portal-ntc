@@ -42,7 +42,7 @@ describe("obterProgramaCatalogo", () => {
     const findByID = vi.fn(async (a: { draft?: boolean }) =>
       a.draft
         ? {
-            id: 4, _status: "draft", sigla: "EDU", nomeCompleto: "Edu", area: 2, cargaHorariaTotal: "64 horas",
+            id: 4, _status: "draft", sigla: "EDU", nomeCompleto: "Edu", eyebrow: "Cultura Digital · IA", area: 2, cargaHorariaTotal: "64 horas",
             visaoGeral: negrito, problema: ambos, objetivo: null, publicoAlvo: null, metodologia: null,
             eixosTematicos: [{ titulo: "E", descricao: "D" }], diferenciais: [{ titulo: "T", descricao: null }],
             resultadosEsperados: [{ resultado: "R" }],
@@ -56,6 +56,7 @@ describe("obterProgramaCatalogo", () => {
     expect(d).toMatchObject({
       situacao: "alteracoes-pendentes",
       areaId: "2",
+      temas: "Cultura Digital · IA",
       textos: { visaoGeral: "**Forte**", objetivo: "" },
       textosComPerda: ["problema"],
       eixos: [{ titulo: "E", descricao: "D" }],

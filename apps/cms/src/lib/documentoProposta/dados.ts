@@ -92,6 +92,8 @@ export interface DadosDocumentoProposta {
   clienteContatoEmail: string;
   programaNome: string;
   programaSigla: string;
+  /** Linha de temas do programa (campo `eyebrow`), impressa na capa e no Resumo. Vazia some. */
+  programaTemas: string;
   itens: ItemDocumento[];
   cargaHorariaTotalModulos: string;
   conteudoHtml: ConteudoHtmlProposta;
@@ -291,6 +293,7 @@ export async function obterDadosDocumentoProposta(
     clienteContatoEmail: texto(cliente?.email) || texto(contatoPrincipal?.email),
     programaNome: programa?.nomeCompleto ?? "Programa Estratégico NTC",
     programaSigla: programa?.sigla ?? "",
+    programaTemas: programa?.eyebrow ?? "",
     itens,
     cargaHorariaTotalModulos: cargaHorariaTotalDosModulos(contados),
     conteudoHtml,

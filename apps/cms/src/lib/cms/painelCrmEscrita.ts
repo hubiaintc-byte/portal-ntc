@@ -1110,11 +1110,6 @@ export async function registrarEnvio(dados: DadosEnvio): Promise<ResultadoEscrit
 
 // --- Geração de PDF da proposta (spec 2026-08-29 · Fase B2) ---------------
 
-function formatarDataCurta(iso: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "UTC" });
-}
-
 /**
  * Resultado da geração do PDF: como `ResultadoEscrita`, mais o relatório de
  * omissão do spec §1.1 — os títulos das seções que ficaram fora do documento.
@@ -1133,12 +1128,7 @@ export async function gerarESalvarPdfProposta(id: string): Promise<ResultadoGera
 
   try {
     const { html, omitidas } = montarHtmlDocumentoProposta(dados);
-    const pdf = await gerarPdfDeHtml(html, {
-      codigo: dados.codigo,
-      siglaPrograma: dados.programaSigla,
-      validadeFormatada: formatarDataCurta(dados.validadeISO),
-      emitidaFormatada: formatarDataCurta(dados.dataCriacaoISO),
-    });
+    const pdf = await gerarPdfDeHtml(html);
 
     const payload = await obterPayload();
 

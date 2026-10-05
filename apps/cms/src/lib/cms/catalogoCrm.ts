@@ -60,6 +60,8 @@ export interface ProgramaCatalogoDetalhe {
   situacao: SituacaoPrograma;
   sigla: string;
   nomeCompleto: string;
+  /** Linha de temas (campo `eyebrow`), impressa na capa e no Resumo Executivo da proposta. */
+  temas: string;
   areaId: string;
   cargaHorariaTotal: string;
   textos: Record<CampoTextoPrograma, string>;
@@ -182,6 +184,7 @@ export async function obterProgramaCatalogo(id: string): Promise<ProgramaCatalog
       situacao: situacaoPrograma(principal._status, p._status),
       sigla: p.sigla ?? "",
       nomeCompleto: p.nomeCompleto ?? "",
+      temas: p.eyebrow ?? "",
       areaId: idDe(p.area) ?? "",
       cargaHorariaTotal: p.cargaHorariaTotal ?? "",
       textos,

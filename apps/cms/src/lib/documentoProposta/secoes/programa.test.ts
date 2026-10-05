@@ -28,6 +28,7 @@ const BASE: DadosDocumentoProposta = {
   clienteContatoEmail: "gabinete@orgao.gov.br",
   programaNome: "Programa de Teste",
   programaSigla: "PTE",
+  programaTemas: "",
   itens: [],
   cargaHorariaTotalModulos: "24h · 3 módulos · 8h por módulo",
   conteudoHtml: {
@@ -120,7 +121,7 @@ describe("secoesDeConteudo", () => {
   });
 
   it("entrega os textos corridos tal e qual o HTML da proposta", () => {
-    expect(porChave(BASE, "apresentacao")).toBe("<p>apresentação</p>");
+    expect(porChave(BASE, "apresentacao")).toContain("<p>apresentação</p>");
     expect(porChave(BASE, "contexto")).toBe("<p>contexto</p>");
     expect(porChave(BASE, "objetivos")).toBe("<h3>Objetivo Geral</h3><p>geral</p>");
     expect(porChave(BASE, "publico-alvo")).toBe("<ul><li>gestores</li></ul>");
@@ -129,6 +130,34 @@ describe("secoesDeConteudo", () => {
 
   it("proposta sem nenhum conteúdo deixa todas as 10 seções com corpo vazio", () => {
     for (const s of secoesDeConteudo(VAZIO)) expect(s.corpoHtml).toBe("");
+  });
+
+  // --- Apresentação --------------------------------------------------------
+
+  it("Apresentação abre com o parágrafo do modelo, parametrizado e escapado, antes do texto da proposta", () => {
+    const html = porChave(BASE, "apresentacao");
+    expect(html).toContain(
+      "<p>É com elevada honra institucional que o <strong>Instituto NTC do Brasil</strong> dirige à <strong>Secretaria de Teste &lt;X&gt;</strong> a presente Proposta Técnico-Comercial referente ao Programa Estratégico <strong>PTE — Programa de Teste</strong>, na modalidade EventON NTC ao vivo.</p>",
+    );
+    expect(html.indexOf("É com elevada honra")).toBeLessThan(html.indexOf("<p>apresentação</p>"));
+  });
+
+  it("Apresentação fecha com a citação fixa do modelo", () => {
+    const html = porChave(BASE, "apresentacao");
+    expect(html.endsWith(
+      '<div class="quote">"Formar é, antes de tudo, capacitar o serviço público para servir com excelência."</div>',
+    )).toBe(true);
+  });
+
+  it("abertura sem modalidade nem sigla não deixa cláusula vazia", () => {
+    const html = porChave({ ...BASE, modalidade: "", programaSigla: "" }, "apresentacao");
+    expect(html).toContain("referente ao Programa Estratégico <strong>Programa de Teste</strong>.</p>");
+    expect(html).not.toContain("na modalidade");
+  });
+
+  it("sem órgão não há abertura; sem abertura nem texto, a seção fica vazia (sem citação órfã)", () => {
+    expect(porChave({ ...BASE, clienteOrgao: "—" }, "apresentacao")).not.toContain("elevada honra");
+    expect(porChave(VAZIO, "apresentacao")).toBe("");
   });
 
   // --- Arquitetura ---------------------------------------------------------
@@ -181,16 +210,32 @@ describe("secoesDeConteudo", () => {
 
   // --- Módulos Contratados -------------------------------------------------
 
-  it("Módulos Contratados traz um cartão por módulo, numerado em sequência", () => {
+  it("Módulos Contratados traz um cartão por módulo, numerado pelo código do módulo, como no modelo", () => {
     const html = porChave(BASE, "modulos");
     expect([...html.matchAll(/<div class="modulo-premium">/g)]).toHaveLength(3);
+    // O modelo imprime 1 · 2 · 4 ao lado de M01 · M02 · M04 — nunca "3" ao lado de M04.
     expect([...html.matchAll(/<div class="numero">(\d+)<\/div>/g)].map((m) => m[1])).toEqual([
       "1",
       "2",
-      "3",
+      "4",
     ]);
     expect(html).toContain("M01 · Cultura Digital");
     expect(html).toContain("<p>ementa 1</p>");
+  });
+
+  it("módulo sem código legível cai na posição do cartão", () => {
+    const d: DadosDocumentoProposta = {
+      ...BASE,
+      modulosDetalhados: [
+        { codigo: "M03", titulo: "Com código", cargaHoraria: null, ementaHtml: "" },
+        { codigo: "", titulo: "Sem código", cargaHoraria: null, ementaHtml: "" },
+      ],
+    };
+    const html = porChave(d, "modulos");
+    expect([...html.matchAll(/<div class="numero">(\d+)<\/div>/g)].map((m) => m[1])).toEqual([
+      "3",
+      "2",
+    ]);
   });
 
   it("badge dourado só quando o módulo tem carga horária; badge de data nunca", () => {
@@ -206,12 +251,46 @@ describe("secoesDeConteudo", () => {
     expect(porChave({ ...BASE, modalidade: "" }, "modulos")).not.toContain("badge outline");
   });
 
-  it("não usa os elementos do modelo sem dado na proposta (grid-mod e nota-anexo)", () => {
+  it("não usa os elementos do modelo sem dado na proposta (grid-mod, docentes e nota-anexo)", () => {
     const html = porChave(BASE, "modulos");
     expect(html).not.toContain("grid-mod");
     expect(html).not.toContain("nota-anexo");
-    expect(html).not.toContain("Entregas Formativas");
     expect(html).not.toContain("Conduzido por");
+  });
+
+  it("carga horária do módulo sai por extenso no badge, como no modelo", () => {
+    const html = porChave(BASE, "modulos");
+    expect(html).toContain('<span class="badge gold">8 horas</span>');
+    const um = porChave({ ...BASE, modulosDetalhados: [{ codigo: "M01", titulo: "T", cargaHoraria: "1h", ementaHtml: "" }] }, "modulos");
+    expect(um).toContain('<span class="badge gold">1 hora</span>');
+    const livre = porChave({ ...BASE, modulosDetalhados: [{ codigo: "M01", titulo: "T", cargaHoraria: "8h30", ementaHtml: "" }] }, "modulos");
+    expect(livre).toContain('<span class="badge gold">8h30</span>');
+  });
+
+  it("a lista final da ementa vira 'Entregas Formativas Principais'; o texto antes dela segue como ementa", () => {
+    const d: DadosDocumentoProposta = {
+      ...BASE,
+      modulosDetalhados: [
+        { codigo: "M01", titulo: "T", cargaHoraria: null, ementaHtml: "<p>intro</p><ul><li>a</li><li>b</li></ul>" },
+      ],
+    };
+    const html = porChave(d, "modulos");
+    expect(html).toContain("<p>intro</p></div>");
+    expect(html).toContain('<div class="bloco-mod"><h5>Entregas Formativas Principais</h5><ul><li>a</li><li>b</li></ul></div>');
+  });
+
+  it("ementa sem lista, com lista no meio ou com mais de uma lista fica intacta", () => {
+    for (const ementaHtml of ["<p>só texto</p>", "<ul><li>a</li></ul><p>depois</p>", "<ul><li>a</li></ul><ul><li>b</li></ul>"]) {
+      const html = porChave({ ...BASE, modulosDetalhados: [{ codigo: "M01", titulo: "T", cargaHoraria: null, ementaHtml }] }, "modulos");
+      expect(html).not.toContain("bloco-mod");
+      expect(html).toContain(ementaHtml);
+    }
+  });
+
+  it("ementa que é só a lista sai só com o bloco de entregas", () => {
+    const html = porChave({ ...BASE, modulosDetalhados: [{ codigo: "M01", titulo: "T", cargaHoraria: null, ementaHtml: "<ul><li>a</li></ul>" }] }, "modulos");
+    expect(html).toContain('<div class="bloco-mod"><h5>Entregas Formativas Principais</h5><ul><li>a</li></ul></div>');
+    expect(html).not.toContain("text-align:justify");
   });
 
   it("a abertura de Módulos Contratados cita o órgão do cliente, escapado", () => {
@@ -296,6 +375,7 @@ describe("secoesDeConteudo", () => {
       "badge",
       "gold",
       "outline",
+      "bloco-mod",
       "docente-card",
       "nome",
       "titulacao",

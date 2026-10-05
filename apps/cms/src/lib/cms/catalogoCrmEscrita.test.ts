@@ -79,6 +79,18 @@ describe("salvarPrograma", () => {
     expect("problema" in data).toBe(false);
   });
 
+  it("linha de temas vai para eyebrow, aparada; vazia vira null; ausente não é tocada", async () => {
+    const p = payloadFalso();
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarPrograma("4", { ...programaBase, temas: " Cultura Digital · IA " }, false, usuario);
+    await salvarPrograma("4", { ...programaBase, temas: "  " }, false, usuario);
+    await salvarPrograma("4", programaBase, false, usuario);
+    const dados = p.update.mock.calls.map((c) => (c[0] as { data: Record<string, unknown> }).data);
+    expect(dados[0]!.eyebrow).toBe("Cultura Digital · IA");
+    expect(dados[1]!.eyebrow).toBeNull();
+    expect("eyebrow" in dados[2]!).toBe(false);
+  });
+
   it("ignora chaves de textos fora da lista de campos de texto", async () => {
     const p = payloadFalso();
     obterPayloadMock.mockResolvedValue(p);

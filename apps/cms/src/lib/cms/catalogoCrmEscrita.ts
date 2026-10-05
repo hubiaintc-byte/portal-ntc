@@ -36,6 +36,8 @@ const ERRO_GENERICO = "Não foi possível salvar. Tente novamente.";
 export interface DadosPrograma {
   sigla: string;
   nomeCompleto: string;
+  /** Linha de temas (campo `eyebrow`). Ausente = não tocar. */
+  temas?: string;
   areaId: string;
   cargaHorariaTotal: string;
   /** Só os textos que o usuário alterou (todos, num programa novo). Ausente = não tocar — preserva formatação que o editor não representa. */
@@ -132,6 +134,7 @@ export async function salvarPrograma(
       const bruto: Record<string, unknown> = {
         sigla,
         nomeCompleto: dados.nomeCompleto.trim(),
+        ...(dados.temas === undefined ? {} : { eyebrow: textoOuNulo(dados.temas) }),
         area: dados.areaId === "" ? null : Number(dados.areaId),
         cargaHorariaTotal: textoOuNulo(dados.cargaHorariaTotal),
         ...textos,

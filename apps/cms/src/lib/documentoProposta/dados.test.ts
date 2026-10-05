@@ -53,6 +53,7 @@ describe("obterDadosDocumentoProposta", () => {
     expect(dados?.clienteOrgao).toBe("Secretaria de Educação de São Paulo");
     expect(dados?.clienteDirigente).toBe("Fulano de Tal");
     expect(dados?.programaNome).toBe("Programa de Gestão Estratégica");
+    expect(dados?.programaTemas).toBe("");
     expect(dados?.tipoTexto).toBe("Trilha Completa de Programa Estratégico");
     expect(dados?.itens).toEqual([
       { rotulo: "M1 · Gestão Democrática", cargaHoraria: "40h", valorUnitario: 100 },

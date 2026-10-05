@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { DadosDocumentoProposta } from "./dados";
 import { montarHtmlDocumentoProposta } from "./html";
+import { LOGO_RESUMO_PROPOSTA_HTML } from "./logoProposta";
 
 /** Proposta com TODOS os campos preenchidos: fecha as 21 seções do modelo. */
 const DADOS_COMPLETOS: DadosDocumentoProposta = {
@@ -29,6 +30,7 @@ const DADOS_COMPLETOS: DadosDocumentoProposta = {
   clienteContatoEmail: "gabinete@orgao.gov.br",
   programaNome: "Programa de Gestão Estratégica",
   programaSigla: "PROGE",
+  programaTemas: "",
   itens: [{ rotulo: "M1 · Gestão Democrática", cargaHoraria: "40h", valorUnitario: 100 }],
   cargaHorariaTotalModulos: "40h · 1 módulo",
   conteudoHtml: {
@@ -168,20 +170,35 @@ describe("montarHtmlDocumentoProposta", () => {
   });
 
   it("usa a paleta do modelo, nunca a Soberana", () => {
-    const html = htmlDe(DADOS_COMPLETOS);
+    // O logo da faixa do Resumo é a arte oficial da marca, copiada verbatim do
+    // modelo — traz as cores da marca (Oxford incluso). A regra vale para a
+    // paleta do documento, não para a arte do logo.
+    const html = htmlDe(DADOS_COMPLETOS).replace(LOGO_RESUMO_PROPOSTA_HTML, "");
     expect(html).toContain("#0E2A47");
     expect(html).toContain("#B68B40");
     expect(html).not.toContain("#11365E");
     expect(html).not.toContain("#B5995A");
   });
 
-  it("não busca fonte na rede nem usa margin boxes de paged media", () => {
+  it("não busca fonte na rede", () => {
     const html = htmlDe(DADOS_COMPLETOS);
     expect(html).not.toContain("fonts.googleapis");
     expect(html).not.toContain("fonts.gstatic");
-    expect(html).not.toContain("@top-left");
-    expect(html).not.toContain("@bottom-right");
     expect(html).toContain("@font-face");
+  });
+
+  it("cabeçalho e rodapé vêm do @page do modelo, com os dados desta proposta", () => {
+    const html = htmlDe(DADOS_COMPLETOS);
+    expect(html).toContain('@top-left { content: "Instituto NTC do Brasil · PROGE";');
+    expect(html).toContain('@top-right { content: "NTC-PROP-2026-PROGE-SP-X-v01";');
+    expect(html).toContain('@bottom-left { content: "Validade: 28/09/2026 · Emitida: 29/08/2026";');
+  });
+
+  it("termina na contracapa, depois da última seção", () => {
+    const html = htmlDe(DADOS_COMPLETOS);
+    const contracapa = html.indexOf('<section class="contracapa">');
+    expect(contracapa).toBeGreaterThan(html.lastIndexOf('<section class="sec">'));
+    expect(html.slice(contracapa)).toMatch(/<\/section>\s*<\/body><\/html>$/);
   });
 
   it("em Presencial, omite a seção de EventON e fecha a numeração sem buraco", () => {

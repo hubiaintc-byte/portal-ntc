@@ -13,8 +13,9 @@
  * inventar conteúdo (CLAUDE.md §5.3).
  *
  * Elementos do modelo deliberadamente NÃO reproduzidos, por não haver dado na
- * proposta: o badge de data do módulo, o `.grid-mod` ("Entregas Formativas
- * Principais" e "Conduzido por") e a `.nota-anexo` dos cartões de módulo.
+ * proposta: o badge de data do módulo, a coluna "Conduzido por" do `.grid-mod`
+ * e a `.nota-anexo` dos cartões de módulo. "Entregas Formativas Principais"
+ * sai num `.bloco-mod` sozinho, a partir da lista final da ementa.
  *
  * Os números de seção não aparecem aqui: `montarSecoes` numera pela posição
  * final, depois de descartar as seções de corpo vazio.
@@ -26,7 +27,7 @@ import type {
   ModuloDetalhadoDocumento,
 } from "../dados";
 import { cargaHorariaTotalCurta, esc } from "../formato";
-import { modulosContadosDoDocumento } from "../modulos";
+import { digitosDoCodigo, modulosContadosDoDocumento } from "../modulos";
 import type { SecaoDocumento } from "../montar";
 
 /** Valor útil para imprimir: não vazio, sem o marcador "—" nem "A definir". */
@@ -45,6 +46,41 @@ const ESTILO_EMENTA =
 
 function caixa(rotulo: string, valor: string, classeValor: "value" | "text"): string {
   return `<div class="box"><div class="label">${esc(rotulo)}</div><div class="${classeValor}">${esc(valor)}</div></div>`;
+}
+
+// --- Apresentação Executiva (4) --------------------------------------------
+
+/** Citação de fecho da seção 4 do modelo (linha 260) — mobília fixa do documento, igual para todo programa. */
+const CITACAO_APRESENTACAO =
+  '<div class="quote">"Formar é, antes de tudo, capacitar o serviço público para servir com excelência."</div>';
+
+/**
+ * Parágrafo de abertura da seção 4, transcrito do modelo (linha 258) e
+ * parametrizado com órgão, programa e modalidade. Gerado, não editável — como
+ * o Objeto da Proposta. O 2º parágrafo do modelo é o texto próprio do
+ * programa, que aqui é o `textoApresentacao` da proposta. Sem órgão não há a
+ * quem dirigir a proposta, e o parágrafo cai inteiro.
+ */
+function aberturaApresentacao(d: DadosDocumentoProposta): string {
+  const orgao = util(d.clienteOrgao);
+  if (!orgao) return "";
+  const sigla = d.programaSigla.trim();
+  const nome = util(d.programaNome);
+  const programa = sigla && nome ? `${sigla} — ${nome}` : sigla || nome;
+  const modalidade = util(d.modalidade);
+  return [
+    `<p>É com elevada honra institucional que o <strong>Instituto NTC do Brasil</strong> dirige à <strong>${esc(orgao)}</strong> a presente Proposta Técnico-Comercial`,
+    programa ? ` referente ao Programa Estratégico <strong>${esc(programa)}</strong>` : "",
+    modalidade ? `, na modalidade ${esc(modalidade)}` : "",
+    ".</p>",
+  ].join("");
+}
+
+function montarApresentacao(d: DadosDocumentoProposta): string {
+  const abertura = aberturaApresentacao(d);
+  const texto = d.conteudoHtml.apresentacao;
+  if (!abertura && !texto.trim()) return "";
+  return `${abertura}${texto}${CITACAO_APRESENTACAO}`;
 }
 
 // --- Arquitetura da Solução (9) ---------------------------------------------
@@ -101,6 +137,28 @@ function montarArquitetura(d: DadosDocumentoProposta): string {
 
 // --- Módulos Contratados (10) -----------------------------------------------
 
+/** "8h" → "8 horas", como o badge do modelo; formato fora do padrão sai como gravado. */
+function cargaPorExtenso(carga: string): string {
+  const m = /^(\d+)\s*h(?:oras?)?$/i.exec(carga.trim());
+  if (!m) return carga;
+  const n = Number(m[1]);
+  return `${n} ${n === 1 ? "hora" : "horas"}`;
+}
+
+/**
+ * Separa a lista final da ementa para o bloco "Entregas Formativas
+ * Principais" do modelo. Só quando há exatamente uma lista e ela fecha a
+ * ementa — em qualquer outro formato a ementa sai intacta, em vez de
+ * reordenada.
+ */
+function separarEntregas(ementaHtml: string): { ementa: string; entregas: string } {
+  const html = ementaHtml.trim();
+  const inicio = html.indexOf("<ul>");
+  const unica = inicio >= 0 && html.indexOf("<ul", inicio + 1) === -1;
+  if (!unica || !html.endsWith("</ul>")) return { ementa: html, entregas: "" };
+  return { ementa: html.slice(0, inicio).trim(), entregas: html.slice(inicio) };
+}
+
 function cartaoModulo(
   m: ModuloDetalhadoDocumento,
   posicao: number,
@@ -109,17 +167,25 @@ function cartaoModulo(
   const codigo = m.codigo.trim();
   const titulo = m.titulo.trim();
   const rotulo = codigo && titulo ? `${esc(codigo)} · ${esc(titulo)}` : esc(codigo || titulo);
-  const carga = util(m.cargaHoraria ?? "");
+  const carga = cargaPorExtenso(util(m.cargaHoraria ?? ""));
   const badges = [
     carga ? `<span class="badge gold">${esc(carga)}</span>` : "",
     modalidade ? `<span class="badge outline">${esc(modalidade)}</span>` : "",
   ].filter((b) => b.length > 0);
 
+  // O círculo mostra o número do módulo, como o modelo (1 · 2 · 4 ao lado de
+  // M01 · M02 · M04); a posição do cartão só entra quando o código não é legível.
+  const digitos = digitosDoCodigo(codigo);
+  const numero = digitos === null ? posicao : Number(digitos);
+  const { ementa, entregas } = separarEntregas(m.ementaHtml);
+
   return `<div class="modulo-premium">
-<div class="numero">${posicao}</div>
+<div class="numero">${numero}</div>
 <div class="titulo-mod">${rotulo}</div>${
     badges.length > 0 ? `\n<div class="badges">${badges.join("")}</div>` : ""
-  }${m.ementaHtml.trim() ? `\n<div style="${ESTILO_EMENTA}">${m.ementaHtml}</div>` : ""}
+  }${ementa ? `\n<div style="${ESTILO_EMENTA}">${ementa}</div>` : ""}${
+    entregas ? `\n<div class="bloco-mod"><h5>Entregas Formativas Principais</h5>${entregas}</div>` : ""
+  }
 </div>`;
 }
 
@@ -188,7 +254,7 @@ function montarResultados(d: DadosDocumentoProposta): string {
 export function secoesDeConteudo(d: DadosDocumentoProposta): SecaoDocumento[] {
   const c = d.conteudoHtml;
   return [
-    { chave: "apresentacao", titulo: "Apresentação Executiva", corpoHtml: c.apresentacao },
+    { chave: "apresentacao", titulo: "Apresentação Executiva", corpoHtml: montarApresentacao(d) },
     { chave: "contexto", titulo: "Contexto e Justificativa", corpoHtml: c.contexto },
     { chave: "objetivos", titulo: "Objetivos", corpoHtml: c.objetivos },
     { chave: "publico-alvo", titulo: "Público-alvo", corpoHtml: c.publicoAlvo },

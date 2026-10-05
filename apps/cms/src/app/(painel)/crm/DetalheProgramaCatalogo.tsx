@@ -37,6 +37,7 @@ export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo,
   const novo = p === null;
   const [sigla, setSigla] = useState(p?.sigla ?? "");
   const [nome, setNome] = useState(p?.nomeCompleto ?? "");
+  const [temas, setTemas] = useState(p?.temas ?? "");
   const [areaId, setAreaId] = useState(p?.areaId ?? "");
   const [carga, setCarga] = useState(p?.cargaHorariaTotal ?? "");
   const [textos, setTextos] = useState<Record<CampoTextoPrograma, string>>(p?.textos ?? TEXTOS_VAZIOS);
@@ -63,6 +64,7 @@ export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo,
     const dados: DadosPrograma = {
       sigla,
       nomeCompleto: nome,
+      temas,
       areaId,
       cargaHorariaTotal: carga,
       textos: enviar,
@@ -135,6 +137,7 @@ export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo,
         <h2>Identificação</h2>
         <CampoTexto rotulo="Sigla" valor={sigla} onMudar={setSigla} obrigatorio curto />
         <CampoTexto rotulo="Nome completo" valor={nome} onMudar={setNome} obrigatorio />
+        <CampoTexto rotulo="Linha de temas (capa da proposta; ex.: Cultura Digital · IA · Computação)" valor={temas} onMudar={setTemas} />
         <CampoSelect rotulo="Área" valor={areaId} onMudar={setAreaId} opcoes={areas.map((a) => ({ value: a.id, label: a.nome }))} />
         <CampoTexto rotulo="Carga horária total (ex.: 64 horas)" valor={carga} onMudar={setCarga} curto />
       </section>

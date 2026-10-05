@@ -17,7 +17,7 @@ import {
   formatarMoedaDocumento,
   formatarPercentualDocumento,
 } from "./formato";
-import { LOGO_PROPOSTA_HTML } from "./logoProposta";
+import { LOGO_OFICIAL_SVG, LOGO_PROPOSTA_HTML, LOGO_RESUMO_PROPOSTA_HTML } from "./logoProposta";
 import { contagemDeItensDoDocumento, modulosContadosDoDocumento } from "./modulos";
 
 /** Dois a dez por extenso; acima disso o algarismo lê melhor que a palavra. */
@@ -60,8 +60,9 @@ function prefixoDoEscopo(tipo: string, numModulos: number): string {
 
 // ---------------------------------------------------------------------------
 // Capa e Resumo Executivo — transcritos de docs/prototipos/proposta-modelo-v1.html
-// (capa: linhas 167-194; resumo: 195-244, sem o `.header-pag`, que no nosso
-// gerador é o headerTemplate do Playwright). Elemento sem dado é omitido.
+// (capa: linhas 167-194; resumo: 195-244, com o `.header-pag` — a faixa com
+// logo e "Resumo Executivo" no corpo da página, que não se confunde com o
+// cabeçalho corrido do Playwright). Elemento sem dado é omitido.
 // ---------------------------------------------------------------------------
 
 /** Valor útil para imprimir: não vazio e não o marcador "—" de ausência. */
@@ -79,6 +80,7 @@ export function montarCapa(d: DadosDocumentoProposta): string {
   const sigla = d.programaSigla.trim();
   const titulo = sigla || d.programaNome;
   const subtitulo = sigla ? d.programaNome : "";
+  const temas = presente(d.programaTemas);
   const ufMunicipio = [d.clienteUf, d.clienteMunicipio]
     .map(presente)
     .filter((p) => p.length > 0)
@@ -108,6 +110,7 @@ export function montarCapa(d: DadosDocumentoProposta): string {
     <div class="selo">Proposta Técnico-Comercial</div>
     ${d.subtitulo.trim() ? `<div class="selo-tipo">${esc(d.subtitulo)}</div>` : ""}
     ${sigla ? `<div class="selo-programa">Programa ${esc(sigla)}</div>` : ""}
+    ${temas ? `<div class="tagline-programa">${esc(temas)}</div>` : ""}
   </div>
   <div class="cover-mid">
     <div class="titulo">${esc(titulo)}</div>
@@ -219,7 +222,7 @@ export function montarResumoExecutivo(d: DadosDocumentoProposta): string {
   const escopo = prefixoEscopo && prefixoEscopo !== sigla ? prefixoEscopo : d.tipoTexto;
 
   const cards = [
-    card("Programa", sigla || d.programaNome, "", true),
+    card("Programa", sigla || d.programaNome, presente(d.programaTemas), true),
     card("Escopo Contratado", escopo, n > 0 ? `${n} ${n === 1 ? "módulo-evento" : "módulos-evento"} institucionais` : ""),
     presente(d.modalidade) ? card("Modalidade", d.modalidade, "", true) : "",
     cargaHorariaTotalLegivel(d.cargaHorariaTotalModulos)
@@ -240,6 +243,10 @@ export function montarResumoExecutivo(d: DadosDocumentoProposta): string {
   ].filter((c) => c.length > 0);
 
   return `<section class="resumo-exec">
+  <div class="header-pag">
+    <div>${LOGO_RESUMO_PROPOSTA_HTML}</div>
+    <div class="programa-id">Resumo Executivo${sigla ? `<span class="sigla">${esc(sigla)}</span>` : ""}</div>
+  </div>
   <div class="titulo-pagina">Resumo Executivo da Proposta</div>
   <div class="subtitulo-pagina">Visão consolidada do escopo, modalidade, investimento e condições contratuais</div>
 
@@ -263,6 +270,45 @@ export function montarResumoExecutivo(d: DadosDocumentoProposta): string {
 
   <div class="cards-resumo">
     ${cards.join("\n    ")}
+  </div>
+</section>`;
+}
+
+/**
+ * Contracapa — transcrita de docs/prototipos/proposta-modelo-v1.html (linhas
+ * 371-397). Endereço, contatos e slogan são os dados institucionais do modelo
+ * aprovado; sigla, linha de temas, código e versão vêm da proposta. A área de
+ * QR code do CSS do modelo não é usada (o modelo também não a usa).
+ */
+export function montarContracapa(d: DadosDocumentoProposta): string {
+  const sigla = d.programaSigla.trim();
+  const temas = presente(d.programaTemas);
+  const versao = `v${String(d.versao).padStart(2, "0")}`;
+  const seloFinal = [`Proposta ${d.codigo}`, `Versão ${versao}`, sigla].filter((p) => p.length > 0).join(" · ");
+
+  return `<section class="contracapa">
+  <div class="contracapa-fundo"></div>
+  <div class="contracapa-top"><div class="selo-cima">Instituto NTC do Brasil</div></div>
+  <div class="contracapa-mid">
+    <div class="logo-grande">${LOGO_OFICIAL_SVG}</div>
+    <div class="slogan">Inteligência institucional.<br>Impacto real.</div>
+    <div class="submotto">Excelência técnica para formar, capacitar e fortalecer a Administração Pública.</div>
+    <div class="linha-deco-c"></div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:11.5pt;color:#D6B070;font-style:italic;letter-spacing:1pt;text-align:center;max-width:140mm;line-height:1.55">
+      Programas Estratégicos do Instituto NTC do Brasil${sigla ? ` &nbsp;·&nbsp; ${esc(sigla)}` : ""}
+${temas ? `      <br>\n      <span style="color:#C9BC9A;font-size:10pt;letter-spacing:.5pt;font-style:normal">${esc(temas)}</span>\n` : ""}    </div>
+  </div>
+  <div class="contracapa-bot">
+    <div class="endereco">Endereço Institucional</div>
+    <div class="dados-end">Grupo NTC · Instituto NTC do Brasil<br>SCS Quadra 9 · Bloco C · Ed. Parque Cidade Corporate · Sala 1001 · Asa Sul<br>CEP 70308-200 · Brasília — DF</div>
+    <div class="contatos-titulo">Fale com a NTC · Coordenação Comercial</div>
+    <div class="contatos">
+      <div><strong>Telefone</strong> (63) 3212-1199</div>
+      <div><strong>WhatsApp</strong> (63) 98444-4040</div>
+      <div><strong>E-mail</strong> contato@institutontc.com.br</div>
+      <div><strong>Site</strong> www.institutontc.com.br</div>
+    </div>
+    <div class="selo-final">${esc(seloFinal)}</div>
   </div>
 </section>`;
 }
