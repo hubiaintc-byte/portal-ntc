@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { authenticated } from "../access/authenticated";
 import { superAdmin, superAdminField } from "../access/superAdmin";
+import { recusarLoginForaDoPainel } from "../lib/cms/loginSoPeloPainel";
 import { emailRecuperacaoHtml } from "../lib/emailsCms";
 
 /**
@@ -40,6 +41,11 @@ export const Users: CollectionConfig = {
           token: args?.token ?? "",
         }),
     },
+  },
+  hooks: {
+    // Login só pela Local API (painel), que aplica o passkey; a REST/GraphQL
+    // nativa entregaria sessão só com a senha.
+    beforeLogin: [recusarLoginForaDoPainel],
   },
   access: {
     read: authenticated,

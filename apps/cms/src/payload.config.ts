@@ -120,6 +120,9 @@ export default buildConfig({
     outputFile: path.resolve(dirname, "../../../packages/types/src/payload-types.ts"),
   },
   graphQL: {
+    // O painel não usa GraphQL; desligado para não abrir caminho paralelo de
+    // login/leitura (ver lib/cms/rotasApiBloqueadas.ts).
+    disable: true,
     schemaOutputFile: path.resolve(dirname, "generated-schema.graphql"),
   },
   db: postgresAdapter({
