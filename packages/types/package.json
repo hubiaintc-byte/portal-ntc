@@ -14,7 +14,7 @@
     "clean": "rm -rf .turbo node_modules"
   },
   "dependencies": {
-    "payload": "3.18.0"
+    "payload": "3.90.2"
   },
   "devDependencies": {
     "typescript": "^5.7.2"
