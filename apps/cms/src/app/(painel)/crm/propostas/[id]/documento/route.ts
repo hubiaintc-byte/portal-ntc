@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { obterUsuarioCms } from "@/lib/cms/autenticacao";
+import { obterUsuarioCmsComPerfil } from "@/lib/cms/autenticacao";
+import { PERFIS_CRM } from "@/lib/cms/perfis";
 import { gerarESalvarPdfProposta } from "@/lib/cms/painelCrmEscrita";
 import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
@@ -20,9 +21,10 @@ import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
  * caminho de diagnóstico, para inspecionar a montagem sem gastar geração.
  */
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const usuario = await obterUsuarioCms();
+  // Proposta tem preço, desconto e dados de contato: só o perfil do CRM.
+  const usuario = await obterUsuarioCmsComPerfil(PERFIS_CRM);
   if (!usuario) {
-    return NextResponse.json({ erro: "Sessão expirada." }, { status: 401 });
+    return NextResponse.json({ erro: "Sessão expirada ou sem permissão." }, { status: 401 });
   }
 
   const { id } = await params;

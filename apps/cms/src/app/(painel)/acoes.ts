@@ -6,7 +6,8 @@ import type { RequiredDataFromCollectionSlug } from "payload";
 import { VERTICAIS_CONTATO } from "@ntc/lib";
 import type { Rodape } from "@ntc/types";
 
-import { obterUsuarioCms } from "@/lib/cms/autenticacao";
+import { obterUsuarioCms, obterUsuarioCmsComPerfil } from "@/lib/cms/autenticacao";
+import { PERFIS_EVENTOS, PERFIS_INSTITUCIONAL } from "@/lib/cms/perfis";
 import {
   listarAreasCms,
   listarConteudosCms,
@@ -61,6 +62,8 @@ import { obterPayload } from "@/lib/payloadClient";
 const ERRO_SESSAO = "Sessão expirada. Entre novamente.";
 
 const RECUSADO: ResultadoEscrita = { ok: false, erro: ERRO_SESSAO };
+/** Escritas que também exigem perfil (a Local API ignora o `access` das coleções). */
+const RECUSADO_PERFIL: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
 
 export async function carregarEvento(id: string): Promise<EventoCmsDetalhe | null> {
   if (!(await obterUsuarioCms())) return null;
@@ -77,7 +80,7 @@ export async function salvarEvento(
   id: string,
   campos: CamposEventoCompletos,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCms())) return { resultado: RECUSADO, evento: null };
+  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
   const resultado = await salvarCamposEvento(id, campos);
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
@@ -93,7 +96,7 @@ export async function enviarMidia(
   campo: "imagemCapa" | "folderPdf",
   formData: FormData,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCms())) return { resultado: RECUSADO, evento: null };
+  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
     return { resultado: { ok: false, erro: "Nenhum arquivo selecionado." }, evento: null };
@@ -109,7 +112,7 @@ export async function alternarPublicacaoEvento(
   id: string,
   publicar: boolean,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCms())) return { resultado: RECUSADO, evento: null };
+  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
   const resultado = publicar ? await publicarEvento(id) : await despublicarEvento(id);
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
@@ -121,7 +124,7 @@ export async function salvarPalestrantesEvento(
   id: string,
   idsEspecialistas: string[],
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCms())) return { resultado: RECUSADO, evento: null };
+  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
   const resultado = await vincularPalestrantesEvento(id, idsEspecialistas);
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
@@ -134,7 +137,7 @@ export async function salvarPalestrantesEvento(
  * a porta do PDF + revisão no detalhe.
  */
 export async function importarEventoPdf(formData: FormData): Promise<ResultadoImportacao> {
-  if (!(await obterUsuarioCms())) return RECUSADO;
+  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return RECUSADO_PERFIL;
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
     return { ok: false, erro: "Nenhum arquivo selecionado." };
@@ -149,7 +152,7 @@ export async function importarEventoPdf(formData: FormData): Promise<ResultadoIm
 
 /** Salva os eventos em destaque na Home. */
 export async function salvarEventosDestaqueHome(idsEventos: string[]): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCms())) return RECUSADO;
+  if (!(await obterUsuarioCmsComPerfil(PERFIS_INSTITUCIONAL))) return RECUSADO_PERFIL;
   const resultado = await salvarEventosHome(idsEventos);
   if (resultado.ok) revalidatePath("/");
   return resultado;
@@ -163,7 +166,7 @@ export async function alternarOcultarPalestrante(
   id: string,
   oculto: boolean,
 ): Promise<{ resultado: ResultadoEscrita; palestrante: PalestranteCmsDetalhe | null }> {
-  if (!(await obterUsuarioCms())) return { resultado: RECUSADO, palestrante: null };
+  if (!(await obterUsuarioCmsComPerfil(PERFIS_INSTITUCIONAL))) return { resultado: RECUSADO_PERFIL, palestrante: null };
   const resultado = await definirOcultarPalestrante(id, oculto);
   if (resultado.ok) revalidatePath("/");
   const palestrante = resultado.ok ? await obterPalestranteCms(id) : null;

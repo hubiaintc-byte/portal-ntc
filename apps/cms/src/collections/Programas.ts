@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { editorInstitucional } from "../access/editorInstitucional";
+import { editorCatalogo } from "../access/editorCatalogo";
 import { autoSlug } from "../hooks/autoSlug";
 import { bloquearProgramaComDependentes } from "../lib/crm/exclusaoCatalogo";
 import { seoFields } from "../shared/seoFields";
@@ -23,9 +23,9 @@ export const Programas: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: editorInstitucional,
-    update: editorInstitucional,
-    delete: editorInstitucional,
+    create: editorCatalogo,
+    update: editorCatalogo,
+    delete: editorCatalogo,
   },
   versions: { drafts: true, maxPerDoc: 30 },
   hooks: { beforeDelete: [bloquearProgramaComDependentes] },

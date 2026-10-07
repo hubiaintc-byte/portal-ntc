@@ -14,10 +14,23 @@ vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
 const obterUsuarioCmsMock = vi.fn();
 const obterUsuarioAutenticadoMock = vi.fn();
-vi.mock("@/lib/cms/autenticacao", () => ({
-  obterUsuarioCms: obterUsuarioCmsMock,
-  obterUsuarioAutenticado: obterUsuarioAutenticadoMock,
-}));
+// As variantes com perfil reproduzem `autenticacao.ts` sobre os mocks de
+// sessão, com o `temPerfil` real — a regra de perfil é exercitada de verdade.
+vi.mock("@/lib/cms/autenticacao", async () => {
+  const { temPerfil } = await import("@/lib/cms/perfis");
+  const comPerfil =
+    (obter: () => Promise<{ perfil?: string } | null>) =>
+    async (permitidos: Parameters<typeof temPerfil>[1]) => {
+      const u = await obter();
+      return u && temPerfil(u.perfil, permitidos) ? u : null;
+    };
+  return {
+    obterUsuarioCms: obterUsuarioCmsMock,
+    obterUsuarioAutenticado: obterUsuarioAutenticadoMock,
+    obterUsuarioCmsComPerfil: comPerfil(obterUsuarioCmsMock),
+    obterUsuarioAutenticadoComPerfil: comPerfil(obterUsuarioAutenticadoMock),
+  };
+});
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
@@ -109,7 +122,7 @@ describe("salvarClienteCrm — sessão antes da Local API", () => {
 
     const resultado = await salvarClienteCrm(null, dadosBase);
 
-    expect(resultado).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(resultado).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
     expect(create).not.toHaveBeenCalled();
     expect(update).not.toHaveBeenCalled();
   });
@@ -119,7 +132,7 @@ describe("moverLeadCrm", () => {
   it("sem sessão recusa sem tocar a Local API", async () => {
     obterUsuarioAutenticadoMock.mockResolvedValue(null);
     const { update } = montarPayloadFalso();
-    expect(await moverLeadCrm("7", "em-contato")).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(await moverLeadCrm("7", "em-contato")).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
     expect(update).not.toHaveBeenCalled();
   });
 
@@ -135,7 +148,7 @@ describe("agendarEventoCrm", () => {
   it("sem sessão recusa sem tocar a Local API", async () => {
     obterUsuarioAutenticadoMock.mockResolvedValue(null);
     const { create } = montarPayloadFalso();
-    expect(await agendarEventoCrm("7", dadosEventoBase)).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(await agendarEventoCrm("7", dadosEventoBase)).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
     expect(create).not.toHaveBeenCalled();
     expect(executarEmTransacaoMock).not.toHaveBeenCalled();
   });
@@ -153,7 +166,7 @@ describe("apagarLeadCrm", () => {
   it("sem sessão recusa sem tocar a Local API", async () => {
     obterUsuarioAutenticadoMock.mockResolvedValue(null);
     montarPayloadFalso();
-    expect(await apagarLeadCrm("7", "Ana Contato")).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(await apagarLeadCrm("7", "Ana Contato")).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
     expect(executarEmTransacaoMock).not.toHaveBeenCalled();
   });
 });
@@ -162,7 +175,7 @@ describe("restaurarConteudoPropostaCrm", () => {
   it("sem sessão recusa sem tocar o banco", async () => {
     obterUsuarioAutenticadoMock.mockResolvedValue(null);
     montarPayloadFalso();
-    expect(await restaurarConteudoPropostaCrm("9", "tudo")).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    expect(await restaurarConteudoPropostaCrm("9", "tudo")).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
     expect(obterPayloadMock).not.toHaveBeenCalled();
   });
 });
@@ -173,7 +186,7 @@ describe("salvarSecaoConteudoPropostaCrm", () => {
     montarPayloadFalso();
     expect(
       await salvarSecaoConteudoPropostaCrm("9", "apresentacao", { tipo: "texto", texto: "Oi." }),
-    ).toEqual({ ok: false, erro: "Sessão expirada. Entre novamente." });
+    ).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
     expect(obterPayloadMock).not.toHaveBeenCalled();
   });
 
@@ -188,5 +201,19 @@ describe("salvarSecaoConteudoPropostaCrm", () => {
     );
     const data = (update.mock.calls[0]![0] as { data: Record<string, unknown> }).data;
     expect(Object.keys(data)).toEqual(["textoFechamento"]);
+  });
+});
+
+describe("acoesCrm — perfil do CRM", () => {
+  it("editores não chegam ao CRM: recusa sem tocar a Local API", async () => {
+    for (const perfil of ["editor-institucional", "editor-eventos"]) {
+      const usuario = { id: "8", nome: "Editor", perfil };
+      obterUsuarioCmsMock.mockResolvedValue(usuario);
+      obterUsuarioAutenticadoMock.mockResolvedValue(usuario);
+      expect(await moverLeadCrm("1", "em-contato")).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
+      expect(await salvarClienteCrm(null, dadosBase)).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
+      expect(await apagarLeadCrm("1", "Fulano")).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
+    }
+    expect(obterPayloadMock).not.toHaveBeenCalled();
   });
 });

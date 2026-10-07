@@ -53,6 +53,8 @@ import { TelaPropostas } from "./TelaPropostas";
 
 interface ShellCrmProps {
   usuario: { nome: string; email: string; perfil: string };
+  /** false = perfil só do catálogo: o menu mostra apenas o Catálogo Institucional. */
+  acessoCrm: boolean;
   clientes: ClienteCrmResumo[];
   leads: LeadCrmResumo[];
   catalogo: CatalogoCrm;
@@ -161,6 +163,7 @@ const CRUMB: Record<TelaCrmId, string> = {
 
 export function ShellCrm({
   usuario,
+  acessoCrm,
   clientes,
   leads,
   catalogo,
@@ -174,7 +177,7 @@ export function ShellCrm({
   hojeISO,
   erroLeitura,
 }: ShellCrmProps) {
-  const [tela, setTela] = useState<TelaCrmId>("painel");
+  const [tela, setTela] = useState<TelaCrmId>(acessoCrm ? "painel" : "programas");
   const [clienteDet, setClienteDet] = useState<ClienteCrmDetalhe | null>(null);
   const [modalLead, setModalLead] = useState<ModalLeadAberto | null>(null);
   const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
@@ -293,7 +296,7 @@ export function ShellCrm({
   }
 
   const grupos: GrupoNav[] = [
-    { rotulo: "Comercial", itens: NAV_COMERCIAL },
+    ...(acessoCrm ? [{ rotulo: "Comercial", itens: NAV_COMERCIAL }] : []),
     { rotulo: "Catálogo Institucional", itens: NAV_CATALOGO },
   ];
 

@@ -1,4 +1,5 @@
-import { exigirUsuarioCms } from "@/lib/cms/autenticacao";
+import { exigirPerfil } from "@/lib/cms/autenticacao";
+import { PERFIS_CATALOGO, PERFIS_CRM, temPerfil } from "@/lib/cms/perfis";
 import {
   listarClientesCrm,
   listarLeadsCrm,
@@ -32,9 +33,14 @@ export const dynamic = "force-dynamic";
  * Rota /crm — módulo CRM do Portal Admin. Server Component: carrega SÓ os
  * dados comerciais e entrega ao casco client. Banco indisponível ⇒ listas
  * vazias + erroLeitura (mesmo padrão da rota /).
+ *
+ * Entram os perfis do catálogo (`PERFIS_CATALOGO`); os dados comerciais
+ * (leads, clientes, propostas, envios) só são lidos para quem tem perfil do
+ * CRM — o editor-institucional vê só o Catálogo.
  */
 export default async function PainelCrmPage() {
-  const usuario = await exigirUsuarioCms();
+  const usuario = await exigirPerfil(PERFIS_CATALOGO);
+  const acessoCrm = temPerfil(usuario.perfil, PERFIS_CRM);
 
   let clientes: ClienteCrmResumo[] = [];
   let leads: LeadCrmResumo[] = [];
@@ -49,19 +55,28 @@ export default async function PainelCrmPage() {
   let erroLeitura = false;
 
   try {
-    [clientes, leads, catalogo, usuarios, programas, modulos, produtos, propostas, envios, areas] =
-      await Promise.all([
-        listarClientesCrm(),
-        listarLeadsCrm(),
-        obterCatalogoCrm(),
-        listarUsuariosCms(),
+    if (acessoCrm) {
+      [clientes, leads, catalogo, usuarios, programas, modulos, produtos, propostas, envios, areas] =
+        await Promise.all([
+          listarClientesCrm(),
+          listarLeadsCrm(),
+          obterCatalogoCrm(),
+          listarUsuariosCms(),
+          listarProgramasCrm(),
+          listarModulosCrm(),
+          listarProdutosCrm(),
+          listarPropostasCrm(),
+          todosEnviosCrm(),
+          listarAreasCrm(),
+        ]);
+    } else {
+      [programas, modulos, produtos, areas] = await Promise.all([
         listarProgramasCrm(),
         listarModulosCrm(),
         listarProdutosCrm(),
-        listarPropostasCrm(),
-        todosEnviosCrm(),
         listarAreasCrm(),
       ]);
+    }
   } catch (e) {
     console.error("[PainelCrmPage] Erro ao ler banco:", e);
     erroLeitura = true;
@@ -72,6 +87,7 @@ export default async function PainelCrmPage() {
   return (
     <ShellCrm
       usuario={usuario}
+      acessoCrm={acessoCrm}
       clientes={clientes}
       leads={leads}
       catalogo={catalogo}

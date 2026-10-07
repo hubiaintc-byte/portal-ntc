@@ -6,6 +6,8 @@ import type { TypedUser } from "payload";
 
 import { obterPayload } from "@/lib/payloadClient";
 
+import { temPerfil, type PerfilPainel } from "./perfis";
+
 /**
  * Sessão do Painel Admin — validada contra o JWT do Payload (collection
  * Users), gravado pelo login /entrar no cookie payload-token.
@@ -83,5 +85,29 @@ export async function exigirUsuarioCms(): Promise<UsuarioCms> {
 export async function exigirSuperAdmin(): Promise<UsuarioCms> {
   const usuario = await obterUsuarioCms();
   if (!usuario || usuario.perfil !== "super-admin") redirect("/");
+  return usuario;
+}
+
+/**
+ * Sessão com perfil: `null` sem sessão OU com perfil fora de `permitidos`.
+ * É a guarda das Server Actions — a Local API ignora o `access` das coleções.
+ */
+export async function obterUsuarioCmsComPerfil(permitidos: readonly PerfilPainel[]): Promise<UsuarioCms | null> {
+  const usuario = await obterUsuarioCms();
+  return usuario && temPerfil(usuario.perfil, permitidos) ? usuario : null;
+}
+
+/** Como `obterUsuarioCmsComPerfil`, devolvendo o usuário cru (para `user:` da Local API). */
+export async function obterUsuarioAutenticadoComPerfil(
+  permitidos: readonly PerfilPainel[],
+): Promise<UsuarioAutenticado | null> {
+  const usuario = await obterUsuarioAutenticado();
+  return usuario && temPerfil(usuario.perfil, permitidos) ? usuario : null;
+}
+
+/** Guarda de página por perfil: sem sessão vai a /entrar; perfil insuficiente, a "/". */
+export async function exigirPerfil(permitidos: readonly PerfilPainel[]): Promise<UsuarioCms> {
+  const usuario = await exigirUsuarioCms();
+  if (!temPerfil(usuario.perfil, permitidos)) redirect("/");
   return usuario;
 }

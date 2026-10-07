@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { obterUsuarioAutenticado, obterUsuarioCms } from "@/lib/cms/autenticacao";
+import { obterUsuarioAutenticadoComPerfil, obterUsuarioCms } from "@/lib/cms/autenticacao";
+import { PERFIS_CATALOGO } from "@/lib/cms/perfis";
 import {
   obterModuloCatalogo,
   obterProgramaCatalogo,
@@ -25,7 +26,7 @@ import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
  * regra de acoesCrm.ts: sessão validada ANTES de tocar a Local API.
  */
 
-const RECUSADO: ResultadoEscrita = { ok: false, erro: "Sessão expirada. Entre novamente." };
+const RECUSADO: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
 
 export async function carregarProgramaCatalogoCrm(id: string): Promise<ProgramaCatalogoDetalhe | null> {
   if (!(await obterUsuarioCms())) return null;
@@ -33,7 +34,7 @@ export async function carregarProgramaCatalogoCrm(id: string): Promise<ProgramaC
 }
 
 export async function salvarProgramaCatalogoCrm(id: string | null, dados: DadosPrograma, publicar: boolean): Promise<ResultadoComId> {
-  const usuario = await obterUsuarioAutenticado();
+  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CATALOGO);
   if (!usuario) return RECUSADO;
   const r = await salvarPrograma(id, dados, publicar, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -41,7 +42,7 @@ export async function salvarProgramaCatalogoCrm(id: string | null, dados: DadosP
 }
 
 export async function excluirProgramaCatalogoCrm(id: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticado();
+  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CATALOGO);
   if (!usuario) return RECUSADO;
   const r = await excluirPrograma(id, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -54,7 +55,7 @@ export async function carregarModuloCatalogoCrm(id: string): Promise<ModuloCatal
 }
 
 export async function salvarModuloCatalogoCrm(id: string | null, dados: DadosModulo): Promise<ResultadoComId> {
-  const usuario = await obterUsuarioAutenticado();
+  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CATALOGO);
   if (!usuario) return RECUSADO;
   const r = await salvarModulo(id, dados, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -62,7 +63,7 @@ export async function salvarModuloCatalogoCrm(id: string | null, dados: DadosMod
 }
 
 export async function excluirModuloCatalogoCrm(id: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticado();
+  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CATALOGO);
   if (!usuario) return RECUSADO;
   const r = await excluirModulo(id, usuario);
   if (r.ok) revalidatePath("/crm");

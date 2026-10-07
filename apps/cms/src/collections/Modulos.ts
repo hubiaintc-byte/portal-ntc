@@ -1,6 +1,6 @@
 import type { CollectionConfig } from "payload";
 
-import { editorInstitucional } from "../access/editorInstitucional";
+import { editorCatalogo } from "../access/editorCatalogo";
 import { bloquearModuloComDependentes } from "../lib/crm/exclusaoCatalogo";
 
 /**
@@ -19,9 +19,9 @@ export const Modulos: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: editorInstitucional,
-    update: editorInstitucional,
-    delete: editorInstitucional,
+    create: editorCatalogo,
+    update: editorCatalogo,
+    delete: editorCatalogo,
   },
   hooks: { beforeDelete: [bloquearModuloComDependentes] },
   fields: [
