@@ -8,8 +8,9 @@ const nextConfig: NextConfig = {
   // Sem isto, `sharp` quebra a fase "Collecting page data" ao importar
   // o payload.config em route handlers.
   serverExternalPackages: ["sharp", "payload", "@payloadcms/db-postgres", "@payloadcms/next"],
+  // Next 15.5: saiu de `experimental` para o topo da config.
+  typedRoutes: true,
   experimental: {
-    typedRoutes: true,
     // Server Actions do protótipo CMS recebem uploads (capa, folder PDF). O
     // default de 1 MB estoura com fotos de capa; os folders "Nova Data" de
     // 2026 chegam a 14 MB, então 20 MB dá folga. A coleção Media (Payload)

@@ -1,4 +1,4 @@
-// Sem dependências: é importado pelo middleware (runtime edge).
+// Sem dependências: é importado pelo proxy (`src/proxy.ts`, ex-middleware do Next 15).
 
 /**
  * Rotas da API nativa do Payload que o painel não usa e que abrem caminhos
