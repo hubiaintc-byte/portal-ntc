@@ -30,7 +30,18 @@ export const Users: CollectionConfig = {
     // login é de sessão por padrão; "Manter sessão iniciada" o
     // persiste pelos 14 dias. Interim até a 2FA da Janela C (CLAUDE.md §17).
     tokenExpiration: 60 * 60 * 24 * 14,
+    // Payload 3.90 liga sessões no banco por padrão (tabela `users_sessions`,
+    // que deixaria o logout invalidar o token). A tabela ainda não existe no
+    // banco — o push é manual (CLAUDE.md §14) — e, com sessões ligadas, toda
+    // leitura de `users` falharia. Desligado até o push; depois dele, remover
+    // esta linha (comportamento até aqui: igual ao Payload 3.18).
+    useSessions: false,
     forgotPassword: {
+      // 3.90: intervalo mínimo entre pedidos de redefinição grava em
+      // `users.reset_password_requested_at`, coluna que ainda não existe.
+      // 0 = sem o campo (como no 3.18); o /entrar/recuperar já tem rate
+      // limit próprio (tentativas-acesso). Remover depois do push.
+      minRequestInterval: 0,
       // 24h — validade única da coleção cobre o reset e o convite de
       // boas-vindas (spec 2026-07-10 §3).
       expiration: 1000 * 60 * 60 * 24,

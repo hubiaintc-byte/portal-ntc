@@ -36,6 +36,7 @@ import { CorpoDocente } from "./globals/CorpoDocente";
 import { Home } from "./globals/Home";
 import { OGrupo } from "./globals/OGrupo";
 import { Rodape } from "./globals/Rodape";
+import { manterRlsLigado, objectKeySemColuna } from "./lib/cms/compatibilidadeSchema";
 import { lexicalRestrictiveFeatures } from "./shared/lexical-config";
 
 const filename = fileURLToPath(import.meta.url);
@@ -130,6 +131,9 @@ export default buildConfig({
     // request e um push acidental pode descartar dados). Sincronização de schema
     // é manual e pontual: PAYLOAD_DB_PUSH=1 pnpm payload:push:schema.
     push: process.env.PAYLOAD_DB_PUSH === "1",
+    // RLS ligado em todas as tabelas — ver compatibilidadeSchema.ts. Sem isto
+    // o push desligaria o RLS das 126 tabelas, em silêncio.
+    afterSchemaInit: [manterRlsLigado],
     pool: {
       connectionString: process.env.DATABASE_URI || "",
     },
@@ -197,5 +201,7 @@ export default buildConfig({
         forcePathStyle: true,
       },
     }),
+    // Precisa vir depois dos s3Storage — ver compatibilidadeSchema.ts.
+    objectKeySemColuna,
   ],
 });
