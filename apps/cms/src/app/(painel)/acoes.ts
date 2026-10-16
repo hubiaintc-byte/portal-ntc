@@ -6,11 +6,16 @@ import type { RequiredDataFromCollectionSlug } from "payload";
 import { VERTICAIS_CONTATO } from "@ntc/lib";
 import type { Rodape } from "@ntc/types";
 
-import { obterUsuarioCms, obterUsuarioCmsComPerfil } from "@/lib/cms/autenticacao";
+import {
+  obterUsuarioAutenticadoComPerfil,
+  obterUsuarioCms,
+  obterUsuarioCmsComPerfil,
+} from "@/lib/cms/autenticacao";
 import { PERFIS_EVENTOS, PERFIS_INSTITUCIONAL } from "@/lib/cms/perfis";
 import {
   listarAreasCms,
   listarConteudosCms,
+  listarOpcoesPalestranteCms,
   obterConteudoCms,
   obterEventoCms,
   obterPalestranteCms,
@@ -25,6 +30,7 @@ import {
   definirOcultarPalestrante,
   despublicarConteudoCms,
   despublicarEvento,
+  ehCamposPalestrante,
   enviarMidiaConteudo as enviarMidiaConteudoCms,
   enviarMidiaEvento,
   excluirConteudoCms,
@@ -34,6 +40,7 @@ import {
   salvarContatosCms,
   salvarConteudoCms,
   salvarEventosHome,
+  salvarPalestranteCms,
   vincularPalestrantesEvento,
   type CamposContatos,
   type CamposConteudo,
@@ -180,6 +187,56 @@ export async function alternarOcultarPalestrante(
   if (resultado.ok) revalidatePath("/");
   const palestrante = resultado.ok ? await obterPalestranteCms(id) : null;
   return { resultado, palestrante };
+}
+
+const DADOS_INVALIDOS: ResultadoEscrita = { ok: false, erro: "Dados do formulário inválidos." };
+
+/**
+ * Cria (`id` vazio) ou edita um palestrante, gravando PUBLICADO, junto com o
+ * card dele no Corpo Docente. O `FormData` traz `id`, `campos` (JSON de
+ * `CamposPalestrante`), `foto` (File, opcional) e `fotoAlt`.
+ */
+export async function salvarPalestrante(
+  formData: FormData,
+): Promise<{ resultado: ResultadoEscrita; palestrante: PalestranteCmsDetalhe | null }> {
+  // O usuário cru vai para `executarEmTransacao` (vira `req.user`).
+  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_INSTITUCIONAL);
+  if (!usuario) return { resultado: RECUSADO_PERFIL, palestrante: null };
+
+  const idBruto = formData.get("id");
+  const id = typeof idBruto === "string" && idBruto.trim() !== "" ? idBruto.trim() : null;
+  if (id !== null && !/^\d+$/.test(id)) return { resultado: DADOS_INVALIDOS, palestrante: null };
+
+  let campos: unknown;
+  try {
+    campos = JSON.parse(String(formData.get("campos") ?? ""));
+  } catch {
+    return { resultado: DADOS_INVALIDOS, palestrante: null };
+  }
+  if (!ehCamposPalestrante(campos)) return { resultado: DADOS_INVALIDOS, palestrante: null };
+  if (![...campos.linhasAtuacaoIds, ...campos.programasIds].every((v) => /^\d+$/.test(v))) {
+    return { resultado: DADOS_INVALIDOS, palestrante: null };
+  }
+
+  const arquivo = formData.get("foto");
+  const foto =
+    arquivo instanceof File && arquivo.size > 0
+      ? { arquivo, alt: String(formData.get("fotoAlt") ?? "") }
+      : null;
+
+  const resultado = await salvarPalestranteCms(usuario, id, campos, foto);
+  if (resultado.ok) revalidatePath("/");
+  const palestrante = resultado.ok && resultado.id ? await obterPalestranteCms(resultado.id) : null;
+  return { resultado, palestrante };
+}
+
+/** Áreas e programas para os selects de relação do formulário do palestrante. */
+export async function carregarOpcoesPalestrante(): Promise<{
+  areas: { id: string; nome: string }[];
+  programas: { id: string; sigla: string }[];
+}> {
+  if (!(await obterUsuarioCms())) return { areas: [], programas: [] };
+  return listarOpcoesPalestranteCms();
 }
 
 /**
