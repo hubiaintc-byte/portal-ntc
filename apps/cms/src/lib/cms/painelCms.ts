@@ -60,6 +60,7 @@ export interface PalestranteCmsResumo {
 // ---- Tipos de detalhe (tela cheia, somente leitura) --------------------
 
 export interface EventoCmsDetalhe extends EventoCmsResumo {
+  slug: string;
   eyebrow: string | null;
   area: string | null;
   cargaHoraria: string | null;
@@ -271,6 +272,7 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
   const d = doc as unknown as {
     id: string | number;
     nome?: string;
+    slug?: string;
     eyebrow?: string;
     dataInicio?: string | null;
     modalidade?: string;
@@ -319,6 +321,7 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
   return {
     id: String(d.id),
     titulo: d.nome ?? "(sem título)",
+    slug: d.slug ?? "",
     eyebrow: d.eyebrow ?? null,
     programa: nomeDeRelacao(d.programa, "sigla"),
     area: nomeDeRelacao(d.area),

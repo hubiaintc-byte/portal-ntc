@@ -21,6 +21,7 @@ import {
 } from "@/lib/cms/painelCms";
 import {
   criarEventoDePdf,
+  criarEventoEmBrancoCms,
   definirOcultarPalestrante,
   despublicarConteudoCms,
   despublicarEvento,
@@ -146,6 +147,14 @@ export async function importarEventoPdf(formData: FormData): Promise<ResultadoIm
     return { ok: false, erro: "Envie um arquivo PDF." };
   }
   const resultado = await criarEventoDePdf(arquivo);
+  if (resultado.ok) revalidatePath("/");
+  return resultado;
+}
+
+/** Cria um evento em branco (rascunho) para o editor preencher no detalhe. */
+export async function criarEventoEmBranco(): Promise<ResultadoEscrita & { id?: string }> {
+  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return RECUSADO_PERFIL;
+  const resultado = await criarEventoEmBrancoCms();
   if (resultado.ok) revalidatePath("/");
   return resultado;
 }

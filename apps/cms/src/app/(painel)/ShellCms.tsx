@@ -19,6 +19,7 @@ import {
   carregarAreas,
   carregarConteudo,
   carregarEvento,
+  criarEventoEmBranco,
   carregarPalestrante,
   carregarUsuarios,
 } from "./acoes";
@@ -155,6 +156,8 @@ export function ShellCms({
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
   const [conteudoDet, setConteudoDet] = useState<ConteudoCmsDetalhe | null>(null);
   const [criandoConteudo, setCriandoConteudo] = useState(false);
+  const [criandoEvento, setCriandoEvento] = useState(false);
+  const [erroNovoEvento, setErroNovoEvento] = useState<string | null>(null);
   const [areas, setAreas] = useState<{ id: string; nome: string }[]>([]);
   const [carregando, iniciarCarga] = useTransition();
   const router = useRouter();
@@ -175,6 +178,24 @@ export function ShellCms({
       setUsuarios(lista);
       setUsuariosCarregados(true);
     });
+  }
+
+  function novoEvento() {
+    setCriandoEvento(true);
+    setErroNovoEvento(null);
+    void (async () => {
+      try {
+        const r = await criarEventoEmBranco();
+        if (r.ok && r.id) {
+          router.refresh();
+          abrirEvento(r.id, true);
+        } else {
+          setErroNovoEvento(r.erro ?? "Não foi possível criar o evento.");
+        }
+      } finally {
+        setCriandoEvento(false);
+      }
+    })();
   }
 
   function abrirEvento(id: string, emEdicao = false) {
@@ -292,6 +313,9 @@ export function ShellCms({
                 eventos={eventos}
                 onAbrir={abrirEvento}
                 onAbrirImportado={(id) => abrirEvento(id, true)}
+                onNovo={novoEvento}
+                criando={criandoEvento}
+                erroNovo={erroNovoEvento}
               />
             )}
             {tela === "conteudos" && (

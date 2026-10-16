@@ -12,6 +12,8 @@ import { montarCamposEvento } from "@/lib/importacaoPdf/montarCamposEvento";
 import { parsearFolderEvento } from "@/lib/importacaoPdf/parsearFolderEvento";
 import { obterPayload } from "@/lib/payloadClient";
 
+import { NOME_EVENTO_EM_BRANCO, slugParaSalvar, slugProvisorio } from "./slugEvento";
+
 /**
  * Escrita de eventos para o Painel Admin — via Local API do
  * Payload (mesmo motor do admin). Edita campos de texto e faz upload de capa
@@ -31,6 +33,7 @@ export interface ResultadoEscrita {
 
 export interface CamposEventoCompletos {
   nome: string;
+  slug: string;
   dataInicio: string;
   dataFim: string;
   resumo: string;
@@ -91,6 +94,14 @@ export async function salvarCamposEvento(
     if (erroLinhas) return { ok: false, erro: erroLinhas };
 
     const payload = await obterPayload();
+    const atual = (await payload.findByID({ collection: "eventos", id, draft: true, depth: 0 })) as {
+      slug?: string | null;
+    };
+    const slug = slugParaSalvar({
+      slugDigitado: campos.slug,
+      slugAtual: atual.slug ?? "",
+      nome: campos.nome,
+    });
     // Os builders de lexicalBuilders.ts tipam `children` como `unknown[]`
     // (nós heterogêneos: parágrafo/heading/lista); o Payload aceita qualquer
     // array de nós JSON em runtime (validação é do editor Lexical
@@ -104,6 +115,7 @@ export async function salvarCamposEvento(
       id,
       data: {
         nome: campos.nome,
+        slug,
         // Campo required no schema: import sem data parseada chega como "" e a
         // chave é omitida (string vazia estoura no timestamptz do Postgres);
         // o rascunho segue sem data até o editor preencher.
@@ -147,7 +159,34 @@ export async function salvarCamposEvento(
     });
     return { ok: true };
   } catch (e) {
-    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao salvar." };
+    return { ok: false, erro: traduzirErroEvento(e) };
+  }
+}
+
+function traduzirErroEvento(e: unknown): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/duplicate key|unique constraint/i.test(msg)) {
+    return "Já existe um evento com este endereço (slug).";
+  }
+  return msg || "Erro ao salvar.";
+}
+
+/**
+ * Cria um evento EM RASCUNHO, em branco, só com nome e slug provisórios (o
+ * slug é regerado do nome no primeiro salvar — ver `slugParaSalvar`).
+ */
+export async function criarEventoEmBrancoCms(): Promise<ResultadoEscrita & { id?: string }> {
+  try {
+    const payload = await obterPayload();
+    const criado = await payload.create({
+      collection: "eventos",
+      data: { nome: NOME_EVENTO_EM_BRANCO, slug: slugProvisorio() },
+      draft: true,
+      overrideAccess: true,
+    });
+    return { ok: true, id: String(criado.id) };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroEvento(e) };
   }
 }
 
