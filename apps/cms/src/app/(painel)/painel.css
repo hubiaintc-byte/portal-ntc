@@ -1476,6 +1476,12 @@ body {
   margin-bottom: 30px;
   align-items: flex-start;
 }
+/* Botão "Editar" do palestrante, à direita do cabeçalho do perfil. */
+.pcms-perfil-head .pcms-det-head__acoes {
+  margin-left: auto;
+  align-self: flex-start;
+}
+
 .pcms-perfil-foto {
   width: 130px;
   height: 150px;
@@ -1998,7 +2004,8 @@ body {
   font-size: 0.86rem;
   cursor: pointer;
 }
-.pcms-field--check input[type="checkbox"] {
+.pcms-field--check input[type="checkbox"],
+.pcms-field--check input[type="radio"] {
   width: auto;
   accent-color: var(--pcms-oxford);
 }

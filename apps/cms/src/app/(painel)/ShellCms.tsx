@@ -20,6 +20,7 @@ import {
   carregarConteudo,
   carregarEvento,
   criarEventoEmBranco,
+  carregarOpcoesPalestrante,
   carregarPalestrante,
   carregarUsuarios,
 } from "./acoes";
@@ -34,6 +35,7 @@ import { TelaUsuarios } from "./TelaUsuarios";
 import { DetalheConteudo } from "./DetalheConteudo";
 import { DetalheEvento } from "./DetalheEvento";
 import { DetalhePalestrante } from "./DetalhePalestrante";
+import { FormPalestrante } from "./FormPalestrante";
 
 /**
  * Casco do Painel Admin (sidebar Oxford + topbar + conteúdo).
@@ -159,6 +161,10 @@ export function ShellCms({
   const [criandoEvento, setCriandoEvento] = useState(false);
   const [erroNovoEvento, setErroNovoEvento] = useState<string | null>(null);
   const [areas, setAreas] = useState<{ id: string; nome: string }[]>([]);
+  const [criandoPalestrante, setCriandoPalestrante] = useState(false);
+  const [opcoesPalestrante, setOpcoesPalestrante] = useState<
+    Awaited<ReturnType<typeof carregarOpcoesPalestrante>>
+  >({ areas: [], programas: [] });
   const [carregando, iniciarCarga] = useTransition();
   const router = useRouter();
 
@@ -215,6 +221,14 @@ export function ShellCms({
     });
   }
 
+  function novoPalestrante() {
+    iniciarCarga(async () => {
+      setOpcoesPalestrante(await carregarOpcoesPalestrante());
+      setPalestranteDet(null);
+      setCriandoPalestrante(true);
+    });
+  }
+
   function abrirConteudo(id: string) {
     iniciarCarga(async () => {
       const [det, listaAreas] = await Promise.all([carregarConteudo(id), carregarAreas()]);
@@ -240,11 +254,13 @@ export function ShellCms({
     setPalestranteDet(null);
     setConteudoDet(null);
     setCriandoConteudo(false);
+    setCriandoPalestrante(false);
     setTela(id);
     if (id === "usuarios") abrirUsuarios();
   }
 
-  const detalheAberto = eventoDet ?? palestranteDet ?? conteudoDet ?? (criandoConteudo ? true : null);
+  const detalheAberto =
+    eventoDet ?? palestranteDet ?? conteudoDet ?? (criandoConteudo || criandoPalestrante ? true : null);
 
   const navSistema: ItemNav[] = ehSuperAdmin
     ? [
@@ -291,8 +307,24 @@ export function ShellCms({
           }}
           onSalvou={() => router.refresh()}
         />
+      ) : criandoPalestrante ? (
+        <FormPalestrante
+          palestrante={null}
+          opcoes={opcoesPalestrante}
+          onCancelar={() => setCriandoPalestrante(false)}
+          onSalvou={(salvo) => {
+            router.refresh();
+            setCriandoPalestrante(false);
+            setPalestranteDet(salvo);
+          }}
+        />
       ) : palestranteDet ? (
-        <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
+        <DetalhePalestrante
+          key={palestranteDet.id}
+          palestrante={palestranteDet}
+          onVoltar={() => setPalestranteDet(null)}
+          onSalvou={() => router.refresh()}
+        />
       ) : (
         !detalheAberto && (
           <>
@@ -306,7 +338,11 @@ export function ShellCms({
               />
             )}
             {tela === "palestrantes" && (
-              <TelaPalestrantes palestrantes={palestrantes} onAbrir={abrirPalestrante} />
+              <TelaPalestrantes
+                palestrantes={palestrantes}
+                onAbrir={abrirPalestrante}
+                onNovo={novoPalestrante}
+              />
             )}
             {tela === "eventos" && (
               <TelaEventos
