@@ -13,7 +13,7 @@ import { ehSlugProvisorio } from "./slugEvento";
 
 const campos: CamposEventoCompletos = {
   nome: "Seminário de Gestão Escolar",
-  slug: "novo-evento-abc",
+  slug: "novo-evento-rascunho-abc",
   dataInicio: "",
   dataFim: "",
   resumo: "",
@@ -61,7 +61,7 @@ describe("criarEventoEmBrancoCms", () => {
 
 describe("salvarCamposEvento (slug)", () => {
   it("lê o slug atual e grava o slug derivado do nome quando era provisório", async () => {
-    findByID.mockResolvedValue({ slug: "novo-evento-abc" });
+    findByID.mockResolvedValue({ slug: "novo-evento-rascunho-abc" });
     update.mockResolvedValue({});
     const r = await salvarCamposEvento("9", campos);
     expect(r).toEqual({ ok: true });
@@ -70,7 +70,7 @@ describe("salvarCamposEvento (slug)", () => {
   });
 
   it("traduz violação de unicidade do slug", async () => {
-    findByID.mockResolvedValue({ slug: "novo-evento-abc" });
+    findByID.mockResolvedValue({ slug: "novo-evento-rascunho-abc" });
     update.mockRejectedValue(new Error('duplicate key value violates unique constraint "eventos_slug_idx"'));
     expect(await salvarCamposEvento("9", campos)).toEqual({
       ok: false,

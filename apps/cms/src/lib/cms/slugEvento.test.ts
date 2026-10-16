@@ -43,4 +43,19 @@ describe("slugProvisorio", () => {
     expect(ehSlugProvisorio(b)).toBe(true);
     expect(ehSlugProvisorio("seminario-x")).toBe(false);
   });
+
+  it("tem o marcador de rascunho e o reconhecimento exige o formato exato", () => {
+    expect(slugProvisorio(new Date(1_000_000))).toBe("novo-evento-rascunho-" + (1_000_000).toString(36));
+    // Slugs que um editor poderia escolher não são confundidos com provisório.
+    expect(ehSlugProvisorio("novo-evento-abc")).toBe(false);
+    expect(ehSlugProvisorio("novo-evento-rascunho-")).toBe(false);
+    expect(ehSlugProvisorio("novo-evento-rascunho-abc-sp")).toBe(false);
+    expect(ehSlugProvisorio("x-novo-evento-rascunho-abc")).toBe(false);
+  });
+
+  it("slug escolhido parecido com o antigo prefixo não é regerado do nome", () => {
+    expect(
+      slugParaSalvar({ slugDigitado: "novo-evento-abc", slugAtual: "novo-evento-abc", nome: "Outro nome" }),
+    ).toBe("novo-evento-abc");
+  });
 });

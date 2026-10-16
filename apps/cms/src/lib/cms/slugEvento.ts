@@ -1,6 +1,11 @@
 import slugify from "slugify";
 
-export const PREFIXO_SLUG_PROVISORIO = "novo-evento-";
+/**
+ * O marcador "rascunho" distingue o slug gerado por "Novo evento" de um slug
+ * que o editor escolheu e que só começa parecido (ex.: "novo-evento-sp").
+ */
+export const PREFIXO_SLUG_PROVISORIO = "novo-evento-rascunho-";
+const PADRAO_SLUG_PROVISORIO = /^novo-evento-rascunho-[0-9a-z]+$/;
 export const NOME_EVENTO_EM_BRANCO = "Novo evento";
 
 /** Mesma normalização do hook `autoSlug` da coleção. */
@@ -13,7 +18,7 @@ export function slugProvisorio(agora: Date = new Date()): string {
 }
 
 export function ehSlugProvisorio(slug: string): boolean {
-  return slug.startsWith(PREFIXO_SLUG_PROVISORIO);
+  return PADRAO_SLUG_PROVISORIO.test(slug);
 }
 
 /**
