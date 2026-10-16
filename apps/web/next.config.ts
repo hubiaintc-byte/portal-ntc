@@ -60,6 +60,10 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    // Fotos e capas do CMS passam pelo otimizador (lib/imagemOtimizada.ts).
+    // Um upload novo ganha nome novo no Storage, então 31 dias de cache não
+    // servem imagem velha — e evitam reprocessar a mesma capa a cada hora.
+    minimumCacheTTL: 2_678_400,
     remotePatterns: [
       // Supabase Storage público (qualquer projeto *.supabase.co/storage/v1/object/public/*).
       // O bucket é resolvido em runtime pelo generateFileURL do storage-s3.

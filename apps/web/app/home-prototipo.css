@@ -1394,6 +1394,17 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
  */
 .fade-in,
 .fade-in.is-visible { opacity: 1; transform: none; }
+/*
+ * O CSS de cada route group redeclara `.fade-in { opacity: 0 }` (animação de
+ * entrada no scroll, via InteracoesScroll). No herói isso escondia o título
+ * até o JS hidratar — medido em 07/10/2026: 1,1–1,8 s com a página já pintada
+ * em celular lento. O conteúdo do herói (`*-hero-content` e `hero-page-content`)
+ * aparece direto; o
+ * resto da página mantém a animação. Seletor com especificidade maior que o
+ * `.fade-in` dos grupos, então vale qualquer que seja a ordem dos CSS.
+ */
+.fade-in[class*="hero-content"],
+.fade-in.hero-page-content { opacity: 1; transform: none; }
 :focus-visible { outline: 2px solid var(--dourado); outline-offset: 3px; border-radius: 2px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

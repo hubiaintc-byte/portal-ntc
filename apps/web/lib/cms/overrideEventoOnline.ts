@@ -1,6 +1,7 @@
 import { cache } from "react";
 
 import type { EventoOnline } from "@/app/(capacitacao)/agenda/[slug]/conteudoEventos";
+import { imagemOtimizada } from "@/lib/imagemOtimizada";
 
 import { obterPayload } from "../payloadClient";
 import { derivarDatasEvento } from "./derivarDatasEvento";
@@ -13,7 +14,10 @@ import { derivarDatasEvento } from "./derivarDatasEvento";
  */
 
 interface OverrideEvento {
+  /** Capa no tamanho do herói da página do evento. */
   coverUrl?: string;
+  /** A mesma capa no tamanho dos cards (home e agenda). */
+  coverCardUrl?: string;
   dataInicioISO?: string;
   folderUrl?: string;
   /** Mapa nome-normalizado → URL da foto, vindo da coleção `especialistas`. */
@@ -46,8 +50,10 @@ export async function buscarOverride(slug: string): Promise<OverrideEvento | nul
       | { imagemCapa?: UploadComUrl; dataInicio?: string; folderPdf?: UploadComUrl }
       | undefined;
     if (!doc) return null;
+    const capa = urlDoUpload(doc.imagemCapa);
     return {
-      coverUrl: urlDoUpload(doc.imagemCapa),
+      coverUrl: capa && imagemOtimizada(capa, 1920),
+      coverCardUrl: capa && imagemOtimizada(capa, 828),
       dataInicioISO: doc.dataInicio,
       folderUrl: urlDoUpload(doc.folderPdf),
       fotosPalestrantes: await buscarFotosPalestrantes(),
@@ -88,7 +94,7 @@ const buscarFotosPalestrantes = cache(async (): Promise<Record<string, string>> 
       if (esp.ocultarDoSite) continue;
       const url = urlDoUpload(esp.foto);
       if (esp.nome && url) {
-        mapa[normalizarNome(esp.nome)] = url;
+        mapa[normalizarNome(esp.nome)] = imagemOtimizada(url, 640);
       }
     }
     return mapa;

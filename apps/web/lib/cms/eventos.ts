@@ -20,6 +20,7 @@ import type {
   Media,
 } from "@ntc/types/payload-types";
 
+import { imagemOtimizada } from "@/lib/imagemOtimizada";
 import { obterPayload } from "../payloadClient";
 
 import type {
@@ -72,7 +73,7 @@ export async function fetchEvento(slug: string): Promise<Evento | null> {
 
 function urlDaFoto(foto: Especialista["foto"] | EventoCMS["imagemCapa"]): string {
   if (typeof foto === "object" && foto !== null) {
-    return (foto as Media).url ?? "";
+    return imagemOtimizada((foto as Media).url ?? "", 640);
   }
   return "";
 }

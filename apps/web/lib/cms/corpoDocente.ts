@@ -19,6 +19,7 @@ import type {
   Programa,
 } from "@ntc/types/payload-types";
 
+import { imagemOtimizada } from "@/lib/imagemOtimizada";
 import { obterPayload } from "../payloadClient";
 
 import {
@@ -258,7 +259,7 @@ function siglaDoPrograma(p: Programa): string {
 
 function urlDaFoto(foto: Especialista["foto"]): string {
   if (typeof foto === "object" && foto !== null) {
-    return (foto as Media).url ?? "";
+    return imagemOtimizada((foto as Media).url ?? "", 640);
   }
   return "";
 }

@@ -20,6 +20,14 @@ import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
  * `?html=1` devolve o HTML sem passar pelo Chromium e **sem salvar nada** —
  * caminho de diagnóstico, para inspecionar a montagem sem gastar geração.
  */
+/**
+ * Gerar o PDF abre um Chromium (na Vercel, o `@sparticuz/chromium`, que ainda
+ * extrai o binário no cold start) e renderiza 20+ seções: passa fácil do tempo
+ * padrão de uma função. 60 s cabe em qualquer plano da Vercel.
+ */
+export const maxDuration = 60;
+export const runtime = "nodejs";
+
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   // Proposta tem preço, desconto e dados de contato: só o perfil do CRM.
   const usuario = await obterUsuarioCmsComPerfil(PERFIS_CRM);

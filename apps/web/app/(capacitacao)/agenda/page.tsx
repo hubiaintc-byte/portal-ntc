@@ -36,8 +36,8 @@ async function aplicarOverrideCard(eventos: EventoReal[]): Promise<EventoReal[]>
         const ovr = await buscarOverride(e.slug);
         if (!ovr) return e;
         let card = e.card;
-        if (ovr.coverUrl) {
-          card = { ...card, imagemUrl: ovr.coverUrl };
+        if (ovr.coverCardUrl) {
+          card = { ...card, imagemUrl: ovr.coverCardUrl };
         }
         if (ovr.dataInicioISO) {
           const d = derivarDatasEvento(ovr.dataInicioISO);
