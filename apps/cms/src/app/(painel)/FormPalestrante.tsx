@@ -69,7 +69,11 @@ interface FormPalestranteProps {
   palestrante: PalestranteCmsDetalhe | null;
   opcoes: { areas: { id: string; nome: string }[]; programas: { id: string; sigla: string }[] };
   onCancelar: () => void;
-  onSalvou: (p: PalestranteCmsDetalhe) => void;
+  /**
+   * `p` null: gravou, mas a releitura falhou — `aviso` explica e quem chama
+   * volta para a lista em vez de mostrar dados velhos.
+   */
+  onSalvou: (p: PalestranteCmsDetalhe | null, aviso?: string) => void;
 }
 
 const CAMPOS_VAZIOS: CamposPalestrante = {
@@ -215,11 +219,16 @@ export function FormPalestrante({ palestrante, opcoes, onCancelar, onSalvou }: F
     }
 
     iniciarSalvar(async () => {
-      const { resultado, palestrante: salvo } = await salvarPalestrante(fd);
-      if (resultado.ok && salvo) {
-        onSalvou(salvo);
-      } else {
-        setErro(resultado.erro ?? "Não foi possível salvar o palestrante.");
+      try {
+        const { resultado, palestrante: salvo } = await salvarPalestrante(fd);
+        if (resultado.ok) {
+          onSalvou(salvo, resultado.aviso);
+        } else {
+          setErro(resultado.erro ?? "Não foi possível salvar o palestrante.");
+        }
+      } catch {
+        // Server Action rejeitada (rede, timeout): o formulário fica como está.
+        setErro("Não foi possível salvar — verifique a conexão e tente de novo.");
       }
     });
   }
@@ -341,7 +350,6 @@ export function FormPalestrante({ palestrante, opcoes, onCancelar, onSalvou }: F
           <button
             type="button"
             className="pcms-btn pcms-btn--ghost"
-            aria-label="Escolher arquivo — Foto"
             aria-describedby={errosCampo.foto ? "pl-foto-dica pl-foto-erro" : "pl-foto-dica"}
             onClick={() => fotoInputRef.current?.click()}
             disabled={salvando}

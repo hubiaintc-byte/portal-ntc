@@ -179,6 +179,9 @@ export function ShellCms({
   >({ areas: [], programas: [] });
   const [carregando, iniciarCarga] = useTransition();
   const router = useRouter();
+  // Mensagem do fluxo de palestrante mostrada na lista (falha ao abrir o
+  // formulário, ou "salvo, mas não deu para reler").
+  const [avisoPalestrante, setAvisoPalestrante] = useState<{ erro: boolean; texto: string } | null>(null);
 
   const ehSuperAdmin = usuario.perfil === "super-admin";
 
@@ -244,6 +247,7 @@ export function ShellCms({
   }
 
   function abrirPalestrante(id: string) {
+    setAvisoPalestrante(null);
     iniciarCarga(async () => {
       const det = await carregarPalestrante(id);
       if (det) setPalestranteDet(det);
@@ -251,11 +255,28 @@ export function ShellCms({
   }
 
   function novoPalestrante() {
+    setAvisoPalestrante(null);
     iniciarCarga(async () => {
-      setOpcoesPalestrante(await carregarOpcoesPalestrante());
-      setPalestranteDet(null);
-      setCriandoPalestrante(true);
+      try {
+        setOpcoesPalestrante(await carregarOpcoesPalestrante());
+        setPalestranteDet(null);
+        setCriandoPalestrante(true);
+      } catch {
+        setAvisoPalestrante({
+          erro: true,
+          texto: "Não foi possível abrir o formulário — verifique a conexão e tente de novo.",
+        });
+      }
     });
+  }
+
+  /** Gravou, mas a releitura falhou: volta à lista com o aviso e recarrega. */
+  function salvouSemReleitura(aviso: string | undefined) {
+    setCriandoPalestrante(false);
+    setPalestranteDet(null);
+    setAvisoPalestrante({ erro: false, texto: aviso ?? "Salvo." });
+    router.refresh();
+    if (tela === "corpo-docente") abrirCorpoDocente();
   }
 
   function abrirConteudo(id: string) {
@@ -279,6 +300,7 @@ export function ShellCms({
 
   // Trocar de tela pela sidebar sempre fecha qualquer detalhe aberto.
   function irPara(id: TelaId) {
+    setAvisoPalestrante(null);
     setEventoDet(null);
     setPalestranteDet(null);
     setConteudoDet(null);
@@ -342,7 +364,11 @@ export function ShellCms({
           palestrante={null}
           opcoes={opcoesPalestrante}
           onCancelar={() => setCriandoPalestrante(false)}
-          onSalvou={(salvo) => {
+          onSalvou={(salvo, aviso) => {
+            if (!salvo) {
+              salvouSemReleitura(aviso);
+              return;
+            }
             router.refresh();
             setCriandoPalestrante(false);
             setPalestranteDet(salvo);
@@ -353,11 +379,22 @@ export function ShellCms({
           key={palestranteDet.id}
           palestrante={palestranteDet}
           onVoltar={() => setPalestranteDet(null)}
-          onSalvou={() => router.refresh()}
+          onSalvou={(avisoSemReleitura) => {
+            if (avisoSemReleitura !== undefined) salvouSemReleitura(avisoSemReleitura);
+            else router.refresh();
+          }}
         />
       ) : (
         !detalheAberto && (
           <>
+            {avisoPalestrante && (
+              <p
+                className={`pcms-form-aviso${avisoPalestrante.erro ? " pcms-form-aviso--erro" : ""}`}
+                role={avisoPalestrante.erro ? "alert" : "status"}
+              >
+                {avisoPalestrante.texto}
+              </p>
+            )}
             {tela === "dashboard" && (
               <TelaDashboard
                 eventos={eventos}

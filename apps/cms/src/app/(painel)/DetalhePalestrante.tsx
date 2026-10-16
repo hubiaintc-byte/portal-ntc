@@ -21,8 +21,12 @@ function vertAttr(vertical: string | null): string | undefined {
 interface DetalhePalestranteProps {
   palestrante: PalestranteCmsDetalhe;
   onVoltar: () => void;
-  /** Avisa o shell para recarregar a lista depois de salvar no formulário. */
-  onSalvou: () => void;
+  /**
+   * Avisa o shell para recarregar a lista depois de salvar no formulário.
+   * Com `avisoSemReleitura`, gravou mas não deu para reler: o shell volta à
+   * lista e mostra o aviso.
+   */
+  onSalvou: (avisoSemReleitura?: string) => void;
 }
 
 /** Tela cheia de detalhe de um palestrante — leitura, visibilidade e modo edição. */
@@ -33,12 +37,17 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou }:
   const [opcoes, setOpcoes] = useState<OpcoesPalestrante | null>(null);
   const [editando, setEditando] = useState(false);
   const [abrindoEdicao, iniciarAbrirEdicao] = useTransition();
+  const [erroEdicao, setErroEdicao] = useState<string | null>(null);
 
   function abrirEdicao() {
-    setErro(null);
+    setErroEdicao(null);
     iniciarAbrirEdicao(async () => {
-      setOpcoes(await carregarOpcoesPalestrante());
-      setEditando(true);
+      try {
+        setOpcoes(await carregarOpcoesPalestrante());
+        setEditando(true);
+      } catch {
+        setErroEdicao("Não foi possível abrir a edição — verifique a conexão e tente de novo.");
+      }
     });
   }
 
@@ -61,10 +70,14 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou }:
         palestrante={p}
         opcoes={opcoes}
         onCancelar={() => setEditando(false)}
-        onSalvou={(salvo) => {
-          setP(salvo);
+        onSalvou={(salvo, aviso) => {
           setEditando(false);
-          onSalvou();
+          if (salvo) {
+            setP(salvo);
+            onSalvou();
+          } else {
+            onSalvou(aviso ?? "Salvo.");
+          }
         }}
       />
     );
@@ -108,6 +121,11 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou }:
           >
             {abrindoEdicao ? "Abrindo…" : "Editar"}
           </button>
+          {erroEdicao && (
+            <p className="pcms-erro" role="alert">
+              {erroEdicao}
+            </p>
+          )}
         </div>
       </div>
 

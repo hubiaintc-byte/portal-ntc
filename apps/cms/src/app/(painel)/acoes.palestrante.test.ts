@@ -41,7 +41,7 @@ vi.mock("@/lib/cms/autenticacao", async () => {
 const revalidatePath = vi.fn();
 vi.mock("next/cache", () => ({ revalidatePath }));
 
-const { carregarOpcoesPalestrante, salvarPalestrante } = await import("./acoes");
+const { carregarOpcoesPalestrante, salvarOrdemCorpoDocente, salvarPalestrante } = await import("./acoes");
 
 const superAdmin = { id: 1, nome: "Ana", perfil: "super-admin" };
 const editorEventos = { id: 2, nome: "Iara", perfil: "editor-eventos" };
@@ -135,6 +135,70 @@ describe("salvarPalestrante (Server Action)", () => {
     expect(r.palestrante).toMatchObject({ id: "42", nome: "Ana Souza", slug: "ana-souza" });
     expect(r.palestrante?.editavel.corpoDocente).toBeNull();
     expect(revalidatePath).toHaveBeenCalledWith("/");
+  });
+});
+
+describe("salvarPalestrante — releitura depois de salvar", () => {
+  const AVISO = "Salvo. Não foi possível recarregar os dados — reabra o palestrante.";
+
+  function preparaCriacao() {
+    obterUsuarioAutenticadoMock.mockResolvedValue(superAdmin);
+    create.mockImplementation(async (args: { collection: string }) =>
+      args.collection === "media" ? { id: 90 } : { id: 42 },
+    );
+    findGlobal.mockResolvedValue({ cards: [{ formato: "expert", especialista: 1, id: "c1" }] });
+    find.mockResolvedValue({ docs: [] });
+  }
+
+  it("se a releitura lança, devolve ok com aviso e palestrante null", async () => {
+    preparaCriacao();
+    // A releitura (obterPalestranteCms) lê o Global depois do especialista.
+    findByID.mockResolvedValue({ id: 42, nome: "Ana Souza", slug: "ana-souza" });
+    findGlobal
+      .mockResolvedValueOnce({ cards: [{ formato: "expert", especialista: 1, id: "c1" }] })
+      .mockRejectedValue(new Error("conexão caiu"));
+    const r = await salvarPalestrante(formulario(JSON.stringify(campos)));
+    expect(r).toEqual({ resultado: { ok: true, id: "42", aviso: AVISO }, palestrante: null });
+    expect(revalidatePath).toHaveBeenCalledWith("/");
+  });
+
+  it("se a releitura não encontra o registro, devolve o mesmo aviso", async () => {
+    preparaCriacao();
+    findByID.mockRejectedValue(new Error("não achou"));
+    const r = await salvarPalestrante(formulario(JSON.stringify(campos)));
+    expect(r).toEqual({ resultado: { ok: true, id: "42", aviso: AVISO }, palestrante: null });
+  });
+});
+
+describe("normalização de ids", () => {
+  it("salvarPalestrante: id com zeros à esquerda vira o número canônico", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(superAdmin);
+    findByID.mockResolvedValue({ id: 7, foto: 5, curriculoCurto: { root: {} }, nome: "Ana" });
+    findGlobal.mockResolvedValue({ cards: [{ formato: "expert", especialista: 1, id: "c1" }] });
+    update.mockResolvedValue({ id: 7 });
+    const fd = formulario(JSON.stringify({ ...campos, linhasAtuacaoIds: ["003"], programasIds: ["011"] }), "007");
+    fd.delete("foto");
+    await salvarPalestrante(fd);
+    expect(update).toHaveBeenCalledWith(expect.objectContaining({ collection: "especialistas", id: "7" }));
+    const data = update.mock.calls[0]![0].data;
+    expect(data.linhasAtuacao).toEqual([3]);
+    expect(data.programasRelacionados).toEqual([11]);
+  });
+
+  it("salvarOrdemCorpoDocente: '007' casa o card do especialista 7", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(superAdmin);
+    findGlobal.mockResolvedValue({
+      cards: [
+        { formato: "expert", especialista: 7, id: "a" },
+        { formato: "expert", especialista: 8, id: "b" },
+      ],
+    });
+    updateGlobal.mockResolvedValue({});
+    const r = await salvarOrdemCorpoDocente(["008", "007"]);
+    expect(r.resultado.ok).toBe(true);
+    expect(updateGlobal.mock.calls[0]![0].data.cards.map((c: { especialista: number }) => c.especialista)).toEqual([
+      8, 7,
+    ]);
   });
 });
 

@@ -193,6 +193,12 @@ export async function alternarOcultarPalestrante(
 }
 
 const DADOS_INVALIDOS: ResultadoEscrita = { ok: false, erro: "Dados do formulário inválidos." };
+const AVISO_SEM_RELEITURA = "Salvo. Não foi possível recarregar os dados — reabra o palestrante.";
+
+// Até 15 dígitos: acima disso `Number` perde precisão e o id canônico deixa de ser inteiro.
+const ehIdNumerico = (v: unknown): v is string => typeof v === "string" && /^\d{1,15}$/.test(v);
+/** "007" e "7" são o mesmo registro: sem isso, um id forjado duplicaria um card. */
+const idCanonico = (v: string): string => String(Number(v));
 
 /**
  * Cria (`id` vazio) ou edita um palestrante, gravando PUBLICADO, junto com o
@@ -207,19 +213,25 @@ export async function salvarPalestrante(
   if (!usuario) return { resultado: RECUSADO_PERFIL, palestrante: null };
 
   const idBruto = formData.get("id");
-  const id = typeof idBruto === "string" && idBruto.trim() !== "" ? idBruto.trim() : null;
-  if (id !== null && !/^\d+$/.test(id)) return { resultado: DADOS_INVALIDOS, palestrante: null };
+  const idTexto = typeof idBruto === "string" && idBruto.trim() !== "" ? idBruto.trim() : null;
+  if (idTexto !== null && !ehIdNumerico(idTexto)) return { resultado: DADOS_INVALIDOS, palestrante: null };
+  const id = idTexto === null ? null : idCanonico(idTexto);
 
-  let campos: unknown;
+  let bruto: unknown;
   try {
-    campos = JSON.parse(String(formData.get("campos") ?? ""));
+    bruto = JSON.parse(String(formData.get("campos") ?? ""));
   } catch {
     return { resultado: DADOS_INVALIDOS, palestrante: null };
   }
-  if (!ehCamposPalestrante(campos)) return { resultado: DADOS_INVALIDOS, palestrante: null };
-  if (![...campos.linhasAtuacaoIds, ...campos.programasIds].every((v) => /^\d+$/.test(v))) {
+  if (!ehCamposPalestrante(bruto)) return { resultado: DADOS_INVALIDOS, palestrante: null };
+  if (![...bruto.linhasAtuacaoIds, ...bruto.programasIds].every(ehIdNumerico)) {
     return { resultado: DADOS_INVALIDOS, palestrante: null };
   }
+  const campos = {
+    ...bruto,
+    linhasAtuacaoIds: bruto.linhasAtuacaoIds.map(idCanonico),
+    programasIds: bruto.programasIds.map(idCanonico),
+  };
 
   const arquivo = formData.get("foto");
   const foto =
@@ -229,7 +241,12 @@ export async function salvarPalestrante(
 
   const resultado = await salvarPalestranteCms(usuario, id, campos, foto);
   if (resultado.ok) revalidatePath("/");
-  const palestrante = resultado.ok && resultado.id ? await obterPalestranteCms(resultado.id) : null;
+  if (!resultado.ok || !resultado.id) return { resultado, palestrante: null };
+
+  // A escrita já foi confirmada: uma falha na releitura não pode virar erro
+  // (o PO tentaria salvar de novo e criaria outro registro).
+  const palestrante = await obterPalestranteCms(resultado.id).catch(() => null);
+  if (!palestrante) return { resultado: { ...resultado, aviso: AVISO_SEM_RELEITURA }, palestrante: null };
   return { resultado, palestrante };
 }
 
@@ -245,10 +262,10 @@ export async function salvarOrdemCorpoDocente(
 ): Promise<{ resultado: ResultadoEscrita; cards: CardCorpoDocenteResumo[] | null }> {
   const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_INSTITUCIONAL);
   if (!usuario) return { resultado: RECUSADO_PERFIL, cards: null };
-  if (!Array.isArray(idsNaOrdem) || !idsNaOrdem.every((v) => typeof v === "string" && /^\d+$/.test(v))) {
+  if (!Array.isArray(idsNaOrdem) || !idsNaOrdem.every(ehIdNumerico)) {
     return { resultado: DADOS_INVALIDOS, cards: null };
   }
-  const resultado = await salvarOrdemCorpoDocenteCms(usuario, idsNaOrdem);
+  const resultado = await salvarOrdemCorpoDocenteCms(usuario, idsNaOrdem.map(idCanonico));
   if (resultado.ok) revalidatePath("/");
   const cards = resultado.ok ? await listarCardsCorpoDocenteCms() : null;
   return { resultado, cards };
