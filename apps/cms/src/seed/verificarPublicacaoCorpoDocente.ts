@@ -19,6 +19,11 @@ async function main(): Promise<void> {
     const payload = await getPayload({ config });
     req = await createLocalReq({}, payload);
     transacaoAberta = Boolean(await initTransaction(req));
+    // Sem transação o updateGlobal abaixo gravaria DE VERDADE no banco
+    // (compartilhado com produção) — aborta antes de qualquer escrita.
+    if (!transacaoAberta) {
+      throw new Error("Não foi possível abrir uma transação; nada foi gravado. Verificação abortada.");
+    }
     const antes = await payload.findGlobal({ slug: "corpo-docente", depth: 0, draft: true, req });
     const cards = antes.cards ?? [];
 
