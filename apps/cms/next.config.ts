@@ -1,7 +1,47 @@
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
+
+const emDev = process.env.NODE_ENV !== "production";
+
+/** Cabeçalhos de segurança comuns (auditoria de 07/10/2026). */
+function cabecalhosSeguranca(csp: string[], molduraPermitida: "DENY" | "SAMEORIGIN") {
+  return [
+    { key: "Content-Security-Policy", value: csp.join("; ") },
+    { key: "X-Frame-Options", value: molduraPermitida },
+    { key: "X-Content-Type-Options", value: "nosniff" },
+    { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+    { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  ];
+}
+
+/**
+ * CSP do painel: nada de terceiros além das imagens do Supabase Storage
+ * (capas, fotos). Ninguém pode emoldurar o painel (clickjacking). A rota de
+ * diagnóstico do documento da proposta acrescenta a própria CSP, mais
+ * restrita — as duas valem juntas.
+ */
+const cspPainel = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${emDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://*.supabase.co",
+  "media-src 'self' blob: https://*.supabase.co",
+  "font-src 'self' data:",
+  `connect-src 'self'${emDev ? " ws: wss:" : ""}`,
+  "frame-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  ...(emDev ? [] : ["upgrade-insecure-requests"]),
+];
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/:path*", headers: cabecalhosSeguranca(cspPainel, "DENY") }];
+  },
   reactStrictMode: true,
   // Motor de PDF (CRM Fase B2): pacotes com binário nativo — o bundler/
   // tracer do Next não deve tentar empacotá-los, só deixá-los externos.

@@ -1,6 +1,46 @@
 import type { NextConfig } from "next";
 
+
+const emDev = process.env.NODE_ENV !== "production";
+
+/** Cabeçalhos de segurança comuns (auditoria de 07/10/2026). */
+function cabecalhosSeguranca(csp: string[], molduraPermitida: "DENY" | "SAMEORIGIN") {
+  return [
+    { key: "Content-Security-Policy", value: csp.join("; ") },
+    { key: "X-Frame-Options", value: molduraPermitida },
+    { key: "X-Content-Type-Options", value: "nosniff" },
+    { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+    { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+  ];
+}
+
+/**
+ * CSP do site. Origens externas usadas de fato: Turnstile (script, iframe e
+ * siteverify do widget), o mapa do Google em /contato (iframe) e o Supabase
+ * Storage (imagens e folders do CMS). `'unsafe-inline'` em script fica até
+ * haver nonce — o Next injeta scripts inline de hidratação.
+ */
+const cspSite = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${emDev ? " 'unsafe-eval'" : ""} https://challenges.cloudflare.com`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://*.supabase.co",
+  "media-src 'self' https://*.supabase.co",
+  "font-src 'self' data:",
+  `connect-src 'self' https://challenges.cloudflare.com${emDev ? " ws: wss:" : ""}`,
+  "frame-src https://challenges.cloudflare.com https://www.google.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'self'",
+  ...(emDev ? [] : ["upgrade-insecure-requests"]),
+];
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  async headers() {
+    return [{ source: "/:path*", headers: cabecalhosSeguranca(cspSite, "SAMEORIGIN") }];
+  },
   reactStrictMode: true,
   transpilePackages: ["@ntc/ui", "@ntc/lib", "@ntc/types"],
   // Payload 3 + Next 15: estes pacotes server-only devem ficar fora do

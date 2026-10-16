@@ -8,14 +8,20 @@ import { z } from "zod";
  * O IP entra no grupo `consentimentoLgpd.ipSubmissao` do Lead (CLAUDE.md §12).
  */
 
+// A origem vem do navegador, não da pessoa (URL, referrer, UTMs): um valor
+// longo é truncado em vez de recusar o envio de quem só preencheu o formulário.
+const truncado = (n: number) => z.string().transform((v) => v.slice(0, n));
+const url = () => truncado(1000);
+const utm = () => truncado(200).optional();
+
 export const origemFrontSchema = z.object({
-  pagina: z.string(),
-  referrer: z.string().optional(),
-  utm_source: z.string().optional(),
-  utm_medium: z.string().optional(),
-  utm_campaign: z.string().optional(),
-  utm_term: z.string().optional(),
-  utm_content: z.string().optional(),
+  pagina: url(),
+  referrer: url().optional(),
+  utm_source: utm(),
+  utm_medium: utm(),
+  utm_campaign: utm(),
+  utm_term: utm(),
+  utm_content: utm(),
 });
 
 export type OrigemFront = z.infer<typeof origemFrontSchema>;

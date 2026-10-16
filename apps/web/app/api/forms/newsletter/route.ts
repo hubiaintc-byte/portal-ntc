@@ -12,7 +12,9 @@ import type { Payload } from "payload";
 import { obterPayload } from "@/lib/payloadClient";
 import { criarStoreRateLimit } from "@/lib/storeRateLimit";
 import {
+  corpoParaRegistro,
   errosDeZod,
+  lerCorpoJson,
   respostaErro,
   respostaRateLimit,
   respostaSucesso,
@@ -61,14 +63,13 @@ async function resolverAreas(
   return area ? [Number(area.id)] : [];
 }
 export async function POST(req: Request) {
-  const body = await req.json().catch(() => null);
-  if (!body || typeof body !== "object") {
-    return respostaErro("Corpo da requisição inválido.", 400);
-  }
+  const lido = await lerCorpoJson(req);
+  if (!lido.ok) return lido.resposta;
+  const body = lido.body;
 
   const captchaToken =
-    typeof (body as Record<string, unknown>).hcaptchaToken === "string"
-      ? ((body as Record<string, unknown>).hcaptchaToken as string)
+    typeof body.hcaptchaToken === "string"
+      ? body.hcaptchaToken
       : undefined;
   const xff = req.headers.get("x-forwarded-for") ?? "";
   const ip = xff.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "0.0.0.0";
@@ -115,7 +116,7 @@ export async function POST(req: Request) {
           politicaVersao: dados.consentimentoLgpd.politicaVersao || POLITICA_VERSAO_ATUAL,
           ipSubmissao: origem.ipSubmissao,
         },
-        payloadBruto: body as Record<string, unknown>,
+        payloadBruto: corpoParaRegistro(body),
       },
     });
 
