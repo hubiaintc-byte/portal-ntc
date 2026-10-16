@@ -12,11 +12,13 @@ import { createLocalReq, getPayload, initTransaction, killTransaction } from "pa
 import config from "../payload.config";
 
 async function main(): Promise<void> {
-  const payload = await getPayload({ config });
-  const req = await createLocalReq({}, payload);
-  await initTransaction(req);
   let falhou = false;
+  let req: Awaited<ReturnType<typeof createLocalReq>> | undefined;
+  let transacaoAberta = false;
   try {
+    const payload = await getPayload({ config });
+    req = await createLocalReq({}, payload);
+    transacaoAberta = Boolean(await initTransaction(req));
     const antes = await payload.findGlobal({ slug: "corpo-docente", depth: 0, draft: true, req });
     const cards = antes.cards ?? [];
 
@@ -31,7 +33,7 @@ async function main(): Promise<void> {
     const depois = await payload.findGlobal({ slug: "corpo-docente", depth: 0, draft: false, req });
 
     const heroIgual = JSON.stringify(antes.hero) === JSON.stringify(depois.hero);
-    const linksIgual = JSON.stringify(antes.quicklinks) === JSON.stringify(depois.quicklinks);
+    const linksIgual = JSON.stringify(antes.hero?.quicklinks) === JSON.stringify(depois.hero?.quicklinks);
     const cardsIgual = (depois.cards ?? []).length === cards.length;
     if (!heroIgual || !linksIgual || !cardsIgual) {
       throw new Error(
@@ -45,9 +47,9 @@ async function main(): Promise<void> {
     const dados = (e as { data?: unknown }).data;
     if (dados) console.error(JSON.stringify(dados, null, 2));
   } finally {
-    await killTransaction(req);
+    if (req && transacaoAberta) await killTransaction(req);
   }
   process.exit(falhou ? 1 : 0);
 }
 
-void main();
+await main();
