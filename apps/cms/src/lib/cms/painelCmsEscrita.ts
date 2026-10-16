@@ -18,6 +18,7 @@ import { obterPayload } from "@/lib/payloadClient";
 import {
   aplicarCardDe,
   type CardDesejado,
+  ctaHrefPermitido,
   type CardGlobal,
   ListaDesatualizadaError,
   reordenarCards,
@@ -1029,6 +1030,9 @@ function validarPalestrante(
   if (campos.instituicao.trim() === "") return "Informe a instituição.";
   if (id === null && foto === null) return ERRO_FOTO_OBRIGATORIA;
   if (foto !== null && !foto.arquivo.type.startsWith("image/")) return "A foto precisa ser uma imagem.";
+  if (campos.corpoDocente !== null && !ctaHrefPermitido(campos.corpoDocente.textos.ctaHref)) {
+    return "Link do botão do card: use um endereço que comece com /, #, http://, https:// ou mailto:.";
+  }
   const curto = campos.curriculoCurtoMarkdown;
   if ((id === null && curto === undefined) || (curto !== undefined && curto.trim() === "")) {
     return ERRO_CURRICULO_CURTO;

@@ -131,6 +131,16 @@ describe("salvarPalestranteCms — validação antes de qualquer escrita", () =>
     nenhumaEscrita();
   });
 
+  it("recusa link do botão do card fora de /, #, http(s) e mailto", async () => {
+    const card: CardDesejado = { formato: "expert", textos: { ...TEXTOS_CARD_VAZIOS, ctaHref: "javascript:alert(1)" } };
+    const r = await salvarPalestranteCms(usuario, "42", { ...campos, corpoDocente: card }, null);
+    expect(r).toEqual({
+      ok: false,
+      erro: "Link do botão do card: use um endereço que comece com /, #, http://, https:// ou mailto:.",
+    });
+    nenhumaEscrita();
+  });
+
   it("recusa foto que não é imagem", async () => {
     const pdf = new File([new Uint8Array([1])], "ana.pdf", { type: "application/pdf" });
     const r = await salvarPalestranteCms(usuario, null, campos, { arquivo: pdf, alt: "" });

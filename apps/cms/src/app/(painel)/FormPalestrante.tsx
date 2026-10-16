@@ -753,7 +753,7 @@ function BlocoCorpoDocente({
           )}
 
           <div className="pcms-editor__grid">
-            {campo("ctaHref", "Link do botão")}
+            {campo("ctaHref", "Link do botão", "começa com /, #, http://, https:// ou mailto:")}
             {campo(
               "ctaRotulo",
               "Rótulo do botão",

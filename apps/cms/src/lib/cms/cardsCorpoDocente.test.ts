@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   aplicarCardDe,
   cardDoEspecialista,
+  ctaHrefPermitido,
   idEspecialistaDoCard,
   ListaDesatualizadaError,
   reordenarCards,
+  sanitizarHtmlCard,
   TEXTOS_CARD_VAZIOS,
   type CardDesejado,
   type CardGlobal,
@@ -104,4 +106,51 @@ describe("reordenarCards", () => {
     expect(() => reordenarCards(cards(), ["12", "7", "4", "5"])).toThrow(ListaDesatualizadaError);
     expect(() => reordenarCards(cards(), ["12", "12", "4"])).toThrow(ListaDesatualizadaError);
   });
+});
+
+describe("sanitizarHtmlCard", () => {
+  it("mantém só <strong> e </strong> literais", () => {
+    expect(sanitizarHtmlCard("Atuação · <strong>STF</strong>")).toBe("Atuação · <strong>STF</strong>");
+  });
+
+  it("escapa qualquer outra marcação, atributos e aspas", () => {
+    expect(sanitizarHtmlCard('<img src=x onerror="alert(1)">')).toBe(
+      "&lt;img src=x onerror=&quot;alert(1)&quot;&gt;",
+    );
+    expect(sanitizarHtmlCard("<script>x</script>")).toBe("&lt;script&gt;x&lt;/script&gt;");
+    expect(sanitizarHtmlCard('<strong onclick="x">a</strong>')).toBe(
+      "&lt;strong onclick=&quot;x&quot;&gt;a</strong>",
+    );
+    expect(sanitizarHtmlCard("<STRONG>a</STRONG>")).toBe("&lt;STRONG&gt;a&lt;/STRONG&gt;");
+    expect(sanitizarHtmlCard("d'Ávila")).toBe("d&#39;Ávila");
+  });
+
+  it("escapa & solto, sem dobrar entidade já gravada (o texto volta ao formulário e é salvo de novo)", () => {
+    expect(sanitizarHtmlCard("Gestão & Saúde")).toBe("Gestão &amp; Saúde");
+    expect(sanitizarHtmlCard("Gestão &amp; Saúde &middot; &#183;")).toBe("Gestão &amp; Saúde &middot; &#183;");
+    expect(sanitizarHtmlCard(sanitizarHtmlCard("a & <b>"))).toBe(sanitizarHtmlCard("a & <b>"));
+  });
+});
+
+describe("aplicarCardDe — HTML dos campos que o site injeta", () => {
+  it("sanitiza metaAtuacao e metaEixos ao montar o card featured", () => {
+    const r = aplicarCardDe([], "5", {
+      formato: "featured",
+      textos: { ...TEXTOS_CARD_VAZIOS, metaAtuacao: "<em>x</em> <strong>y</strong>", metaEixos: "<a href=j>z</a>" },
+    });
+    expect(r[0]!.metaAtuacao).toBe("&lt;em&gt;x&lt;/em&gt; <strong>y</strong>");
+    expect(r[0]!.metaEixos).toBe("&lt;a href=j&gt;z&lt;/a&gt;");
+  });
+});
+
+describe("ctaHrefPermitido", () => {
+  it.each(["", "/programas/edutec", "#agenda", "https://ntc.org.br", "http://x.br", "mailto:a@b.br", " /x "])(
+    "aceita %j",
+    (href) => expect(ctaHrefPermitido(href)).toBe(true),
+  );
+
+  it.each(["javascript:alert(1)", " JavaScript:alert(1)", "data:text/html,x", "vbscript:x", "programas/edutec", "ftp://x"])(
+    "recusa %j",
+    (href) => expect(ctaHrefPermitido(href)).toBe(false),
+  );
 });

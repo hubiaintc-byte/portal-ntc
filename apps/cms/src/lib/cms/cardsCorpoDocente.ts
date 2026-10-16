@@ -51,6 +51,38 @@ export function idEspecialistaDoCard(card: CardGlobal): string | null {
 
 const vazioParaNulo = (v: string): string | null => (v === "" ? null : v);
 
+/** `&` que já abre uma entidade (`&amp;`, `&middot;`, `&#183;`, `&#xB7;`). */
+const ENTIDADE = /^&(?:[a-zA-Z][a-zA-Z0-9]*|#[0-9]+|#x[0-9a-fA-F]+);/;
+
+/**
+ * Texto de card que o site injeta como HTML (`metaAtuacao`, `metaEixos` —
+ * `dangerouslySetInnerHTML` em `FilterBarDocentes.tsx`). Escapa toda a
+ * marcação e devolve só `<strong>`/`</strong>` literais, a única formatação
+ * que o formulário oferece. Uma entidade já gravada não é escapada de novo:
+ * o texto volta ao formulário como está e é salvo outra vez a cada edição.
+ */
+export function sanitizarHtmlCard(texto: string): string {
+  let saida = "";
+  for (let i = 0; i < texto.length; i++) {
+    const c = texto[i]!;
+    if (c === "&") saida += ENTIDADE.test(texto.slice(i)) ? "&" : "&amp;";
+    else if (c === "<") saida += "&lt;";
+    else if (c === ">") saida += "&gt;";
+    else if (c === '"') saida += "&quot;";
+    else if (c === "'") saida += "&#39;";
+    else saida += c;
+  }
+  return saida.replaceAll("&lt;strong&gt;", "<strong>").replaceAll("&lt;/strong&gt;", "</strong>");
+}
+
+const PREFIXOS_CTA = ["/", "#", "http://", "https://", "mailto:"];
+
+/** Link do botão do card: vazio (o site usa "#"), caminho interno, âncora, http(s) ou e-mail. */
+export function ctaHrefPermitido(href: string): boolean {
+  const h = href.trim().toLowerCase();
+  return h === "" || PREFIXOS_CTA.some((p) => h.startsWith(p));
+}
+
 function textoDe(v: string | null | undefined): string {
   return v ?? "";
 }
@@ -98,8 +130,8 @@ function montarCard(
     tag: vazioParaNulo(t.tag),
     axisBadge: vazioParaNulo(t.axisBadge),
     credencialCard: vazioParaNulo(t.credencialCard),
-    metaAtuacao: featured ? vazioParaNulo(t.metaAtuacao) : null,
-    metaEixos: featured ? vazioParaNulo(t.metaEixos) : null,
+    metaAtuacao: featured ? vazioParaNulo(sanitizarHtmlCard(t.metaAtuacao)) : null,
+    metaEixos: featured ? vazioParaNulo(sanitizarHtmlCard(t.metaEixos)) : null,
     programasTexto: featured ? null : vazioParaNulo(t.programasTexto),
     programasStrong: featured ? null : vazioParaNulo(t.programasStrong),
     sufixoPrograma: featured ? null : vazioParaNulo(t.sufixoPrograma),
