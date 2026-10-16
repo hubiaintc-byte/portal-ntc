@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import type {
+  CardCorpoDocenteResumo,
   ConteudoCmsDetalhe,
   ConteudoCmsResumo,
   EventoCmsDetalhe,
@@ -18,6 +19,7 @@ import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
 import {
   carregarAreas,
   carregarConteudo,
+  carregarCorpoDocente,
   carregarEvento,
   criarEventoEmBranco,
   carregarOpcoesPalestrante,
@@ -26,6 +28,7 @@ import {
 } from "./acoes";
 import { ShellPainel, type GrupoNav } from "./shell/ShellPainel";
 import { TelaDashboard } from "./TelaDashboard";
+import { TelaCorpoDocente } from "./TelaCorpoDocente";
 import { TelaHome } from "./TelaHome";
 import { TelaPalestrantes } from "./TelaPalestrantes";
 import { TelaEventos } from "./TelaEventos";
@@ -58,6 +61,7 @@ interface ShellCmsProps {
 type TelaId =
   | "dashboard"
   | "palestrantes"
+  | "corpo-docente"
   | "eventos"
   | "conteudos"
   | "home"
@@ -86,6 +90,12 @@ const Ico = {
       <path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5" />
       <path d="M16 4.5a3.2 3.2 0 0 1 0 6.4" />
       <path d="M17 14.8c2.4.6 4 2.6 4 5.2" />
+    </svg>
+  ),
+  corpoDocente: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 6h16M4 12h16M4 18h10" />
+      <path d="M18 15v6M15 18h6" />
     </svg>
   ),
   eventos: (
@@ -127,6 +137,7 @@ const Ico = {
 const NAV_PRINCIPAL: ItemNav[] = [
   { id: "dashboard", rotulo: "Painel", icone: Ico.painel },
   { id: "palestrantes", rotulo: "Palestrantes", icone: Ico.palestrantes },
+  { id: "corpo-docente", rotulo: "Corpo Docente", icone: Ico.corpoDocente },
   { id: "eventos", rotulo: "Eventos", icone: Ico.eventos },
   { id: "conteudos", rotulo: "Conteúdos", icone: Ico.conteudos },
   { id: "home", rotulo: "Home", icone: Ico.home },
@@ -135,6 +146,7 @@ const NAV_PRINCIPAL: ItemNav[] = [
 const CRUMB: Record<TelaId, string> = {
   dashboard: "Painel",
   palestrantes: "Editorial · Palestrantes",
+  "corpo-docente": "Editorial · Corpo Docente",
   eventos: "Editorial · Eventos",
   conteudos: "Editorial · Conteúdos",
   home: "Editorial · Home",
@@ -183,6 +195,23 @@ export function ShellCms({
       const lista = await carregarUsuarios();
       setUsuarios(lista);
       setUsuariosCarregados(true);
+    });
+  }
+
+  // Cards do Corpo Docente: lidos ao abrir a tela (e a cada reabertura, para
+  // não mostrar ordem velha depois de editar um palestrante).
+  const [cardsCorpo, setCardsCorpo] = useState<CardCorpoDocenteResumo[] | null>(null);
+  const [erroCorpo, setErroCorpo] = useState<string | null>(null);
+  const [carregandoCorpo, iniciarCargaCorpo] = useTransition();
+
+  function abrirCorpoDocente() {
+    setErroCorpo(null);
+    iniciarCargaCorpo(async () => {
+      try {
+        setCardsCorpo(await carregarCorpoDocente());
+      } catch {
+        setErroCorpo("Não foi possível carregar o Corpo Docente. Recarregue a página.");
+      }
     });
   }
 
@@ -257,6 +286,7 @@ export function ShellCms({
     setCriandoPalestrante(false);
     setTela(id);
     if (id === "usuarios") abrirUsuarios();
+    if (id === "corpo-docente") abrirCorpoDocente();
   }
 
   const detalheAberto =
@@ -342,6 +372,15 @@ export function ShellCms({
                 palestrantes={palestrantes}
                 onAbrir={abrirPalestrante}
                 onNovo={novoPalestrante}
+              />
+            )}
+            {tela === "corpo-docente" && (
+              <TelaCorpoDocente
+                cards={cardsCorpo}
+                carregando={carregandoCorpo}
+                erroCarga={erroCorpo}
+                onAbrirPalestrante={abrirPalestrante}
+                onSalvou={setCardsCorpo}
               />
             )}
             {tela === "eventos" && (

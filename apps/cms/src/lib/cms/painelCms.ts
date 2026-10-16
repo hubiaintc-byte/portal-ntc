@@ -6,7 +6,7 @@ import { obterPayload } from "@/lib/payloadClient";
 import { lexicalParaTexto, lexicalToHtml } from "@/lib/cms/lexical";
 import { idaEVoltaPreserva, lexicalParaMarkdown } from "@/lib/markdownLexical";
 
-import { cardDoEspecialista } from "./cardsCorpoDocente";
+import { cardDoEspecialista, type FormatoCard } from "./cardsCorpoDocente";
 import { lerCardsCorpoDocente, type CamposPalestrante } from "./painelCmsEscrita";
 
 /**
@@ -693,4 +693,36 @@ export async function listarOpcoesPalestranteCms(): Promise<{
       sigla: typeof d.sigla === "string" ? d.sigla : "(sem sigla)",
     })),
   };
+}
+
+export interface CardCorpoDocenteResumo {
+  especialistaId: string;
+  nome: string;
+  fotoUrl: string | null;
+  formato: FormatoCard;
+  ocultarDoSite: boolean;
+}
+
+/**
+ * Cards de pessoa (featured/expert) do Global `corpo-docente`, na ordem dele.
+ * Card cujo especialista não resolve (id solto) é omitido: a ordem enviada
+ * fica sem ele e o servidor recusa por lista desatualizada, o que é seguro.
+ */
+export async function listarCardsCorpoDocenteCms(): Promise<CardCorpoDocenteResumo[]> {
+  const payload = await obterPayload();
+  const global = await payload.findGlobal({ slug: "corpo-docente", depth: 1, draft: true });
+  const resumos: CardCorpoDocenteResumo[] = [];
+  for (const card of global.cards ?? []) {
+    if (card.formato === "axis") continue;
+    const e = card.especialista;
+    if (e === null || e === undefined || typeof e !== "object") continue;
+    resumos.push({
+      especialistaId: String(e.id),
+      nome: e.nome ?? "(sem nome)",
+      fotoUrl: urlDeMidia(e.foto),
+      formato: card.formato,
+      ocultarDoSite: Boolean(e.ocultarDoSite),
+    });
+  }
+  return resumos;
 }

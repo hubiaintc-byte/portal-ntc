@@ -14,7 +14,13 @@ import { montarCamposEvento } from "@/lib/importacaoPdf/montarCamposEvento";
 import { parsearFolderEvento } from "@/lib/importacaoPdf/parsearFolderEvento";
 import { obterPayload } from "@/lib/payloadClient";
 
-import { aplicarCardDe, type CardDesejado, type CardGlobal } from "./cardsCorpoDocente";
+import {
+  aplicarCardDe,
+  type CardDesejado,
+  type CardGlobal,
+  ListaDesatualizadaError,
+  reordenarCards,
+} from "./cardsCorpoDocente";
 import { NOME_EVENTO_EM_BRANCO, slugParaSalvar, slugProvisorio } from "./slugEvento";
 
 /**
@@ -1146,6 +1152,34 @@ export async function salvarPalestranteCms(
     });
     return { ok: true, id: idFinal };
   } catch (e) {
+    return { ok: false, erro: traduzirErroPalestrante(e) };
+  }
+}
+
+/**
+ * Grava a nova ordem dos cards de pessoa do Corpo Docente (os de eixo ficam
+ * onde estão). O Global é relido dentro da transação e `reordenarCards`
+ * recusa se a lista mudou desde que a tela foi aberta.
+ */
+export async function salvarOrdemCorpoDocenteCms(
+  usuario: UsuarioAutenticado,
+  idsNaOrdem: string[],
+): Promise<ResultadoEscrita> {
+  if (!idsNaOrdem.every(ehIdNumerico)) return { ok: false, erro: ERRO_DADOS_INVALIDOS };
+  try {
+    const payload = await obterPayload();
+    await executarEmTransacao(payload, usuario, async (req) => {
+      const lidos = await lerCardsCorpoDocente(payload, req);
+      await gravarCardsCorpoDocente(payload, req, reordenarCards(lidos, idsNaOrdem));
+    });
+    return { ok: true };
+  } catch (e) {
+    if (e instanceof ListaDesatualizadaError) {
+      return {
+        ok: false,
+        erro: "A lista do Corpo Docente mudou desde que a tela foi aberta — recarregue e tente de novo.",
+      };
+    }
     return { ok: false, erro: traduzirErroPalestrante(e) };
   }
 }

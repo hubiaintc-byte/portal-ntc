@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { aplicarCardDe, type CardDesejado, type CardGlobal, TEXTOS_CARD_VAZIOS } from "./cardsCorpoDocente";
+import { aplicarCardDe, reordenarCards, type CardDesejado, type CardGlobal, TEXTOS_CARD_VAZIOS } from "./cardsCorpoDocente";
 import { markdownParaLexical } from "@/lib/markdownLexical";
 
 /**
@@ -35,7 +35,7 @@ vi.mock("@/lib/crm/transacao", () => ({
   },
 }));
 
-const { salvarPalestranteCms } = await import("./painelCmsEscrita");
+const { salvarPalestranteCms, salvarOrdemCorpoDocenteCms } = await import("./painelCmsEscrita");
 type Campos = Parameters<typeof salvarPalestranteCms>[2];
 
 const usuario = { id: 1, perfil: "super-admin" } as unknown as Parameters<typeof salvarPalestranteCms>[0];
@@ -283,5 +283,41 @@ describe("salvarPalestranteCms — atualização", () => {
     expect(update.mock.calls[0]![0].req).toBe(REQ);
     expect(transacao.rollbacks).toBe(1);
     expect(transacao.commits).toBe(0);
+  });
+});
+
+describe("salvarOrdemCorpoDocenteCms", () => {
+  it("grava reordenarCards(lidos, ids) publicado, com o req da transação", async () => {
+    findGlobal.mockResolvedValue({ cards: [cardDe(1), cardDe(2), cardDe(3)] });
+    const r = await salvarOrdemCorpoDocenteCms(usuario, ["3", "1", "2"]);
+    expect(r).toEqual({ ok: true });
+    expect(updateGlobal).toHaveBeenCalledTimes(1);
+    expect(updateGlobal.mock.calls[0]![0]).toEqual({
+      slug: "corpo-docente",
+      data: { cards: reordenarCards([cardDe(1), cardDe(2), cardDe(3)], ["3", "1", "2"]), _status: "published" },
+      depth: 0,
+      overrideAccess: true,
+      req: REQ,
+    });
+    expect(transacao.commits).toBe(1);
+  });
+
+  it("lista desatualizada: erro legível e nenhuma escrita no Global", async () => {
+    findGlobal.mockResolvedValue({ cards: [cardDe(1), cardDe(2), cardDe(3)] });
+    const r = await salvarOrdemCorpoDocenteCms(usuario, ["1", "2"]);
+    expect(r).toEqual({
+      ok: false,
+      erro: "A lista do Corpo Docente mudou desde que a tela foi aberta — recarregue e tente de novo.",
+    });
+    expect(updateGlobal).not.toHaveBeenCalled();
+  });
+
+  it("Global recusa: mesma mensagem de ErroCorpoDocente", async () => {
+    updateGlobal.mockRejectedValue(new Error("The following field is invalid: quicklinks"));
+    const r = await salvarOrdemCorpoDocenteCms(usuario, ["2", "1"]);
+    expect(r.ok).toBe(false);
+    expect(r.erro).toMatch(/^Não foi possível atualizar o Corpo Docente/);
+    expect(r.erro).toContain("quicklinks");
+    expect(transacao.rollbacks).toBe(1);
   });
 });

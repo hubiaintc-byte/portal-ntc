@@ -14,12 +14,14 @@ import {
 import { PERFIS_EVENTOS, PERFIS_INSTITUCIONAL } from "@/lib/cms/perfis";
 import {
   listarAreasCms,
+  listarCardsCorpoDocenteCms,
   listarConteudosCms,
   listarOpcoesPalestranteCms,
   obterConteudoCms,
   obterEventoCms,
   obterPalestranteCms,
   type ConteudoCmsDetalhe,
+  type CardCorpoDocenteResumo,
   type ConteudoCmsResumo,
   type EventoCmsDetalhe,
   type PalestranteCmsDetalhe,
@@ -40,6 +42,7 @@ import {
   salvarContatosCms,
   salvarConteudoCms,
   salvarEventosHome,
+  salvarOrdemCorpoDocenteCms,
   salvarPalestranteCms,
   vincularPalestrantesEvento,
   type CamposContatos,
@@ -228,6 +231,27 @@ export async function salvarPalestrante(
   if (resultado.ok) revalidatePath("/");
   const palestrante = resultado.ok && resultado.id ? await obterPalestranteCms(resultado.id) : null;
   return { resultado, palestrante };
+}
+
+/** Cards de pessoa do Corpo Docente, na ordem atual, para a tela de ordenação. */
+export async function carregarCorpoDocente(): Promise<CardCorpoDocenteResumo[]> {
+  if (!(await obterUsuarioCms())) return [];
+  return listarCardsCorpoDocenteCms();
+}
+
+/** Grava a ordem dos cards e devolve a lista relida. */
+export async function salvarOrdemCorpoDocente(
+  idsNaOrdem: string[],
+): Promise<{ resultado: ResultadoEscrita; cards: CardCorpoDocenteResumo[] | null }> {
+  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_INSTITUCIONAL);
+  if (!usuario) return { resultado: RECUSADO_PERFIL, cards: null };
+  if (!Array.isArray(idsNaOrdem) || !idsNaOrdem.every((v) => typeof v === "string" && /^\d+$/.test(v))) {
+    return { resultado: DADOS_INVALIDOS, cards: null };
+  }
+  const resultado = await salvarOrdemCorpoDocenteCms(usuario, idsNaOrdem);
+  if (resultado.ok) revalidatePath("/");
+  const cards = resultado.ok ? await listarCardsCorpoDocenteCms() : null;
+  return { resultado, cards };
 }
 
 /** Áreas e programas para os selects de relação do formulário do palestrante. */
