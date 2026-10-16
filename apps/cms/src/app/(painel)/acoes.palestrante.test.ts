@@ -122,6 +122,7 @@ describe("salvarPalestrante (Server Action)", () => {
     );
     findGlobal.mockResolvedValue({ cards: [{ formato: "expert", especialista: 1, id: "c1" }] });
     findByID.mockResolvedValue({ id: 42, nome: "Ana Souza", slug: "ana-souza", titulacao: "doutorado" });
+    find.mockResolvedValue({ docs: [] });
 
     const r = await salvarPalestrante(formulario(JSON.stringify(campos)));
 

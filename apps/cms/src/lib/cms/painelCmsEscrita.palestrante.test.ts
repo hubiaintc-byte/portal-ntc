@@ -1,3 +1,4 @@
+import { ValidationError } from "payload";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { aplicarCardDe, reordenarCards, type CardDesejado, type CardGlobal, TEXTOS_CARD_VAZIOS } from "./cardsCorpoDocente";
@@ -17,7 +18,8 @@ const update = vi.fn();
 const findByID = vi.fn();
 const findGlobal = vi.fn();
 const updateGlobal = vi.fn();
-const payloadFalso = { create, update, findByID, findGlobal, updateGlobal };
+const find = vi.fn();
+const payloadFalso = { create, update, findByID, findGlobal, updateGlobal, find };
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: async () => payloadFalso }));
 
 const transacao = { commits: 0, rollbacks: 0 };
@@ -65,6 +67,8 @@ const desejo: CardDesejado = {
   textos: { ...TEXTOS_CARD_VAZIOS, tag: "Docente", credencialCard: "Doutora pela UnB." },
 };
 
+const ERRO_NOME_REPETIDO = "Já existe um palestrante com este nome. Diferencie o nome (ex.: inclua o sobrenome).";
+
 const imagem = () => new File([new Uint8Array([1, 2, 3])], "ana.jpg", { type: "image/jpeg" });
 
 const cardDe = (id: number, formato: CardGlobal["formato"] = "expert"): CardGlobal => ({
@@ -84,6 +88,7 @@ beforeEach(() => {
   findByID.mockResolvedValue({ id: 42, foto: 5, curriculoCurto: markdownParaLexical("Texto.") });
   findGlobal.mockResolvedValue({ cards: [cardDe(1), cardDe(2)] });
   updateGlobal.mockResolvedValue({});
+  find.mockResolvedValue({ docs: [] });
 });
 
 function nenhumaEscrita() {
@@ -210,17 +215,43 @@ describe("salvarPalestranteCms — criação", () => {
     expect(chamada.data.cards).toHaveLength(3);
   });
 
-  it("slug duplicado vira mensagem legível", async () => {
+  it("na criação, confere antes de qualquer escrita o slug que o nome vai gerar", async () => {
+    find.mockResolvedValue({ docs: [{ id: 7 }] });
+    const r = await salvarPalestranteCms(
+      usuario,
+      null,
+      { ...campos, nome: "  Ana Souza Júnior " },
+      { arquivo: imagem(), alt: "" },
+    );
+    expect(r).toEqual({ ok: false, erro: ERRO_NOME_REPETIDO });
+    expect(find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: "especialistas",
+        where: { slug: { equals: "ana-souza-junior" } },
+        draft: true,
+        limit: 1,
+        depth: 0,
+      }),
+    );
+    nenhumaEscrita();
+  });
+
+  it("slug duplicado lançado pelo Payload (ValidationError) vira mensagem legível", async () => {
     create.mockImplementation(async (args: { collection: string }) => {
       if (args.collection === "media") return { id: 90 };
-      throw new Error('duplicate key value violates unique constraint "especialistas_slug_idx"');
+      throw new ValidationError({
+        collection: "especialistas",
+        errors: [{ message: "Value must be unique", path: "slug" }],
+      });
     });
     const r = await salvarPalestranteCms(usuario, null, campos, { arquivo: imagem(), alt: "" });
-    expect(r).toEqual({
-      ok: false,
-      erro: "Já existe um palestrante com este nome. Diferencie o nome (ex.: inclua o sobrenome).",
-    });
+    expect(r).toEqual({ ok: false, erro: ERRO_NOME_REPETIDO });
     expect(transacao.rollbacks).toBe(1);
+  });
+
+  it("na atualização, não confere slug (o nome não muda o slug existente)", async () => {
+    await salvarPalestranteCms(usuario, "42", campos, null);
+    expect(find).not.toHaveBeenCalled();
   });
 });
 

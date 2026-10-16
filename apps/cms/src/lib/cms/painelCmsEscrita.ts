@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { Payload, PayloadRequest, RequiredDataFromCollectionSlug } from "payload";
+import slugify from "slugify";
 
 import type { Rodape } from "@ntc/types";
 
@@ -21,6 +22,7 @@ import {
   ListaDesatualizadaError,
   reordenarCards,
 } from "./cardsCorpoDocente";
+import { ehErroSlugDuplicado } from "./erroSlugDuplicado";
 import { NOME_EVENTO_EM_BRANCO, slugParaSalvar, slugProvisorio } from "./slugEvento";
 
 /**
@@ -111,6 +113,18 @@ export async function salvarCamposEvento(
       slugAtual: atual.slug ?? "",
       nome: campos.nome,
     });
+    // Salvar é `draft: true`, que grava só a versão (as tabelas de versão não
+    // têm o índice único): a colisão só estouraria no Publicar. Conferida
+    // aqui, contra rascunhos inclusive, para o editor saber já no salvar.
+    const outro = await payload.find({
+      collection: "eventos",
+      where: { and: [{ slug: { equals: slug } }, { id: { not_equals: id } }] },
+      draft: true,
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    });
+    if (outro.docs.length > 0) return { ok: false, erro: ERRO_SLUG_EVENTO };
     // Os builders de lexicalBuilders.ts tipam `children` como `unknown[]`
     // (nós heterogêneos: parágrafo/heading/lista); o Payload aceita qualquer
     // array de nós JSON em runtime (validação é do editor Lexical
@@ -172,12 +186,12 @@ export async function salvarCamposEvento(
   }
 }
 
-function traduzirErroEvento(e: unknown): string {
+const ERRO_SLUG_EVENTO = "Já existe um evento com este endereço (slug).";
+
+function traduzirErroEvento(e: unknown, padrao = "Erro ao salvar."): string {
+  if (ehErroSlugDuplicado(e)) return ERRO_SLUG_EVENTO;
   const msg = e instanceof Error ? e.message : String(e);
-  if (/duplicate key|unique constraint/i.test(msg)) {
-    return "Já existe um evento com este endereço (slug).";
-  }
-  return msg || "Erro ao salvar.";
+  return msg || padrao;
 }
 
 /**
@@ -214,7 +228,7 @@ export async function publicarEvento(id: string): Promise<ResultadoEscrita> {
     });
     return { ok: true };
   } catch (e) {
-    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao publicar." };
+    return { ok: false, erro: traduzirErroEvento(e, "Erro ao publicar.") };
   }
 }
 
@@ -1022,12 +1036,13 @@ function validarPalestrante(
   return null;
 }
 
+const ERRO_NOME_REPETIDO =
+  "Já existe um palestrante com este nome. Diferencie o nome (ex.: inclua o sobrenome).";
+
 function traduzirErroPalestrante(e: unknown): string {
   if (e instanceof ErroCorpoDocente) return e.message;
+  if (ehErroSlugDuplicado(e)) return ERRO_NOME_REPETIDO;
   const msg = e instanceof Error ? e.message : String(e);
-  if (/duplicate key|unique constraint/i.test(msg)) {
-    return "Já existe um palestrante com este nome. Diferencie o nome (ex.: inclua o sobrenome).";
-  }
   return msg || "Erro ao salvar o palestrante.";
 }
 
@@ -1087,7 +1102,20 @@ export async function salvarPalestranteCms(
   try {
     const payload = await obterPayload();
 
-    if (id !== null) {
+    if (id === null) {
+      // Mesmo cálculo do hook `autoSlug` da coleção, que gera o slug do nome
+      // na criação; conferido antes de subir a foto para não deixar media órfã.
+      const slug = slugify(campos.nome.trim(), { lower: true, strict: true, locale: "pt" });
+      const existente = await payload.find({
+        collection: "especialistas",
+        where: { slug: { equals: slug } },
+        draft: true,
+        limit: 1,
+        depth: 0,
+        overrideAccess: true,
+      });
+      if (existente.docs.length > 0) return { ok: false, erro: ERRO_NOME_REPETIDO };
+    } else {
       // Publicar exige foto e currículo curto: um especialista criado em
       // rascunho pelo import de PDF pode não ter nenhum dos dois.
       const atual = (await payload.findByID({

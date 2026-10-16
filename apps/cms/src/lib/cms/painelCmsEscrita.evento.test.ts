@@ -1,14 +1,26 @@
+import { ValidationError } from "payload";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const create = vi.fn();
 const update = vi.fn();
 const findByID = vi.fn();
+const find = vi.fn();
 
 vi.mock("@/lib/payloadClient", () => ({
-  obterPayload: async () => ({ create, update, findByID }),
+  obterPayload: async () => ({ create, update, findByID, find }),
 }));
 
-import { criarEventoEmBrancoCms, salvarCamposEvento, type CamposEventoCompletos } from "./painelCmsEscrita";
+import {
+  criarEventoEmBrancoCms,
+  publicarEvento,
+  salvarCamposEvento,
+  type CamposEventoCompletos,
+} from "./painelCmsEscrita";
+
+/** O que o adapter drizzle 3.90 lança numa violação de unicidade (23505). */
+const slugDuplicado = () =>
+  new ValidationError({ collection: "eventos", errors: [{ message: "Value must be unique", path: "slug" }] });
+const ERRO_SLUG = "Já existe um evento com este endereço (slug).";
 import { ehSlugProvisorio } from "./slugEvento";
 
 const campos: CamposEventoCompletos = {
@@ -39,6 +51,8 @@ beforeEach(() => {
   create.mockReset();
   update.mockReset();
   findByID.mockReset();
+  find.mockReset();
+  find.mockResolvedValue({ docs: [] });
 });
 
 describe("criarEventoEmBrancoCms", () => {
@@ -69,12 +83,37 @@ describe("salvarCamposEvento (slug)", () => {
     expect(update.mock.calls[0]![0].data.slug).toBe("seminario-de-gestao-escolar");
   });
 
-  it("traduz violação de unicidade do slug", async () => {
+  it("confere antes de salvar se outro evento (inclusive rascunho) já usa o slug", async () => {
     findByID.mockResolvedValue({ slug: "novo-evento-rascunho-abc" });
-    update.mockRejectedValue(new Error('duplicate key value violates unique constraint "eventos_slug_idx"'));
-    expect(await salvarCamposEvento("9", campos)).toEqual({
-      ok: false,
-      erro: "Já existe um evento com este endereço (slug).",
-    });
+    find.mockResolvedValue({ docs: [{ id: 4 }] });
+    expect(await salvarCamposEvento("9", campos)).toEqual({ ok: false, erro: ERRO_SLUG });
+    expect(find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: "eventos",
+        where: { and: [{ slug: { equals: "seminario-de-gestao-escolar" } }, { id: { not_equals: "9" } }] },
+        draft: true,
+        limit: 1,
+        depth: 0,
+      }),
+    );
+    expect(update).not.toHaveBeenCalled();
+  });
+
+  it("traduz a ValidationError de unicidade do slug lançada pelo Payload", async () => {
+    findByID.mockResolvedValue({ slug: "novo-evento-rascunho-abc" });
+    update.mockRejectedValue(slugDuplicado());
+    expect(await salvarCamposEvento("9", campos)).toEqual({ ok: false, erro: ERRO_SLUG });
+  });
+});
+
+describe("publicarEvento", () => {
+  it("traduz a colisão de slug que só aparece ao publicar", async () => {
+    update.mockRejectedValue(slugDuplicado());
+    expect(await publicarEvento("9")).toEqual({ ok: false, erro: ERRO_SLUG });
+  });
+
+  it("outros erros seguem com a mensagem original", async () => {
+    update.mockRejectedValue(new Error("falhou"));
+    expect(await publicarEvento("9")).toEqual({ ok: false, erro: "falhou" });
   });
 });
