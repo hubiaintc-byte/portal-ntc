@@ -35,7 +35,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ erro: "Proposta não encontrada." }, { status: 404 });
     }
     const { html } = montarHtmlDocumentoProposta(dados);
-    return new NextResponse(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+    return new NextResponse(html, {
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        // Servido na origem do painel: nenhum script roda e nada é buscado
+        // fora do próprio documento (fontes e logos vão embutidos).
+        "Content-Security-Policy":
+          "default-src 'none'; style-src 'unsafe-inline'; font-src data:; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "Cache-Control": "private, no-store",
+      },
+    });
   }
 
   const resultado = await gerarESalvarPdfProposta(id);

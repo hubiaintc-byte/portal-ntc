@@ -87,3 +87,19 @@ describe("cssPaginasProposta", () => {
     expect(c).toContain('content: "A\\"B\\\\C\\A D";');
   });
 });
+
+describe("cssPaginasProposta — texto da proposta dentro do <style>", () => {
+  const base = { sigla: "EDUTEC", codigo: "NTC-PROP-2026-X-v01", validade: "", emissao: "" };
+
+  it("não deixa a sigla, o código ou as datas fecharem o <style>", () => {
+    const ataque = "</style><script>fetch('//x')</script>";
+    const css = cssPaginasProposta({ ...base, sigla: ataque, codigo: ataque, validade: ataque });
+    expect(css.toLowerCase()).not.toContain("</style");
+    expect(css.toLowerCase()).not.toContain("<script");
+    expect(css).toContain("\\3C /style\\3E ");
+  });
+
+  it("mantém o texto comum intacto", () => {
+    expect(cssPaginasProposta(base)).toContain('"Instituto NTC do Brasil · EDUTEC"');
+  });
+});

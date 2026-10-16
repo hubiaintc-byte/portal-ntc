@@ -79,6 +79,15 @@ describe("faltas", () => {
     expect(faltasParaRascunho({ sigla: " ", nomeCompleto: "" })).toEqual(["Sigla", "Nome completo"]);
     expect(faltasParaRascunho({ sigla: "X", nomeCompleto: "Y" })).toEqual([]);
   });
+  it("sigla aceita só letras maiúsculas, números e + (vai crua para o cabeçalho do PDF)", () => {
+    for (const sigla of ["EDUTEC", "PROSUS+", "PEI", "M2026"]) {
+      expect(faltasParaRascunho({ sigla, nomeCompleto: "Y" })).toEqual([]);
+    }
+    const msg = "Sigla: use só letras maiúsculas, números e +";
+    for (const sigla of ["</STYLE><SCRIPT>", "PRO SUS", "EDU-TEC", "edutec", 'A"B']) {
+      expect(faltasParaRascunho({ sigla, nomeCompleto: "Y" })).toEqual([msg]);
+    }
+  });
   it("publicação completa não tem faltas (descrição do diferencial é opcional)", () => {
     expect(faltasParaPublicar(completo)).toEqual([]);
   });

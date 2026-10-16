@@ -91,9 +91,17 @@ export function filtrarModulos<T extends ModuloFiltravel>(lista: readonly T[], f
 const vazio = (v: string) => v.trim() === "";
 
 /** Sigla para o rascunho ser encontrável; nome porque o slug (único) deriva dele (`autoSlug`). */
+/**
+ * Formato da sigla: letras maiúsculas, números e `+` (PROSUS+, PROAPS+). A
+ * sigla vai para o cabeçalho de cada página do PDF da proposta, então só
+ * caracteres que não têm significado em HTML/CSS.
+ */
+const FORMATO_SIGLA = /^[A-Z0-9+]+$/;
+
 export function faltasParaRascunho(p: { sigla: string; nomeCompleto: string }): string[] {
   const faltas: string[] = [];
   if (vazio(p.sigla)) faltas.push("Sigla");
+  else if (!FORMATO_SIGLA.test(p.sigla.trim())) faltas.push("Sigla: use só letras maiúsculas, números e +");
   if (vazio(p.nomeCompleto)) faltas.push("Nome completo");
   return faltas;
 }

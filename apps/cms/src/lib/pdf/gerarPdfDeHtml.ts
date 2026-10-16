@@ -37,7 +37,14 @@ async function abrirBrowser(): Promise<Browser> {
 export async function gerarPdfDeHtml(html: string): Promise<Buffer> {
   const browser = await abrirBrowser();
   try {
-    const page = await browser.newPage();
+    // O documento é estático e autocontido (fontes e logos embutidos, nenhum
+    // <script>): o Chromium roda sem JavaScript e sem rede. Se algum texto
+    // escapar do escape do HTML, ele não executa nem consegue mandar a
+    // proposta para fora. `page.evaluate` (abaixo) continua funcionando — o
+    // Playwright avalia num mundo isolado, não pelos scripts da página.
+    const contexto = await browser.newContext({ javaScriptEnabled: false });
+    const page = await contexto.newPage();
+    await page.route("**/*", (rota) => rota.abort());
     await page.setContent(html, { waitUntil: "load" });
     // As fontes da marca (Cormorant Garamond, Barlow) vão embutidas como
     // data URI base64 no próprio HTML (ver

@@ -38,9 +38,21 @@ export interface MetaPaginasProposta {
   emissao: string;
 }
 
-/** Texto como string CSS (para `content:`): escapa aspas, barra e quebra de linha. */
+/**
+ * Texto como string CSS (para `content:`): escapa barra, aspas e quebra de
+ * linha, e também `<`/`>` como escapes CSS (`\3C `/`\3E `). O resultado vai
+ * dentro de um `<style>`, onde o parser HTML só procura `</style` — sem escapar
+ * `<`, um texto como `</style><script>…` (sigla, código) fecharia o bloco e
+ * injetaria HTML no documento renderizado pelo Chromium.
+ */
 function stringCss(texto: string): string {
-  return `"${texto.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\r?\n/g, "\\A ")}"`;
+  const escapado = texto
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\r?\n/g, "\\A ")
+    .replace(/</g, "\\3C ")
+    .replace(/>/g, "\\3E ");
+  return `"${escapado}"`;
 }
 
 /**
