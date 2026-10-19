@@ -1,5 +1,7 @@
 import { Fragment } from "react";
 
+import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
+
 import type { EventoHibrido, EventoPresencial } from "./conteudoEventos";
 import { CountdownSidebar } from "./CountdownSidebar";
 import { EventoSubnav } from "./EventoSubnav";
@@ -223,7 +225,7 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                       <article key={i} className="speaker-detail-card">
                         <div className="speaker-detail-portrait">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={p.foto} alt={p.nome} loading="lazy" />
+                          <img {...imgResponsiva(p.foto, "(max-width: 599px) 100vw, (max-width: 1099px) 50vw, 250px")} alt={p.nome} loading="lazy" />
                         </div>
                         <div className="speaker-detail-info">
                           <span className="role">{p.role}</span>
@@ -395,7 +397,7 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
               <div className="sidebar-card">
                 <div className="sidebar-card-cover">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={evento.sidebar.coverImg} alt={evento.titulo} loading="lazy" />
+                  <img {...imgResponsiva(evento.sidebar.coverImg, "(max-width: 1099px) 100vw, 380px")} alt={evento.titulo} loading="lazy" />
                   <span className="sidebar-card-status">{evento.sidebar.status}</span>
                 </div>
                 <div className="sidebar-card-body">
@@ -489,7 +491,7 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                   <div
                     className="es-cover-img"
                     aria-hidden="true"
-                    style={{ backgroundImage: `url('${card.coverImg}')` }}
+                    style={fundoResponsivo(card.coverImg, "miniatura")}
                   />
                   <div className="es-cover-overlay" />
                   {card.date.tipo === "range" ? (

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { fundoResponsivo } from "@/lib/imagemLocal";
 import { carregarContatos } from "@/lib/contatos";
 
 import { CONTEUDO_OGRUPO, montarEnderecoOGrupo } from "./conteudoOGrupo";
@@ -166,7 +167,7 @@ export default async function OGrupoPage() {
       >
         <div
           className="grupo-hero-bg"
-          style={{ backgroundImage: `url('${heroImgUrl}')` }}
+          style={fundoResponsivo(heroImgUrl)}
           aria-hidden
         />
 

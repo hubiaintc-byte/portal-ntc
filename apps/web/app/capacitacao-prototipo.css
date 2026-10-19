@@ -300,6 +300,9 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   background-image:
     linear-gradient(125deg, rgba(11, 23, 38, 0.92) 0%, rgba(17, 54, 94, 0.80) 55%, rgba(11, 23, 38, 0.72) 100%),
     url('/img/fotos/_optimized/hero-grupo-plenaria.1920.webp');
+  background-image:
+    linear-gradient(125deg, rgba(11, 23, 38, 0.92) 0%, rgba(17, 54, 94, 0.80) 55%, rgba(11, 23, 38, 0.72) 100%),
+    image-set(url("/img/fotos/_optimized/hero-grupo-plenaria.1920.avif") type("image/avif"), url("/img/fotos/_optimized/hero-grupo-plenaria.1920.webp") type("image/webp"));
   background-size: cover;
   background-position: center 42%;
   filter: saturate(88%) contrast(1.06);
@@ -469,6 +472,9 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   background-image:
     linear-gradient(135deg, rgba(11, 23, 38, 0.93) 0%, rgba(17, 54, 94, 0.74) 60%, rgba(11, 23, 38, 0.84) 100%),
     url('/img/fotos/_optimized/sintese-mesa-executiva.1920.webp');
+  background-image:
+    linear-gradient(135deg, rgba(11, 23, 38, 0.93) 0%, rgba(17, 54, 94, 0.74) 60%, rgba(11, 23, 38, 0.84) 100%),
+    image-set(url("/img/fotos/_optimized/sintese-mesa-executiva.1920.avif") type("image/avif"), url("/img/fotos/_optimized/sintese-mesa-executiva.1920.webp") type("image/webp"));
   background-size: cover;
   background-position: center 40%;
   background-attachment: fixed;
@@ -890,6 +896,9 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   background-image:
     linear-gradient(160deg, rgba(11, 23, 38, 0.20) 0%, rgba(11, 23, 38, 0.06) 50%, transparent 100%),
     url('/img/fotos/_optimized/credibilidade-ato-institucional.1920.webp');
+  background-image:
+    linear-gradient(160deg, rgba(11, 23, 38, 0.20) 0%, rgba(11, 23, 38, 0.06) 50%, transparent 100%),
+    image-set(url("/img/fotos/_optimized/credibilidade-ato-institucional.1920.avif") type("image/avif"), url("/img/fotos/_optimized/credibilidade-ato-institucional.1920.webp") type("image/webp"));
   background-size: cover; background-position: center;
   border: 1px solid var(--prata-30);
   filter: saturate(92%) contrast(1.02);
@@ -922,6 +931,9 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   background-image:
     linear-gradient(135deg, rgba(11, 23, 38, 0.93) 0%, rgba(17, 54, 94, 0.78) 60%, rgba(11, 23, 38, 0.86) 100%),
     url('/img/fotos/_optimized/eventon-estudio.1920.webp');
+  background-image:
+    linear-gradient(135deg, rgba(11, 23, 38, 0.93) 0%, rgba(17, 54, 94, 0.78) 60%, rgba(11, 23, 38, 0.86) 100%),
+    image-set(url("/img/fotos/_optimized/eventon-estudio.1920.avif") type("image/avif"), url("/img/fotos/_optimized/eventon-estudio.1920.webp") type("image/webp"));
   background-size: cover; background-position: center 42%;
   filter: saturate(85%) contrast(1.06);
 }
@@ -1190,6 +1202,9 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   background-image:
     linear-gradient(135deg, rgba(11, 23, 38, 0.94) 0%, rgba(17, 54, 94, 0.80) 60%, rgba(11, 23, 38, 0.88) 100%),
     url('/img/fotos/_optimized/cta-institucional-premium2.1920.webp');
+  background-image:
+    linear-gradient(135deg, rgba(11, 23, 38, 0.94) 0%, rgba(17, 54, 94, 0.80) 60%, rgba(11, 23, 38, 0.88) 100%),
+    image-set(url("/img/fotos/_optimized/cta-institucional-premium2.1920.avif") type("image/avif"), url("/img/fotos/_optimized/cta-institucional-premium2.1920.webp") type("image/webp"));
   background-size: cover; background-position: center 42%;
   filter: saturate(86%) contrast(1.04);
 }

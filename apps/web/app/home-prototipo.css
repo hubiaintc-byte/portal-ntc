@@ -1732,6 +1732,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .experts-section--premium .experts-parallax {
   position: absolute; inset: -60px 0 -60px 0; z-index: 0;
   background-image: url('/img/fotos/_optimized/plenario-publico.1920.webp');
+  background-image: image-set(url("/img/fotos/_optimized/plenario-publico.1920.avif") type("image/avif"), url("/img/fotos/_optimized/plenario-publico.1920.webp") type("image/webp"));
   background-size: cover; background-position: center;
   opacity: 0.13; filter: grayscale(0.4) saturate(0.9);
   transform: translateY(var(--parallax-y, 0));
@@ -1842,9 +1843,13 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
   transition: transform 900ms ease-out, filter 700ms ease-out;
 }
 .vitrine:hover .vitrine-img { transform: scale(1.04); filter: saturate(95%); }
-.vitrine[data-vertical="gov"] .vitrine-img { background-image: url('/img/fotos/_optimized/area-gestao-publica.1920.webp'); }
+/* Fotos em avif via image-set() (lib/imagemLocal.ts). As fotos do slider do
+   herói (hero-principal, area-educacao, contratacao, eventon-estudio) ficam só
+   em webp neste arquivo: o <img> do slider já baixa o .webp, e o avif aqui
+   baixaria a mesma foto duas vezes na Home. */
+.vitrine[data-vertical="gov"] .vitrine-img { background-image: url('/img/fotos/_optimized/area-gestao-publica.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/area-gestao-publica.1920.avif") type("image/avif"), url("/img/fotos/_optimized/area-gestao-publica.1920.webp") type("image/webp")); }
 .vitrine[data-vertical="edu"] .vitrine-img { background-image: url('/img/fotos/_optimized/area-educacao.1920.webp'); }
-.vitrine[data-vertical="sau"] .vitrine-img { background-image: url('/img/fotos/_optimized/area-saude.1920.webp'); }
+.vitrine[data-vertical="sau"] .vitrine-img { background-image: url('/img/fotos/_optimized/area-saude.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/area-saude.1920.avif") type("image/avif"), url("/img/fotos/_optimized/area-saude.1920.webp") type("image/webp")); }
 
 .vitrine::before {
   content: ''; position: absolute; inset: 0; z-index: 1;

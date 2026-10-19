@@ -11,6 +11,7 @@ import {
 } from "@/lib/eventos/adaptarParaCard";
 import { buscarOverride } from "@/lib/cms/overrideEventoOnline";
 import { derivarDatasEvento } from "@/lib/cms/derivarDatasEvento";
+import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
 
 import { SliderHero, type SlidePremium } from "./SliderHero";
 import { FALLBACK_HOME } from "./conteudoFallback";
@@ -41,6 +42,16 @@ export const metadata: Metadata = {
 };
 
 const f = FALLBACK_HOME;
+
+/**
+ * Fotos que o slider do herói já baixa em .webp (`<img>`, sem avif): os fundos
+ * que repetem a mesma foto ficam no mesmo .webp, senão a Home a baixaria duas
+ * vezes (webp no slider + avif no fundo).
+ */
+const FOTOS_DO_SLIDER = new Set<string>(f.slider.slides.map((s) => s.imagemSrc));
+function fundoHome(src: string) {
+  return FOTOS_DO_SLIDER.has(src) ? { backgroundImage: `url('${src}')` } : fundoResponsivo(src);
+}
 
 type EventoReal = NonNullable<(typeof EVENTOS_AGENDA)[keyof typeof EVENTOS_AGENDA]>;
 
@@ -135,7 +146,7 @@ export default async function HomePage() {
                 <div className="event-cover">
                   <div
                     className="event-cover-img"
-                    style={{ backgroundImage: `url('${evt.imagemSrc}')` }}
+                    style={fundoHome(evt.imagemSrc)}
                     aria-hidden="true"
                   />
                   <div className="event-cover-overlay" />
@@ -233,7 +244,7 @@ export default async function HomePage() {
                   <div className="es-cover">
                     <div
                       className="es-cover-img"
-                      style={{ backgroundImage: `url('${evt.imagemSrc}')` }}
+                      style={fundoResponsivo(evt.imagemSrc, "miniatura")}
                       aria-hidden="true"
                     />
                     <div className="es-cover-overlay" />
@@ -361,7 +372,7 @@ export default async function HomePage() {
               <article key={area.vert} className="area-card" data-vert={area.vert}>
                 <div
                   className="area-card-img"
-                  style={{ backgroundImage: `url('${area.imagemSrc}')` }}
+                  style={fundoHome(area.imagemSrc)}
                   aria-hidden="true"
                 />
                 <div className="area-card-overlay" />
@@ -539,7 +550,7 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="solutions-image">
-              <img src={f.solucoes.imagemSrc} alt={f.solucoes.imagemAlt} loading="lazy" />
+              <img {...imgResponsiva(f.solucoes.imagemSrc, "(max-width: 899px) 100vw, (max-width: 1199px) 45vw, 576px")} alt={f.solucoes.imagemAlt} loading="lazy" />
             </div>
           </div>
         </div>
@@ -559,7 +570,7 @@ export default async function HomePage() {
               <article key={m.titulo} className="mode-card">
                 <div
                   className="mode-card-bg"
-                  style={{ backgroundImage: `url('${m.imagemSrc}')` }}
+                  style={fundoHome(m.imagemSrc)}
                   aria-hidden="true"
                 />
                 <div className="mode-card-overlay" />

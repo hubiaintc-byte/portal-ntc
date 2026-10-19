@@ -1,5 +1,7 @@
 import { Fragment } from "react";
 
+import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
+
 import type { Modulo } from "./conteudoModulos";
 import { ModuloCountdownSidebar } from "./ModuloCountdownSidebar";
 import { ModuloFaq } from "./ModuloFaq";
@@ -60,7 +62,7 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
         <div
           className="evt-hero-bg"
           aria-hidden="true"
-          style={{ backgroundImage: `url('${modulo.hero.bgImg}')` }}
+          style={fundoResponsivo(modulo.hero.bgImg)}
         />
         <div className="container evt-hero-content fade-in">
           <div className="evt-hero-tags">
@@ -237,7 +239,7 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                     <article key={i} className="speaker-detail-card">
                       <div className="speaker-detail-portrait">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={p.foto} alt={`${p.nome} · ${p.roleTag}`} loading="lazy" />
+                        <img {...imgResponsiva(p.foto, "(max-width: 599px) 100vw, (max-width: 1099px) 50vw, 250px")} alt={`${p.nome} · ${p.roleTag}`} loading="lazy" />
                         <span className="speaker-role-tag">{p.roleTag}</span>
                       </div>
                       <div className="speaker-detail-info">
@@ -406,7 +408,7 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
               <div className="sb-card">
                 <div className="sb-cover">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={modulo.sidebar.coverImg} alt={modulo.metaTitle} loading="lazy" />
+                  <img {...imgResponsiva(modulo.sidebar.coverImg, "(max-width: 1099px) 100vw, 380px")} alt={modulo.metaTitle} loading="lazy" />
                   <span className="sb-status">{modulo.sidebar.status}</span>
                   <span
                     className="sb-cover-eventon"
@@ -499,7 +501,7 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
                   <div
                     className="es-cover-img"
                     aria-hidden="true"
-                    style={{ backgroundImage: `url('${card.coverImg}')` }}
+                    style={fundoResponsivo(card.coverImg, "miniatura")}
                   />
                   <div className="es-cover-overlay" />
                   {card.date.tipo === "range" ? (
