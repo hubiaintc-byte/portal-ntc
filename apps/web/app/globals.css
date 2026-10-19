@@ -126,3 +126,16 @@ h6 {
 .skip-link:focus {
   top: 1rem;
 }
+
+/*
+ * Fundos inline das fotos de public/img/fotos/_optimized (lib/imagemLocal.ts,
+ * `fundoResponsivo`): o `style` traz o `url()` do .webp de sempre e a custom
+ * property `--fundo-set` com um `image-set()` avif/webp (e .640 onde o fundo
+ * é pequeno). Só aplica onde o navegador entende `image-set(... type())`;
+ * o `!important` é o único jeito de uma folha vencer o `style` inline.
+ */
+@supports (background-image: image-set(url("data:,") type("image/avif") 1x)) {
+  [style*="--fundo-set"] {
+    background-image: var(--fundo-set) !important;
+  }
+}
