@@ -1,11 +1,9 @@
-import type { Config, Field, Plugin } from "payload";
-
 /**
  * Ajustes de schema da atualização Payload 3.18 → 3.90.
  *
- * O banco é um só para dev e produção, e o `payload:push:schema` é manual
- * (CLAUDE.md §14). Estes dois ajustes deixam o código novo rodar contra o
- * schema que JÁ está no banco, sem exigir push no mesmo deploy.
+ * Sobrou só a marca de RLS: os ajustes temporários (`_objectKey` virtual,
+ * sessões e `minRequestInterval` desligados) saíram em 19/10/2026, depois do
+ * push que criou as colunas e tabelas do 3.90.
  */
 
 const ENABLE_RLS = Symbol.for("drizzle:EnableRLS");
@@ -30,34 +28,3 @@ export function manterRlsLigado<S extends { tables: Record<string, unknown> }>({
   }
   return schema;
 }
-
-const COLECOES_COM_STORAGE = ["media", "documentos-comerciais"];
-
-function tornarObjectKeyVirtual(fields: Field[]): Field[] {
-  return fields.map((field) =>
-    "name" in field && field.name === "_objectKey" && field.type === "text"
-      ? { ...field, virtual: true }
-      : field,
-  );
-}
-
-/**
- * Plugin que precisa vir DEPOIS dos `s3Storage`: o plugin de storage do
- * Payload 3.90 acrescenta o campo `_objectKey` às coleções de upload, com
- * coluna própria (`_objectkey`) que não existe no banco — e toda leitura de
- * `media`/`documentos-comerciais` (e de qualquer documento que as popule)
- * falharia com `column "_objectkey" does not exist`.
- *
- * O `_objectKey` só é preenchido em uploads feitos direto do navegador
- * (`clientUploads`), que este projeto não usa: nos uploads pelo servidor ele
- * fica vazio. Marcá-lo como `virtual` (sem coluna) é, portanto, equivalente
- * para nós. TEMPORÁRIO: depois do push que cria a coluna, remover este plugin.
- */
-export const objectKeySemColuna: Plugin = (config: Config): Config => ({
-  ...config,
-  collections: (config.collections ?? []).map((colecao) =>
-    COLECOES_COM_STORAGE.includes(colecao.slug)
-      ? { ...colecao, fields: tornarObjectKeyVirtual(colecao.fields) }
-      : colecao,
-  ),
-});

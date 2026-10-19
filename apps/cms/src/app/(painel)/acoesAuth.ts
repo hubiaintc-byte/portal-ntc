@@ -2,6 +2,7 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { createLocalReq, logoutOperation } from "payload";
 
 import { checarRateLimit, LIMITE_RECUPERACAO } from "@ntc/lib";
 import type {
@@ -11,7 +12,7 @@ import type {
   RegistrationResponseJSON,
 } from "@simplewebauthn/server";
 
-import { COOKIE_SESSAO, obterUsuarioCms } from "@/lib/cms/autenticacao";
+import { COOKIE_SESSAO, obterUsuarioAutenticado, obterUsuarioCms } from "@/lib/cms/autenticacao";
 import {
   confirmarCadastroPasskey,
   confirmarLoginPasskey,
@@ -130,8 +131,26 @@ export async function verificarAutenticacaoPasskey(
 
 /** Encerra a sessão (apaga o cookie) e volta ao login. */
 export async function sair(): Promise<void> {
+  await encerrarSessaoNoServidor();
   (await cookies()).delete(COOKIE_SESSAO);
   redirect("/entrar");
+}
+
+/**
+ * Remove a sessão do token atual de `users.sessions`: sem isso o JWT seguiria
+ * válido até expirar (14 dias), mesmo depois do "Sair". Falhar aqui não impede
+ * o logout no navegador — só fica registrado.
+ */
+async function encerrarSessaoNoServidor(): Promise<void> {
+  const usuario = await obterUsuarioAutenticado();
+  if (!usuario) return;
+  try {
+    const payload = await obterPayload();
+    const req = await createLocalReq({ user: usuario }, payload);
+    await logoutOperation({ collection: payload.collections.users, req });
+  } catch (e) {
+    console.error("[sair] não foi possível encerrar a sessão no servidor", e);
+  }
 }
 
 const MENSAGEM_RECUPERACAO =
