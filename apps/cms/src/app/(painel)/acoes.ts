@@ -11,7 +11,7 @@ import {
   obterUsuarioCms,
   obterUsuarioCmsComPerfil,
 } from "@/lib/cms/autenticacao";
-import { PERFIS_EVENTOS, PERFIS_INSTITUCIONAL } from "@/lib/cms/perfis";
+import { PERFIS_EDITORIAIS, PERFIS_EVENTOS, PERFIS_INSTITUCIONAL, temPerfil } from "@/lib/cms/perfis";
 import {
   listarAreasCms,
   listarCardsCorpoDocenteCms,
@@ -412,8 +412,6 @@ export async function removerPasskeyAdminCms(passkeyId: string): Promise<Resulta
  * contatos §5).
  */
 
-const PERFIS_EDITORIAIS = ["super-admin", "editor-institucional"];
-
 const RECUSADO_EDITORIAL: ResultadoEscrita = {
   ok: false,
   erro: "Você não tem permissão para esta ação.",
@@ -423,7 +421,7 @@ const RECUSADO_EDITORIAL: ResultadoEscrita = {
 async function barrarNaoEditorial(): Promise<ResultadoEscrita | null> {
   const usuario = await obterUsuarioCms();
   if (!usuario) return RECUSADO;
-  if (!PERFIS_EDITORIAIS.includes(usuario.perfil)) return RECUSADO_EDITORIAL;
+  if (!temPerfil(usuario.perfil, PERFIS_EDITORIAIS)) return RECUSADO_EDITORIAL;
   return null;
 }
 
