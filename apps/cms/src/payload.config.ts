@@ -43,13 +43,11 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 const bucket = process.env.SUPABASE_BUCKET || "ntc-portal-media";
-// Bucket dedicado e privado para documentos comerciais (propostas em PDF —
-// CRM Fase B2). Enquanto SUPABASE_BUCKET_PRIVADO não for criado no Supabase
-// e configurado, cai de volta no bucket público de `media` — a coleção
-// documentos-comerciais.access.read continua exigindo usuário autenticado
-// via /api/documentos-comerciais/file/*, mas o objeto em si só fica
-// realmente privado quando o bucket dedicado existir. Ver CLAUDE.md §12.
-const bucketPrivado = process.env.SUPABASE_BUCKET_PRIVADO || bucket;
+// Bucket dedicado e privado para documentos comerciais (propostas, contratos,
+// empenhos). Sem SUPABASE_BUCKET_PRIVADO o plugin precisa de algum nome, mas
+// nenhum arquivo chega a ele: o hook `protegerDocumentoComercial` recusa o
+// upload antes (falha fechada, desde 19/10/2026). Ver CLAUDE.md §12.
+const bucketPrivado = process.env.SUPABASE_BUCKET_PRIVADO || "documentos-comerciais-sem-bucket";
 
 /**
  * Configuração do Payload 3 — Portal Grupo NTC · Sprint F.

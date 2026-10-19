@@ -24,7 +24,19 @@ export interface StoreRateLimit {
   contarDesde(rota: string, ip: string, desde: Date): Promise<number>;
   registrar(rota: string, ip: string): Promise<void>;
   limparAntesDe(rota: string, ip: string, antesDe: Date): Promise<void>;
+  /**
+   * Apaga tentativas de qualquer (rota, IP) anteriores a `antesDe`. Sem ela,
+   * IPs que não voltam deixariam linhas para sempre (`limparAntesDe` só limpa
+   * o par da requisição atual).
+   */
+  limparTudoAntesDe?(antesDe: Date): Promise<void>;
 }
+
+/** Tentativas mais velhas que isto não servem a nenhuma janela de limite. */
+export const RETENCAO_TENTATIVAS_SEGUNDOS = 24 * 60 * 60;
+
+/** Fração das requisições que também faz a limpeza geral (barata, com índice em `created_at`). */
+const CHANCE_LIMPEZA_GERAL = 0.05;
 
 /** Formulários públicos: 5 envios por IP a cada 10 minutos. */
 export const LIMITE_PADRAO: LimiteRota = { maxTentativas: 5, janelaSegundos: 600 };
@@ -40,8 +52,16 @@ export async function checarRateLimit(
   rota: string,
   store: StoreRateLimit,
   limite: LimiteRota = LIMITE_PADRAO,
+  opcoes: { sorteio?: () => number } = {},
 ): Promise<ResultadoRateLimit> {
   if (process.env.RATELIMIT_ENABLED !== "true") return { ok: true };
+
+  if (store.limparTudoAntesDe && (opcoes.sorteio ?? Math.random)() < CHANCE_LIMPEZA_GERAL) {
+    // Manutenção: nunca decide o limite, então falhar aqui não bloqueia ninguém.
+    await store
+      .limparTudoAntesDe(new Date(Date.now() - RETENCAO_TENTATIVAS_SEGUNDOS * 1000))
+      .catch((e: unknown) => console.error("[checarRateLimit] limpeza geral", e));
+  }
 
   const inicioJanela = new Date(Date.now() - limite.janelaSegundos * 1000);
   try {
