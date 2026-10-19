@@ -11,6 +11,7 @@ import {
 } from "@ntc/lib";
 import type { Payload, PayloadRequest } from "payload";
 
+import { contarModulosPorPrograma } from "@/lib/cms/agregadosCrm";
 import { contarDependentesModulo, contarDependentesPrograma } from "@/lib/crm/exclusaoCatalogo";
 import { idaEVoltaPreserva, lexicalParaMarkdown } from "@/lib/markdownLexical";
 import { obterPayload } from "@/lib/payloadClient";
@@ -111,17 +112,20 @@ export async function listarAreasCrm(): Promise<AreaOpcao[]> {
 
 export async function listarProgramasCrm(): Promise<ProgramaCrmResumo[]> {
   const payload = await obterPayload();
-  const [ultimas, principais, modulos] = await Promise.all([
-    payload.find({ collection: "programas", depth: 1, limit: 200, draft: true, sort: "sigla" }),
+  const [ultimas, principais, contagem] = await Promise.all([
+    payload.find({
+      collection: "programas",
+      depth: 1,
+      limit: 200,
+      draft: true,
+      sort: "sigla",
+      select: { sigla: true, nomeCompleto: true, area: true, _status: true },
+      populate: { areas: { nome: true } },
+    }),
     payload.find({ collection: "programas", depth: 0, limit: 200, draft: false, select: { _status: true } }),
-    payload.find({ collection: "modulos", depth: 0, limit: 2000, select: { programa: true } }),
+    contarModulosPorPrograma(payload),
   ]);
   const statusPrincipal = new Map(principais.docs.map((p) => [String(p.id), p._status]));
-  const contagem = new Map<string, number>();
-  for (const m of modulos.docs) {
-    const pid = idDe(m.programa);
-    if (pid !== null) contagem.set(pid, (contagem.get(pid) ?? 0) + 1);
-  }
   return ultimas.docs.map((p) => ({
     id: String(p.id),
     sigla: p.sigla ?? "",
@@ -135,7 +139,15 @@ export async function listarProgramasCrm(): Promise<ProgramaCrmResumo[]> {
 
 export async function listarModulosCrm(): Promise<ModuloCrmResumo[]> {
   const payload = await obterPayload();
-  const res = await payload.find({ collection: "modulos", depth: 1, limit: 2000, sort: "numero" });
+  // Do programa só se exibe a sigla: populado nela, sem os textos do programa.
+  const res = await payload.find({
+    collection: "modulos",
+    depth: 1,
+    limit: 2000,
+    sort: "numero",
+    select: { numero: true, titulo: true, programa: true, comercial: true },
+    populate: { programas: { sigla: true } },
+  });
   return res.docs.map((m) => ({
     id: String(m.id),
     numero: m.numero,

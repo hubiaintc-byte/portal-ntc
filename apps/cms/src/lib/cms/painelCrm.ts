@@ -4,7 +4,6 @@ import type {
   ClienteCrm,
   DocumentoComercial,
   EnvioProposta,
-  Evento,
   EventoComercial,
   Lead,
   LinhaDoTempo,
@@ -12,7 +11,9 @@ import type {
   VersaoProposta,
 } from "@ntc/types";
 import type { Payload, Where } from "payload";
+import { cache } from "react";
 
+import { contarNegociosPorCliente, ultimoItemLinhaDoTempoPorCliente } from "@/lib/cms/agregadosCrm";
 import { credencialDaFicha } from "@/lib/documentoProposta/dados";
 import { modalidadeEhOnline } from "@/lib/documentoProposta/secoes/institucional";
 import {
@@ -294,7 +295,7 @@ function campoRelNum(v: unknown, campo: string): number | null {
   return null;
 }
 
-function mapearContatos(doc: ClienteCrm): ContatoResumo[] {
+function mapearContatos(doc: Pick<ClienteCrm, "contatos">): ContatoResumo[] {
   return (doc.contatos ?? []).map((c) => ({
     nome: c.nome,
     cargo: c.cargo ?? null,
@@ -312,7 +313,12 @@ interface AgregadosCliente {
   ultimoItemISO: string | null;
 }
 
-function mapearClienteResumo(doc: ClienteCrm, agregados: AgregadosCliente): ClienteCrmResumo {
+type ClienteResumoDoc = Pick<
+  ClienteCrm,
+  "id" | "orgao" | "sigla" | "municipio" | "uf" | "esfera" | "area" | "origem" | "responsavel" | "contatos"
+>;
+
+function mapearClienteResumo(doc: ClienteResumoDoc, agregados: AgregadosCliente): ClienteCrmResumo {
   const contatos = mapearContatos(doc);
   return {
     id: String(doc.id),
@@ -330,7 +336,58 @@ function mapearClienteResumo(doc: ClienteCrm, agregados: AgregadosCliente): Clie
   };
 }
 
-export function mapearLeadCrm(doc: Lead): LeadCrmResumo {
+/**
+ * Campos que o resumo do lead usa — e só eles. As listas leem com este
+ * `select` e populam as relações só com o rótulo que exibem (sigla do
+ * programa, órgão do cliente, nome do responsável).
+ */
+const SELECT_LEAD_RESUMO = {
+  nome: true,
+  email: true,
+  instituicao: true,
+  cargo: true,
+  detalhesProposta: { programa: true, participantesEstimados: true },
+  estagio: true,
+  perdido: true,
+  motivoPerda: true,
+  cliente: true,
+  responsavel: true,
+  valorEstimado: true,
+  origemEntrada: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+const POPULATE_LEAD_RESUMO = {
+  programas: { sigla: true },
+  "clientes-crm": { orgao: true },
+  users: { nome: true },
+} as const;
+
+type LeadResumoDoc = Pick<
+  Lead,
+  | "id"
+  | "nome"
+  | "email"
+  | "instituicao"
+  | "cargo"
+  | "estagio"
+  | "perdido"
+  | "motivoPerda"
+  | "cliente"
+  | "responsavel"
+  | "valorEstimado"
+  | "origemEntrada"
+  | "createdAt"
+  | "updatedAt"
+> & {
+  detalhesProposta?: {
+    programa?: unknown;
+    participantesEstimados?: number | null;
+  } | null;
+};
+
+export function mapearLeadCrm(doc: LeadResumoDoc): LeadCrmResumo {
   return {
     id: String(doc.id),
     nome: doc.nome,
@@ -362,6 +419,8 @@ export async function listarLeadsCrm(): Promise<LeadCrmResumo[]> {
     limit: 500,
     sort: "-createdAt",
     where: { tipo: { equals: "proposta" } },
+    select: SELECT_LEAD_RESUMO,
+    populate: POPULATE_LEAD_RESUMO,
   });
   return res.docs.map(mapearLeadCrm);
 }
@@ -377,7 +436,9 @@ export interface ItemLinhaDoTempoResumo {
   referencia: { colecao: string; id: string } | null;
 }
 
-function mapearItemLinhaDoTempo(doc: LinhaDoTempo): ItemLinhaDoTempoResumo {
+type ItemLinhaDoTempoDoc = Pick<LinhaDoTempo, "id" | "tipo" | "titulo" | "detalhe" | "usuario" | "em" | "lead" | "referencia">;
+
+function mapearItemLinhaDoTempo(doc: ItemLinhaDoTempoDoc): ItemLinhaDoTempoResumo {
   const ref = doc.referencia;
   return {
     id: String(doc.id),
@@ -396,7 +457,16 @@ export async function listarLinhaDoTempo(
 ): Promise<ItemLinhaDoTempoResumo[]> {
   const payload = await obterPayload();
   const where: Where = "clienteId" in filtro ? { cliente: { equals: filtro.clienteId } } : { lead: { equals: filtro.leadId } };
-  const res = await payload.find({ collection: "linha-do-tempo", depth: 1, limit: 300, sort: "-em", where });
+  const res = await payload.find({
+    collection: "linha-do-tempo",
+    depth: 1,
+    limit: 300,
+    sort: "-em",
+    where,
+    select: { tipo: true, titulo: true, detalhe: true, usuario: true, em: true, lead: true, referencia: true },
+    // `lead` só é usado como id; o populate fica no mínimo.
+    populate: { users: { nome: true }, leads: { nome: true } },
+  });
   return res.docs.map(mapearItemLinhaDoTempo);
 }
 
@@ -595,29 +665,30 @@ export async function obterLeadCrm(id: string): Promise<LeadCrmDetalhe | null> {
 
 export async function listarClientesCrm(): Promise<ClienteCrmResumo[]> {
   const payload = await obterPayload();
-  const res = await payload.find({
-    collection: "clientes-crm",
-    depth: 1,
-    limit: 500,
-    sort: "orgao",
-  });
-  // Agregados client-side (duas leituras, sem N+1): nº de negócios por
-  // cliente e o item mais recente da linha do tempo (ordenada por -em, o
-  // primeiro visto por cliente é o último registro).
-  const [leads, itens] = await Promise.all([
-    payload.find({ collection: "leads", depth: 0, limit: 1000, where: { tipo: { equals: "proposta" } } }),
-    payload.find({ collection: "linha-do-tempo", depth: 0, limit: 1000, sort: "-em" }),
+  // Agregados no banco (GROUP BY), sem trazer leads e linha do tempo inteiros:
+  // nº de negócios por cliente e o item mais recente da linha do tempo.
+  const [res, negociosPorCliente, ultimoItemPorCliente] = await Promise.all([
+    payload.find({
+      collection: "clientes-crm",
+      depth: 1,
+      limit: 500,
+      sort: "orgao",
+      select: {
+        orgao: true,
+        sigla: true,
+        municipio: true,
+        uf: true,
+        esfera: true,
+        area: true,
+        origem: true,
+        responsavel: true,
+        contatos: true,
+      },
+      populate: { users: { nome: true } },
+    }),
+    contarNegociosPorCliente(payload),
+    ultimoItemLinhaDoTempoPorCliente(payload),
   ]);
-  const negociosPorCliente = new Map<string, number>();
-  for (const lead of leads.docs) {
-    const clienteId = idRel(lead.cliente);
-    if (clienteId) negociosPorCliente.set(clienteId, (negociosPorCliente.get(clienteId) ?? 0) + 1);
-  }
-  const ultimoItemPorCliente = new Map<string, string>();
-  for (const item of itens.docs) {
-    const clienteId = idRel(item.cliente);
-    if (clienteId && !ultimoItemPorCliente.has(clienteId)) ultimoItemPorCliente.set(clienteId, item.em);
-  }
   return res.docs.map((doc) =>
     mapearClienteResumo(doc, {
       numNegocios: negociosPorCliente.get(String(doc.id)) ?? 0,
@@ -635,7 +706,15 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
     return null;
   }
   const [negocios, linhaDoTempo, eventosRes, propostas] = await Promise.all([
-    payload.find({ collection: "leads", depth: 1, limit: 200, sort: "-createdAt", where: { cliente: { equals: doc.id }, tipo: { equals: "proposta" } } }),
+    payload.find({
+      collection: "leads",
+      depth: 1,
+      limit: 200,
+      sort: "-createdAt",
+      where: { cliente: { equals: doc.id }, tipo: { equals: "proposta" } },
+      select: SELECT_LEAD_RESUMO,
+      populate: POPULATE_LEAD_RESUMO,
+    }),
     listarLinhaDoTempo({ clienteId: id }),
     payload.find({ collection: "eventos-comerciais", depth: 1, limit: 100, sort: "-dataInicio", where: { cliente: { equals: doc.id } } }),
     // Conta à parte dos negócios: uma proposta sobrevive à desvinculação de
@@ -662,6 +741,24 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
   };
 }
 
+/**
+ * Eventos do catálogo (rascunho incluso), com só os campos que o CRM exibe.
+ * `cache` por request: a página /crm pede a mesma leitura por
+ * `obterCatalogoCrm` e por `listarProdutosCrm`, e ela sai uma vez só.
+ */
+const lerEventosCatalogo = cache(async () => {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "eventos",
+    depth: 0,
+    limit: 500,
+    draft: true,
+    sort: "nome",
+    select: { nome: true, comercial: { codigo: true, valor: true } },
+  });
+  return res.docs;
+});
+
 export async function obterCatalogoCrm(): Promise<CatalogoCrm> {
   const payload = await obterPayload();
   const [programas, modulos, eventos, especialistas] = await Promise.all([
@@ -674,10 +771,26 @@ export async function obterCatalogoCrm(): Promise<CatalogoCrm> {
       draft: false,
       where: { _status: { equals: "published" } },
       sort: "sigla",
+      select: { sigla: true, nomeCompleto: true },
     }),
-    payload.find({ collection: "modulos", depth: 0, limit: 2000, draft: true, sort: "numero" }),
-    payload.find({ collection: "eventos", depth: 0, limit: 500, draft: true, sort: "nome" }),
-    payload.find({ collection: "especialistas", depth: 0, limit: 500, draft: true, sort: "nome" }),
+    payload.find({
+      collection: "modulos",
+      depth: 0,
+      limit: 2000,
+      draft: true,
+      sort: "numero",
+      select: { titulo: true, numero: true, programa: true },
+    }),
+    lerEventosCatalogo(),
+    payload.find({
+      collection: "especialistas",
+      depth: 0,
+      limit: 500,
+      draft: true,
+      sort: "nome",
+      // Os campos de `credencialDaFicha`, e nada mais.
+      select: { nome: true, titulacao: true, instituicao: true, cargoAtual: true },
+    }),
   ]);
   const publicados = new Set(programas.docs.map((p) => String(p.id)));
   return {
@@ -688,7 +801,7 @@ export async function obterCatalogoCrm(): Promise<CatalogoCrm> {
         return pid !== null && publicados.has(pid);
       })
       .map((m) => ({ id: String(m.id), titulo: m.titulo, numero: m.numero, programaId: idRel(m.programa) })),
-    eventos: eventos.docs.map((e) => ({ id: String(e.id), nome: e.nome })),
+    eventos: eventos.map((e) => ({ id: String(e.id), nome: e.nome })),
     especialistas: especialistas.docs.map((e) => ({
       id: String(e.id),
       nome: e.nome,
@@ -699,14 +812,13 @@ export async function obterCatalogoCrm(): Promise<CatalogoCrm> {
 
 export async function listarUsuariosCms(): Promise<UsuarioCmsResumo[]> {
   const payload = await obterPayload();
-  const res = await payload.find({ collection: "users", depth: 0, limit: 100, sort: "nome" });
+  const res = await payload.find({ collection: "users", depth: 0, limit: 100, sort: "nome", select: { nome: true, email: true } });
   return res.docs.map((u) => ({ id: String(u.id), nome: u.nome ?? u.email }));
 }
 
 export async function listarProdutosCrm(): Promise<ProdutoCrmResumo[]> {
-  const payload = await obterPayload();
-  const res = await payload.find({ collection: "eventos", depth: 0, limit: 500, draft: true, sort: "nome" });
-  return res.docs.map((e: Evento) => ({
+  const eventos = await lerEventosCatalogo();
+  return eventos.map((e) => ({
     id: String(e.id),
     nome: e.nome,
     codigo: e.comercial?.codigo ?? null,
@@ -714,7 +826,12 @@ export async function listarProdutosCrm(): Promise<ProdutoCrmResumo[]> {
   }));
 }
 
-function mapearPropostaResumo(doc: Proposta): PropostaResumo {
+type PropostaResumoDoc = Pick<
+  Proposta,
+  "id" | "codigo" | "codigoBase" | "versao" | "cliente" | "programa" | "valorLiquido" | "status" | "lead"
+>;
+
+function mapearPropostaResumo(doc: PropostaResumoDoc): PropostaResumo {
   const status = doc.status ?? "rascunho";
   return {
     id: String(doc.id),
@@ -730,7 +847,12 @@ function mapearPropostaResumo(doc: Proposta): PropostaResumo {
   };
 }
 
-function mapearEnvioResumo(doc: EnvioProposta): EnvioResumo {
+type EnvioResumoDoc = Pick<
+  EnvioProposta,
+  "id" | "proposta" | "data" | "canal" | "destinatarios" | "status" | "observacoes"
+>;
+
+function mapearEnvioResumo(doc: EnvioResumoDoc): EnvioResumo {
   return {
     id: String(doc.id),
     propostaCodigo: campoRel(doc.proposta, "codigo") ?? "",
@@ -745,7 +867,24 @@ function mapearEnvioResumo(doc: EnvioProposta): EnvioResumo {
 /** Só a versão vigente (maior `versao`) de cada `codigoBase`. */
 export async function listarPropostasCrm(): Promise<PropostaResumo[]> {
   const payload = await obterPayload();
-  const res = await payload.find({ collection: "propostas", limit: 1000, depth: 1 });
+  // Só os campos do resumo: sem os 12 textos e as 6 listas do documento, e
+  // com as relações populadas só no rótulo exibido.
+  const res = await payload.find({
+    collection: "propostas",
+    limit: 1000,
+    depth: 1,
+    select: {
+      codigo: true,
+      codigoBase: true,
+      versao: true,
+      cliente: true,
+      programa: true,
+      valorLiquido: true,
+      status: true,
+      lead: true,
+    },
+    populate: { "clientes-crm": { orgao: true }, programas: { sigla: true }, leads: { nome: true } },
+  });
   const porBase = new Map<string, PropostaResumo>();
   for (const doc of res.docs) {
     const resumo = mapearPropostaResumo(doc);
@@ -903,7 +1042,15 @@ export async function versoesDeProposta(codBase: string): Promise<VersaoResumo[]
 
 export async function todosEnviosCrm(): Promise<EnvioResumo[]> {
   const payload = await obterPayload();
-  const res = await payload.find({ collection: "envios", depth: 1, limit: 500, sort: "-data" });
+  const res = await payload.find({
+    collection: "envios",
+    depth: 1,
+    limit: 500,
+    sort: "-data",
+    select: { proposta: true, data: true, canal: true, destinatarios: true, status: true, observacoes: true },
+    // Da proposta só se exibe o código — sem isto vinha o documento inteiro.
+    populate: { propostas: { codigo: true } },
+  });
   return res.docs.map(mapearEnvioResumo);
 }
 
