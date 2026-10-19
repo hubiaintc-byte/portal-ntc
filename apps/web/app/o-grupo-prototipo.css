@@ -406,9 +406,9 @@
   background-size: cover; background-position: center;
   filter: saturate(80%) brightness(0.45);
 }
-.portfolio-vert-card.edu::before { background-image: url('/img/fotos/_optimized/area-educacao-premium.1920.webp'); }
-.portfolio-vert-card.gov::before { background-image: url('/img/fotos/_optimized/area-gestao-publica-premium.1920.webp'); }
-.portfolio-vert-card.sau::before { background-image: url('/img/fotos/_optimized/area-saude-premium2.1920.webp'); }
+.portfolio-vert-card.edu::before { background-image: url('/img/fotos/_optimized/area-educacao-premium.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/area-educacao-premium.1920.avif") type("image/avif"), url("/img/fotos/_optimized/area-educacao-premium.1920.webp") type("image/webp")); }
+.portfolio-vert-card.gov::before { background-image: url('/img/fotos/_optimized/area-gestao-publica-premium.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/area-gestao-publica-premium.1920.avif") type("image/avif"), url("/img/fotos/_optimized/area-gestao-publica-premium.1920.webp") type("image/webp")); }
+.portfolio-vert-card.sau::before { background-image: url('/img/fotos/_optimized/area-saude-premium2.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/area-saude-premium2.1920.avif") type("image/avif"), url("/img/fotos/_optimized/area-saude-premium2.1920.webp") type("image/webp")); }
 .portfolio-vert-card::after {
   content: ''; position: absolute; inset: 0; z-index: 0;
   background: linear-gradient(180deg, rgba(11,23,38,0.30) 0%, rgba(11,23,38,0.92) 100%);
@@ -939,6 +939,7 @@ html { scroll-padding-top: 148px; }
 .sintese-editorial-image {
   position: relative; min-height: 460px;
   background-image: url('/img/fotos/_optimized/sintese-mesa-executiva.1920.webp');
+  background-image: image-set(url("/img/fotos/_optimized/sintese-mesa-executiva.1920.avif") type("image/avif"), url("/img/fotos/_optimized/sintese-mesa-executiva.1920.webp") type("image/webp"));
   background-size: cover; background-position: center;
   overflow: hidden;
 }
@@ -1225,6 +1226,7 @@ html { scroll-padding-top: 148px; }
 .grupo-section--autoridade-dark::before {
   content: ''; position: absolute; inset: 0;
   background-image: url('/img/fotos/_optimized/plenario-publico.1920.webp');
+  background-image: image-set(url("/img/fotos/_optimized/plenario-publico.1920.avif") type("image/avif"), url("/img/fotos/_optimized/plenario-publico.1920.webp") type("image/webp"));
   background-size: cover; background-position: center;
   opacity: 0.07; filter: grayscale(0.5);
 }
@@ -1443,26 +1445,27 @@ html { scroll-padding-top: 148px; }
 .grupo-cta-final--image::after {
   content: ''; position: absolute; inset: 0; z-index: 0;
   background-image: url('/img/fotos/_optimized/cta-institucional-premium.1920.webp');
+  background-image: image-set(url("/img/fotos/_optimized/cta-institucional-premium.1920.avif") type("image/avif"), url("/img/fotos/_optimized/cta-institucional-premium.1920.webp") type("image/webp"));
   background-size: cover; background-position: center;
   opacity: 0.18; filter: grayscale(0.5) saturate(0.7);
 }
 .grupo-cta-final--image > .container { position: relative; z-index: 2; }
 
 /* === Mosaico das curadorias · imagens geradas premium === */
-.am-photo.am-gov { background-image: url('/img/fotos/_optimized/autoridade-gestao-publica.1920.webp'); }
-.am-photo.am-cont { background-image: url('/img/fotos/_optimized/autoridade-contratacoes.1920.webp'); }
-.am-photo.am-edu { background-image: url('/img/fotos/_optimized/autoridade-educacao.1920.webp'); }
-.am-photo.am-sau { background-image: url('/img/fotos/_optimized/autoridade-saude.1920.webp'); }
+.am-photo.am-gov { background-image: url('/img/fotos/_optimized/autoridade-gestao-publica.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/autoridade-gestao-publica.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/autoridade-gestao-publica.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/autoridade-gestao-publica.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/autoridade-gestao-publica.1920.webp") type("image/webp") 2x); }
+.am-photo.am-cont { background-image: url('/img/fotos/_optimized/autoridade-contratacoes.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/autoridade-contratacoes.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/autoridade-contratacoes.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/autoridade-contratacoes.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/autoridade-contratacoes.1920.webp") type("image/webp") 2x); }
+.am-photo.am-edu { background-image: url('/img/fotos/_optimized/autoridade-educacao.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/autoridade-educacao.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/autoridade-educacao.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/autoridade-educacao.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/autoridade-educacao.1920.webp") type("image/webp") 2x); }
+.am-photo.am-sau { background-image: url('/img/fotos/_optimized/autoridade-saude.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/autoridade-saude.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/autoridade-saude.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/autoridade-saude.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/autoridade-saude.1920.webp") type("image/webp") 2x); }
 
 /* === Mosaico de credibilidade · imagens geradas premium + reaproveitadas === */
-.cm-cell.cm-1 { background-image: url('/img/fotos/_optimized/credibilidade-ato-institucional.1920.webp'); }
-.cm-cell.cm-2 { background-image: url('/img/fotos/_optimized/plenario-publico.1920.webp'); }
-.cm-cell.cm-3 { background-image: url('/img/fotos/_optimized/eventon-online.1920.webp'); }
-.cm-cell.cm-4 { background-image: url('/img/fotos/_optimized/contratacao.1920.webp'); }
-.cm-cell.cm-5 { background-image: url('/img/fotos/_optimized/credibilidade-bastidor-transmissao.1920.webp'); }
-.cm-cell.cm-6 { background-image: url('/img/fotos/_optimized/area-educacao.1920.webp'); }
-.cm-cell.cm-7 { background-image: url('/img/fotos/_optimized/area-saude.1920.webp'); }
-.cm-cell.cm-8 { background-image: url('/img/fotos/_optimized/hero-secundario.1920.webp'); }
+.cm-cell.cm-1 { background-image: url('/img/fotos/_optimized/credibilidade-ato-institucional.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/credibilidade-ato-institucional.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/credibilidade-ato-institucional.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/credibilidade-ato-institucional.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/credibilidade-ato-institucional.1920.webp") type("image/webp") 2x); }
+.cm-cell.cm-2 { background-image: url('/img/fotos/_optimized/plenario-publico.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/plenario-publico.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/plenario-publico.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/plenario-publico.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/plenario-publico.1920.webp") type("image/webp") 2x); }
+.cm-cell.cm-3 { background-image: url('/img/fotos/_optimized/eventon-online.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/eventon-online.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/eventon-online.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/eventon-online.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/eventon-online.1920.webp") type("image/webp") 2x); }
+.cm-cell.cm-4 { background-image: url('/img/fotos/_optimized/contratacao.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/contratacao.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/contratacao.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/contratacao.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/contratacao.1920.webp") type("image/webp") 2x); }
+.cm-cell.cm-5 { background-image: url('/img/fotos/_optimized/credibilidade-bastidor-transmissao.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/credibilidade-bastidor-transmissao.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/credibilidade-bastidor-transmissao.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/credibilidade-bastidor-transmissao.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/credibilidade-bastidor-transmissao.1920.webp") type("image/webp") 2x); }
+.cm-cell.cm-6 { background-image: url('/img/fotos/_optimized/area-educacao.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/area-educacao.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/area-educacao.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/area-educacao.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/area-educacao.1920.webp") type("image/webp") 2x); }
+.cm-cell.cm-7 { background-image: url('/img/fotos/_optimized/area-saude.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/area-saude.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/area-saude.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/area-saude.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/area-saude.1920.webp") type("image/webp") 2x); }
+.cm-cell.cm-8 { background-image: url('/img/fotos/_optimized/hero-secundario.1920.webp'); background-image: image-set(url("/img/fotos/_optimized/hero-secundario.640.avif") type("image/avif") 1x, url("/img/fotos/_optimized/hero-secundario.1920.avif") type("image/avif") 2x, url("/img/fotos/_optimized/hero-secundario.640.webp") type("image/webp") 1x, url("/img/fotos/_optimized/hero-secundario.1920.webp") type("image/webp") 2x); }
 
 /* Banda de indicadores adicional acima do mosaico Oxford */
 .credibilidade-numbers {

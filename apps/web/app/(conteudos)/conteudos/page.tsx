@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
 
+import { fundoResponsivo } from "@/lib/imagemLocal";
 import { listarConteudosPublicados, listarDestaques } from "@/lib/conteudos";
 
 import {
@@ -194,7 +195,7 @@ export default async function ConteudosPage() {
                 >
                   <div
                     className="cont-featured-figura"
-                    style={d.imagemUrl ? { backgroundImage: `url('${d.imagemUrl}')` } : undefined}
+                    style={d.imagemUrl ? fundoResponsivo(d.imagemUrl) : undefined}
                   >
                     <span className="cont-featured-figura-tag">{d.tipoLabel}</span>
                   </div>

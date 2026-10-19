@@ -295,6 +295,7 @@ h1, h2, h3, h4 { font-family: var(--font-serif); color: var(--tinta); margin: 0;
 .hero-page-bg {
   position: absolute; inset: 0; z-index: 0;
   background-image: url('/img/fotos/_optimized/hero-contato-escritorio-institucional.1920.webp');
+  background-image: image-set(url("/img/fotos/_optimized/hero-contato-escritorio-institucional.1920.avif") type("image/avif"), url("/img/fotos/_optimized/hero-contato-escritorio-institucional.1920.webp") type("image/webp"));
   background-size: cover;
   background-position: center 42%;
   filter: saturate(86%) contrast(1.05);

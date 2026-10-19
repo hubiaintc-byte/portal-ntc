@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
+
 import {
   PROGRAMAS,
   SLUGS_VALIDOS,
@@ -106,7 +108,7 @@ export default async function ProgramaPage({ params }: Props) {
       <section className="prog-hero" aria-label={`${p.siglaExibida} · ${p.nomeCompleto}`}>
         <div
           className="prog-hero-bg"
-          style={{ backgroundImage: `url('${p.hero.bgSrc}')` }}
+          style={fundoResponsivo(p.hero.bgSrc)}
           aria-hidden="true"
         />
         <div className="container prog-hero-content fade-in">
@@ -335,7 +337,7 @@ export default async function ProgramaPage({ params }: Props) {
                       <article key={i} className="fpc-card">
                         <div className="fpc-portrait">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={c.imgSrc} alt={c.imgAlt} loading="lazy" />
+                          <img {...imgResponsiva(c.imgSrc, "(max-width: 599px) 80vw, 170px")} alt={c.imgAlt} loading="lazy" />
                           <span className="fpc-axis-badge">{c.axisBadge}</span>
                         </div>
                         <div className="fpc-info">
@@ -360,7 +362,7 @@ export default async function ProgramaPage({ params }: Props) {
                       <article key={i} className="fac-card">
                         <div className="fac-portrait">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={e.imgSrc} alt={e.imgAlt} loading="lazy" />
+                          <img {...imgResponsiva(e.imgSrc, "(max-width: 599px) 80vw, (max-width: 1099px) 45vw, 170px")} alt={e.imgAlt} loading="lazy" />
                           <span className="fac-axis-badge">{e.axisBadge}</span>
                         </div>
                         <div className="fac-info">
@@ -431,7 +433,7 @@ export default async function ProgramaPage({ params }: Props) {
                           <div className="pef-cover">
                             <div
                               className="pef-cover-img"
-                              style={{ backgroundImage: `url('${f.bgImg}')` }}
+                              style={fundoResponsivo(f.bgImg)}
                               aria-hidden="true"
                             />
                             <div className="pef-cover-overlay" />
@@ -486,7 +488,7 @@ export default async function ProgramaPage({ params }: Props) {
                               <div className="pem-cover">
                                 <div
                                   className="pem-cover-img"
-                                  style={{ backgroundImage: `url('${mini.bgImg}')` }}
+                                  style={fundoResponsivo(mini.bgImg, "miniatura")}
                                   aria-hidden="true"
                                 />
                                 <div className="pem-cover-overlay" />
@@ -588,7 +590,7 @@ export default async function ProgramaPage({ params }: Props) {
                   <div className="prog-sb-cover">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={p.hero.bgSrc}
+                      {...imgResponsiva(p.hero.bgSrc, "(max-width: 1099px) 100vw, 380px")}
                       alt={`${p.siglaExibida} · ${p.nomeCompleto}`}
                       loading="lazy"
                     />
@@ -654,7 +656,7 @@ export default async function ProgramaPage({ params }: Props) {
                   <div className="es-cover">
                     <div
                       className="es-cover-img"
-                      style={{ backgroundImage: `url('${p.hero.bgSrc}')` }}
+                      style={fundoResponsivo(p.hero.bgSrc, "miniatura")}
                       aria-hidden="true"
                     />
                     <div className="es-cover-overlay" />

@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties, KeyboardEvent } from "react";
 
+import { imgResponsiva } from "@/lib/imagemLocal";
+
 import {
   AREA_LABELS,
   ATUACAO_OPTIONS,
@@ -706,7 +708,7 @@ export function FilterBarDocentes({
               >
                 <div className="efc-portrait">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={f.imagemSrc} alt={f.imagemAlt} loading="lazy" />
+                  <img {...imgResponsiva(f.imagemSrc, "(max-width: 599px) 100vw, 180px")} alt={f.imagemAlt} loading="lazy" />
                   <span className="efc-axis-badge">{f.axisBadge}</span>
                 </div>
                 <div className="efc-info">
@@ -889,7 +891,7 @@ function ExpertAuthorityCard({ c }: { c: CardExpert }) {
     >
       <div className="eac-portrait">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={c.imagemSrc} alt={c.imagemAlt} loading="lazy" />
+        <img {...imgResponsiva(c.imagemSrc, "(max-width: 599px) 100vw, (max-width: 1099px) 50vw, 290px")} alt={c.imagemAlt} loading="lazy" />
         <span className="eac-axis-badge">{c.axisBadge}</span>
         <span className="eac-tipo-tag">{c.tipoTag}</span>
       </div>

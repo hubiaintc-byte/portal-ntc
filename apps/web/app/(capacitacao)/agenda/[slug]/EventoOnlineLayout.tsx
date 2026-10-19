@@ -1,5 +1,7 @@
 import { Fragment } from "react";
 
+import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
+
 import type { EventoOnline } from "./conteudoEventos";
 import { CountdownSidebar } from "./CountdownSidebar";
 import { EventoSubnav } from "./EventoSubnav";
@@ -47,9 +49,7 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
         <section className="evt-hero" aria-label={`${evento.titulo} ${evento.dataEvento}`}>
           <div
             className="evt-hero-bg"
-            style={{
-              backgroundImage: `url('${hero.bgUrl ?? "/img/fotos/_optimized/area-educacao.1920.webp"}')`,
-            }}
+            style={fundoResponsivo(hero.bgUrl ?? "/img/fotos/_optimized/area-educacao.1920.webp")}
             aria-hidden="true"
           />
           <div className="container evt-hero-content fade-in">
@@ -234,7 +234,7 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
                       <article key={i} className="speaker-detail-card">
                         <div className="speaker-detail-portrait">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={p.foto} alt={`${p.nome} · ${p.roleTag}`} loading="lazy" />
+                          <img {...imgResponsiva(p.foto, "(max-width: 599px) 100vw, (max-width: 1099px) 50vw, 250px")} alt={`${p.nome} · ${p.roleTag}`} loading="lazy" />
                           <span className="speaker-role-tag">{p.roleTag}</span>
                         </div>
                         <div className="speaker-detail-info">
@@ -367,7 +367,7 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
                 <div className="sb-card">
                   <div className="sb-cover">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={evento.sidebarOnline.coverImg} alt={evento.titulo} loading="lazy" />
+                    <img {...imgResponsiva(evento.sidebarOnline.coverImg, "(max-width: 1099px) 100vw, 380px")} alt={evento.titulo} loading="lazy" />
                     <span className="sb-status">{evento.sidebarOnline.status}</span>
                     <span className="sb-cover-eventon" dangerouslySetInnerHTML={{ __html: evento.sidebarOnline.coverEventonHtml }} />
                   </div>
@@ -424,7 +424,7 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
               {evento.relatedOnline.cards.map((card, i) => (
                 <article key={i} className="event-secondary-card" data-area={card.area}>
                   <div className="es-cover">
-                    <div className="es-cover-img" aria-hidden="true" style={{ backgroundImage: `url('${card.coverImg}')` }} />
+                    <div className="es-cover-img" aria-hidden="true" style={fundoResponsivo(card.coverImg, "miniatura")} />
                     <div className="es-cover-overlay" />
                     {card.date.tipo === "range" ? (
                       <div className="es-date range">

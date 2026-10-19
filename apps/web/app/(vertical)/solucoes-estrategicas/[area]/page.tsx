@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
+
 import { FALLBACK_VERTICAIS, type VerticalSlug } from "./conteudoFallback";
 import { FaqAcordeao } from "./FaqAcordeao";
 import { NavBarInternaSticky } from "./NavBarInternaSticky";
@@ -86,7 +88,7 @@ export default async function VerticalPage({ params }: Props) {
         <section className="vert-hero" aria-label={`${v.breadcrumb.current} · Vertical Estratégica`}>
           <div
             className="vert-hero-bg"
-            style={{ backgroundImage: `url('${v.hero.bgSrc}')` }}
+            style={fundoResponsivo(v.hero.bgSrc)}
             aria-hidden="true"
           />
           <div className="container vert-hero-content fade-in">
@@ -187,7 +189,7 @@ export default async function VerticalPage({ params }: Props) {
                   <div className="pc-cover">
                     <div
                       className="pc-cover-img"
-                      style={{ backgroundImage: `url('${p.imagemSrc}')` }}
+                      style={fundoResponsivo(p.imagemSrc)}
                       aria-hidden="true"
                     />
                     {p.flagAberto ? <span className="pc-flag">Módulos abertos</span> : null}
@@ -243,7 +245,7 @@ export default async function VerticalPage({ params }: Props) {
                     {v.autoridade.featured.map((e, i) => (
                       <article key={i} className="expert-featured-card">
                         <div className="efc-portrait">
-                          <img src={e.imagemSrc} alt={e.imagemAlt} loading="lazy" />
+                          <img {...imgResponsiva(e.imagemSrc, "(max-width: 599px) 100vw, 180px")} alt={e.imagemAlt} loading="lazy" />
                           <span className="efc-axis-badge">{e.axisBadge}</span>
                         </div>
                         <div className="efc-info">
@@ -279,7 +281,7 @@ export default async function VerticalPage({ params }: Props) {
                     {v.autoridade.cards.map((e, i) => (
                       <article key={i} className="expert-authority-card">
                         <div className="eac-portrait">
-                          <img src={e.imagemSrc} alt={e.imagemAlt} loading="lazy" />
+                          <img {...imgResponsiva(e.imagemSrc, "(max-width: 599px) 100vw, (max-width: 1099px) 50vw, 290px")} alt={e.imagemAlt} loading="lazy" />
                           <span className="eac-axis-badge">{e.axisBadge}</span>
                         </div>
                         <div className="eac-info">
@@ -368,7 +370,7 @@ export default async function VerticalPage({ params }: Props) {
                   <div className="es-cover">
                     <div
                       className="es-cover-img"
-                      style={{ backgroundImage: `url('${evt.imagemSrc}')` }}
+                      style={fundoResponsivo(evt.imagemSrc, "miniatura")}
                       aria-hidden="true"
                     />
                     <div className="es-cover-overlay" />
@@ -479,7 +481,7 @@ export default async function VerticalPage({ params }: Props) {
                   className={`content-vert-card${c.featured ? " featured" : ""}`}
                 >
                   <div className="content-vert-img">
-                    <img src={c.imagemSrc} alt={c.imagemAlt} loading="lazy" />
+                    <img {...imgResponsiva(c.imagemSrc, "(max-width: 1099px) 100vw, 520px")} alt={c.imagemAlt} loading="lazy" />
                   </div>
                   <div className="content-vert-body">
                     <span className="content-demo-tag">Demonstrativo</span>

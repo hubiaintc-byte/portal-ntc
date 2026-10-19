@@ -3,6 +3,8 @@
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { fundoResponsivo } from "@/lib/imagemLocal";
+
 import {
   type AreaSlug,
   type CartaoEvento,
@@ -924,7 +926,7 @@ function CardEvento({ evento: e, now }: CardEventoProps) {
       <div className="event-cover">
         <div
           className="event-cover-img"
-          style={{ backgroundImage: `url('${e.imagemUrl}')` }}
+          style={fundoResponsivo(e.imagemUrl)}
           aria-hidden="true"
         />
         <div className="event-cover-overlay" />
