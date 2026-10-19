@@ -9,7 +9,7 @@ import type {
   ConteudoCmsResumo,
   EventoCmsDetalhe,
   EventoCmsResumo,
-  LeadCmsResumo,
+  ResumoLeadsCms,
   PalestranteCmsDetalhe,
   PalestranteCmsResumo,
 } from "@/lib/cms/painelCms";
@@ -52,7 +52,7 @@ interface ShellCmsProps {
   usuario: { nome: string; email: string; perfil: string; id: string };
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
-  leads: LeadCmsResumo[];
+  resumoLeads: ResumoLeadsCms;
   conteudos: ConteudoCmsResumo[];
   eventosHomeIds: string[];
   erroLeitura: boolean;
@@ -158,7 +158,7 @@ export function ShellCms({
   usuario,
   eventos,
   palestrantes,
-  leads,
+  resumoLeads,
   conteudos,
   eventosHomeIds,
   erroLeitura,
@@ -399,7 +399,7 @@ export function ShellCms({
               <TelaDashboard
                 eventos={eventos}
                 palestrantes={palestrantes}
-                leads={leads}
+                resumoLeads={resumoLeads}
                 conteudos={conteudos}
                 erroLeitura={erroLeitura}
               />

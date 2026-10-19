@@ -105,20 +105,6 @@ export interface EventoCmsDetalhe extends EventoCmsResumo {
 
 // ---- Leads (somente leitura, doc 11 §11) -------------------------------
 
-export type LeadTipoCms = "proposta" | "contato" | "newsletter" | "candidatura";
-
-export interface LeadCmsResumo {
-  id: string;
-  nome: string;
-  email: string;
-  instituicao: string;
-  tipo: LeadTipoCms;
-  /** Data de entrada formatada pt-BR. */
-  data: string;
-  /** ISO de createdAt, para ordenação/uso futuro. */
-  dataISO: string;
-}
-
 export interface PalestranteCmsDetalhe extends PalestranteCmsResumo {
   cargoAtual: string | null;
   curriculoCurtoHtml: string;
@@ -483,43 +469,29 @@ function idsDeRelacoes(rels: unknown[] | null | undefined): string[] {
 }
 
 // ============================================================
-// Leads (somente leitura — triagem comercial no painel)
+// Leads — só contagens (o painel do Site é aberto a todos os perfis)
 // ============================================================
 
-const TIPOS_VALIDOS: LeadTipoCms[] = ["proposta", "contato", "newsletter", "candidatura"];
-
-function normalizarTipo(t: unknown): LeadTipoCms {
-  return TIPOS_VALIDOS.includes(t as LeadTipoCms) ? (t as LeadTipoCms) : "contato";
+export interface ResumoLeadsCms {
+  total: number;
+  ultimos30Dias: number;
 }
 
-export async function listarLeadsCms(): Promise<LeadCmsResumo[]> {
+/**
+ * Contagens de leads para o card do painel do Site. Até 19/10/2026 a página
+ * carregava os 300 leads mais recentes (nome, e-mail, instituição) e os
+ * entregava ao navegador de qualquer perfil — inclusive editores, que não têm
+ * acesso ao CRM — só para contar. Agora o banco conta e nenhum dado pessoal
+ * sai do servidor.
+ */
+export async function contarLeadsCms(agora: Date = new Date()): Promise<ResumoLeadsCms> {
   const payload = await obterPayload();
-  const res = await payload.find({
-    collection: "leads",
-    depth: 0,
-    limit: 300,
-    sort: "-createdAt",
-  });
-
-  return res.docs.map((d) => {
-    const doc = d as unknown as {
-      id: string | number;
-      nome?: string;
-      email?: string;
-      instituicao?: string;
-      tipo?: string;
-      createdAt?: string;
-    };
-    return {
-      id: String(doc.id),
-      nome: doc.nome ?? "—",
-      email: doc.email ?? "—",
-      instituicao: doc.instituicao || "—",
-      tipo: normalizarTipo(doc.tipo),
-      data: doc.createdAt ? FMT_DATA.format(new Date(doc.createdAt)) : "—",
-      dataISO: doc.createdAt ?? "",
-    };
-  });
+  const desde = new Date(agora.getTime() - 30 * 86_400_000).toISOString();
+  const [total, recentes] = await Promise.all([
+    payload.count({ collection: "leads" }),
+    payload.count({ collection: "leads", where: { createdAt: { greater_than_equal: desde } } }),
+  ]);
+  return { total: total.totalDocs, ultimos30Dias: recentes.totalDocs };
 }
 
 // ============================================================

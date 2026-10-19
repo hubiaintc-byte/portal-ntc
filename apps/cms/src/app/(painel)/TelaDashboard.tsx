@@ -1,14 +1,15 @@
 import type {
   ConteudoCmsResumo,
   EventoCmsResumo,
-  LeadCmsResumo,
+  ResumoLeadsCms,
   PalestranteCmsResumo,
 } from "@/lib/cms/painelCms";
 
 interface TelaDashboardProps {
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
-  leads: LeadCmsResumo[];
+  /** Só contagens: o painel do Site é aberto a todos os perfis (ver contarLeadsCms). */
+  resumoLeads: ResumoLeadsCms;
   conteudos: ConteudoCmsResumo[];
   erroLeitura: boolean;
 }
@@ -17,15 +18,13 @@ interface TelaDashboardProps {
 export function TelaDashboard({
   eventos,
   palestrantes,
-  leads,
+  resumoLeads,
   conteudos,
   erroLeitura,
 }: TelaDashboardProps) {
   const eventosPublicados = eventos.filter((e) => e.status === "publicado").length;
   const eventosRascunho = eventos.filter((e) => e.status === "rascunho").length;
   const palestrantesComFoto = palestrantes.filter((p) => p.temFoto).length;
-  const limite = Date.now() - 30 * 86_400_000;
-  const leadsNovos = leads.filter((l) => Date.parse(l.dataISO) >= limite).length;
   const conteudosPublicados = conteudos.filter((c) => c.situacao === "publicado").length;
 
   const metricas = [
@@ -49,11 +48,11 @@ export function TelaDashboard({
     },
     {
       rotulo: "Leads (30 dias)",
-      valor: String(leadsNovos),
+      valor: String(resumoLeads.ultimos30Dias),
       delta:
-        leads.length === 0
+        resumoLeads.total === 0
           ? "nenhum lead recebido"
-          : `de ${leads.length} ${leads.length === 1 ? "lead" : "leads"} no total`,
+          : `de ${resumoLeads.total} ${resumoLeads.total === 1 ? "lead" : "leads"} no total`,
       vertical: null,
     },
     {
