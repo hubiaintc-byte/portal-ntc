@@ -36,7 +36,7 @@ import { CorpoDocente } from "./globals/CorpoDocente";
 import { Home } from "./globals/Home";
 import { OGrupo } from "./globals/OGrupo";
 import { Rodape } from "./globals/Rodape";
-import { manterRlsLigado, objectKeySemColuna } from "./lib/cms/compatibilidadeSchema";
+import { manterRlsLigado } from "./lib/cms/compatibilidadeSchema";
 import { lexicalRestrictiveFeatures } from "./shared/lexical-config";
 
 const filename = fileURLToPath(import.meta.url);
@@ -200,6 +200,5 @@ export default buildConfig({
       },
     }),
     // Precisa vir depois dos s3Storage — ver compatibilidadeSchema.ts.
-    objectKeySemColuna,
   ],
 });
