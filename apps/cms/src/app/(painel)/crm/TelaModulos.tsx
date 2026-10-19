@@ -12,9 +12,11 @@ interface TelaModulosProps {
   programas: ProgramaCrmResumo[];
   onAbrir: (id: string) => void;
   onNovo: () => void;
+  /** false ⇒ perfil sem escrita no catálogo: some "Novo módulo". */
+  podeEditar: boolean;
 }
 
-export function TelaModulos({ modulos, programas, onAbrir, onNovo }: TelaModulosProps) {
+export function TelaModulos({ modulos, programas, onAbrir, onNovo, podeEditar }: TelaModulosProps) {
   const [busca, setBusca] = useState("");
   const [programaId, setProgramaId] = useState("");
 
@@ -29,11 +31,13 @@ export function TelaModulos({ modulos, programas, onAbrir, onNovo }: TelaModulos
           <h1>Módulos</h1>
           <p>Módulos do catálogo com seus dados comerciais de referência.</p>
         </div>
-        <div className="pcms-pagehead__acoes">
-          <button type="button" className="pcms-btn" onClick={onNovo}>
-            Novo módulo
-          </button>
-        </div>
+        {podeEditar && (
+          <div className="pcms-pagehead__acoes">
+            <button type="button" className="pcms-btn" onClick={onNovo}>
+              Novo módulo
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="pcms-toolbar pcms-kanban__toolbar">

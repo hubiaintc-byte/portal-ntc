@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 
 import type { DadosEnvio } from "@/lib/cms/painelCrmEscrita";
+import type { CapacidadesPainel } from "@/lib/cms/perfis";
 import type {
   CatalogoCrm,
   ClienteCrmDetalhe,
@@ -55,6 +56,12 @@ interface ShellCrmProps {
   usuario: { nome: string; email: string; perfil: string };
   /** false = perfil só do catálogo: o menu mostra apenas o Catálogo Institucional. */
   acessoCrm: boolean;
+  /**
+   * O que este usuário pode escrever, calculado no servidor (crm/page.tsx) por
+   * `capacidadesDoPerfil`. Só decide quais controles aparecem — a guarda de
+   * cada Server Action continua sendo a barreira real.
+   */
+  capacidades: CapacidadesPainel;
   clientes: ClienteCrmResumo[];
   leads: LeadCrmResumo[];
   catalogo: CatalogoCrm;
@@ -164,6 +171,7 @@ const CRUMB: Record<TelaCrmId, string> = {
 export function ShellCrm({
   usuario,
   acessoCrm,
+  capacidades,
   clientes,
   leads,
   catalogo,
@@ -326,6 +334,7 @@ export function ShellCrm({
           }}
           onAbrirModulo={abrirModuloCatalogo}
           onNovoModulo={(programaId) => setCatalogoDet({ tipo: "modulo", modulo: null, programaIdInicial: programaId })}
+          podeEditar={capacidades.editarCatalogo}
         />
         </>
       ) : catalogoDet?.tipo === "modulo" ? (
@@ -342,6 +351,7 @@ export function ShellCrm({
             fecharTudo();
             setTela("modulos");
           }}
+          podeEditar={capacidades.editarCatalogo}
         />
         </>
       ) : formAberto?.entidade === "cliente" ? (
@@ -426,6 +436,7 @@ export function ShellCrm({
               areas={areas}
               onAbrir={abrirProgramaCatalogo}
               onNovo={() => setCatalogoDet({ tipo: "programa", programa: null })}
+              podeEditar={capacidades.editarCatalogo}
             />
           )}
           {tela === "modulos" && (
@@ -434,6 +445,7 @@ export function ShellCrm({
               programas={programas}
               onAbrir={abrirModuloCatalogo}
               onNovo={() => setCatalogoDet({ tipo: "modulo", modulo: null })}
+              podeEditar={capacidades.editarCatalogo}
             />
           )}
           {tela === "produtos" && <TelaProdutos produtos={produtos} />}

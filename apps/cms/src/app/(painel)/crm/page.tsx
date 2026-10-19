@@ -1,5 +1,5 @@
 import { exigirPerfil } from "@/lib/cms/autenticacao";
-import { PERFIS_CATALOGO, PERFIS_CRM, temPerfil } from "@/lib/cms/perfis";
+import { PERFIS_CATALOGO, capacidadesDoPerfil } from "@/lib/cms/perfis";
 import {
   listarClientesCrm,
   listarLeadsCrm,
@@ -40,7 +40,10 @@ export const dynamic = "force-dynamic";
  */
 export default async function PainelCrmPage() {
   const usuario = await exigirPerfil(PERFIS_CATALOGO);
-  const acessoCrm = temPerfil(usuario.perfil, PERFIS_CRM);
+  // O que a interface deixa este perfil fazer — mesmas regras das Server
+  // Actions, que seguem sendo a barreira real.
+  const capacidades = capacidadesDoPerfil(usuario.perfil);
+  const acessoCrm = capacidades.usarCrm;
 
   let clientes: ClienteCrmResumo[] = [];
   let leads: LeadCrmResumo[] = [];
@@ -88,6 +91,7 @@ export default async function PainelCrmPage() {
     <ShellCrm
       usuario={usuario}
       acessoCrm={acessoCrm}
+      capacidades={capacidades}
       clientes={clientes}
       leads={leads}
       catalogo={catalogo}
