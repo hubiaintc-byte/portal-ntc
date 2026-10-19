@@ -148,7 +148,7 @@ function texto(v: string | null | undefined): string {
  * gravado na criação da proposta (`painelCrmEscrita.criarProposta`). Exportada
  * para que as duas pontas não divirjam no formato.
  */
-export function credencialDaFicha(e: Especialista): string {
+export function credencialDaFicha(e: Pick<Especialista, "titulacao" | "instituicao" | "cargoAtual">): string {
   return [TITULACAO_TEXTO[e.titulacao] ?? "", texto(e.instituicao), texto(e.cargoAtual)]
     .map((p) => p.trim())
     .filter((p) => p.length > 0)

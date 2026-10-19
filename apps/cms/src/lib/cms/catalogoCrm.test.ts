@@ -2,8 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
+const contarModulosPorPrograma = vi.fn();
+vi.mock("@/lib/cms/agregadosCrm", () => ({ contarModulosPorPrograma }));
 
-const { listarProgramasCrm, obterProgramaCatalogo, obterModuloCatalogo, situacaoDoPrograma } = await import("./catalogoCrm");
+const { listarModulosCrm, listarProgramasCrm, obterProgramaCatalogo, obterModuloCatalogo, situacaoDoPrograma } = await import("./catalogoCrm");
 
 const negrito = {
   root: { type: "root", children: [{ type: "paragraph", children: [{ type: "text", text: "Forte", format: 1 }] }] },
@@ -13,8 +15,9 @@ afterEach(() => vi.clearAllMocks());
 
 describe("listarProgramasCrm", () => {
   it("cruza a leitura publicada com a última versão para a situação, e conta módulos", async () => {
+    contarModulosPorPrograma.mockResolvedValue(new Map([["1", 2], ["2", 1]]));
     const find = vi.fn(async (args: { collection: string; draft?: boolean }) => {
-      if (args.collection === "modulos") return { docs: [{ programa: 1 }, { programa: 1 }, { programa: 2 }] };
+      expect(args.collection).toBe("programas");
       if (args.draft) {
         return { docs: [{ id: 1, sigla: "A", nomeCompleto: "Alfa", area: { id: 9, nome: "Educação" }, _status: "draft" }, { id: 2, sigla: "B", nomeCompleto: "Beta", area: null, _status: "draft" }] };
       }
@@ -26,6 +29,18 @@ describe("listarProgramasCrm", () => {
       { id: "1", sigla: "A", nome: "Alfa", areaId: "9", area: "Educação", situacao: "alteracoes-pendentes", numModulos: 2 },
       { id: "2", sigla: "B", nome: "Beta", areaId: null, area: null, situacao: "rascunho", numModulos: 1 },
     ]);
+  });
+});
+
+describe("listarModulosCrm", () => {
+  it("popula o programa só na sigla", async () => {
+    const find = vi.fn<(a: { populate?: unknown }) => Promise<{ docs: unknown[] }>>(async () => ({
+      docs: [{ id: 5, numero: 2, titulo: "M", programa: { id: 1, sigla: "EDUTEC" }, comercial: { valor: 10 } }],
+    }));
+    obterPayloadMock.mockResolvedValue({ find });
+    const [m] = await listarModulosCrm();
+    expect(find.mock.calls[0]?.[0].populate).toEqual({ programas: { sigla: true } });
+    expect(m).toEqual({ id: "5", numero: 2, titulo: "M", tituloComercial: null, programaId: "1", programaSigla: "EDUTEC", valor: 10, replay: null, certificacao: null });
   });
 });
 
