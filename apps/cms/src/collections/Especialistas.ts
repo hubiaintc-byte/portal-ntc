@@ -11,6 +11,7 @@ import {
   TITULACAO_DOCENTE,
   VERTICAL_DOCENTE,
 } from "../shared/types";
+import { leituraPublica } from "../access/leituraPublica";
 
 /**
  * Especialistas (doc 11 §8).
@@ -28,7 +29,10 @@ export const Especialistas: CollectionConfig = {
     listSearchableFields: ["nome", "instituicao"],
   },
   access: {
-    read: () => true,
+    // Anônimo não vê quem está oculto do site (nem rascunho).
+    read: leituraPublica({
+      or: [{ ocultarDoSite: { equals: false } }, { ocultarDoSite: { exists: false } }],
+    }),
     create: editorInstitucional,
     update: editorInstitucional,
     delete: editorInstitucional,

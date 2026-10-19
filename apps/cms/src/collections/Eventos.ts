@@ -5,6 +5,8 @@ import { autoSlug } from "../hooks/autoSlug";
 import { revalidatePage } from "../hooks/revalidatePage";
 import { seoFields } from "../shared/seoFields";
 import { MODALIDADE_EVENTO } from "../shared/types";
+import { leituraPublica } from "../access/leituraPublica";
+import { campoSoParaLogado } from "../access/leituraPublica";
 
 /**
  * Eventos (doc 11 §7).
@@ -23,7 +25,7 @@ export const Eventos: CollectionConfig = {
     listSearchableFields: ["nome", "slug"],
   },
   access: {
-    read: () => true,
+    read: leituraPublica(),
     create: editorEventos,
     update: editorEventos,
     delete: editorEventos,
@@ -209,6 +211,8 @@ export const Eventos: CollectionConfig = {
             {
               name: "linkReplay",
               type: "text",
+              // Link de replay pago: fora da API pública.
+              access: { read: campoSoParaLogado },
               admin: { condition: (d) => Boolean(d?.replayDisponivel) },
             },
             {
@@ -217,7 +221,7 @@ export const Eventos: CollectionConfig = {
               admin: { condition: (d) => Boolean(d?.replayDisponivel) },
             },
             { name: "certificadoEmitido", type: "checkbox" },
-            { name: "observacoesCertificado", type: "textarea" },
+            { name: "observacoesCertificado", type: "textarea", access: { read: campoSoParaLogado } },
           ],
         },
         {
@@ -255,6 +259,8 @@ export const Eventos: CollectionConfig = {
       name: "comercial",
       type: "group",
       label: "Dados comerciais (CRM)",
+      // Preço e condições: fora da API pública (o site lê pela Local API).
+      access: { read: campoSoParaLogado },
       admin: { description: "Usado pelo módulo CRM do painel; o site ignora este grupo." },
       fields: [
         { name: "codigo", type: "text", admin: { description: "Código comercial do produto (CRM legado)." } },

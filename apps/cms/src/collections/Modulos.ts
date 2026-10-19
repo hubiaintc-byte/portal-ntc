@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { editorCatalogo } from "../access/editorCatalogo";
 import { bloquearModuloComDependentes } from "../lib/crm/exclusaoCatalogo";
+import { campoSoParaLogado } from "../access/leituraPublica";
 
 /**
  * Módulos (doc 11 §6).
@@ -46,6 +47,8 @@ export const Modulos: CollectionConfig = {
       name: "comercial",
       type: "group",
       label: "Dados comerciais (CRM)",
+      // Preço e condições: fora da API pública (o site lê pela Local API).
+      access: { read: campoSoParaLogado },
       admin: { description: "Usado pelo módulo CRM do painel; o site ignora este grupo." },
       fields: [
         { name: "tituloComercial", type: "text" },

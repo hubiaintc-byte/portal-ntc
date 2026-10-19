@@ -4,6 +4,7 @@ import { editorInstitucional } from "../access/editorInstitucional";
 import { autoSlug } from "../hooks/autoSlug";
 import { seoFields } from "../shared/seoFields";
 import { AREA_SIGLAS } from "../shared/types";
+import { leituraPublica } from "../access/leituraPublica";
 
 /**
  * Áreas Estratégicas (doc 11 §4).
@@ -21,7 +22,7 @@ export const Areas: CollectionConfig = {
     group: "Editorial",
   },
   access: {
-    read: () => true,
+    read: leituraPublica(),
     create: editorInstitucional,
     update: editorInstitucional,
     delete: () => false,

@@ -4,6 +4,7 @@ import { editorCatalogo } from "../access/editorCatalogo";
 import { autoSlug } from "../hooks/autoSlug";
 import { bloquearProgramaComDependentes } from "../lib/crm/exclusaoCatalogo";
 import { seoFields } from "../shared/seoFields";
+import { leituraPublica } from "../access/leituraPublica";
 
 /**
  * Programas Estratégicos (doc 11 §5).
@@ -22,7 +23,7 @@ export const Programas: CollectionConfig = {
     listSearchableFields: ["sigla", "nomeCompleto", "slug"],
   },
   access: {
-    read: () => true,
+    read: leituraPublica(),
     create: editorCatalogo,
     update: editorCatalogo,
     delete: editorCatalogo,

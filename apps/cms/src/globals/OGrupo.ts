@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
 
 import { editorInstitucional } from "../access/editorInstitucional";
+import { leituraPublicaGlobal } from "../access/leituraPublica";
 
 /**
  * Global "O Grupo NTC" (doc 13 §2.2).
@@ -14,7 +15,7 @@ export const OGrupo: GlobalConfig = {
   slug: "o-grupo",
   label: "O Grupo NTC",
   admin: { group: "Páginas Singleton" },
-  access: { read: () => true, update: editorInstitucional },
+  access: { read: leituraPublicaGlobal, update: editorInstitucional },
   versions: { drafts: true, max: 20 },
   fields: [
     {

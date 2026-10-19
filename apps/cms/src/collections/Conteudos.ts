@@ -9,6 +9,7 @@ import { autoSlug } from "../hooks/autoSlug";
 import { derivarTempoLeitura } from "../hooks/tempoLeitura";
 import { lexicalRestrictiveFeatures } from "../shared/lexical-config";
 import { seoFields } from "../shared/seoFields";
+import { leituraPublica } from "../access/leituraPublica";
 
 /**
  * Conteúdos editoriais (doc 11 §9).
@@ -26,7 +27,7 @@ export const Conteudos: CollectionConfig = {
     listSearchableFields: ["titulo", "slug"],
   },
   access: {
-    read: () => true,
+    read: leituraPublica(),
     create: editorInstitucional,
     update: editorInstitucional,
     delete: editorInstitucional,

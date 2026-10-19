@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
 
 import { editorInstitucional } from "../access/editorInstitucional";
+import { leituraPublicaGlobal } from "../access/leituraPublica";
 
 /**
  * Global Home (doc 11 §13).
@@ -13,7 +14,7 @@ export const Home: GlobalConfig = {
   slug: "home",
   label: "Home (Página Inicial)",
   admin: { group: "Páginas Singleton" },
-  access: { read: () => true, update: editorInstitucional },
+  access: { read: leituraPublicaGlobal, update: editorInstitucional },
   versions: { drafts: true, max: 20 },
   fields: [
     {
