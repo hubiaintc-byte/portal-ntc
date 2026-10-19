@@ -20,10 +20,20 @@ interface TelaEventosProps {
   criando?: boolean;
   /** Falha ao criar o evento em branco. */
   erroNovo?: string | null;
+  /** false ⇒ perfil sem escrita em eventos: some Importar PDF e Novo evento. */
+  podeEditar: boolean;
 }
 
 /** Listagem de eventos — dados reais do banco (somente leitura). */
-export function TelaEventos({ eventos, onAbrir, onAbrirImportado, onNovo, criando = false, erroNovo = null }: TelaEventosProps) {
+export function TelaEventos({
+  eventos,
+  onAbrir,
+  onAbrirImportado,
+  onNovo,
+  criando = false,
+  erroNovo = null,
+  podeEditar,
+}: TelaEventosProps) {
   const [modalImportar, setModalImportar] = useState(false);
 
   return (
@@ -38,30 +48,32 @@ export function TelaEventos({ eventos, onAbrir, onAbrirImportado, onNovo, criand
               : `${eventos.length} ${eventos.length === 1 ? "evento" : "eventos"} no portal — rascunhos inclusos.`}
           </p>
         </div>
-        <div className="pcms-pagehead__acoes">
-          <button
-            type="button"
-            className="pcms-btn pcms-btn--ghost"
-            onClick={() => setModalImportar(true)}
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 16V4M8 8l4-4 4 4" />
-              <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
-            </svg>
-            Importar PDF
-          </button>
-          <button type="button" className="pcms-btn" onClick={onNovo} disabled={criando}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Novo evento
-          </button>
-        </div>
+        {podeEditar && (
+          <div className="pcms-pagehead__acoes">
+            <button
+              type="button"
+              className="pcms-btn pcms-btn--ghost"
+              onClick={() => setModalImportar(true)}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 16V4M8 8l4-4 4 4" />
+                <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
+              </svg>
+              Importar PDF
+            </button>
+            <button type="button" className="pcms-btn" onClick={onNovo} disabled={criando}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Novo evento
+            </button>
+          </div>
+        )}
       </div>
 
       <AvisoForm erro={erroNovo} />
 
-      {modalImportar && (
+      {podeEditar && modalImportar && (
         <ModalImportarPdf
           onFechar={() => setModalImportar(false)}
           onImportado={(id) => {

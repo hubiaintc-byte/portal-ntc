@@ -2431,3 +2431,12 @@ body {
 .pcms-lista-catalogo__item { border: 1px solid var(--pcms-linha); padding: 12px; border-radius: 8px; }
 .pcms-lista-catalogo__titulo { margin: 0 0 8px; font-weight: 600; }
 .pcms-lista-catalogo__acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Formulário em modo só leitura (perfil sem escrita): o <fieldset disabled>
+   desabilita os campos sem mudar o layout da tela. */
+.pcms-somente-leitura {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}

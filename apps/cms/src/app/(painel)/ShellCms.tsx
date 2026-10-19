@@ -15,6 +15,7 @@ import type {
 } from "@/lib/cms/painelCms";
 
 import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
+import type { CapacidadesPainel } from "@/lib/cms/perfis";
 
 import {
   carregarAreas,
@@ -50,6 +51,12 @@ import { FormPalestrante } from "./FormPalestrante";
 interface ShellCmsProps {
   /** Usuário autenticado (rodapé da sidebar + guarda do item "Usuários"). */
   usuario: { nome: string; email: string; perfil: string; id: string };
+  /**
+   * O que este usuário pode escrever, calculado no servidor (page.tsx) por
+   * `capacidadesDoPerfil`. Só decide quais controles aparecem — a guarda de
+   * cada Server Action continua sendo a barreira real.
+   */
+  capacidades: CapacidadesPainel;
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
   resumoLeads: ResumoLeadsCms;
@@ -156,6 +163,7 @@ const CRUMB: Record<TelaId, string> = {
 
 export function ShellCms({
   usuario,
+  capacidades,
   eventos,
   palestrantes,
   resumoLeads,
@@ -183,7 +191,7 @@ export function ShellCms({
   // formulário, ou "salvo, mas não deu para reler").
   const [avisoPalestrante, setAvisoPalestrante] = useState<{ erro: boolean; texto: string } | null>(null);
 
-  const ehSuperAdmin = usuario.perfil === "super-admin";
+  const ehSuperAdmin = capacidades.gerirUsuarios;
 
   // Lista de usuários NUNCA vem no payload inicial da page.tsx (evitaria
   // enviar dados de gestão de usuários a quem não é super-admin) — carrega
@@ -219,6 +227,7 @@ export function ShellCms({
   }
 
   function novoEvento() {
+    if (!capacidades.editarEventos) return;
     setCriandoEvento(true);
     setErroNovoEvento(null);
     void (async () => {
@@ -255,6 +264,7 @@ export function ShellCms({
   }
 
   function novoPalestrante() {
+    if (!capacidades.editarPalestrantes) return;
     setAvisoPalestrante(null);
     iniciarCarga(async () => {
       try {
@@ -291,6 +301,7 @@ export function ShellCms({
   }
 
   function novoConteudo() {
+    if (!capacidades.editarConteudos) return;
     iniciarCarga(async () => {
       setAreas(await carregarAreas());
       setConteudoDet(null);
@@ -342,6 +353,7 @@ export function ShellCms({
           evento={eventoDet}
           palestrantesDisponiveis={palestrantes}
           edicaoInicial={eventoEmEdicao}
+          podeEditar={capacidades.editarEventos}
           onVoltar={() => {
             setEventoDet(null);
             setEventoEmEdicao(false);
@@ -358,6 +370,7 @@ export function ShellCms({
             setCriandoConteudo(false);
           }}
           onSalvou={() => router.refresh()}
+          podeEditar={capacidades.editarConteudos}
         />
       ) : criandoPalestrante ? (
         <FormPalestrante
@@ -379,6 +392,7 @@ export function ShellCms({
           key={palestranteDet.id}
           palestrante={palestranteDet}
           onVoltar={() => setPalestranteDet(null)}
+          podeEditar={capacidades.editarPalestrantes}
           onSalvou={(avisoSemReleitura) => {
             if (avisoSemReleitura !== undefined) salvouSemReleitura(avisoSemReleitura);
             else router.refresh();
@@ -409,6 +423,7 @@ export function ShellCms({
                 palestrantes={palestrantes}
                 onAbrir={abrirPalestrante}
                 onNovo={novoPalestrante}
+                podeEditar={capacidades.editarPalestrantes}
               />
             )}
             {tela === "corpo-docente" && (
@@ -418,6 +433,7 @@ export function ShellCms({
                 erroCarga={erroCorpo}
                 onAbrirPalestrante={abrirPalestrante}
                 onSalvou={setCardsCorpo}
+                podeEditar={capacidades.editarCorpoDocente}
               />
             )}
             {tela === "eventos" && (
@@ -428,13 +444,27 @@ export function ShellCms({
                 onNovo={novoEvento}
                 criando={criandoEvento}
                 erroNovo={erroNovoEvento}
+                podeEditar={capacidades.editarEventos}
               />
             )}
             {tela === "conteudos" && (
-              <TelaConteudos conteudos={conteudos} onAbrir={abrirConteudo} onNovo={novoConteudo} />
+              <TelaConteudos
+                conteudos={conteudos}
+                onAbrir={abrirConteudo}
+                onNovo={novoConteudo}
+                podeEditar={capacidades.editarConteudos}
+              />
             )}
-            {tela === "home" && <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />}
-            {tela === "config" && <TelaConfiguracoes usuario={usuario} />}
+            {tela === "home" && (
+              <TelaHome
+                eventos={eventos}
+                selecionadosIniciais={eventosHomeIds}
+                podeEditar={capacidades.editarHome}
+              />
+            )}
+            {tela === "config" && (
+              <TelaConfiguracoes usuario={usuario} podeEditarContatos={capacidades.editarContatos} />
+            )}
             {tela === "usuarios" && ehSuperAdmin && (
               <TelaUsuarios
                 usuarios={usuarios}

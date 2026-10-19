@@ -83,6 +83,12 @@ interface DetalheConteudoProps {
   onVoltar: () => void;
   /** Avisa o shell para recarregar a lista (a tela continua aberta). */
   onSalvou: () => void;
+  /**
+   * false ⇒ perfil sem escrita em conteúdos (`capacidades.editarConteudos`):
+   * somem Salvar/Publicar/Despublicar/Excluir e os envios de arquivo, e os
+   * campos ficam desabilitados (só leitura).
+   */
+  podeEditar: boolean;
 }
 
 interface CampoArquivoProps {
@@ -93,6 +99,8 @@ interface CampoArquivoProps {
   /** Resumo do arquivo já vinculado (ex. nome do PDF ou "Sem imagem"). */
   atual: string;
   onEnviado: (detalhe: ConteudoCmsDetalhe) => void;
+  /** false ⇒ só mostra o arquivo atual, sem controle de envio. */
+  podeEnviar: boolean;
 }
 
 /**
@@ -107,7 +115,7 @@ interface CampoArquivoProps {
  * de leitura publica (§10), e o painel não tem tela de Mídias para corrigi-lo
  * depois. O anexo não pede — é um PDF, nunca renderizado como imagem.
  */
-function CampoArquivo({ conteudoId, campo, rotulo, accept, atual, onEnviado }: CampoArquivoProps) {
+function CampoArquivo({ conteudoId, campo, rotulo, accept, atual, onEnviado, podeEnviar }: CampoArquivoProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, iniciar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
@@ -134,6 +142,15 @@ function CampoArquivo({ conteudoId, campo, rotulo, accept, atual, onEnviado }: C
       if (resultado.ok && conteudo) onEnviado(conteudo);
       else setErro(resultado.erro ?? "Falha no upload.");
     });
+  }
+
+  if (!podeEnviar) {
+    return (
+      <div className="pcms-upload">
+        <span className="pcms-det-meta__rot">{rotulo}</span>
+        <p className="pcms-upload__atual">{atual}</p>
+      </div>
+    );
   }
 
   return (
@@ -209,6 +226,7 @@ export function DetalheConteudo({
   palestrantes,
   onVoltar,
   onSalvou,
+  podeEditar,
 }: DetalheConteudoProps) {
   const [id, setId] = useState<string | null>(conteudo?.id ?? null);
   const [campos, setCampos] = useState<CamposConteudo>(() => camposDe(conteudo));
@@ -376,58 +394,62 @@ export function DetalheConteudo({
         </div>
         <div className="pcms-det-head__acoes">
           <span className={CLASSE_SITUACAO[situacao]}>{ROTULO_SITUACAO[situacao]}</span>
-          <button
-            type="button"
-            className="pcms-btn pcms-btn--ghost"
-            onClick={salvar}
-            disabled={processando}
-          >
-            {processando ? "Salvando…" : "Salvar rascunho"}
-          </button>
-          {situacao === "publicado" ? (
-            <button
-              type="button"
-              className="pcms-btn pcms-btn--ghost"
-              onClick={despublicar}
-              disabled={processando}
-            >
-              Despublicar
-            </button>
-          ) : (
-            <button type="button" className="pcms-btn" onClick={publicar} disabled={processando}>
-              Publicar
-            </button>
-          )}
-          {id !== null &&
-            (confirmandoExclusao ? (
-              <>
+          {podeEditar && (
+            <>
+              <button
+                type="button"
+                className="pcms-btn pcms-btn--ghost"
+                onClick={salvar}
+                disabled={processando}
+              >
+                {processando ? "Salvando…" : "Salvar rascunho"}
+              </button>
+              {situacao === "publicado" ? (
                 <button
                   type="button"
                   className="pcms-btn pcms-btn--ghost"
-                  onClick={() => setConfirmandoExclusao(false)}
+                  onClick={despublicar}
                   disabled={processando}
                 >
-                  Cancelar
+                  Despublicar
                 </button>
-                <button
-                  type="button"
-                  className="pcms-btn pcms-btn--perigo"
-                  onClick={excluir}
-                  disabled={processando}
-                >
-                  Confirmar exclusão
+              ) : (
+                <button type="button" className="pcms-btn" onClick={publicar} disabled={processando}>
+                  Publicar
                 </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                className="pcms-btn pcms-btn--perigo"
-                onClick={() => setConfirmandoExclusao(true)}
-                disabled={processando}
-              >
-                Excluir
-              </button>
-            ))}
+              )}
+              {id !== null &&
+                (confirmandoExclusao ? (
+                  <>
+                    <button
+                      type="button"
+                      className="pcms-btn pcms-btn--ghost"
+                      onClick={() => setConfirmandoExclusao(false)}
+                      disabled={processando}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      className="pcms-btn pcms-btn--perigo"
+                      onClick={excluir}
+                      disabled={processando}
+                    >
+                      Confirmar exclusão
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="pcms-btn pcms-btn--perigo"
+                    onClick={() => setConfirmandoExclusao(true)}
+                    disabled={processando}
+                  >
+                    Excluir
+                  </button>
+                ))}
+            </>
+          )}
         </div>
       </div>
 
@@ -438,6 +460,8 @@ export function DetalheConteudo({
         </p>
       )}
 
+      {/* Sem permissão de escrita, o fieldset desabilita todos os campos de uma vez. */}
+      <fieldset className="pcms-somente-leitura" disabled={!podeEditar}>
       <div className="pcms-det-grid">
         <div className="pcms-det-main">
           <section className="pcms-editor">
@@ -667,6 +691,7 @@ export function DetalheConteudo({
                 accept="image/*"
                 atual={imagemNome ?? "Sem imagem"}
                 onEnviado={aplicarMidia}
+                podeEnviar={podeEditar}
               />
               {mostraAnexo && (
                 <CampoArquivo
@@ -676,6 +701,7 @@ export function DetalheConteudo({
                   accept="application/pdf"
                   atual={anexoNome ?? "Sem anexo"}
                   onEnviado={aplicarMidia}
+                  podeEnviar={podeEditar}
                 />
               )}
               <div className="pcms-field">
@@ -730,6 +756,7 @@ export function DetalheConteudo({
           </div>
         </aside>
       </div>
+      </fieldset>
     </>
   );
 }

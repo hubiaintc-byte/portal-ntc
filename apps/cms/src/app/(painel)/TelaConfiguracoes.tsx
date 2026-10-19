@@ -22,6 +22,11 @@ import { AvisoForm, CampoArea, CampoSenha, CampoTexto } from "./crm/CamposCrm";
 interface TelaConfiguracoesProps {
   /** Usuário logado — usado só para exibir o e-mail da conta na seção real. */
   usuario: { id: string; nome: string; email: string };
+  /**
+   * false ⇒ perfil sem escrita nos contatos (`capacidades.editarContatos`):
+   * a seção mostra os dados com os campos desabilitados e sem "Salvar contatos".
+   */
+  podeEditarContatos: boolean;
 }
 
 /**
@@ -29,7 +34,7 @@ interface TelaConfiguracoesProps {
  * senha via Server Action). O restante da tela segue demonstrativo — nada
  * mais aqui é salvo ainda.
  */
-export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
+export function TelaConfiguracoes({ usuario, podeEditarContatos }: TelaConfiguracoesProps) {
   const [senhaAtual, setSenhaAtual] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmacao, setConfirmacao] = useState("");
@@ -155,7 +160,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
 
   function enviarContatos(e: React.FormEvent) {
     e.preventDefault();
-    if (salvandoContatos || contatos === null) return;
+    if (!podeEditarContatos || salvandoContatos || contatos === null) return;
     setErroContatos(null);
     setSucessoContatos(null);
     setAvisoContatos(null);
@@ -308,6 +313,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
                 </p>
               )}
 
+              <fieldset className="pcms-somente-leitura" disabled={!podeEditarContatos}>
               <h4>Atendimento</h4>
               <div className="pcms-editor__grid">
                 <CampoTexto
@@ -407,9 +413,13 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
                 <CampoTexto rotulo="CNPJ" valor={contatos.cnpj} onMudar={atualizarContato("cnpj")} curto />
               </div>
 
-              <button type="submit" className="pcms-btn" disabled={salvandoContatos}>
-                {salvandoContatos ? "Salvando…" : "Salvar contatos"}
-              </button>
+              </fieldset>
+
+              {podeEditarContatos && (
+                <button type="submit" className="pcms-btn" disabled={salvandoContatos}>
+                  {salvandoContatos ? "Salvando…" : "Salvar contatos"}
+                </button>
+              )}
               <p className="pcms-editor__hint">
                 Estes dados aparecem no rodapé de todas as páginas, na página de Contato, em O Grupo e
                 nas páginas legais. A atualização no site pode levar alguns minutos.

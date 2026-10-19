@@ -56,6 +56,12 @@ interface DetalheEventoProps {
   onVoltar: () => void;
   /** true ⇒ abre direto no modo de edição (revisão pós-importação de PDF). */
   edicaoInicial?: boolean;
+  /**
+   * false ⇒ perfil sem escrita em eventos (`capacidades.editarEventos`): somem
+   * Editar, Publicar/Despublicar, os envios de capa/folder e "Gerenciar"
+   * palestrantes — a tela fica só leitura.
+   */
+  podeEditar: boolean;
 }
 
 /** Tela cheia de detalhe de um evento — leitura + edição completa via CMS. */
@@ -64,9 +70,10 @@ export function DetalheEvento({
   palestrantesDisponiveis,
   onVoltar,
   edicaoInicial = false,
+  podeEditar,
 }: DetalheEventoProps) {
   const [evento, setEvento] = useState(eventoInicial);
-  const [editando, setEditando] = useState(edicaoInicial);
+  const [editando, setEditando] = useState(edicaoInicial && podeEditar);
   const [gerenciandoPalestrantes, setGerenciandoPalestrantes] = useState(false);
   const [salvando, iniciarSalvar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
@@ -147,7 +154,7 @@ export function DetalheEvento({
           <span className={`pcms-selo pcms-selo--${evento.status}`}>
             {ROTULO_STATUS[evento.status]}
           </span>
-          {!editando && (
+          {podeEditar && !editando && (
             <>
               <button type="button" className="pcms-btn pcms-btn--ghost" onClick={abrirEdicao}>
                 Editar
@@ -165,7 +172,7 @@ export function DetalheEvento({
         </div>
       </div>
 
-      {editando && (
+      {podeEditar && editando && (
         <section className="pcms-editor">
           <div className="pcms-editor__head">Editar campos</div>
 
@@ -638,6 +645,7 @@ export function DetalheEvento({
                 accept="image/*"
                 atual={evento.capaNome ?? "Sem capa"}
                 onAtualizado={setEvento}
+                podeEnviar={podeEditar}
               />
               <CampoUpload
                 eventoId={evento.id}
@@ -646,6 +654,7 @@ export function DetalheEvento({
                 accept="application/pdf"
                 atual={evento.folderPdfNome ?? "Sem folder"}
                 onAtualizado={setEvento}
+                podeEnviar={podeEditar}
               />
             </div>
           </div>
@@ -668,7 +677,7 @@ export function DetalheEvento({
           <div className="pcms-det-card">
             <div className="pcms-det-card__head pcms-det-card__head--acao">
               Palestrantes
-              {!gerenciandoPalestrantes && (
+              {podeEditar && !gerenciandoPalestrantes && (
                 <button
                   type="button"
                   className="pcms-link-acao"
@@ -679,7 +688,7 @@ export function DetalheEvento({
               )}
             </div>
             <div className="pcms-det-card__body">
-              {gerenciandoPalestrantes ? (
+              {podeEditar && gerenciandoPalestrantes ? (
                 <SeletorPalestrantes
                   eventoId={evento.id}
                   vinculadosIds={evento.palestrantes.map((p) => p.id)}

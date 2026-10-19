@@ -14,10 +14,12 @@ interface TelaPalestrantesProps {
   palestrantes: PalestranteCmsResumo[];
   onAbrir: (id: string) => void;
   onNovo: () => void;
+  /** false ⇒ perfil sem escrita em palestrantes: some "Novo palestrante". */
+  podeEditar: boolean;
 }
 
 /** Listagem de palestrantes/especialistas — dados reais do banco (leitura). */
-export function TelaPalestrantes({ palestrantes, onAbrir, onNovo }: TelaPalestrantesProps) {
+export function TelaPalestrantes({ palestrantes, onAbrir, onNovo, podeEditar }: TelaPalestrantesProps) {
   const comFoto = palestrantes.filter((p) => p.temFoto).length;
   const ocultos = palestrantes.filter((p) => p.ocultarDoSite).length;
 
@@ -34,12 +36,14 @@ export function TelaPalestrantes({ palestrantes, onAbrir, onNovo }: TelaPalestra
                 (ocultos > 0 ? ` · ${ocultos} oculto${ocultos > 1 ? "s" : ""} do site.` : ".")}
           </p>
         </div>
-        <button type="button" className="pcms-btn" onClick={onNovo}>
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          Novo palestrante
-        </button>
+        {podeEditar && (
+          <button type="button" className="pcms-btn" onClick={onNovo}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Novo palestrante
+          </button>
+        )}
       </div>
 
       <div className="pcms-toolbar">

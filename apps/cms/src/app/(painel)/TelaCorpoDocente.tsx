@@ -14,6 +14,8 @@ interface TelaCorpoDocenteProps {
   erroCarga: string | null;
   onAbrirPalestrante: (id: string) => void;
   onSalvou: (cards: CardCorpoDocenteResumo[]) => void;
+  /** false ⇒ perfil sem escrita no Corpo Docente: lista só leitura, sem reordenar. */
+  podeEditar: boolean;
 }
 
 /**
@@ -26,6 +28,7 @@ export function TelaCorpoDocente({
   erroCarga,
   onAbrirPalestrante,
   onSalvou,
+  podeEditar,
 }: TelaCorpoDocenteProps) {
   const [ordem, setOrdem] = useState<string[]>(() => (cards ?? []).map((c) => c.especialistaId));
   // Nova leitura do servidor reinicia a ordem local (ajuste de estado durante
@@ -86,9 +89,11 @@ export function TelaCorpoDocente({
             Ordem dos cards na página pública. Para incluir ou tirar alguém, abra o palestrante.
           </p>
         </div>
-        <button type="button" className="pcms-btn" onClick={salvar} disabled={!mudou || salvando}>
-          {salvando ? "Salvando…" : "Salvar ordem"}
-        </button>
+        {podeEditar && (
+          <button type="button" className="pcms-btn" onClick={salvar} disabled={!mudou || salvando}>
+            {salvando ? "Salvando…" : "Salvar ordem"}
+          </button>
+        )}
       </div>
 
       <AvisoForm erro={erroCarga ?? erro} />
@@ -135,30 +140,32 @@ export function TelaCorpoDocente({
                 </span>
                 {c.ocultarDoSite && <span className="pcms-selo pcms-selo--oculto">Oculto do site</span>}
 
-                <span className="pcms-home-row__acoes">
-                  <button
-                    type="button"
-                    className="pcms-iconbtn"
-                    onClick={() => mover(i, -1)}
-                    disabled={i === 0 || salvando}
-                    aria-label={`Subir ${c.nome}`}
-                  >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 19V6M6 12l6-6 6 6" />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    className="pcms-iconbtn"
-                    onClick={() => mover(i, 1)}
-                    disabled={i === lista.length - 1 || salvando}
-                    aria-label={`Descer ${c.nome}`}
-                  >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 5v13M18 12l-6 6-6-6" />
-                    </svg>
-                  </button>
-                </span>
+                {podeEditar && (
+                  <span className="pcms-home-row__acoes">
+                    <button
+                      type="button"
+                      className="pcms-iconbtn"
+                      onClick={() => mover(i, -1)}
+                      disabled={i === 0 || salvando}
+                      aria-label={`Subir ${c.nome}`}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 19V6M6 12l6-6 6 6" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      className="pcms-iconbtn"
+                      onClick={() => mover(i, 1)}
+                      disabled={i === lista.length - 1 || salvando}
+                      aria-label={`Descer ${c.nome}`}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 5v13M18 12l-6 6-6-6" />
+                      </svg>
+                    </button>
+                  </span>
+                )}
               </li>
             ))}
           </ol>

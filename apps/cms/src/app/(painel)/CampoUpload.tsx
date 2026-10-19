@@ -14,10 +14,20 @@ interface CampoUploadProps {
   /** Resumo do arquivo atual (ex. "Capa vinculada" ou nome do PDF). */
   atual: string;
   onAtualizado: (evento: EventoCmsDetalhe) => void;
+  /** false ⇒ só mostra o arquivo atual, sem controle de envio. */
+  podeEnviar: boolean;
 }
 
 /** Campo de upload (capa ou PDF) — envia via Server Action e atualiza o pai. */
-export function CampoUpload({ eventoId, campo, rotulo, accept, atual, onAtualizado }: CampoUploadProps) {
+export function CampoUpload({
+  eventoId,
+  campo,
+  rotulo,
+  accept,
+  atual,
+  onAtualizado,
+  podeEnviar,
+}: CampoUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, iniciar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
@@ -41,6 +51,15 @@ export function CampoUpload({ eventoId, campo, rotulo, accept, atual, onAtualiza
         setNomeArquivo(null);
       }
     });
+  }
+
+  if (!podeEnviar) {
+    return (
+      <div className="pcms-upload">
+        <span className="pcms-det-meta__rot">{rotulo}</span>
+        <p className="pcms-upload__atual">{atual}</p>
+      </div>
+    );
   }
 
   return (
