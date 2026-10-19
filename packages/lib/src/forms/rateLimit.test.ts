@@ -89,3 +89,43 @@ describe("checarRateLimit", () => {
     erro.mockRestore();
   });
 });
+
+describe("checarRateLimit — limpeza geral da tabela", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-19T12:00:00.000Z"));
+    process.env.RATELIMIT_ENABLED = "true";
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    delete process.env.RATELIMIT_ENABLED;
+  });
+
+  function comLimpezaGeral() {
+    const base = storeFalso(0);
+    const limparTudoAntesDe = vi.fn(async (_antesDe: Date) => {});
+    return { ...base, store: { ...base.store, limparTudoAntesDe }, limparTudoAntesDe };
+  }
+
+  it("de vez em quando apaga tentativas de qualquer IP com mais de um dia", async () => {
+    const { store, limparTudoAntesDe } = comLimpezaGeral();
+    await checarRateLimit("1.2.3.4", "/api/forms/contato", store, LIMITE_PADRAO, { sorteio: () => 0.01 });
+    expect(limparTudoAntesDe).toHaveBeenCalledWith(new Date("2026-10-18T12:00:00.000Z"));
+  });
+
+  it("na maioria das requisições não faz a limpeza geral", async () => {
+    const { store, limparTudoAntesDe } = comLimpezaGeral();
+    await checarRateLimit("1.2.3.4", "/api/forms/contato", store, LIMITE_PADRAO, { sorteio: () => 0.9 });
+    expect(limparTudoAntesDe).not.toHaveBeenCalled();
+  });
+
+  it("falha na limpeza geral não bloqueia a requisição", async () => {
+    const { store } = comLimpezaGeral();
+    store.limparTudoAntesDe = vi.fn().mockRejectedValue(new Error("banco fora"));
+    const erro = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(
+      await checarRateLimit("1.2.3.4", "/api/forms/contato", store, LIMITE_PADRAO, { sorteio: () => 0 }),
+    ).toEqual({ ok: true });
+    erro.mockRestore();
+  });
+});

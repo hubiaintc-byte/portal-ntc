@@ -20,14 +20,12 @@ export function criarStoreRateLimit(): StoreRateLimit {
   return {
     async contarDesde(rota, ip, desde) {
       const payload = await obterPayload();
-      const res = await payload.find({
+      const { totalDocs } = await payload.count({
         collection: "tentativas-acesso",
         where: { and: [...filtro(rota, ip), { createdAt: { greater_than: desde.toISOString() } }] },
-        limit: 0,
-        depth: 0,
         overrideAccess: true,
       });
-      return res.totalDocs;
+      return totalDocs;
     },
 
     async registrar(rota, ip) {
@@ -35,6 +33,15 @@ export function criarStoreRateLimit(): StoreRateLimit {
       await payload.create({
         collection: "tentativas-acesso",
         data: { rota, ip },
+        overrideAccess: true,
+      });
+    },
+
+    async limparTudoAntesDe(antesDe) {
+      const payload = await obterPayload();
+      await payload.delete({
+        collection: "tentativas-acesso",
+        where: { createdAt: { less_than: antesDe.toISOString() } },
         overrideAccess: true,
       });
     },

@@ -1,6 +1,8 @@
 import type { CollectionConfig } from "payload";
 
-import { authenticated } from "../access/authenticated";
+import { atendimentoComercial } from "../access/atendimentoComercial";
+import { superAdmin } from "../access/superAdmin";
+import { protegerDocumentoComercial } from "../hooks/protegerDocumentoComercial";
 import { sanitizarFilename } from "../hooks/sanitizarFilename";
 import { registrarDocumentoNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
 
@@ -10,8 +12,8 @@ import { registrarDocumentoNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
  * autenticado no painel: propostas carregam preços, descontos e dados de
  * contato (CLAUDE.md §12 · LGPD). Registrada em payload.config.ts numa
  * instância própria do plugin s3Storage, apontando para SUPABASE_BUCKET_PRIVADO
- * (bucket dedicado e privado — cai no bucket público de `media` como fallback
- * enquanto esse bucket não for criado). SEM `disablePayloadAccessControl` —
+ * (bucket dedicado e privado). Sem essa variável o upload é recusado
+ * (`protegerDocumentoComercial`), nunca desviado para o bucket público. SEM `disablePayloadAccessControl` —
  * Payload intermedeia toda leitura pelo próprio access control da coleção.
  */
 export const DocumentosComerciais: CollectionConfig = {
@@ -22,14 +24,16 @@ export const DocumentosComerciais: CollectionConfig = {
     useAsTitle: "filename",
     group: "CRM",
   },
+  // Propostas com preço, contratos e empenhos: só o perfil do CRM (o mesmo das
+  // Server Actions — lib/cms/perfis.ts). Excluir, só o super-admin.
   access: {
-    read: authenticated,
-    create: authenticated,
-    update: authenticated,
-    delete: authenticated,
+    read: atendimentoComercial,
+    create: atendimentoComercial,
+    update: atendimentoComercial,
+    delete: superAdmin,
   },
   hooks: {
-    beforeOperation: [sanitizarFilename],
+    beforeOperation: [sanitizarFilename, protegerDocumentoComercial],
     afterChange: [registrarDocumentoNaLinhaDoTempo],
   },
   upload: {
