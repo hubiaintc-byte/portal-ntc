@@ -1,9 +1,12 @@
 import "server-only";
 
-import type { RequiredDataFromCollectionSlug } from "payload";
+import type { Payload, PayloadRequest, RequiredDataFromCollectionSlug } from "payload";
+import slugify from "slugify";
 
 import type { Rodape } from "@ntc/types";
 
+import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
+import { executarEmTransacao } from "@/lib/crm/transacao";
 import { casarOuCriarPalestrantes } from "@/lib/importacaoPdf/casarOuCriarPalestrantes";
 import { textoParaLexical } from "@/lib/lexicalBuilders";
 import { extrairTextoPdf } from "@/lib/importacaoPdf/extrairTextoPdf";
@@ -11,6 +14,17 @@ import { markdownParaLexical } from "@/lib/markdownLexical";
 import { montarCamposEvento } from "@/lib/importacaoPdf/montarCamposEvento";
 import { parsearFolderEvento } from "@/lib/importacaoPdf/parsearFolderEvento";
 import { obterPayload } from "@/lib/payloadClient";
+
+import {
+  aplicarCardDe,
+  type CardDesejado,
+  ctaHrefPermitido,
+  type CardGlobal,
+  ListaDesatualizadaError,
+  reordenarCards,
+} from "./cardsCorpoDocente";
+import { ehErroSlugDuplicado } from "./erroSlugDuplicado";
+import { NOME_EVENTO_EM_BRANCO, slugParaSalvar, slugProvisorio } from "./slugEvento";
 
 /**
  * Escrita de eventos para o Painel Admin — via Local API do
@@ -31,6 +45,7 @@ export interface ResultadoEscrita {
 
 export interface CamposEventoCompletos {
   nome: string;
+  slug: string;
   dataInicio: string;
   dataFim: string;
   resumo: string;
@@ -91,6 +106,26 @@ export async function salvarCamposEvento(
     if (erroLinhas) return { ok: false, erro: erroLinhas };
 
     const payload = await obterPayload();
+    const atual = (await payload.findByID({ collection: "eventos", id, draft: true, depth: 0 })) as {
+      slug?: string | null;
+    };
+    const slug = slugParaSalvar({
+      slugDigitado: campos.slug,
+      slugAtual: atual.slug ?? "",
+      nome: campos.nome,
+    });
+    // Salvar é `draft: true`, que grava só a versão (as tabelas de versão não
+    // têm o índice único): a colisão só estouraria no Publicar. Conferida
+    // aqui, contra rascunhos inclusive, para o editor saber já no salvar.
+    const outro = await payload.find({
+      collection: "eventos",
+      where: { and: [{ slug: { equals: slug } }, { id: { not_equals: id } }] },
+      draft: true,
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    });
+    if (outro.docs.length > 0) return { ok: false, erro: ERRO_SLUG_EVENTO };
     // Os builders de lexicalBuilders.ts tipam `children` como `unknown[]`
     // (nós heterogêneos: parágrafo/heading/lista); o Payload aceita qualquer
     // array de nós JSON em runtime (validação é do editor Lexical
@@ -104,6 +139,7 @@ export async function salvarCamposEvento(
       id,
       data: {
         nome: campos.nome,
+        slug,
         // Campo required no schema: import sem data parseada chega como "" e a
         // chave é omitida (string vazia estoura no timestamptz do Postgres);
         // o rascunho segue sem data até o editor preencher.
@@ -147,7 +183,34 @@ export async function salvarCamposEvento(
     });
     return { ok: true };
   } catch (e) {
-    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao salvar." };
+    return { ok: false, erro: traduzirErroEvento(e) };
+  }
+}
+
+const ERRO_SLUG_EVENTO = "Já existe um evento com este endereço (slug).";
+
+function traduzirErroEvento(e: unknown, padrao = "Erro ao salvar."): string {
+  if (ehErroSlugDuplicado(e)) return ERRO_SLUG_EVENTO;
+  const msg = e instanceof Error ? e.message : String(e);
+  return msg || padrao;
+}
+
+/**
+ * Cria um evento EM RASCUNHO, em branco, só com nome e slug provisórios (o
+ * slug é regerado do nome no primeiro salvar — ver `slugParaSalvar`).
+ */
+export async function criarEventoEmBrancoCms(): Promise<ResultadoEscrita & { id?: string }> {
+  try {
+    const payload = await obterPayload();
+    const criado = await payload.create({
+      collection: "eventos",
+      data: { nome: NOME_EVENTO_EM_BRANCO, slug: slugProvisorio() },
+      draft: true,
+      overrideAccess: true,
+    });
+    return { ok: true, id: String(criado.id) };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroEvento(e) };
   }
 }
 
@@ -166,7 +229,7 @@ export async function publicarEvento(id: string): Promise<ResultadoEscrita> {
     });
     return { ok: true };
   } catch (e) {
-    return { ok: false, erro: e instanceof Error ? e.message : "Erro ao publicar." };
+    return { ok: false, erro: traduzirErroEvento(e, "Erro ao publicar.") };
   }
 }
 
@@ -816,4 +879,339 @@ export async function salvarContatosCms(campos: CamposContatos): Promise<Resulta
 
   const revalidou = await revalidarLayoutDoSite();
   return revalidou ? { ok: true } : { ok: true, aviso: AVISO_REVALIDACAO };
+}
+
+/* ---------------- Palestrantes (coleção especialistas) + Corpo Docente ---------------- */
+
+export interface CamposPalestrante {
+  nome: string;
+  titulacao: string;
+  instituicao: string;
+  cargoAtual: string;
+  /** undefined = não mudou (não reenviar). Obrigatório e não vazio na criação. */
+  curriculoCurtoMarkdown?: string;
+  /** undefined = não mudou (não reenviar). */
+  curriculoCompletoMarkdown?: string;
+  linkLattes: string;
+  linkLinkedin: string;
+  vertical: string;
+  tipo: string;
+  frente: string;
+  formacao: string;
+  atuacao: string[];
+  linhasAtuacaoIds: string[];
+  programasIds: string[];
+  ocultarDoSite: boolean;
+  /** null = não aparece no Corpo Docente. */
+  corpoDocente: CardDesejado | null;
+}
+
+const CHAVES_TEXTO_PALESTRANTE = [
+  "nome",
+  "titulacao",
+  "instituicao",
+  "cargoAtual",
+  "linkLattes",
+  "linkLinkedin",
+  "vertical",
+  "tipo",
+  "frente",
+  "formacao",
+] as const;
+
+const CHAVES_TEXTO_CARD = [
+  "tag",
+  "axisBadge",
+  "credencialCard",
+  "metaAtuacao",
+  "metaEixos",
+  "programasTexto",
+  "programasStrong",
+  "sufixoPrograma",
+  "ctaHref",
+  "ctaRotulo",
+] as const;
+
+const ehListaDeTextos = (v: unknown): v is string[] =>
+  Array.isArray(v) && v.every((x) => typeof x === "string");
+
+function ehCardDesejado(v: unknown): v is CardDesejado {
+  if (typeof v !== "object" || v === null) return false;
+  const c = v as { formato?: unknown; textos?: unknown };
+  if (c.formato !== "featured" && c.formato !== "expert") return false;
+  if (typeof c.textos !== "object" || c.textos === null) return false;
+  const t = c.textos as Record<string, unknown>;
+  return CHAVES_TEXTO_CARD.every((k) => typeof t[k] === "string");
+}
+
+/**
+ * O JSON que chega da Server Action tem o formato de `CamposPalestrante`?
+ * Server Action é endpoint público: o `FormData` pode vir forjado.
+ */
+export function ehCamposPalestrante(v: unknown): v is CamposPalestrante {
+  if (typeof v !== "object" || v === null) return false;
+  const c = v as Record<string, unknown>;
+  const opcional = (x: unknown) => x === undefined || typeof x === "string";
+  return (
+    CHAVES_TEXTO_PALESTRANTE.every((k) => typeof c[k] === "string") &&
+    opcional(c.curriculoCurtoMarkdown) &&
+    opcional(c.curriculoCompletoMarkdown) &&
+    ehListaDeTextos(c.atuacao) &&
+    ehListaDeTextos(c.linhasAtuacaoIds) &&
+    ehListaDeTextos(c.programasIds) &&
+    typeof c.ocultarDoSite === "boolean" &&
+    (c.corpoDocente === null || ehCardDesejado(c.corpoDocente))
+  );
+}
+
+const ERRO_DADOS_INVALIDOS = "Dados do formulário inválidos.";
+const ERRO_FOTO_OBRIGATORIA = "Envie a foto do palestrante.";
+const ERRO_CURRICULO_CURTO = "Informe o currículo curto.";
+const ERRO_ULTIMO_CARD =
+  "O Corpo Docente precisa de ao menos um nome — inclua outro antes de tirar este.";
+
+const ehIdNumerico = (v: string) => /^\d+$/.test(v);
+
+/**
+ * Falha do Global `corpo-docente` numa escrita de card. A mensagem diz que o
+ * problema está no Global (hero, quicklinks, métricas… validados inteiros ao
+ * gravar publicado), não no palestrante que o PO acabou de editar.
+ */
+export class ErroCorpoDocente extends Error {
+  constructor(causa: unknown) {
+    const detalhe = causa instanceof Error ? causa.message : String(causa);
+    super(
+      `Não foi possível atualizar o Corpo Docente (${detalhe || "erro desconhecido"}) — o problema está nos dados da página Corpo Docente, não neste palestrante.`,
+    );
+    this.name = "ErroCorpoDocente";
+  }
+}
+
+/** Cards do Global, da versão mais recente (`draft: true`). */
+export async function lerCardsCorpoDocente(payload: Payload, req?: PayloadRequest): Promise<CardGlobal[]> {
+  const global = await payload.findGlobal({ slug: "corpo-docente", depth: 0, draft: true, req });
+  return global.cards ?? [];
+}
+
+/**
+ * Troca só `cards` e grava o Global PUBLICADO (o resto vai intacto). Chamada
+ * provada contra o banco real na Task 1 do plano. Lança `ErroCorpoDocente`.
+ */
+export async function gravarCardsCorpoDocente(
+  payload: Payload,
+  req: PayloadRequest,
+  cards: CardGlobal[],
+): Promise<void> {
+  try {
+    await payload.updateGlobal({
+      slug: "corpo-docente",
+      data: { cards, _status: "published" },
+      depth: 0,
+      overrideAccess: true,
+      req,
+    });
+  } catch (e) {
+    throw new ErroCorpoDocente(e);
+  }
+}
+
+const temPessoa = (cards: CardGlobal[]) => cards.some((c) => c.formato !== "axis");
+const mudou = (antes: CardGlobal[], depois: CardGlobal[]) => JSON.stringify(antes) !== JSON.stringify(depois);
+
+function validarPalestrante(
+  id: string | null,
+  campos: CamposPalestrante,
+  foto: { arquivo: File; alt: string } | null,
+): string | null {
+  if (id !== null && !ehIdNumerico(id)) return ERRO_DADOS_INVALIDOS;
+  if (![...campos.linhasAtuacaoIds, ...campos.programasIds].every(ehIdNumerico)) return ERRO_DADOS_INVALIDOS;
+  if (campos.nome.trim() === "") return "Informe o nome do palestrante.";
+  if (campos.titulacao.trim() === "") return "Informe a titulação.";
+  if (campos.instituicao.trim() === "") return "Informe a instituição.";
+  if (id === null && foto === null) return ERRO_FOTO_OBRIGATORIA;
+  if (foto !== null && !foto.arquivo.type.startsWith("image/")) return "A foto precisa ser uma imagem.";
+  if (campos.corpoDocente !== null && !ctaHrefPermitido(campos.corpoDocente.textos.ctaHref)) {
+    return "Link do botão do card: use um endereço que comece com /, #, http://, https:// ou mailto:.";
+  }
+  const curto = campos.curriculoCurtoMarkdown;
+  if ((id === null && curto === undefined) || (curto !== undefined && curto.trim() === "")) {
+    return ERRO_CURRICULO_CURTO;
+  }
+  return null;
+}
+
+const ERRO_NOME_REPETIDO =
+  "Já existe um palestrante com este nome. Diferencie o nome (ex.: inclua o sobrenome).";
+
+function traduzirErroPalestrante(e: unknown): string {
+  if (e instanceof ErroCorpoDocente) return e.message;
+  if (ehErroSlugDuplicado(e)) return ERRO_NOME_REPETIDO;
+  const msg = e instanceof Error ? e.message : String(e);
+  return msg || "Erro ao salvar o palestrante.";
+}
+
+function dadosDoEspecialista(campos: CamposPalestrante, fotoId: number | string | null): Record<string, unknown> {
+  return {
+    nome: campos.nome.trim(),
+    titulacao: campos.titulacao,
+    instituicao: campos.instituicao.trim(),
+    cargoAtual: ouNulo(campos.cargoAtual),
+    // Markdown só é reenviado se mudou: reescrever um campo intocado
+    // degradaria o Lexical importado (mesma regra do catálogo, v3.4).
+    ...(campos.curriculoCurtoMarkdown !== undefined
+      ? { curriculoCurto: markdownParaLexical(campos.curriculoCurtoMarkdown) }
+      : {}),
+    ...(campos.curriculoCompletoMarkdown !== undefined
+      ? {
+          curriculoCompleto:
+            campos.curriculoCompletoMarkdown.trim() === ""
+              ? null
+              : markdownParaLexical(campos.curriculoCompletoMarkdown),
+        }
+      : {}),
+    linkLattes: ouNulo(campos.linkLattes),
+    linkLinkedin: ouNulo(campos.linkLinkedin),
+    vertical: ouNulo(campos.vertical),
+    tipo: ouNulo(campos.tipo),
+    frente: ouNulo(campos.frente),
+    formacao: ouNulo(campos.formacao),
+    atuacao: campos.atuacao,
+    linhasAtuacao: campos.linhasAtuacaoIds.map(Number),
+    programasRelacionados: campos.programasIds.map(Number),
+    ocultarDoSite: campos.ocultarDoSite,
+    ...(fotoId !== null ? { foto: fotoId } : {}),
+    // Sem rascunho para palestrante (spec §4.1): salvar já manda para o site.
+    _status: "published",
+  };
+}
+
+/**
+ * Cria ou atualiza um palestrante PUBLICADO e inclui/atualiza/remove o card
+ * dele no Global `corpo-docente`, as duas escritas na mesma transação.
+ *
+ * Toda recusa de validação acontece antes de qualquer escrita (inclusive a
+ * da foto). A `media` da foto é criada ANTES da transação: upload em storage
+ * não é transacional, e uma media órfã numa falha é aceitável (já acontece no
+ * import de PDF).
+ */
+export async function salvarPalestranteCms(
+  usuario: UsuarioAutenticado,
+  id: string | null,
+  campos: CamposPalestrante,
+  foto: { arquivo: File; alt: string } | null,
+): Promise<ResultadoEscrita & { id?: string }> {
+  const erro = validarPalestrante(id, campos, foto);
+  if (erro) return { ok: false, erro };
+
+  try {
+    const payload = await obterPayload();
+
+    if (id === null) {
+      // Mesmo cálculo do hook `autoSlug` da coleção, que gera o slug do nome
+      // na criação; conferido antes de subir a foto para não deixar media órfã.
+      const slug = slugify(campos.nome.trim(), { lower: true, strict: true, locale: "pt" });
+      const existente = await payload.find({
+        collection: "especialistas",
+        where: { slug: { equals: slug } },
+        draft: true,
+        limit: 1,
+        depth: 0,
+        overrideAccess: true,
+      });
+      if (existente.docs.length > 0) return { ok: false, erro: ERRO_NOME_REPETIDO };
+    } else {
+      // Publicar exige foto e currículo curto: um especialista criado em
+      // rascunho pelo import de PDF pode não ter nenhum dos dois.
+      const atual = (await payload.findByID({
+        collection: "especialistas",
+        id,
+        depth: 0,
+        draft: true,
+        overrideAccess: true,
+      })) as { foto?: unknown; curriculoCurto?: unknown };
+      if (foto === null && (atual.foto === null || atual.foto === undefined)) {
+        return { ok: false, erro: ERRO_FOTO_OBRIGATORIA };
+      }
+      if (campos.curriculoCurtoMarkdown === undefined && !atual.curriculoCurto) {
+        return { ok: false, erro: ERRO_CURRICULO_CURTO };
+      }
+      const lidos = await lerCardsCorpoDocente(payload);
+      const novos = aplicarCardDe(lidos, id, campos.corpoDocente);
+      if (mudou(lidos, novos) && !temPessoa(novos)) return { ok: false, erro: ERRO_ULTIMO_CARD };
+    }
+
+    let fotoId: number | string | null = null;
+    if (foto !== null) {
+      const alt = foto.alt.trim();
+      const media = await payload.create({
+        collection: "media",
+        data: { alt: alt.length > 0 ? alt : campos.nome.trim() },
+        file: {
+          data: Buffer.from(await foto.arquivo.arrayBuffer()),
+          name: foto.arquivo.name,
+          mimetype: foto.arquivo.type,
+          size: foto.arquivo.size,
+        },
+        overrideAccess: true,
+      });
+      fotoId = media.id;
+    }
+
+    // O tipo gerado descreve o documento completo e não admite `null` nem o
+    // Lexical do conversor (`children: unknown[]`); os selects chegam como
+    // string validada pelo próprio Payload. Conversão uma vez, no limite da
+    // Local API — mesmo padrão de `salvarConteudoCms`.
+    const data = dadosDoEspecialista(campos, fotoId) as unknown as RequiredDataFromCollectionSlug<"especialistas">;
+
+    const idFinal = await executarEmTransacao(payload, usuario, async (req) => {
+      // Relido dentro da transação: a lista pode ter mudado desde a checagem.
+      const lidos = await lerCardsCorpoDocente(payload, req);
+      let salvoId: string;
+      if (id === null) {
+        const criado = await payload.create({ collection: "especialistas", data, overrideAccess: true, req });
+        salvoId = String(criado.id);
+      } else {
+        await payload.update({ collection: "especialistas", id, data, overrideAccess: true, req });
+        salvoId = id;
+      }
+      const novos = aplicarCardDe(lidos, salvoId, campos.corpoDocente);
+      if (mudou(lidos, novos)) {
+        // Lançar (não retornar) para reverter a escrita do especialista.
+        if (!temPessoa(novos)) throw new Error(ERRO_ULTIMO_CARD);
+        await gravarCardsCorpoDocente(payload, req, novos);
+      }
+      return salvoId;
+    });
+    return { ok: true, id: idFinal };
+  } catch (e) {
+    return { ok: false, erro: traduzirErroPalestrante(e) };
+  }
+}
+
+/**
+ * Grava a nova ordem dos cards de pessoa do Corpo Docente (os de eixo ficam
+ * onde estão). O Global é relido dentro da transação e `reordenarCards`
+ * recusa se a lista mudou desde que a tela foi aberta.
+ */
+export async function salvarOrdemCorpoDocenteCms(
+  usuario: UsuarioAutenticado,
+  idsNaOrdem: string[],
+): Promise<ResultadoEscrita> {
+  if (!idsNaOrdem.every(ehIdNumerico)) return { ok: false, erro: ERRO_DADOS_INVALIDOS };
+  try {
+    const payload = await obterPayload();
+    await executarEmTransacao(payload, usuario, async (req) => {
+      const lidos = await lerCardsCorpoDocente(payload, req);
+      await gravarCardsCorpoDocente(payload, req, reordenarCards(lidos, idsNaOrdem));
+    });
+    return { ok: true };
+  } catch (e) {
+    if (e instanceof ListaDesatualizadaError) {
+      return {
+        ok: false,
+        erro: "A lista do Corpo Docente mudou desde que a tela foi aberta — recarregue e tente de novo.",
+      };
+    }
+    return { ok: false, erro: traduzirErroPalestrante(e) };
+  }
 }

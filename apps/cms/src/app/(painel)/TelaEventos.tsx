@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import type { EventoCmsResumo } from "@/lib/cms/painelCms";
 
+import { AvisoForm } from "./crm/CamposCrm";
 import { ModalImportarPdf } from "./ModalImportarPdf";
 
 const ROTULO_STATUS: Record<EventoCmsResumo["status"], string> = {
@@ -14,10 +15,15 @@ interface TelaEventosProps {
   onAbrir: (id: string) => void;
   /** Abre o evento recém-importado direto em modo de edição (revisão). */
   onAbrirImportado: (id: string) => void;
+  /** Cria um evento em branco e o abre em edição. */
+  onNovo: () => void;
+  criando?: boolean;
+  /** Falha ao criar o evento em branco. */
+  erroNovo?: string | null;
 }
 
 /** Listagem de eventos — dados reais do banco (somente leitura). */
-export function TelaEventos({ eventos, onAbrir, onAbrirImportado }: TelaEventosProps) {
+export function TelaEventos({ eventos, onAbrir, onAbrirImportado, onNovo, criando = false, erroNovo = null }: TelaEventosProps) {
   const [modalImportar, setModalImportar] = useState(false);
 
   return (
@@ -44,7 +50,7 @@ export function TelaEventos({ eventos, onAbrir, onAbrirImportado }: TelaEventosP
             </svg>
             Importar PDF
           </button>
-          <button type="button" className="pcms-btn" disabled title="Em breve">
+          <button type="button" className="pcms-btn" onClick={onNovo} disabled={criando}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -52,6 +58,8 @@ export function TelaEventos({ eventos, onAbrir, onAbrirImportado }: TelaEventosP
           </button>
         </div>
       </div>
+
+      <AvisoForm erro={erroNovo} />
 
       {modalImportar && (
         <ModalImportarPdf

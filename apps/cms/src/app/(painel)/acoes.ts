@@ -6,24 +6,33 @@ import type { RequiredDataFromCollectionSlug } from "payload";
 import { VERTICAIS_CONTATO } from "@ntc/lib";
 import type { Rodape } from "@ntc/types";
 
-import { obterUsuarioCms, obterUsuarioCmsComPerfil } from "@/lib/cms/autenticacao";
+import {
+  obterUsuarioAutenticadoComPerfil,
+  obterUsuarioCms,
+  obterUsuarioCmsComPerfil,
+} from "@/lib/cms/autenticacao";
 import { PERFIS_EVENTOS, PERFIS_INSTITUCIONAL } from "@/lib/cms/perfis";
 import {
   listarAreasCms,
+  listarCardsCorpoDocenteCms,
   listarConteudosCms,
+  listarOpcoesPalestranteCms,
   obterConteudoCms,
   obterEventoCms,
   obterPalestranteCms,
   type ConteudoCmsDetalhe,
+  type CardCorpoDocenteResumo,
   type ConteudoCmsResumo,
   type EventoCmsDetalhe,
   type PalestranteCmsDetalhe,
 } from "@/lib/cms/painelCms";
 import {
   criarEventoDePdf,
+  criarEventoEmBrancoCms,
   definirOcultarPalestrante,
   despublicarConteudoCms,
   despublicarEvento,
+  ehCamposPalestrante,
   enviarMidiaConteudo as enviarMidiaConteudoCms,
   enviarMidiaEvento,
   excluirConteudoCms,
@@ -33,6 +42,8 @@ import {
   salvarContatosCms,
   salvarConteudoCms,
   salvarEventosHome,
+  salvarOrdemCorpoDocenteCms,
+  salvarPalestranteCms,
   vincularPalestrantesEvento,
   type CamposContatos,
   type CamposConteudo,
@@ -150,6 +161,14 @@ export async function importarEventoPdf(formData: FormData): Promise<ResultadoIm
   return resultado;
 }
 
+/** Cria um evento em branco (rascunho) para o editor preencher no detalhe. */
+export async function criarEventoEmBranco(): Promise<ResultadoEscrita & { id?: string }> {
+  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return RECUSADO_PERFIL;
+  const resultado = await criarEventoEmBrancoCms();
+  if (resultado.ok) revalidatePath("/");
+  return resultado;
+}
+
 /** Salva os eventos em destaque na Home. */
 export async function salvarEventosDestaqueHome(idsEventos: string[]): Promise<ResultadoEscrita> {
   if (!(await obterUsuarioCmsComPerfil(PERFIS_INSTITUCIONAL))) return RECUSADO_PERFIL;
@@ -171,6 +190,94 @@ export async function alternarOcultarPalestrante(
   if (resultado.ok) revalidatePath("/");
   const palestrante = resultado.ok ? await obterPalestranteCms(id) : null;
   return { resultado, palestrante };
+}
+
+const DADOS_INVALIDOS: ResultadoEscrita = { ok: false, erro: "Dados do formulário inválidos." };
+const AVISO_SEM_RELEITURA = "Salvo. Não foi possível recarregar os dados — reabra o palestrante.";
+
+// Até 15 dígitos: acima disso `Number` perde precisão e o id canônico deixa de ser inteiro.
+const ehIdNumerico = (v: unknown): v is string => typeof v === "string" && /^\d{1,15}$/.test(v);
+/** "007" e "7" são o mesmo registro: sem isso, um id forjado duplicaria um card. */
+const idCanonico = (v: string): string => String(Number(v));
+
+/**
+ * Cria (`id` vazio) ou edita um palestrante, gravando PUBLICADO, junto com o
+ * card dele no Corpo Docente. O `FormData` traz `id`, `campos` (JSON de
+ * `CamposPalestrante`), `foto` (File, opcional) e `fotoAlt`.
+ */
+export async function salvarPalestrante(
+  formData: FormData,
+): Promise<{ resultado: ResultadoEscrita; palestrante: PalestranteCmsDetalhe | null }> {
+  // O usuário cru vai para `executarEmTransacao` (vira `req.user`).
+  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_INSTITUCIONAL);
+  if (!usuario) return { resultado: RECUSADO_PERFIL, palestrante: null };
+
+  const idBruto = formData.get("id");
+  const idTexto = typeof idBruto === "string" && idBruto.trim() !== "" ? idBruto.trim() : null;
+  if (idTexto !== null && !ehIdNumerico(idTexto)) return { resultado: DADOS_INVALIDOS, palestrante: null };
+  const id = idTexto === null ? null : idCanonico(idTexto);
+
+  let bruto: unknown;
+  try {
+    bruto = JSON.parse(String(formData.get("campos") ?? ""));
+  } catch {
+    return { resultado: DADOS_INVALIDOS, palestrante: null };
+  }
+  if (!ehCamposPalestrante(bruto)) return { resultado: DADOS_INVALIDOS, palestrante: null };
+  if (![...bruto.linhasAtuacaoIds, ...bruto.programasIds].every(ehIdNumerico)) {
+    return { resultado: DADOS_INVALIDOS, palestrante: null };
+  }
+  const campos = {
+    ...bruto,
+    linhasAtuacaoIds: bruto.linhasAtuacaoIds.map(idCanonico),
+    programasIds: bruto.programasIds.map(idCanonico),
+  };
+
+  const arquivo = formData.get("foto");
+  const foto =
+    arquivo instanceof File && arquivo.size > 0
+      ? { arquivo, alt: String(formData.get("fotoAlt") ?? "") }
+      : null;
+
+  const resultado = await salvarPalestranteCms(usuario, id, campos, foto);
+  if (resultado.ok) revalidatePath("/");
+  if (!resultado.ok || !resultado.id) return { resultado, palestrante: null };
+
+  // A escrita já foi confirmada: uma falha na releitura não pode virar erro
+  // (o PO tentaria salvar de novo e criaria outro registro).
+  const palestrante = await obterPalestranteCms(resultado.id).catch(() => null);
+  if (!palestrante) return { resultado: { ...resultado, aviso: AVISO_SEM_RELEITURA }, palestrante: null };
+  return { resultado, palestrante };
+}
+
+/** Cards de pessoa do Corpo Docente, na ordem atual, para a tela de ordenação. */
+export async function carregarCorpoDocente(): Promise<CardCorpoDocenteResumo[]> {
+  if (!(await obterUsuarioCms())) return [];
+  return listarCardsCorpoDocenteCms();
+}
+
+/** Grava a ordem dos cards e devolve a lista relida. */
+export async function salvarOrdemCorpoDocente(
+  idsNaOrdem: string[],
+): Promise<{ resultado: ResultadoEscrita; cards: CardCorpoDocenteResumo[] | null }> {
+  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_INSTITUCIONAL);
+  if (!usuario) return { resultado: RECUSADO_PERFIL, cards: null };
+  if (!Array.isArray(idsNaOrdem) || !idsNaOrdem.every(ehIdNumerico)) {
+    return { resultado: DADOS_INVALIDOS, cards: null };
+  }
+  const resultado = await salvarOrdemCorpoDocenteCms(usuario, idsNaOrdem.map(idCanonico));
+  if (resultado.ok) revalidatePath("/");
+  const cards = resultado.ok ? await listarCardsCorpoDocenteCms() : null;
+  return { resultado, cards };
+}
+
+/** Áreas e programas para os selects de relação do formulário do palestrante. */
+export async function carregarOpcoesPalestrante(): Promise<{
+  areas: { id: string; nome: string }[];
+  programas: { id: string; sigla: string }[];
+}> {
+  if (!(await obterUsuarioCms())) return { areas: [], programas: [] };
+  return listarOpcoesPalestranteCms();
 }
 
 /**

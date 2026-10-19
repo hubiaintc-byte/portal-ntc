@@ -6,6 +6,8 @@ import type { EventoCmsDetalhe, PalestranteCmsResumo } from "@/lib/cms/painelCms
 import type { CamposEventoCompletos } from "@/lib/cms/painelCmsEscrita";
 
 import { alternarPublicacaoEvento, salvarEvento } from "./acoes";
+import { ehSlugProvisorio } from "@/lib/cms/slugEvento";
+
 import { CampoUpload } from "./CampoUpload";
 import { SeletorPalestrantes } from "./SeletorPalestrantes";
 
@@ -25,6 +27,7 @@ const MODALIDADES = [
 function camposDe(evento: EventoCmsDetalhe): CamposEventoCompletos {
   return {
     nome: evento.titulo,
+    slug: evento.slug,
     dataInicio: evento.dataInicioISO ?? "",
     dataFim: evento.dataFimISO ?? "",
     resumo: evento.resumo ?? "",
@@ -174,6 +177,21 @@ export function DetalheEvento({
               value={campos.nome}
               onChange={(e) => mudar("nome", e.target.value)}
             />
+          </div>
+          <div className="pcms-field">
+            <label htmlFor="ed-slug">Endereço (slug)</label>
+            <input
+              id="ed-slug"
+              type="text"
+              value={campos.slug}
+              aria-describedby="ed-slug-ajuda"
+              onChange={(e) => mudar("slug", e.target.value)}
+            />
+            <p id="ed-slug-ajuda" className="pcms-editor__hint">
+              {ehSlugProvisorio(campos.slug)
+                ? "Provisório: será gerado a partir do nome ao salvar."
+                : "Atenção: mudar o endereço muda a URL pública do evento."}
+            </p>
           </div>
           <div className="pcms-field">
             <label htmlFor="ed-resumo">Resumo (até 280 caracteres)</label>

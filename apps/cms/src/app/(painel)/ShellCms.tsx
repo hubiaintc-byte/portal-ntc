@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import type {
+  CardCorpoDocenteResumo,
   ConteudoCmsDetalhe,
   ConteudoCmsResumo,
   EventoCmsDetalhe,
@@ -18,12 +19,16 @@ import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
 import {
   carregarAreas,
   carregarConteudo,
+  carregarCorpoDocente,
   carregarEvento,
+  criarEventoEmBranco,
+  carregarOpcoesPalestrante,
   carregarPalestrante,
   carregarUsuarios,
 } from "./acoes";
 import { ShellPainel, type GrupoNav } from "./shell/ShellPainel";
 import { TelaDashboard } from "./TelaDashboard";
+import { TelaCorpoDocente } from "./TelaCorpoDocente";
 import { TelaHome } from "./TelaHome";
 import { TelaPalestrantes } from "./TelaPalestrantes";
 import { TelaEventos } from "./TelaEventos";
@@ -33,6 +38,7 @@ import { TelaUsuarios } from "./TelaUsuarios";
 import { DetalheConteudo } from "./DetalheConteudo";
 import { DetalheEvento } from "./DetalheEvento";
 import { DetalhePalestrante } from "./DetalhePalestrante";
+import { FormPalestrante } from "./FormPalestrante";
 
 /**
  * Casco do Painel Admin (sidebar Oxford + topbar + conteúdo).
@@ -55,6 +61,7 @@ interface ShellCmsProps {
 type TelaId =
   | "dashboard"
   | "palestrantes"
+  | "corpo-docente"
   | "eventos"
   | "conteudos"
   | "home"
@@ -83,6 +90,12 @@ const Ico = {
       <path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5" />
       <path d="M16 4.5a3.2 3.2 0 0 1 0 6.4" />
       <path d="M17 14.8c2.4.6 4 2.6 4 5.2" />
+    </svg>
+  ),
+  corpoDocente: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 6h16M4 12h16M4 18h10" />
+      <path d="M18 15v6M15 18h6" />
     </svg>
   ),
   eventos: (
@@ -124,6 +137,7 @@ const Ico = {
 const NAV_PRINCIPAL: ItemNav[] = [
   { id: "dashboard", rotulo: "Painel", icone: Ico.painel },
   { id: "palestrantes", rotulo: "Palestrantes", icone: Ico.palestrantes },
+  { id: "corpo-docente", rotulo: "Corpo Docente", icone: Ico.corpoDocente },
   { id: "eventos", rotulo: "Eventos", icone: Ico.eventos },
   { id: "conteudos", rotulo: "Conteúdos", icone: Ico.conteudos },
   { id: "home", rotulo: "Home", icone: Ico.home },
@@ -132,6 +146,7 @@ const NAV_PRINCIPAL: ItemNav[] = [
 const CRUMB: Record<TelaId, string> = {
   dashboard: "Painel",
   palestrantes: "Editorial · Palestrantes",
+  "corpo-docente": "Editorial · Corpo Docente",
   eventos: "Editorial · Eventos",
   conteudos: "Editorial · Conteúdos",
   home: "Editorial · Home",
@@ -155,9 +170,18 @@ export function ShellCms({
   const [palestranteDet, setPalestranteDet] = useState<PalestranteCmsDetalhe | null>(null);
   const [conteudoDet, setConteudoDet] = useState<ConteudoCmsDetalhe | null>(null);
   const [criandoConteudo, setCriandoConteudo] = useState(false);
+  const [criandoEvento, setCriandoEvento] = useState(false);
+  const [erroNovoEvento, setErroNovoEvento] = useState<string | null>(null);
   const [areas, setAreas] = useState<{ id: string; nome: string }[]>([]);
+  const [criandoPalestrante, setCriandoPalestrante] = useState(false);
+  const [opcoesPalestrante, setOpcoesPalestrante] = useState<
+    Awaited<ReturnType<typeof carregarOpcoesPalestrante>>
+  >({ areas: [], programas: [] });
   const [carregando, iniciarCarga] = useTransition();
   const router = useRouter();
+  // Mensagem do fluxo de palestrante mostrada na lista (falha ao abrir o
+  // formulário, ou "salvo, mas não deu para reler").
+  const [avisoPalestrante, setAvisoPalestrante] = useState<{ erro: boolean; texto: string } | null>(null);
 
   const ehSuperAdmin = usuario.perfil === "super-admin";
 
@@ -177,6 +201,41 @@ export function ShellCms({
     });
   }
 
+  // Cards do Corpo Docente: lidos ao abrir a tela (e a cada reabertura, para
+  // não mostrar ordem velha depois de editar um palestrante).
+  const [cardsCorpo, setCardsCorpo] = useState<CardCorpoDocenteResumo[] | null>(null);
+  const [erroCorpo, setErroCorpo] = useState<string | null>(null);
+  const [carregandoCorpo, iniciarCargaCorpo] = useTransition();
+
+  function abrirCorpoDocente() {
+    setErroCorpo(null);
+    iniciarCargaCorpo(async () => {
+      try {
+        setCardsCorpo(await carregarCorpoDocente());
+      } catch {
+        setErroCorpo("Não foi possível carregar o Corpo Docente. Recarregue a página.");
+      }
+    });
+  }
+
+  function novoEvento() {
+    setCriandoEvento(true);
+    setErroNovoEvento(null);
+    void (async () => {
+      try {
+        const r = await criarEventoEmBranco();
+        if (r.ok && r.id) {
+          router.refresh();
+          abrirEvento(r.id, true);
+        } else {
+          setErroNovoEvento(r.erro ?? "Não foi possível criar o evento.");
+        }
+      } finally {
+        setCriandoEvento(false);
+      }
+    })();
+  }
+
   function abrirEvento(id: string, emEdicao = false) {
     iniciarCarga(async () => {
       const det = await carregarEvento(id);
@@ -188,10 +247,36 @@ export function ShellCms({
   }
 
   function abrirPalestrante(id: string) {
+    setAvisoPalestrante(null);
     iniciarCarga(async () => {
       const det = await carregarPalestrante(id);
       if (det) setPalestranteDet(det);
     });
+  }
+
+  function novoPalestrante() {
+    setAvisoPalestrante(null);
+    iniciarCarga(async () => {
+      try {
+        setOpcoesPalestrante(await carregarOpcoesPalestrante());
+        setPalestranteDet(null);
+        setCriandoPalestrante(true);
+      } catch {
+        setAvisoPalestrante({
+          erro: true,
+          texto: "Não foi possível abrir o formulário — verifique a conexão e tente de novo.",
+        });
+      }
+    });
+  }
+
+  /** Gravou, mas a releitura falhou: volta à lista com o aviso e recarrega. */
+  function salvouSemReleitura(aviso: string | undefined) {
+    setCriandoPalestrante(false);
+    setPalestranteDet(null);
+    setAvisoPalestrante({ erro: false, texto: aviso ?? "Salvo." });
+    router.refresh();
+    if (tela === "corpo-docente") abrirCorpoDocente();
   }
 
   function abrirConteudo(id: string) {
@@ -215,15 +300,19 @@ export function ShellCms({
 
   // Trocar de tela pela sidebar sempre fecha qualquer detalhe aberto.
   function irPara(id: TelaId) {
+    setAvisoPalestrante(null);
     setEventoDet(null);
     setPalestranteDet(null);
     setConteudoDet(null);
     setCriandoConteudo(false);
+    setCriandoPalestrante(false);
     setTela(id);
     if (id === "usuarios") abrirUsuarios();
+    if (id === "corpo-docente") abrirCorpoDocente();
   }
 
-  const detalheAberto = eventoDet ?? palestranteDet ?? conteudoDet ?? (criandoConteudo ? true : null);
+  const detalheAberto =
+    eventoDet ?? palestranteDet ?? conteudoDet ?? (criandoConteudo || criandoPalestrante ? true : null);
 
   const navSistema: ItemNav[] = ehSuperAdmin
     ? [
@@ -270,11 +359,42 @@ export function ShellCms({
           }}
           onSalvou={() => router.refresh()}
         />
+      ) : criandoPalestrante ? (
+        <FormPalestrante
+          palestrante={null}
+          opcoes={opcoesPalestrante}
+          onCancelar={() => setCriandoPalestrante(false)}
+          onSalvou={(salvo, aviso) => {
+            if (!salvo) {
+              salvouSemReleitura(aviso);
+              return;
+            }
+            router.refresh();
+            setCriandoPalestrante(false);
+            setPalestranteDet(salvo);
+          }}
+        />
       ) : palestranteDet ? (
-        <DetalhePalestrante palestrante={palestranteDet} onVoltar={() => setPalestranteDet(null)} />
+        <DetalhePalestrante
+          key={palestranteDet.id}
+          palestrante={palestranteDet}
+          onVoltar={() => setPalestranteDet(null)}
+          onSalvou={(avisoSemReleitura) => {
+            if (avisoSemReleitura !== undefined) salvouSemReleitura(avisoSemReleitura);
+            else router.refresh();
+          }}
+        />
       ) : (
         !detalheAberto && (
           <>
+            {avisoPalestrante && (
+              <p
+                className={`pcms-form-aviso${avisoPalestrante.erro ? " pcms-form-aviso--erro" : ""}`}
+                role={avisoPalestrante.erro ? "alert" : "status"}
+              >
+                {avisoPalestrante.texto}
+              </p>
+            )}
             {tela === "dashboard" && (
               <TelaDashboard
                 eventos={eventos}
@@ -285,13 +405,29 @@ export function ShellCms({
               />
             )}
             {tela === "palestrantes" && (
-              <TelaPalestrantes palestrantes={palestrantes} onAbrir={abrirPalestrante} />
+              <TelaPalestrantes
+                palestrantes={palestrantes}
+                onAbrir={abrirPalestrante}
+                onNovo={novoPalestrante}
+              />
+            )}
+            {tela === "corpo-docente" && (
+              <TelaCorpoDocente
+                cards={cardsCorpo}
+                carregando={carregandoCorpo}
+                erroCarga={erroCorpo}
+                onAbrirPalestrante={abrirPalestrante}
+                onSalvou={setCardsCorpo}
+              />
             )}
             {tela === "eventos" && (
               <TelaEventos
                 eventos={eventos}
                 onAbrir={abrirEvento}
                 onAbrirImportado={(id) => abrirEvento(id, true)}
+                onNovo={novoEvento}
+                criando={criandoEvento}
+                erroNovo={erroNovoEvento}
               />
             )}
             {tela === "conteudos" && (

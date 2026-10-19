@@ -4,7 +4,10 @@ import { rotuloCategoria, type ConteudoCategoria } from "@ntc/lib";
 
 import { obterPayload } from "@/lib/payloadClient";
 import { lexicalParaTexto, lexicalToHtml } from "@/lib/cms/lexical";
-import { lexicalParaMarkdown } from "@/lib/markdownLexical";
+import { idaEVoltaPreserva, lexicalParaMarkdown } from "@/lib/markdownLexical";
+
+import { cardDoEspecialista, type FormatoCard } from "./cardsCorpoDocente";
+import { lerCardsCorpoDocente, type CamposPalestrante } from "./painelCmsEscrita";
 
 /**
  * Leitura de dados reais para o Painel Admin (rota /).
@@ -60,6 +63,7 @@ export interface PalestranteCmsResumo {
 // ---- Tipos de detalhe (tela cheia, somente leitura) --------------------
 
 export interface EventoCmsDetalhe extends EventoCmsResumo {
+  slug: string;
   eyebrow: string | null;
   area: string | null;
   cargaHoraria: string | null;
@@ -123,6 +127,12 @@ export interface PalestranteCmsDetalhe extends PalestranteCmsResumo {
   linkLinkedin: string | null;
   linhasAtuacao: string[];
   tipo: string | null;
+  slug: string;
+  /** Valores do formulário de edição (inclui o card do Corpo Docente). */
+  editavel: CamposPalestrante;
+  /** true = salvar o currículo pelo editor Markdown perderia formatação. */
+  curriculoCurtoComPerda: boolean;
+  curriculoCompletoComPerda: boolean;
 }
 
 const FMT_DATA = new Intl.DateTimeFormat("pt-BR", {
@@ -271,6 +281,7 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
   const d = doc as unknown as {
     id: string | number;
     nome?: string;
+    slug?: string;
     eyebrow?: string;
     dataInicio?: string | null;
     modalidade?: string;
@@ -319,6 +330,7 @@ export async function obterEventoCms(id: string): Promise<EventoCmsDetalhe | nul
   return {
     id: String(d.id),
     titulo: d.nome ?? "(sem título)",
+    slug: d.slug ?? "",
     eyebrow: d.eyebrow ?? null,
     programa: nomeDeRelacao(d.programa, "sigla"),
     area: nomeDeRelacao(d.area),
@@ -392,18 +404,23 @@ export async function obterPalestranteCms(id: string): Promise<PalestranteCmsDet
   const d = doc as unknown as {
     id: string | number;
     nome?: string;
+    slug?: string | null;
     titulacao?: string;
     instituicao?: string;
-    cargoAtual?: string;
+    cargoAtual?: string | null;
     vertical?: string | null;
-    tipo?: string;
+    tipo?: string | null;
+    frente?: string | null;
+    formacao?: string | null;
+    atuacao?: string[] | null;
     foto?: unknown;
     ocultarDoSite?: boolean | null;
     curriculoCurto?: unknown;
     curriculoCompleto?: unknown;
-    linkLattes?: string;
-    linkLinkedin?: string;
-    linhasAtuacao?: unknown[];
+    linkLattes?: string | null;
+    linkLinkedin?: string | null;
+    linhasAtuacao?: unknown[] | null;
+    programasRelacionados?: unknown[] | null;
   };
 
   const nome = d.nome ?? "(sem nome)";
@@ -411,10 +428,32 @@ export async function obterPalestranteCms(id: string): Promise<PalestranteCmsDet
   const linhasAtuacao = (d.linhasAtuacao ?? [])
     .map((a) => nomeDeRelacao(a))
     .filter((s): s is string => Boolean(s));
+  const cards = await lerCardsCorpoDocente(payload);
+
+  const editavel: CamposPalestrante = {
+    nome: d.nome ?? "",
+    titulacao: d.titulacao ?? "",
+    instituicao: d.instituicao ?? "",
+    cargoAtual: d.cargoAtual ?? "",
+    curriculoCurtoMarkdown: lexicalParaMarkdown(d.curriculoCurto),
+    curriculoCompletoMarkdown: lexicalParaMarkdown(d.curriculoCompleto),
+    linkLattes: d.linkLattes ?? "",
+    linkLinkedin: d.linkLinkedin ?? "",
+    vertical: d.vertical ?? "",
+    tipo: d.tipo ?? "",
+    frente: d.frente ?? "",
+    formacao: d.formacao ?? "",
+    atuacao: d.atuacao ?? [],
+    linhasAtuacaoIds: idsDeRelacoes(d.linhasAtuacao),
+    programasIds: idsDeRelacoes(d.programasRelacionados),
+    ocultarDoSite: Boolean(d.ocultarDoSite),
+    corpoDocente: cardDoEspecialista(cards, String(d.id)),
+  };
 
   return {
     id: String(d.id),
     nome,
+    slug: d.slug ?? "",
     iniciais: iniciaisDe(nome),
     titulacao: d.titulacao ?? "—",
     instituicao: d.instituicao ?? "—",
@@ -429,7 +468,18 @@ export async function obterPalestranteCms(id: string): Promise<PalestranteCmsDet
     linkLattes: d.linkLattes ?? null,
     linkLinkedin: d.linkLinkedin ?? null,
     linhasAtuacao,
+    editavel,
+    curriculoCurtoComPerda: !idaEVoltaPreserva(d.curriculoCurto),
+    curriculoCompletoComPerda: !idaEVoltaPreserva(d.curriculoCompleto),
   };
+}
+
+/** Ids (string) de uma relação hasMany, resolvida (objeto) ou não (id cru). */
+function idsDeRelacoes(rels: unknown[] | null | undefined): string[] {
+  return (rels ?? [])
+    .map((r) => (typeof r === "object" && r !== null ? (r as { id?: unknown }).id : r))
+    .filter((v): v is string | number => typeof v === "string" || typeof v === "number")
+    .map((v) => String(v));
 }
 
 // ============================================================
@@ -626,3 +676,53 @@ export async function listarAreasCms(): Promise<{ id: string; nome: string }[]> 
   });
 }
 
+/** Opções dos selects de relação do formulário do palestrante. */
+export async function listarOpcoesPalestranteCms(): Promise<{
+  areas: { id: string; nome: string }[];
+  programas: { id: string; sigla: string }[];
+}> {
+  const payload = await obterPayload();
+  const [areas, res] = await Promise.all([
+    listarAreasCms(),
+    payload.find({ collection: "programas", depth: 0, limit: 100, sort: "sigla", select: { sigla: true } }),
+  ]);
+  return {
+    areas,
+    programas: res.docs.map((d) => ({
+      id: String(d.id),
+      sigla: typeof d.sigla === "string" ? d.sigla : "(sem sigla)",
+    })),
+  };
+}
+
+export interface CardCorpoDocenteResumo {
+  especialistaId: string;
+  nome: string;
+  fotoUrl: string | null;
+  formato: FormatoCard;
+  ocultarDoSite: boolean;
+}
+
+/**
+ * Cards de pessoa (featured/expert) do Global `corpo-docente`, na ordem dele.
+ * Card cujo especialista não resolve (id solto) é omitido: a ordem enviada
+ * fica sem ele e o servidor recusa por lista desatualizada, o que é seguro.
+ */
+export async function listarCardsCorpoDocenteCms(): Promise<CardCorpoDocenteResumo[]> {
+  const payload = await obterPayload();
+  const global = await payload.findGlobal({ slug: "corpo-docente", depth: 1, draft: true });
+  const resumos: CardCorpoDocenteResumo[] = [];
+  for (const card of global.cards ?? []) {
+    if (card.formato === "axis") continue;
+    const e = card.especialista;
+    if (e === null || e === undefined || typeof e !== "object") continue;
+    resumos.push({
+      especialistaId: String(e.id),
+      nome: e.nome ?? "(sem nome)",
+      fotoUrl: urlDeMidia(e.foto),
+      formato: card.formato,
+      ocultarDoSite: Boolean(e.ocultarDoSite),
+    });
+  }
+  return resumos;
+}

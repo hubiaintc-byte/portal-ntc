@@ -4,7 +4,10 @@ import { useState, useTransition } from "react";
 
 import type { PalestranteCmsDetalhe } from "@/lib/cms/painelCms";
 
-import { alternarOcultarPalestrante } from "./acoes";
+import { alternarOcultarPalestrante, carregarOpcoesPalestrante } from "./acoes";
+import { FormPalestrante, rotuloDocente } from "./FormPalestrante";
+
+type OpcoesPalestrante = Awaited<ReturnType<typeof carregarOpcoesPalestrante>>;
 
 function vertAttr(vertical: string | null): string | undefined {
   if (!vertical) return undefined;
@@ -18,13 +21,35 @@ function vertAttr(vertical: string | null): string | undefined {
 interface DetalhePalestranteProps {
   palestrante: PalestranteCmsDetalhe;
   onVoltar: () => void;
+  /**
+   * Avisa o shell para recarregar a lista depois de salvar no formulário.
+   * Com `avisoSemReleitura`, gravou mas não deu para reler: o shell volta à
+   * lista e mostra o aviso.
+   */
+  onSalvou: (avisoSemReleitura?: string) => void;
 }
 
-/** Tela cheia de detalhe de um palestrante — leitura + controle de visibilidade. */
-export function DetalhePalestrante({ palestrante: inicial, onVoltar }: DetalhePalestranteProps) {
+/** Tela cheia de detalhe de um palestrante — leitura, visibilidade e modo edição. */
+export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou }: DetalhePalestranteProps) {
   const [p, setP] = useState(inicial);
   const [salvando, iniciarSalvar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
+  const [opcoes, setOpcoes] = useState<OpcoesPalestrante | null>(null);
+  const [editando, setEditando] = useState(false);
+  const [abrindoEdicao, iniciarAbrirEdicao] = useTransition();
+  const [erroEdicao, setErroEdicao] = useState<string | null>(null);
+
+  function abrirEdicao() {
+    setErroEdicao(null);
+    iniciarAbrirEdicao(async () => {
+      try {
+        setOpcoes(await carregarOpcoesPalestrante());
+        setEditando(true);
+      } catch {
+        setErroEdicao("Não foi possível abrir a edição — verifique a conexão e tente de novo.");
+      }
+    });
+  }
 
   function alternarVisibilidade() {
     const oculto = !p.ocultarDoSite;
@@ -38,6 +63,27 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar }: DetalhePa
       }
     });
   }
+
+  if (editando && opcoes) {
+    return (
+      <FormPalestrante
+        palestrante={p}
+        opcoes={opcoes}
+        onCancelar={() => setEditando(false)}
+        onSalvou={(salvo, aviso) => {
+          setEditando(false);
+          if (salvo) {
+            setP(salvo);
+            onSalvou();
+          } else {
+            onSalvou(aviso ?? "Salvo.");
+          }
+        }}
+      />
+    );
+  }
+
+  const card = p.editavel.corpoDocente;
 
   return (
     <>
@@ -63,8 +109,23 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar }: DetalhePa
           <p className="pcms-perfil-cargo">
             {[p.cargoAtual, p.instituicao].filter(Boolean).join(" · ")}
           </p>
-          {p.vertical && <span className="pcms-selo-vert">{p.vertical}</span>}
+          {p.vertical && <span className="pcms-selo-vert">{rotuloDocente(p.vertical)}</span>}
           {p.ocultarDoSite && <span className="pcms-selo pcms-selo--oculto">Oculto do site</span>}
+        </div>
+        <div className="pcms-det-head__acoes">
+          <button
+            type="button"
+            className="pcms-btn pcms-btn--ghost"
+            onClick={abrirEdicao}
+            disabled={abrindoEdicao}
+          >
+            {abrindoEdicao ? "Abrindo…" : "Editar"}
+          </button>
+          {erroEdicao && (
+            <p className="pcms-erro" role="alert">
+              {erroEdicao}
+            </p>
+          )}
         </div>
       </div>
 
@@ -111,6 +172,27 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar }: DetalhePa
                 />
               </div>
               {erro && <p className="pcms-erro">{erro}</p>}
+            </div>
+          </div>
+
+          <div className="pcms-det-card">
+            <div className="pcms-det-card__head">Corpo Docente</div>
+            <div className="pcms-det-card__body">
+              {card ? (
+                <>
+                  <span className="pcms-selo pcms-selo--info">
+                    {card.formato === "featured" ? "Destaque" : "Card comum"}
+                  </span>
+                  {card.textos.tag && <p className="pcms-det-link">{card.textos.tag}</p>}
+                  {p.ocultarDoSite && (
+                    <p className="pcms-editor__hint">
+                      Não aparece na página enquanto estiver oculto do site
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="pcms-editor__hint">Não aparece no Corpo Docente</p>
+              )}
             </div>
           </div>
 
