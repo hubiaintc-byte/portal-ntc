@@ -14,7 +14,7 @@ interface TelaCorpoDocenteProps {
   erroCarga: string | null;
   onAbrirPalestrante: (id: string) => void;
   onSalvou: (cards: CardCorpoDocenteResumo[]) => void;
-  /** false ⇒ perfil sem escrita no Corpo Docente: lista só leitura, sem reordenar. */
+  /** false ⇒ sem a tela de escrita no Corpo Docente: lista só leitura, sem reordenar. */
   podeEditar: boolean;
 }
 

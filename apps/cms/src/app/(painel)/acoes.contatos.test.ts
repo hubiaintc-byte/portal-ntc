@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 /**
  * Gates das Server Actions de Contatos institucionais
  * (`carregarContatosCms`/`salvarContatos`, tela Configurações). Leitura pede
- * sessão; escrita pede perfil editorial — a escrita usa `overrideAccess:
+ * sessão; escrita pede a tela `site.contatos` — a escrita usa `overrideAccess:
  * true`, então o `access: editorInstitucional` do Global `rodape` nunca é
  * consultado (spec de contatos §5).
  *

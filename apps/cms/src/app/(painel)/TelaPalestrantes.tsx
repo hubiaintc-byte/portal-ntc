@@ -14,7 +14,7 @@ interface TelaPalestrantesProps {
   palestrantes: PalestranteCmsResumo[];
   onAbrir: (id: string) => void;
   onNovo: () => void;
-  /** false ⇒ perfil sem escrita em palestrantes: some "Novo palestrante". */
+  /** false ⇒ sem a tela de escrita em palestrantes: some "Novo palestrante". */
   podeEditar: boolean;
 }
 

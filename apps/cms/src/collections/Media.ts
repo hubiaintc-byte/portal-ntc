@@ -9,7 +9,8 @@ import { sanitizarFilename } from "../hooks/sanitizarFilename";
  *
  * Servida via Supabase Storage (S3-compat) configurado no payload.config.ts.
  * Mídia é pública para leitura (URLs aparecem no front), mas escrita
- * restrita a editores institucionais e super-admins (DAB §10.1).
+ * restrita a quem tem alguma tela do Site que sobe imagem (Eventos, Palestrantes,
+ * Conteúdos ou Home) e a administradores.
  *
  * imageSizes gerados pelo Sharp on-upload — economiza bandwidth e ajusta
  * automaticamente para `next/image` no front, que escolhe a variante via

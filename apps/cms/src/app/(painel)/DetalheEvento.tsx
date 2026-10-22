@@ -57,7 +57,7 @@ interface DetalheEventoProps {
   /** true ⇒ abre direto no modo de edição (revisão pós-importação de PDF). */
   edicaoInicial?: boolean;
   /**
-   * false ⇒ perfil sem escrita em eventos (`capacidades.editarEventos`): somem
+   * false ⇒ sem a tela de escrita em eventos (`capacidades.editarEventos`): somem
    * Editar, Publicar/Despublicar, os envios de capa/folder e "Gerenciar"
    * palestrantes — a tela fica só leitura.
    */

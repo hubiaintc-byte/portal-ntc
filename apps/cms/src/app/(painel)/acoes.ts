@@ -81,7 +81,7 @@ const TELAS_CONTATOS: readonly TelaPainel[] = ["site.contatos"];
 const ERRO_SESSAO = "Sessão expirada. Entre novamente.";
 
 const RECUSADO: ResultadoEscrita = { ok: false, erro: ERRO_SESSAO };
-/** Escritas que também exigem perfil (a Local API ignora o `access` das coleções). */
+/** Escritas que também exigem tela (a Local API ignora o `access` das coleções). */
 const RECUSADO_PERFIL: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
 
 export async function carregarEvento(id: string): Promise<EventoCmsDetalhe | null> {
@@ -300,7 +300,7 @@ export async function carregarOpcoesPalestrante(): Promise<{
  * válida — só administradores criam/editam/removem contas administrativas.
  */
 
-const RECUSADO_SUPER_ADMIN: ResultadoEscrita = {
+const RECUSADO_ADMINISTRADOR: ResultadoEscrita = {
   ok: false,
   erro: "Você não tem permissão para esta ação.",
 };
@@ -356,7 +356,7 @@ export async function criarUsuarioCms(dados: {
 }): Promise<{ resultado: ResultadoUsuarios; usuarios: UsuarioGestaoResumo[] }> {
   const usuario = await obterAdministrador();
   if (!usuario) {
-    return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
+    return { resultado: RECUSADO_ADMINISTRADOR, usuarios: [] };
   }
   const p = await obterPayloadUsuarios();
   const resultado = await criarUsuario(p, dados);
@@ -370,7 +370,7 @@ export async function editarUsuarioCms(
 ): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioGestaoResumo[] }> {
   const usuario = await obterAdministrador();
   if (!usuario) {
-    return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
+    return { resultado: RECUSADO_ADMINISTRADOR, usuarios: [] };
   }
   const p = await obterPayloadUsuarios();
   const resultado = await editarUsuario(p, id, dados, usuario.id);
@@ -383,7 +383,7 @@ export async function removerUsuarioCms(
 ): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioGestaoResumo[] }> {
   const usuario = await obterAdministrador();
   if (!usuario) {
-    return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
+    return { resultado: RECUSADO_ADMINISTRADOR, usuarios: [] };
   }
   const p = await obterPayloadUsuarios();
   const resultado = await removerUsuario(p, id, usuario.id);
@@ -398,15 +398,15 @@ export async function removerUsuarioCms(
  */
 export async function reenviarConviteUsuarioCms(id: string): Promise<ResultadoEscrita> {
   const usuario = await obterAdministrador();
-  if (!usuario) return RECUSADO_SUPER_ADMIN;
+  if (!usuario) return RECUSADO_ADMINISTRADOR;
   const p = await obterPayloadUsuarios();
   return reenviarConvite(p, id);
 }
 
 /**
- * Passkeys de outro usuário (tela Usuários) — mesma guarda super-admin das
+ * Passkeys de outro usuário (tela Usuários) — mesma guarda de administrador das
  * demais actions deste bloco; remoção reaproveita removerPasskey (Task 4)
- * com chamadorEhSuperAdmin=true, que ignora a checagem de dono.
+ * com chamadorEhAdministrador=true (administrador), que ignora a checagem de dono.
  */
 export async function listarPasskeysDeUsuarioCms(usuarioId: string): Promise<PasskeyResumo[]> {
   const usuario = await obterAdministrador();
@@ -416,7 +416,7 @@ export async function listarPasskeysDeUsuarioCms(usuarioId: string): Promise<Pas
 
 export async function removerPasskeyAdminCms(passkeyId: string): Promise<ResultadoEscrita> {
   const usuario = await obterAdministrador();
-  if (!usuario) return RECUSADO_SUPER_ADMIN;
+  if (!usuario) return RECUSADO_ADMINISTRADOR;
   return removerPasskey(passkeyId, usuario.id, true);
 }
 
@@ -424,12 +424,12 @@ export async function removerPasskeyAdminCms(passkeyId: string): Promise<Resulta
  * Server Actions de Conteúdos editoriais (telas de lista e detalhe do
  * painel) e de Contatos institucionais (tela Configurações).
  *
- * Leitura: basta a sessão — o spec de conteúdos §6.4 dá a lista ao
- * `editor-eventos` ("vê a lista e não edita"), e os contatos institucionais
+ * Leitura: basta a sessão — a lista é de leitura para qualquer pessoa
+ * logada (sem tela de Conteúdos ela não edita), e os contatos institucionais
  * aparecem no rodapé de toda página pública.
  *
  * Escrita: exige tela do site. Toda escrita destas telas chama a Local
- * API com `overrideAccess: true`, então o `access: editorInstitucional`
+ * API com `overrideAccess: true`, então o `access` por tela
  * declarado em `Conteudos.ts` e em `Rodape.ts` nunca chega a ser consultado —
  * é esta guarda que faz a regra valer (spec de conteúdos §6.4, spec de
  * contatos §5).
@@ -527,7 +527,7 @@ export async function enviarMidiaConteudo(
 
 /**
  * Server Actions de Contatos institucionais (tela Configurações). A leitura
- * exige sessão; a escrita exige tela do site (`barrarNaoEditorial`).
+ * exige sessão; a escrita exige tela do site (`barrarSemTela`).
  */
 
 const CONTATOS_VAZIOS: CamposContatos = {

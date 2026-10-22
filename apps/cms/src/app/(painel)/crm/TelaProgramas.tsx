@@ -13,7 +13,7 @@ interface TelaProgramasProps {
   areas: AreaOpcao[];
   onAbrir: (id: string) => void;
   onNovo: () => void;
-  /** false ⇒ perfil sem escrita no catálogo: some "Novo programa". */
+  /** false ⇒ sem a tela de escrita no catálogo: some "Novo programa". */
   podeEditar: boolean;
 }
 

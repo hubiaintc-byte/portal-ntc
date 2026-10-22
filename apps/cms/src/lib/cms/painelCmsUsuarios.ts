@@ -143,7 +143,7 @@ export async function criarUsuario(
   }
 
   // Usuário já está criado — falha a partir daqui não desfaz o cadastro,
-  // só perde o convite automático (o super-admin pode reenviar depois via
+  // só perde o convite automático (o administrador pode reenviar depois via
   // "esqueci a senha").
   try {
     const token = await p.forgotPassword({

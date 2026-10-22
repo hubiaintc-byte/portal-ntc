@@ -47,7 +47,7 @@ const {
   subirDocumentoEvento,
 } = await import("./painelCrmEscrita");
 
-const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
+const usuario = { id: 5, collection: "users", nome: "Ana", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
 
 function payloadFalso() {
   const create = vi.fn(async ({ data }: { data: Record<string, unknown> }) => ({ id: 101, ...data }));

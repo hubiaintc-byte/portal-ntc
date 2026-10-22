@@ -16,9 +16,9 @@ import {
 import { AvisoForm, BarraForm, CampoCheck, CampoTexto } from "./crm/CamposCrm";
 
 /**
- * Gestão de usuários do painel (só super-admin — item da sidebar já é
+ * Gestão de usuários do painel (só administrador — item da sidebar já é
  * gated). Tela client autossuficiente: os dados chegam vazios da page.tsx
- * (evita mandar a lista a quem não é super-admin) e são carregados aqui via
+ * (evita mandar a lista a quem não é administrador) e são carregados aqui via
  * `carregarUsuarios()` ao montar (ShellCms dispara a primeira carga).
  */
 
@@ -61,7 +61,7 @@ export function TelaUsuarios({
   const [confirmandoRemocao, setConfirmandoRemocao] = useState<string | null>(null);
   const [reenviando, setReenviando] = useState<string | null>(null);
   // Feedback inline por linha — cobre tanto o reenvio de convite quanto uma
-  // falha ao remover (ex.: "não é possível remover o último super-admin").
+  // falha ao remover (ex.: "não é possível remover o último administrador").
   const [feedbackLinha, setFeedbackLinha] = useState<{ id: string; ok: boolean; texto: string } | null>(
     null,
   );

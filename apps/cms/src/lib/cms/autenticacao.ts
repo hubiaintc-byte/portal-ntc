@@ -6,7 +6,6 @@ import type { TypedUser } from "payload";
 
 import { obterPayload } from "@/lib/payloadClient";
 
-import { temPerfil, type PerfilPainel } from "./perfis";
 import { acessoDoUsuario, temTela, type AcessoPainel, type TelaPainel } from "./telas";
 
 /**
@@ -27,7 +26,6 @@ export interface UsuarioCms {
   id: string;
   nome: string;
   email: string;
-  perfil: string;
   acesso: AcessoPainel;
 }
 
@@ -67,7 +65,6 @@ function resumirUsuario(usuario: UsuarioAutenticado): UsuarioCms {
     // payload.auth() alarga email para string|undefined (união de coleções
     // auth); na collection users o campo é obrigatório.
     email: usuario.email ?? "",
-    perfil: usuario.perfil ?? "",
     acesso: acessoDoUsuario(usuario),
   };
 }
@@ -76,42 +73,6 @@ function resumirUsuario(usuario: UsuarioAutenticado): UsuarioCms {
 export async function exigirUsuarioCms(): Promise<UsuarioCms> {
   const usuario = await obterUsuarioCms();
   if (!usuario) redirect("/entrar");
-  return usuario;
-}
-
-/**
- * Guarda de página mais restrita: exige sessão E perfil "super-admin" —
- * usada na tela de gestão de usuários. Sem sessão ou perfil insuficiente,
- * redireciona para "/" (evita revelar a existência da rota a quem não pode
- * acessá-la).
- */
-export async function exigirSuperAdmin(): Promise<UsuarioCms> {
-  const usuario = await obterUsuarioCms();
-  if (!usuario || usuario.perfil !== "super-admin") redirect("/");
-  return usuario;
-}
-
-/**
- * Sessão com perfil: `null` sem sessão OU com perfil fora de `permitidos`.
- * É a guarda das Server Actions — a Local API ignora o `access` das coleções.
- */
-export async function obterUsuarioCmsComPerfil(permitidos: readonly PerfilPainel[]): Promise<UsuarioCms | null> {
-  const usuario = await obterUsuarioCms();
-  return usuario && temPerfil(usuario.perfil, permitidos) ? usuario : null;
-}
-
-/** Como `obterUsuarioCmsComPerfil`, devolvendo o usuário cru (para `user:` da Local API). */
-export async function obterUsuarioAutenticadoComPerfil(
-  permitidos: readonly PerfilPainel[],
-): Promise<UsuarioAutenticado | null> {
-  const usuario = await obterUsuarioAutenticado();
-  return usuario && temPerfil(usuario.perfil, permitidos) ? usuario : null;
-}
-
-/** Guarda de página por perfil: sem sessão vai a /entrar; perfil insuficiente, a "/". */
-export async function exigirPerfil(permitidos: readonly PerfilPainel[]): Promise<UsuarioCms> {
-  const usuario = await exigirUsuarioCms();
-  if (!temPerfil(usuario.perfil, permitidos)) redirect("/");
   return usuario;
 }
 
@@ -151,7 +112,7 @@ export async function exigirTela(telas: readonly TelaPainel[]): Promise<UsuarioC
   return usuario;
 }
 
-/** Guarda de página de administrador (substitui `exigirSuperAdmin`): sem sessão ou sem permissão, "/". */
+/** Guarda de página de administrador : sem sessão ou sem permissão, "/". */
 export async function exigirAdministrador(): Promise<UsuarioCms> {
   const usuario = await obterUsuarioCms();
   if (!usuario || !usuario.acesso.administrador) redirect("/");

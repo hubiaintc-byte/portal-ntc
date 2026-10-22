@@ -6,7 +6,7 @@ import { TIPOS_LINHA_DO_TEMPO } from "@ntc/lib";
 
 /**
  * Linha do tempo do cliente (spec 2026-09-15 §3.7). Append-only: update e
- * delete negados a todo perfil. `create` é negado à UI, exceto para notas
+ * delete negados a todos. `create` é negado à UI, exceto para notas
  * manuais (`tipo = nota`) de usuário com acesso ao CRM — os demais tipos são
  * gravados só pela Local API interna (hooks), com overrideAccess padrão.
  */

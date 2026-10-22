@@ -20,7 +20,7 @@ interface TelaEventosProps {
   criando?: boolean;
   /** Falha ao criar o evento em branco. */
   erroNovo?: string | null;
-  /** false ⇒ perfil sem escrita em eventos: some Importar PDF e Novo evento. */
+  /** false ⇒ sem a tela de escrita em eventos: some Importar PDF e Novo evento. */
   podeEditar: boolean;
 }
 

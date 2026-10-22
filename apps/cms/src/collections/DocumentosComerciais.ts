@@ -23,8 +23,8 @@ export const DocumentosComerciais: CollectionConfig = {
     useAsTitle: "filename",
     group: "CRM",
   },
-  // Propostas com preço, contratos e empenhos: só o perfil do CRM (o mesmo das
-  // Server Actions — lib/cms/perfis.ts). Excluir, só o super-admin.
+  // Propostas com preço, contratos e empenhos: só quem tem Clientes ou Propostas (as mesmas
+  // telas das Server Actions — lib/cms/telas.ts). Excluir, só o administrador.
   access: {
     read: acessoPorTela(["crm.clientes", "crm.propostas"]),
     create: acessoPorTela(["crm.clientes", "crm.propostas"]),

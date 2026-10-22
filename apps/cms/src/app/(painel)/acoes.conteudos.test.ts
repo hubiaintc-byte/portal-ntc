@@ -7,9 +7,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
  * criaria registros `media` (arquivo no Supabase Storage), publicaria e
  * apagaria conteúdo. E como toda escrita chama a Local API com
  * `overrideAccess: true`, o `access: editorConteudos` declarado em
- * `Conteudos.ts` nunca é consultado — o perfil tem de ser checado aqui
- * (spec §6.4: escrevem `super-admin` e `editor-institucional`;
- * `editor-eventos` vê a lista e não edita).
+ * `Conteudos.ts` nunca é consultado — a tela tem de ser checada aqui
+ * (escreve quem tem `site.conteudos`, ou o administrador;
+ * quem só tem outras telas vê a lista e não edita).
  *
  * Mesmo padrão de mock de acoesCrm.test.ts — `vi.mock` no topo (hoistado
  * pelo Vitest) troca a Local API, a autenticação e o cache do Next antes de

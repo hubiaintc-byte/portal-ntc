@@ -66,7 +66,7 @@ export default async function PainelPage() {
     erroLeitura = true;
   }
 
-  // O que a interface deixa este perfil fazer — calculado aqui, no servidor,
+  // O que a interface deixa esta pessoa fazer — calculado aqui, no servidor,
   // com as mesmas regras das Server Actions (que seguem sendo a barreira real).
   const capacidades = capacidadesDoAcesso(acesso);
 

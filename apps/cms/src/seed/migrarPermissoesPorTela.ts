@@ -7,10 +7,31 @@
  * `PERMISSOES_MIGRAR_APLICAR=1`. Execução: `pnpm --filter @ntc/cms permissoes:migrar`.
  */
 
-import { acessoDoPerfilLegado } from "../lib/cms/telas";
-import type { TelaPainel } from "../lib/cms/telas";
+import { TELAS } from "../lib/cms/telas";
+import type { AcessoPainel, TelaPainel } from "../lib/cms/telas";
 
 const APLICAR = process.env.PERMISSOES_MIGRAR_APLICAR === "1";
+
+/**
+ * Mapeamento dos 4 perfis fixos (modelo antigo) para administrador/telas.
+ * Mora aqui porque só esta migração ainda precisa dele.
+ */
+export function acessoDoPerfilLegado(perfil: string | null | undefined): AcessoPainel {
+  const site = TELAS.filter((t) => t.modulo === "site").map((t) => t.id);
+  const crm = TELAS.filter((t) => t.modulo === "crm").map((t) => t.id);
+  switch (perfil) {
+    case "super-admin":
+      return { administrador: true, telas: [] };
+    case "atendimento-comercial":
+      return { administrador: false, telas: ["site.painel", ...crm] };
+    case "editor-institucional":
+      return { administrador: false, telas: [...site, "crm.programas", "crm.modulos", "crm.produtos"] };
+    case "editor-eventos":
+      return { administrador: false, telas: ["site.painel", "site.eventos"] };
+    default:
+      return { administrador: false, telas: [] };
+  }
+}
 
 export interface UsuarioParaMigrar {
   id: number;

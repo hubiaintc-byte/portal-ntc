@@ -9,7 +9,7 @@ import { salvarEventosDestaqueHome } from "./acoes";
 interface TelaHomeProps {
   eventos: EventoCmsResumo[];
   selecionadosIniciais: string[];
-  /** false ⇒ perfil sem escrita na Home: curadoria só leitura. */
+  /** false ⇒ sem a tela de escrita na Home: curadoria só leitura. */
   podeEditar: boolean;
 }
 

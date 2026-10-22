@@ -20,7 +20,7 @@ interface DetalheModuloCatalogoProps {
   onSalvo: (id: string) => void;
   onExcluido: () => void;
   /**
-   * false ⇒ perfil sem escrita no catálogo (`capacidades.editarCatalogo`):
+   * false ⇒ sem a tela de escrita no catálogo (`capacidades.editarCatalogo`):
    * somem Salvar e a zona de risco; campos desabilitados.
    */
   podeEditar: boolean;

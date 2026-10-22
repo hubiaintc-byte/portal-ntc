@@ -36,15 +36,6 @@ export type TitulacaoDocente = (typeof TITULACAO_DOCENTE)[number];
 // Categorias editoriais: fonte única em @ntc/lib (usada por painel e site).
 export { CONTEUDO_CATEGORIA, type ConteudoCategoria } from "@ntc/lib";
 
-/** Perfis administrativos do admin Payload (DAB §10.1). */
-export const PERFIL_ADMIN = [
-  "super-admin",
-  "editor-institucional",
-  "editor-eventos",
-  "atendimento-comercial",
-] as const;
-export type PerfilAdmin = (typeof PERFIL_ADMIN)[number];
-
 /**
  * Enums do Corpo Docente — usados em Especialistas (atributos da pessoa)
  * e replicados no dataset de filtro do FilterBarDocentes (web).

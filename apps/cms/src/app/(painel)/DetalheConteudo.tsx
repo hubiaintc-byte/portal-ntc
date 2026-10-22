@@ -84,7 +84,7 @@ interface DetalheConteudoProps {
   /** Avisa o shell para recarregar a lista (a tela continua aberta). */
   onSalvou: () => void;
   /**
-   * false ⇒ perfil sem escrita em conteúdos (`capacidades.editarConteudos`):
+   * false ⇒ sem a tela de escrita em conteúdos (`capacidades.editarConteudos`):
    * somem Salvar/Publicar/Despublicar/Excluir e os envios de arquivo, e os
    * campos ficam desabilitados (só leitura).
    */

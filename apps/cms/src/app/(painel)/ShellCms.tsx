@@ -51,7 +51,7 @@ import { FormPalestrante } from "./FormPalestrante";
 
 interface ShellCmsProps {
   /** Usuário autenticado (rodapé da sidebar + guarda do item "Usuários"). */
-  usuario: { nome: string; email: string; perfil: string; id: string };
+  usuario: { nome: string; email: string; id: string };
   /** Telas da pessoa: decidem o menu, a tela inicial e o seletor de módulo. */
   acesso: AcessoPainel;
   /**
@@ -187,10 +187,10 @@ export function ShellCms({
   // formulário, ou "salvo, mas não deu para reler").
   const [avisoPalestrante, setAvisoPalestrante] = useState<{ erro: boolean; texto: string } | null>(null);
 
-  const ehSuperAdmin = capacidades.gerirUsuarios;
+  const ehAdministrador = capacidades.gerirUsuarios;
 
   // Lista de usuários NUNCA vem no payload inicial da page.tsx (evitaria
-  // enviar dados de gestão de usuários a quem não é super-admin) — carrega
+  // enviar dados de gestão de usuários a quem não é administrador) — carrega
   // sob demanda quando a tela "Usuários" é aberta pela primeira vez.
   const [usuarios, setUsuarios] = useState<UsuarioGestaoResumo[]>([]);
   const [usuariosCarregados, setUsuariosCarregados] = useState(false);
@@ -336,7 +336,7 @@ export function ShellCms({
   const detalheAberto =
     eventoDet ?? palestranteDet ?? conteudoDet ?? (criandoConteudo || criandoPalestrante ? true : null);
 
-  const navSistema: ItemNav[] = ehSuperAdmin
+  const navSistema: ItemNav[] = ehAdministrador
     ? [
         { id: "config", rotulo: "Configurações", icone: Ico.config },
         { id: "usuarios", rotulo: "Usuários", icone: Ico.usuarios },
@@ -358,6 +358,7 @@ export function ShellCms({
       modulo="site"
       mostrarCrm={mostraModuloCrm(acesso)}
       usuario={usuario}
+      administrador={acesso.administrador}
       grupos={grupos}
       telaAtiva={tela}
       onIrPara={(id) => irPara(id as TelaId)}
@@ -489,7 +490,7 @@ export function ShellCms({
             {tela === "config" && (
               <TelaConfiguracoes usuario={usuario} mostrarContatos={capacidades.editarContatos} />
             )}
-            {tela === "usuarios" && ehSuperAdmin && (
+            {tela === "usuarios" && ehAdministrador && (
               <TelaUsuarios
                 usuarios={usuarios}
                 usuarioAtualId={usuario.id}

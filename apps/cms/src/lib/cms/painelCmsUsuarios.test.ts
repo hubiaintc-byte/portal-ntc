@@ -129,7 +129,7 @@ describe("editarUsuario", () => {
   const A = { id: 2, nome: "A", email: "a@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" };
   const B = { id: 3, nome: "B", email: "b@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" };
 
-  it("atualiza nome, administrador e telas (sem perfil)", async () => {
+  it("atualiza nome, administrador e telas (sem o campo legado)", async () => {
     const payload = mockPayload([
       { id: 5, nome: "Carla", email: "c@ntc.org", administrador: false, telas: [], updatedAt: "2026-07-01T00:00:00.000Z" },
       A,
@@ -250,7 +250,7 @@ describe("removerUsuario", () => {
     expect(payload.delete).not.toHaveBeenCalled();
   });
 
-  it("bloqueia remover o último super-admin", async () => {
+  it("bloqueia remover o último administrador", async () => {
     const payload = mockPayload([
       { id: 2, nome: "Único", email: "unico@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
     ]);
@@ -259,7 +259,7 @@ describe("removerUsuario", () => {
     expect(payload.delete).not.toHaveBeenCalled();
   });
 
-  it("remove quando há outro super-admin", async () => {
+  it("remove quando há outro administrador", async () => {
     const payload = mockPayload([
       { id: 2, nome: "A", email: "a@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
       { id: 3, nome: "B", email: "b@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
@@ -269,7 +269,7 @@ describe("removerUsuario", () => {
     expect(payload.delete).toHaveBeenCalledWith({ collection: "users", id: "2", overrideAccess: true });
   });
 
-  it("remove normalmente um perfil não super-admin", async () => {
+  it("remove normalmente um usuário não administrador", async () => {
     const payload = mockPayload([
       { id: 2, nome: "A", email: "a@ntc.org", administrador: false, telas: ["site.eventos"], updatedAt: "2026-07-01T00:00:00.000Z" },
     ]);

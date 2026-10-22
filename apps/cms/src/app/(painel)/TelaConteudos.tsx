@@ -12,7 +12,7 @@ interface TelaConteudosProps {
   conteudos: ConteudoCmsResumo[];
   onAbrir: (id: string) => void;
   onNovo: () => void;
-  /** false ⇒ perfil sem escrita em conteúdos: some "Novo conteúdo". */
+  /** false ⇒ sem a tela de escrita em conteúdos: some "Novo conteúdo". */
   podeEditar: boolean;
 }
 

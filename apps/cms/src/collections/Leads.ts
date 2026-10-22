@@ -21,7 +21,7 @@ import { ESFERA_INSTITUCIONAL, LEAD_TIPO } from "../shared/types";
  * autorização explícita do PO em 2026-05-20 (CLAUDE.md §5.1).
  *
  * Access (DAB §10.1): todas as operações, inclusive `create`, exigem
- * `atendimento-comercial` ou `super-admin`. Os 4 handlers do site
+ * quem tem Dashboard ou Leads do CRM, ou o administrador. Os 4 handlers do site
  * (`apps/web/app/api/forms/*`) criam leads pela Local API
  * (`obterPayload().create`), que roda com `overrideAccess: true` por padrão
  * e por isso não passa por esta regra. O `create` via REST (`POST /api/leads`)

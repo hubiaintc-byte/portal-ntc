@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
  * Gates das Server Actions do palestrante. Server Action é endpoint público
  * e a Local API ignora o `access` das coleções, então sessão E tela
  * (`site.palestrantes`) são checados aqui, antes de qualquer escrita.
- * A Local API é falsa; `temPerfil` é o real.
+ * A Local API é falsa; `temTela` é o real.
  */
 const create = vi.fn();
 const update = vi.fn();
@@ -43,7 +43,7 @@ vi.mock("next/cache", () => ({ revalidatePath }));
 
 const { carregarOpcoesPalestrante, salvarOrdemCorpoDocente, salvarPalestrante } = await import("./acoes");
 
-const superAdmin = { id: 1, nome: "Ana", administrador: true, telas: [] };
+const administrador = { id: 1, nome: "Ana", administrador: true, telas: [] };
 const soEventos = { id: 2, nome: "Iara", administrador: false, telas: ["site.eventos"] };
 const soPalestrantes = { id: 3, nome: "Rui", administrador: false, telas: ["site.palestrantes"] };
 const soCorpoDocente = { id: 4, nome: "Eva", administrador: false, telas: ["site.corpo-docente"] };
@@ -108,21 +108,21 @@ describe("salvarPalestrante (Server Action)", () => {
     ["JSON inválido", "{não é json"],
     ["formato errado", JSON.stringify({ ...campos, atuacao: "universidade" })],
   ])("campos com %s → dados inválidos", async (_rotulo, json) => {
-    obterUsuarioAutenticadoMock.mockResolvedValue(superAdmin);
+    obterUsuarioAutenticadoMock.mockResolvedValue(administrador);
     const r = await salvarPalestrante(formulario(json));
     expect(r).toEqual({ resultado: { ok: false, erro: "Dados do formulário inválidos." }, palestrante: null });
     nenhumaEscrita();
   });
 
   it("id não numérico → dados inválidos", async () => {
-    obterUsuarioAutenticadoMock.mockResolvedValue(superAdmin);
+    obterUsuarioAutenticadoMock.mockResolvedValue(administrador);
     const r = await salvarPalestrante(formulario(JSON.stringify(campos), "12; drop"));
     expect(r.resultado).toEqual({ ok: false, erro: "Dados do formulário inválidos." });
     nenhumaEscrita();
   });
 
-  it("com super-admin e id vazio, cria e devolve o detalhe recarregado", async () => {
-    obterUsuarioAutenticadoMock.mockResolvedValue(superAdmin);
+  it("com administrador e id vazio, cria e devolve o detalhe recarregado", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(administrador);
     create.mockImplementation(async (args: { collection: string }) =>
       args.collection === "media" ? { id: 90 } : { id: 42 },
     );
@@ -231,7 +231,7 @@ describe("salvarPalestrante — releitura depois de salvar", () => {
   const AVISO = "Salvo. Não foi possível recarregar os dados — reabra o palestrante.";
 
   function preparaCriacao() {
-    obterUsuarioAutenticadoMock.mockResolvedValue(superAdmin);
+    obterUsuarioAutenticadoMock.mockResolvedValue(administrador);
     create.mockImplementation(async (args: { collection: string }) =>
       args.collection === "media" ? { id: 90 } : { id: 42 },
     );
@@ -261,7 +261,7 @@ describe("salvarPalestrante — releitura depois de salvar", () => {
 
 describe("normalização de ids", () => {
   it("salvarPalestrante: id com zeros à esquerda vira o número canônico", async () => {
-    obterUsuarioAutenticadoMock.mockResolvedValue(superAdmin);
+    obterUsuarioAutenticadoMock.mockResolvedValue(administrador);
     findByID.mockResolvedValue({ id: 7, foto: 5, curriculoCurto: { root: {} }, nome: "Ana" });
     findGlobal.mockResolvedValue({ cards: [{ formato: "expert", especialista: 1, id: "c1" }] });
     update.mockResolvedValue({ id: 7 });
@@ -275,7 +275,7 @@ describe("normalização de ids", () => {
   });
 
   it("salvarOrdemCorpoDocente: '007' casa o card do especialista 7", async () => {
-    obterUsuarioAutenticadoMock.mockResolvedValue(superAdmin);
+    obterUsuarioAutenticadoMock.mockResolvedValue(administrador);
     findGlobal.mockResolvedValue({
       cards: [
         { formato: "expert", especialista: 7, id: "a" },
@@ -299,7 +299,7 @@ describe("carregarOpcoesPalestrante (Server Action)", () => {
   });
 
   it("com sessão, devolve áreas e programas", async () => {
-    obterUsuarioCmsMock.mockResolvedValue(superAdmin);
+    obterUsuarioCmsMock.mockResolvedValue(administrador);
     find.mockImplementation(async (args: { collection: string }) =>
       args.collection === "areas"
         ? { docs: [{ id: 3, nome: "Educação" }] }

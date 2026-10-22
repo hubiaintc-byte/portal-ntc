@@ -56,7 +56,7 @@ import { TelaProgramas } from "./TelaProgramas";
 import { TelaPropostas } from "./TelaPropostas";
 
 interface ShellCrmProps {
-  usuario: { nome: string; email: string; perfil: string };
+  usuario: { nome: string; email: string };
   /** Telas da pessoa: decidem o menu, a tela inicial e o seletor de módulo. */
   acesso: AcessoPainel;
   /**
@@ -327,6 +327,7 @@ export function ShellCrm({
       modulo="crm"
       mostrarCrm
       usuario={usuario}
+      administrador={acesso.administrador}
       grupos={grupos}
       telaAtiva={tela}
       onIrPara={irPara}

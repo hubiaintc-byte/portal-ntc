@@ -167,7 +167,7 @@ describe("removerPasskey", () => {
     });
   });
 
-  it("não-dono e não-super-admin não consegue remover", async () => {
+  it("não-dono e não-administrador não consegue remover", async () => {
     const payloadFalso = montarPayloadFalso({
       findByID: vi.fn().mockResolvedValue({ id: 7, usuario: "42" }),
     });
@@ -176,7 +176,7 @@ describe("removerPasskey", () => {
     expect(payloadFalso.delete).not.toHaveBeenCalled();
   });
 
-  it("super-admin remove o passkey de qualquer usuário", async () => {
+  it("administrador remove o passkey de qualquer usuário", async () => {
     const payloadFalso = montarPayloadFalso({
       findByID: vi.fn().mockResolvedValue({ id: 7, usuario: "42" }),
     });

@@ -131,7 +131,7 @@ export async function confirmarCadastroPasskey(
 export async function removerPasskey(
   passkeyId: string,
   usuarioIdChamador: string,
-  chamadorEhSuperAdmin: boolean,
+  chamadorEhAdministrador: boolean,
 ): Promise<ResultadoEscrita> {
   try {
     const payload = await obterPayload();
@@ -141,7 +141,7 @@ export async function removerPasskey(
       overrideAccess: true,
     })) as unknown as PasskeyDoc;
     const donoId = typeof doc.usuario === "object" ? String(doc.usuario.id) : String(doc.usuario);
-    if (!chamadorEhSuperAdmin && donoId !== usuarioIdChamador) {
+    if (!chamadorEhAdministrador && donoId !== usuarioIdChamador) {
       return { ok: false, erro: "Você não tem permissão para remover este passkey." };
     }
     await payload.delete({ collection: "passkeys", id: passkeyId, overrideAccess: true });

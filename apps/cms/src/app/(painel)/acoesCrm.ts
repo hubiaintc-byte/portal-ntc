@@ -51,8 +51,7 @@ import {
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
 
 /**
- * Server Actions do módulo CRM. Toda action valida a sessão E o perfil do CRM
- * (por tela) ANTES de tocar a Local API, que ignora o `access` das coleções — Server Actions são endpoints públicos (mesma regra de acoes.ts).
+ * Server Actions do módulo CRM. Toda action valida a sessão E a tela do CRM ANTES de tocar a Local API, que ignora o `access` das coleções — Server Actions são endpoints públicos (mesma regra de acoes.ts).
  */
 
 const RECUSADO: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };

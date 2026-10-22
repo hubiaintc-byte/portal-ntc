@@ -480,7 +480,7 @@ export interface ResumoLeadsCms {
 /**
  * Contagens de leads para o card do painel do Site. Até 19/10/2026 a página
  * carregava os 300 leads mais recentes (nome, e-mail, instituição) e os
- * entregava ao navegador de qualquer perfil — inclusive editores, que não têm
+ * entregava ao navegador de qualquer pessoa — inclusive quem não tem Leads, que não têm
  * acesso ao CRM — só para contar. Agora o banco conta e nenhum dado pessoal
  * sai do servidor.
  */

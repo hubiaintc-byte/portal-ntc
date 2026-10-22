@@ -28,7 +28,7 @@ interface DetalhePalestranteProps {
    */
   onSalvou: (avisoSemReleitura?: string) => void;
   /**
-   * false ⇒ perfil sem escrita em palestrantes (`capacidades.editarPalestrantes`):
+   * false ⇒ sem a tela de escrita em palestrantes (`capacidades.editarPalestrantes`):
    * some "Editar" e o switch "Ocultar do site" vira texto de estado.
    */
   podeEditar: boolean;

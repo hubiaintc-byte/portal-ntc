@@ -5,7 +5,7 @@ import type { CollectionConfig } from "payload";
  * Log de auditoria (doc 11 §12).
  *
  * Registro append-only de ações administrativas (login, criar, atualizar,
- * publicar, despublicar, deletar). Read-only para super-admin; nunca editável
+ * publicar, despublicar, deletar). Read-only para administrador; nunca editável
  * pela UI. A escrita acontece exclusivamente via hooks internos (ainda a
  * desenvolver em janelas posteriores).
  */

@@ -30,7 +30,7 @@ interface DetalheProgramaCatalogoProps {
   onAbrirModulo: (id: string) => void;
   onNovoModulo: (programaId: string) => void;
   /**
-   * false ⇒ perfil sem escrita no catálogo (`capacidades.editarCatalogo`):
+   * false ⇒ sem a tela de escrita no catálogo (`capacidades.editarCatalogo`):
    * somem Salvar/Publicar, "Novo módulo" e a zona de risco; campos desabilitados.
    */
   podeEditar: boolean;

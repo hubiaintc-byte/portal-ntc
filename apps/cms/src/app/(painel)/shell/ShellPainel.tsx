@@ -20,7 +20,9 @@ interface ShellPainelProps {
   modulo: ModuloPainel;
   /** O seletor mostra o CRM só com alguma tela `crm.*`; o Site aparece sempre (Minha conta). */
   mostrarCrm: boolean;
-  usuario: { nome: string; email: string; perfil: string };
+  usuario: { nome: string; email: string };
+  /** Rótulo do rodapé da sidebar: "Administrador" ou "Equipe". */
+  administrador: boolean;
   grupos: GrupoNav[];
   telaAtiva: string;
   onIrPara: (id: string) => void;
@@ -46,6 +48,7 @@ export function ShellPainel({
   modulo,
   mostrarCrm,
   usuario,
+  administrador,
   grupos,
   telaAtiva,
   onIrPara,
@@ -89,7 +92,7 @@ export function ShellPainel({
           <div className="pcms-avatar-mini">{iniciais(usuario.nome)}</div>
           <div className="pcms-sidebar__usuario-info">
             <strong>{usuario.nome}</strong>
-            <span className="pcms-sidebar__perfil">{usuario.perfil.replace(/-/g, " ")}</span>
+            <span className="pcms-sidebar__perfil">{administrador ? "Administrador" : "Equipe"}</span>
           </div>
           <form action={sair} className="pcms-sair__form">
             <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">

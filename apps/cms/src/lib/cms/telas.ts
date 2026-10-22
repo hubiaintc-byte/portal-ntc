@@ -117,24 +117,3 @@ export function capacidadesDoAcesso(acesso: AcessoPainel): CapacidadesPainel {
     gerirUsuarios: acesso.administrador,
   };
 }
-
-/**
- * Mapeamento dos 4 perfis fixos para o modelo por tela.
- * @deprecated Transitório até a Task 3/9: removido junto com `PERFIS_*`.
- */
-export function acessoDoPerfilLegado(perfil: string | null | undefined): AcessoPainel {
-  const site = TELAS.filter((t) => t.modulo === "site").map((t) => t.id);
-  const crm = TELAS_CRM;
-  switch (perfil) {
-    case "super-admin":
-      return { administrador: true, telas: [] };
-    case "atendimento-comercial":
-      return { administrador: false, telas: ["site.painel", ...crm] };
-    case "editor-institucional":
-      return { administrador: false, telas: [...site, "crm.programas", "crm.modulos", "crm.produtos"] };
-    case "editor-eventos":
-      return { administrador: false, telas: ["site.painel", "site.eventos"] };
-    default:
-      return { administrador: false, telas: [] };
-  }
-}

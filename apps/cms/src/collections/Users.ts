@@ -6,10 +6,10 @@ import { emailRecuperacaoHtml } from "../lib/emailsCms";
 import { TELAS } from "../lib/cms/telas";
 
 /**
- * Coleção Users — auth nativa do Payload, com perfis administrativos
- * conforme DAB §10.1.
+ * Coleção Users — auth nativa do Payload, com permissões por tela
+ * (`administrador` + `telas`, escolhidas por pessoa; DAB §10.1).
  *
- * Apenas super-admins podem criar/atualizar/deletar outros usuários.
+ * Apenas administradores podem criar/atualizar/deletar outros usuários.
  * Demais autenticados podem ler (para fins de exibição de "criado por",
  * dropdowns de responsável em Leads etc.) e atualizar o próprio
  * registro (alteração de senha, e-mail).
@@ -22,7 +22,7 @@ export const Users: CollectionConfig = {
   labels: { singular: "Usuário", plural: "Usuários" },
   admin: {
     useAsTitle: "email",
-    defaultColumns: ["email", "nome", "perfil", "updatedAt"],
+    defaultColumns: ["email", "nome", "administrador", "updatedAt"],
     group: "Sistema",
   },
   auth: {
@@ -80,13 +80,13 @@ export const Users: CollectionConfig = {
         { label: "Atendimento comercial", value: "atendimento-comercial" },
       ],
       access: {
-        // Apenas super-admin pode alterar o próprio perfil ou o de outros.
+        // Legado (campo oculto): só administrador altera.
         update: administradorField,
       },
       admin: {
         hidden: true,
         description:
-          "Define o escopo de acesso ao admin (DAB §10.1). Apenas super-administradores podem alterar.",
+          "Legado, sem efeito: o acesso agora vem de Administrador e Telas. Removido na etapa 2.",
       },
     },
     {
