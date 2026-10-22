@@ -178,7 +178,7 @@ export interface User {
    */
   nome: string;
   /**
-   * Define o escopo de acesso ao admin (DAB §10.1). Apenas super-administradores podem alterar.
+   * Legado, sem efeito: o acesso agora vem de Administrador e Telas. Removido na etapa 2.
    */
   perfil?: ('super-admin' | 'editor-institucional' | 'editor-eventos' | 'atendimento-comercial') | null;
   /**
