@@ -50,7 +50,7 @@ describe("acessoDoPerfilLegado + capacidadesDoAcesso", () => {
   it("super-admin vira administrador com tudo liberado", () => {
     const c = capacidadesDoPerfil("super-admin");
     expect(c.gerirUsuarios).toBe(true);
-    expect(c.editarEventos && c.editarHome && c.editarConteudos && c.editarCatalogo && c.usarCrm).toBe(true);
+    expect(c.editarEventos && c.editarHome && c.editarConteudos && c.editarProgramas && c.editarModulos && c.usarCrm).toBe(true);
   });
 
   it("editor-institucional edita o site e o catálogo, sem gerir usuários", () => {
@@ -62,7 +62,8 @@ describe("acessoDoPerfilLegado + capacidadesDoAcesso", () => {
       editarHome: true,
       editarConteudos: true,
       editarContatos: true,
-      editarCatalogo: true,
+      editarProgramas: true,
+      editarModulos: true,
       gerirUsuarios: false,
       verLeads: false,
     });
@@ -74,7 +75,7 @@ describe("acessoDoPerfilLegado + capacidadesDoAcesso", () => {
 
   it("atendimento-comercial usa o CRM, sem editar o site", () => {
     const c = capacidadesDoPerfil("atendimento-comercial");
-    expect(c).toMatchObject({ usarCrm: true, verLeads: true, editarEventos: false, editarCatalogo: true, gerirUsuarios: false });
+    expect(c).toMatchObject({ usarCrm: true, verLeads: true, editarEventos: false, editarProgramas: true, editarModulos: true, gerirUsuarios: false });
   });
 
   it("perfil ausente ou desconhecido não pode nada", () => {

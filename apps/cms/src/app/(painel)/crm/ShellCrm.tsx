@@ -350,7 +350,7 @@ export function ShellCrm({
           }}
           onAbrirModulo={abrirModuloCatalogo}
           onNovoModulo={(programaId) => setCatalogoDet({ tipo: "modulo", modulo: null, programaIdInicial: programaId })}
-          podeEditar={capacidades.editarCatalogo}
+          podeEditar={capacidades.editarProgramas}
         />
         </>
       ) : catalogoDet?.tipo === "modulo" ? (
@@ -367,7 +367,7 @@ export function ShellCrm({
             fecharTudo();
             setTela("modulos");
           }}
-          podeEditar={capacidades.editarCatalogo}
+          podeEditar={capacidades.editarModulos}
         />
         </>
       ) : formAberto?.entidade === "cliente" ? (
@@ -454,7 +454,7 @@ export function ShellCrm({
               areas={areas}
               onAbrir={abrirProgramaCatalogo}
               onNovo={() => setCatalogoDet({ tipo: "programa", programa: null })}
-              podeEditar={capacidades.editarCatalogo}
+              podeEditar={capacidades.editarProgramas}
             />
           )}
           {tela === "modulos" && (
@@ -463,7 +463,7 @@ export function ShellCrm({
               programas={programas}
               onAbrir={abrirModuloCatalogo}
               onNovo={() => setCatalogoDet({ tipo: "modulo", modulo: null })}
-              podeEditar={capacidades.editarCatalogo}
+              podeEditar={capacidades.editarModulos}
             />
           )}
           {tela === "produtos" && <TelaProdutos produtos={produtos} />}

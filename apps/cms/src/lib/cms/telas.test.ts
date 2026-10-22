@@ -55,7 +55,8 @@ describe("capacidadesDoAcesso", () => {
     expect(c).toMatchObject({
       usarCrm: true,
       verLeads: true,
-      editarCatalogo: false,
+      editarProgramas: false,
+      editarModulos: false,
       gerirUsuarios: false,
       editarEventos: false,
     });
@@ -68,6 +69,17 @@ describe("capacidadesDoAcesso", () => {
     expect(
       capacidadesDoAcesso({ administrador: false, telas: ["site.palestrantes", "site.corpo-docente"] }),
     ).toMatchObject({ editarCardCorpoDocente: true });
+  });
+
+  it("catálogo: Programas edita programas e módulos; Módulos só módulos", () => {
+    expect(capacidadesDoAcesso({ administrador: false, telas: ["crm.programas"] })).toMatchObject({
+      editarProgramas: true,
+      editarModulos: true,
+    });
+    expect(capacidadesDoAcesso({ administrador: false, telas: ["crm.modulos"] })).toMatchObject({
+      editarProgramas: false,
+      editarModulos: true,
+    });
   });
 
   it("acompanhar eventos no acervo do cliente: Clientes, Dashboard ou Leads", () => {

@@ -91,7 +91,10 @@ export interface CapacidadesPainel {
   editarHome: boolean;
   editarConteudos: boolean;
   editarContatos: boolean;
-  editarCatalogo: boolean;
+  /** Escrita de programas (detalhe, lista, "Novo módulo neste programa"). */
+  editarProgramas: boolean;
+  /** Escrita de módulos: Módulos ou Programas — o detalhe do programa cria módulo. */
+  editarModulos: boolean;
   usarCrm: boolean;
   verLeads: boolean;
   /** Agendar, contrato/empenho, links, realizado e cancelar no acervo de eventos do cliente (§3.8). */
@@ -110,7 +113,8 @@ export function capacidadesDoAcesso(acesso: AcessoPainel): CapacidadesPainel {
     editarHome: temTela(acesso, ["site.home"]),
     editarConteudos: temTela(acesso, ["site.conteudos"]),
     editarContatos: temTela(acesso, ["site.contatos"]),
-    editarCatalogo: temTela(acesso, ["crm.programas", "crm.modulos"]),
+    editarProgramas: temTela(acesso, ["crm.programas"]),
+    editarModulos: temTela(acesso, ["crm.modulos", "crm.programas"]),
     usarCrm: temTela(acesso, TELAS_CRM),
     verLeads: temTela(acesso, TELAS_LEADS),
     acompanharEventos: temTela(acesso, [...TELAS_LEADS, "crm.clientes"]),
