@@ -235,9 +235,10 @@ export async function salvarPalestrante(
   if (![...bruto.linhasAtuacaoIds, ...bruto.programasIds].every(ehIdNumerico)) {
     return { resultado: DADOS_INVALIDOS, palestrante: null };
   }
-  // O bloco Corpo Docente só é gravado por quem tem a tela Corpo Docente
-  // (spec §7): `corpoDocente` não nulo = o bloco veio no formulário.
-  if (bruto.corpoDocente !== null && !temTela(acessoDoUsuario(usuario), TELAS_CORPO_DOCENTE)) {
+  // O bloco Corpo Docente só é tocado por quem tem a tela Corpo Docente
+  // (spec §7): `corpoDocente` presente (inclusive null = remover) = o bloco
+  // veio; ausente = não mexer no card.
+  if (bruto.corpoDocente !== undefined && !temTela(acessoDoUsuario(usuario), TELAS_CORPO_DOCENTE)) {
     return { resultado: RECUSADO_PERFIL, palestrante: null };
   }
   const campos = {

@@ -301,6 +301,14 @@ describe("salvarPalestranteCms — atualização", () => {
     expect(findGlobal.mock.calls.at(-1)![0]).toMatchObject({ slug: "corpo-docente", depth: 0, draft: true });
   });
 
+  it("com corpoDocente ausente, não lê nem grava o Global, mesmo com card existente", async () => {
+    const semBloco = { ...campos };
+    delete semBloco.corpoDocente;
+    await salvarPalestranteCms(usuario, "42", semBloco, null);
+    expect(findGlobal).not.toHaveBeenCalled();
+    expect(updateGlobal).not.toHaveBeenCalled();
+  });
+
   it("com corpoDocente null e sem card existente, não toca o Global", async () => {
     await salvarPalestranteCms(usuario, "42", { ...campos, corpoDocente: null }, null);
     expect(update).toHaveBeenCalledTimes(1);

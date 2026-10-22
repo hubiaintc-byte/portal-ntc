@@ -32,10 +32,12 @@ interface DetalhePalestranteProps {
    * some "Editar" e o switch "Ocultar do site" vira texto de estado.
    */
   podeEditar: boolean;
+  /** `capacidades.editarCardCorpoDocente`: repassado ao formulário. */
+  podeEditarCard: boolean;
 }
 
 /** Tela cheia de detalhe de um palestrante — leitura, visibilidade e modo edição. */
-export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou, podeEditar }: DetalhePalestranteProps) {
+export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou, podeEditar, podeEditarCard }: DetalhePalestranteProps) {
   const [p, setP] = useState(inicial);
   const [salvando, iniciarSalvar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
@@ -74,6 +76,7 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou, p
       <FormPalestrante
         palestrante={p}
         opcoes={opcoes}
+        podeEditarCard={podeEditarCard}
         onCancelar={() => setEditando(false)}
         onSalvou={(salvo, aviso) => {
           setEditando(false);

@@ -376,6 +376,7 @@ export function ShellCms({
         <FormPalestrante
           palestrante={null}
           opcoes={opcoesPalestrante}
+          podeEditarCard={capacidades.editarCardCorpoDocente}
           onCancelar={() => setCriandoPalestrante(false)}
           onSalvou={(salvo, aviso) => {
             if (!salvo) {
@@ -393,6 +394,7 @@ export function ShellCms({
           palestrante={palestranteDet}
           onVoltar={() => setPalestranteDet(null)}
           podeEditar={capacidades.editarPalestrantes}
+          podeEditarCard={capacidades.editarCardCorpoDocente}
           onSalvou={(avisoSemReleitura) => {
             if (avisoSemReleitura !== undefined) salvouSemReleitura(avisoSemReleitura);
             else router.refresh();

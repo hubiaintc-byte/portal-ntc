@@ -154,11 +154,41 @@ describe("salvarPalestrante — bloco Corpo Docente por tela", () => {
     find.mockResolvedValue({ docs: [] });
   }
 
-  it("site.palestrantes sem o bloco → salva", async () => {
+  const camposSemBloco: Record<string, unknown> = { ...campos };
+  delete camposSemBloco.corpoDocente;
+
+  it("site.palestrantes com corpoDocente ausente → salva e não toca o card", async () => {
     obterUsuarioAutenticadoMock.mockResolvedValue(soPalestrantes);
     preparaCriacao();
-    const r = await salvarPalestrante(formulario(JSON.stringify(campos)));
+    const r = await salvarPalestrante(formulario(JSON.stringify(camposSemBloco)));
     expect(r.resultado.ok).toBe(true);
+    expect(updateGlobal).not.toHaveBeenCalled();
+  });
+
+  it("site.palestrantes com corpoDocente null → recusa antes de qualquer escrita", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(soPalestrantes);
+    preparaCriacao();
+    const r = await salvarPalestrante(formulario(JSON.stringify({ ...campos, corpoDocente: null }), "42"));
+    expect(r.resultado).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
+    nenhumaEscrita();
+  });
+
+  it("com site.corpo-docente, null remove o card existente", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue({ ...soPalestrantes, telas: ["site.palestrantes", "site.corpo-docente"] });
+    findByID.mockResolvedValue({ id: 42, foto: 5, curriculoCurto: { root: {} }, nome: "Ana", slug: "ana" });
+    findGlobal.mockResolvedValue({
+      cards: [
+        { formato: "expert", especialista: 42, id: "c42" },
+        { formato: "expert", especialista: 1, id: "c1" },
+      ],
+    });
+    update.mockResolvedValue({ id: 42 });
+    updateGlobal.mockResolvedValue({});
+    const fd = formulario(JSON.stringify({ ...campos, corpoDocente: null }), "42");
+    fd.delete("foto");
+    const r = await salvarPalestrante(fd);
+    expect(r.resultado.ok).toBe(true);
+    expect(updateGlobal.mock.calls[0]![0].data.cards.map((c: { especialista: number }) => c.especialista)).toEqual([1]);
   });
 
   it("site.palestrantes com o bloco → recusa antes de qualquer escrita", async () => {
