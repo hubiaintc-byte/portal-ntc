@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { obterUsuarioAutenticadoComTela, obterUsuarioCmsComTela } from "@/lib/cms/autenticacao";
-import { TELAS_LEADS, type TelaPainel } from "@/lib/cms/telas";
+import { TELAS_LEADS, temTela, type TelaPainel } from "@/lib/cms/telas";
 import {
   obterClienteCrm,
   obterLeadCrm,
@@ -63,8 +63,10 @@ const TELAS_PROPOSTAS: readonly TelaPainel[] = ["crm.propostas"];
 const TELAS_LEADS_E_CLIENTES: readonly TelaPainel[] = [...TELAS_LEADS, "crm.clientes"];
 
 export async function carregarClienteCrm(id: string): Promise<ClienteCrmDetalhe | null> {
-  if (!(await obterUsuarioCmsComTela(TELAS_CLIENTES))) return null;
-  return obterClienteCrm(id);
+  const usuario = await obterUsuarioCmsComTela(TELAS_CLIENTES);
+  if (!usuario) return null;
+  // Sem Dashboard/Leads, os negócios saem sem os dados pessoais do lead (spec §3.8).
+  return obterClienteCrm(id, { negociosMinimos: !temTela(usuario.acesso, TELAS_LEADS) });
 }
 
 export async function salvarClienteCrm(

@@ -18,6 +18,8 @@ export interface GrupoNav {
 
 interface ShellPainelProps {
   modulo: ModuloPainel;
+  /** O seletor mostra o CRM só com alguma tela `crm.*`; o Site aparece sempre (Minha conta). */
+  mostrarCrm: boolean;
   usuario: { nome: string; email: string; perfil: string };
   grupos: GrupoNav[];
   telaAtiva: string;
@@ -42,6 +44,7 @@ function iniciais(nome: string): string {
  */
 export function ShellPainel({
   modulo,
+  mostrarCrm,
   usuario,
   grupos,
   telaAtiva,
@@ -60,7 +63,7 @@ export function ShellPainel({
           <span className="pcms-sidebar__painel-rotulo">Painel Admin</span>
         </div>
 
-        <SeletorModulo modulo={modulo} />
+        <SeletorModulo modulo={modulo} mostrarCrm={mostrarCrm} />
 
         <nav className="pcms-nav" aria-label="Navegação principal do painel">
           {grupos.map((grupo) => (

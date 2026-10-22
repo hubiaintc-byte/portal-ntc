@@ -23,10 +23,10 @@ interface TelaConfiguracoesProps {
   /** Usuário logado — usado só para exibir o e-mail da conta na seção real. */
   usuario: { id: string; nome: string; email: string };
   /**
-   * false ⇒ perfil sem escrita nos contatos (`capacidades.editarContatos`):
-   * a seção mostra os dados com os campos desabilitados e sem "Salvar contatos".
+   * Seção "Contatos institucionais": só com a tela Contatos do site
+   * (`capacidades.editarContatos`). Sem ela, a seção nem é lida nem aparece.
    */
-  podeEditarContatos: boolean;
+  mostrarContatos: boolean;
 }
 
 /**
@@ -34,7 +34,7 @@ interface TelaConfiguracoesProps {
  * senha via Server Action). O restante da tela segue demonstrativo — nada
  * mais aqui é salvo ainda.
  */
-export function TelaConfiguracoes({ usuario, podeEditarContatos }: TelaConfiguracoesProps) {
+export function TelaConfiguracoes({ usuario, mostrarContatos }: TelaConfiguracoesProps) {
   const [senhaAtual, setSenhaAtual] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmacao, setConfirmacao] = useState("");
@@ -139,8 +139,9 @@ export function TelaConfiguracoes({ usuario, podeEditarContatos }: TelaConfigura
   const [salvandoContatos, iniciarSalvarContatos] = useTransition();
 
   useEffect(() => {
+    if (!mostrarContatos) return;
     carregarContatosCms().then(setContatos);
-  }, []);
+  }, [mostrarContatos]);
 
   function atualizarContato<K extends keyof CamposContatos>(campo: K) {
     return (valor: CamposContatos[K]) =>
@@ -160,7 +161,7 @@ export function TelaConfiguracoes({ usuario, podeEditarContatos }: TelaConfigura
 
   function enviarContatos(e: React.FormEvent) {
     e.preventDefault();
-    if (!podeEditarContatos || salvandoContatos || contatos === null) return;
+    if (!mostrarContatos || salvandoContatos || contatos === null) return;
     setErroContatos(null);
     setSucessoContatos(null);
     setAvisoContatos(null);
@@ -288,6 +289,7 @@ export function TelaConfiguracoes({ usuario, podeEditarContatos }: TelaConfigura
           )}
         </section>
 
+        {mostrarContatos && (
         <section className="pcms-config-card pcms-config-card--ativa">
           <h3>
             Contatos institucionais
@@ -313,7 +315,7 @@ export function TelaConfiguracoes({ usuario, podeEditarContatos }: TelaConfigura
                 </p>
               )}
 
-              <fieldset className="pcms-somente-leitura" disabled={!podeEditarContatos}>
+              <fieldset className="pcms-somente-leitura" disabled={!mostrarContatos}>
               <h4>Atendimento</h4>
               <div className="pcms-editor__grid">
                 <CampoTexto
@@ -415,7 +417,7 @@ export function TelaConfiguracoes({ usuario, podeEditarContatos }: TelaConfigura
 
               </fieldset>
 
-              {podeEditarContatos && (
+              {mostrarContatos && (
                 <button type="submit" className="pcms-btn" disabled={salvandoContatos}>
                   {salvandoContatos ? "Salvando…" : "Salvar contatos"}
                 </button>
@@ -427,6 +429,7 @@ export function TelaConfiguracoes({ usuario, podeEditarContatos }: TelaConfigura
             </form>
           )}
         </section>
+        )}
 
         <section className="pcms-config-card">
           <h3>

@@ -14,7 +14,8 @@ import { UploadDocumento } from "./UploadDocumento";
 
 interface EventosDoClienteProps {
   eventos: EventoComercialResumo[];
-  onAbrirLead: (id: string) => void;
+  /** Ausente = sem Dashboard/Leads: o lead do evento sai só como texto. */
+  onAbrirLead?: (id: string) => void;
   onAtualizado: () => void;
 }
 
@@ -76,7 +77,7 @@ export function EventosDoCliente({ eventos, onAbrirLead, onAtualizado }: Eventos
 
 interface CardEventoProps {
   evento: EventoComercialResumo;
-  onAbrirLead: (id: string) => void;
+  onAbrirLead?: (id: string) => void;
   onAtualizado: () => void;
 }
 
@@ -108,7 +109,8 @@ function CardEvento({ evento: ev, onAbrirLead, onAtualizado }: CardEventoProps) 
           {ev.modalidade ? ` · ${rotuloDeLista(MODALIDADES_EVENTO, ev.modalidade)}` : ""}
         </span>
         <span className={seloDeStatusEvento(ev.status)}>{ROTULO_STATUS_EVENTO[ev.status] ?? ev.status}</span>
-        {ev.leadId && (
+        {ev.leadId && !onAbrirLead && <span className="pcms-evento-card__meta">lead: {ev.leadNome ?? "—"}</span>}
+        {ev.leadId && onAbrirLead && (
           <button
             type="button"
             className="pcms-link"

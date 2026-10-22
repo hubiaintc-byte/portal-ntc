@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import type {
@@ -14,8 +14,9 @@ import type {
   PalestranteCmsResumo,
 } from "@/lib/cms/painelCms";
 
+import { mostraModuloCrm, navSiteVisivel, telaInicialSite, type TelaIdSite } from "@/lib/cms/navegacao";
 import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
-import type { CapacidadesPainel } from "@/lib/cms/perfis";
+import type { AcessoPainel, CapacidadesPainel } from "@/lib/cms/telas";
 
 import {
   carregarAreas,
@@ -51,6 +52,8 @@ import { FormPalestrante } from "./FormPalestrante";
 interface ShellCmsProps {
   /** Usuário autenticado (rodapé da sidebar + guarda do item "Usuários"). */
   usuario: { nome: string; email: string; perfil: string; id: string };
+  /** Telas da pessoa: decidem o menu, a tela inicial e o seletor de módulo. */
+  acesso: AcessoPainel;
   /**
    * O que este usuário pode escrever, calculado no servidor (page.tsx) por
    * `capacidadesDoAcesso`. Só decide quais controles aparecem — a guarda de
@@ -65,15 +68,7 @@ interface ShellCmsProps {
   erroLeitura: boolean;
 }
 
-type TelaId =
-  | "dashboard"
-  | "palestrantes"
-  | "corpo-docente"
-  | "eventos"
-  | "conteudos"
-  | "home"
-  | "config"
-  | "usuarios";
+type TelaId = TelaIdSite;
 
 interface ItemNav {
   id: TelaId;
@@ -163,6 +158,7 @@ const CRUMB: Record<TelaId, string> = {
 
 export function ShellCms({
   usuario,
+  acesso,
   capacidades,
   eventos,
   palestrantes,
@@ -171,7 +167,7 @@ export function ShellCms({
   eventosHomeIds,
   erroLeitura,
 }: ShellCmsProps) {
-  const [tela, setTela] = useState<TelaId>("dashboard");
+  const [tela, setTela] = useState<TelaId>(() => telaInicialSite(acesso));
   const [eventoDet, setEventoDet] = useState<EventoCmsDetalhe | null>(null);
   // true ⇒ o detalhe abre direto em edição (revisão pós-importação de PDF).
   const [eventoEmEdicao, setEventoEmEdicao] = useState(false);
@@ -225,6 +221,22 @@ export function ShellCms({
       }
     });
   }
+
+  // Quem começa no Corpo Docente (única tela do Site, por exemplo) não passa
+  // por `irPara`: a primeira carga dos cards sai daqui, uma vez só.
+  const cargaInicialFeita = useRef(false);
+  useEffect(() => {
+    if (cargaInicialFeita.current) return;
+    cargaInicialFeita.current = true;
+    if (tela !== "corpo-docente") return;
+    iniciarCargaCorpo(async () => {
+      try {
+        setCardsCorpo(await carregarCorpoDocente());
+      } catch {
+        setErroCorpo("Não foi possível carregar o Corpo Docente. Recarregue a página.");
+      }
+    });
+  }, [tela]);
 
   function novoEvento() {
     if (!capacidades.editarEventos) return;
@@ -332,14 +344,20 @@ export function ShellCms({
       ]
     : [{ id: "config", rotulo: "Configurações", icone: Ico.config }];
 
+  // Menu: só as telas marcadas; Configurações (Minha conta) sempre.
+  const editoriais = new Set(navSiteVisivel(acesso));
+  const itensEditoriais = NAV_PRINCIPAL.filter((i) => editoriais.has(i.id));
   const grupos: GrupoNav[] = [
-    { rotulo: "Editorial", itens: NAV_PRINCIPAL },
+    ...(itensEditoriais.length > 0 ? [{ rotulo: "Editorial", itens: itensEditoriais }] : []),
     { rotulo: "Sistema", itens: navSistema },
   ];
+  // Spec §5: sem nenhuma tela marcada, a pessoa cai em Minha conta com um aviso.
+  const semTelas = !acesso.administrador && acesso.telas.length === 0;
 
   return (
     <ShellPainel
       modulo="site"
+      mostrarCrm={mostraModuloCrm(acesso)}
       usuario={usuario}
       grupos={grupos}
       telaAtiva={tela}
@@ -464,8 +482,13 @@ export function ShellCms({
                 podeEditar={capacidades.editarHome}
               />
             )}
+            {tela === "config" && semTelas && (
+              <p className="pcms-form-aviso" role="status">
+                Você ainda não tem telas liberadas. Peça a um administrador para liberar as telas de que precisa.
+              </p>
+            )}
             {tela === "config" && (
-              <TelaConfiguracoes usuario={usuario} podeEditarContatos={capacidades.editarContatos} />
+              <TelaConfiguracoes usuario={usuario} mostrarContatos={capacidades.editarContatos} />
             )}
             {tela === "usuarios" && ehSuperAdmin && (
               <TelaUsuarios

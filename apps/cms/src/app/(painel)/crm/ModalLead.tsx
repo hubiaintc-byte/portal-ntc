@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 
 import { ESTAGIOS_LEAD, MOTIVOS_PERDA, exigeConfirmacaoDupla, rotuloDoEstagio } from "@ntc/lib";
 
-import type { CatalogoCrm, ClienteCrmResumo, LeadCrmDetalhe, UsuarioCmsResumo } from "@/lib/cms/painelCrm";
+import type { CatalogoCrm, ClienteOpcao, LeadCrmDetalhe, UsuarioCmsResumo } from "@/lib/cms/painelCrm";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
 import {
@@ -27,13 +27,14 @@ const ROTULO_ABA: Record<Aba, string> = { dados: "Dados", acoes: "Ações", hist
 interface ModalLeadProps {
   /** null = modo criação (Novo Lead). */
   lead: LeadCrmDetalhe | null;
-  clientes: ClienteCrmResumo[];
+  clientes: ClienteOpcao[];
   catalogo: CatalogoCrm;
   usuarios: UsuarioCmsResumo[];
   onFechar: () => void;
   /** Recarrega o lead após qualquer escrita (o pai chama carregarLeadCrm). */
   onAtualizado: (id: string) => void;
-  onAbrirCliente: (id: string) => void;
+  /** Ausente = sem a tela Clientes: o nome do cliente sai como texto. */
+  onAbrirCliente?: (id: string) => void;
   /** Novo lead aberto de dentro do cliente: pré-seleciona esse cliente no FormLead. */
   clientePreSelecionado?: string;
   /** Lead apagado com sucesso (Zona de risco): o pai fecha o modal e recarrega o cliente, se houver. */
@@ -188,7 +189,7 @@ export function ModalLead({
           <div>
             <p className="pcms-pagehead__eyebrow">{lead ? `Lead · ${lead.nome}` : "Comercial"}</p>
             <h2 id="pcms-modal-lead-titulo">
-              {lead?.clienteId ? (
+              {lead?.clienteId && onAbrirCliente ? (
                 <button type="button" className="pcms-link" onClick={() => onAbrirCliente(lead.clienteId as string)}>
                   {titulo}
                 </button>

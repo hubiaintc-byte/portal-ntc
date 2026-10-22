@@ -13,6 +13,7 @@ import type {
 } from "@simplewebauthn/server";
 
 import { COOKIE_SESSAO, obterUsuarioAutenticado, obterUsuarioCms } from "@/lib/cms/autenticacao";
+import { destinoDepoisDoLogin } from "@/lib/cms/navegacao";
 import {
   confirmarCadastroPasskey,
   confirmarLoginPasskey,
@@ -22,12 +23,35 @@ import {
   removerPasskey,
   type PasskeyResumo,
 } from "@/lib/cms/painelPasskeys";
+import { acessoDoUsuario } from "@/lib/cms/telas";
 import { obterPayload } from "@/lib/payloadClient";
 import { criarStoreRateLimit } from "@/lib/storeRateLimit";
 import { cifrarTokenPonte, decifrarTokenPonte } from "@/lib/passkeys/tokens";
 import { validarNovaSenha } from "@/lib/validarNovaSenha";
 
 const QUATORZE_DIAS_S = 60 * 60 * 24 * 14;
+
+type UsuarioComTelas = { administrador?: boolean | null; telas?: readonly string[] | null };
+
+/**
+ * Para onde vai quem acabou de entrar: /crm se só tem telas do CRM, senão o
+ * Site (spec §5). Falha ao ler o usuário cai no Site — de lá a pessoa navega.
+ */
+async function destinoDoUsuario(usuarioId: string): Promise<"/" | "/crm"> {
+  try {
+    const payload = await obterPayload();
+    const u = await payload.findByID({
+      collection: "users",
+      id: usuarioId,
+      depth: 0,
+      overrideAccess: true,
+      select: { administrador: true, telas: true },
+    });
+    return destinoDepoisDoLogin(acessoDoUsuario(u as UsuarioComTelas));
+  } catch {
+    return "/";
+  }
+}
 
 export interface EstadoLogin {
   erro?: string;
@@ -56,6 +80,7 @@ export async function entrar(
 
   let token: string | undefined;
   let usuarioId: string | undefined;
+  let destino: "/" | "/crm" = "/";
   try {
     const payload = await obterPayload();
     const resultado = await payload.login({
@@ -64,6 +89,7 @@ export async function entrar(
     });
     token = resultado.token;
     usuarioId = resultado.user ? String(resultado.user.id) : undefined;
+    destino = destinoDepoisDoLogin(acessoDoUsuario(resultado.user as UsuarioComTelas | undefined));
   } catch (e) {
     // 401 = credencial inválida/lockout (APIError do Payload). Qualquer outra
     // coisa (banco fora etc.) recebe mensagem neutra, sem vazar detalhe.
@@ -104,7 +130,7 @@ export async function entrar(
     // Sem "manter sessão": cookie de sessão (morre ao fechar o navegador).
     ...(manter ? { maxAge: QUATORZE_DIAS_S } : {}),
   });
-  redirect("/");
+  redirect(destino);
 }
 
 /** Completa o login depois da senha, confirmando o 2º fator (passkey). */
@@ -126,7 +152,7 @@ export async function verificarAutenticacaoPasskey(
     path: "/",
     ...(claims.manter ? { maxAge: QUATORZE_DIAS_S } : {}),
   });
-  redirect("/");
+  redirect(await destinoDoUsuario(claims.userId));
 }
 
 /** Encerra a sessão (apaga o cookie) e volta ao login. */
@@ -212,6 +238,7 @@ export async function redefinirSenha(
 
   let tokenSessao: string | undefined;
   let usuarioId: string | undefined;
+  let destino: "/" | "/crm" = "/";
   try {
     const payload = await obterPayload();
     const resultado = await payload.resetPassword({
@@ -221,6 +248,7 @@ export async function redefinirSenha(
     });
     tokenSessao = resultado.token;
     usuarioId = resultado.user ? String((resultado.user as { id: unknown }).id) : undefined;
+    destino = destinoDepoisDoLogin(acessoDoUsuario(resultado.user as UsuarioComTelas | undefined));
   } catch {
     return { erro: "Link inválido ou expirado. Solicite uma nova redefinição." };
   }
@@ -252,7 +280,7 @@ export async function redefinirSenha(
     secure: process.env.NODE_ENV === "production",
     path: "/",
   });
-  redirect("/");
+  redirect(destino);
 }
 
 /**

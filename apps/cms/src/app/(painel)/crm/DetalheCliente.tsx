@@ -17,14 +17,32 @@ interface DetalheClienteProps {
   cliente: ClienteCrmDetalhe;
   onVoltar: () => void;
   onEditar: () => void;
-  onAbrirLead: (id: string) => void;
-  onNovoLead: () => void;
+  /**
+   * Ausentes = sem Dashboard/Leads (spec §3.8): os negócios saem só com o
+   * contato e o estágio, sem abrir o modal do lead, e sem "Novo lead".
+   */
+  onAbrirLead?: (id: string) => void;
+  onNovoLead?: () => void;
   onNota: (texto: string) => Promise<string | null>;
   onAtualizado: () => void;
   onApagado: () => void;
 }
 
 const FMT = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
+
+function SeloEstagio({ estagio, perdido }: { estagio: string; perdido: boolean }) {
+  return (
+    <>
+      <span className={seloDeEstagioLead(estagio)}>{rotuloDoEstagio(estagio)}</span>
+      {perdido && (
+        <>
+          {" "}
+          <span className="pcms-selo pcms-selo--erro">Perdido</span>
+        </>
+      )}
+    </>
+  );
+}
 
 /** Detalhe do cliente, o ativo permanente: dados + contatos, negócios, eventos e a linha do tempo com nota manual. */
 export function DetalheCliente({
@@ -88,9 +106,11 @@ export function DetalheCliente({
           <button type="button" className="pcms-btn pcms-btn--ghost" onClick={onEditar}>
             Editar
           </button>
-          <button type="button" className="pcms-btn" onClick={onNovoLead}>
-            Novo lead
-          </button>
+          {onNovoLead && (
+            <button type="button" className="pcms-btn" onClick={onNovoLead}>
+              Novo lead
+            </button>
+          )}
           {!apagando ? (
             <button
               type="button"
@@ -171,6 +191,25 @@ export function DetalheCliente({
             <h2>Negócios</h2>
             {c.negocios.length === 0 ? (
               <div className="pcms-vazio">Nenhum lead deste cliente.</div>
+            ) : c.negociosMinimos || !onAbrirLead ? (
+              <table className="pcms-tabela">
+                <thead>
+                  <tr>
+                    <th>Contato</th>
+                    <th>Estágio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {c.negocios.map((l) => (
+                    <tr key={l.id}>
+                      <td>{l.nome}</td>
+                      <td>
+                        <SeloEstagio estagio={l.estagio} perdido={l.perdido} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             ) : (
               <table className="pcms-tabela">
                 <thead>
@@ -203,13 +242,7 @@ export function DetalheCliente({
                       <td>{l.programaSigla ?? "—"}</td>
                       <td>{l.valorEstimado !== null ? formatarMoedaBRL(l.valorEstimado) : "—"}</td>
                       <td>
-                        <span className={seloDeEstagioLead(l.estagio)}>{rotuloDoEstagio(l.estagio)}</span>
-                        {l.perdido && (
-                          <>
-                            {" "}
-                            <span className="pcms-selo pcms-selo--erro">Perdido</span>
-                          </>
-                        )}
+                        <SeloEstagio estagio={l.estagio} perdido={l.perdido} />
                       </td>
                     </tr>
                   ))}

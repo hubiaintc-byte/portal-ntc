@@ -24,10 +24,13 @@ vi.mock("@/lib/cms/autenticacao", async () => {
       const u = await obter();
       return u && temTela(acessoDoUsuario(u), telas) ? u : null;
     };
+  // Como `UsuarioCms`, o resumo carrega o `acesso` já normalizado.
+  const comTelaResumo = (telas: Parameters<typeof temTela>[1]) =>
+    comTela(obterUsuarioCmsMock)(telas).then((u) => (u ? { ...u, acesso: acessoDoUsuario(u) } : null));
   return {
     obterUsuarioCms: obterUsuarioCmsMock,
     obterUsuarioAutenticado: obterUsuarioAutenticadoMock,
-    obterUsuarioCmsComTela: comTela(obterUsuarioCmsMock),
+    obterUsuarioCmsComTela: comTelaResumo,
     obterUsuarioAutenticadoComTela: comTela(obterUsuarioAutenticadoMock),
   };
 });
@@ -233,6 +236,24 @@ describe("acoesCrm — permissão por tela", () => {
     obterPayloadMock.mockClear();
     await salvarSecaoConteudoPropostaCrm("9", "fechamento", { tipo: "texto", texto: "x" });
     expect(obterPayloadMock).toHaveBeenCalled();
+  });
+
+  it("só Clientes: carregarClienteCrm lê os negócios sem os campos pessoais do lead (§3.8)", async () => {
+    montarPayloadFalso();
+    logar({ id: "9", nome: "Clientes", administrador: false, telas: ["crm.clientes"] });
+    await carregarClienteCrm("3");
+    const payload = await obterPayloadMock.mock.results[0]!.value;
+    const chamadaLeads = payload.find.mock.calls.find(([a]: [{ collection: string }]) => a.collection === "leads")[0];
+    expect(chamadaLeads.select).not.toHaveProperty("email");
+  });
+
+  it("Clientes e Leads: carregarClienteCrm lê os negócios completos", async () => {
+    montarPayloadFalso();
+    logar({ id: "9", nome: "Comercial", administrador: false, telas: ["crm.clientes", "crm.leads"] });
+    await carregarClienteCrm("3");
+    const payload = await obterPayloadMock.mock.results[0]!.value;
+    const chamadaLeads = payload.find.mock.calls.find(([a]: [{ collection: string }]) => a.collection === "leads")[0];
+    expect(chamadaLeads.select).toHaveProperty("email");
   });
 
   it("só Leads: salvarLeadCrm com cliente novo e vincularClienteCrm passam (§3.7)", async () => {

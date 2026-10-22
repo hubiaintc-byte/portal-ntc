@@ -55,19 +55,42 @@ export interface ClienteCrmResumo {
   ultimoItemISO: string | null;
 }
 
-export interface ClienteCrmDetalhe extends ClienteCrmResumo {
+/**
+ * Dado de apoio (spec §3.3): o cliente como opção de um select (wizard da
+ * proposta, novo lead, "Trocar cliente…"), para quem não tem a tela Clientes.
+ */
+export type ClienteOpcao = Pick<ClienteCrmResumo, "id" | "orgao" | "sigla">;
+
+/** Dado de apoio (spec §3.3): o lead como opção do wizard da proposta, para quem não tem Dashboard/Leads. */
+export type LeadOpcao = Pick<LeadCrmResumo, "id" | "nome" | "instituicao" | "clienteId" | "programaSigla">;
+
+/**
+ * Negócio do cliente na forma mínima (spec §3.8): para quem tem a tela
+ * Clientes sem Dashboard/Leads — só o nome do contato e o estágio, sem os
+ * dados pessoais nem a mensagem original do lead.
+ */
+export interface NegocioMinimo {
+  id: string;
+  nome: string;
+  estagio: string;
+  perdido: boolean;
+}
+
+interface ClienteCrmDetalheBase extends ClienteCrmResumo {
   tipo: string | null;
   cnpj: string | null;
   email: string | null;
   observacoes: string | null;
   responsavelId: string | null;
   contatos: ContatoResumo[];
-  negocios: LeadCrmResumo[];
   linhaDoTempo: ItemLinhaDoTempoResumo[];
   eventos: EventoComercialResumo[];
   /** Propostas com `cliente` = este, inclusive as que sobreviveram ao lead que as originou (apagarLead desvincula só o lead). */
   numPropostas: number;
 }
+
+export type ClienteCrmDetalhe = ClienteCrmDetalheBase &
+  ({ negociosMinimos: false; negocios: LeadCrmResumo[] } | { negociosMinimos: true; negocios: NegocioMinimo[] });
 
 export interface LeadCrmResumo {
   id: string;
@@ -425,6 +448,27 @@ export async function listarLeadsCrm(): Promise<LeadCrmResumo[]> {
   return res.docs.map(mapearLeadCrm);
 }
 
+/** Leads do CRM como opção do wizard da proposta (dado de apoio, spec §3.3) — sem contato nem mensagem. */
+export async function listarLeadsOpcoesCrm(): Promise<LeadOpcao[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "leads",
+    depth: 1,
+    limit: 500,
+    sort: "-createdAt",
+    where: { tipo: { equals: "proposta" } },
+    select: { nome: true, instituicao: true, cliente: true, detalhesProposta: { programa: true } },
+    populate: { programas: { sigla: true }, "clientes-crm": { orgao: true } },
+  });
+  return res.docs.map((doc) => ({
+    id: String(doc.id),
+    nome: doc.nome,
+    instituicao: doc.instituicao ?? "—",
+    clienteId: idRel(doc.cliente),
+    programaSigla: campoRel(doc.detalhesProposta?.programa, "sigla"),
+  }));
+}
+
 export interface ItemLinhaDoTempoResumo {
   id: string;
   tipo: string;
@@ -697,7 +741,28 @@ export async function listarClientesCrm(): Promise<ClienteCrmResumo[]> {
   );
 }
 
-export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | null> {
+/** Clientes como opção de select (dado de apoio, spec §3.3): só id, órgão e sigla. */
+export async function listarClientesOpcoesCrm(): Promise<ClienteOpcao[]> {
+  const payload = await obterPayload();
+  const res = await payload.find({
+    collection: "clientes-crm",
+    depth: 0,
+    limit: 500,
+    sort: "orgao",
+    select: { orgao: true, sigla: true },
+  });
+  return res.docs.map((doc) => ({ id: String(doc.id), orgao: doc.orgao, sigla: doc.sigla ?? null }));
+}
+
+/**
+ * Detalhe do cliente. `negociosMinimos` (chamador sem Dashboard/Leads): os
+ * negócios saem como `NegocioMinimo` e o banco nem é consultado pelos campos
+ * pessoais do lead (spec §3.8, §6).
+ */
+export async function obterClienteCrm(
+  id: string,
+  opcoes: { negociosMinimos: boolean } = { negociosMinimos: false },
+): Promise<ClienteCrmDetalhe | null> {
   const payload = await obterPayload();
   let doc: ClienteCrm;
   try {
@@ -705,16 +770,40 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
   } catch {
     return null;
   }
+  const whereNegocios: Where = { cliente: { equals: doc.id }, tipo: { equals: "proposta" } };
   const [negocios, linhaDoTempo, eventosRes, propostas] = await Promise.all([
-    payload.find({
-      collection: "leads",
-      depth: 1,
-      limit: 200,
-      sort: "-createdAt",
-      where: { cliente: { equals: doc.id }, tipo: { equals: "proposta" } },
-      select: SELECT_LEAD_RESUMO,
-      populate: POPULATE_LEAD_RESUMO,
-    }),
+    opcoes.negociosMinimos
+      ? payload
+          .find({
+            collection: "leads",
+            depth: 0,
+            limit: 200,
+            sort: "-createdAt",
+            where: whereNegocios,
+            select: { nome: true, estagio: true, perdido: true },
+          })
+          .then((r) => ({
+            minimos: true as const,
+            lista: r.docs.map(
+              (l): NegocioMinimo => ({
+                id: String(l.id),
+                nome: l.nome,
+                estagio: l.estagio ?? "lead",
+                perdido: l.perdido === true,
+              }),
+            ),
+          }))
+      : payload
+          .find({
+            collection: "leads",
+            depth: 1,
+            limit: 200,
+            sort: "-createdAt",
+            where: whereNegocios,
+            select: SELECT_LEAD_RESUMO,
+            populate: POPULATE_LEAD_RESUMO,
+          })
+          .then((r) => ({ minimos: false as const, lista: r.docs.map(mapearLeadCrm) })),
     listarLinhaDoTempo({ clienteId: id }),
     payload.find({ collection: "eventos-comerciais", depth: 1, limit: 100, sort: "-dataInicio", where: { cliente: { equals: doc.id } } }),
     // Conta à parte dos negócios: uma proposta sobrevive à desvinculação de
@@ -722,10 +811,9 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
     payload.count({ collection: "propostas", where: { cliente: { equals: doc.id } } }),
   ]);
   const eventos = await mapearEventosComDocumentos(payload, eventosRes.docs);
-  const negociosMapeados = negocios.docs.map(mapearLeadCrm);
-  return {
+  const base: ClienteCrmDetalheBase = {
     ...mapearClienteResumo(doc, {
-      numNegocios: negociosMapeados.length,
+      numNegocios: negocios.lista.length,
       ultimoItemISO: linhaDoTempo[0]?.emISO ?? null,
     }),
     tipo: doc.tipo ?? null,
@@ -734,11 +822,13 @@ export async function obterClienteCrm(id: string): Promise<ClienteCrmDetalhe | n
     observacoes: doc.observacoes ?? null,
     responsavelId: idRel(doc.responsavel),
     contatos: mapearContatos(doc),
-    negocios: negociosMapeados,
     linhaDoTempo,
     eventos,
     numPropostas: propostas.totalDocs,
   };
+  return negocios.minimos
+    ? { ...base, negociosMinimos: true, negocios: negocios.lista }
+    : { ...base, negociosMinimos: false, negocios: negocios.lista };
 }
 
 /**

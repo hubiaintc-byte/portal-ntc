@@ -6,8 +6,8 @@ import { calcularValoresProposta, modulosDoPrograma, STATUS_PROPOSTA, TIPOS_PROP
 
 import type {
   CatalogoCrm,
-  ClienteCrmResumo,
-  LeadCrmResumo,
+  ClienteOpcao,
+  LeadOpcao,
   PropostaDetalhe,
   UsuarioCmsResumo,
 } from "@/lib/cms/painelCrm";
@@ -27,10 +27,10 @@ import {
 
 interface FormPropostaProps {
   inicial: PropostaDetalhe | null;
-  clientes: ClienteCrmResumo[];
+  clientes: ClienteOpcao[];
   catalogo: CatalogoCrm;
   usuarios: UsuarioCmsResumo[];
-  leads: LeadCrmResumo[];
+  leads: LeadOpcao[];
   onSalvo: () => void;
   onCancelar: () => void;
 }
