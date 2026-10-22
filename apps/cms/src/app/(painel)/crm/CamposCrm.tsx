@@ -142,14 +142,21 @@ interface CampoCheckProps {
   rotulo: string;
   marcado: boolean;
   onMudar: (v: boolean) => void;
+  desabilitado?: boolean;
 }
 
-export function CampoCheck({ rotulo, marcado, onMudar }: CampoCheckProps) {
+export function CampoCheck({ rotulo, marcado, onMudar, desabilitado }: CampoCheckProps) {
   const id = useId();
   return (
     <div className="pcms-field pcms-field--check">
       <label htmlFor={id}>
-        <input id={id} type="checkbox" checked={marcado} onChange={(e) => onMudar(e.target.checked)} />
+        <input
+          id={id}
+          type="checkbox"
+          checked={marcado}
+          disabled={desabilitado}
+          onChange={(e) => onMudar(e.target.checked)}
+        />
         {rotulo}
       </label>
     </div>

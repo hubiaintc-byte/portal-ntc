@@ -343,7 +343,8 @@ export async function carregarUsuarios(): Promise<UsuarioGestaoResumo[]> {
 export async function criarUsuarioCms(dados: {
   nome: string;
   email: string;
-  perfil: string;
+  administrador: boolean;
+  telas: TelaPainel[];
 }): Promise<{ resultado: ResultadoUsuarios; usuarios: UsuarioGestaoResumo[] }> {
   const usuario = await obterAdministrador();
   if (!usuario) {
@@ -357,14 +358,14 @@ export async function criarUsuarioCms(dados: {
 
 export async function editarUsuarioCms(
   id: string,
-  dados: { nome: string; perfil: string },
+  dados: { nome: string; administrador: boolean; telas: TelaPainel[] },
 ): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioGestaoResumo[] }> {
   const usuario = await obterAdministrador();
   if (!usuario) {
     return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
   }
   const p = await obterPayloadUsuarios();
-  const resultado = await editarUsuario(p, id, dados);
+  const resultado = await editarUsuario(p, id, dados, usuario.id);
   const usuarios = await listarUsuarios(p);
   return { resultado, usuarios };
 }

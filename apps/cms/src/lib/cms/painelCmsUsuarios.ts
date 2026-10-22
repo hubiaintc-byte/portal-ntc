@@ -5,9 +5,10 @@ import { randomInt } from "node:crypto";
 import { emailBoasVindasHtml } from "@/lib/emailsCms";
 
 import type { ResultadoEscrita } from "./painelCmsEscrita";
+import { acessoDoUsuario, type TelaPainel } from "./telas";
 
 /**
- * Gestão de usuários do Painel Admin (tela "Usuários", só super-admin).
+ * Gestão de usuários do Painel Admin (tela "Usuários", só administrador).
  * Núcleo testável recebe a superfície mínima mockável da Local API
  * (PayloadUsuarios) — mesmo padrão de casarOuCriarPalestrantes.ts.
  *
@@ -25,7 +26,8 @@ export interface UsuarioGestaoResumo {
   id: string;
   nome: string;
   email: string;
-  perfil: string;
+  administrador: boolean;
+  telas: TelaPainel[];
   atualizadoEm: string;
 }
 
@@ -37,20 +39,6 @@ export interface ResultadoUsuarios extends ResultadoEscrita {
   aviso?: string;
 }
 
-/**
- * Perfis válidos — espelho das options do campo `perfil` em
- * apps/cms/src/collections/Users.ts (fonte canônica; ao mudar lá, mudar aqui).
- */
-const PERFIS_VALIDOS = [
-  "super-admin",
-  "editor-institucional",
-  "editor-eventos",
-  "atendimento-comercial",
-] as const;
-
-const perfilValido = (perfil: string): boolean =>
-  (PERFIS_VALIDOS as readonly string[]).includes(perfil);
-
 /** Superfície mínima da Local API usada aqui — permite mock nos testes. */
 export interface PayloadUsuarios {
   find(args: {
@@ -60,7 +48,7 @@ export interface PayloadUsuarios {
     sort: string;
     overrideAccess: true;
   }): Promise<{
-    docs: { id: string | number; nome: string; email: string; perfil?: string | null; updatedAt: string }[];
+    docs: { id: string | number; nome: string; email: string; administrador?: boolean | null; telas?: string[] | null; updatedAt: string }[];
   }>;
   create(args: {
     collection: "users";
@@ -108,19 +96,19 @@ export async function listarUsuarios(p: PayloadUsuarios): Promise<UsuarioGestaoR
     id: String(u.id),
     nome: u.nome,
     email: u.email,
-    perfil: u.perfil ?? "",
+    administrador: acessoDoUsuario(u).administrador,
+    telas: [...acessoDoUsuario(u).telas],
     atualizadoEm: u.updatedAt,
   }));
 }
 
 export async function criarUsuario(
   p: PayloadUsuarios,
-  dados: { nome: string; email: string; perfil: string },
+  dados: { nome: string; email: string; administrador: boolean; telas: TelaPainel[] },
 ): Promise<ResultadoUsuarios> {
   if (dados.nome.trim() === "" || dados.email.trim() === "") {
     return { ok: false, erro: "Informe nome e e-mail." };
   }
-  if (!perfilValido(dados.perfil)) return { ok: false, erro: "Perfil inválido." };
 
   try {
     await p.create({
@@ -128,7 +116,8 @@ export async function criarUsuario(
       data: {
         nome: dados.nome.trim(),
         email: dados.email.trim(),
-        perfil: dados.perfil,
+        administrador: dados.administrador,
+        telas: acessoDoUsuario({ telas: dados.telas }).telas,
         password: gerarSenhaAleatoria(),
       },
       overrideAccess: true,
@@ -201,17 +190,22 @@ export async function reenviarConvite(p: PayloadUsuarios, id: string): Promise<R
   }
 }
 
+const MSG_ULTIMO_ADMIN = "Não é possível remover o último administrador.";
+
 export async function editarUsuario(
   p: PayloadUsuarios,
   id: string,
-  dados: { nome: string; perfil: string },
+  dados: { nome: string; administrador: boolean; telas: TelaPainel[] },
+  autorId: string,
 ): Promise<ResultadoEscrita> {
   if (dados.nome.trim() === "") return { ok: false, erro: "Informe o nome." };
-  if (!perfilValido(dados.perfil)) return { ok: false, erro: "Perfil inválido." };
+  if (!dados.administrador && id === autorId) {
+    return { ok: false, erro: "Você não pode tirar o seu próprio acesso de administrador." };
+  }
   try {
-    // Rebaixar o último super-admin deixaria o painel sem quem gerencie
+    // Desmarcar o último administrador deixaria o painel sem quem gerencie
     // usuários — mesma classe de lockout que a guarda de removerUsuario evita.
-    if (dados.perfil !== "super-admin") {
+    if (!dados.administrador) {
       const todos = await p.find({
         collection: "users",
         limit: 200,
@@ -220,17 +214,19 @@ export async function editarUsuario(
         overrideAccess: true,
       });
       const alvo = todos.docs.find((u) => String(u.id) === id);
-      if (alvo?.perfil === "super-admin") {
-        const superAdmins = todos.docs.filter((u) => u.perfil === "super-admin");
-        if (superAdmins.length <= 1) {
-          return { ok: false, erro: "Não é possível rebaixar o último super-administrador." };
-        }
+      if (alvo && acessoDoUsuario(alvo).administrador) {
+        const administradores = todos.docs.filter((u) => acessoDoUsuario(u).administrador);
+        if (administradores.length <= 1) return { ok: false, erro: MSG_ULTIMO_ADMIN };
       }
     }
     await p.update({
       collection: "users",
       id,
-      data: { nome: dados.nome.trim(), perfil: dados.perfil },
+      data: {
+        nome: dados.nome.trim(),
+        administrador: dados.administrador,
+        telas: acessoDoUsuario({ telas: dados.telas }).telas,
+      },
       overrideAccess: true,
     });
     return { ok: true };
@@ -243,9 +239,9 @@ export async function editarUsuario(
 export async function removerUsuario(
   p: PayloadUsuarios,
   id: string,
-  idSolicitante: string,
+  autorId: string,
 ): Promise<ResultadoEscrita> {
-  if (id === idSolicitante) {
+  if (id === autorId) {
     return { ok: false, erro: "Você não pode remover a si mesmo." };
   }
   try {
@@ -257,11 +253,9 @@ export async function removerUsuario(
       overrideAccess: true,
     });
     const alvo = todos.docs.find((u) => String(u.id) === id);
-    if (alvo?.perfil === "super-admin") {
-      const superAdmins = todos.docs.filter((u) => u.perfil === "super-admin");
-      if (superAdmins.length <= 1) {
-        return { ok: false, erro: "Não é possível remover o último super-administrador." };
-      }
+    if (alvo && acessoDoUsuario(alvo).administrador) {
+      const administradores = todos.docs.filter((u) => acessoDoUsuario(u).administrador);
+      if (administradores.length <= 1) return { ok: false, erro: MSG_ULTIMO_ADMIN };
     }
     await p.delete({ collection: "users", id, overrideAccess: true });
     return { ok: true };

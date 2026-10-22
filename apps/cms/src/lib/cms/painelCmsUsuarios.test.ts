@@ -12,7 +12,7 @@ import {
 } from "./painelCmsUsuarios";
 
 function mockPayload(
-  usuarios: { id: string | number; nome: string; email: string; perfil: string; updatedAt: string }[],
+  usuarios: { id: string | number; nome: string; email: string; administrador?: boolean; telas?: string[]; updatedAt: string }[],
 ): PayloadUsuarios & {
   find: ReturnType<typeof vi.fn>;
   create: ReturnType<typeof vi.fn>;
@@ -48,17 +48,17 @@ describe("gerarSenhaAleatoria", () => {
 describe("listarUsuarios", () => {
   it("mapeia os docs do Payload para o resumo", async () => {
     const payload = mockPayload([
-      { id: 1, nome: "Ana", email: "ana@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 1, nome: "Ana", email: "ana@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
     ]);
     const r: UsuarioGestaoResumo[] = await listarUsuarios(payload);
     expect(r).toEqual([
-      { id: "1", nome: "Ana", email: "ana@ntc.org", perfil: "super-admin", atualizadoEm: "2026-07-01T00:00:00.000Z" },
+      { id: "1", nome: "Ana", email: "ana@ntc.org", administrador: true, telas: [], atualizadoEm: "2026-07-01T00:00:00.000Z" },
     ]);
   });
 });
 
 describe("criarUsuario", () => {
-  const dados = { nome: "Bruno", email: "bruno@ntc.org", perfil: "editor-institucional" };
+  const dados = { nome: "Bruno", email: "bruno@ntc.org", administrador: false, telas: ["site.eventos" as const, "crm.leads" as const] };
 
   it("cria com senha aleatória, dispara forgotPassword e envia e-mail com o token", async () => {
     const payload = mockPayload([]);
@@ -69,7 +69,9 @@ describe("criarUsuario", () => {
     const dataCriada = payload.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
     expect(dataCriada.nome).toBe("Bruno");
     expect(dataCriada.email).toBe("bruno@ntc.org");
-    expect(dataCriada.perfil).toBe("editor-institucional");
+    expect(dataCriada.administrador).toBe(false);
+    expect(dataCriada.telas).toEqual(["site.eventos", "crm.leads"]);
+    expect(dataCriada).not.toHaveProperty("perfil");
     expect(typeof dataCriada.password).toBe("string");
     expect((dataCriada.password as string).length).toBe(24);
 
@@ -111,74 +113,65 @@ describe("criarUsuario", () => {
     expect(r).toEqual({ ok: true });
   });
 
-  it("perfil inválido é recusado antes de tocar o Payload", async () => {
+  it("telas desconhecidas são descartadas", async () => {
     const payload = mockPayload([]);
-    const r = await criarUsuario(payload, { ...dados, perfil: "hacker" });
-    expect(r).toEqual({ ok: false, erro: "Perfil inválido." });
-    expect(payload.create).not.toHaveBeenCalled();
+    await criarUsuario(payload, { ...dados, telas: ["crm.leads", "x" as never] });
+    const data = payload.create.mock.calls[0]?.[0]?.data as Record<string, unknown>;
+    expect(data.telas).toEqual(["crm.leads"]);
   });
 });
 
 describe("editarUsuario", () => {
-  it("atualiza nome e perfil", async () => {
+  const A = { id: 2, nome: "A", email: "a@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" };
+  const B = { id: 3, nome: "B", email: "b@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" };
+
+  it("atualiza nome, administrador e telas (sem perfil)", async () => {
     const payload = mockPayload([
-      { id: 5, nome: "Carla", email: "c@ntc.org", perfil: "editor-institucional", updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 5, nome: "Carla", email: "c@ntc.org", administrador: false, telas: [], updatedAt: "2026-07-01T00:00:00.000Z" },
+      A,
     ]);
-    const r = await editarUsuario(payload, "5", { nome: "Carla", perfil: "editor-eventos" });
+    const r = await editarUsuario(payload, "5", { nome: "Carla", administrador: false, telas: ["crm.leads", "x" as never] }, "2");
     expect(r.ok).toBe(true);
     expect(payload.update).toHaveBeenCalledWith({
       collection: "users",
       id: "5",
-      data: { nome: "Carla", perfil: "editor-eventos" },
+      data: { nome: "Carla", administrador: false, telas: ["crm.leads"] },
       overrideAccess: true,
     });
   });
 
-  it("perfil inválido é recusado antes de tocar o Payload", async () => {
-    const payload = mockPayload([]);
-    const r = await editarUsuario(payload, "5", { nome: "Carla", perfil: "root" });
-    expect(r).toEqual({ ok: false, erro: "Perfil inválido." });
+  it("recusa desmarcar o próprio administrador", async () => {
+    const payload = mockPayload([A, B]);
+    const r = await editarUsuario(payload, "2", { nome: "A", administrador: false, telas: [] }, "2");
+    expect(r).toEqual({ ok: false, erro: "Você não pode tirar o seu próprio acesso de administrador." });
     expect(payload.update).not.toHaveBeenCalled();
   });
 
-  it("bloqueia rebaixar o último super-admin", async () => {
-    const payload = mockPayload([
-      { id: 2, nome: "Único", email: "unico@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
-    ]);
-    const r = await editarUsuario(payload, "2", { nome: "Único", perfil: "editor-eventos" });
-    expect(r).toEqual({ ok: false, erro: "Não é possível rebaixar o último super-administrador." });
+  it("recusa desmarcar o único administrador", async () => {
+    const payload = mockPayload([A]);
+    const r = await editarUsuario(payload, "2", { nome: "A", administrador: false, telas: [] }, "9");
+    expect(r).toEqual({ ok: false, erro: "Não é possível remover o último administrador." });
     expect(payload.update).not.toHaveBeenCalled();
   });
 
-  it("rebaixa super-admin quando há outro", async () => {
-    const payload = mockPayload([
-      { id: 2, nome: "A", email: "a@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
-      { id: 3, nome: "B", email: "b@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
-    ]);
-    const r = await editarUsuario(payload, "2", { nome: "A", perfil: "editor-eventos" });
-    expect(r.ok).toBe(true);
-    expect(payload.update).toHaveBeenCalledWith({
-      collection: "users",
-      id: "2",
-      data: { nome: "A", perfil: "editor-eventos" },
-      overrideAccess: true,
-    });
-  });
-
-  it("manter o último super-admin como super-admin segue permitido", async () => {
-    const payload = mockPayload([
-      { id: 2, nome: "Único", email: "unico@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
-    ]);
-    const r = await editarUsuario(payload, "2", { nome: "Renomeado", perfil: "super-admin" });
+  it("com dois administradores, desmarcar um funciona", async () => {
+    const payload = mockPayload([A, B]);
+    const r = await editarUsuario(payload, "2", { nome: "A", administrador: false, telas: ["site.eventos"] }, "3");
     expect(r.ok).toBe(true);
     expect(payload.update).toHaveBeenCalled();
+  });
+
+  it("manter o único administrador como administrador segue permitido", async () => {
+    const payload = mockPayload([A]);
+    const r = await editarUsuario(payload, "2", { nome: "Renomeado", administrador: true, telas: [] }, "2");
+    expect(r.ok).toBe(true);
   });
 });
 
 describe("reenviarConvite", () => {
   it("dispara forgotPassword e envia e-mail com o token para o usuário alvo", async () => {
     const payload = mockPayload([
-      { id: 7, nome: "Dora", email: "dora@ntc.org", perfil: "editor-eventos", updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 7, nome: "Dora", email: "dora@ntc.org", administrador: false, telas: ["site.eventos"], updatedAt: "2026-07-01T00:00:00.000Z" },
     ]);
     const r = await reenviarConvite(payload, "7");
     expect(r).toEqual({ ok: true });
@@ -201,7 +194,7 @@ describe("reenviarConvite", () => {
 
   it("falha no envio retorna erro sem lançar", async () => {
     const payload = mockPayload([
-      { id: 7, nome: "Dora", email: "dora@ntc.org", perfil: "editor-eventos", updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 7, nome: "Dora", email: "dora@ntc.org", administrador: false, telas: ["site.eventos"], updatedAt: "2026-07-01T00:00:00.000Z" },
     ]);
     payload.sendEmail.mockRejectedValue(new Error("Resend fora do ar"));
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -222,17 +215,17 @@ describe("removerUsuario", () => {
 
   it("bloqueia remover o último super-admin", async () => {
     const payload = mockPayload([
-      { id: 2, nome: "Único", email: "unico@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 2, nome: "Único", email: "unico@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
     ]);
     const r = await removerUsuario(payload, "2", "1");
-    expect(r).toEqual({ ok: false, erro: "Não é possível remover o último super-administrador." });
+    expect(r).toEqual({ ok: false, erro: "Não é possível remover o último administrador." });
     expect(payload.delete).not.toHaveBeenCalled();
   });
 
   it("remove quando há outro super-admin", async () => {
     const payload = mockPayload([
-      { id: 2, nome: "A", email: "a@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
-      { id: 3, nome: "B", email: "b@ntc.org", perfil: "super-admin", updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 2, nome: "A", email: "a@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 3, nome: "B", email: "b@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
     ]);
     const r = await removerUsuario(payload, "2", "1");
     expect(r.ok).toBe(true);
@@ -241,7 +234,7 @@ describe("removerUsuario", () => {
 
   it("remove normalmente um perfil não super-admin", async () => {
     const payload = mockPayload([
-      { id: 2, nome: "A", email: "a@ntc.org", perfil: "editor-institucional", updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 2, nome: "A", email: "a@ntc.org", administrador: false, telas: ["site.eventos"], updatedAt: "2026-07-01T00:00:00.000Z" },
     ]);
     const r = await removerUsuario(payload, "2", "1");
     expect(r.ok).toBe(true);
