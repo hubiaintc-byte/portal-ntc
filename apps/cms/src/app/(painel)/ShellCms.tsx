@@ -53,7 +53,7 @@ interface ShellCmsProps {
   usuario: { nome: string; email: string; perfil: string; id: string };
   /**
    * O que este usuário pode escrever, calculado no servidor (page.tsx) por
-   * `capacidadesDoPerfil`. Só decide quais controles aparecem — a guarda de
+   * `capacidadesDoAcesso`. Só decide quais controles aparecem — a guarda de
    * cada Server Action continua sendo a barreira real.
    */
   capacidades: CapacidadesPainel;

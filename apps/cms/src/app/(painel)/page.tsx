@@ -1,5 +1,5 @@
 import { exigirUsuarioCms } from "@/lib/cms/autenticacao";
-import { capacidadesDoPerfil } from "@/lib/cms/perfis";
+import { acessoDoPerfilLegado, capacidadesDoAcesso } from "@/lib/cms/telas";
 import {
   listarConteudosCms,
   listarEventosCms,
@@ -51,7 +51,7 @@ export default async function PainelPage() {
 
   // O que a interface deixa este perfil fazer — calculado aqui, no servidor,
   // com as mesmas regras das Server Actions (que seguem sendo a barreira real).
-  const capacidades = capacidadesDoPerfil(usuario.perfil);
+  const capacidades = capacidadesDoAcesso(acessoDoPerfilLegado(usuario.perfil));
 
   return (
     <ShellCms

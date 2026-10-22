@@ -1,5 +1,6 @@
 import { exigirPerfil } from "@/lib/cms/autenticacao";
-import { PERFIS_CATALOGO, capacidadesDoPerfil } from "@/lib/cms/perfis";
+import { PERFIS_CATALOGO, PERFIS_CRM, temPerfil } from "@/lib/cms/perfis";
+import { acessoDoPerfilLegado, capacidadesDoAcesso } from "@/lib/cms/telas";
 import {
   listarClientesCrm,
   listarLeadsCrm,
@@ -42,8 +43,10 @@ export default async function PainelCrmPage() {
   const usuario = await exigirPerfil(PERFIS_CATALOGO);
   // O que a interface deixa este perfil fazer — mesmas regras das Server
   // Actions, que seguem sendo a barreira real.
-  const capacidades = capacidadesDoPerfil(usuario.perfil);
-  const acessoCrm = capacidades.usarCrm;
+  const capacidades = capacidadesDoAcesso(acessoDoPerfilLegado(usuario.perfil));
+  // Transitório (Task 3): `usarCrm` por tela inclui o editor-institucional (tem telas crm.*
+  // do catálogo); aqui o gate de dados comerciais segue o perfil legado.
+  const acessoCrm = temPerfil(usuario.perfil, PERFIS_CRM);
 
   let clientes: ClienteCrmResumo[] = [];
   let leads: LeadCrmResumo[] = [];

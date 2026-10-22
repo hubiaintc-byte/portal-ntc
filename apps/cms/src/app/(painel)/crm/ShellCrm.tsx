@@ -58,7 +58,7 @@ interface ShellCrmProps {
   acessoCrm: boolean;
   /**
    * O que este usuário pode escrever, calculado no servidor (crm/page.tsx) por
-   * `capacidadesDoPerfil`. Só decide quais controles aparecem — a guarda de
+   * `capacidadesDoAcesso`. Só decide quais controles aparecem — a guarda de
    * cada Server Action continua sendo a barreira real.
    */
   capacidades: CapacidadesPainel;
