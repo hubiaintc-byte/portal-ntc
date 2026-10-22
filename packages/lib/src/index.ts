@@ -122,6 +122,7 @@ export {
   STATUS_EVENTO,
   eventoCorrente,
   acoesDeEvento,
+  acoesDoAcervo,
   estagioDaAcaoEvento,
   urlValida,
 } from "./crm/eventos";

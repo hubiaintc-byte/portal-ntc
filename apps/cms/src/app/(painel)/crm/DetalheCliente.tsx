@@ -26,6 +26,8 @@ interface DetalheClienteProps {
   onNota: (texto: string) => Promise<string | null>;
   onAtualizado: () => void;
   onApagado: () => void;
+  /** `capacidades.acompanharEventos` (servidor): ações de acompanhamento no acervo de eventos. */
+  podeAcompanharEventos: boolean;
 }
 
 const FMT = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
@@ -54,6 +56,7 @@ export function DetalheCliente({
   onNota,
   onAtualizado,
   onApagado,
+  podeAcompanharEventos,
 }: DetalheClienteProps) {
   const [apagando, setApagando] = useState(false);
   const [enviando, iniciar] = useTransition();
@@ -253,7 +256,12 @@ export function DetalheCliente({
 
           <section className="pcms-det-bloco">
             <h2>Eventos</h2>
-            <EventosDoCliente eventos={c.eventos} onAbrirLead={onAbrirLead} onAtualizado={onAtualizado} />
+            <EventosDoCliente
+              eventos={c.eventos}
+              onAbrirLead={onAbrirLead}
+              podeAcompanhar={podeAcompanharEventos}
+              onAtualizado={onAtualizado}
+            />
           </section>
         </div>
 

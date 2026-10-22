@@ -33,6 +33,18 @@ export function acoesDeEvento(lead: LeadParaAcoes, corrente: EventoParaAcoes | n
   return ["registrar-contrato", "links", "realizado", "cancelar"];
 }
 
+/**
+ * Ações de acompanhamento de um evento no acervo do cliente (spec de
+ * permissões §3.8): as mesmas da aba Ações para um evento agendado, menos
+ * "agendar" — agendar nasce de um lead e fica no modal.
+ */
+export function acoesDoAcervo(status: string): AcaoEvento[] {
+  if (status !== "agendado") return [];
+  return acoesDeEvento({ perdido: false }, {
+    id: "", status: "agendado", dataInicioISO: "", temContrato: false, numLinks: 0,
+  }).filter((a) => a !== "agendar");
+}
+
 export function estagioDaAcaoEvento(acao: AcaoEvento): EstagioLead | null {
   switch (acao) {
     case "agendar": return "evento-agendado";

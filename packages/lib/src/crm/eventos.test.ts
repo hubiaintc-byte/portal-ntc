@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { acoesDeEvento, estagioDaAcaoEvento, eventoCorrente, urlValida, type EventoParaAcoes } from "./eventos";
+import { acoesDeEvento, acoesDoAcervo, estagioDaAcaoEvento, eventoCorrente, urlValida, type EventoParaAcoes } from "./eventos";
 
 const ag: EventoParaAcoes = { id: "1", status: "agendado", dataInicioISO: "2026-10-01", temContrato: false, numLinks: 0 };
 const re: EventoParaAcoes = { id: "2", status: "realizado", dataInicioISO: "2026-08-01", temContrato: true, numLinks: 2 };
@@ -42,5 +42,15 @@ describe("urlValida", () => {
     expect(urlValida("javascript:alert(1)")).toBe(false);
     expect(urlValida("inscricao.exemplo.com")).toBe(false);
     expect(urlValida("")).toBe(false);
+  });
+});
+
+describe("acoesDoAcervo", () => {
+  it("evento agendado: contrato, links, realizado, cancelar — sem agendar", () =>
+    expect(acoesDoAcervo("agendado")).toEqual(["registrar-contrato", "links", "realizado", "cancelar"]));
+  it("realizado, cancelado ou desconhecido: nada", () => {
+    expect(acoesDoAcervo("realizado")).toEqual([]);
+    expect(acoesDoAcervo("cancelado")).toEqual([]);
+    expect(acoesDoAcervo("outro")).toEqual([]);
   });
 });

@@ -399,6 +399,7 @@ export function ShellCrm({
             return r.ok ? null : (r.erro ?? "Erro.");
           }}
           onAtualizado={() => abrirCliente(clienteDet.id)}
+          podeAcompanharEventos={capacidades.acompanharEventos}
           onApagado={() => {
             fecharTudo();
             setTela("clientes");

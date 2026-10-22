@@ -94,6 +94,8 @@ export interface CapacidadesPainel {
   editarCatalogo: boolean;
   usarCrm: boolean;
   verLeads: boolean;
+  /** Contrato/empenho, links, realizado e cancelar no acervo de eventos do cliente (§3.8). */
+  acompanharEventos: boolean;
   gerirUsuarios: boolean;
 }
 
@@ -111,6 +113,7 @@ export function capacidadesDoAcesso(acesso: AcessoPainel): CapacidadesPainel {
     editarCatalogo: temTela(acesso, ["crm.programas", "crm.modulos"]),
     usarCrm: temTela(acesso, TELAS_CRM),
     verLeads: temTela(acesso, TELAS_LEADS),
+    acompanharEventos: temTela(acesso, [...TELAS_LEADS, "crm.clientes"]),
     gerirUsuarios: acesso.administrador,
   };
 }

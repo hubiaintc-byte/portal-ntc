@@ -70,6 +70,12 @@ describe("capacidadesDoAcesso", () => {
     ).toMatchObject({ editarCardCorpoDocente: true });
   });
 
+  it("acompanhar eventos no acervo do cliente: Clientes, Dashboard ou Leads", () => {
+    expect(capacidadesDoAcesso({ administrador: false, telas: ["crm.clientes"] }).acompanharEventos).toBe(true);
+    expect(capacidadesDoAcesso({ administrador: false, telas: ["crm.leads"] }).acompanharEventos).toBe(true);
+    expect(capacidadesDoAcesso({ administrador: false, telas: ["crm.propostas"] }).acompanharEventos).toBe(false);
+  });
+
   it("administrador pode tudo", () => {
     expect(Object.values(capacidadesDoAcesso({ administrador: true, telas: [] })).every(Boolean)).toBe(true);
   });
