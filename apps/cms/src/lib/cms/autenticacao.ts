@@ -7,6 +7,7 @@ import type { TypedUser } from "payload";
 import { obterPayload } from "@/lib/payloadClient";
 
 import { temPerfil, type PerfilPainel } from "./perfis";
+import { acessoDoUsuario, temTela, type AcessoPainel, type TelaPainel } from "./telas";
 
 /**
  * Sessão do Painel Admin — validada contra o JWT do Payload (collection
@@ -27,6 +28,7 @@ export interface UsuarioCms {
   nome: string;
   email: string;
   perfil: string;
+  acesso: AcessoPainel;
 }
 
 /**
@@ -66,6 +68,7 @@ function resumirUsuario(usuario: UsuarioAutenticado): UsuarioCms {
     // auth); na collection users o campo é obrigatório.
     email: usuario.email ?? "",
     perfil: usuario.perfil ?? "",
+    acesso: acessoDoUsuario(usuario),
   };
 }
 
@@ -109,5 +112,48 @@ export async function obterUsuarioAutenticadoComPerfil(
 export async function exigirPerfil(permitidos: readonly PerfilPainel[]): Promise<UsuarioCms> {
   const usuario = await exigirUsuarioCms();
   if (!temPerfil(usuario.perfil, permitidos)) redirect("/");
+  return usuario;
+}
+
+/**
+ * Sessão com acesso a ao menos uma das telas (administrador sempre passa):
+ * `null` sem sessão ou sem tela. É a guarda das Server Actions.
+ */
+export async function obterUsuarioCmsComTela(telas: readonly TelaPainel[]): Promise<UsuarioCms | null> {
+  const usuario = await obterUsuarioCms();
+  return usuario && temTela(usuario.acesso, telas) ? usuario : null;
+}
+
+/** Como `obterUsuarioCmsComTela`, devolvendo o usuário cru (para `user:` da Local API). */
+export async function obterUsuarioAutenticadoComTela(
+  telas: readonly TelaPainel[],
+): Promise<UsuarioAutenticado | null> {
+  const usuario = await obterUsuarioAutenticado();
+  return usuario && temTela(acessoDoUsuario(usuario), telas) ? usuario : null;
+}
+
+/** Sessão de administrador, ou `null`. */
+export async function obterAdministrador(): Promise<UsuarioCms | null> {
+  const usuario = await obterUsuarioCms();
+  return usuario?.acesso.administrador ? usuario : null;
+}
+
+/** Como `obterAdministrador`, devolvendo o usuário cru. */
+export async function obterAdministradorAutenticado(): Promise<UsuarioAutenticado | null> {
+  const usuario = await obterUsuarioAutenticado();
+  return usuario && acessoDoUsuario(usuario).administrador ? usuario : null;
+}
+
+/** Guarda de página por tela: sem sessão vai a /entrar; sem tela, a "/". */
+export async function exigirTela(telas: readonly TelaPainel[]): Promise<UsuarioCms> {
+  const usuario = await exigirUsuarioCms();
+  if (!temTela(usuario.acesso, telas)) redirect("/");
+  return usuario;
+}
+
+/** Guarda de página de administrador (substitui `exigirSuperAdmin`): sem sessão ou sem permissão, "/". */
+export async function exigirAdministrador(): Promise<UsuarioCms> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario || !usuario.acesso.administrador) redirect("/");
   return usuario;
 }
