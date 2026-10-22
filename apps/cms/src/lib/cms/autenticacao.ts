@@ -65,7 +65,7 @@ function resumirUsuario(usuario: UsuarioAutenticado): UsuarioCms {
     // payload.auth() alarga email para string|undefined (união de coleções
     // auth); na collection users o campo é obrigatório.
     email: usuario.email ?? "",
-    perfil: usuario.perfil,
+    perfil: usuario.perfil ?? "",
   };
 }
 

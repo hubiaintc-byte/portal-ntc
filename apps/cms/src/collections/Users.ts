@@ -1,9 +1,13 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, FieldAccess } from "payload";
 
 import { authenticated } from "../access/authenticated";
 import { superAdmin, superAdminField } from "../access/superAdmin";
 import { recusarLoginForaDoPainel } from "../lib/cms/loginSoPeloPainel";
 import { emailRecuperacaoHtml } from "../lib/emailsCms";
+import { TELAS } from "../lib/cms/telas";
+
+const soAdministrador: FieldAccess = ({ req }) =>
+  Boolean((req.user as { administrador?: boolean } | null | undefined)?.administrador);
 
 /**
  * Coleção Users — auth nativa do Payload, com perfis administrativos
@@ -76,7 +80,8 @@ export const Users: CollectionConfig = {
       name: "perfil",
       label: "Perfil administrativo",
       type: "select",
-      required: true,
+      // Legado: substituído por `administrador`/`telas`. Some na etapa 2.
+      required: false,
       defaultValue: "editor-institucional",
       options: [
         { label: "Super-administrador", value: "super-admin" },
@@ -89,9 +94,27 @@ export const Users: CollectionConfig = {
         update: superAdminField,
       },
       admin: {
+        hidden: true,
         description:
           "Define o escopo de acesso ao admin (DAB §10.1). Apenas super-administradores podem alterar.",
       },
+    },
+    {
+      name: "administrador",
+      label: "Administrador",
+      type: "checkbox",
+      defaultValue: false,
+      access: { create: soAdministrador, update: soAdministrador },
+      admin: { description: "Acesso total ao painel, inclusive gestão de usuários." },
+    },
+    {
+      name: "telas",
+      label: "Telas",
+      type: "select",
+      hasMany: true,
+      options: TELAS.map((t) => ({ label: t.rotulo, value: t.id })),
+      access: { create: soAdministrador, update: soAdministrador },
+      admin: { description: "Telas do painel que esta pessoa pode usar." },
     },
   ],
 };

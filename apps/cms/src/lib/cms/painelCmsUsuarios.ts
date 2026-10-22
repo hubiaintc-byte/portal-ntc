@@ -60,7 +60,7 @@ export interface PayloadUsuarios {
     sort: string;
     overrideAccess: true;
   }): Promise<{
-    docs: { id: string | number; nome: string; email: string; perfil: string; updatedAt: string }[];
+    docs: { id: string | number; nome: string; email: string; perfil?: string | null; updatedAt: string }[];
   }>;
   create(args: {
     collection: "users";
@@ -108,7 +108,7 @@ export async function listarUsuarios(p: PayloadUsuarios): Promise<UsuarioGestaoR
     id: String(u.id),
     nome: u.nome,
     email: u.email,
-    perfil: u.perfil,
+    perfil: u.perfil ?? "",
     atualizadoEm: u.updatedAt,
   }));
 }
