@@ -211,8 +211,8 @@ export function ShellCms({
   const [erroCorpo, setErroCorpo] = useState<string | null>(null);
   const [carregandoCorpo, iniciarCargaCorpo] = useTransition();
 
-  function abrirCorpoDocente() {
-    setErroCorpo(null);
+  /** Só a transição de leitura dos cards — sem setState síncrono, cabe no efeito de montagem. */
+  function lerCardsCorpo() {
     iniciarCargaCorpo(async () => {
       try {
         setCardsCorpo(await carregarCorpoDocente());
@@ -222,6 +222,11 @@ export function ShellCms({
     });
   }
 
+  function abrirCorpoDocente() {
+    setErroCorpo(null);
+    lerCardsCorpo();
+  }
+
   // Quem começa no Corpo Docente (única tela do Site, por exemplo) não passa
   // por `irPara`: a primeira carga dos cards sai daqui, uma vez só.
   const cargaInicialFeita = useRef(false);
@@ -229,13 +234,7 @@ export function ShellCms({
     if (cargaInicialFeita.current) return;
     cargaInicialFeita.current = true;
     if (tela !== "corpo-docente") return;
-    iniciarCargaCorpo(async () => {
-      try {
-        setCardsCorpo(await carregarCorpoDocente());
-      } catch {
-        setErroCorpo("Não foi possível carregar o Corpo Docente. Recarregue a página.");
-      }
-    });
+    lerCardsCorpo();
   }, [tela]);
 
   function novoEvento() {
