@@ -19,7 +19,7 @@ import { acessoDoUsuario, type TelaPainel } from "./telas";
  * RESEND_API_KEY, o adapter de e-mail do Payload loga no console
  * (CLAUDE.md §19.2/19.3) — aqui replicamos a mesma degradação: falha só
  * no envio não desfaz a criação do usuário (ele já existe; o
- * super-admin pode reenviar depois via "esqueci a senha").
+ * administrador pode reenviar depois pelo "Reenviar convite").
  */
 
 export interface UsuarioGestaoResumo {

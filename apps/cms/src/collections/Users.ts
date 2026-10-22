@@ -9,10 +9,9 @@ import { TELAS } from "../lib/cms/telas";
  * Coleção Users — auth nativa do Payload, com permissões por tela
  * (`administrador` + `telas`, escolhidas por pessoa; DAB §10.1).
  *
- * Apenas administradores podem criar/atualizar/deletar outros usuários.
- * Demais autenticados podem ler (para fins de exibição de "criado por",
- * dropdowns de responsável em Leads etc.) e atualizar o próprio
- * registro (alteração de senha, e-mail).
+ * Apenas administradores criam/removem usuários e marcam `administrador`/
+ * `telas`. Cada pessoa lê e atualiza só o próprio registro (nome, senha);
+ * os selects de responsável do painel leem pela Local API, não pela REST.
  *
  * 2FA (TOTP) é pendência da Janela C — CLAUDE.md §17. Até lá, a única
  * defesa de credenciais é senha forte + JWT do Payload com expiração.

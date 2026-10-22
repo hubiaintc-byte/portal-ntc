@@ -27,7 +27,7 @@ import { ESFERA_INSTITUCIONAL, LEAD_TIPO } from "../shared/types";
  * e por isso não passa por esta regra. O `create` via REST (`POST /api/leads`)
  * ficava público até a Sessão 1 do kanban; com os campos do CRM (`cliente`,
  * `estagio`, `valorEstimado`…) e os hooks de casamento/linha do tempo agora
- * alcançáveis pelo create, ele passou a ser restrito aos perfis do CRM —
+ * alcançáveis pelo create, ele passou a exigir as telas Dashboard/Leads —
  * um anônimo não pode mais escrever na linha do tempo de um cliente qualquer
  * nem criar clientes em massa sem captcha/rate limit.
  */

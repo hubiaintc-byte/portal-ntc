@@ -483,7 +483,7 @@ export function TelaConfiguracoes({ usuario, mostrarContatos }: TelaConfiguracoe
           <div className="pcms-toggle-row">
             <span>
               Autenticação em duas etapas (2FA)
-              <small>TOTP obrigatório para super-admins</small>
+              <small>TOTP obrigatório para administradores</small>
             </span>
             <span className="pcms-switch pcms-switch--on" aria-hidden="true" />
           </div>

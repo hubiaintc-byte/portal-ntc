@@ -469,7 +469,7 @@ function idsDeRelacoes(rels: unknown[] | null | undefined): string[] {
 }
 
 // ============================================================
-// Leads — só contagens (o painel do Site é aberto a todos os perfis)
+// Leads — só contagens (o Painel do Site não depende da tela Leads)
 // ============================================================
 
 export interface ResumoLeadsCms {

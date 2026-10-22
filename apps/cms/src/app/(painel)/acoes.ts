@@ -82,8 +82,8 @@ const TELAS_LEITURA_PALESTRANTE: readonly TelaPainel[] = ["site.palestrantes", "
 const ERRO_SESSAO = "Sessão expirada. Entre novamente.";
 
 const RECUSADO: ResultadoEscrita = { ok: false, erro: ERRO_SESSAO };
-/** Escritas que também exigem tela (a Local API ignora o `access` das coleções). */
-const RECUSADO_PERFIL: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
+/** Recusa por tela (a Local API ignora o `access` das coleções). */
+const RECUSADO_TELA: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
 
 /**
  * Leituras do detalhe também exigem a tela de onde são abertas (spec §5):
@@ -105,7 +105,7 @@ export async function salvarEvento(
   id: string,
   campos: CamposEventoCompletos,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
   const resultado = await salvarCamposEvento(id, campos);
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
@@ -121,7 +121,7 @@ export async function enviarMidia(
   campo: "imagemCapa" | "folderPdf",
   formData: FormData,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
     return { resultado: { ok: false, erro: "Nenhum arquivo selecionado." }, evento: null };
@@ -137,7 +137,7 @@ export async function alternarPublicacaoEvento(
   id: string,
   publicar: boolean,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
   const resultado = publicar ? await publicarEvento(id) : await despublicarEvento(id);
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
@@ -149,7 +149,7 @@ export async function salvarPalestrantesEvento(
   id: string,
   idsEspecialistas: string[],
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
   const resultado = await vincularPalestrantesEvento(id, idsEspecialistas);
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
@@ -162,7 +162,7 @@ export async function salvarPalestrantesEvento(
  * a porta do PDF + revisão no detalhe.
  */
 export async function importarEventoPdf(formData: FormData): Promise<ResultadoImportacao> {
-  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return RECUSADO_PERFIL;
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return RECUSADO_TELA;
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
     return { ok: false, erro: "Nenhum arquivo selecionado." };
@@ -177,7 +177,7 @@ export async function importarEventoPdf(formData: FormData): Promise<ResultadoIm
 
 /** Cria um evento em branco (rascunho) para o editor preencher no detalhe. */
 export async function criarEventoEmBranco(): Promise<ResultadoEscrita & { id?: string }> {
-  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return RECUSADO_PERFIL;
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return RECUSADO_TELA;
   const resultado = await criarEventoEmBrancoCms();
   if (resultado.ok) revalidatePath("/");
   return resultado;
@@ -185,7 +185,7 @@ export async function criarEventoEmBranco(): Promise<ResultadoEscrita & { id?: s
 
 /** Salva os eventos em destaque na Home. */
 export async function salvarEventosDestaqueHome(idsEventos: string[]): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCmsComTela(TELAS_HOME))) return RECUSADO_PERFIL;
+  if (!(await obterUsuarioCmsComTela(TELAS_HOME))) return RECUSADO_TELA;
   const resultado = await salvarEventosHome(idsEventos);
   if (resultado.ok) revalidatePath("/");
   return resultado;
@@ -199,7 +199,7 @@ export async function alternarOcultarPalestrante(
   id: string,
   oculto: boolean,
 ): Promise<{ resultado: ResultadoEscrita; palestrante: PalestranteCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComTela(TELAS_PALESTRANTES))) return { resultado: RECUSADO_PERFIL, palestrante: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_PALESTRANTES))) return { resultado: RECUSADO_TELA, palestrante: null };
   const resultado = await definirOcultarPalestrante(id, oculto);
   if (resultado.ok) revalidatePath("/");
   const palestrante = resultado.ok ? await obterPalestranteCms(id) : null;
@@ -224,7 +224,7 @@ export async function salvarPalestrante(
 ): Promise<{ resultado: ResultadoEscrita; palestrante: PalestranteCmsDetalhe | null }> {
   // O usuário cru vai para `executarEmTransacao` (vira `req.user`).
   const usuario = await obterUsuarioAutenticadoComTela(TELAS_PALESTRANTES);
-  if (!usuario) return { resultado: RECUSADO_PERFIL, palestrante: null };
+  if (!usuario) return { resultado: RECUSADO_TELA, palestrante: null };
 
   const idBruto = formData.get("id");
   const idTexto = typeof idBruto === "string" && idBruto.trim() !== "" ? idBruto.trim() : null;
@@ -245,7 +245,7 @@ export async function salvarPalestrante(
   // (spec §7): `corpoDocente` presente (inclusive null = remover) = o bloco
   // veio; ausente = não mexer no card.
   if (bruto.corpoDocente !== undefined && !temTela(acessoDoUsuario(usuario), TELAS_CORPO_DOCENTE)) {
-    return { resultado: RECUSADO_PERFIL, palestrante: null };
+    return { resultado: RECUSADO_TELA, palestrante: null };
   }
   const campos = {
     ...bruto,
@@ -281,7 +281,7 @@ export async function salvarOrdemCorpoDocente(
   idsNaOrdem: string[],
 ): Promise<{ resultado: ResultadoEscrita; cards: CardCorpoDocenteResumo[] | null }> {
   const usuario = await obterUsuarioAutenticadoComTela(TELAS_CORPO_DOCENTE);
-  if (!usuario) return { resultado: RECUSADO_PERFIL, cards: null };
+  if (!usuario) return { resultado: RECUSADO_TELA, cards: null };
   if (!Array.isArray(idsNaOrdem) || !idsNaOrdem.every(ehIdNumerico)) {
     return { resultado: DADOS_INVALIDOS, cards: null };
   }
@@ -534,7 +534,7 @@ export async function enviarMidiaConteudo(
 
 /**
  * Server Actions de Contatos institucionais (tela Configurações). A leitura
- * exige sessão; a escrita exige tela do site (`barrarSemTela`).
+ * exige sessão; a escrita exige a tela Contatos do site (`barrarSemTela`).
  */
 
 const CONTATOS_VAZIOS: CamposContatos = {
