@@ -99,7 +99,9 @@ export default async function PainelCrmPage() {
       seTiver(verLeads, listarLeadsCrm, []),
       // Apoio: o select de lead do wizard, para quem tem Propostas sem Dashboard/Leads.
       seTiver(!verLeads && verPropostas, listarLeadsOpcoesCrm, []),
-      seTiver(verLeads || verPropostas, obterCatalogoCrm, CATALOGO_VAZIO),
+      // Catálogo publicado (sem dado pessoal): wizard, modal do lead e o
+      // "Agendar evento" do acervo do cliente (módulo opcional).
+      seTiver(verLeads || verClientes || verPropostas, obterCatalogoCrm, CATALOGO_VAZIO),
       // Responsáveis (só nome): selects do lead, do cliente e da proposta.
       seTiver(verLeads || verClientes || verPropostas, listarUsuariosCms, []),
       seTiver(verCatalogo, listarProgramasCrm, []),

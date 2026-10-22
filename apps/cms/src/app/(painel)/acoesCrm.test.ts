@@ -269,11 +269,19 @@ describe("acoesCrm — permissão por tela", () => {
     expect(r).not.toEqual(RECUSA);
   });
 
-  it("só Clientes: carregarLeadCrm null, evento realizado ok, agendar recusado, nota ok", async () => {
+  it("só Propostas: agendarEventoCrm recusado", async () => {
+    montarPayloadFalso();
+    logar({ id: "11", nome: "Propostas", administrador: false, telas: ["crm.propostas"] });
+    expect(await agendarEventoCrm("1", dadosEventoBase)).toEqual(RECUSA);
+    expect(executarEmTransacaoMock).not.toHaveBeenCalled();
+  });
+
+  it("só Clientes: carregarLeadCrm null, evento realizado ok, agendar pelo acervo ok (§3.8), nota ok", async () => {
     montarPayloadFalso();
     logar({ id: "10", nome: "Clientes", administrador: false, telas: ["crm.clientes"] });
     expect(await carregarLeadCrm("1")).toBeNull();
-    expect(await agendarEventoCrm("1", dadosEventoBase)).toEqual(RECUSA);
+    expect(await agendarEventoCrm("1", dadosEventoBase)).not.toEqual(RECUSA);
+    expect(executarEmTransacaoMock).toHaveBeenCalled();
     expect(await marcarEventoRealizadoCrm("4")).not.toEqual(RECUSA);
     expect(await adicionarNotaCrm("3", null, "nota")).not.toEqual(RECUSA);
     expect(await moverLeadCrm("1", "em-contato")).toEqual(RECUSA);

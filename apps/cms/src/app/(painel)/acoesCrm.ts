@@ -187,8 +187,9 @@ export async function adicionarNotaCrm(clienteId: string, leadId: string | null,
   return r;
 }
 
+/** Agenda pelo modal do lead ou pelo acervo de eventos do cliente (spec §3.8), escolhendo um negócio. */
 export async function agendarEventoCrm(leadId: string, dados: DadosEvento): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS_E_CLIENTES);
   if (!usuario) return RECUSADO;
   const r = await agendarEvento(leadId, dados, usuario);
   if (r.ok) revalidatePath("/crm");

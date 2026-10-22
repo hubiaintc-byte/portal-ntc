@@ -94,7 +94,7 @@ export interface CapacidadesPainel {
   editarCatalogo: boolean;
   usarCrm: boolean;
   verLeads: boolean;
-  /** Contrato/empenho, links, realizado e cancelar no acervo de eventos do cliente (§3.8). */
+  /** Agendar, contrato/empenho, links, realizado e cancelar no acervo de eventos do cliente (§3.8). */
   acompanharEventos: boolean;
   gerirUsuarios: boolean;
 }

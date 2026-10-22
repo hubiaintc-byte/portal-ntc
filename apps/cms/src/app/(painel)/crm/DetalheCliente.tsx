@@ -2,9 +2,17 @@
 
 import { useState, useTransition } from "react";
 
-import { AREAS_CRM, ESFERAS_CRM, ORIGENS_CLIENTE, podeApagarCliente, TIPOS_INSTITUICAO, rotuloDoEstagio } from "@ntc/lib";
+import {
+  AREAS_CRM,
+  ESFERAS_CRM,
+  negociosQuePodemAgendar,
+  ORIGENS_CLIENTE,
+  podeApagarCliente,
+  TIPOS_INSTITUICAO,
+  rotuloDoEstagio,
+} from "@ntc/lib";
 
-import type { ClienteCrmDetalhe } from "@/lib/cms/painelCrm";
+import type { CatalogoCrm, ClienteCrmDetalhe } from "@/lib/cms/painelCrm";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 
 import { apagarClienteCrm } from "../acoesCrm";
@@ -28,6 +36,8 @@ interface DetalheClienteProps {
   onApagado: () => void;
   /** `capacidades.acompanharEventos` (servidor): ações de acompanhamento no acervo de eventos. */
   podeAcompanharEventos: boolean;
+  /** Módulos do catálogo para o "Agendar evento" do acervo. */
+  catalogo: CatalogoCrm;
 }
 
 const FMT = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" });
@@ -57,6 +67,7 @@ export function DetalheCliente({
   onAtualizado,
   onApagado,
   podeAcompanharEventos,
+  catalogo,
 }: DetalheClienteProps) {
   const [apagando, setApagando] = useState(false);
   const [enviando, iniciar] = useTransition();
@@ -260,6 +271,11 @@ export function DetalheCliente({
               eventos={c.eventos}
               onAbrirLead={onAbrirLead}
               podeAcompanhar={podeAcompanharEventos}
+              negociosAgendaveis={negociosQuePodemAgendar<{ id: string; nome: string; perdido: boolean }>(
+                c.negocios,
+                c.eventos,
+              )}
+              catalogo={catalogo}
               onAtualizado={onAtualizado}
             />
           </section>

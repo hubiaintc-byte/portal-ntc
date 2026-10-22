@@ -401,6 +401,7 @@ export function ShellCrm({
           }}
           onAtualizado={() => abrirCliente(clienteDet.id)}
           podeAcompanharEventos={capacidades.acompanharEventos}
+          catalogo={catalogo}
           onApagado={() => {
             fecharTudo();
             setTela("clientes");

@@ -35,14 +35,31 @@ export function acoesDeEvento(lead: LeadParaAcoes, corrente: EventoParaAcoes | n
 
 /**
  * Ações de acompanhamento de um evento no acervo do cliente (spec de
- * permissões §3.8): as mesmas da aba Ações para um evento agendado, menos
- * "agendar" — agendar nasce de um lead e fica no modal.
+ * permissões §3.8): as mesmas da aba Ações para um evento agendado. "Agendar"
+ * não é ação de um evento existente — cria um novo, a partir de um negócio do
+ * cliente; quais negócios podem agendar é `negociosQuePodemAgendar`.
  */
 export function acoesDoAcervo(status: string): AcaoEvento[] {
-  if (status !== "agendado") return [];
-  return acoesDeEvento({ perdido: false }, {
-    id: "", status: "agendado", dataInicioISO: "", temContrato: false, numLinks: 0,
-  }).filter((a) => a !== "agendar");
+  return status === "agendado" ? ["registrar-contrato", "links", "realizado", "cancelar"] : [];
+}
+
+const STATUS_VALIDOS: readonly string[] = ["agendado", "realizado", "cancelado"];
+
+/**
+ * Negócios do cliente que podem receber um evento novo no acervo (§3.8):
+ * a mesma regra da aba Ações do modal — lead não perdido e sem evento
+ * corrente agendado.
+ */
+export function negociosQuePodemAgendar<N extends { id: string; perdido: boolean }>(
+  negocios: readonly N[],
+  eventos: readonly { id: string; leadId: string | null; status: string; dataInicioISO: string }[],
+): N[] {
+  return negocios.filter((n) => {
+    const doLead: EventoParaAcoes[] = eventos
+      .filter((e) => e.leadId === n.id && STATUS_VALIDOS.includes(e.status))
+      .map((e) => ({ id: e.id, status: e.status as StatusEvento, dataInicioISO: e.dataInicioISO, temContrato: false, numLinks: 0 }));
+    return acoesDeEvento({ perdido: n.perdido }, eventoCorrente(doLead)).includes("agendar");
+  });
 }
 
 export function estagioDaAcaoEvento(acao: AcaoEvento): EstagioLead | null {

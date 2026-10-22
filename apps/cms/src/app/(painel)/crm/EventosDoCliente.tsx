@@ -4,14 +4,15 @@ import { useState, useTransition } from "react";
 
 import { acoesDoAcervo, MODALIDADES_EVENTO, TIPOS_CONTRATO, type AcaoEvento } from "@ntc/lib";
 
-import type { EventoComercialResumo } from "@/lib/cms/painelCrm";
+import type { CatalogoCrm, EventoComercialResumo } from "@/lib/cms/painelCrm";
 import { formatarMoedaBRL } from "@/lib/cms/kpisComercial";
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
 
 import { cancelarEventoCrm, marcarEventoRealizadoCrm, removerDocumentoEventoCrm } from "../acoesCrm";
-import { AvisoForm, dataLegivel } from "./CamposCrm";
+import { AvisoForm, CampoSelect, dataLegivel } from "./CamposCrm";
 import { EditorLinks } from "./EditorLinks";
 import { FormContrato } from "./FormContrato";
+import { FormEvento } from "./FormEvento";
 import { rotuloDeLista, seloDeStatusEvento } from "./seloStatus";
 import { UploadDocumento } from "./UploadDocumento";
 
@@ -20,10 +21,18 @@ interface EventosDoClienteProps {
   /** Ausente = sem Dashboard/Leads: o lead do evento sai só como texto. */
   onAbrirLead?: (id: string) => void;
   /**
-   * `capacidades.acompanharEventos`, calculada no servidor: mostra contrato,
-   * links, realizado e cancelar no card do evento agendado (spec §3.8).
+   * `capacidades.acompanharEventos`, calculada no servidor: mostra "Agendar
+   * evento" no acervo e contrato, links, realizado e cancelar no card do
+   * evento agendado (spec §3.8).
    */
   podeAcompanhar: boolean;
+  /**
+   * Negócios do cliente que podem receber um evento novo
+   * (`negociosQuePodemAgendar`). "Agendar evento" só aparece com
+   * `podeAcompanhar` e ao menos um negócio — o evento nasce de um lead.
+   */
+  negociosAgendaveis: { id: string; nome: string }[];
+  catalogo: CatalogoCrm;
   onAtualizado: () => void;
 }
 
@@ -47,13 +56,23 @@ function tamanhoLegivel(bytes: number | null): string {
 }
 
 /** Acervo de eventos do cliente: filtro por status, cards expansíveis com contrato, links e documentos. */
-export function EventosDoCliente({ eventos, onAbrirLead, podeAcompanhar, onAtualizado }: EventosDoClienteProps) {
+export function EventosDoCliente({
+  eventos,
+  onAbrirLead,
+  podeAcompanhar,
+  negociosAgendaveis,
+  catalogo,
+  onAtualizado,
+}: EventosDoClienteProps) {
   const [filtro, setFiltro] = useState<FiltroEvento>("todos");
 
   const filtrados = filtro === "todos" ? eventos : eventos.filter((ev) => ev.status === filtro);
 
   return (
     <div className="pcms-eventos-cliente-bloco">
+      {podeAcompanhar && negociosAgendaveis.length > 0 && (
+        <AgendarNoAcervo negocios={negociosAgendaveis} catalogo={catalogo} onAtualizado={onAtualizado} />
+      )}
       <div className="pcms-filtros">
         {FILTROS.map((f) => (
           <button
@@ -86,6 +105,86 @@ export function EventosDoCliente({ eventos, onAbrirLead, podeAcompanhar, onAtual
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * "Agendar evento" no acervo do cliente (spec §3.8), para quem tem Clientes
+ * sem passar pelo modal do lead: escolhe um negócio e reaproveita o
+ * FormEvento e a mesma Server Action (que move o card do lead escolhido).
+ */
+function AgendarNoAcervo({
+  negocios,
+  catalogo,
+  onAtualizado,
+}: {
+  negocios: { id: string; nome: string }[];
+  catalogo: CatalogoCrm;
+  onAtualizado: () => void;
+}) {
+  const [aberto, setAberto] = useState(false);
+  const [leadId, setLeadId] = useState("");
+  const [erro, setErro] = useState<string | null>(null);
+  const [ocupado, iniciar] = useTransition();
+
+  function executar(acao: () => Promise<ResultadoEscrita>, depois?: () => void) {
+    setErro(null);
+    iniciar(async () => {
+      const r = await acao();
+      if (!r.ok) {
+        setErro(r.erro ?? "Erro.");
+        return;
+      }
+      depois?.();
+      onAtualizado();
+    });
+  }
+
+  function fechar() {
+    setAberto(false);
+    setLeadId("");
+  }
+
+  if (!aberto) {
+    return (
+      <div className="pcms-acoes__botoes">
+        <button
+          type="button"
+          className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+          aria-expanded={false}
+          onClick={() => {
+            setErro(null);
+            setAberto(true);
+          }}
+        >
+          Agendar evento
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <section className="pcms-evento-card__bloco">
+      <h4>Agendar evento</h4>
+      <AvisoForm erro={erro} />
+      <CampoSelect
+        rotulo="Negócio"
+        valor={leadId}
+        onMudar={setLeadId}
+        opcoes={negocios.map((n) => ({ label: n.nome, value: n.id }))}
+        obrigatorio
+      />
+      {leadId === "" ? (
+        <div className="pcms-acoes__botoes">
+          <p className="pcms-vazio">Escolha o negócio a que o evento pertence.</p>
+          <button type="button" className="pcms-btn pcms-btn--ghost pcms-btn--mini" onClick={fechar}>
+            Cancelar
+          </button>
+        </div>
+      ) : (
+        <FormEvento leadId={leadId} catalogo={catalogo} ocupado={ocupado} onExecutar={executar} onFechar={fechar} />
+      )}
+    </section>
   );
 }
 

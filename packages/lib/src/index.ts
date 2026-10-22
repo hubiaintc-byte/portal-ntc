@@ -123,6 +123,7 @@ export {
   eventoCorrente,
   acoesDeEvento,
   acoesDoAcervo,
+  negociosQuePodemAgendar,
   estagioDaAcaoEvento,
   urlValida,
 } from "./crm/eventos";
