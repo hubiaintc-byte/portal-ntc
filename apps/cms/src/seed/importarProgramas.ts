@@ -299,9 +299,15 @@ async function main(): Promise<void> {
 // ideia do JEST_WORKER_ID do Jest) — usado aqui só para este módulo poder
 // exportar `planejarImportacao` para teste sem disparar `main()` (que abre
 // conexão real com o banco) como efeito colateral do import.
+//
+// O `await` de topo é obrigatório: sob Payload 3.90 o `payload run` espera só
+// o import do módulo e chama `process.exit(0)` logo depois — com `void main()`
+// o script sairia 0 sem ter rodado.
 if (!process.env.VITEST) {
-  void main().catch((err) => {
+  try {
+    await main();
+  } catch (err) {
     console.error("[programas:importar] Falha:", err);
     process.exit(1);
-  });
+  }
 }

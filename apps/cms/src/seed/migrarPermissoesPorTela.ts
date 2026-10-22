@@ -97,10 +97,15 @@ async function main(): Promise<void> {
   process.exit(houveFalha ? 1 : 0);
 }
 
-// Importável nos testes sem disparar `main()`.
+// Importável nos testes sem disparar `main()`. O `await` de topo é
+// obrigatório: sob Payload 3.90 o `payload run` espera só o import do módulo
+// e chama `process.exit(0)` logo depois — com `void main()` o script saía 0
+// sem ter rodado. O `process.exit(1)` explícito vence o `exit(0)` do bin.
 if (!process.env.VITEST) {
-  void main().catch((err) => {
-    console.error(err);
+  try {
+    await main();
+  } catch (err) {
+    console.error("[permissoes:migrar] Falha:", err);
     process.exit(1);
-  });
+  }
 }
