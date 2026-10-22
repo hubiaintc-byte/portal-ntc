@@ -86,6 +86,9 @@ export function AgendaDropdown({ dados }: AgendaDropdownProps) {
     };
   }, [aberto]);
 
+  // Evento sem data (ex.: rascunho incompleto): não há o que adicionar à agenda.
+  if (!dados.startISO || !dados.endISO) return null;
+
   const urlGoogle = gerarUrlGoogle(dados);
   const urlOutlook = gerarUrlOutlook(dados);
   const icsUri = `data:text/calendar;charset=utf-8,${encodeURIComponent(gerarIcs(dados))}`;

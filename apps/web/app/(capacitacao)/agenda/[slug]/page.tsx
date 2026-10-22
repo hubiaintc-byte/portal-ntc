@@ -19,7 +19,12 @@ export async function generateStaticParams() {
   try {
     const { obterPayload } = await import("@/lib/payloadClient");
     const payload = await obterPayload();
-    const res = await payload.find({ collection: "eventos", limit: 100, depth: 0 });
+    const res = await payload.find({
+      collection: "eventos",
+      where: { _status: { equals: "published" } },
+      limit: 100,
+      depth: 0,
+    });
     const doCms = res.docs
       .map((d) => (d as { slug?: string }).slug)
       .filter((s): s is string => Boolean(s));

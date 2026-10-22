@@ -58,7 +58,7 @@ export async function fetchEvento(slug: string): Promise<Evento | null> {
   const payload = await obterPayload();
   const res = await payload.find({
     collection: "eventos",
-    where: { slug: { equals: slug } },
+    where: { and: [{ slug: { equals: slug } }, { _status: { equals: "published" } }] },
     depth: 2,
     limit: 1,
   });

@@ -41,7 +41,7 @@ export async function buscarOverride(slug: string): Promise<OverrideEvento | nul
     const payload = await obterPayload();
     const res = await payload.find({
       collection: "eventos",
-      where: { slug: { equals: slug } },
+      where: { and: [{ slug: { equals: slug } }, { _status: { equals: "published" } }] },
       limit: 1,
       depth: 1,
       overrideAccess: true,
