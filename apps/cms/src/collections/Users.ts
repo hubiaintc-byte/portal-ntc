@@ -1,13 +1,9 @@
-import type { CollectionConfig, FieldAccess } from "payload";
+import type { CollectionConfig } from "payload";
 
-import { authenticated } from "../access/authenticated";
-import { superAdmin, superAdminField } from "../access/superAdmin";
+import { administrador, administradorField, proprioOuAdministrador } from "../access/porTela";
 import { recusarLoginForaDoPainel } from "../lib/cms/loginSoPeloPainel";
 import { emailRecuperacaoHtml } from "../lib/emailsCms";
 import { TELAS } from "../lib/cms/telas";
-
-const soAdministrador: FieldAccess = ({ req }) =>
-  Boolean((req.user as { administrador?: boolean } | null | undefined)?.administrador);
 
 /**
  * Coleção Users — auth nativa do Payload, com perfis administrativos
@@ -55,16 +51,10 @@ export const Users: CollectionConfig = {
     beforeLogin: [recusarLoginForaDoPainel],
   },
   access: {
-    read: authenticated,
-    create: superAdmin,
-    delete: superAdmin,
-    update: ({ req, id }) => {
-      if (!req.user) return false;
-      if (req.user.collection !== "users") return false;
-      // super-admin atualiza qualquer um; demais perfis só atualizam o próprio registro.
-      if ((req.user as { perfil?: string }).perfil === "super-admin") return true;
-      return req.user.id === id;
-    },
+    read: proprioOuAdministrador,
+    create: administrador,
+    delete: administrador,
+    update: proprioOuAdministrador,
   },
   fields: [
     {
@@ -91,7 +81,7 @@ export const Users: CollectionConfig = {
       ],
       access: {
         // Apenas super-admin pode alterar o próprio perfil ou o de outros.
-        update: superAdminField,
+        update: administradorField,
       },
       admin: {
         hidden: true,
@@ -104,7 +94,7 @@ export const Users: CollectionConfig = {
       label: "Administrador",
       type: "checkbox",
       defaultValue: false,
-      access: { create: soAdministrador, update: soAdministrador },
+      access: { create: administradorField, update: administradorField },
       admin: { description: "Acesso total ao painel, inclusive gestão de usuários." },
     },
     {
@@ -113,7 +103,7 @@ export const Users: CollectionConfig = {
       type: "select",
       hasMany: true,
       options: TELAS.map((t) => ({ label: t.rotulo, value: t.id })),
-      access: { create: soAdministrador, update: soAdministrador },
+      access: { create: administradorField, update: administradorField },
       admin: { description: "Telas do painel que esta pessoa pode usar." },
     },
   ],

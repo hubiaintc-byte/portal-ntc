@@ -1,7 +1,6 @@
+import { acessoPorTela, administrador } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
-import { atendimentoComercial } from "../access/atendimentoComercial";
-import { superAdmin } from "../access/superAdmin";
 import { FINALIDADES_EMAIL } from "./EnviosEmail";
 
 /** Modelos de e-mail com placeholders `{{...}}` (spec §3.5). Editor e envio: Sessão 3. */
@@ -11,10 +10,10 @@ export const ModelosEmail: CollectionConfig = {
   typescript: { interface: "ModeloEmail" },
   admin: { useAsTitle: "nome", defaultColumns: ["nome", "finalidade", "padrao"], group: "CRM" },
   access: {
-    read: atendimentoComercial,
-    create: atendimentoComercial,
-    update: atendimentoComercial,
-    delete: superAdmin,
+    read: acessoPorTela(["crm.envios"]),
+    create: administrador,
+    update: administrador,
+    delete: administrador,
   },
   fields: [
     { name: "nome", type: "text", required: true },

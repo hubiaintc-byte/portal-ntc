@@ -1,6 +1,6 @@
+import { administrador } from "../access/porTela";
 import type { GlobalConfig } from "payload";
 
-import { editorInstitucional } from "../access/editorInstitucional";
 import { leituraPublicaGlobal } from "../access/leituraPublica";
 
 /**
@@ -15,7 +15,7 @@ export const OGrupo: GlobalConfig = {
   slug: "o-grupo",
   label: "O Grupo NTC",
   admin: { group: "Páginas Singleton" },
-  access: { read: leituraPublicaGlobal, update: editorInstitucional },
+  access: { read: leituraPublicaGlobal, update: administrador },
   versions: { drafts: true, max: 20 },
   fields: [
     {
@@ -69,8 +69,7 @@ export const OGrupo: GlobalConfig = {
       hasMany: true,
       maxDepth: 1,
       admin: {
-        description:
-          "Especialistas exibidos em destaque no /o-grupo. Em vazio, a seção é omitida.",
+        description: "Especialistas exibidos em destaque no /o-grupo. Em vazio, a seção é omitida.",
       },
     },
     {
@@ -79,8 +78,7 @@ export const OGrupo: GlobalConfig = {
       relationTo: "clientes",
       hasMany: true,
       admin: {
-        description:
-          "Clientes exibidos em destaque no /o-grupo. Em vazio, a seção é omitida.",
+        description: "Clientes exibidos em destaque no /o-grupo. Em vazio, a seção é omitida.",
       },
     },
     {

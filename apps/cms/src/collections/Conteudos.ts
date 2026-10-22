@@ -1,10 +1,10 @@
+import { acessoPorTela } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
 import { BlockquoteFeature, lexicalEditor } from "@payloadcms/richtext-lexical";
 
 import { categoriaParaSegmento, CONTEUDO_CATEGORIA, rotuloCategoria } from "@ntc/lib";
 
-import { editorInstitucional } from "../access/editorInstitucional";
 import { autoSlug } from "../hooks/autoSlug";
 import { derivarTempoLeitura } from "../hooks/tempoLeitura";
 import { lexicalRestrictiveFeatures } from "../shared/lexical-config";
@@ -28,9 +28,9 @@ export const Conteudos: CollectionConfig = {
   },
   access: {
     read: leituraPublica(),
-    create: editorInstitucional,
-    update: editorInstitucional,
-    delete: editorInstitucional,
+    create: acessoPorTela(["site.conteudos"]),
+    update: acessoPorTela(["site.conteudos"]),
+    delete: acessoPorTela(["site.conteudos"]),
   },
   versions: { drafts: true, maxPerDoc: 30 },
   hooks: {

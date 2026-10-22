@@ -1,3 +1,4 @@
+import { acessoDoUsuario } from "../lib/cms/telas";
 import type { CollectionConfig } from "payload";
 
 /**
@@ -22,12 +23,12 @@ export const Passkeys: CollectionConfig = {
   access: {
     read: ({ req }) => {
       if (!req.user) return false;
-      if ((req.user as { perfil?: string }).perfil === "super-admin") return true;
+      if (acessoDoUsuario(req.user as never).administrador) return true;
       return { usuario: { equals: req.user.id } };
     },
     delete: ({ req }) => {
       if (!req.user) return false;
-      if ((req.user as { perfil?: string }).perfil === "super-admin") return true;
+      if (acessoDoUsuario(req.user as never).administrador) return true;
       return { usuario: { equals: req.user.id } };
     },
     create: () => false,

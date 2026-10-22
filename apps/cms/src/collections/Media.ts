@@ -1,7 +1,7 @@
+import { acessoPorTela } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
 import { authenticated } from "../access/authenticated";
-import { editorInstitucional } from "../access/editorInstitucional";
 import { sanitizarFilename } from "../hooks/sanitizarFilename";
 
 /**
@@ -15,6 +15,8 @@ import { sanitizarFilename } from "../hooks/sanitizarFilename";
  * automaticamente para `next/image` no front, que escolhe a variante via
  * `sizes` (DAB §12.3 · Inventário "ImagemSoberana").
  */
+const MIDIA = acessoPorTela(["site.eventos", "site.palestrantes", "site.conteudos", "site.home"]);
+
 export const Media: CollectionConfig = {
   slug: "media",
   labels: { singular: "Mídia", plural: "Mídias" },
@@ -25,9 +27,9 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: editorInstitucional,
-    update: editorInstitucional,
-    delete: editorInstitucional,
+    create: MIDIA,
+    update: MIDIA,
+    delete: MIDIA,
     readVersions: authenticated,
   },
   // Normaliza o nome do arquivo antes do upload: o Supabase Storage (S3)

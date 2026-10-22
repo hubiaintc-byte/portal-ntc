@@ -1,8 +1,9 @@
+import { acessoPorTela, administrador } from "../access/porTela";
+import { TELAS_LEADS } from "../lib/cms/telas";
 import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 
 import { ESTAGIOS_LEAD, MOTIVOS_PERDA, ORIGENS_ENTRADA_LEAD } from "@ntc/lib";
 
-import { atendimentoComercial } from "../access/atendimentoComercial";
 import { casarClienteDoLead } from "../lib/crm/casamento";
 import { registrarLeadNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
 import { ESFERA_INSTITUCIONAL, LEAD_TIPO } from "../shared/types";
@@ -40,10 +41,10 @@ export const Leads: CollectionConfig = {
     listSearchableFields: ["email", "nome", "instituicao"],
   },
   access: {
-    read: atendimentoComercial,
-    create: atendimentoComercial,
-    update: atendimentoComercial,
-    delete: atendimentoComercial,
+    read: acessoPorTela(TELAS_LEADS),
+    create: acessoPorTela(TELAS_LEADS),
+    update: acessoPorTela(TELAS_LEADS),
+    delete: administrador,
   },
   fields: [
     {

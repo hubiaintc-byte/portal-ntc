@@ -1,6 +1,5 @@
+import { administrador } from "../access/porTela";
 import type { CollectionConfig } from "payload";
-
-import { superAdmin } from "../access/superAdmin";
 
 /**
  * Log de auditoria (doc 11 §12).
@@ -19,7 +18,7 @@ export const AuditLog: CollectionConfig = {
     group: "Sistema",
   },
   access: {
-    read: superAdmin,
+    read: administrador,
     create: () => false,
     update: () => false,
     delete: () => false,

@@ -1,6 +1,5 @@
+import { administrador } from "../access/porTela";
 import type { CollectionConfig } from "payload";
-
-import { superAdmin } from "../access/superAdmin";
 
 /**
  * Registro efêmero de tentativas por (IP, rota) — lastro do rate limit
@@ -25,7 +24,7 @@ export const TentativasAcesso: CollectionConfig = {
     description: "Lastro efêmero do rate limit. Linhas se apagam sozinhas fora da janela.",
   },
   access: {
-    read: superAdmin,
+    read: administrador,
     create: () => false,
     update: () => false,
     delete: () => false,

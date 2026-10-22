@@ -1,15 +1,9 @@
+import { acessoPorTela, administrador } from "../access/porTela";
+import { TELAS_LEADS } from "../lib/cms/telas";
 import type { CollectionConfig } from "payload";
 
-import {
-  AREAS_CRM,
-  ESFERAS_CRM,
-  ORIGENS_CLIENTE,
-  TIPOS_INSTITUICAO,
-  UFS,
-} from "@ntc/lib";
+import { AREAS_CRM, ESFERAS_CRM, ORIGENS_CLIENTE, TIPOS_INSTITUICAO, UFS } from "@ntc/lib";
 
-import { atendimentoComercial } from "../access/atendimentoComercial";
-import { superAdmin } from "../access/superAdmin";
 import { bloquearClienteComDependentes } from "../lib/crm/exclusaoCliente";
 
 /**
@@ -27,10 +21,10 @@ export const ClientesCrm: CollectionConfig = {
     group: "CRM",
   },
   access: {
-    read: atendimentoComercial,
-    create: atendimentoComercial,
-    update: atendimentoComercial,
-    delete: superAdmin,
+    read: acessoPorTela([...TELAS_LEADS, "crm.clientes", "crm.propostas"]),
+    create: acessoPorTela(["crm.clientes"]),
+    update: acessoPorTela(["crm.clientes"]),
+    delete: administrador,
   },
   hooks: {
     beforeChange: [

@@ -1,9 +1,7 @@
+import { acessoPorTela, administrador } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
 import { CANAIS_ENVIO, STATUS_ENVIO } from "@ntc/lib";
-
-import { atendimentoComercial } from "../access/atendimentoComercial";
-import { superAdmin } from "../access/superAdmin";
 
 /** Registro de envios de propostas — registro de fato, não disparo (Fase B1). */
 export const EnviosProposta: CollectionConfig = {
@@ -16,10 +14,10 @@ export const EnviosProposta: CollectionConfig = {
     group: "CRM",
   },
   access: {
-    read: atendimentoComercial,
-    create: atendimentoComercial,
-    update: atendimentoComercial,
-    delete: superAdmin,
+    read: acessoPorTela(["crm.propostas"]),
+    create: acessoPorTela(["crm.propostas"]),
+    update: acessoPorTela(["crm.propostas"]),
+    delete: administrador,
   },
   fields: [
     { name: "proposta", type: "relationship", relationTo: "propostas", required: true },
