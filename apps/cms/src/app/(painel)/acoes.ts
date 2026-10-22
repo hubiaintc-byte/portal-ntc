@@ -77,6 +77,7 @@ const TELAS_CORPO_DOCENTE: readonly TelaPainel[] = ["site.corpo-docente"];
 const TELAS_HOME: readonly TelaPainel[] = ["site.home"];
 const TELAS_CONTEUDOS: readonly TelaPainel[] = ["site.conteudos"];
 const TELAS_CONTATOS: readonly TelaPainel[] = ["site.contatos"];
+const TELAS_LEITURA_PALESTRANTE: readonly TelaPainel[] = ["site.palestrantes", "site.corpo-docente"];
 
 const ERRO_SESSAO = "Sessão expirada. Entre novamente.";
 
@@ -84,13 +85,18 @@ const RECUSADO: ResultadoEscrita = { ok: false, erro: ERRO_SESSAO };
 /** Escritas que também exigem tela (a Local API ignora o `access` das coleções). */
 const RECUSADO_PERFIL: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
 
+/**
+ * Leituras do detalhe também exigem a tela de onde são abertas (spec §5):
+ * a recusa devolve o mesmo vazio de "sem sessão".
+ */
 export async function carregarEvento(id: string): Promise<EventoCmsDetalhe | null> {
-  if (!(await obterUsuarioCms())) return null;
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return null;
   return obterEventoCms(id);
 }
 
+/** Aberto pela lista de Palestrantes e pela tela Corpo Docente. */
 export async function carregarPalestrante(id: string): Promise<PalestranteCmsDetalhe | null> {
-  if (!(await obterUsuarioCms())) return null;
+  if (!(await obterUsuarioCmsComTela(TELAS_LEITURA_PALESTRANTE))) return null;
   return obterPalestranteCms(id);
 }
 
@@ -266,7 +272,7 @@ export async function salvarPalestrante(
 
 /** Cards de pessoa do Corpo Docente, na ordem atual, para a tela de ordenação. */
 export async function carregarCorpoDocente(): Promise<CardCorpoDocenteResumo[]> {
-  if (!(await obterUsuarioCms())) return [];
+  if (!(await obterUsuarioCmsComTela(TELAS_CORPO_DOCENTE))) return [];
   return listarCardsCorpoDocenteCms();
 }
 
@@ -290,7 +296,8 @@ export async function carregarOpcoesPalestrante(): Promise<{
   areas: { id: string; nome: string }[];
   programas: { id: string; sigla: string }[];
 }> {
-  if (!(await obterUsuarioCms())) return { areas: [], programas: [] };
+  // Só o formulário do palestrante (criar/editar) usa — escrita de Palestrantes.
+  if (!(await obterUsuarioCmsComTela(TELAS_PALESTRANTES))) return { areas: [], programas: [] };
   return listarOpcoesPalestranteCms();
 }
 
@@ -424,9 +431,9 @@ export async function removerPasskeyAdminCms(passkeyId: string): Promise<Resulta
  * Server Actions de Conteúdos editoriais (telas de lista e detalhe do
  * painel) e de Contatos institucionais (tela Configurações).
  *
- * Leitura: basta a sessão — a lista é de leitura para qualquer pessoa
- * logada (sem tela de Conteúdos ela não edita), e os contatos institucionais
- * aparecem no rodapé de toda página pública.
+ * Leitura: conteúdos e áreas exigem a tela Conteúdos (spec §5); os
+ * contatos institucionais bastam a sessão — aparecem no rodapé de toda
+ * página pública.
  *
  * Escrita: exige tela do site. Toda escrita destas telas chama a Local
  * API com `overrideAccess: true`, então o `access` por tela
@@ -449,17 +456,17 @@ async function barrarSemTela(telas: readonly TelaPainel[]): Promise<ResultadoEsc
 }
 
 export async function listarConteudos(): Promise<ConteudoCmsResumo[]> {
-  if (!(await obterUsuarioCms())) return [];
+  if (!(await obterUsuarioCmsComTela(TELAS_CONTEUDOS))) return [];
   return listarConteudosCms();
 }
 
 export async function carregarConteudo(id: string): Promise<ConteudoCmsDetalhe | null> {
-  if (!(await obterUsuarioCms())) return null;
+  if (!(await obterUsuarioCmsComTela(TELAS_CONTEUDOS))) return null;
   return obterConteudoCms(id);
 }
 
 export async function carregarAreas(): Promise<{ id: string; nome: string }[]> {
-  if (!(await obterUsuarioCms())) return [];
+  if (!(await obterUsuarioCmsComTela(TELAS_CONTEUDOS))) return [];
   return listarAreasCms();
 }
 

@@ -41,7 +41,8 @@ vi.mock("@/lib/cms/autenticacao", async () => {
 const revalidatePath = vi.fn();
 vi.mock("next/cache", () => ({ revalidatePath }));
 
-const { carregarOpcoesPalestrante, salvarOrdemCorpoDocente, salvarPalestrante } = await import("./acoes");
+const { carregarCorpoDocente, carregarOpcoesPalestrante, carregarPalestrante, salvarOrdemCorpoDocente, salvarPalestrante } =
+  await import("./acoes");
 
 const administrador = { id: 1, nome: "Ana", administrador: true, telas: [] };
 const soEventos = { id: 2, nome: "Iara", administrador: false, telas: ["site.eventos"] };
@@ -312,5 +313,42 @@ describe("carregarOpcoesPalestrante (Server Action)", () => {
     expect(find).toHaveBeenCalledWith(
       expect.objectContaining({ collection: "programas", depth: 0, limit: 100, sort: "sigla", select: { sigla: true } }),
     );
+  });
+});
+
+describe("leituras do palestrante e do Corpo Docente por tela", () => {
+  it("carregarPalestrante: quem só tem Eventos recebe null sem ler o banco", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(soEventos);
+    expect(await carregarPalestrante("7")).toBeNull();
+    expect(findByID).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["Palestrantes", soPalestrantes],
+    ["Corpo Docente", soCorpoDocente],
+  ])("carregarPalestrante: quem tem %s lê o palestrante", async (_rotulo, usuario) => {
+    obterUsuarioCmsMock.mockResolvedValue(usuario);
+    findByID.mockResolvedValue(null);
+    expect(await carregarPalestrante("7")).toBeNull();
+    expect(findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: "especialistas", id: "7" }));
+  });
+
+  it("carregarCorpoDocente: quem só tem Palestrantes recebe lista vazia sem ler o banco", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(soPalestrantes);
+    expect(await carregarCorpoDocente()).toEqual([]);
+    expect(findGlobal).not.toHaveBeenCalled();
+  });
+
+  it("carregarCorpoDocente: quem tem Corpo Docente lê os cards", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(soCorpoDocente);
+    findGlobal.mockResolvedValue({ cards: [] });
+    expect(await carregarCorpoDocente()).toEqual([]);
+    expect(findGlobal).toHaveBeenCalledWith(expect.objectContaining({ slug: "corpo-docente" }));
+  });
+
+  it("carregarOpcoesPalestrante: quem só tem Corpo Docente recebe listas vazias sem ler o banco", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(soCorpoDocente);
+    expect(await carregarOpcoesPalestrante()).toEqual({ areas: [], programas: [] });
+    expect(find).not.toHaveBeenCalled();
   });
 });

@@ -8,8 +8,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
  * apagaria conteúdo. E como toda escrita chama a Local API com
  * `overrideAccess: true`, o `access: editorConteudos` declarado em
  * `Conteudos.ts` nunca é consultado — a tela tem de ser checada aqui
- * (escreve quem tem `site.conteudos`, ou o administrador;
- * quem só tem outras telas vê a lista e não edita).
+ * (lê e escreve quem tem `site.conteudos`, ou o administrador;
+ * quem só tem outras telas não lê nem edita — spec §5).
  *
  * Mesmo padrão de mock de acoesCrm.test.ts — `vi.mock` no topo (hoistado
  * pelo Vitest) troca a Local API, a autenticação e o cache do Next antes de
@@ -24,14 +24,21 @@ vi.mock("@/lib/payloadClient", () => ({
 }));
 
 const obterUsuarioCmsMock = vi.fn();
-vi.mock("@/lib/cms/autenticacao", () => ({
-  obterUsuarioCms: obterUsuarioCmsMock,
-  obterUsuarioAutenticado: vi.fn(),
-}));
+vi.mock("@/lib/cms/autenticacao", async () => {
+  const { temTela } = await import("@/lib/cms/telas");
+  return {
+    obterUsuarioCms: obterUsuarioCmsMock,
+    obterUsuarioAutenticado: vi.fn(),
+    obterUsuarioCmsComTela: async (telas: Parameters<typeof temTela>[1]) => {
+      const u = (await obterUsuarioCmsMock()) as { acesso: Parameters<typeof temTela>[0] } | null;
+      return u && temTela(u.acesso, telas) ? u : null;
+    },
+  };
+});
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
-const { enviarMidiaConteudo, excluirConteudo, listarConteudos, publicarConteudo } =
+const { carregarAreas, carregarConteudo, enviarMidiaConteudo, excluirConteudo, listarConteudos, publicarConteudo } =
   await import("./acoes");
 
 const usuarioFalso = { id: "5", nome: "Ana Editora", acesso: { administrador: true, telas: [] } };
@@ -121,8 +128,17 @@ describe("gate de tela das escritas de conteúdo", () => {
     expect(update).toHaveBeenCalledOnce();
   });
 
-  it("quem só tem site.eventos continua vendo a lista (spec §6.4)", async () => {
+  it("quem só tem site.eventos não lê conteúdos nem áreas (spec §5) — nada chega à Local API", async () => {
     obterUsuarioCmsMock.mockResolvedValue(soEventos);
+
+    expect(await listarConteudos()).toEqual([]);
+    expect(await carregarConteudo("3")).toBeNull();
+    expect(await carregarAreas()).toEqual([]);
+    expect(find).not.toHaveBeenCalled();
+  });
+
+  it("site.conteudos vê a lista", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(editorConteudos);
     find.mockResolvedValue({
       docs: [{ id: 3, titulo: "Nota técnica", categoria: "nota-tecnica", _status: "published" }],
     });
