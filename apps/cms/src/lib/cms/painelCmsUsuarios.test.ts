@@ -19,6 +19,8 @@ function mockPayload(
   update: ReturnType<typeof vi.fn>;
   delete: ReturnType<typeof vi.fn>;
   forgotPassword: ReturnType<typeof vi.fn>;
+  findByID: ReturnType<typeof vi.fn>;
+  count: ReturnType<typeof vi.fn>;
   sendEmail: ReturnType<typeof vi.fn>;
 } {
   return {
@@ -26,6 +28,8 @@ function mockPayload(
     create: vi.fn().mockResolvedValue({ id: "novo-1" }),
     update: vi.fn().mockResolvedValue({}),
     delete: vi.fn().mockResolvedValue({}),
+    findByID: vi.fn(async ({ id }: { id: string | number }) => usuarios.find((u) => String(u.id) === String(id)) ?? null),
+    count: vi.fn(async () => ({ totalDocs: usuarios.filter((u) => u.administrador === true).length })),
     forgotPassword: vi.fn().mockResolvedValue("token-abc"),
     sendEmail: vi.fn().mockResolvedValue({}),
   };
@@ -161,6 +165,29 @@ describe("editarUsuario", () => {
     expect(payload.update).toHaveBeenCalled();
   });
 
+  it("id não canônico ('02') não contorna as guardas", async () => {
+    const payload = mockPayload([A]);
+    const r = await editarUsuario(payload, "02", { nome: "A", administrador: false, telas: [] }, "2");
+    expect(r).toEqual({ ok: false, erro: "Usuário não encontrado." });
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+
+  it("id desconhecido é recusado sem escrever", async () => {
+    const payload = mockPayload([A]);
+    const r = await editarUsuario(payload, "99", { nome: "X", administrador: false, telas: [] }, "2");
+    expect(r).toEqual({ ok: false, erro: "Usuário não encontrado." });
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+
+  it("administrador 'false' (string forjada) é tratado como false", async () => {
+    const payload = mockPayload([A]);
+    const r = await editarUsuario(payload, "2", { nome: "A", administrador: "false" as never, telas: [] }, "2");
+    expect(r).toEqual({ ok: false, erro: "Você não pode tirar o seu próprio acesso de administrador." });
+    expect(payload.update).not.toHaveBeenCalled();
+    const r2 = await editarUsuario(payload, "2", { nome: "A", administrador: "false" as never, telas: [] }, "9");
+    expect(r2).toEqual({ ok: false, erro: "Não é possível remover o último administrador." });
+  });
+
   it("manter o único administrador como administrador segue permitido", async () => {
     const payload = mockPayload([A]);
     const r = await editarUsuario(payload, "2", { nome: "Renomeado", administrador: true, telas: [] }, "2");
@@ -206,6 +233,16 @@ describe("reenviarConvite", () => {
 });
 
 describe("removerUsuario", () => {
+  it("id não canônico ('02') e id desconhecido são recusados sem apagar", async () => {
+    const payload = mockPayload([
+      { id: 2, nome: "A", email: "a@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
+    ]);
+    expect(await removerUsuario(payload, "02", "2")).toEqual({ ok: false, erro: "Usuário não encontrado." });
+    expect(await removerUsuario(payload, " 2", "9")).toEqual({ ok: false, erro: "Usuário não encontrado." });
+    expect(await removerUsuario(payload, "99", "9")).toEqual({ ok: false, erro: "Usuário não encontrado." });
+    expect(payload.delete).not.toHaveBeenCalled();
+  });
+
   it("bloqueia remover a si mesmo", async () => {
     const payload = mockPayload([]);
     const r = await removerUsuario(payload, "1", "1");

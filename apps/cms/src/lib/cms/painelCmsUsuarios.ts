@@ -50,6 +50,17 @@ export interface PayloadUsuarios {
   }): Promise<{
     docs: { id: string | number; nome: string; email: string; administrador?: boolean | null; telas?: string[] | null; updatedAt: string }[];
   }>;
+  findByID(args: {
+    collection: "users";
+    id: string | number;
+    depth: 0;
+    overrideAccess: true;
+  }): Promise<{ id: string | number; administrador?: boolean | null } | null>;
+  count(args: {
+    collection: "users";
+    where: { administrador: { equals: true } };
+    overrideAccess: true;
+  }): Promise<{ totalDocs: number }>;
   create(args: {
     collection: "users";
     data: Record<string, unknown>;
@@ -116,7 +127,7 @@ export async function criarUsuario(
       data: {
         nome: dados.nome.trim(),
         email: dados.email.trim(),
-        administrador: dados.administrador,
+        administrador: dados.administrador === true,
         telas: acessoDoUsuario({ telas: dados.telas }).telas,
         password: gerarSenhaAleatoria(),
       },
@@ -191,6 +202,28 @@ export async function reenviarConvite(p: PayloadUsuarios, id: string): Promise<R
 }
 
 const MSG_ULTIMO_ADMIN = "Não é possível remover o último administrador.";
+const MSG_NAO_ENCONTRADO = "Usuário não encontrado.";
+
+// Até 15 dígitos: acima disso `Number` perde precisão. O adapter converte "02"/" 2" em 2,
+// então só o id canônico passa — senão uma guarda por igualdade de string seria contornada.
+const idValido = (v: unknown): v is string => typeof v === "string" && /^[1-9]\d{0,14}$/.test(v);
+
+/** Busca o alvo e diz se ele é administrador e se é o único. `null` = não existe. */
+async function situacaoDoAlvo(
+  p: PayloadUsuarios,
+  id: string,
+): Promise<{ administrador: boolean; unico: boolean } | null> {
+  const alvo = await p.findByID({ collection: "users", id, depth: 0, overrideAccess: true });
+  if (!alvo) return null;
+  const administrador = alvo.administrador === true;
+  if (!administrador) return { administrador, unico: false };
+  const { totalDocs } = await p.count({
+    collection: "users",
+    where: { administrador: { equals: true } },
+    overrideAccess: true,
+  });
+  return { administrador, unico: totalDocs <= 1 };
+}
 
 export async function editarUsuario(
   p: PayloadUsuarios,
@@ -198,33 +231,25 @@ export async function editarUsuario(
   dados: { nome: string; administrador: boolean; telas: TelaPainel[] },
   autorId: string,
 ): Promise<ResultadoEscrita> {
+  if (!idValido(id)) return { ok: false, erro: MSG_NAO_ENCONTRADO };
   if (dados.nome.trim() === "") return { ok: false, erro: "Informe o nome." };
-  if (!dados.administrador && id === autorId) {
+  const administrador = dados.administrador === true;
+  if (!administrador && id === autorId) {
     return { ok: false, erro: "Você não pode tirar o seu próprio acesso de administrador." };
   }
   try {
-    // Desmarcar o último administrador deixaria o painel sem quem gerencie
-    // usuários — mesma classe de lockout que a guarda de removerUsuario evita.
-    if (!dados.administrador) {
-      const todos = await p.find({
-        collection: "users",
-        limit: 200,
-        depth: 0,
-        sort: "nome",
-        overrideAccess: true,
-      });
-      const alvo = todos.docs.find((u) => String(u.id) === id);
-      if (alvo && acessoDoUsuario(alvo).administrador) {
-        const administradores = todos.docs.filter((u) => acessoDoUsuario(u).administrador);
-        if (administradores.length <= 1) return { ok: false, erro: MSG_ULTIMO_ADMIN };
-      }
+    const alvo = await situacaoDoAlvo(p, id);
+    if (!alvo) return { ok: false, erro: MSG_NAO_ENCONTRADO };
+    // Desmarcar o último administrador deixaria o painel sem quem gerencie usuários.
+    if (!administrador && alvo.administrador && alvo.unico) {
+      return { ok: false, erro: MSG_ULTIMO_ADMIN };
     }
     await p.update({
       collection: "users",
       id,
       data: {
         nome: dados.nome.trim(),
-        administrador: dados.administrador,
+        administrador,
         telas: acessoDoUsuario({ telas: dados.telas }).telas,
       },
       overrideAccess: true,
@@ -241,22 +266,14 @@ export async function removerUsuario(
   id: string,
   autorId: string,
 ): Promise<ResultadoEscrita> {
+  if (!idValido(id)) return { ok: false, erro: MSG_NAO_ENCONTRADO };
   if (id === autorId) {
     return { ok: false, erro: "Você não pode remover a si mesmo." };
   }
   try {
-    const todos = await p.find({
-      collection: "users",
-      limit: 200,
-      depth: 0,
-      sort: "nome",
-      overrideAccess: true,
-    });
-    const alvo = todos.docs.find((u) => String(u.id) === id);
-    if (alvo && acessoDoUsuario(alvo).administrador) {
-      const administradores = todos.docs.filter((u) => acessoDoUsuario(u).administrador);
-      if (administradores.length <= 1) return { ok: false, erro: MSG_ULTIMO_ADMIN };
-    }
+    const alvo = await situacaoDoAlvo(p, id);
+    if (!alvo) return { ok: false, erro: MSG_NAO_ENCONTRADO };
+    if (alvo.administrador && alvo.unico) return { ok: false, erro: MSG_ULTIMO_ADMIN };
     await p.delete({ collection: "users", id, overrideAccess: true });
     return { ok: true };
   } catch (e) {

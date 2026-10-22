@@ -329,6 +329,14 @@ async function obterPayloadUsuarios(): Promise<PayloadUsuarios> {
         overrideAccess: args.overrideAccess,
       }),
     delete: (args) => payload.delete(args),
+    findByID: async (args) => {
+      try {
+        return await payload.findByID(args);
+      } catch {
+        return null;
+      }
+    },
+    count: (args) => payload.count(args),
     forgotPassword: (args) => payload.forgotPassword(args),
     sendEmail: (args) => payload.sendEmail(args),
   };
