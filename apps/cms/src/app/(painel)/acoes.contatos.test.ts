@@ -84,12 +84,12 @@ describe("salvarContatos (Server Action)", () => {
   });
 });
 
-describe("gate de perfil de salvarContatos", () => {
-  it("editor-eventos é recusado antes de tocar o Global", async () => {
+describe("gate de tela de salvarContatos", () => {
+  it("site.conteudos sem site.contatos é recusado antes de tocar o Global", async () => {
     obterUsuarioCmsMock.mockResolvedValue({
       id: "7",
       nome: "Iara Eventos",
-      perfil: "editor-eventos",
+      acesso: { administrador: false, telas: ["site.conteudos"] },
     });
 
     const r = await salvarContatos(campos);
@@ -98,11 +98,11 @@ describe("gate de perfil de salvarContatos", () => {
     expect(updateGlobal).not.toHaveBeenCalled();
   });
 
-  it("editor-institucional escreve", async () => {
+  it("site.contatos escreve", async () => {
     obterUsuarioCmsMock.mockResolvedValue({
       id: "6",
       nome: "Rui Editor",
-      perfil: "editor-institucional",
+      acesso: { administrador: false, telas: ["site.contatos"] },
     });
     updateGlobal.mockResolvedValue({});
 

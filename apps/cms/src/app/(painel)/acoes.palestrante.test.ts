@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 /**
  * Gates das Server Actions do palestrante. Server Action é endpoint público
- * e a Local API ignora o `access` das coleções, então sessão E perfil
- * (`PERFIS_INSTITUCIONAL`) são checados aqui, antes de qualquer escrita.
+ * e a Local API ignora o `access` das coleções, então sessão E tela
+ * (`site.palestrantes`) são checados aqui, antes de qualquer escrita.
  * A Local API é falsa; `temPerfil` é o real.
  */
 const create = vi.fn();
@@ -23,18 +23,18 @@ vi.mock("@/lib/crm/transacao", () => ({
 const obterUsuarioCmsMock = vi.fn();
 const obterUsuarioAutenticadoMock = vi.fn();
 vi.mock("@/lib/cms/autenticacao", async () => {
-  const { temPerfil } = await import("@/lib/cms/perfis");
-  const comPerfil =
-    (obter: () => Promise<{ perfil?: string } | null>) =>
-    async (permitidos: Parameters<typeof temPerfil>[1]) => {
+  const { temTela, acessoDoUsuario } = await import("@/lib/cms/telas");
+  const comTela =
+    (obter: () => Promise<{ administrador?: boolean; telas?: string[] } | null>) =>
+    async (telas: Parameters<typeof temTela>[1]) => {
       const u = await obter();
-      return u && temPerfil(u.perfil, permitidos) ? u : null;
+      return u && temTela(acessoDoUsuario(u), telas) ? u : null;
     };
   return {
     obterUsuarioCms: obterUsuarioCmsMock,
     obterUsuarioAutenticado: obterUsuarioAutenticadoMock,
-    obterUsuarioCmsComPerfil: comPerfil(obterUsuarioCmsMock),
-    obterUsuarioAutenticadoComPerfil: comPerfil(obterUsuarioAutenticadoMock),
+    obterUsuarioCmsComTela: comTela(obterUsuarioCmsMock),
+    obterUsuarioAutenticadoComTela: comTela(obterUsuarioAutenticadoMock),
   };
 });
 
@@ -43,8 +43,14 @@ vi.mock("next/cache", () => ({ revalidatePath }));
 
 const { carregarOpcoesPalestrante, salvarOrdemCorpoDocente, salvarPalestrante } = await import("./acoes");
 
-const superAdmin = { id: 1, nome: "Ana", perfil: "super-admin" };
-const editorEventos = { id: 2, nome: "Iara", perfil: "editor-eventos" };
+const superAdmin = { id: 1, nome: "Ana", administrador: true, telas: [] };
+const soEventos = { id: 2, nome: "Iara", administrador: false, telas: ["site.eventos"] };
+const soPalestrantes = { id: 3, nome: "Rui", administrador: false, telas: ["site.palestrantes"] };
+const soCorpoDocente = { id: 4, nome: "Eva", administrador: false, telas: ["site.corpo-docente"] };
+const cardDesejado = {
+  formato: "expert",
+  textos: { tag: "", axisBadge: "", credencialCard: "", metaAtuacao: "", metaEixos: "", programasTexto: "", programasStrong: "", sufixoPrograma: "", ctaHref: "", ctaRotulo: "" },
+};
 
 const campos = {
   nome: "Ana Souza",
@@ -88,7 +94,7 @@ afterEach(() => {
 describe("salvarPalestrante (Server Action)", () => {
   it.each([
     ["sem sessão", null],
-    ["com perfil editor-eventos", editorEventos],
+    ["só com site.eventos", soEventos],
   ])("%s, recusa sem tocar a Local API", async (_rotulo, usuario) => {
     obterUsuarioAutenticadoMock.mockResolvedValue(usuario);
     const r = await salvarPalestrante(formulario(JSON.stringify(campos)));
@@ -135,6 +141,59 @@ describe("salvarPalestrante (Server Action)", () => {
     expect(r.palestrante).toMatchObject({ id: "42", nome: "Ana Souza", slug: "ana-souza" });
     expect(r.palestrante?.editavel.corpoDocente).toBeNull();
     expect(revalidatePath).toHaveBeenCalledWith("/");
+  });
+});
+
+describe("salvarPalestrante — bloco Corpo Docente por tela", () => {
+  function preparaCriacao() {
+    create.mockImplementation(async (args: { collection: string }) =>
+      args.collection === "media" ? { id: 90 } : { id: 42 },
+    );
+    findGlobal.mockResolvedValue({ cards: [{ formato: "expert", especialista: 1, id: "c1" }] });
+    findByID.mockResolvedValue({ id: 42, nome: "Ana Souza", slug: "ana-souza" });
+    find.mockResolvedValue({ docs: [] });
+  }
+
+  it("site.palestrantes sem o bloco → salva", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(soPalestrantes);
+    preparaCriacao();
+    const r = await salvarPalestrante(formulario(JSON.stringify(campos)));
+    expect(r.resultado.ok).toBe(true);
+  });
+
+  it("site.palestrantes com o bloco → recusa antes de qualquer escrita", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(soPalestrantes);
+    preparaCriacao();
+    const r = await salvarPalestrante(formulario(JSON.stringify({ ...campos, corpoDocente: cardDesejado })));
+    expect(r.resultado).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
+    nenhumaEscrita();
+  });
+
+  it("com site.palestrantes e site.corpo-docente, o bloco é gravado", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue({ ...soPalestrantes, telas: ["site.palestrantes", "site.corpo-docente"] });
+    preparaCriacao();
+    const r = await salvarPalestrante(formulario(JSON.stringify({ ...campos, corpoDocente: cardDesejado })));
+    expect(r.resultado.ok).toBe(true);
+    expect(updateGlobal).toHaveBeenCalled();
+  });
+
+  it("só site.corpo-docente (sem site.palestrantes) é recusado", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(soCorpoDocente);
+    const r = await salvarPalestrante(formulario(JSON.stringify(campos)));
+    expect(r.resultado.ok).toBe(false);
+    nenhumaEscrita();
+  });
+});
+
+describe("salvarOrdemCorpoDocente por tela", () => {
+  it("site.palestrantes sem site.corpo-docente é recusado; com a tela, grava", async () => {
+    findGlobal.mockResolvedValue({ cards: [{ formato: "expert", especialista: 7, id: "a" }] });
+    updateGlobal.mockResolvedValue({});
+    obterUsuarioAutenticadoMock.mockResolvedValue(soPalestrantes);
+    expect((await salvarOrdemCorpoDocente(["7"])).resultado.ok).toBe(false);
+    expect(updateGlobal).not.toHaveBeenCalled();
+    obterUsuarioAutenticadoMock.mockResolvedValue(soCorpoDocente);
+    expect((await salvarOrdemCorpoDocente(["7"])).resultado.ok).toBe(true);
   });
 });
 
