@@ -14,21 +14,21 @@ vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
 const obterUsuarioCmsMock = vi.fn();
 const obterUsuarioAutenticadoMock = vi.fn();
-// As variantes com perfil reproduzem `autenticacao.ts` sobre os mocks de
-// sessão, com o `temPerfil` real — a regra de perfil é exercitada de verdade.
+// As variantes com tela reproduzem `autenticacao.ts` sobre os mocks de
+// sessão, com `temTela`/`acessoDoUsuario` reais — a regra é exercitada de verdade.
 vi.mock("@/lib/cms/autenticacao", async () => {
-  const { temPerfil } = await import("@/lib/cms/perfis");
-  const comPerfil =
-    (obter: () => Promise<{ perfil?: string } | null>) =>
-    async (permitidos: Parameters<typeof temPerfil>[1]) => {
+  const { temTela, acessoDoUsuario } = await import("@/lib/cms/telas");
+  const comTela =
+    (obter: () => Promise<{ administrador?: boolean; telas?: string[] } | null>) =>
+    async (telas: Parameters<typeof temTela>[1]) => {
       const u = await obter();
-      return u && temPerfil(u.perfil, permitidos) ? u : null;
+      return u && temTela(acessoDoUsuario(u), telas) ? u : null;
     };
   return {
     obterUsuarioCms: obterUsuarioCmsMock,
     obterUsuarioAutenticado: obterUsuarioAutenticadoMock,
-    obterUsuarioCmsComPerfil: comPerfil(obterUsuarioCmsMock),
-    obterUsuarioAutenticadoComPerfil: comPerfil(obterUsuarioAutenticadoMock),
+    obterUsuarioCmsComTela: comTela(obterUsuarioCmsMock),
+    obterUsuarioAutenticadoComTela: comTela(obterUsuarioAutenticadoMock),
   };
 });
 
@@ -46,11 +46,11 @@ const executarEmTransacaoMock = vi.fn(
 );
 vi.mock("@/lib/crm/transacao", () => ({ executarEmTransacao: executarEmTransacaoMock }));
 
-const { moverLeadCrm, salvarClienteCrm, agendarEventoCrm, apagarLeadCrm, restaurarConteudoPropostaCrm, salvarSecaoConteudoPropostaCrm } = await import("./acoesCrm");
+const { moverLeadCrm, salvarClienteCrm, apagarClienteCrm, carregarClienteCrm, carregarLeadCrm, salvarLeadCrm, vincularClienteCrm, marcarEventoRealizadoCrm, adicionarNotaCrm, agendarEventoCrm, apagarLeadCrm, restaurarConteudoPropostaCrm, salvarSecaoConteudoPropostaCrm } = await import("./acoesCrm");
 type DadosClienteCrm = Parameters<typeof salvarClienteCrm>[1];
 type DadosEvento = Parameters<typeof agendarEventoCrm>[1];
 
-const usuarioFalso = { id: "5", nome: "Ana Diretora", perfil: "super-admin" };
+const usuarioFalso = { id: "5", nome: "Ana Diretora", administrador: true, telas: [] };
 
 const dadosBase: DadosClienteCrm = {
   orgao: "SME",
@@ -204,16 +204,57 @@ describe("salvarSecaoConteudoPropostaCrm", () => {
   });
 });
 
-describe("acoesCrm — perfil do CRM", () => {
-  it("editores não chegam ao CRM: recusa sem tocar a Local API", async () => {
-    for (const perfil of ["editor-institucional", "editor-eventos"]) {
-      const usuario = { id: "8", nome: "Editor", perfil };
-      obterUsuarioCmsMock.mockResolvedValue(usuario);
-      obterUsuarioAutenticadoMock.mockResolvedValue(usuario);
-      expect(await moverLeadCrm("1", "em-contato")).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
-      expect(await salvarClienteCrm(null, dadosBase)).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
-      expect(await apagarLeadCrm("1", "Fulano")).toEqual({ ok: false, erro: "Sessão expirada ou sem permissão para esta ação." });
-    }
+const RECUSA = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
+
+function logar(usuario: { id: string; nome: string; administrador: boolean; telas: string[] }) {
+  obterUsuarioCmsMock.mockResolvedValue(usuario);
+  obterUsuarioAutenticadoMock.mockResolvedValue(usuario);
+}
+
+describe("acoesCrm — permissão por tela", () => {
+  it("usuário sem telas do CRM: recusa sem tocar a Local API", async () => {
+    logar({ id: "8", nome: "Editor", administrador: false, telas: ["site.eventos"] });
+    expect(await moverLeadCrm("1", "em-contato")).toEqual(RECUSA);
+    expect(await salvarClienteCrm(null, dadosBase)).toEqual(RECUSA);
+    expect(await apagarLeadCrm("1", "Fulano")).toEqual(RECUSA);
     expect(obterPayloadMock).not.toHaveBeenCalled();
+  });
+
+  it("secretaria (leads + propostas): move lead e salva proposta; cliente é recusado", async () => {
+    const { update } = montarPayloadFalso();
+    logar({ id: "9", nome: "Secretaria", administrador: false, telas: ["crm.leads", "crm.propostas"] });
+    expect((await moverLeadCrm("1", "em-contato")).ok).toBe(true);
+    update.mockClear();
+    expect(await salvarClienteCrm(null, dadosBase)).toEqual(RECUSA);
+    expect(await apagarClienteCrm("3")).toEqual(RECUSA);
+    expect(await carregarClienteCrm("3")).toBeNull();
+    expect(update).not.toHaveBeenCalled();
+    // proposta: passa pela guarda (o resultado do restante não importa aqui)
+    obterPayloadMock.mockClear();
+    await salvarSecaoConteudoPropostaCrm("9", "fechamento", { tipo: "texto", texto: "x" });
+    expect(obterPayloadMock).toHaveBeenCalled();
+  });
+
+  it("só Leads: salvarLeadCrm com cliente novo e vincularClienteCrm passam (§3.7)", async () => {
+    montarPayloadFalso();
+    logar({ id: "9", nome: "Leads", administrador: false, telas: ["crm.leads"] });
+    const guarda = await vincularClienteCrm("1", "3");
+    expect(guarda).not.toEqual(RECUSA);
+    const r = await salvarLeadCrm(null, {
+      nome: "Fulano", email: "f@x.gov.br", telefone: "", cargo: "", instituicao: "", esfera: "", programa: "",
+      modalidade: "", participantesEstimados: "", mensagem: "", cliente: "", novoClienteOrgao: "SME Nova",
+      responsavel: "", valorEstimado: "", dataPrevistaEvento: "", observacoes: "",
+    });
+    expect(r).not.toEqual(RECUSA);
+  });
+
+  it("só Clientes: carregarLeadCrm null, evento realizado ok, agendar recusado, nota ok", async () => {
+    montarPayloadFalso();
+    logar({ id: "10", nome: "Clientes", administrador: false, telas: ["crm.clientes"] });
+    expect(await carregarLeadCrm("1")).toBeNull();
+    expect(await agendarEventoCrm("1", dadosEventoBase)).toEqual(RECUSA);
+    expect(await marcarEventoRealizadoCrm("4")).not.toEqual(RECUSA);
+    expect(await adicionarNotaCrm("3", null, "nota")).not.toEqual(RECUSA);
+    expect(await moverLeadCrm("1", "em-contato")).toEqual(RECUSA);
   });
 });
