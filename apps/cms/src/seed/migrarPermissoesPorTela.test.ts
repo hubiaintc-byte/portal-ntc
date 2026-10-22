@@ -4,6 +4,12 @@ import { capacidadesDoAcesso } from "../lib/cms/telas";
 import { acessoDoPerfilLegado, planejarMigracao } from "./migrarPermissoesPorTela";
 
 describe("planejarMigracao", () => {
+  it("usuário criado depois da etapa 1 (perfil null, sem telas) não ganha tela num novo run", () => {
+    expect(planejarMigracao([{ id: 9, perfil: null, administrador: false, telas: [] }])).toEqual([
+      { id: 9, administrador: false, telas: [] },
+    ]);
+  });
+
   it("super-admin vira administrador", () => {
     expect(planejarMigracao([{ id: 1, perfil: "super-admin" }])).toEqual([
       { id: 1, administrador: true, telas: [] },

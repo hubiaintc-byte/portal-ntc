@@ -129,6 +129,10 @@ export async function criarUsuario(
         email: dados.email.trim(),
         administrador: dados.administrador === true,
         telas: acessoDoUsuario({ telas: dados.telas }).telas,
+        // `null` explícito: sem ele o Payload aplica o `defaultValue` legado
+        // ("editor-institucional") e um novo `permissoes:migrar` daria telas
+        // a quem foi criado sem nenhuma.
+        perfil: null,
         password: gerarSenhaAleatoria(),
       },
       overrideAccess: true,

@@ -75,7 +75,8 @@ describe("criarUsuario", () => {
     expect(dataCriada.email).toBe("bruno@ntc.org");
     expect(dataCriada.administrador).toBe(false);
     expect(dataCriada.telas).toEqual(["site.eventos", "crm.leads"]);
-    expect(dataCriada).not.toHaveProperty("perfil");
+    // null explícito: não herda o defaultValue legado do campo oculto.
+    expect(dataCriada.perfil).toBeNull();
     expect(typeof dataCriada.password).toBe("string");
     expect((dataCriada.password as string).length).toBe(24);
 
