@@ -1,8 +1,7 @@
+import { acessoPorTela } from "../access/porTela";
 import type { GlobalConfig } from "payload";
 
 import { VERTICAIS_CONTATO } from "@ntc/lib";
-
-import { editorInstitucional } from "../access/editorInstitucional";
 
 /**
  * Global Rodapé (doc 11 §14).
@@ -14,7 +13,7 @@ export const Rodape: GlobalConfig = {
   slug: "rodape",
   label: "Contatos institucionais",
   admin: { group: "Páginas Singleton" },
-  access: { read: () => true, update: editorInstitucional },
+  access: { read: () => true, update: acessoPorTela(["site.contatos"]) },
   fields: [
     {
       name: "assinaturaInstitucional",

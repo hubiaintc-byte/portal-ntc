@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { obterUsuarioCmsComPerfil } from "@/lib/cms/autenticacao";
-import { PERFIS_CRM } from "@/lib/cms/perfis";
+import { obterUsuarioCmsComTela } from "@/lib/cms/autenticacao";
 import { gerarESalvarPdfProposta } from "@/lib/cms/painelCrmEscrita";
 import { obterDadosDocumentoProposta } from "@/lib/documentoProposta/dados";
 import { montarHtmlDocumentoProposta } from "@/lib/documentoProposta/html";
@@ -29,8 +28,8 @@ export const maxDuration = 60;
 export const runtime = "nodejs";
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  // Proposta tem preço, desconto e dados de contato: só o perfil do CRM.
-  const usuario = await obterUsuarioCmsComPerfil(PERFIS_CRM);
+  // Proposta tem preço, desconto e dados de contato: só quem tem a tela Propostas.
+  const usuario = await obterUsuarioCmsComTela(["crm.propostas"]);
   if (!usuario) {
     return NextResponse.json({ erro: "Sessão expirada ou sem permissão." }, { status: 401 });
   }

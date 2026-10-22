@@ -27,10 +27,17 @@ interface DetalhePalestranteProps {
    * lista e mostra o aviso.
    */
   onSalvou: (avisoSemReleitura?: string) => void;
+  /**
+   * false ⇒ sem a tela de escrita em palestrantes (`capacidades.editarPalestrantes`):
+   * some "Editar" e o switch "Ocultar do site" vira texto de estado.
+   */
+  podeEditar: boolean;
+  /** `capacidades.editarCardCorpoDocente`: repassado ao formulário. */
+  podeEditarCard: boolean;
 }
 
 /** Tela cheia de detalhe de um palestrante — leitura, visibilidade e modo edição. */
-export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou }: DetalhePalestranteProps) {
+export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou, podeEditar, podeEditarCard }: DetalhePalestranteProps) {
   const [p, setP] = useState(inicial);
   const [salvando, iniciarSalvar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
@@ -64,11 +71,12 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou }:
     });
   }
 
-  if (editando && opcoes) {
+  if (podeEditar && editando && opcoes) {
     return (
       <FormPalestrante
         palestrante={p}
         opcoes={opcoes}
+        podeEditarCard={podeEditarCard}
         onCancelar={() => setEditando(false)}
         onSalvou={(salvo, aviso) => {
           setEditando(false);
@@ -112,21 +120,23 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou }:
           {p.vertical && <span className="pcms-selo-vert">{rotuloDocente(p.vertical)}</span>}
           {p.ocultarDoSite && <span className="pcms-selo pcms-selo--oculto">Oculto do site</span>}
         </div>
-        <div className="pcms-det-head__acoes">
-          <button
-            type="button"
-            className="pcms-btn pcms-btn--ghost"
-            onClick={abrirEdicao}
-            disabled={abrindoEdicao}
-          >
-            {abrindoEdicao ? "Abrindo…" : "Editar"}
-          </button>
-          {erroEdicao && (
-            <p className="pcms-erro" role="alert">
-              {erroEdicao}
-            </p>
-          )}
-        </div>
+        {podeEditar && (
+          <div className="pcms-det-head__acoes">
+            <button
+              type="button"
+              className="pcms-btn pcms-btn--ghost"
+              onClick={abrirEdicao}
+              disabled={abrindoEdicao}
+            >
+              {abrindoEdicao ? "Abrindo…" : "Editar"}
+            </button>
+            {erroEdicao && (
+              <p className="pcms-erro" role="alert">
+                {erroEdicao}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="pcms-det-grid">
@@ -161,15 +171,21 @@ export function DetalhePalestrante({ palestrante: inicial, onVoltar, onSalvou }:
                       : "Aparece normalmente nas páginas públicas."}
                   </small>
                 </span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={p.ocultarDoSite}
-                  aria-label="Ocultar do site"
-                  className={`pcms-switch${p.ocultarDoSite ? " pcms-switch--on" : ""}`}
-                  onClick={alternarVisibilidade}
-                  disabled={salvando}
-                />
+                {podeEditar ? (
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={p.ocultarDoSite}
+                    aria-label="Ocultar do site"
+                    className={`pcms-switch${p.ocultarDoSite ? " pcms-switch--on" : ""}`}
+                    onClick={alternarVisibilidade}
+                    disabled={salvando}
+                  />
+                ) : (
+                  <span className={`pcms-selo pcms-selo--${p.ocultarDoSite ? "oculto" : "publicado"}`}>
+                    {p.ocultarDoSite ? "Oculto" : "Visível"}
+                  </span>
+                )}
               </div>
               {erro && <p className="pcms-erro">{erro}</p>}
             </div>

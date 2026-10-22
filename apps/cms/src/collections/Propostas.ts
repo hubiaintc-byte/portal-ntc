@@ -1,9 +1,7 @@
+import { acessoPorTela, administrador } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
 import { STATUS_PROPOSTA, TIPOS_PROPOSTA } from "@ntc/lib";
-
-import { atendimentoComercial } from "../access/atendimentoComercial";
-import { superAdmin } from "../access/superAdmin";
 
 /**
  * Propostas comerciais (spec 2026-07-22 · Fase B1). Derivados (valorBruto,
@@ -20,10 +18,10 @@ export const Propostas: CollectionConfig = {
     group: "CRM",
   },
   access: {
-    read: atendimentoComercial,
-    create: atendimentoComercial,
-    update: atendimentoComercial,
-    delete: superAdmin,
+    read: acessoPorTela(["crm.propostas"]),
+    create: acessoPorTela(["crm.propostas"]),
+    update: acessoPorTela(["crm.propostas"]),
+    delete: administrador,
   },
   fields: [
     { name: "codigoBase", type: "text", required: true, index: true },
@@ -81,7 +79,9 @@ export const Propostas: CollectionConfig = {
     {
       name: "docentes",
       type: "array",
-      admin: { description: "Escolher da coleção preenche nome e credencial; entrada livre é permitida." },
+      admin: {
+        description: "Escolher da coleção preenche nome e credencial; entrada livre é permitida.",
+      },
       fields: [
         { name: "especialista", type: "relationship", relationTo: "especialistas" },
         { name: "nome", type: "text" },

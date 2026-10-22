@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 
 import { ESFERA_INSTITUCIONAL, MODALIDADE_PROPOSTA } from "@ntc/lib";
 
-import type { CatalogoCrm, ClienteCrmResumo, LeadCrmDetalhe, UsuarioCmsResumo } from "@/lib/cms/painelCrm";
+import type { CatalogoCrm, ClienteOpcao, LeadCrmDetalhe, UsuarioCmsResumo } from "@/lib/cms/painelCrm";
 import type { DadosLeadManual } from "@/lib/cms/painelCrmEscrita";
 
 import { salvarLeadCrm } from "../acoesCrm";
@@ -12,7 +12,7 @@ import { AvisoForm, CampoArea, CampoData, CampoNumero, CampoSelect, CampoTexto }
 
 interface FormLeadProps {
   inicial: LeadCrmDetalhe | null;
-  clientes: ClienteCrmResumo[];
+  clientes: ClienteOpcao[];
   catalogo: CatalogoCrm;
   usuarios: UsuarioCmsResumo[];
   onSalvo: () => void;

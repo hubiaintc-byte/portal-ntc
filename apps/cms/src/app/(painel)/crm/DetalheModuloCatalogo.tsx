@@ -19,9 +19,22 @@ interface DetalheModuloCatalogoProps {
   onVoltar: () => void;
   onSalvo: (id: string) => void;
   onExcluido: () => void;
+  /**
+   * false ⇒ sem a tela Módulos nem Programas (`capacidades.editarModulos`):
+   * somem Salvar e a zona de risco; campos desabilitados.
+   */
+  podeEditar: boolean;
 }
 
-export function DetalheModuloCatalogo({ modulo: m, programaIdInicial, programas, onVoltar, onSalvo, onExcluido }: DetalheModuloCatalogoProps) {
+export function DetalheModuloCatalogo({
+  modulo: m,
+  programaIdInicial,
+  programas,
+  onVoltar,
+  onSalvo,
+  onExcluido,
+  podeEditar,
+}: DetalheModuloCatalogoProps) {
   const novo = m === null;
   const [dados, setDados] = useState<DadosModulo>({
     programaId: m?.programaId ?? programaIdInicial ?? "",
@@ -82,11 +95,13 @@ export function DetalheModuloCatalogo({ modulo: m, programaIdInicial, programas,
           <p className="pcms-pagehead__eyebrow">Catálogo Institucional · Módulo</p>
           <h1>{novo ? "Novo módulo" : m.titulo}</h1>
         </div>
-        <div className="pcms-pagehead__acoes">
-          <button type="button" className="pcms-btn" disabled={enviando} onClick={salvar}>
-            {enviando ? "Salvando…" : "Salvar"}
-          </button>
-        </div>
+        {podeEditar && (
+          <div className="pcms-pagehead__acoes">
+            <button type="button" className="pcms-btn" disabled={enviando} onClick={salvar}>
+              {enviando ? "Salvando…" : "Salvar"}
+            </button>
+          </div>
+        )}
       </div>
 
       <p className="pcms-aviso" role="note">
@@ -94,6 +109,8 @@ export function DetalheModuloCatalogo({ modulo: m, programaIdInicial, programas,
       </p>
       <AvisoForm erro={erro} />
 
+      {/* Sem permissão de escrita, o fieldset desabilita todos os campos de uma vez. */}
+      <fieldset className="pcms-somente-leitura" disabled={!podeEditar}>
       <section className="pcms-det-bloco">
         <h2>Módulo</h2>
         <CampoSelect
@@ -116,8 +133,9 @@ export function DetalheModuloCatalogo({ modulo: m, programaIdInicial, programas,
         <CampoTexto rotulo="Replay" valor={dados.replay} onMudar={mudar("replay")} curto />
         <CampoTexto rotulo="Certificação" valor={dados.certificacao} onMudar={mudar("certificacao")} />
       </section>
+      </fieldset>
 
-      {!novo && (
+      {podeEditar && !novo && (
         <section className="pcms-det-bloco">
           <h2>Zona de risco</h2>
           {!podeExcluir.ok && <p className="pcms-pagehead__aviso-apagar">{podeExcluir.motivo}</p>}

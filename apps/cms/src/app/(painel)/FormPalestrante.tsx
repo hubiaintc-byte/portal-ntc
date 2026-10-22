@@ -70,6 +70,11 @@ interface FormPalestranteProps {
   opcoes: { areas: { id: string; nome: string }[]; programas: { id: string; sigla: string }[] };
   onCancelar: () => void;
   /**
+   * false ⇒ sem a tela Corpo Docente (`capacidades.editarCardCorpoDocente`):
+   * o bloco não aparece e o payload não leva `corpoDocente` (o card fica como está).
+   */
+  podeEditarCard: boolean;
+  /**
    * `p` null: gravou, mas a releitura falhou — `aviso` explica e quem chama
    * volta para a lista em vez de mostrar dados velhos.
    */
@@ -101,7 +106,7 @@ const CAMPOS_VAZIOS: CamposPalestrante = {
  * Salvar grava publicado (spec §4.1) — o especialista e o card do Corpo
  * Docente numa transação só, no servidor.
  */
-export function FormPalestrante({ palestrante, opcoes, onCancelar, onSalvou }: FormPalestranteProps) {
+export function FormPalestrante({ palestrante, opcoes, onCancelar, onSalvou, podeEditarCard }: FormPalestranteProps) {
   const novo = palestrante === null;
   const inicial = palestrante?.editavel ?? CAMPOS_VAZIOS;
   // Markdown de partida dos currículos: só reenvia o que mudou, para não
@@ -117,7 +122,7 @@ export function FormPalestrante({ palestrante, opcoes, onCancelar, onSalvou }: F
     linhasAtuacaoIds: [...inicial.linhasAtuacaoIds],
     programasIds: [...inicial.programasIds],
   }));
-  const [cardLigado, setCardLigado] = useState(inicial.corpoDocente !== null);
+  const [cardLigado, setCardLigado] = useState((inicial.corpoDocente ?? null) !== null);
   const [formato, setFormato] = useState<FormatoCard>(inicial.corpoDocente?.formato ?? "expert");
   const [textos, setTextos] = useState<TextosCard>(() => ({
     ...(inicial.corpoDocente?.textos ?? TEXTOS_CARD_VAZIOS),
@@ -168,7 +173,7 @@ export function FormPalestrante({ palestrante, opcoes, onCancelar, onSalvou }: F
       setCardLigado(true);
       return;
     }
-    const cardExistia = inicial.corpoDocente !== null;
+    const cardExistia = (inicial.corpoDocente ?? null) !== null;
     if (cardExistia && !confirmandoDesligar) {
       setConfirmandoDesligar(true);
       return;
@@ -207,7 +212,8 @@ export function FormPalestrante({ palestrante, opcoes, onCancelar, onSalvou }: F
       curriculoCurtoMarkdown: novo || curto !== curtoInicial.current ? curto : undefined,
       curriculoCompletoMarkdown:
         completo !== completoInicial.current ? completo : undefined,
-      corpoDocente: cardLigado ? { formato, textos } : null,
+      // Sem a tela Corpo Docente a chave some do payload: o servidor não toca o card.
+      corpoDocente: podeEditarCard ? (cardLigado ? { formato, textos } : null) : undefined,
     };
 
     const fd = new FormData();
@@ -546,16 +552,18 @@ export function FormPalestrante({ palestrante, opcoes, onCancelar, onSalvou }: F
         </div>
       </section>
 
-      <BlocoCorpoDocente
-        ligado={cardLigado}
-        confirmandoDesligar={confirmandoDesligar}
-        oculto={campos.ocultarDoSite}
-        formato={formato}
-        textos={textos}
-        onAlternar={alternarCard}
-        onFormato={setFormato}
-        onTexto={mudarTexto}
-      />
+      {podeEditarCard && (
+        <BlocoCorpoDocente
+          ligado={cardLigado}
+          confirmandoDesligar={confirmandoDesligar}
+          oculto={campos.ocultarDoSite}
+          formato={formato}
+          textos={textos}
+          onAlternar={alternarCard}
+          onFormato={setFormato}
+          onTexto={mudarTexto}
+        />
+      )}
 
       <div className="pcms-editor__acoes">
         <button type="button" className="pcms-btn" onClick={salvar} disabled={salvando}>

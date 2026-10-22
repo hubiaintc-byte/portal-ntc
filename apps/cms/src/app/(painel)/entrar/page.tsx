@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { obterUsuarioCms } from "@/lib/cms/autenticacao";
+import { destinoDepoisDoLogin } from "@/lib/cms/navegacao";
 
 import { FormLogin } from "./FormLogin";
 
@@ -9,10 +10,12 @@ export const dynamic = "force-dynamic";
 /**
  * /entrar — login do Painel Admin. Layout split institucional (opção B
  * aprovada): painel Oxford com a assinatura da marca à esquerda, formulário
- * sobre osso à direita. Quem já tem sessão válida vai direto para /.
+ * sobre osso à direita. Quem já tem sessão válida vai direto ao destino
+ * dela (`destinoDepoisDoLogin`: /crm se só tem telas do CRM, senão /).
  */
 export default async function EntrarPage() {
-  if (await obterUsuarioCms()) redirect("/");
+  const usuario = await obterUsuarioCms();
+  if (usuario) redirect(destinoDepoisDoLogin(usuario.acesso));
 
   return (
     <main className="pcms-login">

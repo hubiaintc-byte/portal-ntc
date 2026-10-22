@@ -1,6 +1,6 @@
+import { administrador } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
-import { editorInstitucional } from "../access/editorInstitucional";
 import { autoSlug } from "../hooks/autoSlug";
 import { seoFields } from "../shared/seoFields";
 import { AREA_SIGLAS } from "../shared/types";
@@ -23,9 +23,9 @@ export const Areas: CollectionConfig = {
   },
   access: {
     read: leituraPublica(),
-    create: editorInstitucional,
-    update: editorInstitucional,
-    delete: () => false,
+    create: administrador,
+    update: administrador,
+    delete: administrador,
   },
   versions: { drafts: true, maxPerDoc: 20 },
   fields: [

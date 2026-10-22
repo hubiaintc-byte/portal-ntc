@@ -1,7 +1,7 @@
+import { acessoPorTela, administrador } from "../access/porTela";
+import { TELAS_LEADS } from "../lib/cms/telas";
 import type { CollectionConfig } from "payload";
 
-import { atendimentoComercial } from "../access/atendimentoComercial";
-import { superAdmin } from "../access/superAdmin";
 import { registrarEventoNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
 
 /**
@@ -13,18 +13,28 @@ export const EventosComerciais: CollectionConfig = {
   slug: "eventos-comerciais",
   labels: { singular: "Evento comercial", plural: "Eventos comerciais" },
   typescript: { interface: "EventoComercial" },
-  admin: { useAsTitle: "titulo", defaultColumns: ["titulo", "cliente", "dataInicio", "status"], group: "CRM" },
+  admin: {
+    useAsTitle: "titulo",
+    defaultColumns: ["titulo", "cliente", "dataInicio", "status"],
+    group: "CRM",
+  },
   access: {
-    read: atendimentoComercial,
-    create: atendimentoComercial,
-    update: atendimentoComercial,
-    delete: superAdmin,
+    read: acessoPorTela([...TELAS_LEADS, "crm.clientes"]),
+    create: acessoPorTela([...TELAS_LEADS, "crm.clientes"]),
+    update: acessoPorTela([...TELAS_LEADS, "crm.clientes"]),
+    delete: administrador,
   },
   hooks: { afterChange: [registrarEventoNaLinhaDoTempo] },
   fields: [
     // opcional para o lead poder ser apagado sem cascata (spec §5.6)
     { name: "lead", type: "relationship", relationTo: "leads", index: true },
-    { name: "cliente", type: "relationship", relationTo: "clientes-crm", required: true, index: true },
+    {
+      name: "cliente",
+      type: "relationship",
+      relationTo: "clientes-crm",
+      required: true,
+      index: true,
+    },
     { name: "proposta", type: "relationship", relationTo: "propostas" },
     { name: "titulo", type: "text", required: true },
     { name: "dataInicio", type: "date", required: true },

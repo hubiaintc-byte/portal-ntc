@@ -1,6 +1,6 @@
+import { acessoPorTela } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
-import { editorEventos } from "../access/editorEventos";
 import { autoSlug } from "../hooks/autoSlug";
 import { revalidatePage } from "../hooks/revalidatePage";
 import { seoFields } from "../shared/seoFields";
@@ -26,9 +26,9 @@ export const Eventos: CollectionConfig = {
   },
   access: {
     read: leituraPublica(),
-    create: editorEventos,
-    update: editorEventos,
-    delete: editorEventos,
+    create: acessoPorTela(["site.eventos"]),
+    update: acessoPorTela(["site.eventos"]),
+    delete: acessoPorTela(["site.eventos"]),
   },
   versions: { drafts: true, maxPerDoc: 50 },
   hooks: {
@@ -221,7 +221,11 @@ export const Eventos: CollectionConfig = {
               admin: { condition: (d) => Boolean(d?.replayDisponivel) },
             },
             { name: "certificadoEmitido", type: "checkbox" },
-            { name: "observacoesCertificado", type: "textarea", access: { read: campoSoParaLogado } },
+            {
+              name: "observacoesCertificado",
+              type: "textarea",
+              access: { read: campoSoParaLogado },
+            },
           ],
         },
         {
@@ -263,8 +267,17 @@ export const Eventos: CollectionConfig = {
       access: { read: campoSoParaLogado },
       admin: { description: "Usado pelo módulo CRM do painel; o site ignora este grupo." },
       fields: [
-        { name: "codigo", type: "text", admin: { description: "Código comercial do produto (CRM legado)." } },
-        { name: "valor", type: "number", min: 0, admin: { description: "Valor de referência (R$)." } },
+        {
+          name: "codigo",
+          type: "text",
+          admin: { description: "Código comercial do produto (CRM legado)." },
+        },
+        {
+          name: "valor",
+          type: "number",
+          min: 0,
+          admin: { description: "Valor de referência (R$)." },
+        },
       ],
     },
   ],

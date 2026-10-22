@@ -17,8 +17,14 @@ const OPCOES: OpcaoModulo[] = [
   { id: "crm", rotulo: "CRM", descricao: "Comercial", href: "/crm" },
 ];
 
+interface SeletorModuloProps {
+  modulo: ModuloPainel;
+  /** false = a pessoa não tem tela do CRM: só o Site aparece (é onde fica Minha conta). */
+  mostrarCrm: boolean;
+}
+
 /** Droplist de módulo (workspace switcher) da sidebar do painel. */
-export function SeletorModulo({ modulo }: { modulo: ModuloPainel }) {
+export function SeletorModulo({ modulo, mostrarCrm }: SeletorModuloProps) {
   const [aberto, setAberto] = useState(false);
   const raiz = useRef<HTMLDivElement>(null);
   const botaoRef = useRef<HTMLButtonElement>(null);
@@ -42,7 +48,8 @@ export function SeletorModulo({ modulo }: { modulo: ModuloPainel }) {
     };
   }, [aberto]);
 
-  const atual = OPCOES.find((o) => o.id === modulo);
+  const opcoes = OPCOES.filter((o) => o.id !== "crm" || mostrarCrm);
+  const atual = opcoes.find((o) => o.id === modulo);
   if (!atual) return null;
 
   return (
@@ -65,7 +72,7 @@ export function SeletorModulo({ modulo }: { modulo: ModuloPainel }) {
       </button>
       {aberto && (
         <div className="pcms-seletor-modulo__menu" role="menu" aria-label="Trocar de módulo">
-          {OPCOES.map((o) => (
+          {opcoes.map((o) => (
             <Link
               key={o.id}
               role="menuitem"

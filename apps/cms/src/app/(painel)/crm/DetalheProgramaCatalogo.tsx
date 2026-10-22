@@ -29,11 +29,25 @@ interface DetalheProgramaCatalogoProps {
   onExcluido: () => void;
   onAbrirModulo: (id: string) => void;
   onNovoModulo: (programaId: string) => void;
+  /**
+   * false ⇒ sem a tela Programas (`capacidades.editarProgramas`):
+   * somem Salvar/Publicar, "Novo módulo" e a zona de risco; campos desabilitados.
+   */
+  podeEditar: boolean;
 }
 
 const TEXTOS_VAZIOS: Record<CampoTextoPrograma, string> = { visaoGeral: "", problema: "", objetivo: "", publicoAlvo: "", metodologia: "" };
 
-export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo, onExcluido, onAbrirModulo, onNovoModulo }: DetalheProgramaCatalogoProps) {
+export function DetalheProgramaCatalogo({
+  programa: p,
+  areas,
+  onVoltar,
+  onSalvo,
+  onExcluido,
+  onAbrirModulo,
+  onNovoModulo,
+  podeEditar,
+}: DetalheProgramaCatalogoProps) {
   const novo = p === null;
   const [sigla, setSigla] = useState(p?.sigla ?? "");
   const [nome, setNome] = useState(p?.nomeCompleto ?? "");
@@ -108,14 +122,16 @@ export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo,
           <h1>{novo ? "Novo programa" : p.nomeCompleto || p.sigla}</h1>
           {!novo && <span className={seloDeSituacaoPrograma(p.situacao)}>{rotuloSituacaoPrograma(p.situacao)}</span>}
         </div>
-        <div className="pcms-pagehead__acoes">
-          <button type="button" className="pcms-btn pcms-btn--ghost" disabled={enviando} onClick={() => gravar(false)}>
-            {enviando ? "Salvando…" : "Salvar rascunho"}
-          </button>
-          <button type="button" className="pcms-btn" disabled={enviando} onClick={() => gravar(true)}>
-            Publicar
-          </button>
-        </div>
+        {podeEditar && (
+          <div className="pcms-pagehead__acoes">
+            <button type="button" className="pcms-btn pcms-btn--ghost" disabled={enviando} onClick={() => gravar(false)}>
+              {enviando ? "Salvando…" : "Salvar rascunho"}
+            </button>
+            <button type="button" className="pcms-btn" disabled={enviando} onClick={() => gravar(true)}>
+              Publicar
+            </button>
+          </div>
+        )}
       </div>
 
       {(novo || p.situacao === "rascunho") && (
@@ -133,6 +149,8 @@ export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo,
       </p>
       <AvisoForm erro={erro} />
 
+      {/* Sem permissão de escrita, o fieldset desabilita todos os campos de uma vez. */}
+      <fieldset className="pcms-somente-leitura" disabled={!podeEditar}>
       <section className="pcms-det-bloco">
         <h2>Identificação</h2>
         <CampoTexto rotulo="Sigla" valor={sigla} onMudar={setSigla} obrigatorio curto />
@@ -179,6 +197,7 @@ export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo,
         novo={() => ({ texto: "" })}
         campos={[{ chave: "texto", rotulo: "Resultado", area: true }]}
       />
+      </fieldset>
 
       {!novo && (
         <section className="pcms-det-bloco">
@@ -197,13 +216,15 @@ export function DetalheProgramaCatalogo({ programa: p, areas, onVoltar, onSalvo,
               ))}
             </ul>
           )}
-          <button type="button" className="pcms-btn pcms-btn--ghost" onClick={() => onNovoModulo(p.id)}>
-            Novo módulo neste programa
-          </button>
+          {podeEditar && (
+            <button type="button" className="pcms-btn pcms-btn--ghost" onClick={() => onNovoModulo(p.id)}>
+              Novo módulo neste programa
+            </button>
+          )}
         </section>
       )}
 
-      {!novo && (
+      {podeEditar && !novo && (
         <section className="pcms-det-bloco">
           <h2>Zona de risco</h2>
           {!podeExcluir.ok && <p className="pcms-pagehead__aviso-apagar">{podeExcluir.motivo}</p>}

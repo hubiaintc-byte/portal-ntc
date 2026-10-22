@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import type {
@@ -14,7 +14,9 @@ import type {
   PalestranteCmsResumo,
 } from "@/lib/cms/painelCms";
 
+import { mostraModuloCrm, navSiteVisivel, telaInicialSite, type TelaIdSite } from "@/lib/cms/navegacao";
 import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
+import type { AcessoPainel, CapacidadesPainel } from "@/lib/cms/telas";
 
 import {
   carregarAreas,
@@ -49,7 +51,15 @@ import { FormPalestrante } from "./FormPalestrante";
 
 interface ShellCmsProps {
   /** Usuário autenticado (rodapé da sidebar + guarda do item "Usuários"). */
-  usuario: { nome: string; email: string; perfil: string; id: string };
+  usuario: { nome: string; email: string; id: string };
+  /** Telas da pessoa: decidem o menu, a tela inicial e o seletor de módulo. */
+  acesso: AcessoPainel;
+  /**
+   * O que este usuário pode escrever, calculado no servidor (page.tsx) por
+   * `capacidadesDoAcesso`. Só decide quais controles aparecem — a guarda de
+   * cada Server Action continua sendo a barreira real.
+   */
+  capacidades: CapacidadesPainel;
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
   resumoLeads: ResumoLeadsCms;
@@ -58,15 +68,7 @@ interface ShellCmsProps {
   erroLeitura: boolean;
 }
 
-type TelaId =
-  | "dashboard"
-  | "palestrantes"
-  | "corpo-docente"
-  | "eventos"
-  | "conteudos"
-  | "home"
-  | "config"
-  | "usuarios";
+type TelaId = TelaIdSite;
 
 interface ItemNav {
   id: TelaId;
@@ -156,6 +158,8 @@ const CRUMB: Record<TelaId, string> = {
 
 export function ShellCms({
   usuario,
+  acesso,
+  capacidades,
   eventos,
   palestrantes,
   resumoLeads,
@@ -163,7 +167,7 @@ export function ShellCms({
   eventosHomeIds,
   erroLeitura,
 }: ShellCmsProps) {
-  const [tela, setTela] = useState<TelaId>("dashboard");
+  const [tela, setTela] = useState<TelaId>(() => telaInicialSite(acesso));
   const [eventoDet, setEventoDet] = useState<EventoCmsDetalhe | null>(null);
   // true ⇒ o detalhe abre direto em edição (revisão pós-importação de PDF).
   const [eventoEmEdicao, setEventoEmEdicao] = useState(false);
@@ -183,10 +187,10 @@ export function ShellCms({
   // formulário, ou "salvo, mas não deu para reler").
   const [avisoPalestrante, setAvisoPalestrante] = useState<{ erro: boolean; texto: string } | null>(null);
 
-  const ehSuperAdmin = usuario.perfil === "super-admin";
+  const ehAdministrador = capacidades.gerirUsuarios;
 
   // Lista de usuários NUNCA vem no payload inicial da page.tsx (evitaria
-  // enviar dados de gestão de usuários a quem não é super-admin) — carrega
+  // enviar dados de gestão de usuários a quem não é administrador) — carrega
   // sob demanda quando a tela "Usuários" é aberta pela primeira vez.
   const [usuarios, setUsuarios] = useState<UsuarioGestaoResumo[]>([]);
   const [usuariosCarregados, setUsuariosCarregados] = useState(false);
@@ -207,8 +211,8 @@ export function ShellCms({
   const [erroCorpo, setErroCorpo] = useState<string | null>(null);
   const [carregandoCorpo, iniciarCargaCorpo] = useTransition();
 
-  function abrirCorpoDocente() {
-    setErroCorpo(null);
+  /** Só a transição de leitura dos cards — sem setState síncrono, cabe no efeito de montagem. */
+  function lerCardsCorpo() {
     iniciarCargaCorpo(async () => {
       try {
         setCardsCorpo(await carregarCorpoDocente());
@@ -218,7 +222,23 @@ export function ShellCms({
     });
   }
 
+  function abrirCorpoDocente() {
+    setErroCorpo(null);
+    lerCardsCorpo();
+  }
+
+  // Quem começa no Corpo Docente (única tela do Site, por exemplo) não passa
+  // por `irPara`: a primeira carga dos cards sai daqui, uma vez só.
+  const cargaInicialFeita = useRef(false);
+  useEffect(() => {
+    if (cargaInicialFeita.current) return;
+    cargaInicialFeita.current = true;
+    if (tela !== "corpo-docente") return;
+    lerCardsCorpo();
+  }, [tela]);
+
   function novoEvento() {
+    if (!capacidades.editarEventos) return;
     setCriandoEvento(true);
     setErroNovoEvento(null);
     void (async () => {
@@ -255,6 +275,7 @@ export function ShellCms({
   }
 
   function novoPalestrante() {
+    if (!capacidades.editarPalestrantes) return;
     setAvisoPalestrante(null);
     iniciarCarga(async () => {
       try {
@@ -291,6 +312,7 @@ export function ShellCms({
   }
 
   function novoConteudo() {
+    if (!capacidades.editarConteudos) return;
     iniciarCarga(async () => {
       setAreas(await carregarAreas());
       setConteudoDet(null);
@@ -314,22 +336,29 @@ export function ShellCms({
   const detalheAberto =
     eventoDet ?? palestranteDet ?? conteudoDet ?? (criandoConteudo || criandoPalestrante ? true : null);
 
-  const navSistema: ItemNav[] = ehSuperAdmin
+  const navSistema: ItemNav[] = ehAdministrador
     ? [
         { id: "config", rotulo: "Configurações", icone: Ico.config },
         { id: "usuarios", rotulo: "Usuários", icone: Ico.usuarios },
       ]
     : [{ id: "config", rotulo: "Configurações", icone: Ico.config }];
 
+  // Menu: só as telas marcadas; Configurações (Minha conta) sempre.
+  const editoriais = new Set(navSiteVisivel(acesso));
+  const itensEditoriais = NAV_PRINCIPAL.filter((i) => editoriais.has(i.id));
   const grupos: GrupoNav[] = [
-    { rotulo: "Editorial", itens: NAV_PRINCIPAL },
+    ...(itensEditoriais.length > 0 ? [{ rotulo: "Editorial", itens: itensEditoriais }] : []),
     { rotulo: "Sistema", itens: navSistema },
   ];
+  // Spec §5: sem nenhuma tela marcada, a pessoa cai em Minha conta com um aviso.
+  const semTelas = !acesso.administrador && acesso.telas.length === 0;
 
   return (
     <ShellPainel
       modulo="site"
+      mostrarCrm={mostraModuloCrm(acesso)}
       usuario={usuario}
+      administrador={acesso.administrador}
       grupos={grupos}
       telaAtiva={tela}
       onIrPara={(id) => irPara(id as TelaId)}
@@ -342,6 +371,7 @@ export function ShellCms({
           evento={eventoDet}
           palestrantesDisponiveis={palestrantes}
           edicaoInicial={eventoEmEdicao}
+          podeEditar={capacidades.editarEventos}
           onVoltar={() => {
             setEventoDet(null);
             setEventoEmEdicao(false);
@@ -358,11 +388,13 @@ export function ShellCms({
             setCriandoConteudo(false);
           }}
           onSalvou={() => router.refresh()}
+          podeEditar={capacidades.editarConteudos}
         />
       ) : criandoPalestrante ? (
         <FormPalestrante
           palestrante={null}
           opcoes={opcoesPalestrante}
+          podeEditarCard={capacidades.editarCardCorpoDocente}
           onCancelar={() => setCriandoPalestrante(false)}
           onSalvou={(salvo, aviso) => {
             if (!salvo) {
@@ -379,6 +411,8 @@ export function ShellCms({
           key={palestranteDet.id}
           palestrante={palestranteDet}
           onVoltar={() => setPalestranteDet(null)}
+          podeEditar={capacidades.editarPalestrantes}
+          podeEditarCard={capacidades.editarCardCorpoDocente}
           onSalvou={(avisoSemReleitura) => {
             if (avisoSemReleitura !== undefined) salvouSemReleitura(avisoSemReleitura);
             else router.refresh();
@@ -409,6 +443,7 @@ export function ShellCms({
                 palestrantes={palestrantes}
                 onAbrir={abrirPalestrante}
                 onNovo={novoPalestrante}
+                podeEditar={capacidades.editarPalestrantes}
               />
             )}
             {tela === "corpo-docente" && (
@@ -418,6 +453,7 @@ export function ShellCms({
                 erroCarga={erroCorpo}
                 onAbrirPalestrante={abrirPalestrante}
                 onSalvou={setCardsCorpo}
+                podeEditar={capacidades.editarCorpoDocente}
               />
             )}
             {tela === "eventos" && (
@@ -428,14 +464,33 @@ export function ShellCms({
                 onNovo={novoEvento}
                 criando={criandoEvento}
                 erroNovo={erroNovoEvento}
+                podeEditar={capacidades.editarEventos}
               />
             )}
             {tela === "conteudos" && (
-              <TelaConteudos conteudos={conteudos} onAbrir={abrirConteudo} onNovo={novoConteudo} />
+              <TelaConteudos
+                conteudos={conteudos}
+                onAbrir={abrirConteudo}
+                onNovo={novoConteudo}
+                podeEditar={capacidades.editarConteudos}
+              />
             )}
-            {tela === "home" && <TelaHome eventos={eventos} selecionadosIniciais={eventosHomeIds} />}
-            {tela === "config" && <TelaConfiguracoes usuario={usuario} />}
-            {tela === "usuarios" && ehSuperAdmin && (
+            {tela === "home" && (
+              <TelaHome
+                eventos={eventos}
+                selecionadosIniciais={eventosHomeIds}
+                podeEditar={capacidades.editarHome}
+              />
+            )}
+            {tela === "config" && semTelas && (
+              <p className="pcms-form-aviso" role="status">
+                Você ainda não tem telas liberadas. Peça a um administrador para liberar as telas de que precisa.
+              </p>
+            )}
+            {tela === "config" && (
+              <TelaConfiguracoes usuario={usuario} mostrarContatos={capacidades.editarContatos} />
+            )}
+            {tela === "usuarios" && ehAdministrador && (
               <TelaUsuarios
                 usuarios={usuarios}
                 usuarioAtualId={usuario.id}

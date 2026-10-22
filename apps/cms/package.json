@@ -29,6 +29,7 @@
     "conteudos:seed-em-preparacao": "pnpm payload run src/seed/seedConteudosEmPreparacao.ts",
     "contatos:seed": "pnpm payload run src/seed/seedContatos.ts",
     "fotos:especialistas": "pnpm payload run src/seed/vincularFotosEspecialistas.ts",
+    "permissoes:migrar": "pnpm payload run src/seed/migrarPermissoesPorTela.ts",
     "programas:importar": "pnpm payload run src/seed/importarProgramas.ts",
     "senha:admin": "pnpm payload run src/seed/trocarSenhaAdmin.ts",
     "clean": "rm -rf .next .turbo node_modules",

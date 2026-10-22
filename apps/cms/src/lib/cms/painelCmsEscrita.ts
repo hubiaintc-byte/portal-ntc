@@ -902,8 +902,11 @@ export interface CamposPalestrante {
   linhasAtuacaoIds: string[];
   programasIds: string[];
   ocultarDoSite: boolean;
-  /** null = não aparece no Corpo Docente. */
-  corpoDocente: CardDesejado | null;
+  /**
+   * Ausente = não mexer no card do Corpo Docente; null = remover o card;
+   * objeto = criar/atualizar o card.
+   */
+  corpoDocente?: CardDesejado | null;
 }
 
 const CHAVES_TEXTO_PALESTRANTE = [
@@ -960,7 +963,7 @@ export function ehCamposPalestrante(v: unknown): v is CamposPalestrante {
     ehListaDeTextos(c.linhasAtuacaoIds) &&
     ehListaDeTextos(c.programasIds) &&
     typeof c.ocultarDoSite === "boolean" &&
-    (c.corpoDocente === null || ehCardDesejado(c.corpoDocente))
+    (c.corpoDocente === undefined || c.corpoDocente === null || ehCardDesejado(c.corpoDocente))
   );
 }
 
@@ -1030,7 +1033,7 @@ function validarPalestrante(
   if (campos.instituicao.trim() === "") return "Informe a instituição.";
   if (id === null && foto === null) return ERRO_FOTO_OBRIGATORIA;
   if (foto !== null && !foto.arquivo.type.startsWith("image/")) return "A foto precisa ser uma imagem.";
-  if (campos.corpoDocente !== null && !ctaHrefPermitido(campos.corpoDocente.textos.ctaHref)) {
+  if (campos.corpoDocente && !ctaHrefPermitido(campos.corpoDocente.textos.ctaHref)) {
     return "Link do botão do card: use um endereço que comece com /, #, http://, https:// ou mailto:.";
   }
   const curto = campos.curriculoCurtoMarkdown;
@@ -1135,9 +1138,11 @@ export async function salvarPalestranteCms(
       if (campos.curriculoCurtoMarkdown === undefined && !atual.curriculoCurto) {
         return { ok: false, erro: ERRO_CURRICULO_CURTO };
       }
-      const lidos = await lerCardsCorpoDocente(payload);
-      const novos = aplicarCardDe(lidos, id, campos.corpoDocente);
-      if (mudou(lidos, novos) && !temPessoa(novos)) return { ok: false, erro: ERRO_ULTIMO_CARD };
+      if (campos.corpoDocente !== undefined) {
+        const lidos = await lerCardsCorpoDocente(payload);
+        const novos = aplicarCardDe(lidos, id, campos.corpoDocente);
+        if (mudou(lidos, novos) && !temPessoa(novos)) return { ok: false, erro: ERRO_ULTIMO_CARD };
+      }
     }
 
     let fotoId: number | string | null = null;
@@ -1164,8 +1169,6 @@ export async function salvarPalestranteCms(
     const data = dadosDoEspecialista(campos, fotoId) as unknown as RequiredDataFromCollectionSlug<"especialistas">;
 
     const idFinal = await executarEmTransacao(payload, usuario, async (req) => {
-      // Relido dentro da transação: a lista pode ter mudado desde a checagem.
-      const lidos = await lerCardsCorpoDocente(payload, req);
       let salvoId: string;
       if (id === null) {
         const criado = await payload.create({ collection: "especialistas", data, overrideAccess: true, req });
@@ -1174,11 +1177,15 @@ export async function salvarPalestranteCms(
         await payload.update({ collection: "especialistas", id, data, overrideAccess: true, req });
         salvoId = id;
       }
-      const novos = aplicarCardDe(lidos, salvoId, campos.corpoDocente);
-      if (mudou(lidos, novos)) {
-        // Lançar (não retornar) para reverter a escrita do especialista.
-        if (!temPessoa(novos)) throw new Error(ERRO_ULTIMO_CARD);
-        await gravarCardsCorpoDocente(payload, req, novos);
+      if (campos.corpoDocente !== undefined) {
+        // Relido dentro da transação: a lista pode ter mudado desde a checagem.
+        const lidos = await lerCardsCorpoDocente(payload, req);
+        const novos = aplicarCardDe(lidos, salvoId, campos.corpoDocente);
+        if (mudou(lidos, novos)) {
+          // Lançar (não retornar) para reverter a escrita do especialista.
+          if (!temPessoa(novos)) throw new Error(ERRO_ULTIMO_CARD);
+          await gravarCardsCorpoDocente(payload, req, novos);
+        }
       }
       return salvoId;
     });

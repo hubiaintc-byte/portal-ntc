@@ -1,8 +1,9 @@
+import { acessoPorTela, administrador } from "../access/porTela";
+import { TELAS_LEADS } from "../lib/cms/telas";
 import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 
 import { ESTAGIOS_LEAD, MOTIVOS_PERDA, ORIGENS_ENTRADA_LEAD } from "@ntc/lib";
 
-import { atendimentoComercial } from "../access/atendimentoComercial";
 import { casarClienteDoLead } from "../lib/crm/casamento";
 import { registrarLeadNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
 import { ESFERA_INSTITUCIONAL, LEAD_TIPO } from "../shared/types";
@@ -20,13 +21,13 @@ import { ESFERA_INSTITUCIONAL, LEAD_TIPO } from "../shared/types";
  * autorização explícita do PO em 2026-05-20 (CLAUDE.md §5.1).
  *
  * Access (DAB §10.1): todas as operações, inclusive `create`, exigem
- * `atendimento-comercial` ou `super-admin`. Os 4 handlers do site
+ * quem tem Dashboard ou Leads do CRM, ou o administrador. Os 4 handlers do site
  * (`apps/web/app/api/forms/*`) criam leads pela Local API
  * (`obterPayload().create`), que roda com `overrideAccess: true` por padrão
  * e por isso não passa por esta regra. O `create` via REST (`POST /api/leads`)
  * ficava público até a Sessão 1 do kanban; com os campos do CRM (`cliente`,
  * `estagio`, `valorEstimado`…) e os hooks de casamento/linha do tempo agora
- * alcançáveis pelo create, ele passou a ser restrito aos perfis do CRM —
+ * alcançáveis pelo create, ele passou a exigir as telas Dashboard/Leads —
  * um anônimo não pode mais escrever na linha do tempo de um cliente qualquer
  * nem criar clientes em massa sem captcha/rate limit.
  */
@@ -40,10 +41,10 @@ export const Leads: CollectionConfig = {
     listSearchableFields: ["email", "nome", "instituicao"],
   },
   access: {
-    read: atendimentoComercial,
-    create: atendimentoComercial,
-    update: atendimentoComercial,
-    delete: atendimentoComercial,
+    read: acessoPorTela(TELAS_LEADS),
+    create: acessoPorTela(TELAS_LEADS),
+    update: acessoPorTela(TELAS_LEADS),
+    delete: administrador,
   },
   fields: [
     {

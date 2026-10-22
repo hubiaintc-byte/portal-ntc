@@ -18,7 +18,11 @@ export interface GrupoNav {
 
 interface ShellPainelProps {
   modulo: ModuloPainel;
-  usuario: { nome: string; email: string; perfil: string };
+  /** O seletor mostra o CRM só com alguma tela `crm.*`; o Site aparece sempre (Minha conta). */
+  mostrarCrm: boolean;
+  usuario: { nome: string; email: string };
+  /** Rótulo do rodapé da sidebar: "Administrador" ou "Equipe". */
+  administrador: boolean;
   grupos: GrupoNav[];
   telaAtiva: string;
   onIrPara: (id: string) => void;
@@ -42,7 +46,9 @@ function iniciais(nome: string): string {
  */
 export function ShellPainel({
   modulo,
+  mostrarCrm,
   usuario,
+  administrador,
   grupos,
   telaAtiva,
   onIrPara,
@@ -60,7 +66,7 @@ export function ShellPainel({
           <span className="pcms-sidebar__painel-rotulo">Painel Admin</span>
         </div>
 
-        <SeletorModulo modulo={modulo} />
+        <SeletorModulo modulo={modulo} mostrarCrm={mostrarCrm} />
 
         <nav className="pcms-nav" aria-label="Navegação principal do painel">
           {grupos.map((grupo) => (
@@ -86,7 +92,7 @@ export function ShellPainel({
           <div className="pcms-avatar-mini">{iniciais(usuario.nome)}</div>
           <div className="pcms-sidebar__usuario-info">
             <strong>{usuario.nome}</strong>
-            <span className="pcms-sidebar__perfil">{usuario.perfil.replace(/-/g, " ")}</span>
+            <span className="pcms-sidebar__perfil">{administrador ? "Administrador" : "Equipe"}</span>
           </div>
           <form action={sair} className="pcms-sair__form">
             <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">

@@ -9,6 +9,8 @@ import { salvarEventosDestaqueHome } from "./acoes";
 interface TelaHomeProps {
   eventos: EventoCmsResumo[];
   selecionadosIniciais: string[];
+  /** false ⇒ sem a tela de escrita na Home: curadoria só leitura. */
+  podeEditar: boolean;
 }
 
 const ROTULO_STATUS: Record<string, string> = {
@@ -25,7 +27,7 @@ const ROTULO_STATUS: Record<string, string> = {
  * "Disponíveis" (demais eventos, com ação de adicionar). A ordem da lista
  * "Na Home" é a ordem persistida no Global home (eventosAgendaDestaque).
  */
-export function TelaHome({ eventos, selecionadosIniciais }: TelaHomeProps) {
+export function TelaHome({ eventos, selecionadosIniciais, podeEditar }: TelaHomeProps) {
   // `ordem` guarda os ids na Home, NA SEQUÊNCIA de exibição.
   const [ordem, setOrdem] = useState<string[]>(() =>
     selecionadosIniciais.filter((id) => eventos.some((e) => e.id === id)),
@@ -77,9 +79,11 @@ export function TelaHome({ eventos, selecionadosIniciais }: TelaHomeProps) {
           <h1>Home</h1>
           <p>Defina quais eventos aparecem na seção de agenda da página inicial e em que ordem.</p>
         </div>
-        <button type="button" className="pcms-btn" onClick={salvar} disabled={salvando}>
-          {salvando ? "Salvando…" : `Salvar (${naHome.length})`}
-        </button>
+        {podeEditar && (
+          <button type="button" className="pcms-btn" onClick={salvar} disabled={salvando}>
+            {salvando ? "Salvando…" : `Salvar (${naHome.length})`}
+          </button>
+        )}
       </div>
 
       {feedback && (
@@ -95,7 +99,9 @@ export function TelaHome({ eventos, selecionadosIniciais }: TelaHomeProps) {
 
           {naHome.length === 0 ? (
             <p className="pcms-curadoria__vazio">
-              Nenhum evento na Home ainda. Adicione eventos pela lista de disponíveis abaixo.
+              {podeEditar
+                ? "Nenhum evento na Home ainda. Adicione eventos pela lista de disponíveis abaixo."
+                : "Nenhum evento na Home ainda."}
             </p>
           ) : (
             <ol className="pcms-home-lista">
@@ -117,40 +123,42 @@ export function TelaHome({ eventos, selecionadosIniciais }: TelaHomeProps) {
                     {ROTULO_STATUS[e.status] ?? e.status}
                   </span>
 
-                  <span className="pcms-home-row__acoes">
-                    <button
-                      type="button"
-                      className="pcms-iconbtn"
-                      onClick={() => mover(i, -1)}
-                      disabled={i === 0}
-                      aria-label={`Mover "${e.titulo}" para cima`}
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 19V6M6 12l6-6 6 6" />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      className="pcms-iconbtn"
-                      onClick={() => mover(i, 1)}
-                      disabled={i === naHome.length - 1}
-                      aria-label={`Mover "${e.titulo}" para baixo`}
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 5v13M18 12l-6 6-6-6" />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      className="pcms-iconbtn pcms-iconbtn--remover"
-                      onClick={() => remover(e.id)}
-                      aria-label={`Remover "${e.titulo}" da Home`}
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M6 6l12 12M18 6L6 18" />
-                      </svg>
-                    </button>
-                  </span>
+                  {podeEditar && (
+                    <span className="pcms-home-row__acoes">
+                      <button
+                        type="button"
+                        className="pcms-iconbtn"
+                        onClick={() => mover(i, -1)}
+                        disabled={i === 0}
+                        aria-label={`Mover "${e.titulo}" para cima`}
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 19V6M6 12l6-6 6 6" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className="pcms-iconbtn"
+                        onClick={() => mover(i, 1)}
+                        disabled={i === naHome.length - 1}
+                        aria-label={`Mover "${e.titulo}" para baixo`}
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 5v13M18 12l-6 6-6-6" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className="pcms-iconbtn pcms-iconbtn--remover"
+                        onClick={() => remover(e.id)}
+                        aria-label={`Remover "${e.titulo}" da Home`}
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M6 6l12 12M18 6L6 18" />
+                        </svg>
+                      </button>
+                    </span>
+                  )}
                 </li>
               ))}
             </ol>
@@ -185,13 +193,15 @@ export function TelaHome({ eventos, selecionadosIniciais }: TelaHomeProps) {
                     {ROTULO_STATUS[e.status] ?? e.status}
                   </span>
 
-                  <button
-                    type="button"
-                    className="pcms-btn pcms-btn--ghost pcms-btn--mini"
-                    onClick={() => adicionar(e.id)}
-                  >
-                    Adicionar
-                  </button>
+                  {podeEditar && (
+                    <button
+                      type="button"
+                      className="pcms-btn pcms-btn--ghost pcms-btn--mini"
+                      onClick={() => adicionar(e.id)}
+                    >
+                      Adicionar
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

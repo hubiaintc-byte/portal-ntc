@@ -1,6 +1,6 @@
+import { administrador } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
-import { editorInstitucional } from "../access/editorInstitucional";
 import { ESFERA_INSTITUCIONAL } from "../shared/types";
 
 /**
@@ -20,9 +20,9 @@ export const Clientes: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: editorInstitucional,
-    update: editorInstitucional,
-    delete: editorInstitucional,
+    create: administrador,
+    update: administrador,
+    delete: administrador,
   },
   fields: [
     { name: "nome", type: "text", required: true },

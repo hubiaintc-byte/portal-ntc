@@ -12,10 +12,12 @@ interface TelaConteudosProps {
   conteudos: ConteudoCmsResumo[];
   onAbrir: (id: string) => void;
   onNovo: () => void;
+  /** false ⇒ sem a tela de escrita em conteúdos: some "Novo conteúdo". */
+  podeEditar: boolean;
 }
 
 /** Lista de conteúdos editoriais — busca, filtros e acesso ao detalhe. */
-export function TelaConteudos({ conteudos, onAbrir, onNovo }: TelaConteudosProps) {
+export function TelaConteudos({ conteudos, onAbrir, onNovo, podeEditar }: TelaConteudosProps) {
   const [busca, setBusca] = useState("");
   const [categoria, setCategoria] = useState<string>("todas");
   const [situacao, setSituacao] = useState<string>("todas");
@@ -42,14 +44,16 @@ export function TelaConteudos({ conteudos, onAbrir, onNovo }: TelaConteudosProps
               : `${conteudos.length} ${conteudos.length === 1 ? "conteúdo" : "conteúdos"} — rascunhos inclusos.`}
           </p>
         </div>
-        <div className="pcms-pagehead__acoes">
-          <button type="button" className="pcms-btn" onClick={onNovo}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Novo conteúdo
-          </button>
-        </div>
+        {podeEditar && (
+          <div className="pcms-pagehead__acoes">
+            <button type="button" className="pcms-btn" onClick={onNovo}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              Novo conteúdo
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="pcms-toolbar">

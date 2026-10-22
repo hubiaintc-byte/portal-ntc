@@ -22,6 +22,11 @@ import { AvisoForm, CampoArea, CampoSenha, CampoTexto } from "./crm/CamposCrm";
 interface TelaConfiguracoesProps {
   /** Usuário logado — usado só para exibir o e-mail da conta na seção real. */
   usuario: { id: string; nome: string; email: string };
+  /**
+   * Seção "Contatos institucionais": só com a tela Contatos do site
+   * (`capacidades.editarContatos`). Sem ela, a seção nem é lida nem aparece.
+   */
+  mostrarContatos: boolean;
 }
 
 /**
@@ -29,7 +34,7 @@ interface TelaConfiguracoesProps {
  * senha via Server Action). O restante da tela segue demonstrativo — nada
  * mais aqui é salvo ainda.
  */
-export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
+export function TelaConfiguracoes({ usuario, mostrarContatos }: TelaConfiguracoesProps) {
   const [senhaAtual, setSenhaAtual] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmacao, setConfirmacao] = useState("");
@@ -134,8 +139,9 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
   const [salvandoContatos, iniciarSalvarContatos] = useTransition();
 
   useEffect(() => {
+    if (!mostrarContatos) return;
     carregarContatosCms().then(setContatos);
-  }, []);
+  }, [mostrarContatos]);
 
   function atualizarContato<K extends keyof CamposContatos>(campo: K) {
     return (valor: CamposContatos[K]) =>
@@ -155,7 +161,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
 
   function enviarContatos(e: React.FormEvent) {
     e.preventDefault();
-    if (salvandoContatos || contatos === null) return;
+    if (!mostrarContatos || salvandoContatos || contatos === null) return;
     setErroContatos(null);
     setSucessoContatos(null);
     setAvisoContatos(null);
@@ -283,6 +289,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
           )}
         </section>
 
+        {mostrarContatos && (
         <section className="pcms-config-card pcms-config-card--ativa">
           <h3>
             Contatos institucionais
@@ -308,6 +315,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
                 </p>
               )}
 
+              <fieldset className="pcms-somente-leitura" disabled={!mostrarContatos}>
               <h4>Atendimento</h4>
               <div className="pcms-editor__grid">
                 <CampoTexto
@@ -407,9 +415,13 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
                 <CampoTexto rotulo="CNPJ" valor={contatos.cnpj} onMudar={atualizarContato("cnpj")} curto />
               </div>
 
-              <button type="submit" className="pcms-btn" disabled={salvandoContatos}>
-                {salvandoContatos ? "Salvando…" : "Salvar contatos"}
-              </button>
+              </fieldset>
+
+              {mostrarContatos && (
+                <button type="submit" className="pcms-btn" disabled={salvandoContatos}>
+                  {salvandoContatos ? "Salvando…" : "Salvar contatos"}
+                </button>
+              )}
               <p className="pcms-editor__hint">
                 Estes dados aparecem no rodapé de todas as páginas, na página de Contato, em O Grupo e
                 nas páginas legais. A atualização no site pode levar alguns minutos.
@@ -417,6 +429,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
             </form>
           )}
         </section>
+        )}
 
         <section className="pcms-config-card">
           <h3>
@@ -470,7 +483,7 @@ export function TelaConfiguracoes({ usuario }: TelaConfiguracoesProps) {
           <div className="pcms-toggle-row">
             <span>
               Autenticação em duas etapas (2FA)
-              <small>TOTP obrigatório para super-admins</small>
+              <small>TOTP obrigatório para administradores</small>
             </span>
             <span className="pcms-switch pcms-switch--on" aria-hidden="true" />
           </div>

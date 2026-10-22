@@ -12,7 +12,7 @@ const { salvarPrograma, excluirPrograma, salvarModulo, excluirModulo } = await i
 type DadosPrograma = Parameters<typeof salvarPrograma>[1];
 type DadosModulo = Parameters<typeof salvarModulo>[1];
 
-const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
+const usuario = { id: 5, collection: "users", nome: "Ana", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
 
 interface Opcoes {
   siglaEmUso?: boolean;

@@ -7,11 +7,12 @@ import { VERTICAIS_CONTATO } from "@ntc/lib";
 import type { Rodape } from "@ntc/types";
 
 import {
-  obterUsuarioAutenticadoComPerfil,
+  obterAdministrador,
+  obterUsuarioAutenticadoComTela,
   obterUsuarioCms,
-  obterUsuarioCmsComPerfil,
+  obterUsuarioCmsComTela,
 } from "@/lib/cms/autenticacao";
-import { PERFIS_EVENTOS, PERFIS_INSTITUCIONAL } from "@/lib/cms/perfis";
+import { acessoDoUsuario, temTela, type TelaPainel } from "@/lib/cms/telas";
 import {
   listarAreasCms,
   listarCardsCorpoDocenteCms,
@@ -70,19 +71,32 @@ import { obterPayload } from "@/lib/payloadClient";
  * públicos; sem a guarda, qualquer um com a URL escreveria no banco.
  */
 
+const TELAS_EVENTOS: readonly TelaPainel[] = ["site.eventos"];
+const TELAS_PALESTRANTES: readonly TelaPainel[] = ["site.palestrantes"];
+const TELAS_CORPO_DOCENTE: readonly TelaPainel[] = ["site.corpo-docente"];
+const TELAS_HOME: readonly TelaPainel[] = ["site.home"];
+const TELAS_CONTEUDOS: readonly TelaPainel[] = ["site.conteudos"];
+const TELAS_CONTATOS: readonly TelaPainel[] = ["site.contatos"];
+const TELAS_LEITURA_PALESTRANTE: readonly TelaPainel[] = ["site.palestrantes", "site.corpo-docente"];
+
 const ERRO_SESSAO = "Sessão expirada. Entre novamente.";
 
 const RECUSADO: ResultadoEscrita = { ok: false, erro: ERRO_SESSAO };
-/** Escritas que também exigem perfil (a Local API ignora o `access` das coleções). */
-const RECUSADO_PERFIL: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
+/** Recusa por tela (a Local API ignora o `access` das coleções). */
+const RECUSADO_TELA: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
 
+/**
+ * Leituras do detalhe também exigem a tela de onde são abertas (spec §5):
+ * a recusa devolve o mesmo vazio de "sem sessão".
+ */
 export async function carregarEvento(id: string): Promise<EventoCmsDetalhe | null> {
-  if (!(await obterUsuarioCms())) return null;
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return null;
   return obterEventoCms(id);
 }
 
+/** Aberto pela lista de Palestrantes e pela tela Corpo Docente. */
 export async function carregarPalestrante(id: string): Promise<PalestranteCmsDetalhe | null> {
-  if (!(await obterUsuarioCms())) return null;
+  if (!(await obterUsuarioCmsComTela(TELAS_LEITURA_PALESTRANTE))) return null;
   return obterPalestranteCms(id);
 }
 
@@ -91,7 +105,7 @@ export async function salvarEvento(
   id: string,
   campos: CamposEventoCompletos,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
   const resultado = await salvarCamposEvento(id, campos);
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
@@ -107,7 +121,7 @@ export async function enviarMidia(
   campo: "imagemCapa" | "folderPdf",
   formData: FormData,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
     return { resultado: { ok: false, erro: "Nenhum arquivo selecionado." }, evento: null };
@@ -123,7 +137,7 @@ export async function alternarPublicacaoEvento(
   id: string,
   publicar: boolean,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
   const resultado = publicar ? await publicarEvento(id) : await despublicarEvento(id);
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
@@ -135,7 +149,7 @@ export async function salvarPalestrantesEvento(
   id: string,
   idsEspecialistas: string[],
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return { resultado: RECUSADO_PERFIL, evento: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
   const resultado = await vincularPalestrantesEvento(id, idsEspecialistas);
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
@@ -148,7 +162,7 @@ export async function salvarPalestrantesEvento(
  * a porta do PDF + revisão no detalhe.
  */
 export async function importarEventoPdf(formData: FormData): Promise<ResultadoImportacao> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return RECUSADO_PERFIL;
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return RECUSADO_TELA;
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
     return { ok: false, erro: "Nenhum arquivo selecionado." };
@@ -163,7 +177,7 @@ export async function importarEventoPdf(formData: FormData): Promise<ResultadoIm
 
 /** Cria um evento em branco (rascunho) para o editor preencher no detalhe. */
 export async function criarEventoEmBranco(): Promise<ResultadoEscrita & { id?: string }> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_EVENTOS))) return RECUSADO_PERFIL;
+  if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return RECUSADO_TELA;
   const resultado = await criarEventoEmBrancoCms();
   if (resultado.ok) revalidatePath("/");
   return resultado;
@@ -171,7 +185,7 @@ export async function criarEventoEmBranco(): Promise<ResultadoEscrita & { id?: s
 
 /** Salva os eventos em destaque na Home. */
 export async function salvarEventosDestaqueHome(idsEventos: string[]): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_INSTITUCIONAL))) return RECUSADO_PERFIL;
+  if (!(await obterUsuarioCmsComTela(TELAS_HOME))) return RECUSADO_TELA;
   const resultado = await salvarEventosHome(idsEventos);
   if (resultado.ok) revalidatePath("/");
   return resultado;
@@ -185,7 +199,7 @@ export async function alternarOcultarPalestrante(
   id: string,
   oculto: boolean,
 ): Promise<{ resultado: ResultadoEscrita; palestrante: PalestranteCmsDetalhe | null }> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_INSTITUCIONAL))) return { resultado: RECUSADO_PERFIL, palestrante: null };
+  if (!(await obterUsuarioCmsComTela(TELAS_PALESTRANTES))) return { resultado: RECUSADO_TELA, palestrante: null };
   const resultado = await definirOcultarPalestrante(id, oculto);
   if (resultado.ok) revalidatePath("/");
   const palestrante = resultado.ok ? await obterPalestranteCms(id) : null;
@@ -209,8 +223,8 @@ export async function salvarPalestrante(
   formData: FormData,
 ): Promise<{ resultado: ResultadoEscrita; palestrante: PalestranteCmsDetalhe | null }> {
   // O usuário cru vai para `executarEmTransacao` (vira `req.user`).
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_INSTITUCIONAL);
-  if (!usuario) return { resultado: RECUSADO_PERFIL, palestrante: null };
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_PALESTRANTES);
+  if (!usuario) return { resultado: RECUSADO_TELA, palestrante: null };
 
   const idBruto = formData.get("id");
   const idTexto = typeof idBruto === "string" && idBruto.trim() !== "" ? idBruto.trim() : null;
@@ -226,6 +240,12 @@ export async function salvarPalestrante(
   if (!ehCamposPalestrante(bruto)) return { resultado: DADOS_INVALIDOS, palestrante: null };
   if (![...bruto.linhasAtuacaoIds, ...bruto.programasIds].every(ehIdNumerico)) {
     return { resultado: DADOS_INVALIDOS, palestrante: null };
+  }
+  // O bloco Corpo Docente só é tocado por quem tem a tela Corpo Docente
+  // (spec §7): `corpoDocente` presente (inclusive null = remover) = o bloco
+  // veio; ausente = não mexer no card.
+  if (bruto.corpoDocente !== undefined && !temTela(acessoDoUsuario(usuario), TELAS_CORPO_DOCENTE)) {
+    return { resultado: RECUSADO_TELA, palestrante: null };
   }
   const campos = {
     ...bruto,
@@ -252,7 +272,7 @@ export async function salvarPalestrante(
 
 /** Cards de pessoa do Corpo Docente, na ordem atual, para a tela de ordenação. */
 export async function carregarCorpoDocente(): Promise<CardCorpoDocenteResumo[]> {
-  if (!(await obterUsuarioCms())) return [];
+  if (!(await obterUsuarioCmsComTela(TELAS_CORPO_DOCENTE))) return [];
   return listarCardsCorpoDocenteCms();
 }
 
@@ -260,8 +280,8 @@ export async function carregarCorpoDocente(): Promise<CardCorpoDocenteResumo[]> 
 export async function salvarOrdemCorpoDocente(
   idsNaOrdem: string[],
 ): Promise<{ resultado: ResultadoEscrita; cards: CardCorpoDocenteResumo[] | null }> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_INSTITUCIONAL);
-  if (!usuario) return { resultado: RECUSADO_PERFIL, cards: null };
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_CORPO_DOCENTE);
+  if (!usuario) return { resultado: RECUSADO_TELA, cards: null };
   if (!Array.isArray(idsNaOrdem) || !idsNaOrdem.every(ehIdNumerico)) {
     return { resultado: DADOS_INVALIDOS, cards: null };
   }
@@ -276,17 +296,18 @@ export async function carregarOpcoesPalestrante(): Promise<{
   areas: { id: string; nome: string }[];
   programas: { id: string; sigla: string }[];
 }> {
-  if (!(await obterUsuarioCms())) return { areas: [], programas: [] };
+  // Só o formulário do palestrante (criar/editar) usa — escrita de Palestrantes.
+  if (!(await obterUsuarioCmsComTela(TELAS_PALESTRANTES))) return { areas: [], programas: [] };
   return listarOpcoesPalestranteCms();
 }
 
 /**
  * Server Actions da gestão de usuários (tela "Usuários"). Guarda MAIS
- * restrita que as demais: exige perfil "super-admin", não apenas sessão
- * válida — só super-admins criam/editam/removem contas administrativas.
+ * restrita que as demais: exige administrador, não apenas sessão
+ * válida — só administradores criam/editam/removem contas administrativas.
  */
 
-const RECUSADO_SUPER_ADMIN: ResultadoEscrita = {
+const RECUSADO_ADMINISTRADOR: ResultadoEscrita = {
   ok: false,
   erro: "Você não tem permissão para esta ação.",
 };
@@ -315,25 +336,34 @@ async function obterPayloadUsuarios(): Promise<PayloadUsuarios> {
         overrideAccess: args.overrideAccess,
       }),
     delete: (args) => payload.delete(args),
+    findByID: async (args) => {
+      try {
+        return await payload.findByID(args);
+      } catch {
+        return null;
+      }
+    },
+    count: (args) => payload.count(args),
     forgotPassword: (args) => payload.forgotPassword(args),
     sendEmail: (args) => payload.sendEmail(args),
   };
 }
 
 export async function carregarUsuarios(): Promise<UsuarioGestaoResumo[]> {
-  const usuario = await obterUsuarioCms();
-  if (!usuario || usuario.perfil !== "super-admin") return [];
+  const usuario = await obterAdministrador();
+  if (!usuario) return [];
   return listarUsuarios(await obterPayloadUsuarios());
 }
 
 export async function criarUsuarioCms(dados: {
   nome: string;
   email: string;
-  perfil: string;
+  administrador: boolean;
+  telas: TelaPainel[];
 }): Promise<{ resultado: ResultadoUsuarios; usuarios: UsuarioGestaoResumo[] }> {
-  const usuario = await obterUsuarioCms();
-  if (!usuario || usuario.perfil !== "super-admin") {
-    return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
+  const usuario = await obterAdministrador();
+  if (!usuario) {
+    return { resultado: RECUSADO_ADMINISTRADOR, usuarios: [] };
   }
   const p = await obterPayloadUsuarios();
   const resultado = await criarUsuario(p, dados);
@@ -343,14 +373,14 @@ export async function criarUsuarioCms(dados: {
 
 export async function editarUsuarioCms(
   id: string,
-  dados: { nome: string; perfil: string },
+  dados: { nome: string; administrador: boolean; telas: TelaPainel[] },
 ): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioGestaoResumo[] }> {
-  const usuario = await obterUsuarioCms();
-  if (!usuario || usuario.perfil !== "super-admin") {
-    return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
+  const usuario = await obterAdministrador();
+  if (!usuario) {
+    return { resultado: RECUSADO_ADMINISTRADOR, usuarios: [] };
   }
   const p = await obterPayloadUsuarios();
-  const resultado = await editarUsuario(p, id, dados);
+  const resultado = await editarUsuario(p, id, dados, usuario.id);
   const usuarios = await listarUsuarios(p);
   return { resultado, usuarios };
 }
@@ -358,9 +388,9 @@ export async function editarUsuarioCms(
 export async function removerUsuarioCms(
   id: string,
 ): Promise<{ resultado: ResultadoEscrita; usuarios: UsuarioGestaoResumo[] }> {
-  const usuario = await obterUsuarioCms();
-  if (!usuario || usuario.perfil !== "super-admin") {
-    return { resultado: RECUSADO_SUPER_ADMIN, usuarios: [] };
+  const usuario = await obterAdministrador();
+  if (!usuario) {
+    return { resultado: RECUSADO_ADMINISTRADOR, usuarios: [] };
   }
   const p = await obterPayloadUsuarios();
   const resultado = await removerUsuario(p, id, usuario.id);
@@ -374,26 +404,26 @@ export async function removerUsuarioCms(
  * quando o e-mail original falhou, ou para um usuário que perdeu o link.
  */
 export async function reenviarConviteUsuarioCms(id: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioCms();
-  if (!usuario || usuario.perfil !== "super-admin") return RECUSADO_SUPER_ADMIN;
+  const usuario = await obterAdministrador();
+  if (!usuario) return RECUSADO_ADMINISTRADOR;
   const p = await obterPayloadUsuarios();
   return reenviarConvite(p, id);
 }
 
 /**
- * Passkeys de outro usuário (tela Usuários) — mesma guarda super-admin das
+ * Passkeys de outro usuário (tela Usuários) — mesma guarda de administrador das
  * demais actions deste bloco; remoção reaproveita removerPasskey (Task 4)
- * com chamadorEhSuperAdmin=true, que ignora a checagem de dono.
+ * com chamadorEhAdministrador=true (administrador), que ignora a checagem de dono.
  */
 export async function listarPasskeysDeUsuarioCms(usuarioId: string): Promise<PasskeyResumo[]> {
-  const usuario = await obterUsuarioCms();
-  if (!usuario || usuario.perfil !== "super-admin") return [];
+  const usuario = await obterAdministrador();
+  if (!usuario) return [];
   return listarPasskeysDoUsuario(usuarioId);
 }
 
 export async function removerPasskeyAdminCms(passkeyId: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioCms();
-  if (!usuario || usuario.perfil !== "super-admin") return RECUSADO_SUPER_ADMIN;
+  const usuario = await obterAdministrador();
+  if (!usuario) return RECUSADO_ADMINISTRADOR;
   return removerPasskey(passkeyId, usuario.id, true);
 }
 
@@ -401,18 +431,16 @@ export async function removerPasskeyAdminCms(passkeyId: string): Promise<Resulta
  * Server Actions de Conteúdos editoriais (telas de lista e detalhe do
  * painel) e de Contatos institucionais (tela Configurações).
  *
- * Leitura: basta a sessão — o spec de conteúdos §6.4 dá a lista ao
- * `editor-eventos` ("vê a lista e não edita"), e os contatos institucionais
- * aparecem no rodapé de toda página pública.
+ * Leitura: conteúdos e áreas exigem a tela Conteúdos (spec §5); os
+ * contatos institucionais bastam a sessão — aparecem no rodapé de toda
+ * página pública.
  *
- * Escrita: exige perfil editorial. Toda escrita destas telas chama a Local
- * API com `overrideAccess: true`, então o `access: editorInstitucional`
+ * Escrita: exige tela do site. Toda escrita destas telas chama a Local
+ * API com `overrideAccess: true`, então o `access` por tela
  * declarado em `Conteudos.ts` e em `Rodape.ts` nunca chega a ser consultado —
  * é esta guarda que faz a regra valer (spec de conteúdos §6.4, spec de
  * contatos §5).
  */
-
-const PERFIS_EDITORIAIS = ["super-admin", "editor-institucional"];
 
 const RECUSADO_EDITORIAL: ResultadoEscrita = {
   ok: false,
@@ -420,25 +448,25 @@ const RECUSADO_EDITORIAL: ResultadoEscrita = {
 };
 
 /** `null` libera a escrita; qualquer outro retorno é a recusa a devolver. */
-async function barrarNaoEditorial(): Promise<ResultadoEscrita | null> {
+async function barrarSemTela(telas: readonly TelaPainel[]): Promise<ResultadoEscrita | null> {
   const usuario = await obterUsuarioCms();
   if (!usuario) return RECUSADO;
-  if (!PERFIS_EDITORIAIS.includes(usuario.perfil)) return RECUSADO_EDITORIAL;
+  if (!temTela(usuario.acesso, telas)) return RECUSADO_EDITORIAL;
   return null;
 }
 
 export async function listarConteudos(): Promise<ConteudoCmsResumo[]> {
-  if (!(await obterUsuarioCms())) return [];
+  if (!(await obterUsuarioCmsComTela(TELAS_CONTEUDOS))) return [];
   return listarConteudosCms();
 }
 
 export async function carregarConteudo(id: string): Promise<ConteudoCmsDetalhe | null> {
-  if (!(await obterUsuarioCms())) return null;
+  if (!(await obterUsuarioCmsComTela(TELAS_CONTEUDOS))) return null;
   return obterConteudoCms(id);
 }
 
 export async function carregarAreas(): Promise<{ id: string; nome: string }[]> {
-  if (!(await obterUsuarioCms())) return [];
+  if (!(await obterUsuarioCmsComTela(TELAS_CONTEUDOS))) return [];
   return listarAreasCms();
 }
 
@@ -446,7 +474,7 @@ export async function salvarConteudo(
   id: string | null,
   campos: CamposConteudo,
 ): Promise<ResultadoEscrita & { id?: string }> {
-  const barrado = await barrarNaoEditorial();
+  const barrado = await barrarSemTela(TELAS_CONTEUDOS);
   if (barrado) return barrado;
   const r = await salvarConteudoCms(id, campos);
   if (r.ok) revalidatePath("/");
@@ -454,7 +482,7 @@ export async function salvarConteudo(
 }
 
 export async function publicarConteudo(id: string): Promise<ResultadoEscrita> {
-  const barrado = await barrarNaoEditorial();
+  const barrado = await barrarSemTela(TELAS_CONTEUDOS);
   if (barrado) return barrado;
   const r = await publicarConteudoCms(id);
   if (r.ok) revalidatePath("/");
@@ -462,7 +490,7 @@ export async function publicarConteudo(id: string): Promise<ResultadoEscrita> {
 }
 
 export async function despublicarConteudo(id: string): Promise<ResultadoEscrita> {
-  const barrado = await barrarNaoEditorial();
+  const barrado = await barrarSemTela(TELAS_CONTEUDOS);
   if (barrado) return barrado;
   const r = await despublicarConteudoCms(id);
   if (r.ok) revalidatePath("/");
@@ -470,7 +498,7 @@ export async function despublicarConteudo(id: string): Promise<ResultadoEscrita>
 }
 
 export async function excluirConteudo(id: string): Promise<ResultadoEscrita> {
-  const barrado = await barrarNaoEditorial();
+  const barrado = await barrarSemTela(TELAS_CONTEUDOS);
   if (barrado) return barrado;
   const r = await excluirConteudoCms(id);
   if (r.ok) revalidatePath("/");
@@ -490,7 +518,7 @@ export async function enviarMidiaConteudo(
   campo: "imagemDestaque" | "anexoDownload",
   formData: FormData,
 ): Promise<{ resultado: ResultadoEscrita; conteudo: ConteudoCmsDetalhe | null }> {
-  const barrado = await barrarNaoEditorial();
+  const barrado = await barrarSemTela(TELAS_CONTEUDOS);
   if (barrado) return { resultado: barrado, conteudo: null };
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
@@ -506,7 +534,7 @@ export async function enviarMidiaConteudo(
 
 /**
  * Server Actions de Contatos institucionais (tela Configurações). A leitura
- * exige sessão; a escrita exige perfil editorial (`barrarNaoEditorial`).
+ * exige sessão; a escrita exige a tela Contatos do site (`barrarSemTela`).
  */
 
 const CONTATOS_VAZIOS: CamposContatos = {
@@ -561,9 +589,9 @@ export async function carregarContatosCms(): Promise<CamposContatos> {
   };
 }
 
-/** Salva os contatos institucionais (gate de perfil + validação + Global). */
+/** Salva os contatos institucionais (gate de tela + validação + Global). */
 export async function salvarContatos(campos: CamposContatos): Promise<ResultadoEscrita> {
-  const barrado = await barrarNaoEditorial();
+  const barrado = await barrarSemTela(TELAS_CONTATOS);
   if (barrado) return barrado;
   return salvarContatosCms(campos);
 }

@@ -1,18 +1,17 @@
 import type { CollectionConfig } from "payload";
 
-import { authenticated } from "../access/authenticated";
-import { superAdmin, superAdminField } from "../access/superAdmin";
+import { administrador, administradorField, proprioOuAdministrador } from "../access/porTela";
 import { recusarLoginForaDoPainel } from "../lib/cms/loginSoPeloPainel";
 import { emailRecuperacaoHtml } from "../lib/emailsCms";
+import { TELAS } from "../lib/cms/telas";
 
 /**
- * Coleção Users — auth nativa do Payload, com perfis administrativos
- * conforme DAB §10.1.
+ * Coleção Users — auth nativa do Payload, com permissões por tela
+ * (`administrador` + `telas`, escolhidas por pessoa; DAB §10.1).
  *
- * Apenas super-admins podem criar/atualizar/deletar outros usuários.
- * Demais autenticados podem ler (para fins de exibição de "criado por",
- * dropdowns de responsável em Leads etc.) e atualizar o próprio
- * registro (alteração de senha, e-mail).
+ * Apenas administradores criam/removem usuários e marcam `administrador`/
+ * `telas`. Cada pessoa lê e atualiza só o próprio registro (nome, senha);
+ * os selects de responsável do painel leem pela Local API, não pela REST.
  *
  * 2FA (TOTP) é pendência da Janela C — CLAUDE.md §17. Até lá, a única
  * defesa de credenciais é senha forte + JWT do Payload com expiração.
@@ -22,7 +21,7 @@ export const Users: CollectionConfig = {
   labels: { singular: "Usuário", plural: "Usuários" },
   admin: {
     useAsTitle: "email",
-    defaultColumns: ["email", "nome", "perfil", "updatedAt"],
+    defaultColumns: ["email", "nome", "administrador", "updatedAt"],
     group: "Sistema",
   },
   auth: {
@@ -51,16 +50,10 @@ export const Users: CollectionConfig = {
     beforeLogin: [recusarLoginForaDoPainel],
   },
   access: {
-    read: authenticated,
-    create: superAdmin,
-    delete: superAdmin,
-    update: ({ req, id }) => {
-      if (!req.user) return false;
-      if (req.user.collection !== "users") return false;
-      // super-admin atualiza qualquer um; demais perfis só atualizam o próprio registro.
-      if ((req.user as { perfil?: string }).perfil === "super-admin") return true;
-      return req.user.id === id;
-    },
+    read: proprioOuAdministrador,
+    create: administrador,
+    delete: administrador,
+    update: proprioOuAdministrador,
   },
   fields: [
     {
@@ -76,7 +69,8 @@ export const Users: CollectionConfig = {
       name: "perfil",
       label: "Perfil administrativo",
       type: "select",
-      required: true,
+      // Legado: substituído por `administrador`/`telas`. Some na etapa 2.
+      required: false,
       defaultValue: "editor-institucional",
       options: [
         { label: "Super-administrador", value: "super-admin" },
@@ -85,13 +79,31 @@ export const Users: CollectionConfig = {
         { label: "Atendimento comercial", value: "atendimento-comercial" },
       ],
       access: {
-        // Apenas super-admin pode alterar o próprio perfil ou o de outros.
-        update: superAdminField,
+        // Legado (campo oculto): só administrador altera.
+        update: administradorField,
       },
       admin: {
+        hidden: true,
         description:
-          "Define o escopo de acesso ao admin (DAB §10.1). Apenas super-administradores podem alterar.",
+          "Legado, sem efeito: o acesso agora vem de Administrador e Telas. Removido na etapa 2.",
       },
+    },
+    {
+      name: "administrador",
+      label: "Administrador",
+      type: "checkbox",
+      defaultValue: false,
+      access: { create: administradorField, update: administradorField },
+      admin: { description: "Acesso total ao painel, inclusive gestão de usuários." },
+    },
+    {
+      name: "telas",
+      label: "Telas",
+      type: "select",
+      hasMany: true,
+      options: TELAS.map((t) => ({ label: t.rotulo, value: t.id })),
+      access: { create: administradorField, update: administradorField },
+      admin: { description: "Telas do painel que esta pessoa pode usar." },
     },
   ],
 };

@@ -26,7 +26,7 @@ export function ConfirmarPasskey({ precisaPasskey }: ConfirmarPasskeyProps) {
       const resposta = await startAuthentication({ optionsJSON: precisaPasskey.opcoesAutenticacao });
       const resultado = await verificarAutenticacaoPasskey(precisaPasskey.tokenPendente, resposta);
       if (resultado.erro) setErro(resultado.erro);
-      // sucesso: verificarAutenticacaoPasskey já chama redirect("/") no servidor.
+      // sucesso: verificarAutenticacaoPasskey já redireciona no servidor (destinoDepoisDoLogin).
     } catch {
       setErro("Não foi possível confirmar com o passkey. Tente novamente.");
     } finally {

@@ -646,7 +646,7 @@ describe("criarVersaoProposta copia o conteudo da versao vigente", () => {
 });
 
 describe("restaurarConteudoProposta", () => {
-  const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
+  const usuario = { id: 5, collection: "users", nome: "Ana", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
   const TEXTOS = [
     "textoApresentacao", "textoContexto", "textoObjetivos", "textoPublicoAlvo", "textoMetodologia",
     "textoEventon", "textoCertificacaoReplay", "textoCancelamento", "textoProtecaoConteudo",
@@ -786,7 +786,7 @@ describe("restaurarConteudoProposta", () => {
 });
 
 describe("salvarSecaoConteudoProposta", () => {
-  const usuario = { id: 5, collection: "users", nome: "Ana", perfil: "super-admin", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
+  const usuario = { id: 5, collection: "users", nome: "Ana", email: "a@b.c", createdAt: "", updatedAt: "" } as never;
   type Alvo = Parameters<typeof salvarSecaoConteudoProposta>[1];
 
   it("texto grava SÓ o campo do alvo, convertido para Lexical", async () => {

@@ -1,7 +1,5 @@
+import { acessoPorTela, administrador } from "../access/porTela";
 import type { CollectionConfig } from "payload";
-
-import { atendimentoComercial } from "../access/atendimentoComercial";
-import { superAdmin } from "../access/superAdmin";
 
 /** Trilha de versionamento de propostas (spec 2026-07-22 · Fase B1). */
 export const VersoesProposta: CollectionConfig = {
@@ -14,10 +12,10 @@ export const VersoesProposta: CollectionConfig = {
     group: "CRM",
   },
   access: {
-    read: atendimentoComercial,
-    create: atendimentoComercial,
-    update: atendimentoComercial,
-    delete: superAdmin,
+    read: acessoPorTela(["crm.propostas"]),
+    create: acessoPorTela(["crm.propostas"]),
+    update: acessoPorTela(["crm.propostas"]),
+    delete: administrador,
   },
   fields: [
     { name: "codBase", type: "text", required: true, index: true },

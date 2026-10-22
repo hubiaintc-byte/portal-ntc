@@ -1,6 +1,5 @@
+import { acessoPorTela } from "../access/porTela";
 import type { CollectionConfig } from "payload";
-
-import { atendimentoComercial } from "../access/atendimentoComercial";
 
 export const FINALIDADES_EMAIL = [
   { label: "Proposta", value: "proposta" },
@@ -18,8 +17,17 @@ export const EnviosEmail: CollectionConfig = {
   slug: "envios-email",
   labels: { singular: "Envio de e-mail", plural: "Envios de e-mail" },
   typescript: { interface: "EnvioEmail" },
-  admin: { useAsTitle: "assunto", defaultColumns: ["enviadoEm", "cliente", "finalidade", "status"], group: "CRM" },
-  access: { read: atendimentoComercial, create: () => false, update: () => false, delete: () => false },
+  admin: {
+    useAsTitle: "assunto",
+    defaultColumns: ["enviadoEm", "cliente", "finalidade", "status"],
+    group: "CRM",
+  },
+  access: {
+    read: acessoPorTela(["crm.envios"]),
+    create: () => false,
+    update: () => false,
+    delete: () => false,
+  },
   fields: [
     { name: "lead", type: "relationship", relationTo: "leads", index: true },
     { name: "cliente", type: "relationship", relationTo: "clientes-crm", index: true },

@@ -1,27 +1,28 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-/** Gate da Server Action de criação de evento em branco (sessão + perfil). */
+/** Gate da Server Action de criação de evento em branco (sessão + tela). */
 const create = vi.fn();
+const findByID = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({
-  obterPayload: async () => ({ create, update: vi.fn(), find: vi.fn(), findByID: vi.fn(), delete: vi.fn() }),
+  obterPayload: async () => ({ create, update: vi.fn(), find: vi.fn(), findByID, delete: vi.fn() }),
 }));
 
 const obterUsuarioCmsMock = vi.fn();
 vi.mock("@/lib/cms/autenticacao", async () => {
-  const { temPerfil } = await import("@/lib/cms/perfis");
+  const { temTela, acessoDoUsuario } = await import("@/lib/cms/telas");
   return {
     obterUsuarioCms: obterUsuarioCmsMock,
     obterUsuarioAutenticado: vi.fn(),
-    obterUsuarioCmsComPerfil: async (permitidos: readonly string[]) => {
+    obterUsuarioCmsComTela: async (telas: Parameters<typeof temTela>[1]) => {
       const u = await obterUsuarioCmsMock();
-      return u && temPerfil(u.perfil, permitidos as never) ? u : null;
+      return u && temTela(acessoDoUsuario(u), telas) ? u : null;
     },
   };
 });
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
-const { criarEventoEmBranco } = await import("./acoes");
+const { carregarEvento, criarEventoEmBranco } = await import("./acoes");
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -35,18 +36,33 @@ describe("criarEventoEmBranco (Server Action)", () => {
     expect(create).not.toHaveBeenCalled();
   });
 
-  it("com perfil atendimento-comercial, recusa", async () => {
-    obterUsuarioCmsMock.mockResolvedValue({ id: "1", nome: "A", perfil: "atendimento-comercial" });
+  it("só com site.palestrantes (sem site.eventos), recusa", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({ id: "1", nome: "A", administrador: false, telas: ["site.palestrantes"] });
     const r = await criarEventoEmBranco();
     expect(r.ok).toBe(false);
     expect(create).not.toHaveBeenCalled();
   });
 
-  it("com editor-eventos, cria o rascunho", async () => {
-    obterUsuarioCmsMock.mockResolvedValue({ id: "2", nome: "B", perfil: "editor-eventos" });
+  it("com site.eventos, cria o rascunho", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({ id: "2", nome: "B", administrador: false, telas: ["site.eventos"] });
     create.mockResolvedValue({ id: 8 });
     const r = await criarEventoEmBranco();
     expect(r).toEqual({ ok: true, id: "8" });
     expect(create).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("carregarEvento (Server Action)", () => {
+  it("quem não tem a tela Eventos recebe null sem ler o banco", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({ id: 3, administrador: false, telas: ["site.palestrantes"] });
+    expect(await carregarEvento("9")).toBeNull();
+    expect(findByID).not.toHaveBeenCalled();
+  });
+
+  it("quem tem a tela Eventos lê o evento", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({ id: 4, administrador: false, telas: ["site.eventos"] });
+    findByID.mockResolvedValue(null);
+    expect(await carregarEvento("9")).toBeNull();
+    expect(findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: "eventos", id: "9" }));
   });
 });

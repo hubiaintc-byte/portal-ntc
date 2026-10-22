@@ -1,10 +1,11 @@
+import { acessoDoUsuario } from "../lib/cms/telas";
 import type { CollectionConfig } from "payload";
 
 /**
  * Credenciais WebAuthn (passkeys) — 2º fator opcional do login do painel
  * (spec 2026-09-02, substitui o plano de 2FA via TOTP de CLAUDE.md §17.8).
  * Um usuário pode ter várias (um por dispositivo). Leitura/remoção: dono
- * OU super-admin (a tela Usuários permite ao super-admin remover o passkey
+ * OU administrador (a tela Usuários permite ao administrador remover o passkey
  * de qualquer usuário — caso de dispositivo perdido). Escrita real
  * acontece só via Local API com overrideAccess, a partir das Server
  * Actions de apps/cms/src/app/(painel)/acoesAuth.ts e acoes.ts — os
@@ -22,12 +23,12 @@ export const Passkeys: CollectionConfig = {
   access: {
     read: ({ req }) => {
       if (!req.user) return false;
-      if ((req.user as { perfil?: string }).perfil === "super-admin") return true;
+      if (acessoDoUsuario(req.user as never).administrador) return true;
       return { usuario: { equals: req.user.id } };
     },
     delete: ({ req }) => {
       if (!req.user) return false;
-      if ((req.user as { perfil?: string }).perfil === "super-admin") return true;
+      if (acessoDoUsuario(req.user as never).administrador) return true;
       return { usuario: { equals: req.user.id } };
     },
     create: () => false,

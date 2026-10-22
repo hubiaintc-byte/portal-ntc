@@ -1,6 +1,6 @@
+import { acessoPorTela } from "../access/porTela";
 import type { GlobalConfig } from "payload";
 
-import { editorInstitucional } from "../access/editorInstitucional";
 import { leituraPublicaGlobal } from "../access/leituraPublica";
 
 /**
@@ -14,7 +14,7 @@ export const Home: GlobalConfig = {
   slug: "home",
   label: "Home (Página Inicial)",
   admin: { group: "Páginas Singleton" },
-  access: { read: leituraPublicaGlobal, update: editorInstitucional },
+  access: { read: leituraPublicaGlobal, update: acessoPorTela(["site.home"]) },
   versions: { drafts: true, max: 20 },
   fields: [
     {

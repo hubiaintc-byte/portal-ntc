@@ -1,0 +1,111 @@
+/**
+ * Migração da etapa 1 das permissões por tela: converte o `perfil` legado
+ * de cada usuário em `administrador`/`telas`. Só mexe em quem ainda não tem
+ * nenhum dos dois. Idempotente.
+ *
+ * Dry-run por padrão (só lê e imprime o plano); aplica com
+ * `PERMISSOES_MIGRAR_APLICAR=1`. Execução: `pnpm --filter @ntc/cms permissoes:migrar`.
+ */
+
+import { TELAS } from "../lib/cms/telas";
+import type { AcessoPainel, TelaPainel } from "../lib/cms/telas";
+
+const APLICAR = process.env.PERMISSOES_MIGRAR_APLICAR === "1";
+
+/**
+ * Mapeamento dos 4 perfis fixos (modelo antigo) para administrador/telas.
+ * Mora aqui porque só esta migração ainda precisa dele.
+ */
+export function acessoDoPerfilLegado(perfil: string | null | undefined): AcessoPainel {
+  const site = TELAS.filter((t) => t.modulo === "site").map((t) => t.id);
+  const crm = TELAS.filter((t) => t.modulo === "crm").map((t) => t.id);
+  switch (perfil) {
+    case "super-admin":
+      return { administrador: true, telas: [] };
+    case "atendimento-comercial":
+      return { administrador: false, telas: ["site.painel", ...crm] };
+    case "editor-institucional":
+      return { administrador: false, telas: [...site, "crm.programas", "crm.modulos", "crm.produtos"] };
+    case "editor-eventos":
+      return { administrador: false, telas: ["site.painel", "site.eventos"] };
+    default:
+      return { administrador: false, telas: [] };
+  }
+}
+
+export interface UsuarioParaMigrar {
+  id: number;
+  perfil?: string | null;
+  administrador?: boolean | null;
+  telas?: string[] | null;
+}
+
+export interface PlanoUsuario {
+  id: number;
+  administrador: boolean;
+  telas: TelaPainel[];
+}
+
+/** Pura: só usuários sem `administrador` marcado e sem nenhuma tela. */
+export function planejarMigracao(usuarios: UsuarioParaMigrar[]): PlanoUsuario[] {
+  const plano: PlanoUsuario[] = [];
+  for (const u of usuarios) {
+    if (u.administrador || (u.telas && u.telas.length > 0)) continue;
+    const acesso = acessoDoPerfilLegado(u.perfil);
+    plano.push({ id: u.id, administrador: acesso.administrador, telas: [...acesso.telas] });
+  }
+  return plano;
+}
+
+async function main(): Promise<void> {
+  const { getPayload } = await import("payload");
+  const { default: config } = await import("../payload.config");
+  const payload = await getPayload({ config });
+
+  const { docs } = await payload.find({
+    collection: "users",
+    limit: 1000,
+    depth: 0,
+    pagination: false,
+  });
+  const usuarios: UsuarioParaMigrar[] = docs.map((d) => {
+    const u = d as unknown as UsuarioParaMigrar;
+    return { id: u.id, perfil: u.perfil, administrador: u.administrador, telas: u.telas };
+  });
+  const plano = planejarMigracao(usuarios);
+
+  console.log(`${APLICAR ? "APLICANDO" : "DRY-RUN"} — ${plano.length} de ${usuarios.length} usuário(s) a migrar`);
+  let houveFalha = false;
+  for (const p of plano) {
+    const rotulo = `#${p.id} -> administrador=${p.administrador} telas=[${p.telas.join(", ")}]`;
+    if (!APLICAR) {
+      console.log(`  ${rotulo}`);
+      continue;
+    }
+    try {
+      await payload.update({
+        collection: "users",
+        id: p.id,
+        data: { administrador: p.administrador, telas: p.telas },
+      });
+      console.log(`  ok ${rotulo}`);
+    } catch (err) {
+      houveFalha = true;
+      console.error(`  ERRO ${rotulo}`, err);
+    }
+  }
+  process.exit(houveFalha ? 1 : 0);
+}
+
+// Importável nos testes sem disparar `main()`. O `await` de topo é
+// obrigatório: sob Payload 3.90 o `payload run` espera só o import do módulo
+// e chama `process.exit(0)` logo depois — com `void main()` o script saía 0
+// sem ter rodado. O `process.exit(1)` explícito vence o `exit(0)` do bin.
+if (!process.env.VITEST) {
+  try {
+    await main();
+  } catch (err) {
+    console.error("[permissoes:migrar] Falha:", err);
+    process.exit(1);
+  }
+}

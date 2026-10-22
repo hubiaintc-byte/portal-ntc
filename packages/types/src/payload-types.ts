@@ -180,7 +180,33 @@ export interface User {
   /**
    * Define o escopo de acesso ao admin (DAB §10.1). Apenas super-administradores podem alterar.
    */
-  perfil: 'super-admin' | 'editor-institucional' | 'editor-eventos' | 'atendimento-comercial';
+  perfil?: ('super-admin' | 'editor-institucional' | 'editor-eventos' | 'atendimento-comercial') | null;
+  /**
+   * Acesso total ao painel, inclusive gestão de usuários.
+   */
+  administrador?: boolean | null;
+  /**
+   * Telas do painel que esta pessoa pode usar.
+   */
+  telas?:
+    | (
+        | 'site.painel'
+        | 'site.palestrantes'
+        | 'site.corpo-docente'
+        | 'site.eventos'
+        | 'site.conteudos'
+        | 'site.home'
+        | 'site.contatos'
+        | 'crm.dashboard'
+        | 'crm.leads'
+        | 'crm.clientes'
+        | 'crm.propostas'
+        | 'crm.envios'
+        | 'crm.programas'
+        | 'crm.modulos'
+        | 'crm.produtos'
+      )[]
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1829,6 +1855,8 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   nome?: T;
   perfil?: T;
+  administrador?: T;
+  telas?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

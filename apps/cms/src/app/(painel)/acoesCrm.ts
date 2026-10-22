@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { obterUsuarioAutenticadoComPerfil, obterUsuarioCmsComPerfil } from "@/lib/cms/autenticacao";
-import { PERFIS_CRM } from "@/lib/cms/perfis";
+import { obterUsuarioAutenticadoComTela, obterUsuarioCmsComTela } from "@/lib/cms/autenticacao";
+import { TELAS_LEADS, temTela, type TelaPainel } from "@/lib/cms/telas";
 import {
   obterClienteCrm,
   obterLeadCrm,
@@ -51,29 +51,35 @@ import {
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
 
 /**
- * Server Actions do módulo CRM. Toda action valida a sessão E o perfil do CRM
- * (`PERFIS_CRM`) ANTES de tocar a Local API, que ignora o `access` das coleções — Server Actions são endpoints públicos (mesma regra de acoes.ts).
+ * Server Actions do módulo CRM. Toda action valida a sessão E a tela do CRM ANTES de tocar a Local API, que ignora o `access` das coleções — Server Actions são endpoints públicos (mesma regra de acoes.ts).
  */
 
 const RECUSADO: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
 
+const TELAS_CLIENTES: readonly TelaPainel[] = ["crm.clientes"];
+const TELAS_PROPOSTAS: readonly TelaPainel[] = ["crm.propostas"];
+/** Acervo de eventos e notas na página do cliente (spec §3.8). */
+const TELAS_LEADS_E_CLIENTES: readonly TelaPainel[] = [...TELAS_LEADS, "crm.clientes"];
+
 export async function carregarClienteCrm(id: string): Promise<ClienteCrmDetalhe | null> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_CRM))) return null;
-  return obterClienteCrm(id);
+  const usuario = await obterUsuarioCmsComTela(TELAS_CLIENTES);
+  if (!usuario) return null;
+  // Sem Dashboard/Leads, os negócios saem sem os dados pessoais do lead (spec §3.8).
+  return obterClienteCrm(id, { negociosMinimos: !temTela(usuario.acesso, TELAS_LEADS) });
 }
 
 export async function salvarClienteCrm(
   id: string | null,
   dados: DadosClienteCrm,
 ): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_CRM))) return RECUSADO;
+  if (!(await obterUsuarioCmsComTela(TELAS_CLIENTES))) return RECUSADO;
   const resultado = id === null ? await criarClienteCrm(dados) : await atualizarClienteCrm(id, dados);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
 }
 
 export async function carregarPropostaCrm(id: string): Promise<PropostaDetalhe | null> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_CRM))) return null;
+  if (!(await obterUsuarioCmsComTela(TELAS_PROPOSTAS))) return null;
   return obterPropostaCrm(id);
 }
 
@@ -81,7 +87,7 @@ export async function salvarPropostaCrm(
   id: string | null,
   dados: DadosProposta,
 ): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_CRM))) return RECUSADO;
+  if (!(await obterUsuarioCmsComTela(TELAS_PROPOSTAS))) return RECUSADO;
   const resultado = id === null ? await criarProposta(dados) : await atualizarProposta(id, dados);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
@@ -91,7 +97,7 @@ export async function novaVersaoPropostaCrm(
   codBase: string,
   motivo: string,
 ): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_CRM))) return RECUSADO;
+  if (!(await obterUsuarioCmsComTela(TELAS_PROPOSTAS))) return RECUSADO;
   const resultado = await criarVersaoProposta(codBase, motivo);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
@@ -101,7 +107,7 @@ export async function restaurarConteudoPropostaCrm(
   id: string,
   alvo: AlvoRestauracao,
 ): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_PROPOSTAS);
   if (!usuario) return RECUSADO;
   const r = await restaurarConteudoProposta(id, alvo, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -114,7 +120,7 @@ export async function salvarSecaoConteudoPropostaCrm(
   alvo: AlvoConteudoProposta,
   valor: ValorSecaoProposta,
 ): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_PROPOSTAS);
   if (!usuario) return RECUSADO;
   const r = await salvarSecaoConteudoProposta(id, alvo, valor, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -122,19 +128,19 @@ export async function salvarSecaoConteudoPropostaCrm(
 }
 
 export async function registrarEnvioCrm(dados: DadosEnvio): Promise<ResultadoEscrita> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_CRM))) return RECUSADO;
+  if (!(await obterUsuarioCmsComTela(TELAS_PROPOSTAS))) return RECUSADO;
   const resultado = await registrarEnvio(dados);
   if (resultado.ok) revalidatePath("/crm");
   return resultado;
 }
 
 export async function carregarLeadCrm(id: string): Promise<LeadCrmDetalhe | null> {
-  if (!(await obterUsuarioCmsComPerfil(PERFIS_CRM))) return null;
+  if (!(await obterUsuarioCmsComTela(TELAS_LEADS))) return null;
   return obterLeadCrm(id);
 }
 
 export async function salvarLeadCrm(id: string | null, dados: DadosLeadManual): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS);
   if (!usuario) return RECUSADO;
   const r = id === null ? await criarLeadManual(dados, usuario) : await atualizarLeadCrm(id, dados, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -142,7 +148,7 @@ export async function salvarLeadCrm(id: string | null, dados: DadosLeadManual): 
 }
 
 export async function moverLeadCrm(id: string, estagio: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS);
   if (!usuario) return RECUSADO;
   const r = await moverLead(id, estagio, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -150,7 +156,7 @@ export async function moverLeadCrm(id: string, estagio: string): Promise<Resulta
 }
 
 export async function marcarLeadPerdidoCrm(id: string, motivo: string, detalhe: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS);
   if (!usuario) return RECUSADO;
   const r = await marcarLeadPerdido(id, motivo, detalhe, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -158,7 +164,7 @@ export async function marcarLeadPerdidoCrm(id: string, motivo: string, detalhe: 
 }
 
 export async function reabrirLeadCrm(id: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS);
   if (!usuario) return RECUSADO;
   const r = await reabrirLead(id, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -166,7 +172,7 @@ export async function reabrirLeadCrm(id: string): Promise<ResultadoEscrita> {
 }
 
 export async function vincularClienteCrm(leadId: string, clienteId: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS);
   if (!usuario) return RECUSADO;
   const r = await vincularClienteAoLead(leadId, clienteId, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -174,15 +180,16 @@ export async function vincularClienteCrm(leadId: string, clienteId: string): Pro
 }
 
 export async function adicionarNotaCrm(clienteId: string, leadId: string | null, texto: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS_E_CLIENTES);
   if (!usuario) return RECUSADO;
   const r = await adicionarNota(clienteId, leadId, texto, usuario);
   if (r.ok) revalidatePath("/crm");
   return r;
 }
 
+/** Agenda pelo modal do lead ou pelo acervo de eventos do cliente (spec §3.8), escolhendo um negócio. */
 export async function agendarEventoCrm(leadId: string, dados: DadosEvento): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS_E_CLIENTES);
   if (!usuario) return RECUSADO;
   const r = await agendarEvento(leadId, dados, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -195,7 +202,7 @@ export async function registrarContratoCrm(
   dados: DadosContrato,
   formData: FormData,
 ): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS_E_CLIENTES);
   if (!usuario) return RECUSADO;
   const bruto = formData.get("arquivo");
   const arquivo = bruto instanceof File && bruto.size > 0 ? bruto : null;
@@ -205,7 +212,7 @@ export async function registrarContratoCrm(
 }
 
 export async function salvarLinksCrm(eventoId: string, links: DadosLink[]): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS_E_CLIENTES);
   if (!usuario) return RECUSADO;
   const r = await salvarLinksInscricao(eventoId, links, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -213,7 +220,7 @@ export async function salvarLinksCrm(eventoId: string, links: DadosLink[]): Prom
 }
 
 export async function marcarEventoRealizadoCrm(eventoId: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS_E_CLIENTES);
   if (!usuario) return RECUSADO;
   const r = await marcarEventoRealizado(eventoId, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -221,7 +228,7 @@ export async function marcarEventoRealizadoCrm(eventoId: string): Promise<Result
 }
 
 export async function cancelarEventoCrm(eventoId: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS_E_CLIENTES);
   if (!usuario) return RECUSADO;
   const r = await cancelarEvento(eventoId, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -234,7 +241,7 @@ export async function subirDocumentoEventoCrm(
   descricao: string,
   formData: FormData,
 ): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS_E_CLIENTES);
   if (!usuario) return RECUSADO;
   const arquivo = formData.get("arquivo");
   if (!(arquivo instanceof File) || arquivo.size === 0) {
@@ -246,7 +253,7 @@ export async function subirDocumentoEventoCrm(
 }
 
 export async function removerDocumentoEventoCrm(documentoId: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS_E_CLIENTES);
   if (!usuario) return RECUSADO;
   const r = await removerDocumentoEvento(documentoId, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -254,7 +261,7 @@ export async function removerDocumentoEventoCrm(documentoId: string): Promise<Re
 }
 
 export async function apagarLeadCrm(leadId: string, confirmacaoNome: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_LEADS);
   if (!usuario) return RECUSADO;
   const r = await apagarLead(leadId, confirmacaoNome, usuario);
   if (r.ok) revalidatePath("/crm");
@@ -262,7 +269,7 @@ export async function apagarLeadCrm(leadId: string, confirmacaoNome: string): Pr
 }
 
 export async function apagarClienteCrm(clienteId: string): Promise<ResultadoEscrita> {
-  const usuario = await obterUsuarioAutenticadoComPerfil(PERFIS_CRM);
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_CLIENTES);
   if (!usuario) return RECUSADO;
   const r = await apagarCliente(clienteId, usuario);
   if (r.ok) revalidatePath("/crm");

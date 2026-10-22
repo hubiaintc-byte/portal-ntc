@@ -2,9 +2,8 @@
 
 import { Fragment, useState, useTransition } from "react";
 
-import type { OpcaoLista } from "@ntc/lib";
-
 import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
+import { TELAS, type ModuloPainel, type TelaPainel } from "@/lib/cms/telas";
 
 import {
   criarUsuarioCms,
@@ -14,34 +13,33 @@ import {
   removerPasskeyAdminCms,
   removerUsuarioCms,
 } from "./acoes";
-import { AvisoForm, BarraForm, CampoSelect, CampoTexto } from "./crm/CamposCrm";
+import { AvisoForm, BarraForm, CampoCheck, CampoTexto } from "./crm/CamposCrm";
 
 /**
- * Gestão de usuários do painel (só super-admin — item da sidebar já é
+ * Gestão de usuários do painel (só administrador — item da sidebar já é
  * gated). Tela client autossuficiente: os dados chegam vazios da page.tsx
- * (evita mandar a lista a quem não é super-admin) e são carregados aqui via
+ * (evita mandar a lista a quem não é administrador) e são carregados aqui via
  * `carregarUsuarios()` ao montar (ShellCms dispara a primeira carga).
  */
 
-const ROTULO_PERFIL: Record<string, string> = {
-  "super-admin": "Super-administrador",
-  "editor-institucional": "Editor institucional",
-  "editor-eventos": "Editor de eventos",
-  "atendimento-comercial": "Atendimento comercial",
-};
-
-const OPCOES_PERFIL: OpcaoLista[] = Object.entries(ROTULO_PERFIL).map(([value, label]) => ({
-  value,
-  label,
-}));
+const GRUPOS_TELAS: { modulo: ModuloPainel; rotulo: string }[] = [
+  { modulo: "site", rotulo: "Site" },
+  { modulo: "crm", rotulo: "CRM" },
+];
 
 interface DadosForm {
   nome: string;
   email: string;
-  perfil: string;
+  administrador: boolean;
+  telas: TelaPainel[];
 }
 
-const FORM_VAZIO: DadosForm = { nome: "", email: "", perfil: "" };
+const FORM_VAZIO: DadosForm = { nome: "", email: "", administrador: false, telas: [] };
+
+function resumoAcesso(u: UsuarioGestaoResumo): string {
+  if (u.administrador) return "Administrador";
+  return `${u.telas.length} ${u.telas.length === 1 ? "tela" : "telas"}`;
+}
 
 interface TelaUsuariosProps {
   usuarios: UsuarioGestaoResumo[];
@@ -63,7 +61,7 @@ export function TelaUsuarios({
   const [confirmandoRemocao, setConfirmandoRemocao] = useState<string | null>(null);
   const [reenviando, setReenviando] = useState<string | null>(null);
   // Feedback inline por linha — cobre tanto o reenvio de convite quanto uma
-  // falha ao remover (ex.: "não é possível remover o último super-admin").
+  // falha ao remover (ex.: "não é possível remover o último administrador").
   const [feedbackLinha, setFeedbackLinha] = useState<{ id: string; ok: boolean; texto: string } | null>(
     null,
   );
@@ -86,7 +84,7 @@ export function TelaUsuarios({
   }
 
   function abrirEdicao(u: UsuarioGestaoResumo) {
-    setDados({ nome: u.nome, email: u.email, perfil: u.perfil });
+    setDados({ nome: u.nome, email: u.email, administrador: u.administrador, telas: u.telas });
     setErro(null);
     setAviso(null);
     setModo(u.id);
@@ -101,6 +99,13 @@ export function TelaUsuarios({
 
   const m = <K extends keyof DadosForm>(campo: K) => (v: DadosForm[K]) =>
     setDados((d) => ({ ...d, [campo]: v }));
+
+  function alternarTela(id: TelaPainel, marcada: boolean) {
+    setDados((d) => ({
+      ...d,
+      telas: marcada ? [...d.telas, id] : d.telas.filter((t) => t !== id),
+    }));
+  }
 
   function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -122,7 +127,8 @@ export function TelaUsuarios({
       } else if (editando) {
         const { resultado, usuarios: atualizados } = await editarUsuarioCms(editando.id, {
           nome: dados.nome,
-          perfil: dados.perfil,
+          administrador: dados.administrador,
+          telas: dados.telas,
         });
         if (resultado.ok) {
           onUsuariosAtualizados(atualizados);
@@ -223,8 +229,26 @@ export function TelaUsuarios({
               <p>{dados.email}</p>
             </div>
           )}
-          <CampoSelect rotulo="Perfil" valor={dados.perfil} onMudar={m("perfil")} opcoes={OPCOES_PERFIL} curto />
         </div>
+        <CampoCheck
+          rotulo="Administrador (acesso total)"
+          marcado={dados.administrador}
+          onMudar={m("administrador")}
+        />
+        {GRUPOS_TELAS.map((g) => (
+          <fieldset key={g.modulo} className="pcms-conteudo__item">
+            <legend>Telas · {g.rotulo}</legend>
+            {TELAS.filter((t) => t.modulo === g.modulo).map((t) => (
+              <CampoCheck
+                key={t.id}
+                rotulo={t.rotulo}
+                marcado={dados.administrador || dados.telas.includes(t.id)}
+                desabilitado={dados.administrador}
+                onMudar={(v) => alternarTela(t.id, v)}
+              />
+            ))}
+          </fieldset>
+        ))}
         <p className="pcms-editor__hint">
           {modo === "novo"
             ? "Um convite será enviado por e-mail para o usuário definir a própria senha."
@@ -266,7 +290,7 @@ export function TelaUsuarios({
             <tr>
               <th>Nome</th>
               <th>E-mail</th>
-              <th>Perfil</th>
+              <th>Acesso</th>
               <th>Atualizado em</th>
               <th>Ações</th>
             </tr>
@@ -281,7 +305,7 @@ export function TelaUsuarios({
                   </td>
                   <td>{u.email}</td>
                   <td>
-                    <span className="pcms-selo pcms-selo--info">{ROTULO_PERFIL[u.perfil] ?? u.perfil}</span>
+                    <span className="pcms-selo pcms-selo--info">{resumoAcesso(u)}</span>
                   </td>
                   <td>{new Date(u.atualizadoEm).toLocaleDateString("pt-BR")}</td>
                   <td>

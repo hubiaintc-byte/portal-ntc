@@ -2,14 +2,18 @@
 
 import { useEffect, useState, useTransition } from "react";
 
+import { navCrmVisivel, telaInicialCrm, type TelaCrmId } from "@/lib/cms/navegacao";
 import type { DadosEnvio } from "@/lib/cms/painelCrmEscrita";
+import { temTela, type AcessoPainel, type CapacidadesPainel } from "@/lib/cms/telas";
 import type {
   CatalogoCrm,
   ClienteCrmDetalhe,
   ClienteCrmResumo,
+  ClienteOpcao,
   EnvioResumo,
   LeadCrmDetalhe,
   LeadCrmResumo,
+  LeadOpcao,
   ProdutoCrmResumo,
   PropostaDetalhe,
   PropostaResumo,
@@ -52,11 +56,23 @@ import { TelaProgramas } from "./TelaProgramas";
 import { TelaPropostas } from "./TelaPropostas";
 
 interface ShellCrmProps {
-  usuario: { nome: string; email: string; perfil: string };
-  /** false = perfil só do catálogo: o menu mostra apenas o Catálogo Institucional. */
-  acessoCrm: boolean;
+  usuario: { nome: string; email: string };
+  /** Telas da pessoa: decidem o menu, a tela inicial e o seletor de módulo. */
+  acesso: AcessoPainel;
+  /**
+   * O que este usuário pode escrever, calculado no servidor (crm/page.tsx) por
+   * `capacidadesDoAcesso`. Só decide quais controles aparecem — a guarda de
+   * cada Server Action continua sendo a barreira real.
+   */
+  capacidades: CapacidadesPainel;
+  /** Lista completa — só com a tela Clientes (vazia sem ela). */
   clientes: ClienteCrmResumo[];
+  /** Apoio (spec §3.3) para os selects de cliente, carregado só sem a tela Clientes. */
+  clientesOpcoes: ClienteOpcao[];
+  /** Só com Dashboard/Leads (vazia sem eles). */
   leads: LeadCrmResumo[];
+  /** Apoio para o select de lead do wizard, carregado só sem Dashboard/Leads. */
+  leadsOpcoes: LeadOpcao[];
   catalogo: CatalogoCrm;
   usuarios: UsuarioCmsResumo[];
   programas: ProgramaCrmResumo[];
@@ -68,10 +84,6 @@ interface ShellCrmProps {
   hojeISO: string;
   erroLeitura: boolean;
 }
-
-type TelaCrmId =
-  | "painel" | "leads" | "clientes" | "propostas" | "envios"
-  | "programas" | "modulos" | "produtos";
 
 /** Formulário de criação/edição aberto em tela cheia. */
 type FormCrmAberto =
@@ -163,9 +175,12 @@ const CRUMB: Record<TelaCrmId, string> = {
 
 export function ShellCrm({
   usuario,
-  acessoCrm,
+  acesso,
+  capacidades,
   clientes,
+  clientesOpcoes,
   leads,
+  leadsOpcoes,
   catalogo,
   usuarios,
   programas,
@@ -177,7 +192,7 @@ export function ShellCrm({
   hojeISO,
   erroLeitura,
 }: ShellCrmProps) {
-  const [tela, setTela] = useState<TelaCrmId>(acessoCrm ? "painel" : "programas");
+  const [tela, setTela] = useState<TelaCrmId>(() => telaInicialCrm(acesso));
   const [clienteDet, setClienteDet] = useState<ClienteCrmDetalhe | null>(null);
   const [modalLead, setModalLead] = useState<ModalLeadAberto | null>(null);
   const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
@@ -295,15 +310,24 @@ export function ShellCrm({
     });
   }
 
+  // Menu: só as telas marcadas; grupo sem item some.
+  const visiveis = new Set(navCrmVisivel(acesso));
   const grupos: GrupoNav[] = [
-    ...(acessoCrm ? [{ rotulo: "Comercial", itens: NAV_COMERCIAL }] : []),
-    { rotulo: "Catálogo Institucional", itens: NAV_CATALOGO },
-  ];
+    { rotulo: "Comercial", itens: NAV_COMERCIAL.filter((i) => visiveis.has(i.id)) },
+    { rotulo: "Catálogo Institucional", itens: NAV_CATALOGO.filter((i) => visiveis.has(i.id)) },
+  ].filter((g) => g.itens.length > 0);
+
+  const verClientes = temTela(acesso, ["crm.clientes"]);
+  // Selects de apoio: a lista completa quando a pessoa tem a tela, senão a mínima.
+  const opcoesClientes: ClienteOpcao[] = verClientes ? clientes : clientesOpcoes;
+  const opcoesLeads: LeadOpcao[] = capacidades.verLeads ? leadsLocal : leadsOpcoes;
 
   return (
     <ShellPainel
       modulo="crm"
+      mostrarCrm
       usuario={usuario}
+      administrador={acesso.administrador}
       grupos={grupos}
       telaAtiva={tela}
       onIrPara={irPara}
@@ -326,6 +350,7 @@ export function ShellCrm({
           }}
           onAbrirModulo={abrirModuloCatalogo}
           onNovoModulo={(programaId) => setCatalogoDet({ tipo: "modulo", modulo: null, programaIdInicial: programaId })}
+          podeEditar={capacidades.editarProgramas}
         />
         </>
       ) : catalogoDet?.tipo === "modulo" ? (
@@ -342,6 +367,7 @@ export function ShellCrm({
             fecharTudo();
             setTela("modulos");
           }}
+          podeEditar={capacidades.editarModulos}
         />
         </>
       ) : formAberto?.entidade === "cliente" ? (
@@ -354,10 +380,10 @@ export function ShellCrm({
       ) : formAberto?.entidade === "proposta" ? (
         <FormProposta
           inicial={formAberto.inicial}
-          clientes={clientes}
+          clientes={opcoesClientes}
           catalogo={catalogo}
           usuarios={usuarios}
-          leads={leads}
+          leads={opcoesLeads}
           onSalvo={fecharTudo}
           onCancelar={fecharTudo}
         />
@@ -366,14 +392,16 @@ export function ShellCrm({
           cliente={clienteDet}
           onVoltar={fecharTudo}
           onEditar={() => setFormAberto({ entidade: "cliente", inicial: clienteDet })}
-          onAbrirLead={abrirLead}
-          onNovoLead={() => setModalLead({ modo: "novo" })}
+          onAbrirLead={capacidades.verLeads ? abrirLead : undefined}
+          onNovoLead={capacidades.verLeads ? () => setModalLead({ modo: "novo" }) : undefined}
           onNota={async (t) => {
             const r = await adicionarNotaCrm(clienteDet.id, null, t);
             if (r.ok) abrirCliente(clienteDet.id);
             return r.ok ? null : (r.erro ?? "Erro.");
           }}
           onAtualizado={() => abrirCliente(clienteDet.id)}
+          podeAcompanharEventos={capacidades.acompanharEventos}
+          catalogo={catalogo}
           onApagado={() => {
             fecharTudo();
             setTela("clientes");
@@ -426,6 +454,7 @@ export function ShellCrm({
               areas={areas}
               onAbrir={abrirProgramaCatalogo}
               onNovo={() => setCatalogoDet({ tipo: "programa", programa: null })}
+              podeEditar={capacidades.editarProgramas}
             />
           )}
           {tela === "modulos" && (
@@ -434,6 +463,7 @@ export function ShellCrm({
               programas={programas}
               onAbrir={abrirModuloCatalogo}
               onNovo={() => setCatalogoDet({ tipo: "modulo", modulo: null })}
+              podeEditar={capacidades.editarModulos}
             />
           )}
           {tela === "produtos" && <TelaProdutos produtos={produtos} />}
@@ -453,7 +483,7 @@ export function ShellCrm({
         <ModalLead
           key={modalLead.modo === "ver" ? modalLead.lead.id : "novo"}
           lead={modalLead.modo === "ver" ? modalLead.lead : null}
-          clientes={clientes}
+          clientes={opcoesClientes}
           catalogo={catalogo}
           usuarios={usuarios}
           clientePreSelecionado={clienteDet?.id}
@@ -464,10 +494,14 @@ export function ShellCrm({
             if (clienteDet) abrirCliente(clienteDet.id);
           }}
           onAtualizado={abrirLead}
-          onAbrirCliente={(id) => {
-            setModalLead(null);
-            abrirCliente(id);
-          }}
+          onAbrirCliente={
+            verClientes
+              ? (id) => {
+                  setModalLead(null);
+                  abrirCliente(id);
+                }
+              : undefined
+          }
           onApagado={() => {
             // `leadsLocal` só se re-sincroniza com o prop `leads` numa nova
             // leitura do servidor (useEffect acima) — sem tirar o id daqui,

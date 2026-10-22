@@ -1,6 +1,6 @@
+import { acessoPorTela } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
-import { editorCatalogo } from "../access/editorCatalogo";
 import { autoSlug } from "../hooks/autoSlug";
 import { bloquearProgramaComDependentes } from "../lib/crm/exclusaoCatalogo";
 import { seoFields } from "../shared/seoFields";
@@ -24,9 +24,9 @@ export const Programas: CollectionConfig = {
   },
   access: {
     read: leituraPublica(),
-    create: editorCatalogo,
-    update: editorCatalogo,
-    delete: editorCatalogo,
+    create: acessoPorTela(["crm.programas"]),
+    update: acessoPorTela(["crm.programas"]),
+    delete: acessoPorTela(["crm.programas"]),
   },
   versions: { drafts: true, maxPerDoc: 30 },
   hooks: { beforeDelete: [bloquearProgramaComDependentes] },

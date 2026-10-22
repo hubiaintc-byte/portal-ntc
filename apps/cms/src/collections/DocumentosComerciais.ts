@@ -1,7 +1,6 @@
+import { acessoPorTela, administrador } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
-import { atendimentoComercial } from "../access/atendimentoComercial";
-import { superAdmin } from "../access/superAdmin";
 import { protegerDocumentoComercial } from "../hooks/protegerDocumentoComercial";
 import { sanitizarFilename } from "../hooks/sanitizarFilename";
 import { registrarDocumentoNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
@@ -24,13 +23,13 @@ export const DocumentosComerciais: CollectionConfig = {
     useAsTitle: "filename",
     group: "CRM",
   },
-  // Propostas com preço, contratos e empenhos: só o perfil do CRM (o mesmo das
-  // Server Actions — lib/cms/perfis.ts). Excluir, só o super-admin.
+  // Propostas com preço, contratos e empenhos: só quem tem Clientes ou Propostas (as mesmas
+  // telas das Server Actions — lib/cms/telas.ts). Excluir, só o administrador.
   access: {
-    read: atendimentoComercial,
-    create: atendimentoComercial,
-    update: atendimentoComercial,
-    delete: superAdmin,
+    read: acessoPorTela(["crm.clientes", "crm.propostas"]),
+    create: acessoPorTela(["crm.clientes", "crm.propostas"]),
+    update: acessoPorTela(["crm.clientes", "crm.propostas"]),
+    delete: administrador,
   },
   hooks: {
     beforeOperation: [sanitizarFilename, protegerDocumentoComercial],

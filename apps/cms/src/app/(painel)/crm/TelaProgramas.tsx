@@ -13,9 +13,11 @@ interface TelaProgramasProps {
   areas: AreaOpcao[];
   onAbrir: (id: string) => void;
   onNovo: () => void;
+  /** false ⇒ sem a tela de escrita no catálogo: some "Novo programa". */
+  podeEditar: boolean;
 }
 
-export function TelaProgramas({ programas, areas, onAbrir, onNovo }: TelaProgramasProps) {
+export function TelaProgramas({ programas, areas, onAbrir, onNovo, podeEditar }: TelaProgramasProps) {
   const [busca, setBusca] = useState("");
   const [areaId, setAreaId] = useState("");
   const [situacao, setSituacao] = useState<SituacaoPrograma | "">("");
@@ -37,11 +39,13 @@ export function TelaProgramas({ programas, areas, onAbrir, onNovo }: TelaProgram
           <h1>Programas</h1>
           <p>Programas do catálogo comercial — alimentam o wizard e o documento da proposta. O site não lê daqui.</p>
         </div>
-        <div className="pcms-pagehead__acoes">
-          <button type="button" className="pcms-btn" onClick={onNovo}>
-            Novo programa
-          </button>
-        </div>
+        {podeEditar && (
+          <div className="pcms-pagehead__acoes">
+            <button type="button" className="pcms-btn" onClick={onNovo}>
+              Novo programa
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="pcms-toolbar pcms-kanban__toolbar">

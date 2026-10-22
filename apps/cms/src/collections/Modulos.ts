@@ -1,6 +1,6 @@
+import { acessoPorTela } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
-import { editorCatalogo } from "../access/editorCatalogo";
 import { bloquearModuloComDependentes } from "../lib/crm/exclusaoCatalogo";
 import { campoSoParaLogado } from "../access/leituraPublica";
 
@@ -20,9 +20,9 @@ export const Modulos: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: editorCatalogo,
-    update: editorCatalogo,
-    delete: editorCatalogo,
+    create: acessoPorTela(["crm.modulos", "crm.programas"]),
+    update: acessoPorTela(["crm.modulos", "crm.programas"]),
+    delete: acessoPorTela(["crm.modulos", "crm.programas"]),
   },
   hooks: { beforeDelete: [bloquearModuloComDependentes] },
   fields: [
@@ -52,7 +52,12 @@ export const Modulos: CollectionConfig = {
       admin: { description: "Usado pelo módulo CRM do painel; o site ignora este grupo." },
       fields: [
         { name: "tituloComercial", type: "text" },
-        { name: "valor", type: "number", min: 0, admin: { description: "Valor de referência (R$)." } },
+        {
+          name: "valor",
+          type: "number",
+          min: 0,
+          admin: { description: "Valor de referência (R$)." },
+        },
         { name: "replay", type: "text" },
         { name: "certificacao", type: "text" },
       ],

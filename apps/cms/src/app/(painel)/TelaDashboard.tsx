@@ -8,7 +8,7 @@ import type {
 interface TelaDashboardProps {
   eventos: EventoCmsResumo[];
   palestrantes: PalestranteCmsResumo[];
-  /** Só contagens: o painel do Site é aberto a todos os perfis (ver contarLeadsCms). */
+  /** Só contagens: o Painel do Site não depende da tela Leads (ver contarLeadsCms). */
   resumoLeads: ResumoLeadsCms;
   conteudos: ConteudoCmsResumo[];
   erroLeitura: boolean;

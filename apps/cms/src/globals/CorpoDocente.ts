@@ -1,6 +1,6 @@
+import { acessoPorTela } from "../access/porTela";
 import type { GlobalConfig } from "payload";
 
-import { editorInstitucional } from "../access/editorInstitucional";
 import { revalidatePage } from "../hooks/revalidatePage";
 import { leituraPublicaGlobal } from "../access/leituraPublica";
 
@@ -23,7 +23,7 @@ export const CorpoDocente: GlobalConfig = {
   slug: "corpo-docente",
   label: "Corpo Docente (/o-grupo/corpo-docente)",
   admin: { group: "Páginas Singleton" },
-  access: { read: leituraPublicaGlobal, update: editorInstitucional },
+  access: { read: leituraPublicaGlobal, update: acessoPorTela(["site.corpo-docente"]) },
   // Publicar edições dos textos da página revalida a rota no front.
   hooks: { afterChange: [revalidatePage(["/o-grupo/corpo-docente"])] },
   versions: { drafts: true, max: 20 },
@@ -126,7 +126,12 @@ export const CorpoDocente: GlobalConfig = {
                   ],
                 },
                 { name: "sublabel", type: "text", required: true },
-                { name: "num", type: "text", required: true, admin: { description: "Número exibido (ex: '60', '31', '5')." } },
+                {
+                  name: "num",
+                  type: "text",
+                  required: true,
+                  admin: { description: "Número exibido (ex: '60', '31', '5')." },
+                },
                 { name: "label", type: "text", required: true },
                 { name: "detalhe", type: "textarea", required: true },
               ],
@@ -245,7 +250,8 @@ export const CorpoDocente: GlobalConfig = {
                   type: "text",
                   admin: {
                     condition: (_, sibling) => sibling?.formato !== "axis",
-                    description: 'Selo no rodapé da foto. Ex: "Gestão Pública · Direito constitucional".',
+                    description:
+                      'Selo no rodapé da foto. Ex: "Gestão Pública · Direito constitucional".',
                   },
                 },
                 {
@@ -253,7 +259,8 @@ export const CorpoDocente: GlobalConfig = {
                   type: "textarea",
                   admin: {
                     condition: (_, sibling) => sibling?.formato !== "axis",
-                    description: "Parágrafo de credencial exibido no card (≠ currículo curto do Especialista).",
+                    description:
+                      "Parágrafo de credencial exibido no card (≠ currículo curto do Especialista).",
                   },
                 },
                 {
@@ -473,7 +480,12 @@ export const CorpoDocente: GlobalConfig = {
               type: "array",
               minRows: 1,
               fields: [
-                { name: "id", type: "text", required: true, admin: { description: 'Ex: "faq-1".' } },
+                {
+                  name: "id",
+                  type: "text",
+                  required: true,
+                  admin: { description: 'Ex: "faq-1".' },
+                },
                 { name: "pergunta", type: "text", required: true },
                 {
                   name: "parags",

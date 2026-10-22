@@ -1,6 +1,6 @@
+import { acessoPorTela } from "../access/porTela";
 import type { CollectionConfig } from "payload";
 
-import { editorInstitucional } from "../access/editorInstitucional";
 import { autoSlug } from "../hooks/autoSlug";
 import { revalidatePage } from "../hooks/revalidatePage";
 import {
@@ -33,9 +33,9 @@ export const Especialistas: CollectionConfig = {
     read: leituraPublica({
       or: [{ ocultarDoSite: { equals: false } }, { ocultarDoSite: { exists: false } }],
     }),
-    create: editorInstitucional,
-    update: editorInstitucional,
-    delete: editorInstitucional,
+    create: acessoPorTela(["site.palestrantes"]),
+    update: acessoPorTela(["site.palestrantes"]),
+    delete: acessoPorTela(["site.palestrantes"]),
   },
   // Editar/publicar um especialista revalida a página de Corpo Docente,
   // que renderiza foto/credenciais via Global corpo-docente. Sem isto, a
@@ -109,8 +109,7 @@ export const Especialistas: CollectionConfig = {
       type: "select",
       options: TIPO_DOCENTE.map((v) => ({ label: v, value: v })),
       admin: {
-        description:
-          "Camada de autoridade da curadoria (doc 25 — 5 camadas).",
+        description: "Camada de autoridade da curadoria (doc 25 — 5 camadas).",
       },
     },
     {
