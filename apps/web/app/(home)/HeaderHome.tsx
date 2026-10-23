@@ -149,9 +149,9 @@ export function HeaderHome() {
             <Link className="btn btn--secondary btn--mini" href="/contato?assunto=proposta">
               Solicitar proposta
             </Link>
-            <Link className="btn btn--participant btn--mini" href="/eventon#area-participante">
+            <a className="btn btn--participant btn--mini" href="https://ntceventon.com.br/" target="_blank" rel="noopener noreferrer">
               Área do Participante
-            </Link>
+            </a>
             <button
               type="button"
               className="mobile-toggle"
@@ -387,10 +387,10 @@ export function HeaderHome() {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/eventon#area-participante">
+                    <a href="https://ntceventon.com.br/" target="_blank" rel="noopener noreferrer">
                       <strong>Área do Participante</strong>
                       <span>Histórico de eventos, materiais e certificados</span>
-                    </Link>
+                    </a>
                   </li>
                   <li>
                     <Link href="/#capacitacao">
@@ -477,7 +477,7 @@ export function HeaderHome() {
             <Link href="/#eventos-abertos"><strong>Eventos presenciais</strong><span>Capitais estratégicas</span></Link>
             <Link href="/#eventos-abertos"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></Link>
             <Link href="/eventon"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></Link>
-            <Link href="/eventon#area-participante"><strong>Área do Participante</strong><span>Materiais e certificados</span></Link>
+            <a href="https://ntceventon.com.br/" target="_blank" rel="noopener noreferrer"><strong>Área do Participante</strong><span>Materiais e certificados</span></a>
             <Link href="/o-grupo/corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica das 3 verticais</span></Link>
           </div>
 
@@ -517,9 +517,9 @@ export function HeaderHome() {
           <Link className="btn btn--gold" href="/contato?assunto=proposta">
             Solicitar proposta
           </Link>
-          <Link className="btn btn--participant" href="/eventon#area-participante">
+          <a className="btn btn--participant" href="https://ntceventon.com.br/" target="_blank" rel="noopener noreferrer">
             Área do Participante
-          </Link>
+          </a>
         </div>
       </aside>
     </>

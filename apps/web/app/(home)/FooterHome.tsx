@@ -75,7 +75,7 @@ export function FooterHome({ contatos }: FooterHomeProps) {
               <li><Link href="/contato">Inscrever equipe</Link></li>
               <li><Link href="/contato">Atendimento comercial</Link></li>
               <li><Link href="/eventon#suporte">Suporte ao participante</Link></li>
-              <li><Link href="/eventon#area-participante">Área do Participante</Link></li>
+              <li><a href="https://ntceventon.com.br/" target="_blank" rel="noopener noreferrer">Área do Participante</a></li>
               <li><Link href="/contato">{`WhatsApp · ${contatos.whatsapp}`}</Link></li>
             </ul>
           </div>

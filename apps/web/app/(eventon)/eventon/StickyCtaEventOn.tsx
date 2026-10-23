@@ -55,6 +55,8 @@ export function StickyCtaEventOn() {
       <a
         className={stickyCtaEventOn.classe}
         href={stickyCtaEventOn.href}
+        target="_blank"
+        rel="noopener noreferrer"
         data-cms-link={stickyCtaEventOn.cmsLink}
         data-track={stickyCtaEventOn.track}
       >

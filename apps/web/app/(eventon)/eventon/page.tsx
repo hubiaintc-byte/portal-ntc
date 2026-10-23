@@ -53,7 +53,10 @@ export const metadata: Metadata = {
  * Spec: docs/superpowers/specs/2026-10-23-pagina-eventon-design.md.
  */
 
-/** Rota interna vira <Link>; âncora `#…` e link externo ficam <a>. */
+/**
+ * Rota interna vira <Link>; âncora `#…` fica <a>; link externo (a plataforma
+ * EventOn) é <a> em nova aba.
+ */
 function LinkEo({ link }: { link: LinkEventOn }) {
   const conteudo = (
     <>
@@ -71,7 +74,14 @@ function LinkEo({ link }: { link: LinkEventOn }) {
     "data-cms-link": link.cmsLink,
     "data-track": link.track,
   };
-  if (!link.href.startsWith("/")) {
+  if (link.href.startsWith("http")) {
+    return (
+      <a href={link.href} target="_blank" rel="noopener noreferrer" {...props}>
+        {conteudo}
+      </a>
+    );
+  }
+  if (link.href.startsWith("#")) {
     return (
       <a href={link.href} {...props}>
         {conteudo}

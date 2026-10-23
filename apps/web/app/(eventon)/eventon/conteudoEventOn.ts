@@ -10,6 +10,9 @@
  * reais — tabela em docs/superpowers/specs/2026-10-23-pagina-eventon-design.md §3.2.
  */
 
+/** Plataforma EventOn — destino de todo "Acessar" e "Área do Participante". */
+export const URL_PLATAFORMA_EVENTON = "https://ntceventon.com.br/";
+
 export interface LinkEventOn {
   texto: string;
   href: string;
@@ -43,7 +46,7 @@ export const heroEventOn = {
   ctas: [
     {
       texto: "Acessar Área do Participante",
-      href: "#area-participante",
+      href: URL_PLATAFORMA_EVENTON,
       cmsLink: "area-participante",
       track: "hero_cta_acessar",
       classe: "btn btn--gold",
@@ -405,9 +408,6 @@ export const suporteEventOn = {
 
 /* ------------------------------------------------- ÁREA DO PARTICIPANTE */
 
-// TODO: trocar pelo link da Área do Participante na plataforma EventOn,
-// quando o PO informar. Até lá aponta para o /contato (aba Atendimento).
-const HREF_ACESSO = "/contato?categoria=area-participante#tab-atendimento";
 
 export const areaEventOn = {
   eyebrow: "Área do Participante",
@@ -419,7 +419,7 @@ export const areaEventOn = {
   acoes: [
     {
       texto: "Acessar Área do Participante",
-      href: HREF_ACESSO,
+      href: URL_PLATAFORMA_EVENTON,
       cmsLink: "acesso-area-participante",
       track: "eo_area_acesso",
       classe: "btn btn--gold",
@@ -516,7 +516,7 @@ export const ctaFinalEventOn = {
   acoes: [
     {
       texto: "Acessar Área do Participante",
-      href: "#area-participante",
+      href: URL_PLATAFORMA_EVENTON,
       cmsLink: "area-participante",
       track: "eo_cta_final_area",
       classe: "btn btn--gold",
@@ -543,7 +543,7 @@ export const ctaFinalEventOn = {
 
 export const stickyCtaEventOn: LinkEventOn = {
   texto: "Acessar Área do Participante",
-  href: "#area-participante",
+  href: URL_PLATAFORMA_EVENTON,
   cmsLink: "sticky-cta-area-participante",
   track: "sticky_cta_area_participante",
   classe: "btn btn--gold",
