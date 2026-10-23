@@ -358,21 +358,27 @@ export function HeaderHome() {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/#eventos-abertos">
+                    <Link href="/agenda?modalidade=online">
                       <strong>Eventos online</strong>
                       <span>Transmissão ao vivo, replay e certificado</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/#eventos-abertos">
+                    <Link href="/agenda?modalidade=presencial">
                       <strong>Eventos presenciais</strong>
                       <span>Encontros executivos em capitais estratégicas</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/#eventos-abertos">
+                    <Link href="/agenda?modalidade=hibrido">
                       <strong>Eventos híbridos</strong>
                       <span>Combinação de presença e plataforma digital</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/agenda?tab=realizados">
+                      <strong>Eventos passados</strong>
+                      <span>Acervo de eventos realizados com replay disponível</span>
                     </Link>
                   </li>
                 </ul>
@@ -391,18 +397,6 @@ export function HeaderHome() {
                       <strong>Área do Participante</strong>
                       <span>Histórico de eventos, materiais e certificados</span>
                     </a>
-                  </li>
-                  <li>
-                    <Link href="/#capacitacao">
-                      <strong>Próximas turmas</strong>
-                      <span>Turmas em formação e inscrições antecipadas</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/#capacitacao">
-                      <strong>Eventos passados</strong>
-                      <span>Acervo de eventos realizados com replay disponível</span>
-                    </Link>
                   </li>
                   <li>
                     <Link href="/o-grupo/corpo-docente">
@@ -473,9 +467,10 @@ export function HeaderHome() {
           </button>
           <div className={`drawer-sub ${subDrawerAberto["capacitacao-mobile"] ? "is-open" : ""}`}>
             <Link href="/agenda"><strong>Agenda Geral NTC</strong><span>Todos os eventos abertos</span></Link>
-            <Link href="/#eventos-abertos"><strong>Eventos online</strong><span>Ao vivo + replay</span></Link>
-            <Link href="/#eventos-abertos"><strong>Eventos presenciais</strong><span>Capitais estratégicas</span></Link>
-            <Link href="/#eventos-abertos"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></Link>
+            <Link href="/agenda?modalidade=online"><strong>Eventos online</strong><span>Ao vivo + replay</span></Link>
+            <Link href="/agenda?modalidade=presencial"><strong>Eventos presenciais</strong><span>Capitais estratégicas</span></Link>
+            <Link href="/agenda?modalidade=hibrido"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></Link>
+            <Link href="/agenda?tab=realizados"><strong>Eventos passados</strong><span>Acervo com replay disponível</span></Link>
             <Link href="/eventon"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></Link>
             <a href="https://ntceventon.com.br/" target="_blank" rel="noopener noreferrer"><strong>Área do Participante</strong><span>Materiais e certificados</span></a>
             <Link href="/o-grupo/corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica das 3 verticais</span></Link>

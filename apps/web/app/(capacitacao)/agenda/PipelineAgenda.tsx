@@ -1,7 +1,8 @@
 "use client";
 
 import type React from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { fundoResponsivo } from "@/lib/imagemLocal";
 
@@ -184,14 +185,42 @@ function track(_action: string, _payload?: Record<string, unknown>) {
 
 // ----------------- URL sync (espelha writeURL/readURL/hydrate) -----------------
 
+function modalidadeDaUrl(valor: string | null): EstadoAgenda["modalidade"] {
+  return valor && FILTRO_MODALIDADE.some((o) => o.value === valor && o.value)
+    ? (valor as ModalidadeEvento)
+    : "";
+}
+
+function abaDaUrl(valor: string | null): TabSlug {
+  return valor && (TABS_AGENDA as readonly { slug: string }[]).some((t) => t.slug === valor)
+    ? (valor as TabSlug)
+    : DEFAULTS.tab;
+}
+
+// O menu do header leva a /agenda?modalidade=… e /agenda?tab=… também quando
+// a pessoa já está na agenda; a navegação é client-side e o componente não
+// remonta, então a hidratação inicial não relê a URL. Isolado num filho com
+// Suspense para o useSearchParams não tirar a grade do HTML estático.
+function SincronizaUrl({
+  aoMudar,
+}: {
+  aoMudar: (tab: TabSlug, modalidade: EstadoAgenda["modalidade"]) => void;
+}) {
+  const params = useSearchParams();
+  const tab = params.get("tab");
+  const modalidade = params.get("modalidade");
+  useEffect(() => {
+    aoMudar(abaDaUrl(tab), modalidadeDaUrl(modalidade));
+  }, [tab, modalidade, aoMudar]);
+  return null;
+}
+
 function readURL(): Partial<EstadoAgenda> {
   if (typeof window === "undefined") return {};
   const p = new URLSearchParams(window.location.search);
   const out: Partial<EstadoAgenda> = {};
   const tab = p.get("tab");
-  if (tab && (TABS_AGENDA as readonly { slug: string }[]).some((t) => t.slug === tab)) {
-    out.tab = tab as TabSlug;
-  }
+  if (tab && abaDaUrl(tab) === tab) out.tab = tab as TabSlug;
   const area = p.get("area");
   if (area && FILTRO_AREA.some((o) => o.value === area && o.value)) {
     out.area = area as AreaSlug;
@@ -207,10 +236,8 @@ function readURL(): Partial<EstadoAgenda> {
   if (formato && FILTRO_FORMATO.some((o) => o.value === formato && o.value)) {
     out.formato = formato as FormatoEvento;
   }
-  const modalidade = p.get("modalidade");
-  if (modalidade && FILTRO_MODALIDADE.some((o) => o.value === modalidade && o.value)) {
-    out.modalidade = modalidade as ModalidadeEvento;
-  }
+  const modalidade = modalidadeDaUrl(p.get("modalidade"));
+  if (modalidade) out.modalidade = modalidade;
   const cidade = p.get("cidade");
   if (cidade && FILTRO_CIDADE.some((o) => o.value === cidade && o.value)) {
     out.cidade = cidade as CidadeSlug;
@@ -334,6 +361,12 @@ export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
     setHidratado(true);
   }, []);
 
+  const aoMudarUrl = useCallback((tab: TabSlug, modalidade: EstadoAgenda["modalidade"]) => {
+    setState((s) =>
+      s.tab === tab && s.modalidade === modalidade ? s : { ...s, tab, modalidade, page: 1 },
+    );
+  }, []);
+
   // URL sync: re-escreve querystring a cada mudança (após hidratação).
   useEffect(() => {
     if (!hidratado) return;
@@ -389,6 +422,9 @@ export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
 
   return (
     <>
+      <Suspense fallback={null}>
+        <SincronizaUrl aoMudar={aoMudarUrl} />
+      </Suspense>
       {/* TABS */}
       <nav className="agenda-tabs" aria-label="Categorias de oferta">
         <div className="container">
