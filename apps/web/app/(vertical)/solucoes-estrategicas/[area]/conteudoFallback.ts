@@ -205,7 +205,7 @@ const EDUCACAO = {
       { sigla: "PINEI", imagemSrc: `${IMG}/educacao-inclusiva.1920.webp`, nome: "Programa Integrado de Primeira Infância e Educação Infantil", tagline: "Primeira infância e educação infantil articuladas em rede pública.", meta: "6 módulos · 48h" },
       { sigla: "FUTURA", imagemSrc: `${IMG}/area-educacao.1920.webp`, nome: "Programa Estratégico de Ensino Médio, Itinerários de Futuro, Empregabilidade e Educação para o Desenvolvimento", tagline: "Ensino médio com itinerários, empregabilidade e protagonismo juvenil.", meta: "4 módulos · 32h" },
     ] satisfies ProgramaCardItem[],
-    ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/" },
+    ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/programas" },
     ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },
   // NTC Educação usa variante de curadoria com cards de pessoas (8 eixos formativos)
@@ -375,7 +375,7 @@ const GESTAO_PUBLICA = {
       { sigla: "LIDERA", imagemSrc: `${IMG}/autoridade-gestao-publica.1920.webp`, flagAberto: true, nome: "Programa Executivo de Liderança, Alta Gestão e Desenvolvimento Estratégico no Setor Público", tagline: "Formação executiva da alta liderança pública — visão de Estado, capacidade decisória e desempenho institucional.", meta: "8 módulos · 64h" },
       { sigla: "SIGA", imagemSrc: `${IMG}/plenario-publico.1920.webp`, nome: "Sistema Integrado de Gestão da Administração Pública · Planejamento, Governança e Desempenho Institucional", tagline: "Modernização institucional aplicada — gestão integrada, processos, indicadores e cultura organizacional do setor público.", meta: "8 módulos · 64h" },
     ] satisfies ProgramaCardItem[],
-    ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/" },
+    ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/programas" },
     ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },
   autoridade: {
@@ -548,7 +548,7 @@ const SAUDE = {
       { sigla: "PROAPS+", imagemSrc: `${IMG}/autoridade-saude.1920.webp`, flagAberto: true, nome: "Programa Avançado de Fortalecimento da Atenção Primária à Saúde e Redes Assistenciais", tagline: "Atenção primária como ordenadora do cuidado e integração das redes de atenção à saúde.", meta: "9 módulos · 72h" },
       { sigla: "PROSUS+", imagemSrc: `${IMG}/area-saude-premium2.1920.webp`, flagAberto: true, nome: "Programa Executivo de Liderança, Alta Gestão e Desenvolvimento Estratégico em Saúde Pública", tagline: "Formação executiva da alta liderança do SUS — visão sistêmica, capacidade decisória e desempenho institucional.", meta: "8 módulos · 64h" },
     ] satisfies ProgramaCardItem[],
-    ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/" },
+    ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/programas" },
     ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },
   autoridade: {

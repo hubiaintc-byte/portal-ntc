@@ -427,7 +427,7 @@ export const FALLBACK_HOME = {
     introLinha: "Camada institucional · três áreas estratégicas",
     evidenciaTitulo: "Programas em evidência",
     evidenciaSub: "Seleção comercial · Atualizado para Maio · 2026",
-    verTodosLink: { rotulo: "Ver todos os 15 programas", href: "#programas" },
+    verTodosLink: { rotulo: "Ver todos os 15 programas", href: "/programas" },
   },
 
   areas: [

@@ -454,7 +454,7 @@ export function HeaderHome() {
             <Link href="/programas/agip"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></Link>
             <Link href="/programas/lidera"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></Link>
             <Link href="/programas/prosus"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></Link>
-            <Link href="/#programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></Link>
+            <Link href="/programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></Link>
           </div>
 
           <button
