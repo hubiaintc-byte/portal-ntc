@@ -49,7 +49,7 @@ export function FooterHome({ contatos }: FooterHomeProps) {
               <li><Link href="/#solucoes">Soluções</Link></li>
               <li><Link href="/conteudos">Conteúdos</Link></li>
               <li><Link href="/o-grupo/corpo-docente">Corpo Docente</Link></li>
-              <li><Link href="/#eventon">EventOn</Link></li>
+              <li><Link href="/eventon">EventOn</Link></li>
               <li><Link href="/contato">Contato</Link></li>
             </ul>
           </div>
@@ -74,8 +74,8 @@ export function FooterHome({ contatos }: FooterHomeProps) {
               <li><Link href="/contato?assunto=proposta">Solicitar proposta</Link></li>
               <li><Link href="/contato">Inscrever equipe</Link></li>
               <li><Link href="/contato">Atendimento comercial</Link></li>
-              <li><Link href="/#eventon">Suporte ao participante</Link></li>
-              <li><Link href="/#eventon">Área do Participante</Link></li>
+              <li><Link href="/eventon#suporte">Suporte ao participante</Link></li>
+              <li><Link href="/eventon#area-participante">Área do Participante</Link></li>
               <li><Link href="/contato">{`WhatsApp · ${contatos.whatsapp}`}</Link></li>
             </ul>
           </div>

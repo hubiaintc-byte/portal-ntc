@@ -149,7 +149,7 @@ export function HeaderHome() {
             <Link className="btn btn--secondary btn--mini" href="/contato?assunto=proposta">
               Solicitar proposta
             </Link>
-            <Link className="btn btn--participant btn--mini" href="/#eventon">
+            <Link className="btn btn--participant btn--mini" href="/eventon#area-participante">
               Área do Participante
             </Link>
             <button
@@ -381,13 +381,13 @@ export function HeaderHome() {
                 <h4>Plataforma e curadoria</h4>
                 <ul className="mega-list">
                   <li>
-                    <Link href="/#eventon">
+                    <Link href="/eventon">
                       <strong>EventOn</strong>
                       <span>Plataforma de acesso, replay e certificado do Grupo NTC</span>
                     </Link>
                   </li>
                   <li>
-                    <Link href="/#eventon">
+                    <Link href="/eventon#area-participante">
                       <strong>Área do Participante</strong>
                       <span>Histórico de eventos, materiais e certificados</span>
                     </Link>
@@ -476,8 +476,8 @@ export function HeaderHome() {
             <Link href="/#eventos-abertos"><strong>Eventos online</strong><span>Ao vivo + replay</span></Link>
             <Link href="/#eventos-abertos"><strong>Eventos presenciais</strong><span>Capitais estratégicas</span></Link>
             <Link href="/#eventos-abertos"><strong>Eventos híbridos</strong><span>Presença + plataforma</span></Link>
-            <Link href="/#eventon"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></Link>
-            <Link href="/#eventon"><strong>Área do Participante</strong><span>Materiais e certificados</span></Link>
+            <Link href="/eventon"><strong>EventOn</strong><span>Plataforma de acesso e replay</span></Link>
+            <Link href="/eventon#area-participante"><strong>Área do Participante</strong><span>Materiais e certificados</span></Link>
             <Link href="/o-grupo/corpo-docente"><strong>Corpo Docente</strong><span>Curadoria científica das 3 verticais</span></Link>
           </div>
 
@@ -517,7 +517,7 @@ export function HeaderHome() {
           <Link className="btn btn--gold" href="/contato?assunto=proposta">
             Solicitar proposta
           </Link>
-          <Link className="btn btn--participant" href="/#eventon">
+          <Link className="btn btn--participant" href="/eventon#area-participante">
             Área do Participante
           </Link>
         </div>
