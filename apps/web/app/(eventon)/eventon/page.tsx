@@ -45,7 +45,7 @@ export const metadata: Metadata = {
  *   8.  Parallax editorial.
  *   9.  Vitrine por área (4 cards).
  *   10. Suporte ao participante (4 canais).
- *   11. Área do Participante (com card de login só visual).
+ *   11. Área do Participante (o card de login do protótipo foi removido a pedido do PO).
  *   12. <FaqEventOn /> (8 perguntas).
  *   13. CTA final.
  * Fora do <main>: <StickyCtaEventOn /> (mobile).
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
  * Spec: docs/superpowers/specs/2026-10-23-pagina-eventon-design.md.
  */
 
-/** Rota interna vira <Link>; âncora `#…` fica <a>. */
+/** Rota interna vira <Link>; âncora `#…` e link externo ficam <a>. */
 function LinkEo({ link }: { link: LinkEventOn }) {
   const conteudo = (
     <>
@@ -71,7 +71,7 @@ function LinkEo({ link }: { link: LinkEventOn }) {
     "data-cms-link": link.cmsLink,
     "data-track": link.track,
   };
-  if (link.href.startsWith("#")) {
+  if (!link.href.startsWith("/")) {
     return (
       <a href={link.href} {...props}>
         {conteudo}
@@ -407,68 +407,6 @@ export default function PaginaEventOn() {
                   </ul>
                 </aside>
 
-                <article className="eo-login-card" aria-label="Card visual de acesso à Área do Participante">
-                  <p className="eo-login-eyebrow">{areaEventOn.login.eyebrow}</p>
-                  <h3>{areaEventOn.login.titulo}</h3>
-                  <p className="eo-login-card-sub">{areaEventOn.login.sub}</p>
-
-                  {/* Campos só visuais (spans), como no protótipo — não há formulário. */}
-                  <div className="eo-login-field">
-                    <label htmlFor="eo-login-cpf">{areaEventOn.login.cpfLabel}</label>
-                    <div className="eo-login-input">
-                      <span className="eo-login-input-text">{areaEventOn.login.cpfPlaceholder}</span>
-                      <span className="eo-login-input-icon" aria-hidden="true">
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <circle cx="12" cy="8" r="4" />
-                          <path d="M4 21v-1a8 8 0 0116 0v1" />
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="eo-login-field">
-                    <label htmlFor="eo-login-pwd">{areaEventOn.login.senhaLabel}</label>
-                    <div className="eo-login-input is-filled">
-                      <span className="pwd-mask">{areaEventOn.login.senhaMascara}</span>
-                      <span className="eo-login-input-icon" aria-hidden="true">
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <rect x="4" y="10" width="16" height="11" rx="2" />
-                          <path d="M8 10V7a4 4 0 018 0v3" />
-                        </svg>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="eo-login-actions">
-                    <LinkEo link={areaEventOn.login.acao} />
-                  </div>
-
-                  <div className="eo-login-helper">
-                    <LinkEo link={areaEventOn.login.esqueci} />
-                    <span>
-                      {areaEventOn.login.primeiraInscricao} <LinkEo link={areaEventOn.login.agenda} />
-                    </span>
-                  </div>
-
-                  <p
-                    className="eo-login-foot"
-                    dangerouslySetInnerHTML={{ __html: areaEventOn.login.rodapeHtml }}
-                  />
-                </article>
               </div>
             </div>
           </div>

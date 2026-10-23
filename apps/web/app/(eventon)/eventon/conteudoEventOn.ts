@@ -405,10 +405,9 @@ export const suporteEventOn = {
 
 /* ------------------------------------------------- ÁREA DO PARTICIPANTE */
 
-// O /contato abre a aba Atendimento pelo hash; `?categoria` ainda não é lido
-// lá (fica no link, como no protótipo — ver spec §3.2).
+// TODO: trocar pelo link da Área do Participante na plataforma EventOn,
+// quando o PO informar. Até lá aponta para o /contato (aba Atendimento).
 const HREF_ACESSO = "/contato?categoria=area-participante#tab-atendimento";
-const HREF_RECUPERAR = "/contato?categoria=recuperar-acesso#tab-atendimento";
 
 export const areaEventOn = {
   eyebrow: "Área do Participante",
@@ -426,13 +425,6 @@ export const areaEventOn = {
       classe: "btn btn--gold",
       seta: true,
     },
-    {
-      texto: "Recuperar acesso",
-      href: HREF_RECUPERAR,
-      cmsLink: "recuperar-acesso",
-      track: "eo_area_recuperar",
-      classe: "btn btn--secondary",
-    },
   ] satisfies LinkEventOn[],
   aside: {
     eyebrow: "O que você encontra na Área",
@@ -446,38 +438,6 @@ export const areaEventOn = {
       "Acesso, atualização e solicitações dos dados pessoais pelo próprio participante, conforme a LGPD",
       "Canal direto com a equipe de suporte da Plataforma",
     ],
-  },
-  login: {
-    eyebrow: "Acesso institucional · Visual",
-    titulo: "Acesso à Área do Participante",
-    sub: "Login com CPF e senha cadastrada na primeira inscrição.",
-    cpfLabel: "CPF do participante",
-    cpfPlaceholder: "000.000.000-00",
-    senhaLabel: "Senha",
-    senhaMascara: "••••••••",
-    acao: {
-      texto: "Acessar Área do Participante",
-      href: HREF_ACESSO,
-      cmsLink: "acesso-area-participante",
-      track: "eo_login_card_acesso",
-      classe: "btn btn--gold",
-      seta: true,
-    } satisfies LinkEventOn,
-    esqueci: {
-      texto: "Esqueci minha senha",
-      href: HREF_RECUPERAR,
-      cmsLink: "recuperar-acesso",
-      track: "eo_login_card_recuperar",
-    } satisfies LinkEventOn,
-    primeiraInscricao: "Primeira inscrição?",
-    agenda: {
-      texto: "Ver agenda →",
-      href: "/agenda",
-      cmsLink: "agenda-primeira-inscricao",
-      track: "eo_login_card_agenda",
-    } satisfies LinkEventOn,
-    rodapeHtml:
-      "Apresentação visual do acesso institucional. Os dados pessoais são tratados pelo <strong>Instituto NTC do Brasil</strong> conforme a LGPD · DPO: dpo@institutontc.com.br",
   },
 };
 
