@@ -19,6 +19,8 @@ interface OverrideEvento {
   /** A mesma capa no tamanho dos cards (home e agenda). */
   coverCardUrl?: string;
   dataInicioISO?: string;
+  /** Último dia do evento (ausente = evento de um dia). */
+  dataFimISO?: string;
   folderUrl?: string;
   /** Mapa nome-normalizado → URL da foto, vindo da coleção `especialistas`. */
   fotosPalestrantes?: Record<string, string>;
@@ -47,7 +49,12 @@ export async function buscarOverride(slug: string): Promise<OverrideEvento | nul
       overrideAccess: true,
     });
     const doc = res.docs[0] as
-      | { imagemCapa?: UploadComUrl; dataInicio?: string; folderPdf?: UploadComUrl }
+      | {
+          imagemCapa?: UploadComUrl;
+          dataInicio?: string;
+          dataFim?: string | null;
+          folderPdf?: UploadComUrl;
+        }
       | undefined;
     if (!doc) return null;
     const capa = urlDoUpload(doc.imagemCapa);
@@ -55,6 +62,7 @@ export async function buscarOverride(slug: string): Promise<OverrideEvento | nul
       coverUrl: capa && imagemOtimizada(capa, 1920),
       coverCardUrl: capa && imagemOtimizada(capa, 828),
       dataInicioISO: doc.dataInicio,
+      dataFimISO: doc.dataFim ?? undefined,
       folderUrl: urlDoUpload(doc.folderPdf),
       fotosPalestrantes: await buscarFotosPalestrantes(),
     };
@@ -123,7 +131,7 @@ export function aplicarOverrideOnline(
 
   // 2) Data → deriva e sobrescreve todos os formatos
   if (ovr.dataInicioISO) {
-    const d = derivarDatasEvento(ovr.dataInicioISO);
+    const d = derivarDatasEvento(ovr.dataInicioISO, ovr.dataFimISO);
     e = {
       ...e,
       dataEvento: d.dataEvento,

@@ -1,7 +1,7 @@
 /**
  * Deriva todos os formatos de data exibidos numa página de evento online a
- * partir de uma data ISO (campo dataInicio do CMS). Não depende do locale do
- * runtime — usa tabelas literais pt-BR (noUncheckedIndexedAccess seguro).
+ * partir das datas ISO de início e fim (campos dataInicio/dataFim do CMS).
+ * Não depende do locale do runtime — usa tabelas literais pt-BR (noUncheckedIndexedAccess seguro).
  *
  * Horários do evento (08h–18h) são fixos nesta v1 (não vêm do CMS).
  */
@@ -19,6 +19,7 @@ export interface DatasDerivadasEvento {
   icsStart: string; // "20260615T080000"
   icsEnd: string; // "20260615T180000"
   cardDia: string; // "15"        → card.diaDataBloco
+  cardDiaFim?: string; // "16"     → card.diaFimDataBloco (só evento de mais de um dia)
   cardMesAno: string; // "Jun · 2026" → card.mesAnoDataBloco
 }
 
@@ -36,7 +37,18 @@ const DIAS_SEMANA = [
   "Quinta-feira", "Sexta-feira", "Sábado",
 ] as const;
 
-export function derivarDatasEvento(iso: string): DatasDerivadasEvento {
+interface Dia {
+  ymd: string;
+  ano: string;
+  dia2: string;
+  diaNum: number;
+  mesLongo: string;
+  mesCurto: string;
+  diaSemana: string;
+  compactaIcs: string;
+}
+
+function lerDia(iso: string): Dia {
   // Extrai Y-M-D do ISO sem depender de fuso (pega os 10 primeiros chars).
   const ymd = iso.slice(0, 10);
   const [aStr, mStr, dStr] = ymd.split("-");
@@ -44,27 +56,82 @@ export function derivarDatasEvento(iso: string): DatasDerivadasEvento {
   const mesIdx = (Number(mStr ?? "1") - 1 + 12) % 12;
   const diaNum = Number(dStr ?? "1");
   const dia2 = String(diaNum).padStart(2, "0");
-
   // Dia da semana via Date UTC (meio-dia evita drift de fuso).
   const dow = new Date(`${ymd}T12:00:00Z`).getUTCDay();
-  const diaSemana = DIAS_SEMANA[dow] ?? "Segunda-feira";
+  return {
+    ymd,
+    ano,
+    dia2,
+    diaNum,
+    mesLongo: MESES_LONGOS[mesIdx] ?? "Junho",
+    mesCurto: MESES_CURTOS[mesIdx] ?? "Jun",
+    diaSemana: DIAS_SEMANA[dow] ?? "Segunda-feira",
+    compactaIcs: `${ano}${mStr?.padStart(2, "0") ?? "06"}${dia2}`,
+  };
+}
 
-  const mesLongo = MESES_LONGOS[mesIdx] ?? "Junho";
-  const mesCurto = MESES_CURTOS[mesIdx] ?? "Jun";
-  const mesMinusculo = mesLongo.toLowerCase();
-  const compactaIcs = `${ano}${mStr?.padStart(2, "0") ?? "06"}${dia2}`;
+/**
+ * `fimIso` (campo dataFim do CMS) é opcional: ausente ou no mesmo dia que o
+ * início → formatos de um dia. Inscrições fecham às 8h do PRIMEIRO dia
+ * (deadlineISO/countdown) em qualquer caso.
+ */
+export function derivarDatasEvento(iso: string, fimIso?: string | null): DatasDerivadasEvento {
+  const ini = lerDia(iso);
+  const fim = fimIso ? lerDia(fimIso) : null;
+
+  const base = {
+    deadlineISO: encerramentoInscricoesISO(ini.ymd),
+    countdownDateText: `Até ${ini.dia2} de ${ini.mesLongo} de ${ini.ano}, às 8h`,
+    icsStart: `${ini.compactaIcs}T080000`,
+    cardDia: ini.dia2,
+  };
+
+  if (!fim || fim.ymd <= ini.ymd) {
+    return {
+      ...base,
+      metaValue: `${ini.dia2} · ${ini.mesLongo}`,
+      metaSub: `${ini.ano} · ${ini.diaSemana}`,
+      timelineDiaHtml: `${ini.dia2} de <em>${ini.mesLongo}</em> · ${ini.diaSemana}`,
+      sidebarValue: `${ini.dia2} · ${ini.mesCurto} · ${ini.ano}`,
+      dataEvento: `${ini.diaNum} de ${ini.mesLongo.toLowerCase()} de ${ini.ano}`,
+      icsEnd: `${ini.compactaIcs}T180000`,
+      cardMesAno: `${ini.mesCurto} · ${ini.ano}`,
+    };
+  }
+
+  // Dois dias seguidos → "12 e 13"; mais que isso → "18 a 20".
+  const diasCorridos =
+    (Date.parse(`${fim.ymd}T12:00:00Z`) - Date.parse(`${ini.ymd}T12:00:00Z`)) / 86_400_000;
+  const conector = diasCorridos === 1 ? "e" : "a";
+  const semanas = `${ini.diaSemana} ${conector} ${fim.diaSemana}`;
+  const mesmoMes = ini.ymd.slice(0, 7) === fim.ymd.slice(0, 7);
+  const mesmoAno = ini.ano === fim.ano;
 
   return {
-    metaValue: `${dia2} · ${mesLongo}`,
-    metaSub: `${ano} · ${diaSemana}`,
-    timelineDiaHtml: `${dia2} de <em>${mesLongo}</em> · ${diaSemana}`,
-    sidebarValue: `${dia2} · ${mesCurto} · ${ano}`,
-    dataEvento: `${diaNum} de ${mesMinusculo} de ${ano}`,
-    deadlineISO: encerramentoInscricoesISO(ymd),
-    countdownDateText: `Até ${dia2} de ${mesLongo} de ${ano}, às 8h`,
-    icsStart: `${compactaIcs}T080000`,
-    icsEnd: `${compactaIcs}T180000`,
-    cardDia: dia2,
-    cardMesAno: `${mesCurto} · ${ano}`,
+    ...base,
+    metaValue: mesmoMes
+      ? `${ini.dia2} ${conector} ${fim.dia2} · ${ini.mesLongo}`
+      : `${ini.dia2} · ${ini.mesLongo} – ${fim.dia2} · ${fim.mesLongo}`,
+    metaSub: `${mesmoAno ? ini.ano : `${ini.ano}–${fim.ano}`} · ${semanas}`,
+    timelineDiaHtml: mesmoMes
+      ? `${ini.dia2} ${conector} ${fim.dia2} de <em>${ini.mesLongo}</em> · ${semanas}`
+      : `${ini.dia2} de <em>${ini.mesLongo}</em> a ${fim.dia2} de <em>${fim.mesLongo}</em> · ${semanas}`,
+    sidebarValue: mesmoMes
+      ? `${ini.dia2}–${fim.dia2} · ${ini.mesCurto} · ${ini.ano}`
+      : mesmoAno
+        ? `${ini.dia2} · ${ini.mesCurto} – ${fim.dia2} · ${fim.mesCurto} · ${fim.ano}`
+        : `${ini.dia2} · ${ini.mesCurto} · ${ini.ano} – ${fim.dia2} · ${fim.mesCurto} · ${fim.ano}`,
+    dataEvento: mesmoMes
+      ? `${ini.diaNum} ${conector} ${fim.diaNum} de ${ini.mesLongo.toLowerCase()} de ${ini.ano}`
+      : mesmoAno
+        ? `${ini.diaNum} de ${ini.mesLongo.toLowerCase()} a ${fim.diaNum} de ${fim.mesLongo.toLowerCase()} de ${fim.ano}`
+        : `${ini.diaNum} de ${ini.mesLongo.toLowerCase()} de ${ini.ano} a ${fim.diaNum} de ${fim.mesLongo.toLowerCase()} de ${fim.ano}`,
+    icsEnd: `${fim.compactaIcs}T180000`,
+    cardDiaFim: fim.dia2,
+    cardMesAno: mesmoMes
+      ? `${ini.mesCurto} · ${ini.ano}`
+      : mesmoAno
+        ? `${ini.mesCurto} – ${fim.mesCurto} · ${fim.ano}`
+        : `${ini.mesCurto} ${ini.ano} – ${fim.mesCurto} ${fim.ano}`,
   };
 }

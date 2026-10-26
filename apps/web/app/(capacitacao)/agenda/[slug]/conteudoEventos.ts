@@ -401,6 +401,7 @@ export interface CardEvento {
   precoEquipesLabel: string; // "Sob consulta"
   destaqueHome: boolean;
   diaDataBloco: string; // "15"
+  diaFimDataBloco?: string; // "16" — só evento de mais de um dia
   mesAnoDataBloco: string; // "Jun · 2026"
 }
 

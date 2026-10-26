@@ -38,10 +38,11 @@ async function aplicarOverrideCard(eventos: EventoReal[]): Promise<EventoReal[]>
           card = { ...card, imagemUrl: ovr.coverCardUrl };
         }
         if (ovr.dataInicioISO) {
-          const d = derivarDatasEvento(ovr.dataInicioISO);
+          const d = derivarDatasEvento(ovr.dataInicioISO, ovr.dataFimISO);
           card = {
             ...card,
             diaDataBloco: d.cardDia,
+            diaFimDataBloco: d.cardDiaFim,
             mesAnoDataBloco: d.cardMesAno,
             deadlineIso: d.deadlineISO.slice(0, 10),
           };

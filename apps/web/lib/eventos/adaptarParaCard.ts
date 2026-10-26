@@ -23,6 +23,15 @@ function areaLabel(a: "edu" | "gov" | "sau"): string {
       : "NTC Saúde";
 }
 
+type CardEvento = NonNullable<Evento["card"]>;
+
+/** Bloco de data dos cards da Home: intervalo quando o evento tem mais de um dia. */
+function dataCardHome(c: CardEvento): EventoCard["data"] {
+  return c.diaFimDataBloco
+    ? { variante: "range", diasInicio: c.diaDataBloco, diasFim: c.diaFimDataBloco, monYr: c.mesAnoDataBloco }
+    : { variante: "single", dia: c.diaDataBloco, monYr: c.mesAnoDataBloco };
+}
+
 export function paraCardHomePrincipal(e: Evento): EventoCard | null {
   const c = e.card;
   if (!c) return null;
@@ -31,11 +40,7 @@ export function paraCardHomePrincipal(e: Evento): EventoCard | null {
     destaque: c.flags.includes("destaque_editorial"),
     statusTag: { rotulo: "Inscrições abertas", tipo: "open" },
     imagemSrc: c.imagemUrl,
-    data: {
-      variante: "single",
-      dia: c.diaDataBloco,
-      monYr: c.mesAnoDataBloco,
-    },
+    data: dataCardHome(c),
     modalidade: { texto: c.modalidadeLabel },
     programLink: `${c.formatoLabel} · ${areaLabel(e.area)}`,
     titulo: e.titulo,
@@ -64,11 +69,7 @@ export function paraCardHomeSecundario(e: Evento): EventoCardSecundario | null {
   return {
     area: e.area,
     imagemSrc: c.imagemUrl,
-    data: {
-      variante: "single",
-      dia: c.diaDataBloco,
-      monYr: c.mesAnoDataBloco,
-    },
+    data: dataCardHome(c),
     programa: `${c.formatoLabel} · ${areaLabel(e.area)}`,
     titulo: e.titulo,
     bindingSigla: c.programaSlug,
@@ -100,7 +101,9 @@ export function paraCartaoAgenda(e: Evento, ordem: number): CartaoEvento | null 
     status: "abertas",
     selo: { texto: "Inscrições abertas", classe: "status-open" },
     imagemUrl: c.imagemUrl,
-    dataBloco: { tipo: "single", dia: c.diaDataBloco, mesAno: c.mesAnoDataBloco },
+    dataBloco: c.diaFimDataBloco
+      ? { tipo: "range", diaInicio: c.diaDataBloco, diaFim: c.diaFimDataBloco, mesAno: c.mesAnoDataBloco }
+      : { tipo: "single", dia: c.diaDataBloco, mesAno: c.mesAnoDataBloco },
     modalidadeLabel: c.modalidadeLabel,
     formatoLabel: c.formatoLabel,
     areaLabel: areaLabel(e.area),
