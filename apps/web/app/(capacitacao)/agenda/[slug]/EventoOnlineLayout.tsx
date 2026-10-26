@@ -2,6 +2,7 @@ import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
 
 import type { EventoOnline } from "./conteudoEventos";
 import { CountdownSidebar } from "./CountdownSidebar";
+import { CtaComPrazo } from "./InscricoesAbertas";
 import { EventoSubnav } from "./EventoSubnav";
 import { FaqEvento } from "./FaqEvento";
 
@@ -19,6 +20,7 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
   const hero = evento.heroOnline;
   const folderCta = hero?.ctas[1];
   const inscricaoCmsLink = hero?.ctas[0]?.cmsLink ?? "inscricao";
+  const prazoInscricao = evento.sidebarOnline?.countdown.deadline;
 
   return (
     <main id="main" className="event-page" data-evento="EDUTEC-M01">
@@ -55,9 +57,11 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
                   return !ehFolder || (cta.href !== "#" && cta.href !== "");
                 })
                 .map((cta, i) => (
-                  <a key={i} className={cta.classe} href={cta.href} data-cms-link={cta.cmsLink}>
-                    {cta.texto}{cta.arrow && <span className="btn-arrow"> →</span>}
-                  </a>
+                  <CtaComPrazo key={i} texto={cta.texto} deadline={prazoInscricao}>
+                    <a className={cta.classe} href={cta.href} data-cms-link={cta.cmsLink}>
+                      {cta.texto}{cta.arrow && <span className="btn-arrow"> →</span>}
+                    </a>
+                  </CtaComPrazo>
                 ))}
             </div>
           </div>
@@ -87,6 +91,7 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
         folderHref={folderCta?.href ?? "#"}
         folderCmsLink={folderCta?.cmsLink ?? "folder"}
         inscricaoCmsLink={inscricaoCmsLink}
+        prazoInscricao={prazoInscricao}
         agendaIcs={evento.agendaIcs}
       />
 
@@ -333,9 +338,11 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
                   <p style={{ maxWidth: "640px", margin: "0 auto var(--space-4)" }}>{evento.ctaFinalOnline.paragrafo}</p>
                   <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
                     {evento.ctaFinalOnline.ctas.map((cta, i) => (
-                      <a key={i} className={cta.classe} href={cta.href} data-cms-link={cta.cmsLink}>
-                        {cta.texto}{cta.arrow && <span className="btn-arrow"> →</span>}
-                      </a>
+                      <CtaComPrazo key={i} texto={cta.texto} deadline={prazoInscricao}>
+                        <a className={cta.classe} href={cta.href} data-cms-link={cta.cmsLink}>
+                          {cta.texto}{cta.arrow && <span className="btn-arrow"> →</span>}
+                        </a>
+                      </CtaComPrazo>
                     ))}
                   </div>
                 </article>
@@ -374,9 +381,11 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
                   />
                   <div className="sb-actions">
                     {evento.sidebarOnline.acoes.map((a, i) => (
-                      <a key={i} className={a.classe} href={a.href} data-cms-link={a.cmsLink}>
-                        {a.texto}{a.arrow && <span className="btn-arrow"> →</span>}
-                      </a>
+                      <CtaComPrazo key={i} texto={a.texto} deadline={prazoInscricao}>
+                        <a className={a.classe} href={a.href} data-cms-link={a.cmsLink}>
+                          {a.texto}{a.arrow && <span className="btn-arrow"> →</span>}
+                        </a>
+                      </CtaComPrazo>
                     ))}
                   </div>
                   <div className="sb-share">

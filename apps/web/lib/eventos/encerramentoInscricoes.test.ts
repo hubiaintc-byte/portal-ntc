@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { encerramentoInscricoesISO, inscricoesEncerradas } from "./encerramentoInscricoes";
+import { ehCtaDeInscricao, encerramentoInscricoesISO, inscricoesEncerradas } from "./encerramentoInscricoes";
 
 describe("encerramentoInscricoesISO", () => {
   it("fecha às 8h de Brasília do primeiro dia", () => {
@@ -23,5 +23,19 @@ describe("inscricoesEncerradas", () => {
 
   it("abertas na véspera à noite", () => {
     expect(inscricoesEncerradas("2026-11-04", new Date("2026-11-04T02:00:00Z"))).toBe(false);
+  });
+});
+
+describe("ehCtaDeInscricao", () => {
+  it("reconhece os botões de inscrição das páginas de evento", () => {
+    for (const t of ["Inscrever-se", "Inscrever-se agora", "Inscrever equipe ou grupo", "Inscrever equipe ou grupo institucional"]) {
+      expect(ehCtaDeInscricao(t)).toBe(true);
+    }
+  });
+
+  it("mantém os demais botões", () => {
+    for (const t of ["Baixar folder", "Solicitar proposta institucional", "Ver agenda completa", "Saiba mais"]) {
+      expect(ehCtaDeInscricao(t)).toBe(false);
+    }
   });
 });

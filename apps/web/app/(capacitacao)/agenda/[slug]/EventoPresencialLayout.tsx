@@ -5,6 +5,7 @@ import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
 import type { EventoHibrido, EventoPresencial } from "./conteudoEventos";
 import { CountdownSidebar } from "./CountdownSidebar";
 import { EventoSubnav } from "./EventoSubnav";
+import { CtaComPrazo } from "./InscricoesAbertas";
 import { FaqEvento } from "./FaqEvento";
 
 /**
@@ -21,6 +22,7 @@ interface EventoPresencialLayoutProps {
 
 export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) {
   const inscricaoCmsLink = evento.hero.ctas[0]?.cmsLink ?? "inscricao";
+  const prazoInscricao = evento.sidebar.countdown.deadline;
   const folderCta = evento.hero.ctas[1];
 
   return (
@@ -60,15 +62,16 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
             }}
           >
             {evento.hero.ctas.map((cta, i) => (
-              <a
-                key={i}
-                className={cta.classe}
-                href={cta.href}
-                data-cms-link={cta.cmsLink}
-              >
-                {cta.texto}
-                {cta.arrow && <span className="btn-arrow"> →</span>}
-              </a>
+              <CtaComPrazo key={i} texto={cta.texto} deadline={prazoInscricao}>
+                <a
+                  className={cta.classe}
+                  href={cta.href}
+                  data-cms-link={cta.cmsLink}
+                >
+                  {cta.texto}
+                  {cta.arrow && <span className="btn-arrow"> →</span>}
+                </a>
+              </CtaComPrazo>
             ))}
           </div>
         </div>
@@ -95,6 +98,7 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
         folderHref={folderCta?.href ?? "#"}
         folderCmsLink={folderCta?.cmsLink ?? "folder"}
         inscricaoCmsLink={inscricaoCmsLink}
+        prazoInscricao={prazoInscricao}
         agendaIcs={evento.agendaIcs}
       />
 
@@ -354,15 +358,16 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                     }}
                   >
                     {evento.ctaFinal.ctas.map((cta, i) => (
-                      <a
-                        key={i}
-                        className={cta.classe}
-                        href={cta.href}
-                        data-cms-link={cta.cmsLink}
-                      >
-                        {cta.texto}
-                        {cta.arrow && <span className="btn-arrow"> →</span>}
-                      </a>
+                      <CtaComPrazo key={i} texto={cta.texto} deadline={prazoInscricao}>
+                        <a
+                          className={cta.classe}
+                          href={cta.href}
+                          data-cms-link={cta.cmsLink}
+                        >
+                          {cta.texto}
+                          {cta.arrow && <span className="btn-arrow"> →</span>}
+                        </a>
+                      </CtaComPrazo>
                     ))}
                   </div>
                 </article>
@@ -407,15 +412,16 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
                 />
                 <div className="sidebar-actions">
                   {evento.sidebar.acoes.map((acao, i) => (
-                    <a
-                      key={i}
-                      className={acao.classe}
-                      href={acao.href}
-                      data-cms-link={acao.cmsLink}
-                    >
-                      {acao.texto}
-                      {acao.arrow && <span className="btn-arrow"> →</span>}
-                    </a>
+                    <CtaComPrazo key={i} texto={acao.texto} deadline={prazoInscricao}>
+                      <a
+                        className={acao.classe}
+                        href={acao.href}
+                        data-cms-link={acao.cmsLink}
+                      >
+                        {acao.texto}
+                        {acao.arrow && <span className="btn-arrow"> →</span>}
+                      </a>
+                    </CtaComPrazo>
                   ))}
                 </div>
                 <div className="sidebar-share">

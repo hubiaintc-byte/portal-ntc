@@ -19,3 +19,8 @@ export function encerramentoInscricoesISO(dataInicio: string): string {
 export function inscricoesEncerradas(dataInicio: string, agora: Date): boolean {
   return agora.getTime() >= new Date(encerramentoInscricoesISO(dataInicio)).getTime();
 }
+
+/** CTAs que somem com o prazo: texto começando com "Inscrever" (Inscrever-se, Inscrever equipe…). */
+export function ehCtaDeInscricao(texto: string): boolean {
+  return /^inscrever/i.test(texto.trim());
+}

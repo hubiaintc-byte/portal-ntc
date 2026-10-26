@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { AgendaDropdown } from "./AgendaDropdown";
+import { useInscricoesAbertas } from "./InscricoesAbertas";
 import type { EventoBase, NavLink } from "./conteudoEventos";
 
 /**
@@ -22,6 +23,8 @@ interface EventoSubnavProps {
   folderHref: string;
   folderCmsLink: string;
   inscricaoCmsLink: string;
+  /** Prazo das inscrições; vencido, o botão Inscrever-se some. */
+  prazoInscricao?: string;
   agendaIcs: EventoBase["agendaIcs"];
 }
 
@@ -30,8 +33,10 @@ export function EventoSubnav({
   folderHref,
   folderCmsLink,
   inscricaoCmsLink,
+  prazoInscricao,
   agendaIcs,
 }: EventoSubnavProps) {
+  const inscricoesAbertas = useInscricoesAbertas(prazoInscricao ?? "");
   const [activeId, setActiveId] = useState<string | null>(
     links.find((l) => l.isActive)?.href.slice(1) ?? null,
   );
@@ -81,14 +86,16 @@ export function EventoSubnav({
           })}
         </div>
         <div className="evt-nav-actions">
-          <button
-            type="button"
-            className="evt-nav-action primary"
-            data-cms-link={inscricaoCmsLink}
-            onClick={onClickInscrever}
-          >
-            Inscrever-se
-          </button>
+          {inscricoesAbertas && (
+            <button
+              type="button"
+              className="evt-nav-action primary"
+              data-cms-link={inscricaoCmsLink}
+              onClick={onClickInscrever}
+            >
+              Inscrever-se
+            </button>
+          )}
           <button
             type="button"
             className="evt-nav-action"
