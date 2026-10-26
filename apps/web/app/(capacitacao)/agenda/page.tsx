@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Fragment } from "react";
 
 import { derivarDatasEvento } from "@/lib/cms/derivarDatasEvento";
 import { buscarOverride } from "@/lib/cms/overrideEventoOnline";
@@ -11,7 +10,6 @@ import {
   EVENTOS_LISTAGEM,
 } from "./[slug]/conteudoEventos";
 import {
-  BREADCRUMB_AGENDA,
   type CartaoEvento,
   CTAS_INTERMEDIARIOS,
   HERO_AGENDA,
@@ -92,27 +90,6 @@ export default async function AgendaPage() {
 
   return (
     <main id="main">
-      {/* 1. BREADCRUMB */}
-      <nav className="breadcrumb" aria-label="Trilha de navegação">
-        <div className="container">
-          <ol className="breadcrumb-list">
-            {BREADCRUMB_AGENDA.map((item, i) => (
-              <Fragment key={`crumb-${i}`}>
-                <li className={item.current ? "current" : undefined}>
-                  {item.href ? (
-                    <a href={item.href} data-cms-link={item.cmsLink}>
-                      {item.texto}
-                    </a>
-                  ) : (
-                    <span>{item.texto}</span>
-                  )}
-                </li>
-                {i < BREADCRUMB_AGENDA.length - 1 && <li className="sep">/</li>}
-              </Fragment>
-            ))}
-          </ol>
-        </div>
-      </nav>
 
       {/* 2. HERO */}
       <section className="agenda-hero" aria-label="Agenda Geral · Grupo NTC">

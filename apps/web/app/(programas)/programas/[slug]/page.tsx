@@ -81,28 +81,6 @@ export default async function ProgramaPage({ params }: Props) {
 
   return (
     <main id="main" className="program-page" data-programa={p.siglaCss}>
-      {/* ============= BREADCRUMB ============= */}
-      <nav className="breadcrumb" aria-label="Trilha de navegação">
-        <div className="container">
-          <ol className="breadcrumb-list">
-            <li>
-              <Link href="/">Grupo NTC</Link>
-            </li>
-            <li className="sep">/</li>
-            <li>
-              <Link href="/#solucoes">Soluções Estratégicas</Link>
-            </li>
-            <li className="sep">/</li>
-            <li>
-              <Link href={`/solucoes-estrategicas/${p.vertical}`}>
-                {p.verticalRotulo}
-              </Link>
-            </li>
-            <li className="sep">/</li>
-            <li className="current">{p.breadcrumb.current}</li>
-          </ol>
-        </div>
-      </nav>
 
       {/* ============= HERO ============= */}
       <section className="prog-hero" aria-label={`${p.siglaExibida} · ${p.nomeCompleto}`}>

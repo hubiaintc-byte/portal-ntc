@@ -1,5 +1,3 @@
-import { Fragment } from "react";
-
 import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
 
 import type { Modulo } from "./conteudoModulos";
@@ -30,29 +28,6 @@ export function ModuloOnlineLayout({ modulo }: ModuloOnlineLayoutProps) {
       className="event-page"
       data-evento={`${modulo.slugPrograma.toUpperCase()}-${modulo.slugModulo.toUpperCase()}`}
     >
-      {/* 1. BREADCRUMB */}
-      <nav className="breadcrumb" aria-label="Trilha de navegação">
-        <div className="container">
-          <ol className="breadcrumb-list">
-            {modulo.crumb.map((c, i) => (
-              <Fragment key={`crumb-${i}`}>
-                {c.href ? (
-                  <li>
-                    <a href={c.href} data-cms-link={c.cmsLink}>
-                      {c.texto}
-                    </a>
-                  </li>
-                ) : (
-                  <li className="current">{c.texto}</li>
-                )}
-                {i < modulo.crumb.length - 1 && (
-                  <li className="sep" aria-hidden="true">/</li>
-                )}
-              </Fragment>
-            ))}
-          </ol>
-        </div>
-      </nav>
 
       {/* 2. HERO */}
       <section

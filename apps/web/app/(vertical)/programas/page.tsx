@@ -39,18 +39,6 @@ export default function ProgramasPage() {
   return (
     <div className="vertical-page">
       <main id="main">
-        {/* ============= BREADCRUMB ============= */}
-        <nav className="breadcrumb" aria-label="Trilha de navegação">
-          <div className="container">
-            <ol className="breadcrumb-list">
-              <li>
-                <Link href="/">Grupo NTC</Link>
-              </li>
-              <li className="sep">/</li>
-              <li className="current">Programas estratégicos</li>
-            </ol>
-          </div>
-        </nav>
 
         {/* ============= HERO ============= */}
         <section className="vert-hero" aria-label="Programas estratégicos do Grupo NTC">

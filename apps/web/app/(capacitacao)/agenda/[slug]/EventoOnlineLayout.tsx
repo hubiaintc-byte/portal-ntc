@@ -1,5 +1,3 @@
-import { Fragment } from "react";
-
 import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
 
 import type { EventoOnline } from "./conteudoEventos";
@@ -26,23 +24,6 @@ export function EventoOnlineLayout({ evento }: EventoOnlineLayoutProps) {
     <main id="main" className="event-page" data-evento="EDUTEC-M01">
       {/* data-evento é a CHAVE do acento cromático no CSS (.event-page[data-evento='EDUTEC-M01']),
           não o slug (edutec-m01-2026). Manter literal para o acento #1F5060 aplicar. */}
-      {/* BREADCRUMB */}
-      <nav className="breadcrumb" aria-label="Trilha de navegação">
-        <div className="container">
-          <ol className="breadcrumb-list">
-            {evento.crumb.map((c, i) => (
-              <Fragment key={`crumb-${i}`}>
-                {c.href ? (
-                  <li><a href={c.href} data-cms-link={c.cmsLink}>{c.texto}</a></li>
-                ) : (
-                  <li className="current">{c.texto}</li>
-                )}
-                {i < evento.crumb.length - 1 && <li className="sep" aria-hidden="true">/</li>}
-              </Fragment>
-            ))}
-          </ol>
-        </div>
-      </nav>
 
       {/* HERO */}
       {hero && (

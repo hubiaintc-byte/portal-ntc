@@ -67,22 +67,6 @@ export default async function VerticalPage({ params }: Props) {
   return (
     <div className="vertical-page" data-vertical={area}>
       <main id="main">
-        {/* ============= BREADCRUMB ============= */}
-        <nav className="breadcrumb" aria-label="Trilha de navegação">
-          <div className="container">
-            <ol className="breadcrumb-list">
-              <li>
-                <Link href="/">Grupo NTC</Link>
-              </li>
-              <li className="sep">/</li>
-              <li>
-                <Link href="/#solucoes">Soluções Estratégicas</Link>
-              </li>
-              <li className="sep">/</li>
-              <li className="current">{v.breadcrumb.current}</li>
-            </ol>
-          </div>
-        </nav>
 
         {/* ============= HERO ============= */}
         <section className="vert-hero" aria-label={`${v.breadcrumb.current} · Vertical Estratégica`}>

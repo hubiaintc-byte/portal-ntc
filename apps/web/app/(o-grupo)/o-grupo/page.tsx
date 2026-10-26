@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { fundoResponsivo } from "@/lib/imagemLocal";
 import { carregarContatos } from "@/lib/contatos";
@@ -145,20 +144,6 @@ export default async function OGrupoPage() {
 
   return (
     <main id="main">
-      {/* ========================== BREADCRUMB ========================== */}
-      <nav className="breadcrumb" aria-label="Trilha de navegação">
-        <div className="container">
-          <ol className="breadcrumb-list">
-            <li>
-              <Link href="/" data-cms-link="home">
-                Grupo NTC
-              </Link>
-            </li>
-            <li className="sep">/</li>
-            <li className="current">O Grupo</li>
-          </ol>
-        </div>
-      </nav>
 
       {/* ========================== 1. HERO INSTITUCIONAL ========================== */}
       <section

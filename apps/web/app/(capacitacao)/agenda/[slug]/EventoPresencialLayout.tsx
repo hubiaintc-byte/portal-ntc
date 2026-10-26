@@ -25,29 +25,6 @@ export function EventoPresencialLayout({ evento }: EventoPresencialLayoutProps) 
 
   return (
     <main id="main" className="event-page" data-evento={evento.slug}>
-      {/* 1. BREADCRUMB */}
-      <nav className="breadcrumb" aria-label="Trilha de navegação">
-        <div className="container">
-          <ol className="breadcrumb-list">
-            {evento.crumb.map((c, i) => (
-              <Fragment key={`crumb-${i}`}>
-                {c.href ? (
-                  <li>
-                    <a href={c.href} data-cms-link={c.cmsLink}>
-                      {c.texto}
-                    </a>
-                  </li>
-                ) : (
-                  <li className="current">{c.texto}</li>
-                )}
-                {i < evento.crumb.length - 1 && (
-                  <li className="sep" aria-hidden="true">/</li>
-                )}
-              </Fragment>
-            ))}
-          </ol>
-        </div>
-      </nav>
 
       {/* 2. HERO */}
       <section
