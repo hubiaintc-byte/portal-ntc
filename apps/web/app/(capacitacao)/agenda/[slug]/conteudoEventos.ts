@@ -1011,7 +1011,7 @@ const eventoEdutecM01: EventoOnline = {
   sidebar: {
     coverImg: "", status: "", tituloCard: "", rows: [],
     includes: { titulo: "", items: [] },
-    countdown: { label: "", dateText: "", deadline: "2026-06-15T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "", dateText: "", deadline: "2026-06-15T08:00:00-03:00", tipo: "numerico" },
     acoes: [], share: { label: "", links: [] },
   },
   relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
@@ -1265,7 +1265,7 @@ const eventoEdutecM01: EventoOnline = {
       titulo: "O que está incluído",
       items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Material editorial NTC", "Certificado institucional", "Suporte técnico dedicado", "Área do Participante"],
     },
-    countdown: { label: "Prazo de inscrição", dateText: "Até 15 de Junho de 2026", deadline: "2026-06-15T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 15 de Junho de 2026, às 8h", deadline: "2026-06-15T08:00:00-03:00", tipo: "numerico" },
     acoes: [
       { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026", cmsLink: "inscricao-EDUTEC-M01-2026-jun", classe: "btn btn--gold", arrow: true },
       { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+01&evento_url=/agenda/edutec-m01-2026#tab-equipe", cmsLink: "inscricao-equipe-EDUTEC-M01", classe: "btn btn--secondary" },
@@ -1367,7 +1367,7 @@ const eventoEdutecM02: EventoOnline = {
   sidebar: {
     coverImg: "", status: "", tituloCard: "", rows: [],
     includes: { titulo: "", items: [] },
-    countdown: { label: "", dateText: "", deadline: "2026-06-16T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "", dateText: "", deadline: "2026-06-16T08:00:00-03:00", tipo: "numerico" },
     acoes: [], share: { label: "", links: [] },
   },
   relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
@@ -1621,7 +1621,7 @@ const eventoEdutecM02: EventoOnline = {
       titulo: "O que está incluído",
       items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Apostila digital do módulo", "Certificado institucional", "Suporte técnico dedicado", "Acesso ao ambiente EventON NTC"],
     },
-    countdown: { label: "Prazo de inscrição", dateText: "Até 16 de Junho de 2026", deadline: "2026-06-16T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 16 de Junho de 2026, às 8h", deadline: "2026-06-16T08:00:00-03:00", tipo: "numerico" },
     acoes: [
       { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+02&evento_url=/agenda/edutec-m02-2026", cmsLink: "inscricao-EDUTEC-M02-2026-jun", classe: "btn btn--gold", arrow: true },
       { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+02&evento_url=/agenda/edutec-m02-2026#tab-equipe", cmsLink: "inscricao-equipe-EDUTEC-M02", classe: "btn btn--secondary" },
@@ -1723,7 +1723,7 @@ const eventoEdutecM04: EventoOnline = {
   sidebar: {
     coverImg: "", status: "", tituloCard: "", rows: [],
     includes: { titulo: "", items: [] },
-    countdown: { label: "", dateText: "", deadline: "2026-06-17T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "", dateText: "", deadline: "2026-06-17T08:00:00-03:00", tipo: "numerico" },
     acoes: [], share: { label: "", links: [] },
   },
   relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
@@ -1964,7 +1964,7 @@ const eventoEdutecM04: EventoOnline = {
       titulo: "O que está incluído",
       items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Apostila digital do módulo", "Certificado institucional", "Suporte técnico dedicado", "Acesso ao ambiente EventON NTC"],
     },
-    countdown: { label: "Prazo de inscrição", dateText: "Até 17 de Junho de 2026", deadline: "2026-06-17T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 17 de Junho de 2026, às 8h", deadline: "2026-06-17T08:00:00-03:00", tipo: "numerico" },
     acoes: [
       { texto: "Inscrever-se", href: "/contato?evento=EDUTEC+M%C3%B3dulo+04&evento_url=/agenda/edutec-m04-2026", cmsLink: "inscricao-EDUTEC-M04-2026-jun", classe: "btn btn--gold", arrow: true },
       { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=EDUTEC+M%C3%B3dulo+04&evento_url=/agenda/edutec-m04-2026#tab-equipe", cmsLink: "inscricao-equipe-EDUTEC-M04", classe: "btn btn--secondary" },
@@ -2066,7 +2066,7 @@ const eventoProgeM01: EventoOnline = {
   sidebar: {
     coverImg: "", status: "", tituloCard: "", rows: [],
     includes: { titulo: "", items: [] },
-    countdown: { label: "", dateText: "", deadline: "2026-06-22T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "", dateText: "", deadline: "2026-06-22T08:00:00-03:00", tipo: "numerico" },
     acoes: [], share: { label: "", links: [] },
   },
   relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
@@ -2318,7 +2318,7 @@ const eventoProgeM01: EventoOnline = {
       titulo: "O que está incluído",
       items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Apostila digital do módulo", "Certificado institucional", "Suporte técnico dedicado", "Acesso ao ambiente EventON NTC"],
     },
-    countdown: { label: "Prazo de inscrição", dateText: "Até 22 de Junho de 2026", deadline: "2026-06-22T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 22 de Junho de 2026, às 8h", deadline: "2026-06-22T08:00:00-03:00", tipo: "numerico" },
     acoes: [
       { texto: "Inscrever-se", href: "/contato?evento=PROGE+M%C3%B3dulo+01&evento_url=/agenda/proge-m01-2026", cmsLink: "inscricao-PROGE-M01-2026-jun", classe: "btn btn--gold", arrow: true },
       { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=PROGE+M%C3%B3dulo+01&evento_url=/agenda/proge-m01-2026#tab-equipe", cmsLink: "inscricao-equipe-PROGE-M01", classe: "btn btn--secondary" },
@@ -2424,7 +2424,7 @@ const eventoProgeM03: EventoOnline = {
   sidebar: {
     coverImg: "", status: "", tituloCard: "", rows: [],
     includes: { titulo: "", items: [] },
-    countdown: { label: "", dateText: "", deadline: "2026-06-23T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "", dateText: "", deadline: "2026-06-23T08:00:00-03:00", tipo: "numerico" },
     acoes: [], share: { label: "", links: [] },
   },
   relatedEvents: { eyebrowGold: "", h2: "", intro: "", cards: [], footerCtas: [] },
@@ -2677,7 +2677,7 @@ const eventoProgeM03: EventoOnline = {
       titulo: "O que está incluído",
       items: ["8 horas de imersão ao vivo", "Replay por 7 dias após o evento", "Apostila digital do módulo", "Certificado institucional", "Suporte técnico dedicado", "Acesso ao ambiente EventON NTC"],
     },
-    countdown: { label: "Prazo de inscrição", dateText: "Até 23 de Junho de 2026", deadline: "2026-06-23T23:59:59-03:00", tipo: "numerico" },
+    countdown: { label: "Prazo de inscrição", dateText: "Até 23 de Junho de 2026, às 8h", deadline: "2026-06-23T08:00:00-03:00", tipo: "numerico" },
     acoes: [
       { texto: "Inscrever-se", href: "/contato?evento=PROGE+M%C3%B3dulo+03&evento_url=/agenda/proge-m03-2026", cmsLink: "inscricao-PROGE-M03-2026-jun", classe: "btn btn--gold", arrow: true },
       { texto: "Inscrever equipe ou grupo institucional", href: "/contato?evento=PROGE+M%C3%B3dulo+03&evento_url=/agenda/proge-m03-2026#tab-equipe", cmsLink: "inscricao-equipe-PROGE-M03", classe: "btn btn--secondary" },

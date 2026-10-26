@@ -6,14 +6,16 @@
  * Horários do evento (08h–18h) são fixos nesta v1 (não vêm do CMS).
  */
 
+import { encerramentoInscricoesISO } from "@/lib/eventos/encerramentoInscricoes";
+
 export interface DatasDerivadasEvento {
   metaValue: string; // "15 · Junho"
   metaSub: string; // "2026 · Segunda-feira"
   timelineDiaHtml: string; // "15 de <em>Junho</em> · Segunda-feira"
   sidebarValue: string; // "15 · Jun · 2026"
   dataEvento: string; // "15 de junho de 2026"
-  deadlineISO: string; // "2026-06-15T23:59:59-03:00"
-  countdownDateText: string; // "Até 15 de Junho de 2026"
+  deadlineISO: string; // "2026-06-15T08:00:00-03:00" (8h do 1º dia)
+  countdownDateText: string; // "Até 15 de Junho de 2026, às 8h"
   icsStart: string; // "20260615T080000"
   icsEnd: string; // "20260615T180000"
   cardDia: string; // "15"        → card.diaDataBloco
@@ -58,8 +60,8 @@ export function derivarDatasEvento(iso: string): DatasDerivadasEvento {
     timelineDiaHtml: `${dia2} de <em>${mesLongo}</em> · ${diaSemana}`,
     sidebarValue: `${dia2} · ${mesCurto} · ${ano}`,
     dataEvento: `${diaNum} de ${mesMinusculo} de ${ano}`,
-    deadlineISO: `${ymd}T23:59:59-03:00`,
-    countdownDateText: `Até ${dia2} de ${mesLongo} de ${ano}`,
+    deadlineISO: encerramentoInscricoesISO(ymd),
+    countdownDateText: `Até ${dia2} de ${mesLongo} de ${ano}, às 8h`,
     icsStart: `${compactaIcs}T080000`,
     icsEnd: `${compactaIcs}T180000`,
     cardDia: dia2,

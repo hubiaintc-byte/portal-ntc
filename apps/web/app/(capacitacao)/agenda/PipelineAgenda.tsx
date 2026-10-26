@@ -4,6 +4,7 @@ import type React from "react";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+import { encerramentoInscricoesISO, inscricoesEncerradas } from "@/lib/eventos/encerramentoInscricoes";
 import { fundoResponsivo } from "@/lib/imagemLocal";
 
 import {
@@ -169,11 +170,21 @@ interface DeadlineInfo {
 
 function computeDeadline(deadlineIso: string, now: Date): DeadlineInfo | null {
   if (!deadlineIso) return null;
-  const deadline = new Date(`${deadlineIso}T23:59:59Z`);
-  const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-  const diffMs = deadline.getTime() - today.getTime();
+  const diffMs = new Date(encerramentoInscricoesISO(deadlineIso)).getTime() - now.getTime();
   const diffDays = Math.ceil(diffMs / 86400000);
   return { diffDays, expired: diffMs <= 0 };
+}
+
+// Às 8h do primeiro dia o evento sai de "Inscrições abertas" e vai para
+// "Eventos realizados" (regra em lib/eventos/encerramentoInscricoes.ts).
+function comAbaDoMomento(e: CartaoEvento, now: Date): CartaoEvento {
+  if (e.tab !== "abertas" || !inscricoesEncerradas(e.dataIso, now)) return e;
+  return {
+    ...e,
+    tab: "realizados",
+    status: "realizados",
+    selo: { texto: "Evento realizado", classe: "status-soon" },
+  };
 }
 
 // ----------------- Analytics (no-op por enquanto) -----------------
@@ -308,21 +319,6 @@ export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
     return () => window.clearTimeout(timer);
   }, [buscaLocal, state.busca]);
 
-  // Contagem por tab (espelha updateTabCounts), ignora filtros.
-  const counts = useMemo(() => {
-    const buckets: Record<TabSlug, number> = {
-      abertas: 0,
-      proximas: 0,
-      "em-breve": 0,
-      replay: 0,
-      realizados: 0,
-    };
-    eventos.forEach((e) => {
-      buckets[e.tab] += 1;
-    });
-    return buckets;
-  }, [eventos]);
-
   const onMudarFiltro = useCallback(
     <K extends keyof EstadoAgenda>(key: K, value: EstadoAgenda[K], trackName: string) => {
       setState((s) => ({ ...s, [key]: value, page: 1 }));
@@ -383,9 +379,26 @@ export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
     return () => window.clearInterval(id);
   }, []);
 
+  const eventosNoMomento = useMemo(() => eventos.map((e) => comAbaDoMomento(e, now)), [eventos, now]);
+
+  // Contagem por tab (espelha updateTabCounts), ignora filtros.
+  const counts = useMemo(() => {
+    const buckets: Record<TabSlug, number> = {
+      abertas: 0,
+      proximas: 0,
+      "em-breve": 0,
+      replay: 0,
+      realizados: 0,
+    };
+    eventosNoMomento.forEach((e) => {
+      buckets[e.tab] += 1;
+    });
+    return buckets;
+  }, [eventosNoMomento]);
+
   // Pipeline (espelha apply() do protótipo).
   const { visiveis, total, totalPages, pageEfetiva, destaques } = useMemo(() => {
-    let pool = filterByTab(eventos, state.tab);
+    let pool = filterByTab(eventosNoMomento, state.tab);
     pool = filterByControls(pool, state);
     pool = filterBySearch(pool, state.busca);
     pool = sortCards(pool, state.sort);
@@ -400,7 +413,7 @@ export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
       !state.busca;
     const dest =
       state.tab === "abertas" && semFiltros
-        ? eventos
+        ? eventosNoMomento
             .filter((e) => e.tab === "abertas" && e.flags.includes("destaque_editorial"))
             .slice(0, 3)
         : [];
@@ -411,7 +424,7 @@ export function PipelineAgenda({ eventos }: PipelineAgendaProps) {
       pageEfetiva: pag.pageEfetiva,
       destaques: dest,
     };
-  }, [eventos, state]);
+  }, [eventosNoMomento, state]);
 
   // Sincroniza page efetiva (paginate pode reduzir page se for inválida).
   useEffect(() => {
@@ -921,7 +934,8 @@ interface CardEventoProps {
 }
 
 function CardEvento({ evento: e, now }: CardEventoProps) {
-  const deadline = computeDeadline(e.deadlineIso, now);
+  const realizado = e.tab === "realizados";
+  const deadline = realizado ? null : computeDeadline(e.deadlineIso, now);
   const seal =
     deadline && !deadline.expired && deadline.diffDays <= 7
       ? deadline.diffDays <= 2
@@ -1016,15 +1030,17 @@ function CardEvento({ evento: e, now }: CardEventoProps) {
         </div>
       </div>
       <div className="event-actions">
-        <a
-          className="btn btn--gold"
-          href={e.ctaInscrever.href}
-          title={e.ctaInscrever.title}
-          data-cms-link={e.ctaInscrever.cmsLink}
-          data-track={e.ctaInscrever.track}
-        >
-          {e.ctaInscrever.texto} <span className="btn-arrow">→</span>
-        </a>
+        {!realizado && (
+          <a
+            className="btn btn--gold"
+            href={e.ctaInscrever.href}
+            title={e.ctaInscrever.title}
+            data-cms-link={e.ctaInscrever.cmsLink}
+            data-track={e.ctaInscrever.track}
+          >
+            {e.ctaInscrever.texto} <span className="btn-arrow">→</span>
+          </a>
+        )}
         <div className="event-actions-row">
           <a
             className="link-arrow"
@@ -1035,14 +1051,16 @@ function CardEvento({ evento: e, now }: CardEventoProps) {
           >
             {e.linkDetalhes.texto}
           </a>
-          <a
-            className="link-arrow"
-            href={e.linkInscreverEquipe.href}
-            data-cms-link={e.linkInscreverEquipe.cmsLink}
-            data-track={e.linkInscreverEquipe.track}
-          >
-            {e.linkInscreverEquipe.texto}
-          </a>
+          {!realizado && (
+            <a
+              className="link-arrow"
+              href={e.linkInscreverEquipe.href}
+              data-cms-link={e.linkInscreverEquipe.cmsLink}
+              data-track={e.linkInscreverEquipe.track}
+            >
+              {e.linkInscreverEquipe.texto}
+            </a>
+          )}
         </div>
       </div>
     </article>

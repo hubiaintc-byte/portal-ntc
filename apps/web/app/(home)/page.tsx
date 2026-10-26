@@ -11,6 +11,7 @@ import {
 } from "@/lib/eventos/adaptarParaCard";
 import { buscarOverride } from "@/lib/cms/overrideEventoOnline";
 import { derivarDatasEvento } from "@/lib/cms/derivarDatasEvento";
+import { inscricoesEncerradas } from "@/lib/eventos/encerramentoInscricoes";
 import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
 
 import { SliderHero, type SlidePremium } from "./SliderHero";
@@ -33,7 +34,9 @@ import { FALLBACK_HOME } from "./conteudoFallback";
  * não de copy editorial.
  */
 
-export const revalidate = 3600;
+// 5 min: os eventos saem da Home às 8h do primeiro dia (encerramentoInscricoes.ts),
+// e a página só é regerada quando o revalidate vence.
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Grupo NTC · Inteligência institucional. Impacto real.",
@@ -98,7 +101,10 @@ export default async function HomePage() {
   const eventosBase = EVENTOS_LISTAGEM.map((slug) => EVENTOS_AGENDA[slug]).filter(
     (e): e is EventoReal => Boolean(e),
   );
-  const eventosReais = await aplicarOverrideCard(eventosBase);
+  const agora = new Date();
+  const eventosReais = (await aplicarOverrideCard(eventosBase)).filter(
+    (e) => e.card && !inscricoesEncerradas(e.card.deadlineIso, agora),
+  );
   const eventosPrincipais = eventosReais
     .filter((e) => e.card?.destaqueHome)
     .map(paraCardHomePrincipal)
