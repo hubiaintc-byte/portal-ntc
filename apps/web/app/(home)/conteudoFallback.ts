@@ -253,7 +253,6 @@ export const FALLBACK_HOME = {
 
   statusBar: {
     livePill: "Inscrições abertas agora",
-    atualizadoEm: "Atualizado · Maio · 2026",
   },
 
   eventosSecao: {
@@ -426,7 +425,7 @@ export const FALLBACK_HOME = {
       "Cada programa é uma solução estruturada — com identidade, módulos e coordenação científica próprias — distribuída em três verticais que organizam todo o portfólio.",
     introLinha: "Camada institucional · três áreas estratégicas",
     evidenciaTitulo: "Programas em evidência",
-    evidenciaSub: "Seleção comercial · Atualizado para Maio · 2026",
+    evidenciaSub: "Seleção comercial",
     verTodosLink: { rotulo: "Ver todos os 15 programas", href: "/programas" },
   },
 

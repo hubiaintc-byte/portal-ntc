@@ -121,7 +121,6 @@ export default async function HomePage() {
         <div className="container">
           <div className="events-status-bar fade-in">
             <span className="live-pill">{f.statusBar.livePill}</span>
-            <span>{f.statusBar.atualizadoEm}</span>
           </div>
 
           <div className="section-head fade-in">
