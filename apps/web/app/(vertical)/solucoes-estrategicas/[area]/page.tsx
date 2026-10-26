@@ -168,7 +168,7 @@ export default async function VerticalPage({ params }: Props) {
                 <Link
                   key={p.sigla}
                   className="program-card-vert"
-                  href={`/programas/${p.sigla.toLowerCase()}`}
+                  href={`/programas/${p.sigla.toLowerCase().replace(/\+$/, "")}`}
                 >
                   <div className="pc-cover">
                     <div
