@@ -1,10 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const obterUsuarioCmsMock = vi.fn();
+const obterUsuarioAutenticadoMock = vi.fn();
 vi.mock("@/lib/cms/autenticacao", () => ({
   COOKIE_SESSAO: "payload-token",
   obterUsuarioCms: obterUsuarioCmsMock,
-  obterUsuarioAutenticado: vi.fn(),
+  obterUsuarioAutenticado: obterUsuarioAutenticadoMock,
+}));
+
+const logoutOperationMock = vi.fn();
+vi.mock("payload", async (original) => ({
+  ...(await original<typeof import("payload")>()),
+  createLocalReq: vi.fn().mockResolvedValue({}),
+  logoutOperation: logoutOperationMock,
 }));
 
 const salvarInscricaoMock = vi.fn();
@@ -14,12 +22,14 @@ vi.mock("@/lib/cms/inscricoesAviso", () => ({
   removerInscricao: removerInscricaoMock,
 }));
 
-vi.mock("@/lib/payloadClient", () => ({ obterPayload: vi.fn() }));
-vi.mock("next/headers", () => ({ cookies: vi.fn(), headers: vi.fn() }));
-vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
+vi.mock("@/lib/payloadClient", () => ({ obterPayload: vi.fn().mockResolvedValue({ collections: { users: {} } }) }));
+const apagarCookieMock = vi.fn();
+vi.mock("next/headers", () => ({ cookies: vi.fn(async () => ({ delete: apagarCookieMock })), headers: vi.fn() }));
+const redirectMock = vi.fn();
+vi.mock("next/navigation", () => ({ redirect: redirectMock }));
 vi.mock("@/lib/cms/painelPasskeys", () => ({}));
 
-const { ativarAvisosCms, desativarAvisosCms, chaveAvisosCms } = await import("./acoesAuth");
+const { ativarAvisosCms, desativarAvisosCms, chaveAvisosCms, sair } = await import("./acoesAuth");
 
 const dados = { endpoint: "https://push.exemplo/a", p256dh: "k", auth: "a" };
 const SESSAO = { ok: false, erro: "Sessão expirada. Entre novamente." };
@@ -64,5 +74,43 @@ describe("avisos — com sessão", () => {
     expect(await chaveAvisosCms()).toBe("pub");
     vi.stubEnv("VAPID_PRIVATE_KEY", "");
     expect(await chaveAvisosCms()).toBeNull();
+  });
+});
+
+describe("sair — inscrição deste aparelho", () => {
+  function comEndpoint(endpoint: string): FormData {
+    const fd = new FormData();
+    fd.set("endpoint", endpoint);
+    return fd;
+  }
+
+  beforeEach(() => {
+    obterUsuarioCmsMock.mockResolvedValue({ id: "9" });
+    obterUsuarioAutenticadoMock.mockResolvedValue({ id: "9" });
+  });
+
+  it("remove a inscrição do usuário da sessão antes de encerrar a sessão", async () => {
+    removerInscricaoMock.mockResolvedValue({ ok: true });
+    await sair(comEndpoint(dados.endpoint));
+    expect(removerInscricaoMock).toHaveBeenCalledWith("9", dados.endpoint);
+    const ordemRemocao = removerInscricaoMock.mock.invocationCallOrder[0]!;
+    expect(ordemRemocao).toBeLessThan(logoutOperationMock.mock.invocationCallOrder[0]!);
+    expect(ordemRemocao).toBeLessThan(apagarCookieMock.mock.invocationCallOrder[0]!);
+    expect(redirectMock).toHaveBeenCalledWith("/entrar");
+  });
+
+  it("falha ao remover a inscrição não impede o logout", async () => {
+    const erro = vi.spyOn(console, "error").mockImplementation(() => {});
+    removerInscricaoMock.mockRejectedValue(new Error("banco fora"));
+    await sair(comEndpoint(dados.endpoint));
+    expect(apagarCookieMock).toHaveBeenCalledWith("payload-token");
+    expect(redirectMock).toHaveBeenCalledWith("/entrar");
+    erro.mockRestore();
+  });
+
+  it("sem endpoint, não toca nas inscrições", async () => {
+    await sair(new FormData());
+    expect(removerInscricaoMock).not.toHaveBeenCalled();
+    expect(redirectMock).toHaveBeenCalledWith("/entrar");
   });
 });

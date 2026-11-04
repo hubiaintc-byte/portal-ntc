@@ -70,3 +70,30 @@ export async function desinscreverEsteAparelho(): Promise<string | null> {
   await desativarAvisosCms(endpoint);
   return endpoint;
 }
+
+/**
+ * Para o "Sair": cancela a inscrição só no navegador, sem chamar Server
+ * Action (a action `sair` apaga a do banco). Espera no máximo `limiteMs`,
+ * engole erros e devolve o endpoint que estava inscrito, ou `null`.
+ */
+export async function cancelarInscricaoLocal(limiteMs: number): Promise<string | null> {
+  let endpoint: string | null = null;
+  let relogio: ReturnType<typeof setTimeout> | undefined;
+  const esgotou = new Promise<void>((resolver) => {
+    relogio = setTimeout(resolver, limiteMs);
+  });
+  const cancelar = (async () => {
+    if (!suportaAvisos()) return;
+    const registro = await navigator.serviceWorker.getRegistration("/");
+    const inscricao = await registro?.pushManager.getSubscription();
+    if (!inscricao) return;
+    endpoint = inscricao.endpoint;
+    await inscricao.unsubscribe();
+  })().catch(() => undefined);
+  try {
+    await Promise.race([cancelar, esgotou]);
+  } finally {
+    clearTimeout(relogio);
+  }
+  return endpoint;
+}

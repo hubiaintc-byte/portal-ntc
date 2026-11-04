@@ -157,8 +157,22 @@ export async function verificarAutenticacaoPasskey(
   redirect(await destinoDoUsuario(claims.userId));
 }
 
-/** Encerra a sessão (apaga o cookie) e volta ao login. */
-export async function sair(): Promise<void> {
+/**
+ * Encerra a sessão (apaga o cookie) e volta ao login. O formulário do "Sair"
+ * manda o `endpoint` dos avisos deste aparelho (já cancelado no navegador):
+ * a inscrição é apagada aqui, ainda com a sessão válida, para um aparelho
+ * compartilhado não seguir recebendo avisos. Falhar nisso nunca segura o logout.
+ */
+export async function sair(formData?: FormData): Promise<void> {
+  const endpoint = formData?.get("endpoint");
+  if (typeof endpoint === "string" && endpoint) {
+    try {
+      const usuario = await obterUsuarioCms();
+      if (usuario) await removerInscricao(usuario.id, endpoint);
+    } catch (e) {
+      console.error("[sair] não foi possível remover a inscrição de avisos", e);
+    }
+  }
   await encerrarSessaoNoServidor();
   (await cookies()).delete(COOKIE_SESSAO);
   redirect("/entrar");
