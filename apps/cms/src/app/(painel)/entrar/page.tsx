@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { obterUsuarioCms } from "@/lib/cms/autenticacao";
 import { destinoDepoisDoLogin } from "@/lib/cms/navegacao";
 
+import { OrientacaoInstalacao } from "../OrientacaoInstalacao";
+
 import { FormLogin } from "./FormLogin";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +37,7 @@ export default async function EntrarPage() {
       </section>
       <section className="pcms-login__painel">
         <FormLogin />
+        <OrientacaoInstalacao />
       </section>
     </main>
   );

@@ -1,9 +1,39 @@
 "use client";
 
+import { desinscreverEsteAparelho } from "@/lib/avisos/navegador";
+
 import { sair } from "../acoesAuth";
 import { SeletorModulo } from "./SeletorModulo";
 
 export type ModuloPainel = "site" | "crm";
+
+/** Tempo máximo que o "Sair" espera a desinscrição dos avisos antes de seguir. */
+const ESPERA_DESINSCRICAO_MS = 2000;
+
+/**
+ * "Sair" desinscreve este aparelho dos avisos (aparelho compartilhado não
+ * segue recebendo depois do logout). A desinscrição nunca segura o logout:
+ * tem tempo-limite, erros são engolidos e, depois dela, o formulário é
+ * reenviado com a marca `desinscrito` para a action `sair` seguir pelo
+ * caminho normal. Se o JS falhar antes do `preventDefault`, a action segue
+ * sozinha.
+ */
+function sairDesinscrevendo(e: React.FormEvent<HTMLFormElement>) {
+  const form = e.currentTarget;
+  if (form.dataset.desinscrito === "1") return;
+  e.preventDefault();
+  const limite = new Promise<void>((resolver) => setTimeout(resolver, ESPERA_DESINSCRICAO_MS));
+  const desinscrever = desinscreverEsteAparelho().then(
+    () => undefined,
+    () => undefined,
+  );
+  void Promise.race([desinscrever, limite]).then(() => {
+    form.dataset.desinscrito = "1";
+    // Safari < 16 não tem requestSubmit: chama a action direto.
+    if (typeof form.requestSubmit === "function") form.requestSubmit();
+    else void sair();
+  });
+}
 
 export interface ItemNavPainel {
   id: string;
@@ -94,7 +124,7 @@ export function ShellPainel({
             <strong>{usuario.nome}</strong>
             <span className="pcms-sidebar__perfil">{administrador ? "Administrador" : "Equipe"}</span>
           </div>
-          <form action={sair} className="pcms-sair__form">
+          <form action={sair} onSubmit={sairDesinscrevendo} className="pcms-sair__form">
             <button type="submit" className="pcms-sair" aria-label="Sair da sessão" title="Sair">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M9 4H5v16h4" />

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { exigirUsuarioCms } from "@/lib/cms/autenticacao";
+import { leadInicialDaUrl } from "@/lib/cms/leadInicial";
 import { mostraModuloCrm } from "@/lib/cms/navegacao";
 import { capacidadesDoAcesso, TELAS_LEADS, temTela } from "@/lib/cms/telas";
 import {
@@ -50,7 +51,11 @@ function seTiver<T>(pode: boolean, ler: () => Promise<T>, vazio: T): Promise<T> 
  * navegador). Banco indisponível ⇒ listas vazias + erroLeitura (mesmo
  * padrão da rota /). Sem nenhuma tela `crm.*`, volta ao Site.
  */
-export default async function PainelCrmPage() {
+interface PainelCrmPageProps {
+  searchParams: Promise<{ lead?: string | string[] }>;
+}
+
+export default async function PainelCrmPage({ searchParams }: PainelCrmPageProps) {
   const usuario = await exigirUsuarioCms();
   const { acesso } = usuario;
   if (!mostraModuloCrm(acesso)) redirect("/");
@@ -117,6 +122,8 @@ export default async function PainelCrmPage() {
   }
 
   const hojeISO = new Date().toISOString();
+  // `?lead=<id>` vem do toque no aviso de lead novo; o ShellCrm abre o modal.
+  const leadInicial = leadInicialDaUrl((await searchParams).lead);
 
   return (
     <ShellCrm
@@ -137,6 +144,7 @@ export default async function PainelCrmPage() {
       envios={envios}
       hojeISO={hojeISO}
       erroLeitura={erroLeitura}
+      leadInicial={leadInicial}
     />
   );
 }

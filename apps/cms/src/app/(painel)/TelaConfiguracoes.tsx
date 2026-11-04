@@ -17,7 +17,9 @@ import {
   trocarMinhaSenha,
   verificarCadastroPasskeyCms,
 } from "./acoesAuth";
+import { AvisosDoAparelho } from "./AvisosDoAparelho";
 import { AvisoForm, CampoArea, CampoSenha, CampoTexto } from "./crm/CamposCrm";
+import { OrientacaoInstalacao } from "./OrientacaoInstalacao";
 
 interface TelaConfiguracoesProps {
   /** Usuário logado — usado só para exibir o e-mail da conta na seção real. */
@@ -287,6 +289,9 @@ export function TelaConfiguracoes({ usuario, mostrarContatos }: TelaConfiguracoe
               </button>
             </>
           )}
+
+          <AvisosDoAparelho />
+          <OrientacaoInstalacao />
         </section>
 
         {mostrarContatos && (
