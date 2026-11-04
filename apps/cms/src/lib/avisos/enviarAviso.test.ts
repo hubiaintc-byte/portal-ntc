@@ -55,9 +55,14 @@ describe("enviarAvisoATodos", () => {
   it("erro 500 não apaga nem rejeita", async () => {
     const { payload, del } = payloadFalso([inscricao(1)]);
     const enviar = vi.fn().mockRejectedValue({ statusCode: 500 });
+    const espiao = vi.spyOn(console, "error").mockImplementation(() => {});
     const r = await enviarAvisoATodos(payload, aviso, { enviar, vapid });
     expect(r).toEqual({ enviados: 0, removidos: 0 });
     expect(del).not.toHaveBeenCalled();
+    expect(espiao).toHaveBeenCalledTimes(1);
+    expect(espiao.mock.calls[0]).toContain(500);
+    expect(JSON.stringify(espiao.mock.calls)).not.toContain("https://push/1");
+    espiao.mockRestore();
   });
 
   it("envia o aviso serializado", async () => {

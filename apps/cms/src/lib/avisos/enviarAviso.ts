@@ -47,6 +47,14 @@ function statusDoErro(e: unknown): number | null {
   return null;
 }
 
+function hostDoEndpoint(endpoint: string): string {
+  try {
+    return new URL(endpoint).host;
+  } catch {
+    return "?";
+  }
+}
+
 export async function enviarAvisoATodos(
   payload: Payload,
   aviso: AvisoPush,
@@ -75,6 +83,12 @@ export async function enviarAvisoATodos(
           await payload.delete({ collection: "inscricoes-aviso", id: d.id, overrideAccess: true });
           return "removido" as const;
         }
+        console.error(
+          "[avisoLead]",
+          status ?? e,
+          "host:",
+          hostDoEndpoint(d.endpoint),
+        );
         return "falhou" as const;
       }
     }),
@@ -83,7 +97,10 @@ export async function enviarAvisoATodos(
   let enviados = 0;
   let removidos = 0;
   for (const r of resultados) {
-    if (r.status !== "fulfilled") continue;
+    if (r.status !== "fulfilled") {
+      console.error("[avisoLead]", r.reason);
+      continue;
+    }
     if (r.value === "enviado") enviados += 1;
     if (r.value === "removido") removidos += 1;
   }
