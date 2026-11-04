@@ -21,14 +21,14 @@ function payloadFalso(docs: ReturnType<typeof inscricao>[]) {
 
 describe("configVapid", () => {
   it("devolve null sem a chave privada", () => {
-    expect(configVapid({ NEXT_PUBLIC_VAPID_PUBLIC_KEY: "pub" })).toBeNull();
+    expect(configVapid({ VAPID_PUBLIC_KEY: "pub" })).toBeNull();
   });
   it("devolve null sem a chave pública", () => {
     expect(configVapid({ VAPID_PRIVATE_KEY: "priv" })).toBeNull();
   });
   it("usa o assunto default", () => {
     expect(
-      configVapid({ NEXT_PUBLIC_VAPID_PUBLIC_KEY: "pub", VAPID_PRIVATE_KEY: "priv" }),
+      configVapid({ VAPID_PUBLIC_KEY: "pub", VAPID_PRIVATE_KEY: "priv" }),
     ).toEqual({ publica: "pub", privada: "priv", assunto: "mailto:contato@institutontc.com.br" });
   });
 });

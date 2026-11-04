@@ -50,7 +50,7 @@ describe("avisos — sem sessão", () => {
   });
 
   it("a chave pública não é entregue", async () => {
-    vi.stubEnv("NEXT_PUBLIC_VAPID_PUBLIC_KEY", "pub");
+    vi.stubEnv("VAPID_PUBLIC_KEY", "pub");
     vi.stubEnv("VAPID_PRIVATE_KEY", "priv");
     expect(await chaveAvisosCms()).toBeNull();
   });
@@ -69,7 +69,7 @@ describe("avisos — com sessão", () => {
   });
 
   it("chave: devolve a pública, ou null sem VAPID configurado", async () => {
-    vi.stubEnv("NEXT_PUBLIC_VAPID_PUBLIC_KEY", "pub");
+    vi.stubEnv("VAPID_PUBLIC_KEY", "pub");
     vi.stubEnv("VAPID_PRIVATE_KEY", "priv");
     expect(await chaveAvisosCms()).toBe("pub");
     vi.stubEnv("VAPID_PRIVATE_KEY", "");

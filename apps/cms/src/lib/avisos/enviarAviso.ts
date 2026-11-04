@@ -22,7 +22,7 @@ export type EnviarFn = (
 export function configVapid(
   env: Record<string, string | undefined> = process.env,
 ): ConfigVapid | null {
-  const publica = env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const publica = env.VAPID_PUBLIC_KEY;
   const privada = env.VAPID_PRIVATE_KEY;
   if (!publica || !privada) return null;
   return {
