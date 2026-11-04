@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#11365E">
+<title>Sem conexão · Painel NTC</title>
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #11365E; color: #F4EFE6;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.5rem; padding: 2rem; text-align: center;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 500; font-size: 2.25rem; margin: 0; }
+  p { margin: 0; max-width: 28rem; line-height: 1.5; opacity: .85; }
+  button {
+    font: inherit; font-weight: 600; cursor: pointer;
+    background: #F4EFE6; color: #11365E; border: 0; border-radius: 999px;
+    padding: .75rem 1.75rem;
+  }
+  button:focus-visible { outline: 3px solid #B5995A; outline-offset: 3px; }
+</style>
+</head>
+<body>
+  <main>
+    <h1>Sem conexão</h1>
+    <p>O Painel NTC precisa de internet para abrir. Confira sua conexão e tente de novo.</p>
+  </main>
+  <button type="button" onclick="location.reload()">Tentar de novo</button>
+</body>
+</html>

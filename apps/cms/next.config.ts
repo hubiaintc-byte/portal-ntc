@@ -40,7 +40,17 @@ const cspPainel = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: cabecalhosSeguranca(cspPainel, "DENY") }];
+    return [
+      { source: "/:path*", headers: cabecalhosSeguranca(cspPainel, "DENY") },
+      // O navegador precisa revalidar o service worker sempre.
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache" },
+          { key: "Service-Worker-Allowed", value: "/" },
+        ],
+      },
+    ];
   },
   reactStrictMode: true,
   // Motor de PDF (CRM Fase B2): pacotes com binário nativo — o bundler/
