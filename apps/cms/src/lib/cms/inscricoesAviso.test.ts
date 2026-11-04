@@ -5,7 +5,7 @@ vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
 const { salvarInscricao, removerInscricao, removerInscricoesDoUsuario } = await import("./inscricoesAviso");
 
-const valida = { endpoint: "https://push.exemplo/abc", p256dh: "k", auth: "a", aparelho: "iPhone" };
+const valida = { endpoint: "https://fcm.googleapis.com/fcm/send/abc", p256dh: "k", auth: "a", aparelho: "iPhone" };
 
 function mockPayload(docs: { id: number }[] = []) {
   return {
@@ -48,6 +48,40 @@ describe("salvarInscricao", () => {
     expect(await salvarInscricao("1", { ...valida, p256dh: "" })).toEqual({ ok: false, erro: msg });
     expect(await salvarInscricao("1", { ...valida, auth: " " })).toEqual({ ok: false, erro: msg });
     expect(p.find).not.toHaveBeenCalled();
+  });
+});
+
+describe("salvarInscricao: endpoint e tamanhos", () => {
+  const msg = "Não foi possível ativar os avisos neste aparelho.";
+
+  it("recusa host https desconhecido", async () => {
+    const p = mockPayload();
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await salvarInscricao("1", { ...valida, endpoint: "https://push.exemplo/abc" })).toEqual({ ok: false, erro: msg });
+    expect(await salvarInscricao("1", { ...valida, endpoint: "não é url" })).toEqual({ ok: false, erro: msg });
+    expect(p.find).not.toHaveBeenCalled();
+  });
+
+  it("aceita fcm e subdomínio da Apple", async () => {
+    obterPayloadMock.mockResolvedValue(mockPayload());
+    expect(await salvarInscricao("1", valida)).toEqual({ ok: true });
+    expect(
+      await salvarInscricao("1", { ...valida, endpoint: "https://web.push.apple.com/QAbc" }),
+    ).toEqual({ ok: true });
+  });
+
+  it("recusa endpoint longo demais", async () => {
+    const p = mockPayload();
+    obterPayloadMock.mockResolvedValue(p);
+    const longo = "https://fcm.googleapis.com/" + "a".repeat(1100);
+    expect(await salvarInscricao("1", { ...valida, endpoint: longo })).toEqual({ ok: false, erro: msg });
+  });
+
+  it("trunca o nome do aparelho em 200", async () => {
+    const p = mockPayload();
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarInscricao("1", { ...valida, aparelho: "x".repeat(300) });
+    expect(p.create.mock.calls[0]?.[0].data.aparelho).toHaveLength(200);
   });
 });
 

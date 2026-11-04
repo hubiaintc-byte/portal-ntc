@@ -19,6 +19,7 @@ export const avisarLeadNovo: CollectionAfterChangeHook = ({ doc, operation, req 
     try {
       after(enviar);
     } catch {
+      console.warn("[avisoLead] after indisponível, disparo solto");
       void enviar();
     }
   }

@@ -335,10 +335,8 @@ async function obterPayloadUsuarios(): Promise<PayloadUsuarios> {
         data: args.data as RequiredDataFromCollectionSlug<"users">,
         overrideAccess: args.overrideAccess,
       }),
-    delete: (args) =>
-      args.collection === "inscricoes-aviso"
-        ? payload.delete(args)
-        : payload.delete(args),
+    // Cast estreito: o overload de delete é por slug de coleção; o adapter só repassa a união.
+    delete: (args) => payload.delete({ ...args, collection: "inscricoes-aviso" } as never),
     findByID: async (args) => {
       try {
         return await payload.findByID(args);

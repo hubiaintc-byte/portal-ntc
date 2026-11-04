@@ -36,7 +36,8 @@ self.addEventListener("push", (event) => {
   } catch {
     return;
   }
-  const { title, body, url, tag } = aviso;
+  const { body, url, tag } = aviso;
+  const title = aviso.title || "Painel NTC";
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
@@ -54,10 +55,14 @@ self.addEventListener("notificationclick", (event) => {
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((janelas) => {
       const aberta = janelas.find((j) => new URL(j.url).origin === self.location.origin);
-      if (aberta) {
-        return aberta.focus().then(() => ("navigate" in aberta ? aberta.navigate(url) : undefined));
-      }
-      return self.clients.openWindow(url);
+      if (!aberta) return self.clients.openWindow(url);
+      // navigate() pode faltar (alguns navegadores) ou rejeitar numa janela não controlada.
+      const abrirNova = () => self.clients.openWindow(url);
+      if (!("navigate" in aberta)) return aberta.focus().then(abrirNova, abrirNova);
+      return aberta
+        .focus()
+        .then((foco) => (foco || aberta).navigate(url))
+        .catch(abrirNova);
     }),
   );
 });

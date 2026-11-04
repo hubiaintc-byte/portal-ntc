@@ -30,6 +30,26 @@ export interface PayloadInscricoes {
   }): Promise<unknown>;
 }
 
+const LIMITES = { endpoint: 1024, p256dh: 256, auth: 64, aparelho: 200 };
+
+/** Só serviços de push conhecidos (FCM, Mozilla, Apple, Windows), sempre em https. */
+function endpointPermitido(endpoint: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== "https:") return false;
+  const h = url.hostname;
+  return (
+    h === "fcm.googleapis.com" ||
+    h === "updates.push.services.mozilla.com" ||
+    h.endsWith(".push.apple.com") ||
+    h.endsWith(".notify.windows.com")
+  );
+}
+
 function vazio(v: unknown): boolean {
   return typeof v !== "string" || v.trim() === "";
 }
@@ -41,7 +61,14 @@ export async function salvarInscricao(
   if (vazio(usuarioId) || vazio(i?.endpoint) || vazio(i?.p256dh) || vazio(i?.auth)) {
     return { ok: false, erro: MSG_RECUSA };
   }
-  if (!i.endpoint.startsWith("https://")) return { ok: false, erro: MSG_RECUSA };
+  if (
+    i.endpoint.length > LIMITES.endpoint ||
+    i.p256dh.length > LIMITES.p256dh ||
+    i.auth.length > LIMITES.auth ||
+    !endpointPermitido(i.endpoint)
+  ) {
+    return { ok: false, erro: MSG_RECUSA };
+  }
   // O id do usuário é numérico no banco; o relacionamento exige número.
   const dono = Number(usuarioId);
   if (!Number.isInteger(dono)) return { ok: false, erro: MSG_RECUSA };
@@ -53,7 +80,7 @@ export async function salvarInscricao(
       endpoint: i.endpoint,
       p256dh: i.p256dh,
       auth: i.auth,
-      aparelho: i.aparelho || undefined,
+      aparelho: i.aparelho ? i.aparelho.slice(0, LIMITES.aparelho) : undefined,
     };
     const existente = await payload.find({
       collection: "inscricoes-aviso",
