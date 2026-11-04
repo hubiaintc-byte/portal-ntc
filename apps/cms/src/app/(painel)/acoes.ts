@@ -336,7 +336,7 @@ async function obterPayloadUsuarios(): Promise<PayloadUsuarios> {
         overrideAccess: args.overrideAccess,
       }),
     // Cast estreito: o overload de delete é por slug de coleção; o adapter só repassa a união.
-    delete: (args) => payload.delete({ ...args, collection: "inscricoes-aviso" } as never),
+    delete: (args) => payload.delete(args as never),
     findByID: async (args) => {
       try {
         return await payload.findByID(args);
