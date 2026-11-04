@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
   // Motor de PDF (CRM Fase B2): pacotes com binário nativo — o bundler/
   // tracer do Next não deve tentar empacotá-los, só deixá-los externos.
   // Chave estável do Next 15 (não é `experimental.serverComponentsExternalPackages`).
-  serverExternalPackages: ["playwright-core", "@sparticuz/chromium", "playwright"],
+  serverExternalPackages: ["playwright-core", "@sparticuz/chromium", "playwright", "web-push"],
   // Next 16: saiu de `experimental` para o topo da config.
   reactCompiler: false,
   // Next 16: sem isto o `next dev` cria/reescreve um AGENTS.md em apps/cms.

@@ -47,7 +47,7 @@ const nextConfig: NextConfig = {
   // bundle do webpack (resolvidos via require() no runtime do Node).
   // Sem isto, `sharp` quebra a fase "Collecting page data" ao importar
   // o payload.config em route handlers.
-  serverExternalPackages: ["sharp", "payload", "@payloadcms/db-postgres", "@payloadcms/next"],
+  serverExternalPackages: ["sharp", "payload", "@payloadcms/db-postgres", "@payloadcms/next", "web-push"],
   // Next 15.5: saiu de `experimental` para o topo da config.
   typedRoutes: true,
   experimental: {
