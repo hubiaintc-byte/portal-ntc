@@ -4,6 +4,7 @@ import { randomInt } from "node:crypto";
 
 import { emailBoasVindasHtml } from "@/lib/emailsCms";
 
+import { removerInscricoesDoUsuario } from "./inscricoesAviso";
 import type { ResultadoEscrita } from "./painelCmsEscrita";
 import { acessoDoUsuario, type TelaPainel } from "./telas";
 
@@ -73,6 +74,11 @@ export interface PayloadUsuarios {
     overrideAccess: true;
   }): Promise<unknown>;
   delete(args: { collection: "users"; id: string | number; overrideAccess: true }): Promise<unknown>;
+  delete(args: {
+    collection: "inscricoes-aviso";
+    where: { usuario: { equals: string } };
+    overrideAccess: true;
+  }): Promise<unknown>;
   forgotPassword(args: {
     collection: "users";
     data: { email: string };
@@ -278,6 +284,8 @@ export async function removerUsuario(
     const alvo = await situacaoDoAlvo(p, id);
     if (!alvo) return { ok: false, erro: MSG_NAO_ENCONTRADO };
     if (alvo.administrador && alvo.unico) return { ok: false, erro: MSG_ULTIMO_ADMIN };
+    // Os aparelhos inscritos saem antes: sem dono, o aviso iria para um usuário que não existe mais.
+    await removerInscricoesDoUsuario(p, id);
     await p.delete({ collection: "users", id, overrideAccess: true });
     return { ok: true };
   } catch (e) {

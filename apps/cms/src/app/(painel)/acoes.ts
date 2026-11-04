@@ -335,7 +335,10 @@ async function obterPayloadUsuarios(): Promise<PayloadUsuarios> {
         data: args.data as RequiredDataFromCollectionSlug<"users">,
         overrideAccess: args.overrideAccess,
       }),
-    delete: (args) => payload.delete(args),
+    delete: (args) =>
+      args.collection === "inscricoes-aviso"
+        ? payload.delete(args)
+        : payload.delete(args),
     findByID: async (args) => {
       try {
         return await payload.findByID(args);
