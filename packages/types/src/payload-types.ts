@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     passkeys: Passkey;
+    'inscricoes-aviso': InscricoesAviso;
     media: Media;
     areas: Area;
     programas: Programa;
@@ -98,6 +99,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
+    'inscricoes-aviso': InscricoesAvisoSelect<false> | InscricoesAvisoSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     areas: AreasSelect<false> | AreasSelect<true>;
     programas: ProgramasSelect<false> | ProgramasSelect<true>;
@@ -243,6 +245,23 @@ export interface Passkey {
   counter: number;
   transports?: string[] | null;
   ultimoUsoEm?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inscricoes-aviso".
+ */
+export interface InscricoesAviso {
+  id: number;
+  usuario: number | User;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  /**
+   * User-agent resumido, só para identificar o aparelho.
+   */
+  aparelho?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1727,6 +1746,10 @@ export interface PayloadLockedDocument {
         value: number | Passkey;
       } | null)
     | ({
+        relationTo: 'inscricoes-aviso';
+        value: number | InscricoesAviso;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -1887,6 +1910,19 @@ export interface PasskeysSelect<T extends boolean = true> {
   counter?: T;
   transports?: T;
   ultimoUsoEm?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inscricoes-aviso_select".
+ */
+export interface InscricoesAvisoSelect<T extends boolean = true> {
+  usuario?: T;
+  endpoint?: T;
+  p256dh?: T;
+  auth?: T;
+  aparelho?: T;
   updatedAt?: T;
   createdAt?: T;
 }
