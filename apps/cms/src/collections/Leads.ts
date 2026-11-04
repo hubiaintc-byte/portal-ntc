@@ -4,6 +4,7 @@ import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
 
 import { ESTAGIOS_LEAD, MOTIVOS_PERDA, ORIGENS_ENTRADA_LEAD } from "@ntc/lib";
 
+import { avisarLeadNovo } from "../lib/avisos/avisarLeadNovo";
 import { casarClienteDoLead } from "../lib/crm/casamento";
 import { registrarLeadNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
 import { ESFERA_INSTITUCIONAL, LEAD_TIPO } from "../shared/types";
@@ -203,6 +204,6 @@ export const Leads: CollectionConfig = {
         return { ...data, identificacao: `${nome} · ${instituicao} · ${tipo}` };
       }) satisfies CollectionBeforeChangeHook,
     ],
-    afterChange: [casarClienteDoLead, registrarLeadNaLinhaDoTempo],
+    afterChange: [casarClienteDoLead, registrarLeadNaLinhaDoTempo, avisarLeadNovo],
   },
 };

@@ -83,6 +83,8 @@ interface ShellCrmProps {
   envios: EnvioResumo[];
   hojeISO: string;
   erroLeitura: boolean;
+  /** Id vindo de `?lead=` (toque no aviso de lead novo): abre o modal desse lead. */
+  leadInicial?: string;
 }
 
 /** Formulário de criação/edição aberto em tela cheia. */
@@ -191,6 +193,7 @@ export function ShellCrm({
   envios,
   hojeISO,
   erroLeitura,
+  leadInicial,
 }: ShellCrmProps) {
   const [tela, setTela] = useState<TelaCrmId>(() => telaInicialCrm(acesso));
   const [clienteDet, setClienteDet] = useState<ClienteCrmDetalhe | null>(null);
@@ -207,6 +210,23 @@ export function ShellCrm({
   // fora do documento. `null` = nenhuma geração nesta visita do detalhe.
 
   useEffect(() => setLeadsLocal(leads), [leads]);
+
+  // Toque no aviso de lead novo: abre o lead e tira o `?lead=` da URL, para
+  // recarregar a página não reabrir o modal. Sem a tela, id inválido ou lead
+  // inexistente, não acontece nada visível.
+  const verLeads = capacidades.verLeads;
+  useEffect(() => {
+    if (!leadInicial) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("lead");
+    window.history.replaceState(null, "", url);
+    if (!verLeads) return;
+    carregarLeadCrm(leadInicial)
+      .then((det) => {
+        if (det) setModalLead({ modo: "ver", lead: det });
+      })
+      .catch(() => {});
+  }, [leadInicial, verLeads]);
 
   function fecharTudo() {
     setClienteDet(null);

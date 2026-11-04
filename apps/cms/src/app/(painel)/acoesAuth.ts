@@ -14,6 +14,8 @@ import type {
 
 import { COOKIE_SESSAO, obterUsuarioAutenticado, obterUsuarioCms } from "@/lib/cms/autenticacao";
 import { destinoDepoisDoLogin } from "@/lib/cms/navegacao";
+import { configVapid } from "@/lib/avisos/enviarAviso";
+import { removerInscricao, salvarInscricao } from "@/lib/cms/inscricoesAviso";
 import {
   confirmarCadastroPasskey,
   confirmarLoginPasskey,
@@ -155,8 +157,22 @@ export async function verificarAutenticacaoPasskey(
   redirect(await destinoDoUsuario(claims.userId));
 }
 
-/** Encerra a sessão (apaga o cookie) e volta ao login. */
-export async function sair(): Promise<void> {
+/**
+ * Encerra a sessão (apaga o cookie) e volta ao login. O formulário do "Sair"
+ * manda o `endpoint` dos avisos deste aparelho (já cancelado no navegador):
+ * a inscrição é apagada aqui, ainda com a sessão válida, para um aparelho
+ * compartilhado não seguir recebendo avisos. Falhar nisso nunca segura o logout.
+ */
+export async function sair(formData?: FormData): Promise<void> {
+  const endpoint = formData?.get("endpoint");
+  if (typeof endpoint === "string" && endpoint) {
+    try {
+      const usuario = await obterUsuarioCms();
+      if (usuario) await removerInscricao(usuario.id, endpoint);
+    } catch (e) {
+      console.error("[sair] não foi possível remover a inscrição de avisos", e);
+    }
+  }
   await encerrarSessaoNoServidor();
   (await cookies()).delete(COOKIE_SESSAO);
   redirect("/entrar");
@@ -356,4 +372,32 @@ export async function removerPasskeyProprioCms(
   const usuario = await obterUsuarioCms();
   if (!usuario) return { ok: false, erro: "Sessão expirada. Entre novamente." };
   return removerPasskey(passkeyId, usuario.id, false);
+}
+
+/** Liga os avisos (web push) neste aparelho para o usuário da sessão. */
+export async function ativarAvisosCms(i: {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  aparelho?: string;
+}): Promise<ReturnType<typeof salvarInscricao>> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario) return { ok: false, erro: "Sessão expirada. Entre novamente." };
+  return salvarInscricao(usuario.id, i);
+}
+
+/** Desliga os avisos neste aparelho (só apaga a inscrição do próprio usuário). */
+export async function desativarAvisosCms(
+  endpoint: string,
+): Promise<ReturnType<typeof removerInscricao>> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario) return { ok: false, erro: "Sessão expirada. Entre novamente." };
+  return removerInscricao(usuario.id, endpoint);
+}
+
+/** Chave pública VAPID para o navegador assinar o push; `null` se o aviso não está configurado. */
+export async function chaveAvisosCms(): Promise<string | null> {
+  const usuario = await obterUsuarioCms();
+  if (!usuario) return null;
+  return configVapid()?.publica ?? null;
 }

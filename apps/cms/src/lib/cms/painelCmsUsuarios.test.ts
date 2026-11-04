@@ -1,3 +1,5 @@
+vi.mock("@/lib/payloadClient", () => ({ obterPayload: vi.fn() }));
+
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -268,6 +270,20 @@ describe("removerUsuario", () => {
     const r = await removerUsuario(payload, "2", "1");
     expect(r.ok).toBe(true);
     expect(payload.delete).toHaveBeenCalledWith({ collection: "users", id: "2", overrideAccess: true });
+  });
+
+  it("apaga as inscrições de aviso do alvo antes de apagar o usuário", async () => {
+    const payload = mockPayload([
+      { id: 2, nome: "A", email: "a@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
+      { id: 3, nome: "B", email: "b@ntc.org", administrador: true, updatedAt: "2026-07-01T00:00:00.000Z" },
+    ]);
+    await removerUsuario(payload, "2", "1");
+    expect(payload.delete.mock.calls[0]?.[0]).toEqual({
+      collection: "inscricoes-aviso",
+      where: { usuario: { equals: "2" } },
+      overrideAccess: true,
+    });
+    expect(payload.delete.mock.calls[1]?.[0]).toMatchObject({ collection: "users", id: "2" });
   });
 
   it("remove normalmente um usuário não administrador", async () => {

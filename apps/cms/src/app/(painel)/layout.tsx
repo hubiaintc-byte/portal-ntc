@@ -1,17 +1,25 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import { barlow, cormorant } from "../fonts";
+
+import { RegistrarServiceWorker } from "./RegistrarServiceWorker";
 
 import "./painel.css";
 
 export const metadata: Metadata = {
   title: "Painel Admin NTC · Grupo NTC",
   robots: { index: false, follow: false },
-  icons: [{ rel: "icon", type: "image/svg+xml", url: "/favicon.svg" }],
+  icons: [
+    { rel: "icon", type: "image/svg+xml", url: "/favicon.svg" },
+    { rel: "apple-touch-icon", url: "/icones/icone-180.png" },
+  ],
+  appleWebApp: { capable: true, title: "Painel NTC", statusBarStyle: "default" },
 };
+
+export const viewport: Viewport = { themeColor: "#11365E" };
 
 /**
  * Layout raiz do route group (painel) — o Painel Admin na raiz do app cms
@@ -27,6 +35,7 @@ export default function PainelLayout({ children }: { children: ReactNode }) {
         {children}
         <Analytics />
         <SpeedInsights />
+        <RegistrarServiceWorker />
       </body>
     </html>
   );

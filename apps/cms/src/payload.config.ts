@@ -27,6 +27,7 @@ import { ModelosEmail } from "./collections/ModelosEmail";
 import { Modulos } from "./collections/Modulos";
 import { EnviosProposta } from "./collections/EnviosProposta";
 import { Passkeys } from "./collections/Passkeys";
+import { InscricoesAviso } from "./collections/InscricoesAviso";
 import { Programas } from "./collections/Programas";
 import { Propostas } from "./collections/Propostas";
 import { TentativasAcesso } from "./collections/TentativasAcesso";
@@ -90,6 +91,7 @@ export default buildConfig({
   collections: [
     Users,
     Passkeys,
+    InscricoesAviso,
     Media,
     Areas,
     Programas,

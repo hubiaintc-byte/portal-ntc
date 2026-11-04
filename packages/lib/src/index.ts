@@ -203,3 +203,11 @@ export { calcularTempoLeituraMin } from "./editorial/tempo-leitura";
 export { formatarDataBR } from "./editorial/datas";
 export { aplicarAcaoMarkdown } from "./editorial/markdown-acoes";
 export type { AcaoMarkdown, SelecaoTexto } from "./editorial/markdown-acoes";
+
+// Avisos — regras puras do web push de lead novo.
+export {
+  ROTULO_TIPO_LEAD,
+  deveAvisarLead,
+  montarAvisoLead,
+  type AvisoPush,
+} from "./avisos/avisoLead";
