@@ -40,8 +40,20 @@ interface DefFiltro {
   opcoes: readonly (readonly [string, string])[];
 }
 
-export function TelaVisaoExecutiva({ livro, hojeISO, acesso, irPara }: PropsTelaFin) {
-  const [filtros, setFiltros] = useState<FiltrosVisao>(FILTROS_VISAO_INICIAIS);
+interface TelaVisaoExecutivaProps extends PropsTelaFin {
+  /** Filtros guardados no casco (o `UI.dash` do protótipo vale para a sessão, não só para a tela). */
+  filtros: FiltrosVisao;
+  aoMudarFiltros: (f: FiltrosVisao) => void;
+}
+
+export function TelaVisaoExecutiva({
+  livro,
+  hojeISO,
+  acesso,
+  irPara,
+  filtros,
+  aoMudarFiltros,
+}: TelaVisaoExecutivaProps) {
   const [gaveta, setGaveta] = useState<"alertas" | "corporativas" | null>(null);
 
   const telas = navFinVisivel(acesso);
@@ -88,8 +100,8 @@ export function TelaVisaoExecutiva({ livro, hojeISO, acesso, irPara }: PropsTela
   ];
 
   const mudarFiltro = (chave: ChaveFiltro, valor: string) =>
-    setFiltros((f) => ({ ...f, [chave]: valor }) as FiltrosVisao);
-  const limpar = () => setFiltros(FILTROS_VISAO_INICIAIS);
+    aoMudarFiltros({ ...filtros, [chave]: valor } as FiltrosVisao);
+  const limpar = () => aoMudarFiltros(FILTROS_VISAO_INICIAIS);
 
   /** Para onde leva cada alerta (o `go` do protótipo), ou nada se a pessoa não tem a tela. */
   const destinoDe = (a: Alerta): (() => void) | undefined => {
@@ -386,11 +398,11 @@ export function TelaVisaoExecutiva({ livro, hojeISO, acesso, irPara }: PropsTela
                 rodape={
                   <span className="muted">
                     {tot.orcado
-                      ? `${porcentagem(tot.realizado / tot.orcado, 0)} já realizado`
+                      ? `${porcentagem(razao(tot.realizado, tot.orcado), 0)} já realizado`
                       : "sem orçamento"}
                   </span>
                 }
-                dica="Plano de custos e despesas do período, incluindo comissões previstas."
+                dica="Plano de custos e despesas do período."
               />
               <Kpi
                 rotulo="Custo realizado"
@@ -402,7 +414,7 @@ export function TelaVisaoExecutiva({ livro, hojeISO, acesso, irPara }: PropsTela
                     cor="grafite"
                   />
                 }
-                dica="Custos e despesas incorridos, independentemente de pagamento. Inclui comissões devidas."
+                dica="Custos e despesas incorridos, independentemente de pagamento."
               />
               <Kpi
                 rotulo="Valor pago"

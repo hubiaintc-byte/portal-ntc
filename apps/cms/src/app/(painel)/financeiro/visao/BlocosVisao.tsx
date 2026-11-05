@@ -92,7 +92,7 @@ export function HeroResultado({ tot }: { tot: TotaisCarteira }) {
         <div>
           <div className="hc-l">
             Resultado previsto{" "}
-            <Dica texto="Receitas contratadas menos custos e despesas previstos, incluindo comissões previstas. É o que foi assumido, não o que foi executado." />
+            <Dica texto="Receitas contratadas menos custos e despesas previstos. É o que foi assumido, não o que foi executado." />
           </div>
           <div className={`hc-v${tot.resultadoPrevisto < 0 ? " neg" : ""}`}>
             {moeda(tot.resultadoPrevisto)}
