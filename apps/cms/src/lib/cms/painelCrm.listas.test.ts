@@ -7,7 +7,7 @@ const contarNegociosPorCliente = vi.fn();
 const ultimoItemLinhaDoTempoPorCliente = vi.fn();
 vi.mock("@/lib/cms/agregadosCrm", () => ({ contarNegociosPorCliente, ultimoItemLinhaDoTempoPorCliente }));
 
-const { listarClientesCrm, listarLeadsCrm, listarProdutosCrm, listarPropostasCrm, todosEnviosCrm, listarLinhaDoTempo } =
+const { listarClientesCrm, listarLeadsCrm, listarPropostasCrm, todosEnviosCrm, listarLinhaDoTempo } =
   await import("./painelCrm");
 
 afterEach(() => vi.clearAllMocks());
@@ -90,18 +90,6 @@ describe("listarLeadsCrm", () => {
     const [lead] = await listarLeadsCrm();
     expect(argsDe(find).populate).toEqual({ programas: { sigla: true }, "clientes-crm": { orgao: true }, users: { nome: true } });
     expect(lead).toMatchObject({ programaSigla: "EDUTEC", participantesEstimados: 300, clienteId: "9", clienteNome: "SME", responsavelNome: "João", estagio: "lead" });
-  });
-});
-
-describe("listarProdutosCrm", () => {
-  it("lê só nome e dados comerciais do evento", async () => {
-    const find = vi.fn<FindFn>(async () => ({ docs: [{ id: 1, nome: "Seminário", comercial: { codigo: "S1", valor: 90 } }, { id: 2, nome: "Oficina" }] }));
-    obterPayloadMock.mockResolvedValue({ find });
-    expect(await listarProdutosCrm()).toEqual([
-      { id: "1", nome: "Seminário", codigo: "S1", valor: 90 },
-      { id: "2", nome: "Oficina", codigo: null, valor: null },
-    ]);
-    expect(argsDe(find).select).toEqual({ nome: true, comercial: { codigo: true, valor: true } });
   });
 });
 

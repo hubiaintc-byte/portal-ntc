@@ -12,21 +12,24 @@ import {
 
 import type { AreaOpcao, ProgramaCatalogoDetalhe } from "@/lib/cms/catalogoCrm";
 import type { DadosPrograma } from "@/lib/cms/catalogoCrmEscrita";
+import { paginaVazia, type PaginaProgramaEdicao } from "@/lib/cms/paginaProgramaCatalogo";
 
-import { excluirProgramaCatalogoCrm, salvarProgramaCatalogoCrm } from "../acoesCatalogo";
+import { excluirProgramaCatalogoCrm, salvarProgramaCatalogoCrm } from "./acoesCatalogo";
+import { BlocosPaginaPrograma } from "./BlocosPaginaPrograma";
 
-import { CampoMarkdown } from "./CampoMarkdown";
-import { AvisoForm, CampoSelect, CampoTexto } from "./CamposCrm";
+import { CampoMarkdown } from "./crm/CampoMarkdown";
+import { AvisoForm, CampoSelect, CampoTexto } from "./crm/CamposCrm";
 import { EditorListaCatalogo } from "./EditorListaCatalogo";
-import { seloDeSituacaoPrograma } from "./seloStatus";
+import { seloDeSituacaoPrograma } from "./crm/seloStatus";
 
 interface DetalheProgramaCatalogoProps {
   programa: ProgramaCatalogoDetalhe | null;
   areas: AreaOpcao[];
   onVoltar: () => void;
   /** Depois de salvar/publicar: o Shell recarrega o detalhe pelo id. */
-  onSalvo: (id: string) => void;
-  onExcluido: () => void;
+  /** `aviso`: salvo, mas a revalidação do site falhou — quem abre o detalhe de novo mostra. */
+  onSalvo: (id: string, aviso?: string) => void;
+  onExcluido: (aviso?: string) => void;
   onAbrirModulo: (id: string) => void;
   onNovoModulo: (programaId: string) => void;
   /**
@@ -59,6 +62,7 @@ export function DetalheProgramaCatalogo({
   const [eixos, setEixos] = useState<ItemTituloDescricao[]>(p?.eixos ?? []);
   const [diferenciais, setDiferenciais] = useState<ItemTituloDescricao[]>(p?.diferenciais ?? []);
   const [resultados, setResultados] = useState<{ texto: string }[]>((p?.resultados ?? []).map((texto) => ({ texto })));
+  const [pagina, setPagina] = useState<PaginaProgramaEdicao>(() => p?.pagina ?? paginaVazia());
   const [erro, setErro] = useState<string | null>(null);
   const [excluindo, setExcluindo] = useState(false);
   const [enviando, iniciar] = useTransition();
@@ -85,11 +89,12 @@ export function DetalheProgramaCatalogo({
       eixos,
       diferenciais,
       resultados: resultados.map((r) => r.texto),
+      pagina,
     };
     iniciar(async () => {
       const r = await salvarProgramaCatalogoCrm(p?.id ?? null, dados, publicar);
       if (r.ok) {
-        if (r.id) onSalvo(r.id);
+        if (r.id) onSalvo(r.id, r.aviso);
       } else setErro(r.erro ?? "Erro ao salvar o programa.");
     });
   }
@@ -99,7 +104,7 @@ export function DetalheProgramaCatalogo({
     setErro(null);
     iniciar(async () => {
       const r = await excluirProgramaCatalogoCrm(p.id);
-      if (r.ok) onExcluido();
+      if (r.ok) onExcluido(r.aviso);
       else {
         setErro(r.erro ?? "Erro ao excluir o programa.");
         setExcluindo(false);
@@ -118,7 +123,7 @@ export function DetalheProgramaCatalogo({
 
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Catálogo Institucional · Programa</p>
+          <p className="pcms-pagehead__eyebrow">Catálogo · Programa</p>
           <h1>{novo ? "Novo programa" : p.nomeCompleto || p.sigla}</h1>
           {!novo && <span className={seloDeSituacaoPrograma(p.situacao)}>{rotuloSituacaoPrograma(p.situacao)}</span>}
         </div>
@@ -136,12 +141,12 @@ export function DetalheProgramaCatalogo({
 
       {(novo || p.situacao === "rascunho") && (
         <p className="pcms-aviso" role="note">
-          Rascunho não aparece no wizard de proposta. Publique para que ele possa ser vendido.
+          Rascunho não aparece no site nem no wizard de proposta. Publique para pôr a página no ar e liberar o programa para as propostas.
         </p>
       )}
       {!novo && p.situacao === "alteracoes-pendentes" && (
         <p className="pcms-aviso" role="note">
-          Há alterações não publicadas. Propostas novas continuam usando a versão publicada até você publicar.
+          Há alterações não publicadas. O site e as propostas novas continuam usando a versão publicada até você publicar.
         </p>
       )}
       <p className="pcms-aviso" role="note">
@@ -197,6 +202,8 @@ export function DetalheProgramaCatalogo({
         novo={() => ({ texto: "" })}
         campos={[{ chave: "texto", rotulo: "Resultado", area: true }]}
       />
+
+      <BlocosPaginaPrograma pagina={pagina} onMudar={setPagina} slug={p?.slug ?? ""} />
       </fieldset>
 
       {!novo && (

@@ -177,6 +177,7 @@ export {
   type FiltroModulos,
   type ModuloFiltravel,
   type ProgramaParaPublicar,
+  type PaginaParaPublicar,
   type DependentesPrograma,
   type DependentesModulo,
 } from "./crm/catalogo";

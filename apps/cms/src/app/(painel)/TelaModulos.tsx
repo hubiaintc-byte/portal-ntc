@@ -27,9 +27,9 @@ export function TelaModulos({ modulos, programas, onAbrir, onNovo, podeEditar }:
     <>
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Catálogo Institucional</p>
+          <p className="pcms-pagehead__eyebrow">Editorial · Catálogo</p>
           <h1>Módulos</h1>
-          <p>Módulos do catálogo com seus dados comerciais de referência.</p>
+          <p>Módulos dos programas — aparecem na página do programa e nas propostas, com os dados comerciais de referência.</p>
         </div>
         {podeEditar && (
           <div className="pcms-pagehead__acoes">

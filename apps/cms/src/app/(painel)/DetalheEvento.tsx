@@ -77,6 +77,8 @@ export function DetalheEvento({
   const [gerenciandoPalestrantes, setGerenciandoPalestrantes] = useState(false);
   const [salvando, iniciarSalvar] = useTransition();
   const [erro, setErro] = useState<string | null>(null);
+  /** Publicar/despublicar gravou, mas a página do programa no site pode demorar (revalidação falhou). */
+  const [avisoPublicacao, setAvisoPublicacao] = useState<string | null>(null);
   const [campos, setCampos] = useState<CamposEventoCompletos>(() => camposDe(eventoInicial));
 
   function mudar<K extends keyof CamposEventoCompletos>(chave: K, valor: CamposEventoCompletos[K]) {
@@ -121,10 +123,12 @@ export function DetalheEvento({
   function alternarPublicacao() {
     const publicar = evento.status !== "publicado";
     setErro(null);
+    setAvisoPublicacao(null);
     iniciarSalvar(async () => {
       const { resultado, evento: atualizado } = await alternarPublicacaoEvento(evento.id, publicar);
       if (resultado.ok && atualizado) {
         setEvento(atualizado);
+        setAvisoPublicacao(resultado.aviso ?? null);
       } else {
         setErro(resultado.erro ?? "Não foi possível alterar a publicação.");
       }
@@ -171,6 +175,12 @@ export function DetalheEvento({
           )}
         </div>
       </div>
+
+      {avisoPublicacao && (
+        <p className="pcms-form-aviso" role="status">
+          {avisoPublicacao}
+        </p>
+      )}
 
       {podeEditar && editando && (
         <section className="pcms-editor">

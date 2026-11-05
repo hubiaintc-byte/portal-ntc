@@ -22,7 +22,13 @@ vi.mock("@/lib/cms/autenticacao", async () => {
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
-const { carregarEvento, criarEventoEmBranco } = await import("./acoes");
+const revalidarProgramasDoEventoMock = vi.fn(async () => true);
+vi.mock("@/lib/cms/revalidarSite", () => ({
+  revalidarProgramasDoEvento: revalidarProgramasDoEventoMock,
+  AVISO_REVALIDACAO_SITE: "Salvo, mas a atualização no site pode levar alguns minutos.",
+}));
+
+const { alternarPublicacaoEvento, carregarEvento, criarEventoEmBranco } = await import("./acoes");
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -64,5 +70,31 @@ describe("carregarEvento (Server Action)", () => {
     findByID.mockResolvedValue(null);
     expect(await carregarEvento("9")).toBeNull();
     expect(findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: "eventos", id: "9" }));
+  });
+});
+
+describe("alternarPublicacaoEvento revalida a página do programa do evento", () => {
+  it("publicar e despublicar pedem a revalidação do programa", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({ id: 1, administrador: false, telas: ["site.eventos"] });
+    findByID.mockResolvedValue(null);
+    const r = await alternarPublicacaoEvento("12", true);
+    expect(r.resultado).toEqual({ ok: true });
+    await alternarPublicacaoEvento("12", false);
+    expect(revalidarProgramasDoEventoMock).toHaveBeenCalledTimes(2);
+    expect(revalidarProgramasDoEventoMock).toHaveBeenCalledWith(expect.anything(), "12");
+  });
+
+  it("falha na revalidação vira aviso, nunca erro", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({ id: 1, administrador: false, telas: ["site.eventos"] });
+    findByID.mockResolvedValue(null);
+    revalidarProgramasDoEventoMock.mockResolvedValueOnce(false);
+    const r = await alternarPublicacaoEvento("12", true);
+    expect(r.resultado).toEqual({ ok: true, aviso: "Salvo, mas a atualização no site pode levar alguns minutos." });
+  });
+
+  it("sem a tela Eventos não publica nem revalida", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({ id: 1, administrador: false, telas: ["site.home"] });
+    await alternarPublicacaoEvento("12", true);
+    expect(revalidarProgramasDoEventoMock).not.toHaveBeenCalled();
   });
 });

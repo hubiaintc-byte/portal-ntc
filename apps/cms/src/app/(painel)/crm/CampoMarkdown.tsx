@@ -11,11 +11,16 @@ interface CampoMarkdownProps {
   linhas?: number;
   /** O conteúdo gravado tem formatação que o editor não representa — salvar este campo a perderia. */
   avisoPerda?: boolean;
+  /** Marcação leve de uma linha (títulos, destaques): barra só com negrito e itálico. */
+  soEnfase?: boolean;
+  /** Linha de ajuda sob o campo. */
+  dica?: string;
 }
 
 /** Texto rico do catálogo editado como Markdown leve, com a mesma barra dos Conteúdos. */
-export function CampoMarkdown({ rotulo, valor, onMudar, linhas = 6, avisoPerda }: CampoMarkdownProps) {
+export function CampoMarkdown({ rotulo, valor, onMudar, linhas = 6, avisoPerda, soEnfase, dica }: CampoMarkdownProps) {
   const id = useId();
+  const idDica = `${id}-dica`;
   const ref = useRef<HTMLTextAreaElement>(null);
   return (
     <div className="pcms-field">
@@ -25,11 +30,12 @@ export function CampoMarkdown({ rotulo, valor, onMudar, linhas = 6, avisoPerda }
           Este texto tem formatação que o editor não representa (ex.: negrito e itálico juntos). Se você alterar e salvar este campo, essa formatação se perde.
         </p>
       )}
-      <BarraFormatacao textareaRef={ref} valor={valor} onMudar={onMudar} />
+      <BarraFormatacao textareaRef={ref} valor={valor} onMudar={onMudar} soEnfase={soEnfase} />
       <textarea
         id={id}
         ref={ref}
         rows={linhas}
+        aria-describedby={dica ? idDica : undefined}
         value={valor}
         onChange={(e) => onMudar(e.target.value)}
         onKeyDown={(e) => {
@@ -39,6 +45,11 @@ export function CampoMarkdown({ rotulo, valor, onMudar, linhas = 6, avisoPerda }
           aplicarNoTextarea(ref.current, valor, acao, onMudar);
         }}
       />
+      {dica && (
+        <p id={idDica} className="pcms-editor__hint">
+          {dica}
+        </p>
+      )}
     </div>
   );
 }

@@ -5,11 +5,16 @@ import { useId } from "react";
 interface CampoItem<T> {
   chave: keyof T & string;
   rotulo: string;
+  /** Texto longo (textarea). */
   area?: boolean;
+  /** Caixa de marcar — o campo do item é booleano. */
+  marcar?: boolean;
 }
 
 interface EditorListaCatalogoProps<T> {
   rotulo: string;
+  /** Texto sob o título da lista (ex.: onde aparece no site). */
+  descricao?: string;
   /** "Eixo", "Diferencial", "Resultado" — usado em "Eixo 2" e nos nomes acessíveis dos botões. */
   rotuloItem: string;
   itens: T[];
@@ -19,10 +24,18 @@ interface EditorListaCatalogoProps<T> {
 }
 
 /** Lista editável do catálogo: adicionar, remover e reordenar por botões (acessível por teclado). */
-export function EditorListaCatalogo<T extends { [K in keyof T]: string }>({ rotulo, rotuloItem, itens, onMudar, novo, campos }: EditorListaCatalogoProps<T>) {
+export function EditorListaCatalogo<T extends { [K in keyof T]: string | boolean }>({
+  rotulo,
+  descricao,
+  rotuloItem,
+  itens,
+  onMudar,
+  novo,
+  campos,
+}: EditorListaCatalogoProps<T>) {
   const base = useId();
 
-  function mudar(i: number, chave: keyof T & string, valor: string) {
+  function mudar(i: number, chave: keyof T & string, valor: string | boolean) {
     onMudar(itens.map((it, j) => (j === i ? { ...it, [chave]: valor } : it)));
   }
   function mover(i: number, delta: -1 | 1) {
@@ -36,6 +49,7 @@ export function EditorListaCatalogo<T extends { [K in keyof T]: string }>({ rotu
   return (
     <section className="pcms-det-bloco">
       <h2>{rotulo}</h2>
+      {descricao && <p className="pcms-editor__hint">{descricao}</p>}
       {itens.length === 0 && <p>Nenhum item.</p>}
       <ol className="pcms-lista-catalogo">
         {itens.map((it, i) => (
@@ -45,13 +59,25 @@ export function EditorListaCatalogo<T extends { [K in keyof T]: string }>({ rotu
             </p>
             {campos.map((c) => {
               const id = `${base}-${i}-${c.chave}`;
+              const valor = it[c.chave];
+              if (c.marcar) {
+                return (
+                  <div key={c.chave} className="pcms-field pcms-field--check">
+                    <label htmlFor={id}>
+                      <input id={id} type="checkbox" checked={valor === true} onChange={(e) => mudar(i, c.chave, e.target.checked)} />{" "}
+                      {c.rotulo}
+                    </label>
+                  </div>
+                );
+              }
+              const texto = typeof valor === "string" ? valor : "";
               return (
                 <div key={c.chave} className="pcms-field">
                   <label htmlFor={id}>{c.rotulo}</label>
                   {c.area ? (
-                    <textarea id={id} rows={3} value={it[c.chave]} onChange={(e) => mudar(i, c.chave, e.target.value)} />
+                    <textarea id={id} rows={3} value={texto} onChange={(e) => mudar(i, c.chave, e.target.value)} />
                   ) : (
-                    <input id={id} type="text" value={it[c.chave]} onChange={(e) => mudar(i, c.chave, e.target.value)} />
+                    <input id={id} type="text" value={texto} onChange={(e) => mudar(i, c.chave, e.target.value)} />
                   )}
                 </div>
               );

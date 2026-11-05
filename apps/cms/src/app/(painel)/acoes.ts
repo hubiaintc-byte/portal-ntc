@@ -63,6 +63,7 @@ import {
   type UsuarioGestaoResumo,
 } from "@/lib/cms/painelCmsUsuarios";
 import { listarPasskeysDoUsuario, removerPasskey, type PasskeyResumo } from "@/lib/cms/painelPasskeys";
+import { AVISO_REVALIDACAO_SITE, revalidarProgramasDoEvento } from "@/lib/cms/revalidarSite";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
@@ -126,10 +127,20 @@ export async function enviarMidia(
   if (!(arquivo instanceof File) || arquivo.size === 0) {
     return { resultado: { ok: false, erro: "Nenhum arquivo selecionado." }, evento: null };
   }
-  const resultado = await enviarMidiaEvento(id, campo, arquivo);
+  const resultado = await revalidarProgramaDoEvento(id, await enviarMidiaEvento(id, campo, arquivo));
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
   return { resultado, evento };
+}
+
+/**
+ * Evento publicado/despublicado ou com capa nova muda o bloco Módulos abertos
+ * da página do programa dele: pede ao site que a revalide. Falha vira aviso.
+ */
+async function revalidarProgramaDoEvento(id: string, resultado: ResultadoEscrita): Promise<ResultadoEscrita> {
+  if (!resultado.ok) return resultado;
+  const revalidou = await revalidarProgramasDoEvento(await obterPayload(), id);
+  return revalidou ? resultado : { ...resultado, aviso: resultado.aviso ?? AVISO_REVALIDACAO_SITE };
 }
 
 /** Publica ou despublica o evento e devolve o detalhe atualizado. */
@@ -138,7 +149,7 @@ export async function alternarPublicacaoEvento(
   publicar: boolean,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
   if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
-  const resultado = publicar ? await publicarEvento(id) : await despublicarEvento(id);
+  const resultado = await revalidarProgramaDoEvento(id, publicar ? await publicarEvento(id) : await despublicarEvento(id));
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
   return { resultado, evento };

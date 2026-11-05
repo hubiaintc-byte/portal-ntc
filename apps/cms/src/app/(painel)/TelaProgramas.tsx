@@ -6,7 +6,7 @@ import { filtrarProgramas, rotuloSituacaoPrograma, SITUACOES_PROGRAMA, type Situ
 
 import type { AreaOpcao, ProgramaCrmResumo } from "@/lib/cms/catalogoCrm";
 
-import { seloDeSituacaoPrograma } from "./seloStatus";
+import { seloDeSituacaoPrograma } from "./crm/seloStatus";
 
 interface TelaProgramasProps {
   programas: ProgramaCrmResumo[];
@@ -35,9 +35,9 @@ export function TelaProgramas({ programas, areas, onAbrir, onNovo, podeEditar }:
     <>
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Catálogo Institucional</p>
+          <p className="pcms-pagehead__eyebrow">Editorial · Catálogo</p>
           <h1>Programas</h1>
-          <p>Programas do catálogo comercial — alimentam o wizard e o documento da proposta. O site não lê daqui.</p>
+          <p>A página pública de cada programa e o catálogo das propostas. Publicar põe a página no site e libera o programa para as propostas.</p>
         </div>
         {podeEditar && (
           <div className="pcms-pagehead__acoes">

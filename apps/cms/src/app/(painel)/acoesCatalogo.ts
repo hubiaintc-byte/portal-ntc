@@ -22,15 +22,23 @@ import {
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
 
 /**
- * Server Actions do catálogo comercial (Programas e Módulos no CRM). Mesma
- * regra de acoesCrm.ts: sessão validada ANTES de tocar a Local API.
+ * Server Actions do catálogo (telas Programas e Módulos, no módulo Site
+ * desde 05/11/2026 — os ids de tela gravados seguem `crm.*`). Mesma regra de
+ * acoesCrm.ts: sessão validada ANTES de tocar a Local API. A revalidação do
+ * site público é feita pela escrita (catalogoCrmEscrita.ts).
  */
 
 const TELAS_PROGRAMA: readonly TelaPainel[] = ["crm.programas"];
 /** O detalhe do programa também cria módulo (decisão do plano). */
 const TELAS_MODULO: readonly TelaPainel[] = ["crm.modulos", "crm.programas"];
-/** Quem abre o detalhe: catálogo ou propostas (o wizard consulta o catálogo). */
-const TELAS_LEITURA: readonly TelaPainel[] = ["crm.programas", "crm.modulos", "crm.propostas"];
+/** Quem abre o detalhe: as duas telas do catálogo. */
+const TELAS_LEITURA: readonly TelaPainel[] = ["crm.programas", "crm.modulos"];
+
+/** O painel (Site, onde as telas moram) e o CRM (selects do wizard, do lead e do evento). */
+function revalidarPainel(): void {
+  revalidatePath("/");
+  revalidatePath("/crm");
+}
 
 const RECUSADO: ResultadoEscrita = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." };
 
@@ -43,7 +51,7 @@ export async function salvarProgramaCatalogoCrm(id: string | null, dados: DadosP
   const usuario = await obterUsuarioAutenticadoComTela(TELAS_PROGRAMA);
   if (!usuario) return RECUSADO;
   const r = await salvarPrograma(id, dados, publicar, usuario);
-  if (r.ok) revalidatePath("/crm");
+  if (r.ok) revalidarPainel();
   return r;
 }
 
@@ -51,7 +59,7 @@ export async function excluirProgramaCatalogoCrm(id: string): Promise<ResultadoE
   const usuario = await obterUsuarioAutenticadoComTela(TELAS_PROGRAMA);
   if (!usuario) return RECUSADO;
   const r = await excluirPrograma(id, usuario);
-  if (r.ok) revalidatePath("/crm");
+  if (r.ok) revalidarPainel();
   return r;
 }
 
@@ -64,7 +72,7 @@ export async function salvarModuloCatalogoCrm(id: string | null, dados: DadosMod
   const usuario = await obterUsuarioAutenticadoComTela(TELAS_MODULO);
   if (!usuario) return RECUSADO;
   const r = await salvarModulo(id, dados, usuario);
-  if (r.ok) revalidatePath("/crm");
+  if (r.ok) revalidarPainel();
   return r;
 }
 
@@ -72,6 +80,6 @@ export async function excluirModuloCatalogoCrm(id: string): Promise<ResultadoEsc
   const usuario = await obterUsuarioAutenticadoComTela(TELAS_MODULO);
   if (!usuario) return RECUSADO;
   const r = await excluirModulo(id, usuario);
-  if (r.ok) revalidatePath("/crm");
+  if (r.ok) revalidarPainel();
   return r;
 }

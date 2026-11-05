@@ -96,17 +96,17 @@ describe("acoesCatalogo por tela", () => {
     expect(escrita.excluirPrograma).not.toHaveBeenCalled();
   });
 
-  it("leituras do detalhe: crm.programas, crm.modulos ou crm.propostas; outra tela não", async () => {
-    for (const t of ["crm.programas", "crm.modulos", "crm.propostas"]) {
+  it("leituras do detalhe: crm.programas ou crm.modulos; outra tela (inclusive Propostas) não", async () => {
+    for (const t of ["crm.programas", "crm.modulos"]) {
       obterUsuarioCmsMock.mockResolvedValue(com(t));
       await acoes.carregarProgramaCatalogoCrm("1");
       await acoes.carregarModuloCatalogoCrm("1");
     }
-    expect(leitura.obterProgramaCatalogo).toHaveBeenCalledTimes(3);
-    expect(leitura.obterModuloCatalogo).toHaveBeenCalledTimes(3);
-    obterUsuarioCmsMock.mockResolvedValue(com("crm.leads", "site.painel"));
+    expect(leitura.obterProgramaCatalogo).toHaveBeenCalledTimes(2);
+    expect(leitura.obterModuloCatalogo).toHaveBeenCalledTimes(2);
+    obterUsuarioCmsMock.mockResolvedValue(com("crm.leads", "crm.propostas", "site.painel"));
     expect(await acoes.carregarProgramaCatalogoCrm("1")).toBeNull();
     expect(await acoes.carregarModuloCatalogoCrm("1")).toBeNull();
-    expect(leitura.obterProgramaCatalogo).toHaveBeenCalledTimes(3);
+    expect(leitura.obterProgramaCatalogo).toHaveBeenCalledTimes(2);
   });
 });

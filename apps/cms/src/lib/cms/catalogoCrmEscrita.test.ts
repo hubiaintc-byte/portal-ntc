@@ -1,4 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { paginaVazia, type PaginaProgramaEdicao } from "./paginaProgramaCatalogo";
 
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
@@ -56,7 +58,35 @@ const programaBase: DadosPrograma = {
   resultados: [" R ", " "],
 };
 
-afterEach(() => vi.clearAllMocks());
+const fetchMock = vi.fn(async () => ({ ok: true }));
+beforeEach(() => {
+  vi.stubGlobal("fetch", fetchMock);
+  vi.stubEnv("PAYLOAD_PUBLIC_FRONT_URL", "https://site.test");
+  vi.stubEnv("REVALIDATE_SECRET", "s");
+});
+afterEach(() => {
+  vi.clearAllMocks();
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
+
+const pathsRevalidados = () =>
+  fetchMock.mock.calls.map((c) => (JSON.parse(((c as unknown[])[1] as { body: string }).body) as { path: string }).path);
+
+function paginaCompleta(): PaginaProgramaEdicao {
+  const pg = paginaVazia();
+  pg.heroTitulo = "Programa *X*";
+  pg.heroSubtitulo = "Sub";
+  pg.heroImagemCaminho = "/img/x.webp";
+  pg.cartao.nome = "X";
+  pg.cartao.tagline = "Chamada";
+  pg.cartao.descricaoMenu = "Menu";
+  pg.cartao.descricaoMapa = "Mapa";
+  return pg;
+}
+
+/** Programa já gravado, com o que a revalidação lê (slug e sigla da área). */
+const GRAVADO_EDUTEC = { slug: "edutec", area: { id: 2, sigla: "educacao" } };
 
 describe("salvarPrograma", () => {
   it("programa novo nasce rascunho, sigla em maiúsculas, listas sem itens vazios e aparadas", async () => {
@@ -103,10 +133,10 @@ describe("salvarPrograma", () => {
   });
 
   it("publicar envia os dados do formulário com _status published numa só escrita", async () => {
-    const p = payloadFalso();
+    const p = payloadFalso({ contagens: { modulos: 1 }, programaGravado: GRAVADO_EDUTEC });
     obterPayloadMock.mockResolvedValue(p);
-    const r = await salvarPrograma("4", programaBase, true, usuario);
-    expect(r.ok).toBe(true);
+    const r = await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, true, usuario);
+    expect(r).toEqual({ ok: true, id: "1" });
     expect(p.update).toHaveBeenCalledTimes(1);
     const args = p.update.mock.calls[0]![0] as { data: Record<string, unknown>; draft: boolean };
     expect(args.draft).toBe(false);
@@ -116,8 +146,79 @@ describe("salvarPrograma", () => {
   it("publicar sem visão geral (nem no formulário nem gravada) lista as faltas e não escreve", async () => {
     const p = payloadFalso({ programaGravado: { visaoGeral: null } });
     obterPayloadMock.mockResolvedValue(p);
-    const r = await salvarPrograma("4", { ...programaBase, areaId: "", textos: {} }, true, usuario);
-    expect(r).toEqual({ ok: false, erro: "Para publicar, preencha: Área, Visão geral." });
+    const r = await salvarPrograma(
+      "4",
+      { ...programaBase, areaId: "", textos: {}, pagina: paginaCompleta() },
+      true,
+      usuario,
+    );
+    expect(r).toEqual({ ok: false, erro: "Para publicar, preencha: Área, Visão geral, Ao menos um módulo." });
+    expect(p.update).not.toHaveBeenCalled();
+  });
+
+  it("publicar só com o mínimo antigo pede o mínimo da página (lido do gravado quando não vem no formulário)", async () => {
+    const p = payloadFalso({ contagens: { modulos: 2 }, programaGravado: { pagina: { heroTitulo: "Gravado" } } });
+    obterPayloadMock.mockResolvedValue(p);
+    const r = await salvarPrograma("4", programaBase, true, usuario);
+    expect(r).toEqual({
+      ok: false,
+      erro:
+        "Para publicar, preencha: Subtítulo do topo, Imagem do topo, Cartão: nome, Cartão: chamada, Cartão: descrição no menu, Cartão: descrição no mapa do site.",
+    });
+    expect(p.update).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("publicar pede ao site a página do programa, a lista, a vertente, o menu e o mapa", async () => {
+    const p = payloadFalso({ contagens: { modulos: 1 }, programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, true, usuario);
+    expect(pathsRevalidados()).toEqual([
+      "/programas/edutec",
+      "/programas",
+      "/solucoes-estrategicas/educacao",
+      "/",
+      "/mapa-do-site",
+    ]);
+  });
+
+  it("falha na revalidação vira aviso — a publicação fica", async () => {
+    fetchMock.mockResolvedValue({ ok: false });
+    const p = payloadFalso({ contagens: { modulos: 1 }, programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    const r = await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, true, usuario);
+    expect(r).toEqual({ ok: true, id: "1", aviso: "Salvo, mas a atualização no site pode levar alguns minutos." });
+    expect(p.update).toHaveBeenCalledTimes(1);
+    fetchMock.mockResolvedValue({ ok: true });
+  });
+
+  it("salvar rascunho não revalida o site (ele lê o publicado)", async () => {
+    const p = payloadFalso({ programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, false, usuario);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("página enviada vai inteira no group pagina; ausente não é tocada", async () => {
+    const p = payloadFalso();
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, false, usuario);
+    await salvarPrograma("4", programaBase, false, usuario);
+    const dados = p.update.mock.calls.map((c) => (c[0] as { data: Record<string, unknown> }).data);
+    expect(dados[0]!.pagina).toMatchObject({ heroTitulo: "Programa *X*", heroImagemCaminho: "/img/x.webp", cartao: { nome: "X" } });
+    expect("pagina" in dados[1]!).toBe(false);
+  });
+
+  it("página com link ou caminho inválido recusa antes de escrever", async () => {
+    const p = payloadFalso();
+    obterPayloadMock.mockResolvedValue(p);
+    const pg = paginaCompleta();
+    pg.modalidadesCards = [{ destaque: false, tag: "", titulo: "A", descricao: "", ctaRotulo: "", ctaHref: "javascript:x" }];
+    const r = await salvarPrograma("4", { ...programaBase, pagina: pg }, false, usuario);
+    expect(r).toEqual({
+      ok: false,
+      erro: "Corrija: Modalidade 1: o link do botão deve começar com /, #, http://, https:// ou mailto:.",
+    });
     expect(p.update).not.toHaveBeenCalled();
   });
 
@@ -142,11 +243,13 @@ describe("excluirPrograma", () => {
     expect(await excluirPrograma("4", usuario)).toEqual({ ok: false, erro: "Vinculado a 2 módulos — exclua ou desvincule antes." });
     expect(p.delete).not.toHaveBeenCalled();
   });
-  it("sem dependentes apaga", async () => {
-    const p = payloadFalso();
+  it("sem dependentes apaga e revalida o que mostrava o programa (lido antes de apagar)", async () => {
+    const p = payloadFalso({ programaGravado: GRAVADO_EDUTEC });
     obterPayloadMock.mockResolvedValue(p);
     expect(await excluirPrograma("4", usuario)).toEqual({ ok: true });
     expect(p.delete).toHaveBeenCalledWith(expect.objectContaining({ collection: "programas", id: "4" }));
+    expect(pathsRevalidados()).toContain("/programas/edutec");
+    expect(pathsRevalidados()).toContain("/programas");
   });
 });
 
@@ -206,6 +309,25 @@ describe("salvarModulo", () => {
     expect(recalculados.sort()).toEqual(["4", "8"]);
   });
 
+  it("tópicos: enviados viram a lista (sem os vazios); ausentes não são tocados", async () => {
+    const p = payloadFalso({ numeroEmUso: false });
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarModulo("9", { ...moduloBase, topicos: [" A ", "", "B"] }, usuario);
+    await salvarModulo("9", moduloBase, usuario);
+    const dados = p.update.mock.calls
+      .filter((c) => (c[0] as { collection: string }).collection === "modulos")
+      .map((c) => (c[0] as { data: Record<string, unknown> }).data);
+    expect(dados[0]!.topicos).toEqual([{ texto: "A" }, { texto: "B" }]);
+    expect("topicos" in dados[1]!).toBe(false);
+  });
+
+  it("salvar módulo revalida a página do programa", async () => {
+    const p = payloadFalso({ numeroEmUso: false, programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await salvarModulo("9", moduloBase, usuario)).toEqual({ ok: true, id: "1" });
+    expect(pathsRevalidados()).toContain("/programas/edutec");
+  });
+
   it("atualizar sem ementa não reescreve a ementa", async () => {
     const p = payloadFalso({ numeroEmUso: false });
     obterPayloadMock.mockResolvedValue(p);
@@ -246,5 +368,6 @@ describe("excluirModulo", () => {
     expect(await excluirModulo("9", usuario)).toEqual({ ok: true });
     expect(p.delete).toHaveBeenCalledWith(expect.objectContaining({ collection: "modulos", id: "9" }));
     expect(p.update).toHaveBeenCalledWith(expect.objectContaining({ collection: "programas", id: 4 }));
+    expect(pathsRevalidados()).toContain("/programas");
   });
 });

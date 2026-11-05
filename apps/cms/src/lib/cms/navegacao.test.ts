@@ -53,6 +53,13 @@ describe("telaInicialSite", () => {
     );
   });
 
+  it("só catálogo abre Programas, no Site", () => {
+    expect(telaInicialSite({ administrador: false, telas: ["crm.modulos", "crm.programas"] })).toBe(
+      "programas",
+    );
+    expect(destinoDepoisDoLogin({ administrador: false, telas: ["crm.modulos"] })).toBe("/");
+  });
+
   it("só Contatos do site (sem item de menu próprio) abre Configurações", () => {
     expect(telaInicialSite({ administrador: false, telas: ["site.contatos"] })).toBe("config");
   });
@@ -63,11 +70,6 @@ describe("telaInicialCrm", () => {
     expect(telaInicialCrm(SECRETARIA)).toBe("painel");
   });
 
-  it("só catálogo abre Programas", () => {
-    expect(telaInicialCrm({ administrador: false, telas: ["crm.modulos", "crm.programas"] })).toBe(
-      "programas",
-    );
-  });
 
   it("administrador abre o Dashboard", () => {
     expect(telaInicialCrm(ADMIN)).toBe("painel");
@@ -95,16 +97,19 @@ describe("menus", () => {
       "palestrantes",
       "corpo-docente",
       "eventos",
+      "programas",
+      "modulos",
       "conteudos",
       "home",
     ]);
-    expect(navCrmVisivel(ADMIN)).toHaveLength(8);
+    expect(navCrmVisivel(ADMIN)).toEqual(["painel", "leads", "clientes", "propostas", "envios"]);
   });
 
   it("o CRM só aparece no seletor com alguma tela crm.*", () => {
     expect(mostraModuloCrm(VAZIO)).toBe(false);
     expect(mostraModuloCrm({ administrador: false, telas: ["site.eventos"] })).toBe(false);
-    expect(mostraModuloCrm({ administrador: false, telas: ["crm.produtos"] })).toBe(true);
+    expect(mostraModuloCrm({ administrador: false, telas: ["crm.produtos"] })).toBe(false);
+    expect(mostraModuloCrm({ administrador: false, telas: ["crm.programas"] })).toBe(false);
     expect(mostraModuloCrm(ADMIN)).toBe(true);
   });
 });

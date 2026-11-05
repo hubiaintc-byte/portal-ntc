@@ -7,18 +7,20 @@ import { podeExcluirModulo } from "@ntc/lib";
 import type { ModuloCatalogoDetalhe, ProgramaCrmResumo } from "@/lib/cms/catalogoCrm";
 import type { DadosModulo } from "@/lib/cms/catalogoCrmEscrita";
 
-import { excluirModuloCatalogoCrm, salvarModuloCatalogoCrm } from "../acoesCatalogo";
+import { excluirModuloCatalogoCrm, salvarModuloCatalogoCrm } from "./acoesCatalogo";
 
-import { CampoMarkdown } from "./CampoMarkdown";
-import { AvisoForm, CampoNumero, CampoSelect, CampoTexto } from "./CamposCrm";
+import { CampoMarkdown } from "./crm/CampoMarkdown";
+import { AvisoForm, CampoNumero, CampoSelect, CampoTexto } from "./crm/CamposCrm";
+import { EditorListaCatalogo } from "./EditorListaCatalogo";
 
 interface DetalheModuloCatalogoProps {
   modulo: ModuloCatalogoDetalhe | null;
   programaIdInicial?: string;
   programas: ProgramaCrmResumo[];
   onVoltar: () => void;
-  onSalvo: (id: string) => void;
-  onExcluido: () => void;
+  /** `aviso`: salvo, mas a revalidação do site falhou — quem abre o detalhe de novo mostra. */
+  onSalvo: (id: string, aviso?: string) => void;
+  onExcluido: (aviso?: string) => void;
   /**
    * false ⇒ sem a tela Módulos nem Programas (`capacidades.editarModulos`):
    * somem Salvar e a zona de risco; campos desabilitados.
@@ -47,6 +49,7 @@ export function DetalheModuloCatalogo({
     replay: m?.replay ?? "",
     certificacao: m?.certificacao ?? "",
   });
+  const [topicos, setTopicos] = useState<{ texto: string }[]>((m?.topicos ?? []).map((texto) => ({ texto })));
   const [erro, setErro] = useState<string | null>(null);
   const [excluindo, setExcluindo] = useState(false);
   const [enviando, iniciar] = useTransition();
@@ -59,9 +62,10 @@ export function DetalheModuloCatalogo({
     iniciar(async () => {
       const { ementa, ...resto } = dados;
       const ementaMudou = novo || ementa !== (m?.ementa ?? "");
-      const r = await salvarModuloCatalogoCrm(m?.id ?? null, ementaMudou ? { ...resto, ementa } : resto);
+      const base = { ...resto, topicos: topicos.map((t) => t.texto) };
+      const r = await salvarModuloCatalogoCrm(m?.id ?? null, ementaMudou ? { ...base, ementa } : base);
       if (r.ok) {
-        if (r.id) onSalvo(r.id);
+        if (r.id) onSalvo(r.id, r.aviso);
       } else setErro(r.erro ?? "Erro ao salvar o módulo.");
     });
   }
@@ -71,7 +75,7 @@ export function DetalheModuloCatalogo({
     setErro(null);
     iniciar(async () => {
       const r = await excluirModuloCatalogoCrm(m.id);
-      if (r.ok) onExcluido();
+      if (r.ok) onExcluido(r.aviso);
       else {
         setErro(r.erro ?? "Erro ao excluir o módulo.");
         setExcluindo(false);
@@ -92,7 +96,7 @@ export function DetalheModuloCatalogo({
 
       <div className="pcms-pagehead">
         <div>
-          <p className="pcms-pagehead__eyebrow">Catálogo Institucional · Módulo</p>
+          <p className="pcms-pagehead__eyebrow">Catálogo · Módulo</p>
           <h1>{novo ? "Novo módulo" : m.titulo}</h1>
         </div>
         {podeEditar && (
@@ -105,7 +109,7 @@ export function DetalheModuloCatalogo({
       </div>
 
       <p className="pcms-aviso" role="note">
-        Editar um módulo não altera propostas já criadas.
+        Salvar o módulo atualiza a página do programa no site. Propostas já criadas não mudam.
       </p>
       <AvisoForm erro={erro} />
 
@@ -122,9 +126,25 @@ export function DetalheModuloCatalogo({
         />
         <CampoNumero rotulo="Número" valor={dados.numero} onMudar={mudar("numero")} curto />
         <CampoTexto rotulo="Título" valor={dados.titulo} onMudar={mudar("titulo")} obrigatorio />
-        <CampoMarkdown rotulo="Ementa" valor={dados.ementa ?? ""} onMudar={mudar("ementa")} avisoPerda={!novo && m.ementaComPerda} />
+        <CampoMarkdown
+          rotulo="Ementa (descrição)"
+          valor={dados.ementa ?? ""}
+          onMudar={mudar("ementa")}
+          avisoPerda={!novo && m.ementaComPerda}
+          dica="Os tópicos ficam na lista abaixo; a proposta recebe a descrição e os tópicos juntos."
+        />
         <CampoTexto rotulo="Carga horária (ex.: 8h)" valor={dados.cargaHoraria} onMudar={mudar("cargaHoraria")} curto />
       </section>
+
+      <EditorListaCatalogo
+        rotulo="Tópicos"
+        descricao="Aparecem no detalhamento do módulo, na página do programa."
+        rotuloItem="Tópico"
+        itens={topicos}
+        onMudar={setTopicos}
+        novo={() => ({ texto: "" })}
+        campos={[{ chave: "texto", rotulo: "Texto" }]}
+      />
 
       <section className="pcms-det-bloco">
         <h2>Dados comerciais</h2>

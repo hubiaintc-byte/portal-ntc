@@ -21,14 +21,32 @@ import { numeroOuNulo } from "@/lib/cms/painelCrmEscrita";
 import { contarDependentesModulo, contarDependentesPrograma } from "@/lib/crm/exclusaoCatalogo";
 import { executarEmTransacao } from "@/lib/crm/transacao";
 import { lexicalParaMarkdown, markdownParaLexical } from "@/lib/markdownLexical";
+import {
+  errosDaPagina,
+  paginaDoDocumento,
+  paginaParaGravar,
+  paginaParaPublicar,
+  type PaginaProgramaEdicao,
+} from "@/lib/cms/paginaProgramaCatalogo";
+import {
+  AVISO_REVALIDACAO_SITE,
+  caminhosDoPrograma,
+  lerSlugEArea,
+  pedirRevalidacao,
+  revalidarProgramas,
+} from "@/lib/cms/revalidarSite";
 import { obterPayload } from "@/lib/payloadClient";
 
 import type { ResultadoEscrita } from "./painelCmsEscrita";
 
 /**
- * Escrita do catálogo comercial (spec catálogo §3–§6). Validação sempre
- * ANTES da primeira escrita — um `return { ok: false }` dentro de
+ * Escrita do catálogo (spec catálogo §3–§6; desde 05/11/2026 no módulo
+ * Site, com a página pública do programa). Validação sempre ANTES da
+ * primeira escrita — um `return { ok: false }` dentro de
  * `executarEmTransacao` comita (ver o helper).
+ *
+ * O que muda o site (publicar/excluir programa, salvar/excluir módulo) pede
+ * a revalidação DEPOIS do commit; falha vira `aviso`, nunca erro.
  */
 
 const ERRO_GENERICO = "Não foi possível salvar. Tente novamente.";
@@ -45,6 +63,8 @@ export interface DadosPrograma {
   eixos: ItemTituloDescricao[];
   diferenciais: ItemTituloDescricao[];
   resultados: string[];
+  /** Group "Página do site" inteiro. Ausente = não tocar. */
+  pagina?: PaginaProgramaEdicao;
 }
 
 export interface DadosModulo {
@@ -53,6 +73,8 @@ export interface DadosModulo {
   titulo: string;
   /** Ausente = não tocar (obrigatória só na criação) — preserva formatação que o editor não representa. */
   ementa?: string;
+  /** Tópicos da página do programa. Ausente = não tocar. */
+  topicos?: string[];
   cargaHoraria: string;
   tituloComercial: string;
   valor: string;
@@ -73,6 +95,11 @@ const textoOuNulo = (v: string) => (v.trim() === "" ? null : v.trim());
 const richOuNulo = (md: string) => (md.trim() === "" ? null : markdownParaLexical(md));
 const aparar = (itens: ItemTituloDescricao[]): ItemTituloDescricao[] =>
   itens.map((i) => ({ titulo: i.titulo.trim(), descricao: i.descricao.trim() }));
+
+/** Escrita OK; a revalidação do site só pode acrescentar um aviso. */
+function comAviso<R extends ResultadoEscrita>(r: R, revalidou: boolean): R {
+  return revalidou ? r : { ...r, aviso: r.aviso ?? AVISO_REVALIDACAO_SITE };
+}
 
 async function recalcularQuantidade(payload: Payload, programaId: string | number, req: PayloadRequest): Promise<void> {
   const { totalDocs } = await payload.count({ collection: "modulos", where: { programa: { equals: programaId } }, req });
@@ -98,7 +125,7 @@ export async function salvarPrograma(
 ): Promise<ResultadoComId> {
   try {
     const payload = await obterPayload();
-    return await executarEmTransacao(payload, usuario, async (req): Promise<ResultadoComId> => {
+    const r = await executarEmTransacao(payload, usuario, async (req): Promise<ResultadoComId> => {
       const sigla = dados.sigla.trim().toUpperCase();
       const eixos = semItensVazios(dados.eixos);
       const diferenciais = semItensVazios(dados.diferenciais);
@@ -106,13 +133,30 @@ export async function salvarPrograma(
 
       const faltasRascunho = faltasParaRascunho({ sigla, nomeCompleto: dados.nomeCompleto });
       if (!publicar && faltasRascunho.length > 0) return { ok: false, erro: `Para salvar, preencha: ${faltasRascunho.join(", ")}.` };
+      const errosPagina = dados.pagina ? errosDaPagina(dados.pagina) : [];
+      if (errosPagina.length > 0) return { ok: false, erro: `Corrija: ${errosPagina.join("; ")}.` };
 
       if (publicar) {
-        let visaoGeral = dados.textos.visaoGeral;
-        if (visaoGeral === undefined) {
-          visaoGeral = id === null ? "" : lexicalParaMarkdown((await payload.findByID({ collection: "programas", id, depth: 0, draft: true, req })).visaoGeral);
-        }
-        const faltas = faltasParaPublicar({ sigla, nomeCompleto: dados.nomeCompleto, areaId: dados.areaId, cargaHorariaTotal: dados.cargaHorariaTotal, visaoGeral, eixos, diferenciais, resultados });
+        const gravado =
+          id !== null && (dados.textos.visaoGeral === undefined || dados.pagina === undefined)
+            ? await payload.findByID({ collection: "programas", id, depth: 0, draft: true, req })
+            : null;
+        const visaoGeral = dados.textos.visaoGeral ?? lexicalParaMarkdown(gravado?.visaoGeral);
+        const pagina = dados.pagina ?? paginaDoDocumento(gravado?.pagina);
+        const numModulos =
+          id === null ? 0 : (await payload.count({ collection: "modulos", where: { programa: { equals: id } }, req })).totalDocs;
+        const faltas = faltasParaPublicar({
+          sigla,
+          nomeCompleto: dados.nomeCompleto,
+          areaId: dados.areaId,
+          cargaHorariaTotal: dados.cargaHorariaTotal,
+          visaoGeral,
+          eixos,
+          diferenciais,
+          resultados,
+          numModulos,
+          pagina: paginaParaPublicar(pagina),
+        });
         if (faltas.length > 0) return { ok: false, erro: `Para publicar, preencha: ${faltas.join(", ")}.` };
       }
 
@@ -141,6 +185,7 @@ export async function salvarPrograma(
         eixosTematicos: aparar(eixos),
         diferenciais: aparar(diferenciais),
         resultadosEsperados: resultados.map((resultado) => ({ resultado: resultado.trim() })),
+        ...(dados.pagina === undefined ? {} : { pagina: paginaParaGravar(dados.pagina) }),
         _status: publicar ? "published" : "draft",
       };
       const data = bruto as unknown as ProgramaData;
@@ -151,6 +196,9 @@ export async function salvarPrograma(
           : await payload.update({ collection: "programas", id, data, draft: !publicar, req });
       return { ok: true, id: String(doc.id) };
     });
+    // Rascunho não muda o site (ele lê o publicado).
+    if (!r.ok || !publicar || !r.id) return r;
+    return comAviso(r, await revalidarProgramas(payload, [r.id]));
   } catch (e) {
     console.error("[salvarPrograma]", e);
     return { ok: false, erro: ERRO_GENERICO };
@@ -160,12 +208,17 @@ export async function salvarPrograma(
 export async function excluirPrograma(id: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
   try {
     const payload = await obterPayload();
-    return await executarEmTransacao(payload, usuario, async (req): Promise<ResultadoEscrita> => {
-      const r = podeExcluirPrograma(await contarDependentesPrograma(payload, id, req));
-      if (!r.ok) return { ok: false, erro: r.motivo };
+    let caminhos: ReturnType<typeof caminhosDoPrograma> | null = null;
+    const r = await executarEmTransacao(payload, usuario, async (req): Promise<ResultadoEscrita> => {
+      const ok = podeExcluirPrograma(await contarDependentesPrograma(payload, id, req));
+      if (!ok.ok) return { ok: false, erro: ok.motivo };
+      // Depois de apagar não há mais slug para revalidar: lido antes.
+      caminhos = caminhosDoPrograma(await lerSlugEArea(payload, id).catch(() => ({ slug: null, areaSigla: null })));
       await payload.delete({ collection: "programas", id, req });
       return { ok: true };
     });
+    if (!r.ok || caminhos === null) return r;
+    return comAviso(r, await pedirRevalidacao(caminhos));
   } catch (e) {
     console.error("[excluirPrograma]", e);
     return { ok: false, erro: ERRO_GENERICO };
@@ -181,7 +234,8 @@ function idDe(v: unknown): string | null {
 export async function salvarModulo(id: string | null, dados: DadosModulo, usuario: UsuarioAutenticado): Promise<ResultadoComId> {
   try {
     const payload = await obterPayload();
-    return await executarEmTransacao(payload, usuario, async (req): Promise<ResultadoComId> => {
+    const afetados: string[] = [];
+    const r = await executarEmTransacao(payload, usuario, async (req): Promise<ResultadoComId> => {
       const numero = lerNumeroModulo(dados.numero);
       if (numero === null) return { ok: false, erro: "Número do módulo deve ser um inteiro a partir de 1." };
       const faltas = [
@@ -218,6 +272,9 @@ export async function salvarModulo(id: string | null, dados: DadosModulo, usuari
         numero,
         titulo: dados.titulo.trim(),
         ...(dados.ementa !== undefined ? { ementa: markdownParaLexical(dados.ementa) } : {}),
+        ...(dados.topicos !== undefined
+          ? { topicos: dados.topicos.map((t) => t.trim()).filter((t) => t !== "").map((texto) => ({ texto })) }
+          : {}),
         cargaHoraria: textoOuNulo(dados.cargaHoraria),
         comercial: {
           tituloComercial: textoOuNulo(dados.tituloComercial),
@@ -234,8 +291,11 @@ export async function salvarModulo(id: string | null, dados: DadosModulo, usuari
 
       if (id === null || programaAnterior !== dados.programaId) await recalcularQuantidade(payload, dados.programaId, req);
       if (programaAnterior !== null && programaAnterior !== dados.programaId) await recalcularQuantidade(payload, programaAnterior, req);
+      afetados.push(dados.programaId, ...(programaAnterior !== null && programaAnterior !== dados.programaId ? [programaAnterior] : []));
       return { ok: true, id: String(doc.id) };
     });
+    if (!r.ok || afetados.length === 0) return r;
+    return comAviso(r, await revalidarProgramas(payload, afetados));
   } catch (e) {
     console.error("[salvarModulo]", e);
     return { ok: false, erro: ERRO_GENERICO };
@@ -245,15 +305,18 @@ export async function salvarModulo(id: string | null, dados: DadosModulo, usuari
 export async function excluirModulo(id: string, usuario: UsuarioAutenticado): Promise<ResultadoEscrita> {
   try {
     const payload = await obterPayload();
-    return await executarEmTransacao(payload, usuario, async (req): Promise<ResultadoEscrita> => {
-      const r = podeExcluirModulo(await contarDependentesModulo(payload, id, req));
-      if (!r.ok) return { ok: false, erro: r.motivo };
+    let programaId: string | null = null;
+    const r = await executarEmTransacao(payload, usuario, async (req): Promise<ResultadoEscrita> => {
+      const ok = podeExcluirModulo(await contarDependentesModulo(payload, id, req));
+      if (!ok.ok) return { ok: false, erro: ok.motivo };
       const modulo = await payload.findByID({ collection: "modulos", id, depth: 0, req });
       await payload.delete({ collection: "modulos", id, req });
-      const programaId = idDe(modulo.programa);
+      programaId = idDe(modulo.programa);
       if (programaId !== null) await recalcularQuantidade(payload, Number(programaId), req);
       return { ok: true };
     });
+    if (!r.ok || programaId === null) return r;
+    return comAviso(r, await revalidarProgramas(payload, [programaId]));
   } catch (e) {
     console.error("[excluirModulo]", e);
     return { ok: false, erro: ERRO_GENERICO };
