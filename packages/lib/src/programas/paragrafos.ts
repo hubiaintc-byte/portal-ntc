@@ -35,14 +35,17 @@ function paragrafos(doc: unknown): NoGenerico[] {
   return filhosDaRaiz(doc).filter((n) => n.type === "paragraph");
 }
 
-export function paragrafosParaHtml(doc: unknown, opcoes?: { classePrimeiro?: string }): string {
+export function paragrafosParaHtml(
+  doc: unknown,
+  opcoes?: { classePrimeiro?: string; separador?: string },
+): string {
   return paragrafos(doc)
     .map((p, i) => {
       const interno = ((p.children ?? []) as NoGenerico[]).map((n) => textoDoNo(n, true)).join("");
       const classe = i === 0 && opcoes?.classePrimeiro ? ` class="${opcoes.classePrimeiro}"` : "";
       return `<p${classe}>${interno}</p>`;
     })
-    .join("");
+    .join(opcoes?.separador ?? "");
 }
 
 export function textoDoLexical(doc: unknown): string {

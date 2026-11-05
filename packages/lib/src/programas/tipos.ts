@@ -204,3 +204,99 @@ export interface ConteudoPrograma {
     entregas: string[];
   };
 }
+
+/* ------------------------------------------------------------------------ *
+ * Campos do CMS que alimentam a página (Task 4 do plano de 05/11/2026).
+ * `PaginaPrograma` espelha o group `pagina` de `programas` (aba "Página do
+ * site"), com as imagens já resolvidas para URL e as listas de um texto só
+ * achatadas para `string[]`.
+ * ------------------------------------------------------------------------ */
+
+export interface DocentePagina {
+  imgSrc: string;
+  imgAlt: string;
+  eixoBadge: string;
+  nome: string;
+  credencial: string;
+  modulos: string;
+}
+
+export interface CoordenacaoPagina extends DocentePagina {
+  tag: string;
+  eixo: string;
+}
+
+export interface CartaoModalidadePagina {
+  destaque: boolean;
+  tag: string;
+  titulo: string;
+  descricao: string;
+  ctaRotulo: string;
+  ctaHref: string;
+}
+
+export interface PaginaPrograma {
+  /** "vertente" ou a sigla CSS de um dos 15 estilos (`data-programa`). */
+  identidadeVisual: string;
+  heroTitulo: string;
+  heroSubtitulo: string;
+  heroImagem: string;
+  barraDados: { rotulo: string; valor: string; valorSub: string }[];
+  visaoGeralTitulo: string;
+  problemaTitulo: string;
+  problemaDestaque: string;
+  publicoChips: string[];
+  docentes: {
+    titulo: string;
+    intro: string;
+    coordenacaoMarcador: string;
+    especialistasMarcador: string;
+    contadores: { num: string; lbl: string }[];
+    nota: string;
+    coordenacao: CoordenacaoPagina[];
+    especialistas: DocentePagina[];
+  };
+  modalidadesIntro: string;
+  modalidadesCards: CartaoModalidadePagina[];
+  modulosAbertosMicrocopy: string;
+  chamadaFinalTitulo: string;
+  chamadaFinalTexto: string;
+  resumoLateral: { rotulo: string; valor: string }[];
+  entregas: string[];
+  cartao: { nome: string; tagline: string; meta: string; imagem: string; ordem: number | null };
+}
+
+export interface ModuloPrograma {
+  numero: number;
+  titulo: string;
+  /** Lexical (só a descrição da página; os tópicos ficam em `topicos`). */
+  descricao: unknown;
+  topicos: string[];
+  cargaHoraria: string;
+}
+
+export interface CamposPaginaPrograma {
+  sigla: string;
+  slug: string;
+  nomeCompleto: string;
+  vertical: Vertical;
+  /** Ex.: "64 horas". */
+  cargaHorariaTotal: string;
+  /** Lexical, só a parte da página. */
+  visaoGeral: unknown;
+  problema: unknown;
+  objetivo: unknown | null;
+  publicoAlvo: unknown;
+  eixos: { titulo: string; descricao: string }[];
+  resultados: string[];
+  diferenciais: { titulo: string; descricao: string }[];
+  faq: { pergunta: string; resposta: unknown }[];
+  /** Ordenados por `numero`. */
+  modulos: ModuloPrograma[];
+  pagina: PaginaPrograma;
+}
+
+export interface ExtrasEventos {
+  modulosAbertos: Pick<ModulosAbertosRich, "feature" | "miniStack">;
+  status: Map<number, { rotulo: string; tipo: "aberto" | "breve" }>;
+}

@@ -19,6 +19,9 @@ describe("paragrafos", () => {
       '<p class="lede-block">A</p><p>B <strong>C</strong></p>',
     );
   });
+  it("separador entre parágrafos", () => {
+    expect(paragrafosParaHtml(doc, { separador: "\n" })).toBe("<p>A</p>\n<p>B <strong>C</strong></p>");
+  });
   it("itálico e escape", () => {
     expect(paragrafosParaHtml({ root: { children: [{ type: "paragraph", children: [t("a<b", 2)] }] } })).toBe(
       "<p><em>a&lt;b</em></p>",

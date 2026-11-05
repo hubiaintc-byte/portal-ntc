@@ -214,6 +214,8 @@ export {
 
 // Programas — tipos do conteúdo das páginas de programa.
 export type * from "./programas/tipos";
-export { marcacaoParaHtml, htmlInlineParaMarcacao } from "./programas/marcacaoLeve";
+export { escaparTexto, marcacaoParaHtml, htmlInlineParaMarcacao } from "./programas/marcacaoLeve";
 export { paragrafosParaHtml, textoDoLexical } from "./programas/paragrafos";
 export { inteiroParaRomano } from "./programas/romanos";
+export { MOLDE, ROTULO_VERTICAL, SIGLA_CSS_DA_VERTENTE, interpolarMolde } from "./programas/molde";
+export { camposParaPagina, paginaVazia } from "./programas/paginaPrograma";
