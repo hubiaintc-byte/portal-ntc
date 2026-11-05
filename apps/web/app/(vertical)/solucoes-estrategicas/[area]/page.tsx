@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { obterListasProgramas, vertenteComProgramas } from "@/lib/cms/listasProgramas";
 import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
 
 import { FALLBACK_VERTICAIS, type VerticalSlug } from "./conteudoFallback";
@@ -62,7 +63,12 @@ export default async function VerticalPage({ params }: Props) {
   if (!VERTICAIS_VALIDAS.includes(area as VerticalSlug)) {
     notFound();
   }
-  const v = FALLBACK_VERTICAIS[area as VerticalSlug];
+  const listas = await obterListasProgramas();
+  const v = vertenteComProgramas(
+    FALLBACK_VERTICAIS[area as VerticalSlug],
+    listas.porVertical[area as VerticalSlug],
+    listas.total,
+  );
 
   return (
     <div className="vertical-page" data-vertical={area}>
@@ -168,7 +174,7 @@ export default async function VerticalPage({ params }: Props) {
                 <Link
                   key={p.sigla}
                   className="program-card-vert"
-                  href={`/programas/${p.sigla.toLowerCase().replace(/\+$/, "")}`}
+                  href={`/programas/${p.slug}`}
                 >
                   <div className="pc-cover">
                     <div

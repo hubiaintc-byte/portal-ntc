@@ -40,6 +40,17 @@ describe("campos da página do programa", () => {
     expect(iv?.defaultValue).toBe("vertente");
   });
 
+  it("cartao tem descricaoMenu e descricaoMapa, de texto e opcionais", () => {
+    const cartao = achar(pagina?.fields ?? [], "cartao");
+    for (const nome of ["descricaoMenu", "descricaoMapa"]) {
+      const c = achar(cartao?.fields ?? [], nome) as
+        | { type?: string; required?: boolean }
+        | undefined;
+      expect(c?.type).toBe("text");
+      expect(c?.required).not.toBe(true);
+    }
+  });
+
   it("modulos.topicos é opcional", () => {
     const t = achar(Modulos.fields, "topicos");
     expect(t?.type).toBe("array");

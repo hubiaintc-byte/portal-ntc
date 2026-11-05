@@ -3,7 +3,8 @@
  * (Task 6 do plano `docs/superpowers/plans/2026-11-05-programas-lidos-do-cms.md`).
  *
  * Lê `assets/paginas-programas.json` (instantâneo das páginas estáticas) e
- * grava em `programas`/`modulos` os campos da aba "Página do site", dividindo
+ * grava em `programas`/`modulos` os campos da aba "Página do site" (cartão das
+ * listas e menus incluído), dividindo
  * `problema`/`publicoAlvo`/`ementa` nas partes que a página mostra. A regra
  * campo a campo mora em `planejarCargaPaginas` (puro, testado):
  * campo preenchido no CMS e diferente da página **não é sobrescrito** — vai
@@ -24,7 +25,7 @@
 
 import type { Payload } from "payload";
 
-import type { ConteudoPrograma } from "@ntc/lib";
+import type { ConteudoPrograma, PaginaPrograma } from "@ntc/lib";
 
 import {
   planejarCargaPaginas,
@@ -37,7 +38,16 @@ import type {
 
 import paginasJson from "./assets/paginas-programas.json";
 
-const estaticos = (paginasJson as { programas: ConteudoPrograma[] }).programas;
+type CartaoInstantaneo = PaginaPrograma["cartao"] & { sigla: string };
+const instantaneo = paginasJson as unknown as {
+  programas: ConteudoPrograma[];
+  cartoes: CartaoInstantaneo[];
+};
+const estaticos = instantaneo.programas;
+// Cartão das listas e menus do site (copiado dos fallbacks pelo gerador).
+const cartaoPorSigla = new Map(
+  instantaneo.cartoes.map(({ sigla, ...cartao }) => [sigla.toUpperCase(), cartao]),
+);
 
 const APLICAR = process.env.PROGRAMAS_CARREGAR_APLICAR === "1";
 const PREFIXO = "[programas:carregar-paginas]";
@@ -143,7 +153,9 @@ async function main(): Promise<void> {
   for (const estatico of estaticos) {
     const atual = porSigla.get(estatico.sigla.toUpperCase()) ?? null;
     try {
-      const plano = planejarCargaPaginas(atual, estatico);
+      const cartao = cartaoPorSigla.get(estatico.sigla.toUpperCase());
+      if (!cartao) throw new Error("sem cartão no instantâneo");
+      const plano = planejarCargaPaginas(atual, estatico, cartao);
       if (plano.acao === "sem-programa") semPrograma += 1;
       if (plano.acao === "divergente") divergentes += 1;
       if (plano.acao !== "sem-programa" && plano.semMudancas) semMudancas += 1;

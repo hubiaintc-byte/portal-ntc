@@ -1,5 +1,5 @@
 {
-  "geradoEm": "2026-11-05T12:44:34.529Z",
+  "geradoEm": "2026-11-05T13:38:28.665Z",
   "programas": [
     {
       "sigla": "AGIP",
@@ -9607,6 +9607,158 @@
           "Certificação institucional NTC"
         ]
       }
+    }
+  ],
+  "cartoes": [
+    {
+      "sigla": "EDUTEC",
+      "nome": "Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino",
+      "tagline": "Cultura digital, educação midiática e transformação institucional para o século 21.",
+      "meta": "10 módulos · 80h",
+      "imagem": "/img/fotos/_optimized/area-educacao.1920.webp",
+      "ordem": 1,
+      "descricaoMenu": "Educação Digital, Inovação e Tecnologias para Redes Públicas",
+      "descricaoMapa": "Educação Digital · Inovação · Tecnologias"
+    },
+    {
+      "sigla": "PEAR",
+      "nome": "Programa Estratégico de Alfabetização de Alta Performance e Recomposição da Aprendizagem",
+      "tagline": "Recompor a aprendizagem com método e velocidade nas redes públicas de ensino.",
+      "meta": "8 módulos · 64h",
+      "imagem": "/img/fotos/_optimized/area-educacao.1920.webp",
+      "ordem": 2,
+      "descricaoMenu": "Alfabetização de Alta Performance e Recomposição da Aprendizagem",
+      "descricaoMapa": "Alfabetização e recomposição da aprendizagem"
+    },
+    {
+      "sigla": "PEI",
+      "nome": "Programa Estratégico de Educação Integral — Gestão, Currículo e Resultados",
+      "tagline": "Educação integral aplicada — gestão, currículo e resultados em jornada ampliada.",
+      "meta": "9 módulos · 72h",
+      "imagem": "/img/fotos/_optimized/educacao-inclusiva.1920.webp",
+      "ordem": 3,
+      "descricaoMenu": "Educação Integral — Gestão, Currículo e Resultados",
+      "descricaoMapa": "Educação Integral · gestão e currículo"
+    },
+    {
+      "sigla": "PROGIR",
+      "nome": "Programa de Gestão da Inclusão com Resultado na Educação",
+      "tagline": "Gestão da inclusão com resultado — atendimento especializado e redes inclusivas.",
+      "meta": "8 módulos · 64h",
+      "imagem": "/img/fotos/_optimized/educacao-inclusiva.1920.webp",
+      "ordem": 4,
+      "descricaoMenu": "Gestão da Inclusão com Resultado",
+      "descricaoMapa": "Gestão da Inclusão com resultado"
+    },
+    {
+      "sigla": "PROGE",
+      "nome": "Programa Estratégico de Gestão Escolar, Coordenação Pedagógica e Resultados",
+      "tagline": "Gestão escolar e coordenação pedagógica orientadas a resultados mensuráveis.",
+      "meta": "10 módulos · 80h",
+      "imagem": "/img/fotos/_optimized/area-educacao.1920.webp",
+      "ordem": 5,
+      "descricaoMenu": "Gestão Escolar, Coordenação Pedagógica e Resultados",
+      "descricaoMapa": "Gestão Escolar e coordenação pedagógica"
+    },
+    {
+      "sigla": "EGIDE",
+      "nome": "Programa Executivo de IA, Dados e Governança da Transformação Digital na Educação",
+      "tagline": "Inteligência artificial e governança digital aplicadas à gestão das redes públicas.",
+      "meta": "8 módulos · 64h",
+      "imagem": "/img/fotos/_optimized/area-educacao.1920.webp",
+      "ordem": 6,
+      "descricaoMenu": "IA, Dados e Governança da Transformação Digital",
+      "descricaoMapa": "IA, dados e governança digital"
+    },
+    {
+      "sigla": "VIVAESCOLA",
+      "nome": "Programa Estratégico de Convivência, Permanência, Bem-Estar e Proteção Integral na Educação",
+      "tagline": "Cultura escolar contemporânea — convivência, permanência e proteção integral.",
+      "meta": "6 módulos · 48h",
+      "imagem": "/img/fotos/_optimized/educacao-inclusiva.1920.webp",
+      "ordem": 7,
+      "descricaoMenu": "Convivência, Permanência, Bem-Estar e Proteção Integral",
+      "descricaoMapa": "Convivência, bem-estar e proteção integral"
+    },
+    {
+      "sigla": "PINEI",
+      "nome": "Programa Integrado de Primeira Infância e Educação Infantil",
+      "tagline": "Primeira infância e educação infantil articuladas em rede pública.",
+      "meta": "6 módulos · 48h",
+      "imagem": "/img/fotos/_optimized/educacao-inclusiva.1920.webp",
+      "ordem": 8,
+      "descricaoMenu": "Primeira Infância e Educação Infantil",
+      "descricaoMapa": "Primeira Infância e Educação Infantil"
+    },
+    {
+      "sigla": "FUTURA",
+      "nome": "Programa Estratégico de Ensino Médio, Itinerários de Futuro, Empregabilidade e Educação para o Desenvolvimento",
+      "tagline": "Ensino médio com itinerários, empregabilidade e protagonismo juvenil.",
+      "meta": "4 módulos · 32h",
+      "imagem": "/img/fotos/_optimized/area-educacao.1920.webp",
+      "ordem": 9,
+      "descricaoMenu": "Ensino Médio, Itinerários de Futuro, Empregabilidade",
+      "descricaoMapa": "Ensino Médio e empregabilidade"
+    },
+    {
+      "sigla": "AGIP",
+      "nome": "Programa de Aprimoramento da Gestão Integral em Procedimentos Públicos · Lei 14.133/2021",
+      "tagline": "Profissionalização técnica e jurídica das contratações públicas — do planejamento à fiscalização contratual.",
+      "meta": "10 módulos · 80h",
+      "imagem": "/img/fotos/_optimized/area-gestao-publica-premium.1920.webp",
+      "ordem": 10,
+      "descricaoMenu": "Governança, Integridade e Performance nas Contratações Públicas",
+      "descricaoMapa": "Governança e performance em contratações"
+    },
+    {
+      "sigla": "LIDERA",
+      "nome": "Programa Executivo de Liderança, Alta Gestão e Desenvolvimento Estratégico no Setor Público",
+      "tagline": "Formação executiva da alta liderança pública — visão de Estado, capacidade decisória e desempenho institucional.",
+      "meta": "8 módulos · 64h",
+      "imagem": "/img/fotos/_optimized/autoridade-gestao-publica.1920.webp",
+      "ordem": 11,
+      "descricaoMenu": "Liderança, Direção Estratégica e Resultados na Administração",
+      "descricaoMapa": "Liderança e direção estratégica"
+    },
+    {
+      "sigla": "SIGA",
+      "nome": "Sistema Integrado de Gestão da Administração Pública · Planejamento, Governança e Desempenho Institucional",
+      "tagline": "Modernização institucional aplicada — gestão integrada, processos, indicadores e cultura organizacional do setor público.",
+      "meta": "8 módulos · 64h",
+      "imagem": "/img/fotos/_optimized/plenario-publico.1920.webp",
+      "ordem": 12,
+      "descricaoMenu": "Soluções Inteligentes de Governança e Administração",
+      "descricaoMapa": "Soluções inteligentes de governança"
+    },
+    {
+      "sigla": "SIGS",
+      "nome": "Sistema Integrado de Gestão da Saúde Pública · Planejamento, Regulação e Governança do SUS",
+      "tagline": "Gestão integrada do SUS — planejamento, regulação, financiamento e governança das redes assistenciais.",
+      "meta": "10 módulos · 80h",
+      "imagem": "/img/fotos/_optimized/area-saude-premium2.1920.webp",
+      "ordem": 13,
+      "descricaoMenu": "Saúde Inteligente, Governança Digital, IA e Transformação do SUS",
+      "descricaoMapa": "Sistema integrado de gestão em saúde"
+    },
+    {
+      "sigla": "PROAPS+",
+      "nome": "Programa Avançado de Fortalecimento da Atenção Primária à Saúde e Redes Assistenciais",
+      "tagline": "Atenção primária como ordenadora do cuidado e integração das redes de atenção à saúde.",
+      "meta": "9 módulos · 72h",
+      "imagem": "/img/fotos/_optimized/autoridade-saude.1920.webp",
+      "ordem": 14,
+      "descricaoMenu": "Alta Performance na Atenção Primária e Redes de Cuidado",
+      "descricaoMapa": "Atenção Primária e redes de cuidado"
+    },
+    {
+      "sigla": "PROSUS+",
+      "nome": "Programa Executivo de Liderança, Alta Gestão e Desenvolvimento Estratégico em Saúde Pública",
+      "tagline": "Formação executiva da alta liderança do SUS — visão sistêmica, capacidade decisória e desempenho institucional.",
+      "meta": "8 módulos · 64h",
+      "imagem": "/img/fotos/_optimized/area-saude-premium2.1920.webp",
+      "ordem": 15,
+      "descricaoMenu": "Governança, Financiamento e Performance no SUS",
+      "descricaoMapa": "Direção institucional em saúde pública"
     }
   ]
 }

@@ -268,7 +268,17 @@ export interface PaginaPrograma {
   chamadaFinalTexto: string;
   resumoLateral: { rotulo: string; valor: string }[];
   entregas: string[];
-  cartao: { nome: string; tagline: string; meta: string; imagem: string; ordem: number | null };
+  cartao: {
+    nome: string;
+    tagline: string;
+    meta: string;
+    imagem: string;
+    ordem: number | null;
+    /** Texto ao lado da sigla no menu "Programas" do cabeçalho. */
+    descricaoMenu: string;
+    /** Texto ao lado da sigla no mapa do site. */
+    descricaoMapa: string;
+  };
 }
 
 export interface ModuloPrograma {

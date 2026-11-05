@@ -656,6 +656,8 @@ export interface Programa {
       imagem?: (number | null) | Media;
       imagemCaminho?: string | null;
       ordem?: number | null;
+      descricaoMenu?: string | null;
+      descricaoMapa?: string | null;
     };
   };
   faq?:
@@ -2318,6 +2320,8 @@ export interface ProgramasSelect<T extends boolean = true> {
               imagem?: T;
               imagemCaminho?: T;
               ordem?: T;
+              descricaoMenu?: T;
+              descricaoMapa?: T;
             };
       };
   faq?:

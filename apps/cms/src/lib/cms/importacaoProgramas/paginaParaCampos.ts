@@ -8,10 +8,20 @@
  * `avisos` relata o que a conversão não conseguiu levar fielmente (tag
  * fora do subconjunto, numeral romano inválido, HTML fora do formato
  * esperado); para os 15 é vazio.
+ *
+ * O cartão (listas e menus do site) não mora na página: vem à parte, do
+ * instantâneo (`cartoes`), copiado dos fallbacks das listas. Sem ele, o
+ * cartão sai vazio.
  */
 
 import { escaparTexto, htmlInlineParaMarcacao } from "@ntc/lib";
-import type { CamposPaginaPrograma, CartaoModalidadePagina, ConteudoPrograma, ModuloPrograma } from "@ntc/lib";
+import type {
+  CamposPaginaPrograma,
+  CartaoModalidadePagina,
+  ConteudoPrograma,
+  ModuloPrograma,
+  PaginaPrograma,
+} from "@ntc/lib";
 
 import { extrairCartoesDeResultado, htmlParaLexical } from "../htmlParaLexical";
 import { romanoParaInteiro } from "./mapear";
@@ -33,7 +43,20 @@ function cargaLonga(curta: string): string | null {
   return m ? `${m[1]} horas` : null;
 }
 
-export function paginaParaCampos(p: ConteudoPrograma): { campos: CamposPaginaPrograma; avisos: string[] } {
+const CARTAO_VAZIO: PaginaPrograma["cartao"] = {
+  nome: "",
+  tagline: "",
+  meta: "",
+  imagem: "",
+  ordem: null,
+  descricaoMenu: "",
+  descricaoMapa: "",
+};
+
+export function paginaParaCampos(
+  p: ConteudoPrograma,
+  cartao: PaginaPrograma["cartao"] = CARTAO_VAZIO,
+): { campos: CamposPaginaPrograma; avisos: string[] } {
   const avisos: string[] = [];
 
   const inline = (campo: string, html: string | undefined): string => {
@@ -155,8 +178,7 @@ export function paginaParaCampos(p: ConteudoPrograma): { campos: CamposPaginaPro
       chamadaFinalTexto: p.ctaFinal?.corpo ?? "",
       resumoLateral: (p.sidebar?.rows ?? []).map((r) => ({ rotulo: r.rotulo, valor: r.valor })),
       entregas: [...(p.sidebar?.entregas ?? [])],
-      // Preenchido por outra tarefa, a partir das listas e menus do site.
-      cartao: { nome: "", tagline: "", meta: "", imagem: "", ordem: null },
+      cartao: { ...cartao },
     },
   };
 

@@ -153,6 +153,8 @@ const abaPaginaDoSite = {
             { name: "imagem", type: "upload", relationTo: "media", label: "Imagem" },
             { name: "imagemCaminho", type: "text", label: "Caminho da imagem (/img/…)" },
             { name: "ordem", type: "number", label: "Ordem" },
+            { name: "descricaoMenu", type: "text", label: "Descrição no menu" },
+            { name: "descricaoMapa", type: "text", label: "Descrição no mapa do site" },
           ],
         },
       ],

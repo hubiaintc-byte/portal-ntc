@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { ConteudoPrograma } from "@ntc/lib";
+import type { ConteudoPrograma, PaginaPrograma } from "@ntc/lib";
 
 import paginas from "@/seed/assets/paginas-programas.json";
 import instantaneo from "@/seed/assets/programas.json";
@@ -10,7 +10,25 @@ import { planejarCargaPaginas, temRascunhoPendente } from "./planejarCargaPagina
 import type { PlanoCargaPagina, ProgramaAtual } from "./planejarCargaPaginas";
 import type { ProgramaInstantaneo } from "./tipos";
 
-const estaticos = (paginas as { programas: ConteudoPrograma[] }).programas;
+type CartaoInstantaneo = PaginaPrograma["cartao"] & { sigla: string };
+const snapshot = paginas as unknown as {
+  programas: ConteudoPrograma[];
+  cartoes: CartaoInstantaneo[];
+};
+const estaticos = snapshot.programas;
+const cartaoDe = (sigla: string): PaginaPrograma["cartao"] => {
+  const c = snapshot.cartoes.find((k) => k.sigla === sigla);
+  if (!c) throw new Error(`sem cartão para ${sigla}`);
+  return {
+    nome: c.nome,
+    tagline: c.tagline,
+    meta: c.meta,
+    imagem: c.imagem,
+    ordem: c.ordem,
+    descricaoMenu: c.descricaoMenu,
+    descricaoMapa: c.descricaoMapa,
+  };
+};
 const antigosPorSigla = new Map(
   (instantaneo as { programas: ProgramaInstantaneo[] }).programas.map((p) => [p.sigla, p]),
 );
@@ -126,8 +144,9 @@ describe("planejarCargaPaginas — regras", () => {
   it("aplicar o plano e planejar de novo → sem mudanças (idempotente)", () => {
     for (const estatico of estaticos) {
       const atual = atualDe30Set(estatico);
-      const depois = aplicar(atual, planejarCargaPaginas(atual, estatico));
-      const segundo = planejarCargaPaginas(depois, estatico);
+      const cartao = cartaoDe(estatico.sigla);
+      const depois = aplicar(atual, planejarCargaPaginas(atual, estatico, cartao));
+      const segundo = planejarCargaPaginas(depois, estatico, cartao);
       expect(segundo.divergencias, estatico.sigla).toEqual([]);
       expect(segundo.dados.programa, estatico.sigla).toBeNull();
       expect(segundo.dados.modulos, estatico.sigla).toEqual([]);
@@ -241,6 +260,51 @@ describe("planejarCargaPaginas — regras", () => {
       expect(coord).not.toHaveProperty("imagem");
     }
     expect(pagina).not.toHaveProperty("cartao");
+  });
+
+  it("instantâneo traz um cartão completo para cada um dos 15", () => {
+    expect(snapshot.cartoes.map((c) => c.sigla).sort()).toEqual(
+      estaticos.map((p) => p.sigla).sort(),
+    );
+    for (const c of snapshot.cartoes) {
+      for (const campo of [
+        "nome",
+        "tagline",
+        "meta",
+        "imagem",
+        "descricaoMenu",
+        "descricaoMapa",
+      ] as const) {
+        expect(c[campo], `${c.sigla}.${campo}`).not.toBe("");
+      }
+      expect(typeof c.ordem).toBe("number");
+    }
+    expect(new Set(snapshot.cartoes.map((c) => c.ordem)).size).toBe(15);
+  });
+
+  it("cartão do instantâneo é gravado em pagina.cartao, imagem pelo caminho", () => {
+    const edutec = estaticos.find((p) => p.sigla === "EDUTEC") as ConteudoPrograma;
+    const plano = planejarCargaPaginas(atualDe30Set(edutec), edutec, cartaoDe("EDUTEC"));
+    expect(paginaDe(plano).cartao).toEqual({
+      nome: "Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino",
+      tagline:
+        "Cultura digital, educação midiática e transformação institucional para o século 21.",
+      meta: "10 módulos · 80h",
+      imagemCaminho: "/img/fotos/_optimized/area-educacao.1920.webp",
+      ordem: 1,
+      descricaoMenu: "Educação Digital, Inovação e Tecnologias para Redes Públicas",
+      descricaoMapa: "Educação Digital · Inovação · Tecnologias",
+    });
+  });
+
+  it("cartão já preenchido e diferente no CMS → divergência, não sobrescreve", () => {
+    const edutec = estaticos.find((p) => p.sigla === "EDUTEC") as ConteudoPrograma;
+    const atual = atualDe30Set(edutec);
+    atual.pagina = { ...(atual.pagina ?? {}), cartao: { nome: "Editado no painel" } };
+    const plano = planejarCargaPaginas(atual, edutec, cartaoDe("EDUTEC"));
+    expect(plano.divergencias).toContain("pagina.cartao.nome");
+    expect((paginaDe(plano).cartao as Record<string, unknown>).nome).toBeUndefined();
+    expect((paginaDe(plano).cartao as Record<string, unknown>).tagline).toBeTruthy();
   });
 
   it("PROAPS+ e PROSUS+ casam com o +", () => {

@@ -158,6 +158,8 @@ export function docParaCampos(doc: ProgramaCMS, modulos: ModuloCMS[]): CamposPag
         meta: pg.cartao?.meta ?? "",
         imagem: imagem(pg.cartao?.imagem, pg.cartao?.imagemCaminho, 640),
         ordem: pg.cartao?.ordem ?? null,
+        descricaoMenu: pg.cartao?.descricaoMenu ?? "",
+        descricaoMapa: pg.cartao?.descricaoMapa ?? "",
       },
     },
   };
@@ -259,8 +261,27 @@ export const buscarProgramaPublicado = cache(async (slug: string): Promise<Conte
   return camposParaPagina(campos, extras);
 });
 
-/** Programas publicados, ordenados por `pagina.cartao.ordem` (vazios no fim) e depois sigla. */
-export const listarProgramasPublicados = cache(async (): Promise<CamposPaginaPrograma[]> => {
+/** `pagina.cartao.ordem` (vazio no fim) e depois sigla — a ordem de listas e menus. */
+export function compararPorCartao(a: CamposPaginaPrograma, b: CamposPaginaPrograma): number {
+  const oa = a.pagina.cartao.ordem;
+  const ob = b.pagina.cartao.ordem;
+  if (oa !== ob) {
+    if (oa === null) return 1;
+    if (ob === null) return -1;
+    return oa - ob;
+  }
+  return a.sigla.localeCompare(b.sigla);
+}
+
+export interface ProgramaPublicado {
+  id: number;
+  campos: CamposPaginaPrograma;
+  /** Ids dos eventos listados em `eventosVinculados` dos módulos do programa. */
+  eventosVinculados: number[];
+}
+
+/** Programas publicados com o id e os eventos vinculados aos módulos, na ordem do cartão. */
+export const listarProgramasPublicadosComId = cache(async (): Promise<ProgramaPublicado[]> => {
   const payload = await obterPayload();
   const res = await payload.find({
     collection: "programas",
@@ -287,15 +308,19 @@ export const listarProgramasPublicados = cache(async (): Promise<CamposPaginaPro
   }
 
   return res.docs
-    .map((d) => docParaCampos(d, porPrograma.get(d.id) ?? []))
-    .sort((a, b) => {
-      const oa = a.pagina.cartao.ordem;
-      const ob = b.pagina.cartao.ordem;
-      if (oa !== ob) {
-        if (oa === null) return 1;
-        if (ob === null) return -1;
-        return oa - ob;
-      }
-      return a.sigla.localeCompare(b.sigla);
-    });
+    .map((d) => {
+      const modulos = porPrograma.get(d.id) ?? [];
+      return {
+        id: d.id,
+        campos: docParaCampos(d, modulos),
+        eventosVinculados: modulos.flatMap((m) => (m.eventosVinculados ?? []).map(idDe)),
+      };
+    })
+    .sort((a, b) => compararPorCartao(a.campos, b.campos));
 });
+
+/** Programas publicados, ordenados por `pagina.cartao.ordem` (vazios no fim) e depois sigla. */
+export const listarProgramasPublicados = cache(
+  async (): Promise<CamposPaginaPrograma[]> =>
+    (await listarProgramasPublicadosComId()).map((p) => p.campos),
+);

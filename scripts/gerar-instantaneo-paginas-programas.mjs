@@ -3,6 +3,12 @@
  * Gera o instantâneo JSON das 15 páginas de programa (conteúdo completo,
  * forma `ConteudoPrograma` de @ntc/lib) para o seed do CMS.
  *
+ * Também leva os cartões das listas e menus (`cartoes`, um por sigla, forma
+ * `PaginaPrograma["cartao"]` + `sigla`): nome, chamada, meta e imagem dos
+ * cartões das páginas de vertente (`FALLBACK_VERTICAIS`), a ordem dessas
+ * grades (Educação → Gestão Pública → Saúde, 1 a 15) e os textos do menu e
+ * do mapa do site (`DESCRICOES_PROGRAMAS_FALLBACK`). Copiados 1:1.
+ *
  * Importa cada `conteudo<SIGLA>.ts` direto (nunca o índice, cujos imports
  * não têm extensão). Node >= 22.18 carrega `.ts` sem flag.
  *
@@ -30,6 +36,9 @@ function checarVersaoNode() {
 checarVersaoNode();
 
 const DIR_PROGRAMAS = "../apps/web/app/(programas)/programas/[slug]/";
+const FALLBACK_VERTENTES = "../apps/web/app/(vertical)/solucoes-estrategicas/[area]/conteudoFallback.ts";
+const FALLBACK_DESCRICOES = "../apps/web/lib/cms/descricoesProgramasFallback.ts";
+const ORDEM_VERTENTES = ["educacao", "gestao-publica", "saude"];
 const SAIDA = join(__dirname, "..", "apps/cms/src/seed/assets/paginas-programas.json");
 
 // Mesma ordem de PROGRAMAS em conteudoIndex.ts.
@@ -45,9 +54,37 @@ async function main() {
     if (!mod[nome]) throw new Error(`conteudo${nome}.ts não exporta ${nome}`);
     programas.push(mod[nome]);
   }
+  const { FALLBACK_VERTICAIS } = await import(FALLBACK_VERTENTES);
+  const { DESCRICOES_PROGRAMAS_FALLBACK } = await import(FALLBACK_DESCRICOES);
+  const cartoes = [];
+  for (const vertente of ORDEM_VERTENTES) {
+    for (const card of FALLBACK_VERTICAIS[vertente].programas.cards) {
+      const descricoes = DESCRICOES_PROGRAMAS_FALLBACK[card.sigla];
+      if (!descricoes) throw new Error(`sem descrição de menu/mapa para ${card.sigla}`);
+      cartoes.push({
+        sigla: card.sigla,
+        nome: card.nome,
+        tagline: card.tagline,
+        meta: card.meta,
+        imagem: card.imagemSrc,
+        ordem: cartoes.length + 1,
+        descricaoMenu: descricoes.menu,
+        descricaoMapa: descricoes.mapa,
+      });
+    }
+  }
+  const siglas = new Set(programas.map((p) => p.sigla));
+  const siglasCartoes = new Set(cartoes.map((c) => c.sigla));
+  for (const s of siglas) if (!siglasCartoes.has(s)) throw new Error(`sem cartão para ${s}`);
+  for (const s of siglasCartoes) if (!siglas.has(s)) throw new Error(`cartão sem página: ${s}`);
+
   await mkdir(dirname(SAIDA), { recursive: true });
-  await writeFile(SAIDA, JSON.stringify({ geradoEm: new Date().toISOString(), programas }, null, 2) + "\n", "utf8");
-  console.log(`Instantâneo gerado: ${programas.length} programas.`);
+  await writeFile(
+    SAIDA,
+    JSON.stringify({ geradoEm: new Date().toISOString(), programas, cartoes }, null, 2) + "\n",
+    "utf8",
+  );
+  console.log(`Instantâneo gerado: ${programas.length} programas, ${cartoes.length} cartões.`);
   console.log(`→ ${SAIDA}`);
 }
 

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { obterMenuProgramas } from "@/lib/cms/listasProgramas";
 import { carregarContatos } from "@/lib/contatos";
 
 import { HeaderHome } from "../(home)/HeaderHome";
@@ -22,11 +23,11 @@ import "../eventon-prototipo.css";
  * `<InteracoesScroll />` é obrigatório: sem ele `.fade-in` fica invisível.
  */
 export default async function EventOnLayout({ children }: { children: ReactNode }) {
-  const contatos = await carregarContatos();
+  const [contatos, programas] = await Promise.all([carregarContatos(), obterMenuProgramas()]);
 
   return (
     <>
-      <HeaderHome />
+      <HeaderHome programas={programas} />
       {children}
       <FooterHome contatos={contatos} />
       <InteracoesScroll />

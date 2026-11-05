@@ -61,7 +61,7 @@ export function paginaVazia(): PaginaPrograma {
     chamadaFinalTexto: "",
     resumoLateral: [],
     entregas: [],
-    cartao: { nome: "", tagline: "", meta: "", imagem: "", ordem: null },
+    cartao: { nome: "", tagline: "", meta: "", imagem: "", ordem: null, descricaoMenu: "", descricaoMapa: "" },
   };
 }
 

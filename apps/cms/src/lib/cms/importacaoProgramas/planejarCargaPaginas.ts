@@ -19,8 +19,9 @@
  * a proposta, que compõe os dois, duplicaria o conteúdo.
  *
  * Imagens dos 15 vão pelos campos de caminho (`heroImagemCaminho`,
- * `imagemCaminho`); nenhuma `media` é enviada. `pagina.cartao` sai vazio
- * do `paginaParaCampos` até outra tarefa preencher o instantâneo.
+ * `imagemCaminho`); nenhuma `media` é enviada. `pagina.cartao` vem do
+ * terceiro argumento (o cartão do instantâneo); sem ele, nada do cartão é
+ * gravado.
  */
 
 import { lexicalParaHtmlEditorial } from "@ntc/lib";
@@ -187,6 +188,8 @@ function paginaParaPayload(p: PaginaPrograma): Record<string, unknown> {
       meta: p.cartao.meta,
       imagemCaminho: p.cartao.imagem,
       ordem: p.cartao.ordem,
+      descricaoMenu: p.cartao.descricaoMenu,
+      descricaoMapa: p.cartao.descricaoMapa,
     },
   };
 }
@@ -214,13 +217,14 @@ function planoVazio(
 export function planejarCargaPaginas(
   atual: ProgramaAtual | null,
   estatico: ConteudoPrograma,
+  cartao?: PaginaPrograma["cartao"],
 ): PlanoCargaPagina {
   const sigla = estatico.sigla;
   if (!atual || atual.sigla.toUpperCase() !== sigla.toUpperCase())
     return planoVazio(sigla, "sem-programa", []);
   if (atual.rascunhoPendente) return planoVazio(sigla, "divergente", [RASCUNHO]);
 
-  const { campos, avisos } = paginaParaCampos(estatico);
+  const { campos, avisos } = paginaParaCampos(estatico, cartao);
   const divergencias: string[] = [];
   const escrita: Record<string, unknown> = {};
   const paginaAtual = atual.pagina ?? {};
