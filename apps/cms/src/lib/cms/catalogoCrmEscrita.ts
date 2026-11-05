@@ -336,13 +336,22 @@ export type ResultadoImagem = ResultadoEscrita & { midiaId?: string };
 const SEM_LINHA = "Salve o programa antes de enviar a imagem desta linha.";
 
 /**
- * Aponta (ou limpa) a relação de imagem do alvo. Como a capa do evento
- * (`enviarMidiaEvento`), grava no registro principal SEM `draft`, reenviando o
- * `_status` atual: num programa publicado a imagem vai ao ar na hora (e o site
- * é revalidado); num nunca publicado, segue rascunho. Atenção, mesma regra da
- * capa: num programa publicado com alterações pendentes no rascunho, elas vão
- * ao ar junto — o group `pagina` é lido da última versão.
+ * Aponta (ou limpa) a relação de imagem do alvo. O group `pagina` vem da
+ * última versão (`draft: true`), e o Payload 3.90 também mescla o `update`
+ * sobre a última versão — por isso a forma de gravar depende da situação:
+ *
+ * - **publicado** (última versão = publicada): grava publicado e revalida o
+ *   site — só a imagem vai ao ar, nada mais está pendente;
+ * - **alterações pendentes**: grava no rascunho (`draft: true`). Gravar
+ *   publicado aqui poria no ar TODAS as edições pendentes (textos, eixos…).
+ *   A imagem vai ao ar no próximo Publicar; volta um aviso e não revalida;
+ * - **rascunho** (nunca publicado): grava no rascunho, sem revalidar.
+ *
+ * Diferente da capa do evento (`enviarMidiaEvento`), que grava publicado mesmo
+ * com rascunho pendente.
  */
+export const AVISO_IMAGEM_NO_RASCUNHO = "A imagem foi salva no rascunho e vai ao ar quando você publicar o programa.";
+
 async function gravarImagem(
   payload: Payload,
   id: string,
@@ -350,15 +359,25 @@ async function gravarImagem(
   usuario: UsuarioAutenticado,
 ): Promise<ResultadoEscrita> {
   const situacao = await situacaoDoPrograma(payload, id);
-  const publicado = situacao !== "rascunho";
+  if (situacao !== "publicado") {
+    await payload.update({
+      collection: "programas",
+      id,
+      data: { pagina, _status: "draft" } as unknown as ProgramaData,
+      draft: true,
+      overrideAccess: true,
+      user: usuario,
+    });
+    return situacao === "alteracoes-pendentes" ? { ok: true, aviso: AVISO_IMAGEM_NO_RASCUNHO } : { ok: true };
+  }
   await payload.update({
     collection: "programas",
     id,
-    data: { pagina, _status: publicado ? "published" : "draft" } as unknown as ProgramaData,
+    data: { pagina, _status: "published" } as unknown as ProgramaData,
+    draft: false,
     overrideAccess: true,
     user: usuario,
   });
-  if (!publicado) return { ok: true };
   return comAviso({ ok: true }, await revalidarProgramas(payload, [id]));
 }
 

@@ -403,25 +403,58 @@ describe("enviarImagemPrograma", () => {
     expect(r).toEqual({ ok: true, midiaId: "77" });
     expect(p.create).toHaveBeenCalledWith(expect.objectContaining({ collection: "media" }));
     const { data, draft } = paginaGravadaNoUpdate(p);
-    expect(draft).toBeFalsy();
+    expect(draft).toBe(false);
     expect(data._status).toBe("published");
     expect(data.pagina.heroImagem).toBe(77);
     expect(data.pagina.heroImagemCaminho).toBe("/img/topo.webp");
     expect(data.pagina.cartao).toEqual(PAGINA_GRAVADA.cartao);
   });
 
-  it("programa publicado: revalida a página; nunca publicado: grava rascunho e não revalida", async () => {
-    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+  it("publicado (sem pendências): grava publicado (draft false) e revalida a página", async () => {
+    const p = payloadFalso({ statusPrincipal: "published", statusUltima: "published", programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
     obterPayloadMock.mockResolvedValue(p);
-    await enviarImagemPrograma("4", { tipo: "cartao" }, arquivo(), usuario);
+    expect(await enviarImagemPrograma("4", { tipo: "cartao" }, arquivo(), usuario)).toEqual({ ok: true, midiaId: "77" });
+    const u = paginaGravadaNoUpdate(p);
+    expect(u.draft).toBe(false);
+    expect(u.data._status).toBe("published");
+    expect(u.data.pagina.cartao).toEqual({ ...PAGINA_GRAVADA.cartao, imagem: 77 });
     expect(pathsRevalidados()).toContain("/programas/edutec");
-    expect(paginaGravadaNoUpdate(p).data.pagina.cartao).toEqual({ ...PAGINA_GRAVADA.cartao, imagem: 77 });
+  });
 
-    fetchMock.mockClear();
-    const q = payloadFalso({ statusPrincipal: "draft", statusUltima: "draft", programaGravado: { pagina: PAGINA_GRAVADA } });
+  it("alterações pendentes: grava só no rascunho, nunca publicado, avisa e não revalida", async () => {
+    const p = payloadFalso({ statusPrincipal: "published", statusUltima: "draft", programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await enviarImagemPrograma("4", { tipo: "topo" }, arquivo(), usuario)).toEqual({
+      ok: true,
+      midiaId: "77",
+      aviso: "A imagem foi salva no rascunho e vai ao ar quando você publicar o programa.",
+    });
+    const programas = p.update.mock.calls
+      .map((c) => c[0] as { collection: string; draft?: boolean; data: Record<string, unknown> })
+      .filter((c) => c.collection === "programas");
+    expect(programas).toHaveLength(1);
+    expect(programas[0]!.draft).toBe(true);
+    expect(programas.some((c) => c.data._status === "published")).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    const q = payloadFalso({ statusPrincipal: "published", statusUltima: "draft", programaGravado: { pagina: PAGINA_GRAVADA } });
     obterPayloadMock.mockResolvedValue(q);
-    await enviarImagemPrograma("4", { tipo: "cartao" }, arquivo(), usuario);
+    expect(await removerImagemPrograma("4", { tipo: "cartao" }, usuario)).toEqual({
+      ok: true,
+      aviso: "A imagem foi salva no rascunho e vai ao ar quando você publicar o programa.",
+    });
+    expect(paginaGravadaNoUpdate(q).draft).toBe(true);
     expect(paginaGravadaNoUpdate(q).data._status).toBe("draft");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rascunho (nunca publicado): grava no rascunho, sem aviso e sem revalidar", async () => {
+    const p = payloadFalso({ statusPrincipal: "draft", statusUltima: "draft", programaGravado: { pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await enviarImagemPrograma("4", { tipo: "cartao" }, arquivo(), usuario)).toEqual({ ok: true, midiaId: "77" });
+    const u = paginaGravadaNoUpdate(p);
+    expect(u.draft).toBe(true);
+    expect(u.data._status).toBe("draft");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
