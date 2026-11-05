@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import { phaseDonut, serieReceitaXCusto, type Centavos } from "@ntc/lib";
 
 import { CORES_GRAFICO as C, Grafico } from "../ui/Grafico";
@@ -22,7 +24,7 @@ export function PassoFluxo({
 }: {
   rotulo: string;
   valor: Centavos;
-  sub: string;
+  sub: ReactNode;
   seta?: boolean;
   icone: NomeIcone;
 }) {
@@ -52,10 +54,10 @@ export function MiniKpis({ itens, colunas }: { itens: readonly MiniKpi[]; coluna
       className="mini-kpis"
       style={colunas ? { gridTemplateColumns: `repeat(${colunas},minmax(0,1fr))` } : undefined}
     >
-      {itens.map(([l, v, s]) => (
+      {itens.map(([l, v, s, cls]) => (
         <div key={l}>
           <div className="ml">{l}</div>
-          <div className="mv num">{v}</div>
+          <div className={`mv num${cls ? ` ${cls}` : ""}`}>{v}</div>
           {s && <div className="ms">{s}</div>}
         </div>
       ))}

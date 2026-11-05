@@ -128,7 +128,7 @@ export function fatosDoEvento(ev: EventoFin, m: Pick<MetricasEvento, "rf">): Fat
   ];
 }
 
-export type MiniKpi = [rotulo: string, valor: string, sub: string];
+export type MiniKpi = [rotulo: string, valor: string, sub: string, classe?: string];
 
 /** Mini-KPIs de "Operação" (`op` de `wsOverview`); vazio = o bloco não aparece. */
 export function operacaoDoEvento(

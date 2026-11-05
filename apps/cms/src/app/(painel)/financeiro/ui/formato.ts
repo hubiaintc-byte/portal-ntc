@@ -67,7 +67,8 @@ export function tipoCurto(tipo: string): string {
 
 /** Resumo textual dos números de um gráfico, para o `aria-label` (spec §5). */
 export function resumoGrafico(dados: SerieGrafico, dinheiro = true): string {
-  const fmt = (v: number) => (dinheiro ? formatarReais(valorFinito(v)) : NUM_INT.format(valorFinito(v)));
+  const fmt = (v: number) =>
+    dinheiro ? formatarReais(valorFinito(v)) : NUM_INT.format(valorFinito(v));
   if (dados.labels.length === 0 || dados.series.length === 0) return "sem dados no recorte";
   return dados.labels
     .map((rot, i) => {
@@ -90,15 +91,22 @@ export interface LeituraDinheiro {
   valido: boolean;
 }
 
-export function lerCampoDinheiro(texto: string): LeituraDinheiro {
-  if (!texto.trim()) return { valor: null, valido: true };
-  const valor = paraCentavos(texto);
-  return { valor, valido: valor !== null };
+/**
+ * `comSinal`: aceita "-" (ou "−") na frente — só o saldo inicial de conta, que
+ * pode nascer negativo (Ruling R9). Sem ele, o sinal é recusado.
+ */
+export function lerCampoDinheiro(texto: string, comSinal = false): LeituraDinheiro {
+  const t = texto.trim();
+  if (!t) return { valor: null, valido: true };
+  const neg = comSinal && /^[-−]/.test(t);
+  const valor = paraCentavos(neg ? t.replace(/^[-−]\s*/, "") : t);
+  if (valor === null) return { valor: null, valido: false };
+  return { valor: neg && valor ? -valor : valor, valido: true };
 }
 
 /** Texto do campo ao sair: válido e preenchido vira "1.234,56"; senão fica como digitado (para corrigir). */
-export function textoAoSairDinheiro(texto: string): string {
-  const { valor } = lerCampoDinheiro(texto);
+export function textoAoSairDinheiro(texto: string, comSinal = false): string {
+  const { valor } = lerCampoDinheiro(texto, comSinal);
   return valor === null ? texto : textoDeCentavos(valor);
 }
 
@@ -125,7 +133,10 @@ export function comValidade(v: ValidadeDinheiro, campo: string, valido: boolean)
 }
 
 /** Primeiro campo inválido na ordem do formulário (os fora da ordem vêm depois); `null` se todos valem. */
-export function primeiroDinheiroInvalido(v: ValidadeDinheiro, ordem: readonly string[]): string | null {
+export function primeiroDinheiroInvalido(
+  v: ValidadeDinheiro,
+  ordem: readonly string[],
+): string | null {
   const invalidos = Object.keys(v).filter((k) => v[k]);
   return ordem.find((k) => invalidos.includes(k)) ?? invalidos[0] ?? null;
 }

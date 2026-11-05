@@ -134,6 +134,8 @@ interface PropsSelect extends PropsFld {
   placeholder?: string;
   /** Rótulo da opção quando difere do valor (ex.: centro de custo "OPE · Operações e Eventos"). */
   rotuloDe?: (valor: string) => string;
+  /** Opções em `<optgroup>` (os `{ group, items }` do protótipo); com elas, `opcoes` é ignorado. */
+  grupos?: readonly { grupo: string; opcoes: readonly string[] }[];
 }
 
 export function CampoSelect({
@@ -142,8 +144,14 @@ export function CampoSelect({
   opcoes,
   placeholder = "Selecione…",
   rotuloDe,
+  grupos,
   ...fld
 }: PropsSelect) {
+  const opcao = (o: string) => (
+    <option key={o} value={o}>
+      {rotuloDe ? rotuloDe(o) : o}
+    </option>
+  );
   return (
     <Fld {...fld}>
       <select
@@ -155,11 +163,13 @@ export function CampoSelect({
         onChange={(e) => aoMudar(e.target.value)}
       >
         <option value="">{placeholder}</option>
-        {opcoes.map((o) => (
-          <option key={o} value={o}>
-            {rotuloDe ? rotuloDe(o) : o}
-          </option>
-        ))}
+        {grupos
+          ? grupos.map((g) => (
+              <optgroup key={g.grupo} label={g.grupo}>
+                {g.opcoes.map(opcao)}
+              </optgroup>
+            ))
+          : opcoes.map(opcao)}
       </select>
     </Fld>
   );
@@ -284,5 +294,55 @@ export function Grupo({ titulo }: { titulo: string }) {
     <div className="fgroup">
       <span>{titulo}</span>
     </div>
+  );
+}
+
+/** Campo calculado do `FormEngine` (`type: 'computed'`); `esquerda` = `align: 'left'`. */
+export function Calculado({
+  campo,
+  rotulo,
+  span,
+  esquerda,
+  children,
+}: {
+  campo: string;
+  rotulo: string;
+  span: 2 | 3;
+  esquerda?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div className={`fld s${span}`}>
+      <label htmlFor={`f_${campo}`}>{rotulo}</label>
+      <output id={`f_${campo}`} className={`computed${esquerda ? " left" : ""}`} aria-live="polite">
+        {children}
+      </output>
+    </div>
+  );
+}
+
+/** `{ details, hint, items }` do `FormEngine`: bloco recolhível "Mais detalhes". */
+export function MaisDetalhes({
+  aberto,
+  aoAlternar,
+  titulo = "Mais detalhes",
+  dica,
+  children,
+}: {
+  aberto: boolean;
+  aoAlternar: (aberto: boolean) => void;
+  titulo?: string;
+  dica: string;
+  children: ReactNode;
+}) {
+  return (
+    <details className="details" open={aberto} onToggle={(e) => aoAlternar(e.currentTarget.open)}>
+      <summary>
+        <Icone nome="chevR" tamanho="sm" className="chev" />
+        {titulo}
+        <span className="opt">{dica}</span>
+      </summary>
+      <div className="form">{children}</div>
+    </details>
   );
 }

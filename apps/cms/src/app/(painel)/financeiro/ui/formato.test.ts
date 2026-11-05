@@ -138,3 +138,18 @@ describe("validade dos campos de dinheiro", () => {
     expect(ERRO_FORMATO_DINHEIRO).toBe("Valor inválido. Use o formato 1.234,56.");
   });
 });
+
+describe("dinheiro com sinal (saldo inicial de conta, Ruling R9)", () => {
+  it("aceita '-' e '−' só com comSinal", () => {
+    expect(lerCampoDinheiro("-1.234,56", true)).toEqual({ valor: -123456, valido: true });
+    expect(lerCampoDinheiro("− 10", true)).toEqual({ valor: -1000, valido: true });
+    expect(lerCampoDinheiro("-0", true)).toEqual({ valor: 0, valido: true });
+    expect(lerCampoDinheiro("-1.234,56")).toEqual({ valor: null, valido: false });
+    expect(lerCampoDinheiro("-abc", true)).toEqual({ valor: null, valido: false });
+  });
+
+  it("ao sair, negativo é reescrito no formato brasileiro", () => {
+    expect(textoAoSairDinheiro("-1234,5", true)).toBe("-1.234,50");
+    expect(textoAoSairDinheiro("-1234,5")).toBe("-1234,5");
+  });
+});

@@ -4,7 +4,13 @@ import { useState, type ReactNode } from "react";
 
 import type { Centavos } from "@ntc/lib";
 
-import { ERRO_FORMATO_DINHEIRO, lerCampoDinheiro, textoAoSairDinheiro, textoDeCentavos } from "./formato";
+import {
+  ERRO_FORMATO_DINHEIRO,
+  lerCampoDinheiro,
+  textoAoSairDinheiro,
+  textoDeCentavos,
+} from "./formato";
+import { Dica } from "./Selo";
 
 export { textoDeCentavos };
 
@@ -51,6 +57,10 @@ interface CampoDinheiroProps {
   /** Largura na grade `.form` de 6 colunas (`.s1`…`.s4`; sem = linha inteira). */
   span?: 1 | 2 | 3 | 4;
   desabilitado?: boolean;
+  /** Ícone de informação no rótulo (`tip` do protótipo). */
+  dica?: string;
+  /** Aceita valor negativo ("-1.234,56"): só o saldo inicial de conta. */
+  comSinal?: boolean;
 }
 
 export function CampoDinheiro({
@@ -65,6 +75,8 @@ export function CampoDinheiro({
   ajuda,
   span,
   desabilitado,
+  dica,
+  comSinal = false,
 }: CampoDinheiroProps) {
   const [texto, setTexto] = useState(() => textoDeCentavos(valor));
   const [invalido, setInvalido] = useState(false);
@@ -72,7 +84,7 @@ export function CampoDinheiro({
   const [ultimoValor, setUltimoValor] = useState(valor);
   if (valor !== ultimoValor) {
     setUltimoValor(valor);
-    if (valor !== lerCampoDinheiro(texto).valor) {
+    if (valor !== lerCampoDinheiro(texto, comSinal).valor) {
       setTexto(textoDeCentavos(valor));
       setInvalido(false);
       // Sem `aoMudarValidade` aqui (é render): quem muda o valor por fora
@@ -82,7 +94,7 @@ export function CampoDinheiro({
 
   function digitar(t: string) {
     setTexto(t);
-    const { valor: c, valido } = lerCampoDinheiro(t);
+    const { valor: c, valido } = lerCampoDinheiro(t, comSinal);
     // Só limpa o aviso aqui; quem acende é o `sair`.
     if (valido) setInvalido(false);
     setUltimoValor(c);
@@ -91,14 +103,16 @@ export function CampoDinheiro({
   }
 
   function sair() {
-    setInvalido(!lerCampoDinheiro(texto).valido);
-    setTexto(textoAoSairDinheiro(texto));
+    setInvalido(!lerCampoDinheiro(texto, comSinal).valido);
+    setTexto(textoAoSairDinheiro(texto, comSinal));
   }
 
   const mensagem = invalido ? ERRO_FORMATO : (erro ?? "");
   const idErro = `${id}-erro`;
   const idAjuda = `${id}-ajuda`;
-  const classe = ["fld", span ? `s${span}` : "", mensagem ? "invalid" : ""].filter(Boolean).join(" ");
+  const classe = ["fld", span ? `s${span}` : "", mensagem ? "invalid" : ""]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={classe} data-f={id}>
@@ -117,6 +131,7 @@ export function CampoDinheiro({
             <span className="opt">(opcional)</span>
           </>
         ) : null}
+        {dica && <Dica texto={dica} />}
       </label>
       <div className="money">
         <input
@@ -128,7 +143,9 @@ export function CampoDinheiro({
           disabled={desabilitado}
           required={obrigatorio}
           aria-invalid={mensagem ? true : undefined}
-          aria-describedby={[ajuda ? idAjuda : "", mensagem ? idErro : ""].filter(Boolean).join(" ") || undefined}
+          aria-describedby={
+            [ajuda ? idAjuda : "", mensagem ? idErro : ""].filter(Boolean).join(" ") || undefined
+          }
           onChange={(e) => digitar(e.target.value)}
           onBlur={sair}
         />

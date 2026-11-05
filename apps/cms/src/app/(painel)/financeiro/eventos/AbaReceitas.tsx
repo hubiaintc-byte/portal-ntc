@@ -31,11 +31,11 @@ export function AbaReceitas({
   hojeISO,
   capacidades,
   avisar,
-  aoTrocarAba,
   buscas,
   aoBuscar,
   aoAbrirReceita,
   aoAbrirEtapas,
+  aoAbrirFaturamento,
 }: PropsAbaEvento) {
   const aberto = ehAberto(ev);
   const busca = buscas.rec ?? "";
@@ -84,12 +84,11 @@ export function AbaReceitas({
   const abrirAcoes = (r: ReceitaFin, e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     const itens: EntradaMenu[] = [];
-    // A gaveta de faturamento chega na Task 15; até lá, leva à aba.
     if (isContratada(r))
       itens.push({
         rotulo: "Registrar faturamento",
         icone: "receipt",
-        acao: () => aoTrocarAba("faturamento"),
+        acao: () => aoAbrirFaturamento(null, { receitaId: r.id }),
       });
     itens.push({ rotulo: "Editar receita", icone: "edit", acao: () => aoAbrirReceita(r) });
     if (capacidades.excluirFinanceiro)

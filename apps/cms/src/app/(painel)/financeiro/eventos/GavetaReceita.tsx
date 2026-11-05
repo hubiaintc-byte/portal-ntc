@@ -25,7 +25,15 @@ import {
   primeiroDinheiroInvalido,
   type ValidadeDinheiro,
 } from "../ui/formato";
-import { CampoAreaTexto, CampoSelect, CampoTexto, Grupo, Nota } from "./CamposWizard";
+import {
+  Calculado,
+  CampoAreaTexto,
+  CampoSelect,
+  CampoTexto,
+  Grupo,
+  MaisDetalhes,
+  Nota,
+} from "./CamposWizard";
 import {
   CAMPOS_DINHEIRO_RECEITA,
   calculosReceita,
@@ -456,51 +464,5 @@ export function GavetaReceita({
         )}
       </div>
     </Gaveta>
-  );
-}
-
-/** Campo calculado do `FormEngine` (`type: 'computed'`). */
-function Calculado({
-  campo,
-  rotulo,
-  span,
-  children,
-}: {
-  campo: string;
-  rotulo: string;
-  span: 2 | 3;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={`fld s${span}`}>
-      <label htmlFor={`f_${campo}`}>{rotulo}</label>
-      <output id={`f_${campo}`} className="computed">
-        {children}
-      </output>
-    </div>
-  );
-}
-
-/** `{ details: 'Mais detalhes', hint, items }` do `FormEngine`. */
-function MaisDetalhes({
-  aberto,
-  aoAlternar,
-  dica,
-  children,
-}: {
-  aberto: boolean;
-  aoAlternar: (aberto: boolean) => void;
-  dica: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <details className="details" open={aberto} onToggle={(e) => aoAlternar(e.currentTarget.open)}>
-      <summary>
-        <Icone nome="chevR" tamanho="sm" className="chev" />
-        Mais detalhes
-        <span className="opt">{dica}</span>
-      </summary>
-      <div className="form">{children}</div>
-    </details>
   );
 }

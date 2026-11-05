@@ -6,8 +6,11 @@ import {
   eventAlerts,
   eventMetrics,
   type AlertaFin,
+  type CustoFin,
   type EventoFin,
+  type FaturamentoFin,
   type MetricasEvento,
+  type PagamentoFin,
   type ReceitaFin,
 } from "@ntc/lib";
 
@@ -18,16 +21,23 @@ import { MenuContexto, type EntradaMenu } from "../ui/MenuContexto";
 import { ChipVertical, CLASSE_VERTICAL, SeloStatus } from "../ui/Selo";
 import { intervaloDatas, tipoCurto } from "../ui/formato";
 import { GavetaAlertas } from "../visao/Alertas";
+import { AbaCustos } from "./AbaCustos";
+import { AbaFaturamento } from "./AbaFaturamento";
+import { AbaPagamentos } from "./AbaPagamentos";
 import { AbaReceitas } from "./AbaReceitas";
 import { AbaResultado } from "./AbaResultado";
 import { AbaVisaoGeral } from "./AbaVisaoGeral";
 import { ABAS_EVENTO, contagensAbas, programaModulo, temVencido } from "./dadosArea";
+import { custosDoEvento, receitasFaturaveis } from "./dadosLancamentos";
 import {
   dependentesDoEvento,
   exclusaoBloqueada,
   MSG_EVENTO_CRM_COM_LANCAMENTOS,
 } from "./dadosEventos";
+import { GavetaCusto } from "./GavetaCusto";
 import { GavetaEtapas } from "./GavetaEtapas";
+import { GavetaFaturamento } from "./GavetaFaturamento";
+import { GavetaPagamento } from "./GavetaPagamento";
 import { GavetaReceita } from "./GavetaReceita";
 import { IconeModalidade, SeloOrigem, SelosSituacaoCrm } from "./SelosEvento";
 import { ExclusaoEvento } from "./TelaEventos";
@@ -36,9 +46,10 @@ import { WizardEvento } from "./WizardEvento";
 /**
  * Área do evento (`Views.workspace` do protótipo FIN-05, mapa §1.3):
  * cabeçalho com Editar, ⋯ e "Lançar ▾" (sem "Comissão comercial") e as abas na
- * ordem do protótipo, sem Comissões (Fase 2). Esta task porta Visão geral,
- * Receitas e Resultado; Custos, Faturamento e Pagamentos vêm na Task 15 —
- * cada aba recebe `PropsAbaEvento`.
+ * ordem do protótipo, sem Comissões (Fase 2). Cada aba recebe
+ * `PropsAbaEvento`; as gavetas de lançamento (receita, etapas, custo,
+ * faturamento/recebimento, título/baixa) moram aqui, como no protótipo, para
+ * "Lançar ▾" e as abas abrirem as mesmas.
  */
 
 export interface AreaEventoProps extends PropsTelaFin {
@@ -60,13 +71,42 @@ export interface PropsAbaEvento extends PropsTelaFin {
   /** Abre a gaveta de receita (nova com `null`). */
   aoAbrirReceita: (r: ReceitaFin | null) => void;
   aoAbrirEtapas: (r: ReceitaFin) => void;
+  /** Abre a gaveta de custo (novo com `null`). */
+  aoAbrirCusto: (c: CustoFin | null) => void;
+  /** Faturamento novo (`null`, opcionalmente com a receita) ou a parcela em `editar`/`receber`. */
+  aoAbrirFaturamento: (
+    f: FaturamentoFin | null,
+    opcoes?: { receitaId?: string; modo?: "editar" | "receber" },
+  ) => void;
+  /** Título novo (`null`, opcionalmente com o custo) ou o título em `editar`/`baixar`. */
+  aoAbrirPagamento: (
+    p: PagamentoFin | null,
+    opcoes?: { custoId?: string; modo?: "editar" | "baixar" },
+  ) => void;
   aoVerPendencias: () => void;
 }
+
+type EstadoFaturamento = {
+  f: FaturamentoFin | null;
+  receitaId?: string;
+  modo: "editar" | "receber";
+};
+type EstadoPagamento = { p: PagamentoFin | null; custoId?: string; modo: "editar" | "baixar" };
 
 type Menu = { tipo: "mais" | "lancar"; ancora: HTMLElement };
 
 export function AreaEvento(props: AreaEventoProps) {
-  const { evento: ev, livro, hojeISO, capacidades, aba, aoTrocarAba, aoVoltar, avisar } = props;
+  const {
+    evento: ev,
+    livro,
+    hojeISO,
+    capacidades,
+    acesso,
+    aba,
+    aoTrocarAba,
+    aoVoltar,
+    avisar,
+  } = props;
   const m = useMemo(() => eventMetrics(ev, livro, hojeISO), [ev, livro, hojeISO]);
   const alertas = useMemo(() => eventAlerts(ev, livro, hojeISO, m), [ev, livro, hojeISO, m]);
   const contagens = contagensAbas(ev, livro, m);
@@ -78,6 +118,9 @@ export function AreaEvento(props: AreaEventoProps) {
   const [ocupado, setOcupado] = useState(false);
   const [receita, setReceita] = useState<{ r: ReceitaFin | null } | null>(null);
   const [etapas, setEtapas] = useState<ReceitaFin | null>(null);
+  const [custo, setCusto] = useState<{ c: CustoFin | null } | null>(null);
+  const [faturamento, setFaturamento] = useState<EstadoFaturamento | null>(null);
+  const [pagamento, setPagamento] = useState<EstadoPagamento | null>(null);
   const [buscas, setBuscas] = useState<Record<string, string>>({});
 
   const prog = programaModulo(ev);
@@ -119,13 +162,28 @@ export function AreaEvento(props: AreaEventoProps) {
       acao: pedirExclusao,
     });
 
-  // Custo, Faturamento e Pagamento levam à aba até a Task 15 trazer as gavetas.
+  // O protótipo recusa abrir faturamento sem receita contratada e título sem custo.
+  const abrirFaturamento: PropsAbaEvento["aoAbrirFaturamento"] = (f, opcoes) => {
+    if (!f && receitasFaturaveis(livro, ev.id).length === 0)
+      return avisar(
+        "Sem receita contratada",
+        "Registre uma receita contratada antes de faturar.",
+        "erro",
+      );
+    setFaturamento({ f, receitaId: opcoes?.receitaId, modo: opcoes?.modo ?? "editar" });
+  };
+  const abrirPagamento: PropsAbaEvento["aoAbrirPagamento"] = (p, opcoes) => {
+    if (!p && custosDoEvento(livro, ev.id).length === 0)
+      return avisar("Sem custos", "Registre um custo antes de programar pagamentos.", "erro");
+    setPagamento({ p, custoId: opcoes?.custoId, modo: opcoes?.modo ?? "editar" });
+  };
+
   const itensLancar: EntradaMenu[] = [
     { cabecalho: "Novo lançamento" },
     { rotulo: "Receita", icone: "inn", acao: () => setReceita({ r: null }) },
-    { rotulo: "Custo", icone: "out", acao: () => aoTrocarAba("custos") },
-    { rotulo: "Faturamento", icone: "receipt", acao: () => aoTrocarAba("faturamento") },
-    { rotulo: "Pagamento", icone: "wallet", acao: () => aoTrocarAba("pagamentos") },
+    { rotulo: "Custo", icone: "out", acao: () => setCusto({ c: null }) },
+    { rotulo: "Faturamento", icone: "receipt", acao: () => abrirFaturamento(null) },
+    { rotulo: "Pagamento", icone: "wallet", acao: () => abrirPagamento(null) },
   ];
 
   const abrirMenu = (tipo: Menu["tipo"], e: React.MouseEvent<HTMLButtonElement>) => {
@@ -144,6 +202,9 @@ export function AreaEvento(props: AreaEventoProps) {
     aoBuscar: (chave, valor) => setBuscas((b) => ({ ...b, [chave]: valor })),
     aoAbrirReceita: (r) => setReceita({ r }),
     aoAbrirEtapas: setEtapas,
+    aoAbrirCusto: (c) => setCusto({ c }),
+    aoAbrirFaturamento: abrirFaturamento,
+    aoAbrirPagamento: abrirPagamento,
     aoVerPendencias: () => setPendencias(true),
   };
 
@@ -249,7 +310,9 @@ export function AreaEvento(props: AreaEventoProps) {
       <div id="painel-aba-evento" role="tabpanel" aria-labelledby={`aba-evento-${aba}`}>
         {aba === "visao" && <AbaVisaoGeral {...propsAba} />}
         {aba === "receitas" && <AbaReceitas {...propsAba} />}
-        {/* Custos, Faturamento e recebimentos, Pagamentos: Task 15. */}
+        {aba === "custos" && <AbaCustos {...propsAba} />}
+        {aba === "faturamento" && <AbaFaturamento {...propsAba} />}
+        {aba === "pagamentos" && <AbaPagamentos {...propsAba} />}
         {aba === "resultado" && <AbaResultado {...propsAba} />}
       </div>
 
@@ -316,6 +379,55 @@ export function AreaEvento(props: AreaEventoProps) {
             avisar(titulo, descricao);
           }}
           aoFechar={() => setEtapas(null)}
+        />
+      )}
+
+      {custo && (
+        <GavetaCusto
+          evento={ev}
+          custo={custo.c}
+          livro={livro}
+          aoSalvo={(titulo, descricao) => {
+            setCusto(null);
+            avisar(titulo, descricao);
+          }}
+          aoFechar={() => setCusto(null)}
+        />
+      )}
+
+      {faturamento && (
+        <GavetaFaturamento
+          faturamento={faturamento.f}
+          receitaId={faturamento.receitaId}
+          modo={faturamento.modo}
+          contexto={ev}
+          livro={livro}
+          hojeISO={hojeISO}
+          acesso={acesso}
+          avisar={avisar}
+          aoSalvo={(titulo, descricao) => {
+            setFaturamento(null);
+            avisar(titulo, descricao);
+          }}
+          aoFechar={() => setFaturamento(null)}
+        />
+      )}
+
+      {pagamento && (
+        <GavetaPagamento
+          pagamento={pagamento.p}
+          custoId={pagamento.custoId}
+          modo={pagamento.modo}
+          contexto={ev}
+          livro={livro}
+          hojeISO={hojeISO}
+          acesso={acesso}
+          avisar={avisar}
+          aoSalvo={(titulo, descricao) => {
+            setPagamento(null);
+            avisar(titulo, descricao);
+          }}
+          aoFechar={() => setPagamento(null)}
         />
       )}
     </>
