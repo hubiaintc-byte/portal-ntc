@@ -49,9 +49,13 @@ describe("ida e volta nos 15 programas", () => {
     const textos: string[] = [];
     coletar(json.programas, "", textos);
     expect(textos.length).toBeGreaterThan(15);
+    let puladas = 0;
     for (const x of textos) {
       const r = htmlInlineParaMarcacao(x);
-      if (r.tagsDesconhecidas.length > 0) continue;
+      if (r.tagsDesconhecidas.length > 0) {
+        puladas += 1;
+        continue;
+      }
       expect(marcacaoParaHtml(r.texto)).toBe(x);
     }
     console.log(`ida e volta: ${textos.length} textos, ${puladas} com outras tags`);
