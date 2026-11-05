@@ -36,7 +36,8 @@ export const MOLDE = {
     tituloHtml: "O que o programa <em>entrega</em>",
   },
   publico: { eyebrow: "Para quem", titulo: "Público-alvo" },
-  eixos: { eyebrow: "Eixos formativos", tituloHtml: "Quatro <em>eixos estruturantes</em>" },
+  /** Título: `${numeroPorExtenso(n)} <em>eixos estruturantes</em>` (derivado em paginaPrograma.ts). */
+  eixos: { eyebrow: "Eixos formativos" },
   modulos: { eyebrow: "Arquitetura formativa" },
   detalhamento: {
     eyebrow: "Detalhamento",

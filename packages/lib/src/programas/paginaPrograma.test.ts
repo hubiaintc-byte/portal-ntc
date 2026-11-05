@@ -78,4 +78,35 @@ describe("camposParaPagina — campos mínimos", () => {
     const p = camposParaPagina(c, semExtras());
     expect(p.hero.tituloHtml).toBe("A &lt;script&gt; <strong>b</strong>");
   });
+
+  it("título dos eixos acompanha a quantidade", () => {
+    const c = minimo();
+    const eixo = { titulo: "E", descricao: "d" };
+    c.eixos = [eixo, eixo, eixo];
+    const p = camposParaPagina(c, semExtras());
+    expect(p.eixos.tituloHtml).toBe("Três <em>eixos estruturantes</em>");
+    expect(p.eixos.titulo).toBe("Três eixos estruturantes");
+    c.eixos = [eixo];
+    expect(camposParaPagina(c, semExtras()).eixos.tituloHtml).toBe("Um <em>eixo estruturante</em>");
+  });
+
+  it("cartão de modalidade: escapa o texto e troca link proibido por #", () => {
+    const c = minimo();
+    const cartao = { destaque: false, tag: "a<b>", titulo: "T", descricao: "D", ctaRotulo: "Ir", ctaHref: "javascript:alert(1)" };
+    c.pagina.modalidadesCards = [cartao, { ...cartao, ctaHref: '/x" onmouseover="alert(1)' }];
+    const html = camposParaPagina(c, semExtras()).modalidades.corpoHtml;
+    expect(html).toContain('<span class="tag">a&lt;b&gt;</span>');
+    expect(html).toContain('<a class="cta" href="#">Ir</a>');
+    expect(html).toContain('href="/x&quot; onmouseover=&quot;alert(1)"');
+    expect(html).not.toContain("<b>");
+    expect(html).not.toContain("javascript:");
+  });
+
+  it("resultado: escapa o texto", () => {
+    const c = minimo();
+    c.resultados = ["<img src=x onerror=alert(1)>"];
+    const html = camposParaPagina(c, semExtras()).resultados.corpoHtml;
+    expect(html).toContain("<p>&lt;img src=x onerror=alert(1)&gt;</p>");
+    expect(html).not.toContain("<img");
+  });
 });

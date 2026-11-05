@@ -219,3 +219,5 @@ export { paragrafosParaHtml, textoDoLexical } from "./programas/paragrafos";
 export { inteiroParaRomano } from "./programas/romanos";
 export { MOLDE, ROTULO_VERTICAL, SIGLA_CSS_DA_VERTENTE, interpolarMolde } from "./programas/molde";
 export { camposParaPagina, paginaVazia } from "./programas/paginaPrograma";
+export { ctaHrefPermitido } from "./programas/ctaHref";
+export { numeroPorExtenso } from "./programas/numeroPorExtenso";

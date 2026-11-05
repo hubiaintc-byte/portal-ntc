@@ -14,8 +14,10 @@
  * (`paginaParaCampos.test.ts`).
  */
 
+import { ctaHrefPermitido } from "./ctaHref";
 import { escaparTexto, marcacaoParaHtml } from "./marcacaoLeve";
 import { MOLDE, ROTULO_VERTICAL, SIGLA_CSS_DA_VERTENTE, interpolarMolde } from "./molde";
+import { numeroPorExtenso } from "./numeroPorExtenso";
 import { paragrafosParaHtml, textoDoLexical } from "./paragrafos";
 import { inteiroParaRomano } from "./romanos";
 import type {
@@ -114,6 +116,10 @@ function introDosModulos(sigla: string, modulos: ModuloPrograma[], cargaTotal: s
   );
 }
 
+function tituloEixosHtml(n: number): string {
+  return n === 1 ? "Um <em>eixo estruturante</em>" : `${numeroPorExtenso(n)} <em>eixos estruturantes</em>`;
+}
+
 function siglaCssDe(c: CamposPaginaPrograma): string {
   const id = c.pagina.identidadeVisual;
   return !id || id === "vertente" ? SIGLA_CSS_DA_VERTENTE[c.vertical] : id;
@@ -136,7 +142,7 @@ function cartaoModalidade(c: CartaoModalidadePagina): string {
     `    <span class="tag">${escaparTexto(c.tag)}</span>\n` +
     `    <h4>${escaparTexto(c.titulo)}</h4>\n` +
     `    <p>${escaparTexto(c.descricao)}</p>\n` +
-    `    <a class="cta" href="${escaparAtributo(c.ctaHref)}">${escaparTexto(c.ctaRotulo)}</a>\n` +
+    `    <a class="cta" href="${escaparAtributo(ctaHrefPermitido(c.ctaHref) ? c.ctaHref : "#")}">${escaparTexto(c.ctaRotulo)}</a>\n` +
     "  </article>\n"
   );
 }
@@ -181,6 +187,7 @@ export function camposParaPagina(c: CamposPaginaPrograma, extras: ExtrasEventos)
   }));
 
   const { feature, miniStack } = extras.modulosAbertos;
+  const introModulos = introDosModulos(c.sigla, modulos, c.cargaHorariaTotal);
 
   return {
     sigla: c.sigla,
@@ -232,16 +239,13 @@ export function camposParaPagina(c: CamposPaginaPrograma, extras: ExtrasEventos)
     },
     eixos: {
       eyebrow: MOLDE.eixos.eyebrow,
-      ...tituloMolde(MOLDE.eixos.tituloHtml),
+      ...tituloMolde(tituloEixosHtml(c.eixos.length)),
       itens: c.eixos.map((e) => ({ titulo: e.titulo, descricao: e.descricao })),
     },
     modulos: {
       eyebrow: MOLDE.modulos.eyebrow,
       ...tituloMolde(`Estrutura modular · <em>${plural(qtdModulos, "módulo", "módulos")}</em>`),
-      ...(() => {
-        const intro = introDosModulos(c.sigla, modulos, c.cargaHorariaTotal);
-        return intro ? { intro } : {};
-      })(),
+      ...(introModulos ? { intro: introModulos } : {}),
       itens: itensModulos,
     },
     ...(qtdModulos > 0
