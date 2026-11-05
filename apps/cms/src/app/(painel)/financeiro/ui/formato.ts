@@ -101,3 +101,31 @@ export function textoAoSairDinheiro(texto: string): string {
   const { valor } = lerCampoDinheiro(texto);
   return valor === null ? texto : textoDeCentavos(valor);
 }
+
+/** Mensagem do campo de dinheiro com texto que não é valor (Review Focus 2). */
+export const ERRO_FORMATO_DINHEIRO = "Valor inválido. Use o formato 1.234,56.";
+
+/**
+ * Validade dos campos de dinheiro de um formulário: `campo → inválido`. O
+ * `CampoDinheiro` entrega `null` tanto para vazio quanto para inválido; o
+ * formulário guarda isto (via `aoMudarValidade`) para recusar o envio em vez
+ * de gravar R$ 0,00. Padrão das gavetas do Financeiro:
+ *
+ *   const [validade, setValidade] = useState<ValidadeDinheiro>({});
+ *   <CampoDinheiro … aoMudarValidade={(ok) => setValidade((v) => comValidade(v, "desconto", ok))} />
+ *   // no salvar, antes de validar o resto:
+ *   const inv = primeiroDinheiroInvalido(validade, ["valorUnit", "desconto"]);
+ *   if (inv) return mostrarErro(inv, ERRO_FORMATO_DINHEIRO);
+ */
+export type ValidadeDinheiro = Readonly<Record<string, boolean>>;
+
+export function comValidade(v: ValidadeDinheiro, campo: string, valido: boolean): ValidadeDinheiro {
+  if (valido === !v[campo]) return v;
+  return { ...v, [campo]: !valido };
+}
+
+/** Primeiro campo inválido na ordem do formulário (os fora da ordem vêm depois); `null` se todos valem. */
+export function primeiroDinheiroInvalido(v: ValidadeDinheiro, ordem: readonly string[]): string | null {
+  const invalidos = Object.keys(v).filter((k) => v[k]);
+  return ordem.find((k) => invalidos.includes(k)) ?? invalidos[0] ?? null;
+}

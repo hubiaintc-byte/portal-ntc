@@ -17,9 +17,17 @@ import { Gaveta } from "../ui/Gaveta";
 import { Historico } from "../ui/Historico";
 import { Icone } from "../ui/Icone";
 import { TagValidar } from "../ui/Selo";
-import { inteiro, moeda } from "../ui/formato";
+import {
+  comValidade,
+  ERRO_FORMATO_DINHEIRO,
+  inteiro,
+  moeda,
+  primeiroDinheiroInvalido,
+  type ValidadeDinheiro,
+} from "../ui/formato";
 import { CampoAreaTexto, CampoSelect, CampoTexto, Grupo, Nota } from "./CamposWizard";
 import {
+  CAMPOS_DINHEIRO_RECEITA,
   calculosReceita,
   camposDetalhesReceita,
   clientesSugeridos,
@@ -80,6 +88,10 @@ export function GavetaReceita({
   const [f, setF] = useState<FormReceita>(() => formReceita(ev, r));
   const [erro, setErro] = useState<{ campo: string; texto: string } | null>(null);
   const [detalhes, setDetalhes] = useState(false);
+  // Texto que não é valor nos campos de dinheiro: recusa o envio (não grava R$ 0,00).
+  const [validade, setValidade] = useState<ValidadeDinheiro>({});
+  const validadeDe = (campo: string) => (ok: boolean) =>
+    setValidade((v) => comValidade(v, campo, ok));
   const [salvando, setSalvando] = useState(false);
   const corpo = useRef<HTMLDivElement>(null);
 
@@ -104,6 +116,8 @@ export function GavetaReceita({
 
   const salvar = async () => {
     if (salvando) return;
+    const invalido = primeiroDinheiroInvalido(validade, CAMPOS_DINHEIRO_RECEITA);
+    if (invalido) return mostrarErro(invalido, ERRO_FORMATO_DINHEIRO);
     const dados = dadosDaReceita(f, ev, r);
     const v = validarReceita(dados, livro, r?.id ?? null);
     if (!v.ok) return mostrarErro(v.campo, v.erro);
@@ -212,12 +226,13 @@ export function GavetaReceita({
       opcional
       valor={f.desconto}
       aoMudar={mudar("desconto")}
+      aoMudarValidade={validadeDe("desconto")}
       erro={erroDe("desconto")}
       ajuda={
         dica ? (
           <>
             Faixas e políticas de desconto:{" "}
-            <TagValidar texto="BASELINE A LEVANTAR · VALIDAR COM A DIREÇÃO" />
+            <TagValidar texto="BASELINE A LEVANTAR · VALIDAR COM A DIREÇÃO" />.
           </>
         ) : undefined
       }
@@ -281,6 +296,7 @@ export function GavetaReceita({
               obrigatorio
               valor={f.valorUnit}
               aoMudar={mudar("valorUnit")}
+              aoMudarValidade={validadeDe("valorUnit")}
               erro={erroDe("valorUnit")}
             />
             {desconto(2, true)}
@@ -392,6 +408,7 @@ export function GavetaReceita({
               obrigatorio
               valor={f.valorUnit}
               aoMudar={mudar("valorUnit")}
+              aoMudarValidade={validadeDe("valorUnit")}
               erro={erroDe("valorUnit")}
             />
             {situacao}

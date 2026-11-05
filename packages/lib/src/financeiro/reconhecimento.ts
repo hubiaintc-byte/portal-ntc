@@ -6,6 +6,8 @@ import { inPeriod, type Periodo } from "./periodos";
 const n = (v: unknown): number => Number(v) || 0;
 
 export const CRIT_PROVISORIO = "Execução declarada (provisório)";
+/** Critério gravado quando a receita tem etapas (`salvarEtapasFin`). */
+export const CRIT_POR_ETAPA = "Por etapa/módulo concluído";
 
 
 export interface ParcelaReconhecida {

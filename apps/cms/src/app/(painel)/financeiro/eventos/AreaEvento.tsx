@@ -29,7 +29,7 @@ import {
 } from "./dadosEventos";
 import { GavetaEtapas } from "./GavetaEtapas";
 import { GavetaReceita } from "./GavetaReceita";
-import { IconeModalidade } from "./SelosEvento";
+import { IconeModalidade, SeloOrigem, SelosSituacaoCrm } from "./SelosEvento";
 import { ExclusaoEvento } from "./TelaEventos";
 import { WizardEvento } from "./WizardEvento";
 
@@ -174,8 +174,10 @@ export function AreaEvento(props: AreaEventoProps) {
                   <span>{prog}</span>
                 </>
               )}
-              <span style={{ marginLeft: 4 }}>
+              <span style={{ marginLeft: 4 }} className="selos-linha">
                 <SeloStatus status={ev.status} tipo="operacional" />
+                <SeloOrigem evento={ev} />
+                <SelosSituacaoCrm evento={ev} />
               </span>
             </div>
           </div>

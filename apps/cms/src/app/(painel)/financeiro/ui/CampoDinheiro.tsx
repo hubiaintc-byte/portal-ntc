@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 
 import type { Centavos } from "@ntc/lib";
 
-import { lerCampoDinheiro, textoAoSairDinheiro, textoDeCentavos } from "./formato";
+import { ERRO_FORMATO_DINHEIRO, lerCampoDinheiro, textoAoSairDinheiro, textoDeCentavos } from "./formato";
 
 export { textoDeCentavos };
 
@@ -23,7 +23,7 @@ export { textoDeCentavos };
  * ser um valor; enquanto não é, `aoMudar(null)`.
  */
 
-const ERRO_FORMATO = "Valor inválido. Use o formato 1.234,56.";
+const ERRO_FORMATO = ERRO_FORMATO_DINHEIRO;
 
 interface CampoDinheiroProps {
   /** `id` do input; o `label` aponta para ele. */
@@ -33,6 +33,13 @@ interface CampoDinheiroProps {
   valor: Centavos | null;
   /** Chamado a cada digitação: centavos, ou `null` se vazio ou inválido. */
   aoMudar: (valor: Centavos | null) => void;
+  /**
+   * Validade do texto a cada digitação (`false` = não é valor; vazio vale).
+   * O formulário a guarda com `comValidade` e recusa o envio pelo
+   * `primeiroDinheiroInvalido` (ver `formato.ts`) — `aoMudar(null)` sozinho
+   * não distingue vazio de inválido.
+   */
+  aoMudarValidade?: (valido: boolean) => void;
   /** Erro do campo vindo da validação (`ErroValidacao.campo`). */
   erro?: string | null;
   /** Asterisco vermelho (`.req`). */
@@ -51,6 +58,7 @@ export function CampoDinheiro({
   rotulo,
   valor,
   aoMudar,
+  aoMudarValidade,
   erro,
   obrigatorio,
   opcional,
@@ -67,6 +75,8 @@ export function CampoDinheiro({
     if (valor !== lerCampoDinheiro(texto).valor) {
       setTexto(textoDeCentavos(valor));
       setInvalido(false);
+      // Sem `aoMudarValidade` aqui (é render): quem muda o valor por fora
+      // marca a validade do campo como válida junto.
     }
   }
 
@@ -77,6 +87,7 @@ export function CampoDinheiro({
     if (valido) setInvalido(false);
     setUltimoValor(c);
     aoMudar(c);
+    aoMudarValidade?.(valido);
   }
 
   function sair() {

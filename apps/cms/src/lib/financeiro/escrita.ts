@@ -3,6 +3,7 @@ import "server-only";
 import {
   CAMPOS_DO_CRM,
   comDefaultsDeLancamento,
+  CRIT_POR_ETAPA,
   CRIT_PROVISORIO,
   hojeEmSaoPaulo,
   podeExcluirConta,
@@ -67,7 +68,6 @@ const MSG_EVENTO_INEXISTENTE = "Evento vinculado inexistente.";
 const MSG_CONTA_INEXISTENTE = "Conta financeira inexistente.";
 const MSG_SEM_CADASTRO = "Complete o cadastro financeiro do evento antes de lançar nele.";
 const MSG_PENDENTE_SEM_CADASTRO = "Este evento ainda não tem cadastro financeiro.";
-const CRIT_POR_ETAPA = "Por etapa/módulo concluído";
 
 const PREFIXO_CRM = "crm-";
 

@@ -3,6 +3,7 @@ import {
   receitaReconhecida,
   valorBruto,
   valorReceita,
+  CRIT_POR_ETAPA,
   CRIT_PROVISORIO,
   type AlertaFin,
   type Centavos,
@@ -15,7 +16,14 @@ import {
   type ReceitaFin,
 } from "@ntc/lib";
 import type { AbaEvento } from "../ShellFinanceiro";
-import { inteiro, intervaloDatas, moeda, porcentagem, tipoCurto } from "../ui/formato";
+import {
+  inteiro,
+  intervaloDatas,
+  lerCampoDinheiro,
+  moeda,
+  porcentagem,
+  tipoCurto,
+} from "../ui/formato";
 
 /**
  * Derivações da área do evento (`Views.workspace`, `wsOverview`, `wsReceitas`,
@@ -24,8 +32,6 @@ import { inteiro, intervaloDatas, moeda, porcentagem, tipoCurto } from "../ui/fo
  */
 
 const n = (v: unknown): number => Number(v) || 0;
-/** Critério que `salvarEtapasFin` grava quando há etapas. */
-const CRIT_POR_ETAPA = "Por etapa/módulo concluído";
 const norm = (s: unknown): string =>
   String(s || "")
     .normalize("NFD")
@@ -354,6 +360,9 @@ export function calculosReceita(
   };
 }
 
+/** Campos de dinheiro da gaveta de receita, na ordem do formulário (texto inválido recusa o envio). */
+export const CAMPOS_DINHEIRO_RECEITA = ["valorUnit", "desconto"] as const;
+
 /** Campos que moram em "Mais detalhes": erro num deles abre o bloco. */
 export function camposDetalhesReceita(ev: EventoFin): readonly string[] {
   return ehAberto(ev)
@@ -371,10 +380,17 @@ export const descricaoReceitaSalva = (id: string, d: DadosReceitaFin): string =>
 export interface LinhaEtapa extends EtapaReceita {
   chave: number;
   textoValor: string;
+  /** Mostrar "Valor inválido…" na linha (ao sair do campo ou ao tentar salvar). */
+  valorInvalido: boolean;
 }
 
 export const etapasParaEdicao = (r: ReceitaFin, formatar: (c: Centavos) => string): LinhaEtapa[] =>
-  (r.etapas || []).map((e, i) => ({ ...e, chave: i, textoValor: formatar(n(e.valor)) }));
+  (r.etapas || []).map((e, i) => ({
+    ...e,
+    chave: i,
+    textoValor: formatar(n(e.valor)),
+    valorInvalido: false,
+  }));
 
 export const novaEtapa = (chave: number): LinhaEtapa => ({
   chave,
@@ -385,7 +401,20 @@ export const novaEtapa = (chave: number): LinhaEtapa => ({
   concluida: false,
   dataConclusao: "",
   textoValor: "",
+  valorInvalido: false,
 });
+
+/**
+ * Primeira etapa que vai ser gravada (tem nome, base valor) com texto de
+ * valor que não é real brasileiro: o salvar recusa em vez de gravar R$ 0,00.
+ */
+export function etapaComValorInvalido(linhas: readonly LinhaEtapa[]): number | null {
+  const e = linhas.find(
+    (x) =>
+      (x.nome || "").trim() && x.base !== "percentual" && !lerCampoDinheiro(x.textoValor).valido,
+  );
+  return e ? e.chave : null;
+}
 
 /** Valor de uma etapa sobre o total contratado (percentual arredondado ao centavo). */
 export const valorDaEtapa = (

@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  comValidade,
   compacto,
+  ERRO_FORMATO_DINHEIRO,
+  primeiroDinheiroInvalido,
   inteiro,
   intervaloDatas,
   lerCampoDinheiro,
@@ -11,12 +14,16 @@ import {
   textoAoSairDinheiro,
   textoDeCentavos,
   tipoCurto,
+  type ValidadeDinheiro,
 } from "./formato";
 
 describe("resumoGrafico (aria-label dos gráficos, spec §5)", () => {
   it("livro vazio não produz NaN", () => {
     expect(resumoGrafico({ labels: [], series: [] })).toBe("sem dados no recorte");
-    const r = resumoGrafico({ labels: ["Educação"], series: [{ nome: "Receita", valores: [Number.NaN] }] });
+    const r = resumoGrafico({
+      labels: ["Educação"],
+      series: [{ nome: "Receita", valores: [Number.NaN] }],
+    });
     expect(r).toBe("Educação: R$ 0,00");
     expect(r).not.toMatch(/NaN|Infinity/);
   });
@@ -29,11 +36,15 @@ describe("resumoGrafico (aria-label dos gráficos, spec §5)", () => {
         { nome: "Pago", valores: [1000, 50], tipo: "linha" },
       ],
     });
-    expect(r).toBe("jul/26: Faturado R$ 1.234,56, Pago R$ 10,00; ago/26: Faturado R$ 0,00, Pago R$ 0,50");
+    expect(r).toBe(
+      "jul/26: Faturado R$ 1.234,56, Pago R$ 10,00; ago/26: Faturado R$ 0,00, Pago R$ 0,50",
+    );
   });
 
   it("contagens saem sem R$", () => {
-    expect(resumoGrafico({ labels: ["SME"], series: [{ nome: "Pagantes", valores: [1800] }] }, false)).toBe("SME: 1.800");
+    expect(
+      resumoGrafico({ labels: ["SME"], series: [{ nome: "Pagantes", valores: [1800] }] }, false),
+    ).toBe("SME: 1.800");
   });
 });
 
@@ -69,7 +80,8 @@ describe("lerCampoDinheiro e textoAoSairDinheiro (CampoDinheiro valida ao sair)"
   });
 
   it("recusa texto que não é valor, inclusive os prefixos de uma digitação correta", () => {
-    for (const t of ["abc", "1,2,3", "1.", "1.234,"]) expect(lerCampoDinheiro(t)).toEqual({ valor: null, valido: false });
+    for (const t of ["abc", "1,2,3", "1.", "1.234,"])
+      expect(lerCampoDinheiro(t)).toEqual({ valor: null, valido: false });
   });
 
   it("ao sair reescreve o válido e mantém o inválido como digitado", () => {
@@ -104,5 +116,25 @@ describe("formatação da Visão Executiva (fmtBRL, fmtPct, fmtNum, fmtRange, ti
     expect(intervaloDatas("", "")).toBe("—");
     expect(tipoCurto("In Company / Projeto B2G")).toBe("In Company / B2G");
     expect(tipoCurto("Módulo")).toBe("Módulo");
+  });
+});
+
+describe("validade dos campos de dinheiro", () => {
+  it("guarda só os inválidos e devolve o primeiro na ordem do formulário", () => {
+    let v: ValidadeDinheiro = {};
+    expect(primeiroDinheiroInvalido(v, ["valorUnit", "desconto"])).toBeNull();
+    v = comValidade(v, "desconto", lerCampoDinheiro("abc").valido);
+    expect(primeiroDinheiroInvalido(v, ["valorUnit", "desconto"])).toBe("desconto");
+    v = comValidade(v, "valorUnit", lerCampoDinheiro("1,2,3").valido);
+    expect(primeiroDinheiroInvalido(v, ["valorUnit", "desconto"])).toBe("valorUnit");
+    v = comValidade(v, "valorUnit", lerCampoDinheiro("1.234,56").valido);
+    v = comValidade(v, "desconto", lerCampoDinheiro("").valido);
+    expect(primeiroDinheiroInvalido(v, ["valorUnit", "desconto"])).toBeNull();
+    // Campo fora da ordem também barra.
+    expect(primeiroDinheiroInvalido(comValidade({}, "outro", false), ["valorUnit"])).toBe("outro");
+    // Sem mudança, mesma referência (não re-renderiza).
+    const w = comValidade({}, "x", true);
+    expect(comValidade(w, "x", true)).toBe(w);
+    expect(ERRO_FORMATO_DINHEIRO).toBe("Valor inválido. Use o formato 1.234,56.");
   });
 });

@@ -15,9 +15,16 @@ import { salvarEtapasFinAcao } from "../../acoesFinanceiro";
 import { Gaveta } from "../ui/Gaveta";
 import { Icone } from "../ui/Icone";
 import { Selo, TagValidar } from "../ui/Selo";
-import { lerCampoDinheiro, moeda, textoAoSairDinheiro, textoDeCentavos } from "../ui/formato";
+import {
+  ERRO_FORMATO_DINHEIRO,
+  lerCampoDinheiro,
+  moeda,
+  textoAoSairDinheiro,
+  textoDeCentavos,
+} from "../ui/formato";
 import {
   alternarConclusao,
+  etapaComValorInvalido,
   etapasParaEdicao,
   etapasParaSalvar,
   novaEtapa,
@@ -64,6 +71,13 @@ export function GavetaEtapas({
 
   const salvar = async () => {
     if (salvando) return;
+    const invalida = etapaComValorInvalido(linhas);
+    if (invalida !== null) {
+      setLinhas((ls) => ls.map((e) => (e.chave === invalida ? { ...e, valorInvalido: true } : e)));
+      setErro(ERRO_FORMATO_DINHEIRO);
+      window.setTimeout(() => document.getElementById(`etapa-valor-${invalida}`)?.focus(), 0);
+      return;
+    }
     const limpa = etapasParaSalvar(linhas, hojeISO);
     const v = validarEtapas(r, limpa);
     if (!v.ok) return setErro(v.erro);
@@ -212,23 +226,50 @@ export function GavetaEtapas({
                           %<div className="sub num">{moeda(valorDaEtapa(e, total), false)}</div>
                         </>
                       ) : (
-                        <input
-                          aria-label={`Valor da ${rot}`}
-                          inputMode="decimal"
-                          aria-invalid={dinheiro.valido ? undefined : true}
-                          value={e.textoValor}
-                          style={{ width: 120, textAlign: "right" }}
-                          onChange={(x) => {
-                            const t = x.target.value;
-                            mudar(e.chave, {
-                              textoValor: t,
-                              valor: lerCampoDinheiro(t).valor ?? 0,
-                            });
-                          }}
-                          onBlur={() =>
-                            mudar(e.chave, { textoValor: textoAoSairDinheiro(e.textoValor) })
-                          }
-                        />
+                        <>
+                          <input
+                            id={`etapa-valor-${e.chave}`}
+                            aria-label={`Valor da ${rot}`}
+                            inputMode="decimal"
+                            aria-invalid={e.valorInvalido ? true : undefined}
+                            aria-describedby={
+                              e.valorInvalido ? `etapa-valor-${e.chave}-erro` : undefined
+                            }
+                            value={e.textoValor}
+                            style={{ width: 120, textAlign: "right" }}
+                            onChange={(x) => {
+                              const t = x.target.value;
+                              const { valor, valido } = lerCampoDinheiro(t);
+                              // Inválido: o valor fica 0 só na tela; o salvar recusa.
+                              mudar(e.chave, {
+                                textoValor: t,
+                                valor: valor ?? 0,
+                                ...(valido ? { valorInvalido: false } : {}),
+                              });
+                            }}
+                            onBlur={() =>
+                              mudar(e.chave, {
+                                textoValor: textoAoSairDinheiro(e.textoValor),
+                                valorInvalido: !dinheiro.valido,
+                              })
+                            }
+                          />
+                          {e.valorInvalido && (
+                            <div
+                              className="err"
+                              role="alert"
+                              id={`etapa-valor-${e.chave}-erro`}
+                              style={{
+                                fontSize: 12,
+                                color: "var(--vermelho)",
+                                marginTop: 4,
+                                textAlign: "left",
+                              }}
+                            >
+                              {ERRO_FORMATO_DINHEIRO}
+                            </div>
+                          )}
+                        </>
                       )}
                     </td>
                     <td>

@@ -14,6 +14,7 @@ import {
 import {
   ABAS_EVENTO,
   alternarConclusao,
+  etapaComValorInvalido,
   buscaCasa,
   calculosReceita,
   camposDetalhesReceita,
@@ -461,5 +462,17 @@ describe("resultado", () => {
       valor: Math.round(3_000_00 / 9),
       base: "Receita contratada ÷ 9 pagantes",
     });
+  });
+});
+
+describe("valor de etapa inválido", () => {
+  it("recusa a etapa gravável com texto que não é valor; ignora sem nome e percentual", () => {
+    const ok = { ...novaEtapa(0), nome: "M1", textoValor: "1.000,00" };
+    const vazia = { ...novaEtapa(1), nome: "M2", textoValor: "" };
+    const semNome = { ...novaEtapa(2), nome: " ", textoValor: "abc" };
+    const pct = { ...novaEtapa(3), nome: "M3", base: "percentual" as const, textoValor: "abc" };
+    expect(etapaComValorInvalido([ok, vazia, semNome, pct])).toBeNull();
+    const ruim = { ...novaEtapa(4), nome: "M4", textoValor: "1,2,3" };
+    expect(etapaComValorInvalido([ok, ruim])).toBe(4);
   });
 });
