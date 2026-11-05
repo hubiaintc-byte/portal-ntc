@@ -1,11 +1,25 @@
 import { describe, expect, it } from "vitest";
 
-import { TELAS, TELAS_LEADS, acessoDoUsuario, capacidadesDoAcesso, telasDoModulo, temTela } from "./telas";
+import { TELAS, TELAS_FIN, TELAS_LEADS, acessoDoUsuario, capacidadesDoAcesso, telasDoModulo, temTela } from "./telas";
 
 describe("TELAS", () => {
-  it("tem 15 telas com ids únicos", () => {
-    expect(TELAS).toHaveLength(15);
-    expect(new Set(TELAS.map((t) => t.id)).size).toBe(15);
+  it("tem 19 telas com ids únicos", () => {
+    expect(TELAS).toHaveLength(19);
+    expect(new Set(TELAS.map((t) => t.id)).size).toBe(19);
+  });
+  it("as 4 telas do Financeiro vêm no fim", () => {
+    expect([...TELAS_FIN]).toEqual(["fin.visao-executiva", "fin.eventos", "fin.receber", "fin.pagar"]);
+    expect(TELAS.slice(-4).map((t) => t.id)).toEqual(TELAS_FIN);
+  });
+  it("telasDoModulo financeiro", () => {
+    expect(telasDoModulo({ administrador: false, telas: ["fin.receber", "crm.leads"] }, "financeiro")).toEqual(["fin.receber"]);
+  });
+  it("excluirFinanceiro só para administrador", () => {
+    expect(capacidadesDoAcesso({ administrador: true, telas: [] }).excluirFinanceiro).toBe(true);
+    const todas = { administrador: false, telas: [...TELAS_FIN] };
+    const c = capacidadesDoAcesso(todas);
+    expect(c.excluirFinanceiro).toBe(false);
+    expect(c.usarFinanceiro).toBe(true);
   });
 });
 

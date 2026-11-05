@@ -39,7 +39,7 @@ type UsuarioComTelas = { administrador?: boolean | null; telas?: readonly string
  * Para onde vai quem acabou de entrar: /crm se só tem telas do CRM, senão o
  * Site (spec §5). Falha ao ler o usuário cai no Site — de lá a pessoa navega.
  */
-async function destinoDoUsuario(usuarioId: string): Promise<"/" | "/crm"> {
+async function destinoDoUsuario(usuarioId: string): Promise<"/" | "/crm" | "/financeiro"> {
   try {
     const payload = await obterPayload();
     const u = await payload.findByID({
@@ -82,7 +82,7 @@ export async function entrar(
 
   let token: string | undefined;
   let usuarioId: string | undefined;
-  let destino: "/" | "/crm" = "/";
+  let destino: "/" | "/crm" | "/financeiro" = "/";
   try {
     const payload = await obterPayload();
     const resultado = await payload.login({
@@ -254,7 +254,7 @@ export async function redefinirSenha(
 
   let tokenSessao: string | undefined;
   let usuarioId: string | undefined;
-  let destino: "/" | "/crm" = "/";
+  let destino: "/" | "/crm" | "/financeiro" = "/";
   try {
     const payload = await obterPayload();
     const resultado = await payload.resetPassword({

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-import type { ModuloPainel } from "./ShellPainel";
+import type { ModuloPainel } from "@/lib/cms/telas";
 
 interface OpcaoModulo {
   id: ModuloPainel;
@@ -15,16 +15,19 @@ interface OpcaoModulo {
 const OPCOES: OpcaoModulo[] = [
   { id: "site", rotulo: "Site", descricao: "Conteúdo editorial", href: "/" },
   { id: "crm", rotulo: "CRM", descricao: "Comercial", href: "/crm" },
+  { id: "financeiro", rotulo: "Financeiro", descricao: "Gestão financeira", href: "/financeiro" },
 ];
 
 interface SeletorModuloProps {
   modulo: ModuloPainel;
   /** false = a pessoa não tem tela do CRM: só o Site aparece (é onde fica Minha conta). */
   mostrarCrm: boolean;
+  /** false = a pessoa não tem tela do Financeiro. */
+  mostrarFinanceiro: boolean;
 }
 
 /** Droplist de módulo (workspace switcher) da sidebar do painel. */
-export function SeletorModulo({ modulo, mostrarCrm }: SeletorModuloProps) {
+export function SeletorModulo({ modulo, mostrarCrm, mostrarFinanceiro }: SeletorModuloProps) {
   const [aberto, setAberto] = useState(false);
   const raiz = useRef<HTMLDivElement>(null);
   const botaoRef = useRef<HTMLButtonElement>(null);
@@ -48,7 +51,7 @@ export function SeletorModulo({ modulo, mostrarCrm }: SeletorModuloProps) {
     };
   }, [aberto]);
 
-  const opcoes = OPCOES.filter((o) => o.id !== "crm" || mostrarCrm);
+  const opcoes = OPCOES.filter((o) => (o.id !== "crm" || mostrarCrm) && (o.id !== "financeiro" || mostrarFinanceiro));
   const atual = opcoes.find((o) => o.id === modulo);
   if (!atual) return null;
 

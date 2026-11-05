@@ -14,7 +14,7 @@ import type {
   PalestranteCmsResumo,
 } from "@/lib/cms/painelCms";
 
-import { mostraModuloCrm, navSiteVisivel, telaInicialSite, type TelaIdSite } from "@/lib/cms/navegacao";
+import { mostraModuloCrm, mostraModuloFinanceiro, navSiteVisivel, telaInicialSite, type TelaIdSite } from "@/lib/cms/navegacao";
 import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
 import type { AcessoPainel, CapacidadesPainel } from "@/lib/cms/telas";
 
@@ -357,6 +357,7 @@ export function ShellCms({
     <ShellPainel
       modulo="site"
       mostrarCrm={mostraModuloCrm(acesso)}
+      mostrarFinanceiro={mostraModuloFinanceiro(acesso)}
       usuario={usuario}
       administrador={acesso.administrador}
       grupos={grupos}

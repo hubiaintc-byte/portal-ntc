@@ -207,6 +207,10 @@ export interface User {
         | 'crm.programas'
         | 'crm.modulos'
         | 'crm.produtos'
+        | 'fin.visao-executiva'
+        | 'fin.eventos'
+        | 'fin.receber'
+        | 'fin.pagar'
       )[]
     | null;
   updatedAt: string;

@@ -3,6 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   destinoDepoisDoLogin,
   mostraModuloCrm,
+  mostraModuloFinanceiro,
+  navFinVisivel,
+  telaInicialFin,
   navCrmVisivel,
   navSiteVisivel,
   telaInicialCrm,
@@ -106,5 +109,24 @@ describe("menus", () => {
     expect(mostraModuloCrm({ administrador: false, telas: ["site.eventos"] })).toBe(false);
     expect(mostraModuloCrm({ administrador: false, telas: ["crm.produtos"] })).toBe(true);
     expect(mostraModuloCrm(ADMIN)).toBe(true);
+  });
+});
+
+describe("módulo Financeiro", () => {
+  it("login: só telas fin.* vai para /financeiro", () => {
+    expect(destinoDepoisDoLogin({ administrador: false, telas: ["fin.pagar"] })).toBe("/financeiro");
+  });
+  it("login: CRM vence o Financeiro", () => {
+    expect(destinoDepoisDoLogin({ administrador: false, telas: ["crm.leads", "fin.pagar"] })).toBe("/crm");
+  });
+  it("mostraModuloFinanceiro exige alguma tela fin.*", () => {
+    expect(mostraModuloFinanceiro({ administrador: false, telas: ["crm.leads"] })).toBe(false);
+    expect(mostraModuloFinanceiro({ administrador: false, telas: ["fin.receber"] })).toBe(true);
+    expect(mostraModuloFinanceiro(ADMIN)).toBe(true);
+  });
+  it("telaInicialFin respeita a ordem do menu", () => {
+    expect(telaInicialFin({ administrador: false, telas: ["fin.pagar", "fin.eventos"] })).toBe("eventos");
+    expect(telaInicialFin(ADMIN)).toBe("visao");
+    expect(navFinVisivel({ administrador: false, telas: ["fin.pagar", "fin.receber"] })).toEqual(["receber", "pagar"]);
   });
 });

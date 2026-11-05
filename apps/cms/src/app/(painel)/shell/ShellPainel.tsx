@@ -7,7 +7,9 @@ import { cancelarInscricaoLocal } from "@/lib/avisos/navegador";
 import { sair } from "../acoesAuth";
 import { SeletorModulo } from "./SeletorModulo";
 
-export type ModuloPainel = "site" | "crm";
+import type { ModuloPainel } from "@/lib/cms/telas";
+
+export type { ModuloPainel };
 
 /** Tempo máximo que o "Sair" espera o navegador cancelar a inscrição dos avisos. */
 const ESPERA_DESINSCRICAO_MS = 2000;
@@ -27,6 +29,8 @@ interface ShellPainelProps {
   modulo: ModuloPainel;
   /** O seletor mostra o CRM só com alguma tela `crm.*`; o Site aparece sempre (Minha conta). */
   mostrarCrm: boolean;
+  /** O seletor mostra o Financeiro só com alguma tela `fin.*`. */
+  mostrarFinanceiro: boolean;
   usuario: { nome: string; email: string };
   /** Rótulo do rodapé da sidebar: "Administrador" ou "Equipe". */
   administrador: boolean;
@@ -54,6 +58,7 @@ function iniciais(nome: string): string {
 export function ShellPainel({
   modulo,
   mostrarCrm,
+  mostrarFinanceiro,
   usuario,
   administrador,
   grupos,
@@ -106,7 +111,7 @@ export function ShellPainel({
           <span className="pcms-sidebar__painel-rotulo">Painel Admin</span>
         </div>
 
-        <SeletorModulo modulo={modulo} mostrarCrm={mostrarCrm} />
+        <SeletorModulo modulo={modulo} mostrarCrm={mostrarCrm} mostrarFinanceiro={mostrarFinanceiro} />
 
         <nav className="pcms-nav" aria-label="Navegação principal do painel">
           {grupos.map((grupo) => (

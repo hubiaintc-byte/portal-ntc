@@ -25,6 +25,7 @@ import { AvisoForm, BarraForm, CampoCheck, CampoTexto } from "./crm/CamposCrm";
 const GRUPOS_TELAS: { modulo: ModuloPainel; rotulo: string }[] = [
   { modulo: "site", rotulo: "Site" },
   { modulo: "crm", rotulo: "CRM" },
+  { modulo: "financeiro", rotulo: "Financeiro" },
 ];
 
 interface DadosForm {

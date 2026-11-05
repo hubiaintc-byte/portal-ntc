@@ -4,7 +4,7 @@
  * A ordem de `TELAS` é a ordem do menu.
  */
 
-export type ModuloPainel = "site" | "crm";
+export type ModuloPainel = "site" | "crm" | "financeiro";
 
 export type TelaPainel =
   | "site.painel"
@@ -21,7 +21,11 @@ export type TelaPainel =
   | "crm.envios"
   | "crm.programas"
   | "crm.modulos"
-  | "crm.produtos";
+  | "crm.produtos"
+  | "fin.visao-executiva"
+  | "fin.eventos"
+  | "fin.receber"
+  | "fin.pagar";
 
 export const TELAS: readonly { id: TelaPainel; modulo: ModuloPainel; rotulo: string }[] = [
   { id: "site.painel", modulo: "site", rotulo: "Painel" },
@@ -39,7 +43,14 @@ export const TELAS: readonly { id: TelaPainel; modulo: ModuloPainel; rotulo: str
   { id: "crm.programas", modulo: "crm", rotulo: "Programas" },
   { id: "crm.modulos", modulo: "crm", rotulo: "Módulos" },
   { id: "crm.produtos", modulo: "crm", rotulo: "Produtos / Eventos" },
+  { id: "fin.visao-executiva", modulo: "financeiro", rotulo: "Visão Executiva" },
+  { id: "fin.eventos", modulo: "financeiro", rotulo: "Eventos e Projetos" },
+  { id: "fin.receber", modulo: "financeiro", rotulo: "Receber" },
+  { id: "fin.pagar", modulo: "financeiro", rotulo: "Pagar" },
 ];
+
+/** Telas do módulo Financeiro. */
+export const TELAS_FIN: readonly TelaPainel[] = TELAS.filter((t) => t.modulo === "financeiro").map((t) => t.id);
 
 /** Quem vê dados de lead (o quadro e a lista de Leads). */
 export const TELAS_LEADS: readonly TelaPainel[] = ["crm.dashboard", "crm.leads"];
@@ -96,6 +107,9 @@ export interface CapacidadesPainel {
   /** Escrita de módulos: Módulos ou Programas — o detalhe do programa cria módulo. */
   editarModulos: boolean;
   usarCrm: boolean;
+  usarFinanceiro: boolean;
+  /** Excluir lançamentos financeiros: só administrador. */
+  excluirFinanceiro: boolean;
   verLeads: boolean;
   /** Agendar, contrato/empenho, links, realizado e cancelar no acervo de eventos do cliente (§3.8). */
   acompanharEventos: boolean;
@@ -116,6 +130,8 @@ export function capacidadesDoAcesso(acesso: AcessoPainel): CapacidadesPainel {
     editarProgramas: temTela(acesso, ["crm.programas"]),
     editarModulos: temTela(acesso, ["crm.modulos", "crm.programas"]),
     usarCrm: temTela(acesso, TELAS_CRM),
+    usarFinanceiro: temTela(acesso, TELAS_FIN),
+    excluirFinanceiro: acesso.administrador,
     verLeads: temTela(acesso, TELAS_LEADS),
     acompanharEventos: temTela(acesso, [...TELAS_LEADS, "crm.clientes"]),
     gerirUsuarios: acesso.administrador,

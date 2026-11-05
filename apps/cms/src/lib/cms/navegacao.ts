@@ -28,6 +28,9 @@ export type TelaCrmId =
   | "modulos"
   | "produtos";
 
+/** Ids de navegação do módulo Financeiro (`ShellFinanceiro`). */
+export type TelaFinId = "visao" | "eventos" | "receber" | "pagar";
+
 /** Itens editoriais do menu do Site, na ordem do menu. `site.contatos` não tem item: é uma seção de Configurações. */
 export const NAV_SITE: readonly { id: TelaIdSite; tela: TelaPainel }[] = [
   { id: "dashboard", tela: "site.painel" },
@@ -48,6 +51,14 @@ export const NAV_CRM: readonly { id: TelaCrmId; tela: TelaPainel }[] = [
   { id: "programas", tela: "crm.programas" },
   { id: "modulos", tela: "crm.modulos" },
   { id: "produtos", tela: "crm.produtos" },
+];
+
+/** Itens do menu do Financeiro, na ordem do menu. */
+export const NAV_FIN: readonly { id: TelaFinId; tela: TelaPainel }[] = [
+  { id: "visao", tela: "fin.visao-executiva" },
+  { id: "eventos", tela: "fin.eventos" },
+  { id: "receber", tela: "fin.receber" },
+  { id: "pagar", tela: "fin.pagar" },
 ];
 
 function visiveis<T>(acesso: AcessoPainel, nav: readonly { id: T; tela: TelaPainel }[]): T[] {
@@ -82,8 +93,28 @@ export function telaInicialCrm(acesso: AcessoPainel): TelaCrmId {
   return navCrmVisivel(acesso)[0] ?? NAV_CRM[0]!.id;
 }
 
-/** Para onde o login leva: /crm se a pessoa só tem telas do CRM; senão o Site (inclusive sem tela nenhuma). */
-export function destinoDepoisDoLogin(acesso: AcessoPainel): "/" | "/crm" {
-  const temSite = telasDoModulo(acesso, "site").length > 0;
-  return !temSite && mostraModuloCrm(acesso) ? "/crm" : "/";
+/** Itens do menu do Financeiro que esta pessoa vê. */
+export function navFinVisivel(acesso: AcessoPainel): TelaFinId[] {
+  return visiveis(acesso, NAV_FIN);
+}
+
+/** O seletor mostra o Financeiro só com ao menos uma tela `fin.*`. */
+export function mostraModuloFinanceiro(acesso: AcessoPainel): boolean {
+  return telasDoModulo(acesso, "financeiro").length > 0;
+}
+
+/** Primeira tela do Financeiro marcada, na ordem do menu; sem nenhuma, a primeira do menu. */
+export function telaInicialFin(acesso: AcessoPainel): TelaFinId {
+  return navFinVisivel(acesso)[0] ?? NAV_FIN[0]!.id;
+}
+
+/**
+ * Para onde o login leva: sem tela do Site, o CRM se houver, senão o
+ * Financeiro se houver; o resto (inclusive sem tela nenhuma) cai no Site.
+ */
+export function destinoDepoisDoLogin(acesso: AcessoPainel): "/" | "/crm" | "/financeiro" {
+  if (telasDoModulo(acesso, "site").length > 0) return "/";
+  if (mostraModuloCrm(acesso)) return "/crm";
+  if (mostraModuloFinanceiro(acesso)) return "/financeiro";
+  return "/";
 }

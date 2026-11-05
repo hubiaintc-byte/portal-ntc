@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 
-import { navCrmVisivel, telaInicialCrm, type TelaCrmId } from "@/lib/cms/navegacao";
+import { mostraModuloFinanceiro, navCrmVisivel, telaInicialCrm, type TelaCrmId } from "@/lib/cms/navegacao";
 import type { DadosEnvio } from "@/lib/cms/painelCrmEscrita";
 import { temTela, type AcessoPainel, type CapacidadesPainel } from "@/lib/cms/telas";
 import type {
@@ -346,6 +346,7 @@ export function ShellCrm({
     <ShellPainel
       modulo="crm"
       mostrarCrm
+      mostrarFinanceiro={mostraModuloFinanceiro(acesso)}
       usuario={usuario}
       administrador={acesso.administrador}
       grupos={grupos}
