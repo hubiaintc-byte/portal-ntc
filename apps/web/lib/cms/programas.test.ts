@@ -125,6 +125,7 @@ describe("leitura dos programas pelo site", () => {
     expect(evs.where.and).toContainEqual(SO_PUBLICADO);
     expect(evs.where.and).toContainEqual({ or: [{ programa: { equals: 1 } }, { id: { in: [55] } }] });
     expect(evs.draft).toBeUndefined();
+    expect(evs.sort).toBe("-dataInicio");
   });
 
   it("sem evento ativo a seção de módulos abertos some", async () => {
@@ -209,6 +210,11 @@ describe("relacionadosDe", () => {
     const r = relacionadosDe("b", todos);
     expect(r.map((x) => x.slug)).toEqual(["a", "c", "d"]);
     expect(r[0]).toEqual({ slug: "a", sigla: "A", nomeCurto: "Programa a", descritor: "A" });
+  });
+
+  it("ordem por sigla, mesmo quando a ordem da lista (cartao.ordem) discorda", () => {
+    const todos = [campos("z", "educacao"), campos("m", "educacao"), campos("b", "educacao"), campos("a", "educacao")];
+    expect(relacionadosDe("z", todos).map((x) => x.slug)).toEqual(["a", "b", "m"]);
   });
 
   it("slug fora da lista → vazio", () => {

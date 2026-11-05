@@ -163,12 +163,17 @@ export function docParaCampos(doc: ProgramaCMS, modulos: ModuloCMS[]): CamposPag
   };
 }
 
-/** Mesma regra da versão estática: mesma vertente, outro slug, até 3, na ordem da lista. */
+/**
+ * Mesma vertente, outro slug, até 3, em ordem de sigla — independente da
+ * ordem de `todos` (que segue `cartao.ordem`, usada em listas e menus), para
+ * os cards relacionados não mudarem quando a ordem do cartão mudar.
+ */
 export function relacionadosDe(slug: string, todos: CamposPaginaPrograma[]): RelacionadoPrograma[] {
   const atual = todos.find((c) => c.slug === slug);
   if (!atual) return [];
   return todos
     .filter((c) => c.vertical === atual.vertical && c.slug !== slug)
+    .sort((a, b) => a.sigla.localeCompare(b.sigla))
     .slice(0, MAX_RELACIONADOS)
     .map((c) => ({ slug: c.slug, sigla: c.sigla, nomeCurto: c.nomeCompleto, descritor: c.sigla }));
 }
@@ -219,6 +224,7 @@ export const buscarProgramaPublicado = cache(async (slug: string): Promise<Conte
     limit: 100,
   });
 
+  // Evento listado em dois módulos fica com o número do último (ordem de `numero`).
   const numeroPorEvento = new Map<number, number>();
   for (const m of mods.docs) {
     for (const ev of m.eventosVinculados ?? []) numeroPorEvento.set(idDe(ev), m.numero);
@@ -240,6 +246,8 @@ export const buscarProgramaPublicado = cache(async (slug: string): Promise<Conte
     },
     depth: 1,
     limit: 100,
+    // Mais recentes primeiro: histórico longo não empurra os ativos para fora do limite.
+    sort: "-dataInicio",
   });
 
   const campos = docParaCampos(doc, mods.docs);

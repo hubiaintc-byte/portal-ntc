@@ -459,7 +459,7 @@ export default async function ProgramaPage({ params }: Props) {
                             <Link className="btn btn--gold" href={f.ctaHref ?? `/contato?programa=${p.slug}`}>
                               {f.ctaPrimario} <span className="btn-arrow">→</span>
                             </Link>
-                            <Link className="btn btn--secondary" href={`/contato?programa=${p.slug}&assunto=detalhes`}>
+                            <Link className="btn btn--secondary" href={f.ctaHref ?? `/contato?programa=${p.slug}&assunto=detalhes`}>
                               {f.ctaSecundario}
                             </Link>
                           </div>
