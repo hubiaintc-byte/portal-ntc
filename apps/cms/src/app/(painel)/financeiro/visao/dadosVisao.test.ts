@@ -200,3 +200,17 @@ describe("Visão Executiva — derivações", () => {
     expect(recentEvents(evs, hoje).map((e) => e.id)).toEqual(["C", "D", "A", "B"]);
   });
 });
+
+describe("eventos do CRM com cadastro pendente (ruling R15)", () => {
+  it("livro vazio + N pendentes: 0 alertas, 0 por status, nenhum recente", () => {
+    const pendentes = ["1", "2", "3", "4"].map((i) =>
+      evento(`crm-${i}`, { origem: "crm", cadastroPendente: true, status: i === "1" ? "Planejado" : "Em execução" }),
+    );
+    const v = montarVisaoExecutiva({ ...vazio, eventos: pendentes }, FILTROS_VISAO_INICIAIS, hoje);
+    expect(v.carteira.alerts).toEqual([]);
+    expect(v.carteira.rows).toEqual([]);
+    expect(v.porStatus.every((s) => s.n === 0 && s.fracao === 0)).toBe(true);
+    expect(v.recentes).toEqual([]);
+    expect(semNaN(v)).toBe(true);
+  });
+});

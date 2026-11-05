@@ -273,3 +273,16 @@ describe("wizard de evento", () => {
     expect(f).toMatchObject({ nome: "Turma", cargaHoraria: "" });
   });
 });
+
+describe("listarEventos com evento do CRM pendente (ruling R15)", () => {
+  it("o pendente aparece na lista, sem ponto de alerta", () => {
+    const pendentes = [
+      ev({ id: "crm-7", origem: "crm", cadastroPendente: true, status: "Planejado" }),
+      ev({ id: "crm-8", origem: "crm", cadastroPendente: true, status: "Em execução" }),
+    ];
+    const r = listarEventos({ ...vazio, eventos: pendentes }, ESTADO_LISTA_INICIAL, HOJE);
+    expect(r.lista.map((e) => e.id).sort()).toEqual(["crm-7", "crm-8"]);
+    expect(r.alertas["crm-7"]).toEqual([]);
+    expect(r.alertas["crm-8"]).toEqual([]);
+  });
+});

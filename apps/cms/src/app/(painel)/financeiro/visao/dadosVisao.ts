@@ -133,7 +133,10 @@ export function montarVisaoExecutiva(
     hoje,
   );
 
-  const todosOsStatus = livro.eventos.filter((e) => matchEvent(e, { ...f, status: "all" }));
+  // Evento do CRM sem cadastro financeiro não conta na carteira (ruling R15).
+  const todosOsStatus = livro.eventos.filter(
+    (e) => !e.cadastroPendente && matchEvent(e, { ...f, status: "all" }),
+  );
   const porStatus = LISTAS_FIN.statusOperacional.map((status) => {
     const n = todosOsStatus.filter((e) => e.status === status).length;
     return { status, n, fracao: todosOsStatus.length ? n / todosOsStatus.length : 0 };

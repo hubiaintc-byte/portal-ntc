@@ -138,6 +138,8 @@ export interface AlertaFin {
 export const SEV_ORDER: Record<Severidade, number> = { Vencido: 0, Pendente: 1, Atenção: 2, "A validar": 3 };
 
 export function eventAlerts(ev: EventoFin, livro: LivroFinanceiro, hoje: string, metricas?: MetricasEvento): AlertaFin[] {
+  // Evento do CRM ainda sem cadastro financeiro: não alerta (ruling R15).
+  if (ev.cadastroPendente) return [];
   const m = metricas ?? eventMetrics(ev, livro, hoje);
   const out: AlertaFin[] = [];
   const add = (severidade: Severidade, titulo: string, detalhe: string, aba: AlertaFin["aba"], valor: Centavos | null) =>
@@ -226,8 +228,13 @@ export interface Carteira {
   evIds: string[];
 }
 
+/**
+ * Carteira de eventos. Evento do CRM ainda sem cadastro financeiro
+ * (`cadastroPendente`) fica fora das linhas, dos totais e dos alertas
+ * (ruling R15) — aparece só na lista de Eventos, com o selo.
+ */
 export function portfolio(filtro: FiltroCarteira, livro: LivroFinanceiro, hoje: string): Carteira {
-  const evs = livro.eventos.filter((e) => matchEvent(e, filtro));
+  const evs = livro.eventos.filter((e) => !e.cadastroPendente && matchEvent(e, filtro));
   const rows = evs.map((ev) => ({ ev, m: eventMetrics(ev, livro, hoje) }));
   const tot = Object.fromEntries(CHAVES_TOTAIS.map((k) => [k, soma(rows, (x) => x.m[k])])) as TotaisCarteira;
   const alerts = rows

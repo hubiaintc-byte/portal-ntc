@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { demonstrativo, eventMetrics, matchEvent, portfolio } from "./eventos";
+import { demonstrativo, eventAlerts, eventMetrics, matchEvent, portfolio } from "./eventos";
 import type { EventoFin, LivroFinanceiro } from "./tipos";
 
 const vazio: LivroFinanceiro = { eventos: [], receitas: [], faturamentos: [], custos: [], pagamentos: [], contas: [] };
@@ -49,5 +49,28 @@ describe("carteira", () => {
     expect(demonstrativo([100, 80, 60], [30, 50, 70])).toEqual({
       receita: [100, 80, 60], custo: [30, 50, 70], resultado: [70, 30, -10],
     });
+  });
+});
+
+describe("evento do CRM com cadastro financeiro pendente (ruling R15)", () => {
+  const pendentes = [
+    ev({ id: "crm-1", origem: "crm", cadastroPendente: true, status: "Planejado" }),
+    ev({ id: "crm-2", origem: "crm", cadastroPendente: true, status: "Em execução" }),
+    ev({ id: "crm-3", origem: "crm", cadastroPendente: true, status: "Realizado" }),
+  ];
+  const livro: LivroFinanceiro = { ...vazio, eventos: pendentes };
+  it("não gera alerta", () => {
+    for (const e of pendentes) expect(eventAlerts(e, livro, "2026-07-15")).toEqual([]);
+  });
+  it("não entra nas linhas nem nos totais da carteira", () => {
+    const p = portfolio(FILTRO, livro, "2026-07-15");
+    expect(p.rows).toEqual([]);
+    expect(p.evIds).toEqual([]);
+    expect(p.alerts).toEqual([]);
+    for (const v of Object.values(p.tot)) expect(v).toBe(0);
+  });
+  it("evento com cadastro segue na carteira ao lado do pendente", () => {
+    const p = portfolio(FILTRO, { ...livro, eventos: [...pendentes, ev()] }, "2026-07-15");
+    expect(p.evIds).toEqual(["EV-1"]);
   });
 });
