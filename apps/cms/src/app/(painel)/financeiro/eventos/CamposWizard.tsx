@@ -307,12 +307,13 @@ export function Calculado({
 }: {
   campo: string;
   rotulo: string;
-  span: 2 | 3;
+  /** Sem `span` = largura inteira (o `span: 6` do protótipo). */
+  span?: 2 | 3;
   esquerda?: boolean;
   children: ReactNode;
 }) {
   return (
-    <div className={`fld s${span}`}>
+    <div className={`fld${span ? ` s${span}` : ""}`}>
       <label htmlFor={`f_${campo}`}>{rotulo}</label>
       <output id={`f_${campo}`} className={`computed${esquerda ? " left" : ""}`} aria-live="polite">
         {children}

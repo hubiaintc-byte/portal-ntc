@@ -11,20 +11,47 @@ import { eventosParaFaturar } from "./dadosReceber";
 
 /**
  * `openFaturamentoEscolha` do protótipo: "Qual é a origem da receita?".
+ * Com `textos`, também o `openTituloEscolha` de Pagar ("Qual é a origem da
+ * despesa?"), que abre a aba Pagamentos do evento.
  * Evento ou projeto → escolhe o evento aqui e abre a área dele na aba
  * Faturamento e recebimentos (o protótipo mandava para a lista de eventos com
  * um aviso); só aparece para quem tem a tela Eventos. Receita corporativa →
  * abre o faturamento corporativo.
  */
 
+/** Os textos do modal: os do faturamento (Receber) ou os do título (Pagar, `openTituloEscolha`). */
+export interface TextosEscolhaOrigem {
+  eyebrow: string;
+  titulo: string;
+  eventoDescricao: string;
+  corporativoRotulo: string;
+  corporativoDescricao: string;
+  corporativoVazio: string;
+  eventoAjuda: string;
+  eventoBotao: string;
+}
+
+export const TEXTOS_ESCOLHA_FATURAMENTO: TextosEscolhaOrigem = {
+  eyebrow: "Novo faturamento",
+  titulo: "Qual é a origem da receita?",
+  eventoDescricao: "Faturar uma receita vinculada a um evento da carteira",
+  corporativoRotulo: "Receita corporativa",
+  corporativoDescricao: "Faturar uma receita institucional sem evento",
+  corporativoVazio: "Nenhuma receita corporativa contratada",
+  eventoAjuda: "Abre o evento na aba Faturamento e recebimentos.",
+  eventoBotao: "Abrir faturamento do evento",
+};
+
 interface EscolhaFaturamentoProps {
   /** Eventos do livro; `null` = a pessoa não tem a tela Eventos (só o corporativo). */
   eventos: readonly EventoFin[] | null;
-  /** Há receita corporativa contratada para faturar. */
+  /** Há lançamento corporativo para escolher (receita contratada / despesa registrada). */
   temCorporativa: boolean;
   aoEscolherEvento: (eventoId: string) => void;
   aoEscolherCorporativo: () => void;
   aoFechar: () => void;
+  /** Padrão: os do faturamento. */
+  textos?: TextosEscolhaOrigem;
 }
 
 export function EscolhaFaturamento({
@@ -33,6 +60,7 @@ export function EscolhaFaturamento({
   aoEscolherEvento,
   aoEscolherCorporativo,
   aoFechar,
+  textos: T = TEXTOS_ESCOLHA_FATURAMENTO,
 }: EscolhaFaturamentoProps) {
   const [passo, setPasso] = useState<"origem" | "evento">("origem");
   const [eventoId, setEventoId] = useState("");
@@ -76,7 +104,7 @@ export function EscolhaFaturamento({
         </button>
         <button type="button" className="btn btn-primary" onClick={abrirEvento}>
           <Icone nome="receipt" tamanho="sm" />
-          Abrir faturamento do evento
+          {T.eventoBotao}
         </button>
       </>
     );
@@ -85,8 +113,8 @@ export function EscolhaFaturamento({
     <Gaveta
       forma="modal"
       tamanho="sm"
-      eyebrow="Novo faturamento"
-      titulo="Qual é a origem da receita?"
+      eyebrow={T.eyebrow}
+      titulo={T.titulo}
       aoFechar={aoFechar}
       rodape={rodape}
     >
@@ -103,7 +131,7 @@ export function EscolhaFaturamento({
               >
                 <Icone nome="calendar" />
                 <b>Evento ou projeto</b>
-                <span>Faturar uma receita vinculada a um evento da carteira</span>
+                <span>{T.eventoDescricao}</span>
               </button>
             )}
             <button
@@ -114,12 +142,8 @@ export function EscolhaFaturamento({
               onClick={aoEscolherCorporativo}
             >
               <Icone nome="home" />
-              <b>Receita corporativa</b>
-              <span>
-                {temCorporativa
-                  ? "Faturar uma receita institucional sem evento"
-                  : "Nenhuma receita corporativa contratada"}
-              </span>
+              <b>{T.corporativoRotulo}</b>
+              <span>{temCorporativa ? T.corporativoDescricao : T.corporativoVazio}</span>
             </button>
           </div>
         ) : (
@@ -133,7 +157,7 @@ export function EscolhaFaturamento({
               campo="eventoFaturar"
               rotulo="Evento"
               obrigatorio
-              ajuda="Abre o evento na aba Faturamento e recebimentos."
+              ajuda={T.eventoAjuda}
               opcoes={lista.map((e) => e.id)}
               rotuloDe={(id) => `${id} · ${nomes.get(id) ?? ""}`}
               valor={eventoId}

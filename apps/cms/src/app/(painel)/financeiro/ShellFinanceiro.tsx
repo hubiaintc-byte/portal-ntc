@@ -11,6 +11,8 @@ import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { AreaEvento, EventoNaoEncontrado } from "./eventos/AreaEvento";
 import { aplicarFiltrosRecebidos, ESTADO_LISTA_INICIAL, type EstadoListaEventos } from "./eventos/dadosEventos";
 import { TelaEventos } from "./eventos/TelaEventos";
+import { aplicarFiltrosPagar, FILTROS_PAGAR_INICIAIS, type FiltrosPagar } from "./pagar/dadosPagar";
+import { TelaPagar } from "./pagar/TelaPagar";
 import { aplicarFiltrosReceber, FILTROS_RECEBER_INICIAIS, type FiltrosReceber } from "./receber/dadosReceber";
 import { TelaReceber } from "./receber/TelaReceber";
 import { RaizFin05Contexto } from "./ui/PortalFin05";
@@ -131,22 +133,6 @@ function estadoDe(tela: TelaFinId, extra?: ExtraNavegacao): EstadoTelaFin {
   }
 }
 
-/**
- * Placeholder das telas ainda não portadas; cada uma entra no lugar dela nas
- * Tasks 13–17 e já recebe o contrato completo (`PropsTelaFin`).
- */
-function EmConstrucao({ titulo }: PropsTelaFin & { titulo: string }) {
-  return (
-    <div className="page-head">
-      <div className="ph-text">
-        <div className="eyebrow">Financeiro</div>
-        <h1 className="page-title">{titulo}</h1>
-        <p className="page-sub">[em construção]</p>
-      </div>
-    </div>
-  );
-}
-
 export function ShellFinanceiro({
   usuario,
   acesso,
@@ -164,6 +150,8 @@ export function ShellFinanceiro({
   const [listaEventos, setListaEventos] = useState<EstadoListaEventos>(ESTADO_LISTA_INICIAL);
   // Recorte de Receber (filtros e busca), como o `UI.fin`.
   const [filtrosReceber, setFiltrosReceber] = useState<FiltrosReceber>(FILTROS_RECEBER_INICIAIS);
+  // Recorte de Pagar (filtros e busca), como o `UI.pag`.
+  const [filtrosPagar, setFiltrosPagar] = useState<FiltrosPagar>(FILTROS_PAGAR_INICIAIS);
   // Raiz `.fin05` para os portais das camadas fixas (gaveta, menus, toasts).
   const [raiz, setRaiz] = useState<HTMLDivElement | null>(null);
   // Toasts no casco: um "Evento criado" sobrevive à navegação para a área do evento.
@@ -177,6 +165,7 @@ export function ShellFinanceiro({
     const filtros = extra?.filtros;
     if (tela === "eventos" && filtros) setListaEventos((s) => aplicarFiltrosRecebidos(s, filtros));
     if (tela === "receber" && filtros) setFiltrosReceber((s) => aplicarFiltrosReceber(s, filtros));
+    if (tela === "pagar" && filtros) setFiltrosPagar((s) => aplicarFiltrosPagar(s, filtros));
     setEstado(estadoDe(tela, extra));
     window.scrollTo({ top: 0 });
   };
@@ -236,7 +225,9 @@ export function ShellFinanceiro({
           {estado.tela === "receber" && (
             <TelaReceber {...props} filtros={filtrosReceber} aoMudarFiltros={setFiltrosReceber} />
           )}
-          {estado.tela === "pagar" && <EmConstrucao titulo={ROTULO.pagar} {...props} />}
+          {estado.tela === "pagar" && (
+            <TelaPagar {...props} filtros={filtrosPagar} aoMudarFiltros={setFiltrosPagar} />
+          )}
         </div>
       </div>
         {toasts}
