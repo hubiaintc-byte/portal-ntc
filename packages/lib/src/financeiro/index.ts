@@ -4,3 +4,5 @@ export * from "./dinheiro";
 export * from "./periodos";
 export * from "./receitas";
 export * from "./custos";
+export * from "./reconhecimento";
+export * from "./eventos";

@@ -1,32 +1,5 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import type { LivroFinanceiro } from "./tipos";
-
-type Saidas = Record<string, Record<string, Record<string, unknown>>>;
-
-export interface FixtureParidade {
-  hoje: string;
-  db: LivroFinanceiro;
-  saidas: Saidas;
-}
-
-/** Lê o fixture do protótipo e completa os campos de integração que ele não tem. */
-export function carregarFixture(): FixtureParidade {
-  const bruto = JSON.parse(
-    readFileSync(new URL("./__fixtures__/paridade-fin05.json", import.meta.url), "utf8"),
-  ) as { hoje: string; db: Record<string, unknown[]>; saidas: Saidas };
-  const db = {
-    ...bruto.db,
-    eventos: bruto.db.eventos!.map((e) => ({
-      origem: "financeiro",
-      eventoComercialId: null,
-      cadastroPendente: false,
-      canceladoNoCrm: false,
-      ...(e as object),
-    })),
-  } as unknown as LivroFinanceiro;
-  return { hoje: bruto.hoje, db, saidas: bruto.saidas };
-}
+import { carregarFixture } from "./__fixtures__/carregar";
 
 const fx = carregarFixture();
 
@@ -72,5 +45,68 @@ describe("paridade com o protótipo FIN-05 (receitas, parcelas, custos, títulos
   it("o fixture exerce vencidos de parcela e de título", () => {
     expect(Object.values(fx.saidas.fatrecFin!).some((x) => x.vencido === true)).toBe(true);
     expect(Object.values(fx.saidas.pagamentoFin!).some((x) => x.vencido === true)).toBe(true);
+  });
+});
+
+
+describe("paridade com o protótipo FIN-05 (reconhecimento, evento e carteira)", () => {
+  it("reconhecimentoReceita", async () => {
+    const { reconhecimentoReceita } = await import("./reconhecimento");
+    for (const r of fx.db.receitas) {
+      const esperado = (fx.saidas.reconhecimentoReceita as unknown as Record<string, unknown>)[r.id];
+      expect(reconhecimentoReceita(r, fx.db, fx.hoje), r.id).toEqual(esperado);
+    }
+  });
+
+  it("eventMetrics", async () => {
+    const { eventMetrics } = await import("./eventos");
+    for (const ev of fx.db.eventos) {
+      const esperado = (fx.saidas.eventMetrics as unknown as Record<string, Record<string, unknown>>)[ev.id]!;
+      const { demo, ...resto } = esperado;
+      const m = eventMetrics(ev, fx.db, fx.hoje);
+      const chavesComissao = Object.keys(resto).filter((k) => /^comissao|^nComissoes$|^vendedores$|^custoOperacional/.test(k));
+      for (const k of chavesComissao) delete resto[k];
+      expect(m, ev.id).toMatchObject(resto);
+      const d = demo as { receita: number[]; custoTotal: number[]; resultado: number[] };
+      expect(m.demo.receita).toEqual(d.receita);
+      expect(m.demo.custo).toEqual(d.custoTotal);
+      expect(m.demo.resultado).toEqual(d.resultado);
+    }
+  });
+
+  it("eventAlerts", async () => {
+    const { eventAlerts } = await import("./eventos");
+    let total = 0;
+    for (const ev of fx.db.eventos) {
+      const esperado = (
+        (fx.saidas.eventAlerts as unknown as Record<string, { sev: string; titulo: string; detalhe: string; tab: string; valor: number | null }[]>)[ev.id] ?? []
+      )
+        .filter((a) => a.tab !== "comissoes")
+        .map((a) => ({ severidade: a.sev, titulo: a.titulo, detalhe: a.detalhe, aba: a.tab, valor: a.valor }));
+      const obtido = eventAlerts(ev, fx.db, fx.hoje).map(({ severidade, titulo, detalhe, aba, valor }) => ({ severidade, titulo, detalhe, aba, valor }));
+      expect(obtido, ev.id).toEqual(esperado);
+      total += esperado.length;
+    }
+    expect(total).toBeGreaterThan(0);
+  });
+
+  it("portfolio por período", async () => {
+    const { portfolio } = await import("./eventos");
+    const periodos = Object.keys(fx.saidas.portfolio!);
+    expect(periodos.length).toBe(7);
+    for (const periodo of periodos) {
+      const esperado = (fx.saidas.portfolio as unknown as Record<string, { tot: Record<string, number>; alerts: { sev: string; titulo: string; eventoId: string }[]; evIds: string[]; rows: { id: string; m: Record<string, unknown> }[] }>)[periodo]!;
+      const p = portfolio({ periodo: periodo as never, vertical: "all", modalidade: "all", status: "all", tipo: "all" }, fx.db, fx.hoje);
+      const tot = Object.fromEntries(Object.entries(esperado.tot).filter(([k]) => !/^comissao/.test(k)));
+      expect(p.tot, periodo).toMatchObject(tot);
+      expect(p.evIds, periodo).toEqual(esperado.evIds);
+      expect(p.rows.map((x) => x.ev.id), periodo).toEqual(esperado.rows.map((x) => x.id));
+      expect(p.alerts.map((a) => [a.severidade, a.titulo, a.eventoId]), periodo).toEqual(
+        esperado.alerts.filter((a) => (a as { tab?: string }).tab !== "comissoes").map((a) => [a.sev, a.titulo, a.eventoId]),
+      );
+      for (const [i, x] of esperado.rows.entries()) {
+        expect(p.rows[i]!.m.resultadoRealizado, `${periodo} ${x.id}`).toBe(x.m.resultadoRealizado);
+      }
+    }
   });
 });
