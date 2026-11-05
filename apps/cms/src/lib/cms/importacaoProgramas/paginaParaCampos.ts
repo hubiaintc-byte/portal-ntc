@@ -150,7 +150,7 @@ export function paginaParaCampos(p: ConteudoPrograma): { campos: CamposPaginaPro
       },
       modalidadesIntro: decodificar(modalidades?.[1] ?? ""),
       modalidadesCards: cartoes,
-      modulosAbertosMicrocopy: p.modulosAbertos.microcopy,
+      modulosAbertosMicrocopy: p.modulosAbertos?.microcopy ?? "",
       chamadaFinalTitulo: inline("ctaFinal.tituloHtml", p.ctaFinal?.tituloHtml),
       chamadaFinalTexto: p.ctaFinal?.corpo ?? "",
       resumoLateral: (p.sidebar?.rows ?? []).map((r) => ({ rotulo: r.rotulo, valor: r.valor })),

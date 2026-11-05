@@ -110,3 +110,11 @@ describe("camposParaPagina — campos mínimos", () => {
     expect(html).not.toContain("<img");
   });
 });
+
+describe("camposParaPagina — sem evento ativo", () => {
+  it("omite modulosAbertos e a âncora #modulos-abertos", () => {
+    const r = camposParaPagina(minimo(), semExtras());
+    expect("modulosAbertos" in r).toBe(false);
+    expect(r.navAnchors.some((a) => a.href === "#modulos-abertos")).toBe(false);
+  });
+});

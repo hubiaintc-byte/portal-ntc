@@ -132,6 +132,8 @@ export interface EventoMini {
   titulo: string;
   metaHtml: string;
   ctaRotulo: string;
+  /** Destino do botão (ex.: /agenda/<slug>); opcional — a página ainda não o lê. */
+  ctaHref?: string;
 }
 
 export interface EventoFeature {
@@ -145,6 +147,8 @@ export interface EventoFeature {
   metas: string[];
   ctaPrimario: string;
   ctaSecundario: string;
+  /** Destino do botão (ex.: /agenda/<slug>); opcional — a página ainda não o lê. */
+  ctaHref?: string;
 }
 
 export interface ModulosAbertosRich {
@@ -194,7 +198,8 @@ export interface ConteudoPrograma {
   diferenciais?: Diferenciais;
   docentes: DocentesRich;
   modalidades: BlocoEditorial;
-  modulosAbertos: ModulosAbertosRich;
+  /** Ausente quando o programa não tem evento ativo. */
+  modulosAbertos?: ModulosAbertosRich;
   faq: { eyebrow: string; titulo: string; tituloHtml?: string; itens: FaqItem[] };
   ctaFinal?: CtaFinal;
   sidebar?: {

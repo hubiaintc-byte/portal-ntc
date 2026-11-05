@@ -16,7 +16,7 @@ function extrasDe(p: ConteudoPrograma): ExtrasEventos {
     const n = romanoParaInteiro(m.numero);
     if (n !== null && m.statusRotulo && m.statusTipo) status.set(n, { rotulo: m.statusRotulo, tipo: m.statusTipo });
   }
-  return { modulosAbertos: { feature: p.modulosAbertos.feature, miniStack: p.modulosAbertos.miniStack }, status };
+  return { modulosAbertos: { feature: p.modulosAbertos?.feature, miniStack: p.modulosAbertos?.miniStack }, status };
 }
 
 describe("ida e volta das 15 páginas de programa", () => {

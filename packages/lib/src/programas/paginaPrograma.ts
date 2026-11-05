@@ -210,7 +210,7 @@ export function camposParaPagina(c: CamposPaginaPrograma, extras: ExtrasEventos)
       ctas: MOLDE.hero.ctas.map((cta) => ({ rotulo: cta.rotulo, href: molde(cta.href), variante: cta.variante })),
     },
     metaBar,
-    navAnchors: MOLDE.navAnchors.map((a) => ({ ...a })),
+    navAnchors: MOLDE.navAnchors.filter((a) => feature || a.href !== "#modulos-abertos").map((a) => ({ ...a })),
     visaoGeral: {
       eyebrow: MOLDE.visaoGeral.eyebrow,
       ...tituloDoPainel(pg.visaoGeralTitulo),
@@ -307,19 +307,25 @@ export function camposParaPagina(c: CamposPaginaPrograma, extras: ExtrasEventos)
       ...tituloMolde(MOLDE.modalidades.tituloHtml),
       corpoHtml: corpoModalidades(pg),
     },
-    modulosAbertos: {
-      eyebrow: MOLDE.modulosAbertos.eyebrow,
-      ...tituloMolde(molde(MOLDE.modulosAbertos.tituloHtml)),
-      corpoHtml: MOLDE.modulosAbertos.corpoHtml,
-      ...(feature ? { feature: { ...feature, ...MOLDE.modulosAbertos.feature } } : {}),
-      ...(miniStack ? { miniStack: miniStack.map((m) => ({ ...m, ctaRotulo: MOLDE.modulosAbertos.miniCtaRotulo })) } : {}),
-      microcopy: pg.modulosAbertosMicrocopy,
-      bottomCtas: MOLDE.modulosAbertos.bottomCtas.map((b) => ({
-        rotulo: molde(b.rotulo),
-        href: molde(b.href),
-        primario: b.primario,
-      })),
-    },
+    ...(feature
+      ? {
+          modulosAbertos: {
+            eyebrow: MOLDE.modulosAbertos.eyebrow,
+            ...tituloMolde(molde(MOLDE.modulosAbertos.tituloHtml)),
+            corpoHtml: MOLDE.modulosAbertos.corpoHtml,
+            feature: { ...feature, ...MOLDE.modulosAbertos.feature },
+            ...(miniStack
+              ? { miniStack: miniStack.map((m) => ({ ...m, ctaRotulo: MOLDE.modulosAbertos.miniCtaRotulo })) }
+              : {}),
+            microcopy: pg.modulosAbertosMicrocopy,
+            bottomCtas: MOLDE.modulosAbertos.bottomCtas.map((b) => ({
+              rotulo: molde(b.rotulo),
+              href: molde(b.href),
+              primario: b.primario,
+            })),
+          },
+        }
+      : {}),
     faq: {
       eyebrow: MOLDE.faq.eyebrow,
       titulo: MOLDE.faq.titulo,
