@@ -39,6 +39,7 @@ import {
   revalidarProgramas,
 } from "@/lib/cms/revalidarSite";
 import { obterPayload } from "@/lib/payloadClient";
+import { ERRO_SLUG_PROGRAMA_REPETIDO, slugDaSigla } from "@/lib/cms/slugPrograma";
 
 import type { ResultadoEscrita } from "./painelCmsEscrita";
 
@@ -173,6 +174,23 @@ export async function salvarPrograma(
       });
       if (repetida.docs.length > 0) return { ok: false, erro: `Já existe um programa com a sigla ${sigla}.` };
 
+      // Programa novo nasce com o endereço da sigla, como os 15 (R28); o de
+      // programa existente nunca muda (a URL pública já circula).
+      const slugNovo = id === null ? slugDaSigla(sigla) : null;
+      if (slugNovo !== null) {
+        for (const draft of [false, true]) {
+          const comSlug = await payload.find({
+            collection: "programas",
+            where: { slug: { equals: slugNovo } },
+            draft,
+            limit: 1,
+            depth: 0,
+            req,
+          });
+          if (comSlug.docs.length > 0) return { ok: false, erro: ERRO_SLUG_PROGRAMA_REPETIDO };
+        }
+      }
+
       const textos: Record<string, unknown> = {};
       for (const { chave } of CAMPOS_TEXTO_PROGRAMA) {
         const md = dados.textos[chave];
@@ -180,6 +198,7 @@ export async function salvarPrograma(
       }
       const bruto: Record<string, unknown> = {
         sigla,
+        ...(slugNovo === null ? {} : { slug: slugNovo }),
         nomeCompleto: dados.nomeCompleto.trim(),
         ...(dados.temas === undefined ? {} : { eyebrow: textoOuNulo(dados.temas) }),
         area: dados.areaId === "" ? null : Number(dados.areaId),

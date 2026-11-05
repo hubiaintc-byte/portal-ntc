@@ -19,6 +19,7 @@ const usuario = { id: 5, collection: "users", nome: "Ana", email: "a@b.c", creat
 
 interface Opcoes {
   siglaEmUso?: boolean;
+  slugEmUso?: boolean;
   numeroEmUso?: boolean;
   statusPrincipal?: string;
   statusUltima?: string;
@@ -31,7 +32,10 @@ function payloadFalso(o: Opcoes = {}) {
   const create = vi.fn(async ({ data }: { collection?: string; data: Record<string, unknown> }) => ({ id: 77, ...data }));
   const update = vi.fn(async ({ data }: { collection?: string; id?: unknown; data: Record<string, unknown> }) => ({ id: 1, ...data }));
   const del = vi.fn(async () => ({ id: 1 }));
-  const find = vi.fn(async () => ({ docs: o.siglaEmUso ? [{ id: 2 }] : [] }));
+  const find = vi.fn(async ({ where }: { where?: unknown } = {}) => {
+    const porSlug = JSON.stringify(where ?? {}).includes('"slug"');
+    return { docs: (porSlug ? o.slugEmUso : o.siglaEmUso) ? [{ id: 2 }] : [] };
+  });
   const count = vi.fn(async ({ collection }: { collection: string }) => {
     if (collection === "modulos" && o.numeroEmUso !== undefined) return { totalDocs: o.numeroEmUso ? 1 : 0 };
     return { totalDocs: o.contagens?.[collection] ?? 0 };
@@ -234,6 +238,43 @@ describe("salvarPrograma", () => {
     obterPayloadMock.mockResolvedValue(p);
     expect(await salvarPrograma(null, programaBase, false, usuario)).toEqual({ ok: false, erro: "Já existe um programa com a sigla EDU." });
     expect(p.find).toHaveBeenCalledWith(expect.objectContaining({ where: { and: [{ sigla: { equals: "EDU" } }] } }));
+  });
+});
+
+describe("salvarPrograma — endereço (slug) do programa novo (R28)", () => {
+  it("programa novo nasce com o slug da sigla, como os 15 (PROSUS+ → prosus)", async () => {
+    const p = payloadFalso();
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarPrograma(null, { ...programaBase, sigla: " prosus+ " }, false, usuario);
+    const args = p.create.mock.calls[0]![0] as { data: Record<string, unknown> };
+    expect(args.data.slug).toBe("prosus");
+  });
+
+  it("confere o slug em publicados e rascunhos antes de gravar; repetido recusa sem escrever", async () => {
+    const p = payloadFalso({ slugEmUso: true });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await salvarPrograma(null, programaBase, false, usuario)).toEqual({
+      ok: false,
+      erro: "Já existe um programa com este endereço (sigla).",
+    });
+    expect(p.create).not.toHaveBeenCalled();
+
+    const livre = payloadFalso();
+    obterPayloadMock.mockResolvedValue(livre);
+    await salvarPrograma(null, programaBase, false, usuario);
+    const consultas = livre.find.mock.calls.map((c) => (c as unknown[])[0] as { where: unknown; draft?: boolean });
+    const porSlug = consultas.filter((a) => JSON.stringify(a.where).includes('"slug"'));
+    expect(porSlug.map((a) => a.draft === true).sort()).toEqual([false, true]);
+    for (const a of porSlug) expect(a.where).toEqual({ slug: { equals: "edu" } });
+  });
+
+  it("programa existente nunca muda de slug (não envia slug nem confere)", async () => {
+    const p = payloadFalso({ slugEmUso: true, programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    const r = await salvarPrograma("4", { ...programaBase, sigla: "OUTRA" }, false, usuario);
+    expect(r.ok).toBe(true);
+    const args = p.update.mock.calls[0]![0] as { data: Record<string, unknown> };
+    expect("slug" in args.data).toBe(false);
   });
 });
 
