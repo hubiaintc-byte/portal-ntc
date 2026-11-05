@@ -140,7 +140,7 @@ describe("validarEtapas", () => {
 const dadosFat: DadosFaturamentoFin = {
   receitaId: "R1", parcela: "Etapa 1", nf: "", dataFaturamento: "2026-03-01", valorFaturado: 4000, vencimento: "2026-03-31",
   retencaoTributaria: 0, retencaoContratual: 0, retencaoContratualLiberada: 0, dataRecebimento: "", valorRecebido: 0,
-  contaId: "", observacao: "",
+  contaId: "", quitado: false, observacao: "",
 };
 const conta = (p: Partial<ContaFin> = {}): ContaFin => ({ id: "CT1", nome: "Itaú", tipo: "Conta corrente", saldoInicial: 0, dataSaldoInicial: "2026-01-01", ativa: true, ...p }) as ContaFin;
 

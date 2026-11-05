@@ -126,7 +126,7 @@ export function podeExcluirReceita(id: string, livro: LivroFinanceiro): Resultad
 
 // ----------------------------------------------------------- faturamento
 
-export type DadosFaturamentoFin = Omit<FaturamentoFin, "id" | "eventoId" | "quitado">;
+export type DadosFaturamentoFin = Omit<FaturamentoFin, "id" | "eventoId">;
 
 export function validarFaturamento(d: DadosFaturamentoFin, livro: LivroFinanceiro, idAtual: string | null): ResultadoValidacao {
   const r = livro.receitas.find((x) => x.id === d.receitaId);

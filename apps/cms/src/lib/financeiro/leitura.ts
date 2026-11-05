@@ -224,7 +224,6 @@ function faturamentoDoDoc(d: Doc, eventoDaReceita: Map<string, string>): Faturam
   const receitaId = idDe(d.receita as Relacao);
   const valorFaturado = num(d.valorFaturado);
   const valorRecebido = num(d.valorRecebido);
-  const liquido = valorFaturado - num(d.retencaoTributaria) - num(d.retencaoContratual);
   return {
     id: String(d.id),
     receitaId,
@@ -240,8 +239,7 @@ function faturamentoDoDoc(d: Doc, eventoDaReceita: Map<string, string>): Faturam
     dataRecebimento: str(d.dataRecebimento),
     valorRecebido,
     contaId: idDe(d.conta as Relacao),
-    // `quitado` não é gravado (Task 8): derivado = recebido cobre o líquido.
-    quitado: liquido > 0 && valorRecebido >= liquido,
+    quitado: d.quitado === true,
     observacao: str(d.observacao),
   };
 }

@@ -57,7 +57,7 @@ describe("mesclarEventos", () => {
   });
 });
 
-function payloadFalso() {
+function payloadFalso(extra: Record<string, Record<string, unknown>[]> = {}) {
   const dados: Record<string, Record<string, unknown>[]> = {
     "fin-eventos": [{ id: 1, nome: "E" }],
     "fin-receitas": [{ id: 3, evento: 1, valorUnit: 100 }],
@@ -66,6 +66,7 @@ function payloadFalso() {
     "fin-pagamentos": [{ id: 7, custo: 6, valor: 50 }],
     "fin-contas": [{ id: 10, nome: "B" }, { id: 2, nome: "A" }],
     "eventos-comerciais": [],
+    ...extra,
   };
   const find = vi.fn(async ({ collection }: { collection: string }) => ({ docs: dados[collection] ?? [] }));
   obterPayloadMock.mockResolvedValue({ find });
@@ -79,6 +80,11 @@ describe("lerLivroFinanceiro", () => {
     expect(um(l.faturamentos)).toMatchObject({ receitaId: "3", eventoId: "1", contaId: "2" });
     expect(um(l.pagamentos)).toMatchObject({ custoId: "6", eventoId: "1" });
     expect(um(l.receitas).eventoId).toBe("1");
+  });
+  it("quitado gravado passa direto e ausente vira false", async () => {
+    payloadFalso({ "fin-faturamentos": [{ id: 4, receita: 3, quitado: true }, { id: 5, receita: 3 }] });
+    const l = await lerLivroFinanceiro();
+    expect(l.faturamentos.map((f) => f.quitado)).toEqual([true, false]);
   });
   it("contas ordenadas por id numérico crescente", async () => {
     payloadFalso();

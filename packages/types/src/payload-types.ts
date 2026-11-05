@@ -1779,6 +1779,7 @@ export interface FinFaturamento {
   retencaoContratualLiberada?: number | null;
   dataRecebimento?: string | null;
   valorRecebido?: number | null;
+  quitado?: boolean | null;
   conta?: (number | null) | FinConta;
   observacao?: string | null;
   updatedAt: string;
@@ -2914,6 +2915,7 @@ export interface FinFaturamentosSelect<T extends boolean = true> {
   retencaoContratualLiberada?: T;
   dataRecebimento?: T;
   valorRecebido?: T;
+  quitado?: T;
   conta?: T;
   observacao?: T;
   updatedAt?: T;
