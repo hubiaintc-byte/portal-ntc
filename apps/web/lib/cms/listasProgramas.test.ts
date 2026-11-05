@@ -11,7 +11,6 @@ import { FALLBACK_VERTICAIS } from "@/app/(vertical)/solucoes-estrategicas/[area
 import {
   carregarListasProgramas,
   cartaoDoPrograma,
-  listasFallback,
   montarListas,
   programasComEventoAtivo,
   trocarContagem,
@@ -128,36 +127,18 @@ describe("contagens", () => {
     expect(base.programas.tituloHtml).toBe("Nove programas estratégicos · <em>NTC Educação</em>");
   });
 
-  it("vertentes de hoje com os cartões do fallback não mudam nada", () => {
-    const listas = listasFallback();
+  it("vertentes com a mesma contagem de hoje (9/3/3, total 15) não mudam nada", () => {
+    const contagens = { educacao: 9, "gestao-publica": 3, saude: 3 } as const;
     for (const slug of ["educacao", "gestao-publica", "saude"] as const) {
       const base = FALLBACK_VERTICAIS[slug];
-      const v = vertenteComProgramas(base, listas.porVertical[slug], listas.total);
+      const cartoes = Array.from({ length: contagens[slug] }, (_, i) =>
+        cartaoDoPrograma(campos(`P${i}`, slug, i)),
+      );
+      const v = vertenteComProgramas(base, cartoes, 15);
       expect(v.programas.tituloHtml).toBe(base.programas.tituloHtml);
       expect(v.hero.ctas).toEqual(base.hero.ctas);
       expect(v.metadados).toEqual(base.metadados);
       expect(v.programas.ctaPrimario).toEqual(base.programas.ctaPrimario);
-    }
-  });
-});
-
-describe("listasFallback", () => {
-  it("são os 15 cartões das vertentes, na ordem das grades, com menu e mapa", () => {
-    const l = listasFallback();
-    expect(l.total).toBe(15);
-    expect(l.porVertical.educacao.map((c) => c.sigla)).toEqual(
-      FALLBACK_VERTICAIS.educacao.programas.cards.map((c) => c.sigla),
-    );
-    const edutec = l.cartoes.find((c) => c.sigla === "EDUTEC");
-    expect(edutec?.descricaoMenu).toBe(
-      "Educação Digital, Inovação e Tecnologias para Redes Públicas",
-    );
-    expect(edutec?.descricaoMapa).toBe("Educação Digital · Inovação · Tecnologias");
-    expect(edutec?.slug).toBe("edutec");
-    expect(l.cartoes.find((c) => c.sigla === "PROSUS+")?.slug).toBe("prosus");
-    for (const c of l.cartoes) {
-      expect(c.descricaoMenu, c.sigla).not.toBe("");
-      expect(c.descricaoMapa, c.sigla).not.toBe("");
     }
   });
 });
@@ -264,17 +245,13 @@ describe("carregarListasProgramas", () => {
     expect(evs.draft).toBeUndefined();
   });
 
-  it("falha do banco → cartões do fallback (nunca lança: o menu está em toda página)", async () => {
+  it("falha do banco → lança (ISR mantém a última versão boa; sem cartão estático)", async () => {
     find.mockRejectedValue(new Error("coluna inexistente"));
-    const erro = vi.spyOn(console, "error").mockImplementation(() => {});
-    const l = await carregarListasProgramas(AGORA);
-    expect(l.total).toBe(15);
-    expect(erro).toHaveBeenCalled();
-    erro.mockRestore();
+    await expect(carregarListasProgramas(AGORA)).rejects.toThrow("coluna inexistente");
   });
 
-  it("CMS sem nenhum programa publicado → fallback", async () => {
+  it("CMS sem nenhum programa publicado → lança", async () => {
     find.mockResolvedValue({ docs: [] });
-    expect((await carregarListasProgramas(AGORA)).total).toBe(15);
+    await expect(carregarListasProgramas(AGORA)).rejects.toThrow(/Nenhum programa publicado/);
   });
 });

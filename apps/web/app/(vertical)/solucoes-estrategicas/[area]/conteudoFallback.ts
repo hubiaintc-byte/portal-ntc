@@ -194,17 +194,6 @@ const EDUCACAO = {
     tituloHtml: "Nove programas estratégicos · <em>NTC Educação</em>",
     intro:
       "Cada programa é uma solução estruturada em módulos, com identidade própria, coordenação científica e linha editorial específica. Pode ser contratado como trilha completa, módulos avulsos ou solução institucional sob medida.",
-    cards: [
-      { sigla: "EDUTEC", imagemSrc: `${IMG}/area-educacao.1920.webp`, flagAberto: true, nome: "Programa Estratégico de Educação Digital, Inovação e Tecnologias para Redes Públicas de Ensino", tagline: "Cultura digital, educação midiática e transformação institucional para o século 21.", meta: "10 módulos · 80h" },
-      { sigla: "PEAR", imagemSrc: `${IMG}/area-educacao.1920.webp`, flagAberto: true, nome: "Programa Estratégico de Alfabetização de Alta Performance e Recomposição da Aprendizagem", tagline: "Recompor a aprendizagem com método e velocidade nas redes públicas de ensino.", meta: "8 módulos · 64h" },
-      { sigla: "PEI", imagemSrc: `${IMG}/educacao-inclusiva.1920.webp`, nome: "Programa Estratégico de Educação Integral — Gestão, Currículo e Resultados", tagline: "Educação integral aplicada — gestão, currículo e resultados em jornada ampliada.", meta: "9 módulos · 72h" },
-      { sigla: "PROGIR", imagemSrc: `${IMG}/educacao-inclusiva.1920.webp`, nome: "Programa de Gestão da Inclusão com Resultado na Educação", tagline: "Gestão da inclusão com resultado — atendimento especializado e redes inclusivas.", meta: "8 módulos · 64h" },
-      { sigla: "PROGE", imagemSrc: `${IMG}/area-educacao.1920.webp`, flagAberto: true, nome: "Programa Estratégico de Gestão Escolar, Coordenação Pedagógica e Resultados", tagline: "Gestão escolar e coordenação pedagógica orientadas a resultados mensuráveis.", meta: "10 módulos · 80h" },
-      { sigla: "EGIDE", imagemSrc: `${IMG}/area-educacao.1920.webp`, nome: "Programa Executivo de IA, Dados e Governança da Transformação Digital na Educação", tagline: "Inteligência artificial e governança digital aplicadas à gestão das redes públicas.", meta: "8 módulos · 64h" },
-      { sigla: "VIVAESCOLA", imagemSrc: `${IMG}/educacao-inclusiva.1920.webp`, nome: "Programa Estratégico de Convivência, Permanência, Bem-Estar e Proteção Integral na Educação", tagline: "Cultura escolar contemporânea — convivência, permanência e proteção integral.", meta: "6 módulos · 48h" },
-      { sigla: "PINEI", imagemSrc: `${IMG}/educacao-inclusiva.1920.webp`, nome: "Programa Integrado de Primeira Infância e Educação Infantil", tagline: "Primeira infância e educação infantil articuladas em rede pública.", meta: "6 módulos · 48h" },
-      { sigla: "FUTURA", imagemSrc: `${IMG}/area-educacao.1920.webp`, nome: "Programa Estratégico de Ensino Médio, Itinerários de Futuro, Empregabilidade e Educação para o Desenvolvimento", tagline: "Ensino médio com itinerários, empregabilidade e protagonismo juvenil.", meta: "4 módulos · 32h" },
-    ] satisfies ProgramaCardItem[],
     ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/programas" },
     ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },
@@ -370,11 +359,6 @@ const GESTAO_PUBLICA = {
     tituloHtml: "Três programas estratégicos · <em>NTC Gestão Pública</em>",
     intro:
       "Cada programa é uma solução estruturada em módulos, com identidade própria, coordenação científica e linha editorial específica. Pode ser contratado como trilha completa, módulos avulsos ou solução institucional sob medida para o órgão público.",
-    cards: [
-      { sigla: "AGIP", imagemSrc: `${IMG}/area-gestao-publica-premium.1920.webp`, flagAberto: true, nome: "Programa de Aprimoramento da Gestão Integral em Procedimentos Públicos · Lei 14.133/2021", tagline: "Profissionalização técnica e jurídica das contratações públicas — do planejamento à fiscalização contratual.", meta: "10 módulos · 80h" },
-      { sigla: "LIDERA", imagemSrc: `${IMG}/autoridade-gestao-publica.1920.webp`, flagAberto: true, nome: "Programa Executivo de Liderança, Alta Gestão e Desenvolvimento Estratégico no Setor Público", tagline: "Formação executiva da alta liderança pública — visão de Estado, capacidade decisória e desempenho institucional.", meta: "8 módulos · 64h" },
-      { sigla: "SIGA", imagemSrc: `${IMG}/plenario-publico.1920.webp`, nome: "Sistema Integrado de Gestão da Administração Pública · Planejamento, Governança e Desempenho Institucional", tagline: "Modernização institucional aplicada — gestão integrada, processos, indicadores e cultura organizacional do setor público.", meta: "8 módulos · 64h" },
-    ] satisfies ProgramaCardItem[],
     ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/programas" },
     ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },
@@ -543,11 +527,6 @@ const SAUDE = {
     tituloHtml: "Três programas estratégicos · <em>NTC Saúde</em>",
     intro:
       "Cada programa é uma solução estruturada em módulos, com identidade própria, coordenação científica e linha editorial específica. Pode ser contratado como trilha completa, módulos avulsos ou solução institucional sob medida para a realidade da rede de saúde.",
-    cards: [
-      { sigla: "SIGS", imagemSrc: `${IMG}/area-saude-premium2.1920.webp`, flagAberto: true, nome: "Sistema Integrado de Gestão da Saúde Pública · Planejamento, Regulação e Governança do SUS", tagline: "Gestão integrada do SUS — planejamento, regulação, financiamento e governança das redes assistenciais.", meta: "10 módulos · 80h" },
-      { sigla: "PROAPS+", imagemSrc: `${IMG}/autoridade-saude.1920.webp`, flagAberto: true, nome: "Programa Avançado de Fortalecimento da Atenção Primária à Saúde e Redes Assistenciais", tagline: "Atenção primária como ordenadora do cuidado e integração das redes de atenção à saúde.", meta: "9 módulos · 72h" },
-      { sigla: "PROSUS+", imagemSrc: `${IMG}/area-saude-premium2.1920.webp`, flagAberto: true, nome: "Programa Executivo de Liderança, Alta Gestão e Desenvolvimento Estratégico em Saúde Pública", tagline: "Formação executiva da alta liderança do SUS — visão sistêmica, capacidade decisória e desempenho institucional.", meta: "8 módulos · 64h" },
-    ] satisfies ProgramaCardItem[],
     ctaPrimario: { rotulo: "Ver todos os 15 programas do Grupo NTC", href: "/programas" },
     ctaSecundario: { rotulo: "Solicitar proposta institucional", href: "/contato?assunto=proposta" },
   },

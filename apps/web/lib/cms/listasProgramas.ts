@@ -9,9 +9,10 @@
  * (`flagAberto`) sai dos eventos: há evento publicado e ativo do programa
  * (pelo campo `programa` do evento ou por `eventosVinculados` de um módulo).
  *
- * Nunca lança: o menu está em toda página, então qualquer falha (ou nenhum
- * programa publicado) degrada para os cartões estáticos de hoje — mesmo
- * padrão de `carregarContatos`. As listas curadas (drawer mobile com 6, Home
+ * Falha de leitura (ou nenhum programa publicado) LANÇA, como a página do
+ * programa: com ISR a página já gerada continua no ar com a última versão
+ * boa; não há mais cartão estático de reserva (removido na virada do
+ * catálogo para o CMS). As listas curadas (drawer mobile com 6, Home
  * "evidência", `/capacitacao`) não passam por aqui.
  *
  * Server-only — não importe no client (o `HeaderHome` recebe por prop).
@@ -21,12 +22,8 @@ import { cache } from "react";
 
 import { eventoAtivo, numeroPorExtenso, type CamposPaginaPrograma, type Vertical } from "@ntc/lib";
 
-import {
-  FALLBACK_VERTICAIS,
-  type FallbackVertical,
-} from "@/app/(vertical)/solucoes-estrategicas/[area]/conteudoFallback";
+import type { FallbackVertical } from "@/app/(vertical)/solucoes-estrategicas/[area]/conteudoFallback";
 import { obterPayload } from "../payloadClient";
-import { DESCRICOES_PROGRAMAS_FALLBACK } from "./descricoesProgramasFallback";
 import { listarProgramasPublicadosComId } from "./programas";
 
 export interface CartaoPrograma {
@@ -60,8 +57,6 @@ export interface MenuProgramas {
   porVertical: Record<Vertical, ItemMenuPrograma[]>;
   total: number;
 }
-
-const VERTICAIS: Vertical[] = ["educacao", "gestao-publica", "saude"];
 
 // ============================================================
 // Puras
@@ -193,29 +188,6 @@ export function programasComEventoAtivo(
   return ativos;
 }
 
-/** Os cartões estáticos de hoje (vertentes + textos do menu e do mapa). */
-export function listasFallback(): ListasProgramas {
-  const cartoes: CartaoPrograma[] = [];
-  for (const vertical of VERTICAIS) {
-    for (const card of FALLBACK_VERTICAIS[vertical].programas.cards) {
-      const d = DESCRICOES_PROGRAMAS_FALLBACK[card.sigla];
-      cartoes.push({
-        sigla: card.sigla,
-        slug: card.sigla.toLowerCase().replace(/\+$/, ""),
-        nome: card.nome,
-        tagline: card.tagline,
-        meta: card.meta,
-        imagemSrc: card.imagemSrc,
-        flagAberto: "flagAberto" in card ? card.flagAberto === true : false,
-        vertical,
-        descricaoMenu: d?.menu ?? "",
-        descricaoMapa: d?.mapa ?? "",
-      });
-    }
-  }
-  return montarListas(cartoes);
-}
-
 // ============================================================
 // Loader
 // ============================================================
@@ -226,49 +198,43 @@ function idDe(ref: number | { id: number } | null | undefined): number | null {
 }
 
 export async function carregarListasProgramas(agora: Date = new Date()): Promise<ListasProgramas> {
-  try {
-    const publicados = await listarProgramasPublicadosComId();
-    if (publicados.length === 0) return listasFallback();
-
-    const ids = publicados.map((p) => p.id);
-    const vinculados = [...new Set(publicados.flatMap((p) => p.eventosVinculados))];
-    const payload = await obterPayload();
-    const evs = await payload.find({
-      collection: "eventos",
-      where: {
-        and: [
-          { _status: { equals: "published" } },
-          {
-            or: [
-              { programa: { in: ids } },
-              ...(vinculados.length > 0 ? [{ id: { in: vinculados } }] : []),
-            ],
-          },
-        ],
-      },
-      depth: 0,
-      limit: 500,
-      // Mais recentes primeiro: o histórico não empurra os ativos para fora do limite.
-      sort: "-dataInicio",
-    });
-    const ativos = programasComEventoAtivo(
-      evs.docs.map((e) => ({
-        id: e.id,
-        programa: idDe(e.programa),
-        dataInicio: e.dataInicio,
-        dataFim: e.dataFim ?? null,
-      })),
-      publicados.map((p) => ({ programa: p.id, eventos: p.eventosVinculados })),
-      agora,
-    );
-    return montarListas(publicados.map((p) => cartaoDoPrograma(p.campos, ativos.has(p.id))));
-  } catch (erro) {
-    console.error(
-      "[listasProgramas] Falha ao ler os programas do CMS; usando os cartões estáticos.",
-      erro,
-    );
-    return listasFallback();
+  const publicados = await listarProgramasPublicadosComId();
+  if (publicados.length === 0) {
+    throw new Error("[listasProgramas] Nenhum programa publicado no CMS.");
   }
+
+  const ids = publicados.map((p) => p.id);
+  const vinculados = [...new Set(publicados.flatMap((p) => p.eventosVinculados))];
+  const payload = await obterPayload();
+  const evs = await payload.find({
+    collection: "eventos",
+    where: {
+      and: [
+        { _status: { equals: "published" } },
+        {
+          or: [
+            { programa: { in: ids } },
+            ...(vinculados.length > 0 ? [{ id: { in: vinculados } }] : []),
+          ],
+        },
+      ],
+    },
+    depth: 0,
+    limit: 500,
+    // Mais recentes primeiro: o histórico não empurra os ativos para fora do limite.
+    sort: "-dataInicio",
+  });
+  const ativos = programasComEventoAtivo(
+    evs.docs.map((e) => ({
+      id: e.id,
+      programa: idDe(e.programa),
+      dataInicio: e.dataInicio,
+      dataFim: e.dataFim ?? null,
+    })),
+    publicados.map((p) => ({ programa: p.id, eventos: p.eventosVinculados })),
+    agora,
+  );
+  return montarListas(publicados.map((p) => cartaoDoPrograma(p.campos, ativos.has(p.id))));
 }
 
 /** Uma leitura por request (layout e página compartilham). */
