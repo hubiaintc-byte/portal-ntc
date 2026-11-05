@@ -11,7 +11,6 @@ import { Icone } from "../ui/Icone";
 import { MenuContexto, type EntradaMenu } from "../ui/MenuContexto";
 import { CLASSE_VERTICAL, ChipVertical, SeloStatus } from "../ui/Selo";
 import { Tabela, type ColunaTabela } from "../ui/Tabela";
-import { useToasts } from "../ui/Toasts";
 import { intervaloDatas, tipoCurto } from "../ui/formato";
 import {
   algumFiltroEventos,
@@ -58,6 +57,7 @@ interface DefFiltro {
 }
 
 export function TelaEventos({
+  avisar,
   livro,
   hojeISO,
   capacidades,
@@ -69,7 +69,7 @@ export function TelaEventos({
   const [menu, setMenu] = useState<{ ancora: HTMLElement; evento: EventoFin } | null>(null);
   const [excluindo, setExcluindo] = useState<EventoFin | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  const { toasts, mostrar } = useToasts();
+  const mostrar = avisar;
 
   // Busca com o atraso do protótipo (220 ms) antes de refiltrar.
   const [busca, setBusca] = useState(S.q);
@@ -131,15 +131,16 @@ export function TelaEventos({
   };
   const novo = () => setWizard({ evento: null });
 
-  const aoSalvarWizard = (id: string) => {
+  const aoSalvarWizard = (id: string, nome: string) => {
     const antes = wizard?.evento ?? null;
     setWizard(null);
     if (antes === null) {
-      // Evento novo: o protótipo leva direto à área do evento criado.
+      // Evento novo: o protótipo avisa e leva direto à área do evento criado.
+      mostrar("Evento criado", `${id} · ${nome}`);
       irPara("eventos", { eventoId: id, aba: "visao" });
       return;
     }
-    mostrar("Cadastro atualizado", `${id} · ${antes.nome}`);
+    mostrar("Cadastro atualizado", `${id} · ${nome}`);
   };
 
   const pedirExclusao = (e: EventoFin) => {
@@ -505,8 +506,6 @@ export function TelaEventos({
           aoFechar={() => setExcluindo(null)}
         />
       )}
-
-      {toasts}
     </>
   );
 }

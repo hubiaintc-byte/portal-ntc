@@ -84,24 +84,17 @@ interface CartaoEventoProps {
 
 /**
  * `eventCard(e, alerts)`. O `article[role=link]` do protótipo vira
- * `<button>` (ação de navegação por estado, sem `<div onClick>`); o nome
- * acessível é o nome do evento mais os selos de situação. Evento do CRM
+ * `<button>` (ação de navegação por estado, sem `<div onClick>`); sem
+ * `aria-label`: o nome acessível é o texto visível do cartão (nome, datas,
+ * modalidade, local, status, selos e pendências). Evento do CRM
  * pendente diz "Completar cadastro" no lugar de "Ver evento".
  */
 export function CartaoEvento({ evento: e, alertas, aoAbrir }: CartaoEventoProps) {
   const prog = [e.programa, e.modulo].filter(Boolean).join(" · ");
-  const rotulo = [
-    e.nome,
-    e.cadastroPendente ? "Cadastro financeiro pendente" : "",
-    e.canceladoNoCrm ? "Cancelado no CRM" : "",
-  ]
-    .filter(Boolean)
-    .join(" · ");
   return (
     <button
       type="button"
       className={`ev-card ${CLASSE_VERTICAL[e.vertical] ?? ""}`}
-      aria-label={rotulo}
       onClick={aoAbrir}
     >
       <div className="ec-top">

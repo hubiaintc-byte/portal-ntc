@@ -69,6 +69,10 @@ export function MenuContexto({ ancora, itens, aoFechar, rotulo }: MenuContextoPr
         ancora.focus();
         return;
       }
+      if (e.key === "Tab") {
+        aoFecharRef.current();
+        return;
+      }
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
       const bs = Array.from(caixa.current?.querySelectorAll<HTMLButtonElement>("button") ?? []);
       if (bs.length === 0) return;
@@ -92,6 +96,11 @@ export function MenuContexto({ ancora, itens, aoFechar, rotulo }: MenuContextoPr
         className="menu"
         role="menu"
         aria-label={rotulo}
+        onBlur={(e) => {
+          // Tab ou clique fora do menu: fecha (o foco já saiu dele).
+          if (!(e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget)))
+            aoFechar();
+        }}
         style={{ visibility: "hidden", left: 0, top: 0 }}
       >
         {itens.map((it, i) => {
@@ -110,6 +119,9 @@ export function MenuContexto({ ancora, itens, aoFechar, rotulo }: MenuContextoPr
               className={it.perigo ? "danger" : undefined}
               onClick={(e) => {
                 e.stopPropagation();
+                // Foco de volta ao botão antes de desmontar o menu: o que a ação
+                // abrir (wizard, confirmação) guarda o botão como "quem abriu".
+                ancora.focus();
                 aoFechar();
                 it.acao();
               }}

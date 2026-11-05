@@ -45,6 +45,8 @@ interface GavetaProps {
   tamanho?: "sm";
   /** Filhos no lugar do `.ov-body` (o wizard do protótipo substitui o corpo pelo `.wizard`). */
   semCorpo?: boolean;
+  /** Id do elemento que descreve o diálogo (`aria-describedby`), ex.: o texto de uma confirmação. */
+  idDescricao?: string;
   children: ReactNode;
 }
 
@@ -58,6 +60,7 @@ export function Gaveta({
   forma = "gaveta",
   tamanho,
   semCorpo,
+  idDescricao,
   children,
 }: GavetaProps) {
   const classe = forma === "modal" ? `modal${tamanho ? ` ${tamanho}` : ""}` : "drawer";
@@ -126,6 +129,7 @@ export function Gaveta({
         role="dialog"
         aria-modal="true"
         aria-labelledby={idTitulo}
+        aria-describedby={idDescricao}
       >
         <div className="ov-head">
           <div>

@@ -191,6 +191,8 @@ export function CampoChips({ valor, aoMudar, opcoes, ...fld }: PropsChips) {
     const irmaos = alvo.parentElement?.querySelectorAll<HTMLButtonElement>("button");
     irmaos?.[j]?.focus();
   };
+  // Valor vazio ou fora da lista (legado): o primeiro chip é a parada do Tab.
+  const selecionado = opcoes.some((o) => o.valor === valor);
   return (
     <Fld {...fld}>
       <div
@@ -208,7 +210,7 @@ export function CampoChips({ valor, aoMudar, opcoes, ...fld }: PropsChips) {
               type="button"
               role="radio"
               aria-checked={on}
-              tabIndex={on || (!valor && i === 0) ? 0 : -1}
+              tabIndex={on || (!selecionado && i === 0) ? 0 : -1}
               className={on ? "on" : undefined}
               onClick={() => aoMudar(o.valor)}
               onKeyDown={(e) => {

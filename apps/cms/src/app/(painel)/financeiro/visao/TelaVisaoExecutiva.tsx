@@ -52,6 +52,7 @@ export function TelaVisaoExecutiva({
   hojeISO,
   acesso,
   irPara,
+  avisar,
   filtros,
   aoMudarFiltros,
 }: TelaVisaoExecutivaProps) {
@@ -473,8 +474,9 @@ export function TelaVisaoExecutiva({
         <WizardEvento
           evento={null}
           aoFechar={() => setNovoEvento(false)}
-          aoSalvar={(id) => {
+          aoSalvar={(id, nome) => {
             setNovoEvento(false);
+            avisar("Evento criado", `${id} · ${nome}`);
             // Como no protótipo: o evento criado abre na área dele.
             irPara("eventos", { eventoId: id, aba: "visao" });
           }}

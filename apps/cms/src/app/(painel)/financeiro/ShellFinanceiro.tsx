@@ -11,6 +11,7 @@ import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { aplicarFiltrosRecebidos, ESTADO_LISTA_INICIAL, type EstadoListaEventos } from "./eventos/dadosEventos";
 import { TelaEventos } from "./eventos/TelaEventos";
 import { RaizFin05Contexto } from "./ui/PortalFin05";
+import { useToasts, type MostrarToast } from "./ui/Toasts";
 import { TelaVisaoExecutiva } from "./visao/TelaVisaoExecutiva";
 import { FILTROS_VISAO_INICIAIS, type FiltrosVisao } from "./visao/dadosVisao";
 
@@ -21,7 +22,8 @@ import { FILTROS_VISAO_INICIAIS, type FiltrosVisao } from "./visao/dadosVisao";
  * no `ShellCrm`: a tela ativa e, em Eventos, o evento aberto e a aba.
  *
  * Contrato com as telas (Tasks 12–17): cada uma recebe `PropsTelaFin` —
- * `livro`, `hojeISO`, `capacidades`, `acesso` e `irPara(tela, extra?)`.
+ * `livro`, `hojeISO`, `capacidades`, `acesso`, `irPara(tela, extra?)` e
+ * `avisar(titulo, descricao?, tipo?)` (toasts do casco: sobrevivem à navegação).
  */
 
 /** Abas da área do evento, na ordem do protótipo (`WS_TABS`), sem Comissões. */
@@ -53,6 +55,8 @@ export interface PropsTelaFin {
   capacidades: CapacidadesPainel;
   acesso: AcessoPainel;
   irPara: IrParaFin;
+  /** Toast do protótipo (`toast(title, desc, kind)`), mostrado pelo casco. */
+  avisar: MostrarToast;
 }
 
 interface ShellFinanceiroProps {
@@ -139,6 +143,8 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
   const [listaEventos, setListaEventos] = useState<EstadoListaEventos>(ESTADO_LISTA_INICIAL);
   // Raiz `.fin05` para os portais das camadas fixas (gaveta, menus, toasts).
   const [raiz, setRaiz] = useState<HTMLDivElement | null>(null);
+  // Toasts no casco: um "Evento criado" sobrevive à navegação para a área do evento.
+  const { toasts, mostrar: avisar } = useToasts();
 
   const irPara: IrParaFin = (tela, extra) => {
     // Tela que a pessoa não tem não abre (o menu já não a mostra; isto
@@ -164,7 +170,7 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
     ? `Financeiro · ${ROTULO.eventos} · ${eventoAberto.nome}`
     : `Financeiro · ${ROTULO[estado.tela]}`;
 
-  const props: PropsTelaFin = { livro, hojeISO, capacidades, acesso, irPara };
+  const props: PropsTelaFin = { livro, hojeISO, capacidades, acesso, irPara, avisar };
 
   return (
     <ShellPainel
@@ -197,6 +203,7 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
           {estado.tela === "pagar" && <EmConstrucao titulo={ROTULO.pagar} {...props} />}
         </div>
       </div>
+        {toasts}
       </RaizFin05Contexto.Provider>
     </ShellPainel>
   );

@@ -37,7 +37,8 @@ import {
 
 export interface WizardEventoProps {
   evento: EventoFin | null;
-  aoSalvar: (id: string) => void;
+  /** Depois de gravar: o id salvo e o nome gravado (o do CRM, se for dele). */
+  aoSalvar: (id: string, nome: string) => void;
   aoFechar: () => void;
 }
 
@@ -116,9 +117,10 @@ export function WizardEvento({ evento, aoSalvar, aoFechar }: WizardEventoProps) 
     }
     setSalvando(true);
     try {
-      const res = await salvarEventoFinAcao(evento?.id ?? null, dadosDoForm(v));
+      const dados = dadosDoForm(v);
+      const res = await salvarEventoFinAcao(evento?.id ?? null, dados);
       if (res.ok) {
-        aoSalvar(res.id);
+        aoSalvar(res.id, dados.nome);
         return;
       }
       const st = res.campo ? passoDoCampo(res.campo) : -1;
