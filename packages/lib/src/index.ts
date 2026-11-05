@@ -211,3 +211,6 @@ export {
   montarAvisoLead,
   type AvisoPush,
 } from "./avisos/avisoLead";
+
+// Financeiro — tipos, listas, dinheiro e períodos.
+export * from "./financeiro";
