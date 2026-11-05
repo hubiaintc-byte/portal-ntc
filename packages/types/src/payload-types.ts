@@ -88,6 +88,12 @@ export interface Config {
     'modelos-email': ModeloEmail;
     'envios-email': EnvioEmail;
     'linha-do-tempo': LinhaDoTempo;
+    'fin-eventos': FinEvento;
+    'fin-receitas': FinReceita;
+    'fin-faturamentos': FinFaturamento;
+    'fin-custos': FinCusto;
+    'fin-pagamentos': FinPagamento;
+    'fin-contas': FinConta;
     'tentativas-acesso': TentativasAcesso;
     'audit-log': AuditLog;
     'payload-kv': PayloadKv;
@@ -118,6 +124,12 @@ export interface Config {
     'modelos-email': ModelosEmailSelect<false> | ModelosEmailSelect<true>;
     'envios-email': EnviosEmailSelect<false> | EnviosEmailSelect<true>;
     'linha-do-tempo': LinhaDoTempoSelect<false> | LinhaDoTempoSelect<true>;
+    'fin-eventos': FinEventosSelect<false> | FinEventosSelect<true>;
+    'fin-receitas': FinReceitasSelect<false> | FinReceitasSelect<true>;
+    'fin-faturamentos': FinFaturamentosSelect<false> | FinFaturamentosSelect<true>;
+    'fin-custos': FinCustosSelect<false> | FinCustosSelect<true>;
+    'fin-pagamentos': FinPagamentosSelect<false> | FinPagamentosSelect<true>;
+    'fin-contas': FinContasSelect<false> | FinContasSelect<true>;
     'tentativas-acesso': TentativasAcessoSelect<false> | TentativasAcessoSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -1681,6 +1693,165 @@ export interface LinhaDoTempo {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-eventos".
+ */
+export interface FinEvento {
+  id: number;
+  eventoComercial?: (number | null) | EventoComercial;
+  nome?: string | null;
+  vertical?: string | null;
+  tipo?: string | null;
+  modalidade?: string | null;
+  programa?: string | null;
+  modulo?: string | null;
+  cliente?: string | null;
+  cidade?: string | null;
+  uf?: string | null;
+  local?: string | null;
+  dataInicio?: string | null;
+  dataFim?: string | null;
+  cargaHoraria?: number | null;
+  responsavel?: string | null;
+  status?: string | null;
+  qtdPrevista?: number | null;
+  capacidade?: number | null;
+  efetivos?: number | null;
+  pagantesPrev?: number | null;
+  cortesiasPrev?: number | null;
+  refContratual?: string | null;
+  observacoes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-receitas".
+ */
+export interface FinReceita {
+  id: number;
+  evento?: (number | null) | FinEvento;
+  tipoLancamento?: string | null;
+  centroCusto?: string | null;
+  cliente?: string | null;
+  segmento?: string | null;
+  origem?: string | null;
+  tipoReceita?: string | null;
+  etapa?: string | null;
+  qtde?: number | null;
+  valorUnit?: number | null;
+  desconto?: number | null;
+  pagantes?: number | null;
+  cortesias?: number | null;
+  statusEconomico?: string | null;
+  criterioReconhecimento?: string | null;
+  etapas?:
+    | {
+        nome?: string | null;
+        base?: string | null;
+        valor?: number | null;
+        percentual?: number | null;
+        concluida?: boolean | null;
+        dataConclusao?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  competencia?: string | null;
+  referencia?: string | null;
+  observacao?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-faturamentos".
+ */
+export interface FinFaturamento {
+  id: number;
+  receita: number | FinReceita;
+  parcela?: string | null;
+  nf?: string | null;
+  dataFaturamento?: string | null;
+  valorFaturado?: number | null;
+  vencimento?: string | null;
+  retencaoTributaria?: number | null;
+  retencaoContratual?: number | null;
+  retencaoContratualLiberada?: number | null;
+  dataRecebimento?: string | null;
+  valorRecebido?: number | null;
+  conta?: (number | null) | FinConta;
+  observacao?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-contas".
+ */
+export interface FinConta {
+  id: number;
+  nome: string;
+  tipo?: string | null;
+  banco?: string | null;
+  agencia?: string | null;
+  numero?: string | null;
+  saldoInicial?: number | null;
+  dataSaldoInicial?: string | null;
+  ativa?: boolean | null;
+  observacao?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-custos".
+ */
+export interface FinCusto {
+  id: number;
+  evento?: (number | null) | FinEvento;
+  tipoLancamento?: string | null;
+  centroCusto?: string | null;
+  compartilhada?: boolean | null;
+  origemLancamento?: string | null;
+  fase?: string | null;
+  categoria?: string | null;
+  subcategoria?: string | null;
+  descricao?: string | null;
+  fornecedor?: string | null;
+  documento?: string | null;
+  natureza?: string | null;
+  comportamento?: string | null;
+  driver?: string | null;
+  unidade?: string | null;
+  qtde?: number | null;
+  valorUnitPrev?: number | null;
+  valorRealizado?: number | null;
+  competencia?: string | null;
+  dataPrevista?: string | null;
+  periodicidade?: string | null;
+  criterioApropriacao?: string | null;
+  observacao?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-pagamentos".
+ */
+export interface FinPagamento {
+  id: number;
+  custo: number | FinCusto;
+  documento?: string | null;
+  vencimento?: string | null;
+  valor?: number | null;
+  dataPagamento?: string | null;
+  valorPago?: number | null;
+  conta?: (number | null) | FinConta;
+  observacao?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Lastro efêmero do rate limit. Linhas se apagam sozinhas fora da janela.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1824,6 +1995,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'linha-do-tempo';
         value: number | LinhaDoTempo;
+      } | null)
+    | ({
+        relationTo: 'fin-eventos';
+        value: number | FinEvento;
+      } | null)
+    | ({
+        relationTo: 'fin-receitas';
+        value: number | FinReceita;
+      } | null)
+    | ({
+        relationTo: 'fin-faturamentos';
+        value: number | FinFaturamento;
+      } | null)
+    | ({
+        relationTo: 'fin-custos';
+        value: number | FinCusto;
+      } | null)
+    | ({
+        relationTo: 'fin-pagamentos';
+        value: number | FinPagamento;
+      } | null)
+    | ({
+        relationTo: 'fin-contas';
+        value: number | FinConta;
       } | null)
     | ({
         relationTo: 'tentativas-acesso';
@@ -2632,6 +2827,159 @@ export interface LinhaDoTempoSelect<T extends boolean = true> {
       };
   usuario?: T;
   em?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-eventos_select".
+ */
+export interface FinEventosSelect<T extends boolean = true> {
+  eventoComercial?: T;
+  nome?: T;
+  vertical?: T;
+  tipo?: T;
+  modalidade?: T;
+  programa?: T;
+  modulo?: T;
+  cliente?: T;
+  cidade?: T;
+  uf?: T;
+  local?: T;
+  dataInicio?: T;
+  dataFim?: T;
+  cargaHoraria?: T;
+  responsavel?: T;
+  status?: T;
+  qtdPrevista?: T;
+  capacidade?: T;
+  efetivos?: T;
+  pagantesPrev?: T;
+  cortesiasPrev?: T;
+  refContratual?: T;
+  observacoes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-receitas_select".
+ */
+export interface FinReceitasSelect<T extends boolean = true> {
+  evento?: T;
+  tipoLancamento?: T;
+  centroCusto?: T;
+  cliente?: T;
+  segmento?: T;
+  origem?: T;
+  tipoReceita?: T;
+  etapa?: T;
+  qtde?: T;
+  valorUnit?: T;
+  desconto?: T;
+  pagantes?: T;
+  cortesias?: T;
+  statusEconomico?: T;
+  criterioReconhecimento?: T;
+  etapas?:
+    | T
+    | {
+        nome?: T;
+        base?: T;
+        valor?: T;
+        percentual?: T;
+        concluida?: T;
+        dataConclusao?: T;
+        id?: T;
+      };
+  competencia?: T;
+  referencia?: T;
+  observacao?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-faturamentos_select".
+ */
+export interface FinFaturamentosSelect<T extends boolean = true> {
+  receita?: T;
+  parcela?: T;
+  nf?: T;
+  dataFaturamento?: T;
+  valorFaturado?: T;
+  vencimento?: T;
+  retencaoTributaria?: T;
+  retencaoContratual?: T;
+  retencaoContratualLiberada?: T;
+  dataRecebimento?: T;
+  valorRecebido?: T;
+  conta?: T;
+  observacao?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-custos_select".
+ */
+export interface FinCustosSelect<T extends boolean = true> {
+  evento?: T;
+  tipoLancamento?: T;
+  centroCusto?: T;
+  compartilhada?: T;
+  origemLancamento?: T;
+  fase?: T;
+  categoria?: T;
+  subcategoria?: T;
+  descricao?: T;
+  fornecedor?: T;
+  documento?: T;
+  natureza?: T;
+  comportamento?: T;
+  driver?: T;
+  unidade?: T;
+  qtde?: T;
+  valorUnitPrev?: T;
+  valorRealizado?: T;
+  competencia?: T;
+  dataPrevista?: T;
+  periodicidade?: T;
+  criterioApropriacao?: T;
+  observacao?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-pagamentos_select".
+ */
+export interface FinPagamentosSelect<T extends boolean = true> {
+  custo?: T;
+  documento?: T;
+  vencimento?: T;
+  valor?: T;
+  dataPagamento?: T;
+  valorPago?: T;
+  conta?: T;
+  observacao?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fin-contas_select".
+ */
+export interface FinContasSelect<T extends boolean = true> {
+  nome?: T;
+  tipo?: T;
+  banco?: T;
+  agencia?: T;
+  numero?: T;
+  saldoInicial?: T;
+  dataSaldoInicial?: T;
+  ativa?: T;
+  observacao?: T;
   updatedAt?: T;
   createdAt?: T;
 }

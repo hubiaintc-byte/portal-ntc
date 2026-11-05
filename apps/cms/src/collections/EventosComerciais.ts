@@ -3,6 +3,7 @@ import { TELAS_LEADS } from "../lib/cms/telas";
 import type { CollectionConfig } from "payload";
 
 import { registrarEventoNaLinhaDoTempo } from "../lib/crm/linhaDoTempo";
+import { bloquearEventoComFinanceiro } from "../lib/financeiro/exclusao";
 
 /**
  * Evento comercial (spec §3.4): a turma/entrega contratada por um órgão.
@@ -24,7 +25,11 @@ export const EventosComerciais: CollectionConfig = {
     update: acessoPorTela([...TELAS_LEADS, "crm.clientes"]),
     delete: administrador,
   },
-  hooks: { afterChange: [registrarEventoNaLinhaDoTempo] },
+  hooks: {
+    afterChange: [registrarEventoNaLinhaDoTempo],
+    // recusa apagar enquanto houver lançamento no Financeiro (spec §8.1)
+    beforeDelete: [bloquearEventoComFinanceiro],
+  },
   fields: [
     // opcional para o lead poder ser apagado sem cascata (spec §5.6)
     { name: "lead", type: "relationship", relationTo: "leads", index: true },

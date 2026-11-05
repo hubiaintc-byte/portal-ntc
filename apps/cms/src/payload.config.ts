@@ -20,6 +20,12 @@ import { EnviosEmail } from "./collections/EnviosEmail";
 import { Especialistas } from "./collections/Especialistas";
 import { Eventos } from "./collections/Eventos";
 import { EventosComerciais } from "./collections/EventosComerciais";
+import { FinContas } from "./collections/financeiro/FinContas";
+import { FinCustos } from "./collections/financeiro/FinCustos";
+import { FinEventos } from "./collections/financeiro/FinEventos";
+import { FinFaturamentos } from "./collections/financeiro/FinFaturamentos";
+import { FinPagamentos } from "./collections/financeiro/FinPagamentos";
+import { FinReceitas } from "./collections/financeiro/FinReceitas";
 import { Leads } from "./collections/Leads";
 import { LinhaDoTempo } from "./collections/LinhaDoTempo";
 import { Media } from "./collections/Media";
@@ -110,6 +116,12 @@ export default buildConfig({
     ModelosEmail,
     EnviosEmail,
     LinhaDoTempo,
+    FinEventos,
+    FinReceitas,
+    FinFaturamentos,
+    FinCustos,
+    FinPagamentos,
+    FinContas,
     TentativasAcesso,
     AuditLog,
   ],
