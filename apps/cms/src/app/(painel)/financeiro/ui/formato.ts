@@ -1,4 +1,4 @@
-import { formatarReais, type Centavos, type SerieGrafico } from "@ntc/lib";
+import { formatarReais, paraCentavos, type Centavos, type SerieGrafico } from "@ntc/lib";
 
 /**
  * Formatação pura das primitivas do Financeiro (sem React, testável no
@@ -43,4 +43,22 @@ export function resumoGrafico(dados: SerieGrafico, dinheiro = true): string {
 /** Exibição no campo de dinheiro: centavos → "1.234,56"; zero/vazio → "" (`_num.format` do protótipo). */
 export function textoDeCentavos(c: Centavos | null): string {
   return c ? NUM.format(c / 100) : "";
+}
+
+/** Leitura do texto do campo de dinheiro: vazio é válido (sem valor); texto que não é real brasileiro é inválido. */
+export interface LeituraDinheiro {
+  valor: Centavos | null;
+  valido: boolean;
+}
+
+export function lerCampoDinheiro(texto: string): LeituraDinheiro {
+  if (!texto.trim()) return { valor: null, valido: true };
+  const valor = paraCentavos(texto);
+  return { valor, valido: valor !== null };
+}
+
+/** Texto do campo ao sair: válido e preenchido vira "1.234,56"; senão fica como digitado (para corrigir). */
+export function textoAoSairDinheiro(texto: string): string {
+  const { valor } = lerCampoDinheiro(texto);
+  return valor === null ? texto : textoDeCentavos(valor);
 }

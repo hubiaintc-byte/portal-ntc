@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 import { Icone } from "./Icone";
+import { PortalFin05 } from "./PortalFin05";
 
 /**
  * Gaveta lateral do protótipo FIN-05 (`Overlay.open({ kind: 'drawer' })`):
@@ -14,7 +15,8 @@ import { Icone } from "./Icone";
  * recebimento) respondem só a de cima.
  *
  * A gaveta é montada aberta: quem usa renderiza `{aberta && <Gaveta …/>}` e
- * desmonta no `aoFechar`. Precisa estar dentro de `.fin05` (os estilos).
+ * desmonta no `aoFechar`. Sai por `PortalFin05` direto no `.fin05` (os
+ * estilos), fora do `.view-enter` animado.
  */
 
 const FOCAVEIS = 'button, [href], input, select, textarea, summary, [tabindex]:not([tabindex="-1"])';
@@ -93,7 +95,7 @@ export function Gaveta({ titulo, eyebrow, sub, aoFechar, rodape, children }: Gav
   }, []);
 
   return (
-    <>
+    <PortalFin05>
       <div className={`overlay${visivel ? " show" : ""}`} onClick={aoFechar} aria-hidden="true" />
       <div
         ref={caixa}
@@ -115,6 +117,6 @@ export function Gaveta({ titulo, eyebrow, sub, aoFechar, rodape, children }: Gav
         <div className="ov-body">{children}</div>
         {rodape !== undefined && <div className="ov-foot">{rodape}</div>}
       </div>
-    </>
+    </PortalFin05>
   );
 }

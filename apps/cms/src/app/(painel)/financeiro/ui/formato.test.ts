@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { compacto, porcentagem, resumoGrafico, textoDeCentavos } from "./formato";
+import { compacto, lerCampoDinheiro, porcentagem, resumoGrafico, textoAoSairDinheiro, textoDeCentavos } from "./formato";
 
 describe("resumoGrafico (aria-label dos gráficos, spec §5)", () => {
   it("livro vazio não produz NaN", () => {
@@ -42,5 +42,28 @@ describe("compacto e porcentagem (eixos e tooltip da rosca)", () => {
     expect(compacto(Number.NaN)).toBe("0");
     expect(porcentagem(0.3537)).toBe("35,4%");
     expect(porcentagem(0 / 0)).toBe("—");
+  });
+});
+
+describe("lerCampoDinheiro e textoAoSairDinheiro (CampoDinheiro valida ao sair)", () => {
+  it("vazio é válido e sem valor", () => {
+    expect(lerCampoDinheiro("  ")).toEqual({ valor: null, valido: true });
+  });
+
+  it("aceita os formatos brasileiros (Review Focus 2)", () => {
+    expect(lerCampoDinheiro("1.234,56")).toEqual({ valor: 123456, valido: true });
+    expect(lerCampoDinheiro("1234,5")).toEqual({ valor: 123450, valido: true });
+    expect(lerCampoDinheiro("1234")).toEqual({ valor: 123400, valido: true });
+    expect(lerCampoDinheiro("R$ 10")).toEqual({ valor: 1000, valido: true });
+  });
+
+  it("recusa texto que não é valor, inclusive os prefixos de uma digitação correta", () => {
+    for (const t of ["abc", "1,2,3", "1.", "1.234,"]) expect(lerCampoDinheiro(t)).toEqual({ valor: null, valido: false });
+  });
+
+  it("ao sair reescreve o válido e mantém o inválido como digitado", () => {
+    expect(textoAoSairDinheiro("1234,5")).toBe("1.234,50");
+    expect(textoAoSairDinheiro("abc")).toBe("abc");
+    expect(textoAoSairDinheiro("")).toBe("");
   });
 });

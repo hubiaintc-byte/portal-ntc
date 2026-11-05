@@ -8,6 +8,7 @@ import { mostraModuloCrm, navFinVisivel, telaInicialFin, type TelaFinId } from "
 import type { AcessoPainel, CapacidadesPainel } from "@/lib/cms/telas";
 
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
+import { RaizFin05Contexto } from "./ui/PortalFin05";
 
 /**
  * Casco do módulo Financeiro (spec §3.3): a moldura é a do painel
@@ -128,6 +129,8 @@ function EmConstrucao({ titulo }: PropsTelaFin & { titulo: string }) {
 export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, erroLeitura }: ShellFinanceiroProps) {
   const visiveis = navFinVisivel(acesso);
   const [estado, setEstado] = useState<EstadoTelaFin>(() => estadoDe(telaInicialFin(acesso)));
+  // Raiz `.fin05` para os portais das camadas fixas (gaveta, menus, toasts).
+  const [raiz, setRaiz] = useState<HTMLDivElement | null>(null);
 
   const irPara: IrParaFin = (tela, extra) => {
     // Tela que a pessoa não tem não abre (o menu já não a mostra; isto
@@ -165,7 +168,8 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
       breadcrumb={breadcrumb}
       carregando={false}
     >
-      <div className="fin05">
+      <RaizFin05Contexto.Provider value={raiz}>
+      <div className="fin05" ref={setRaiz}>
         {erroLeitura && (
           <div className="form-error" role="alert">
             Não foi possível ler o banco de dados. Os números abaixo podem estar incompletos.
@@ -178,6 +182,7 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
           {estado.tela === "pagar" && <EmConstrucao titulo={ROTULO.pagar} {...props} />}
         </div>
       </div>
+      </RaizFin05Contexto.Provider>
     </ShellPainel>
   );
 }

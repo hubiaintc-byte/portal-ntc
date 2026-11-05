@@ -2,9 +2,9 @@
 
 import { useState, type ReactNode } from "react";
 
-import { paraCentavos, type Centavos } from "@ntc/lib";
+import type { Centavos } from "@ntc/lib";
 
-import { textoDeCentavos } from "./formato";
+import { lerCampoDinheiro, textoAoSairDinheiro, textoDeCentavos } from "./formato";
 
 export { textoDeCentavos };
 
@@ -17,7 +17,10 @@ export { textoDeCentavos };
  *
  * Diferença deliberada do protótipo: lá, texto inválido virava 0 em
  * silêncio (`parseNum`); aqui ele é recusado — `aoMudar(null)` e a mensagem
- * no campo — para "abc" ou "1,2,3" nunca virarem R$ 0,00 sem aviso.
+ * no campo — para "abc" ou "1,2,3" nunca virarem R$ 0,00 sem aviso. A
+ * mensagem só aparece ao sair do campo (digitando "1.234,56" o texto passa
+ * por "1." e "1.234,", que não são valores) e some assim que o texto volta a
+ * ser um valor; enquanto não é, `aoMudar(null)`.
  */
 
 const ERRO_FORMATO = "Valor inválido. Use o formato 1.234,56.";
@@ -61,7 +64,7 @@ export function CampoDinheiro({
   const [ultimoValor, setUltimoValor] = useState(valor);
   if (valor !== ultimoValor) {
     setUltimoValor(valor);
-    if (valor !== (texto.trim() ? paraCentavos(texto) : null)) {
+    if (valor !== lerCampoDinheiro(texto).valor) {
       setTexto(textoDeCentavos(valor));
       setInvalido(false);
     }
@@ -69,21 +72,16 @@ export function CampoDinheiro({
 
   function digitar(t: string) {
     setTexto(t);
-    if (!t.trim()) {
-      setInvalido(false);
-      setUltimoValor(null);
-      aoMudar(null);
-      return;
-    }
-    const c = paraCentavos(t);
-    setInvalido(c === null);
+    const { valor: c, valido } = lerCampoDinheiro(t);
+    // Só limpa o aviso aqui; quem acende é o `sair`.
+    if (valido) setInvalido(false);
     setUltimoValor(c);
     aoMudar(c);
   }
 
   function sair() {
-    const c = texto.trim() ? paraCentavos(texto) : null;
-    if (c !== null) setTexto(textoDeCentavos(c));
+    setInvalido(!lerCampoDinheiro(texto).valido);
+    setTexto(textoAoSairDinheiro(texto));
   }
 
   const mensagem = invalido ? ERRO_FORMATO : (erro ?? "");
@@ -119,7 +117,7 @@ export function CampoDinheiro({
           disabled={desabilitado}
           required={obrigatorio}
           aria-invalid={mensagem ? true : undefined}
-          aria-describedby={[ajuda ? idAjuda : "", idErro].filter(Boolean).join(" ")}
+          aria-describedby={[ajuda ? idAjuda : "", mensagem ? idErro : ""].filter(Boolean).join(" ") || undefined}
           onChange={(e) => digitar(e.target.value)}
           onBlur={sair}
         />
@@ -129,9 +127,11 @@ export function CampoDinheiro({
           {ajuda}
         </div>
       )}
-      <div className="err" role="alert" id={idErro}>
-        {mensagem}
-      </div>
+      {mensagem && (
+        <div className="err" role="alert" id={idErro}>
+          {mensagem}
+        </div>
+      )}
     </div>
   );
 }

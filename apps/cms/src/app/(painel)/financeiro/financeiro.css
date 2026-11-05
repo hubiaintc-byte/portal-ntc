@@ -659,6 +659,14 @@
      spec §4.2, Histórico),
      montado com os tokens dele. */
   & > .form-error { margin-bottom: 22px; }
+  /* Abas por botão: no React as abas são `<button type="button" role="tab"
+     aria-selected>` dentro de `.tabs[role=tablist]`, nunca `<a href="#">`.
+     Mesmo desenho do `.tabs a` do protótipo. */
+  & .tabs button { position: relative; padding: 14px 12px 13px; font: inherit; font-weight: 600; font-size: 13.5px; color: var(--grafite); white-space: nowrap; display: inline-flex; align-items: center; gap: 7px; background: none; border: 0; border-bottom: 0; cursor: pointer; }
+  & .tabs button:hover { color: var(--tinta); }
+  & .tabs button.on { color: var(--azul); }
+  & .tabs button.on::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; background: var(--azul); }
+  & .tabs button.on .tcount { background: var(--azul-50); color: var(--azul); }
   & .hist-corpo { padding: 4px 14px 14px; }
   & .hist-item { display: block; }
   & .hist-topo { display: flex; justify-content: space-between; gap: 12px; }
