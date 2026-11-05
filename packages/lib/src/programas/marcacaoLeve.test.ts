@@ -32,9 +32,11 @@ describe("htmlInlineParaMarcacao", () => {
   });
 });
 
+const CAMPOS_INLINE = new Set(["tituloHtml", "metaHtml", "destaqueHtml"]);
+
 function coletar(no: unknown, chave: string, saida: string[]): void {
   if (typeof no === "string") {
-    if (chave.endsWith("Html")) saida.push(no);
+    if (CAMPOS_INLINE.has(chave)) saida.push(no);
   } else if (Array.isArray(no)) {
     no.forEach((x) => coletar(x, chave, saida));
   } else if (no && typeof no === "object") {
@@ -43,21 +45,17 @@ function coletar(no: unknown, chave: string, saida: string[]): void {
 }
 
 describe("ida e volta nos 15 programas", () => {
-  it("campos *Html só com strong/em sobrevivem intactos", () => {
+  it("todo campo inline (tituloHtml, metaHtml, destaqueHtml) sobrevive intacto", () => {
     const url = new URL("../../../../apps/cms/src/seed/assets/paginas-programas.json", import.meta.url);
     const json = JSON.parse(readFileSync(url, "utf8")) as { programas: unknown[] };
     const textos: string[] = [];
     coletar(json.programas, "", textos);
-    expect(textos.length).toBeGreaterThan(15);
-    let puladas = 0;
+    // 12 títulos + 1 destaque por programa (15) + 45 metaHtml dos miniStack = 240
+    expect(textos.length).toBeGreaterThanOrEqual(240);
     for (const x of textos) {
       const r = htmlInlineParaMarcacao(x);
-      if (r.tagsDesconhecidas.length > 0) {
-        puladas += 1;
-        continue;
-      }
-      expect(marcacaoParaHtml(r.texto)).toBe(x);
+      expect(r.tagsDesconhecidas, x).toEqual([]);
+      expect(marcacaoParaHtml(r.texto), x).toBe(x);
     }
-    console.log(`ida e volta: ${textos.length} textos, ${puladas} com outras tags`);
   });
 });

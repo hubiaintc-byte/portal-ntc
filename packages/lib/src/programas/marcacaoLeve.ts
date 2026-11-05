@@ -4,7 +4,7 @@
  * passar <strong>/<em>.
  */
 
-function escaparTexto(texto: string): string {
+export function escaparTexto(texto: string): string {
   return texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
@@ -27,12 +27,12 @@ export function htmlInlineParaMarcacao(html: string): {
   tagsDesconhecidas: string[];
 } {
   const desconhecidas = new Set<string>();
-  const comMarcas = html.replace(/<(\/?)([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g, (_m, fecha: string, nome: string) => {
+  const comMarcas = html.replace(/<(\/?)([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g, (_m, _fecha: string, nome: string) => {
     const tag = nome.toLowerCase();
     if (tag === "strong") return "**";
     if (tag === "em") return "*";
     desconhecidas.add(tag);
-    return fecha ? "" : "";
+    return "";
   });
   const texto = comMarcas.replace(/&(amp|lt|gt|quot|#39);/g, (_m, c: string) => ENTIDADES[c] ?? _m);
   return { texto, tagsDesconhecidas: Array.from(desconhecidas) };

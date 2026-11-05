@@ -1,14 +1,12 @@
 /** Serialização de documentos Lexical (parágrafos) para o HTML das páginas de programa. */
 
+import { escaparTexto } from "./marcacaoLeve";
+
 interface NoGenerico {
   type?: string;
   text?: string;
   format?: number | string;
   children?: unknown[];
-}
-
-function escaparTexto(texto: string): string {
-  return texto.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function filhosDaRaiz(doc: unknown): NoGenerico[] {
