@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import type { ContaFin, LivroFinanceiro } from "@ntc/lib";
+import type { ContaFin, LivroFinanceiro, SaldoContaResumo } from "@ntc/lib";
 
 import { excluirContaFinAcao, salvarContaFinAcao } from "../../acoesFinanceiro";
 import { ExclusaoLancamento } from "../eventos/ExclusaoLancamento";
@@ -27,11 +27,8 @@ interface ContasFinanceirasProps {
   hojeISO: string;
   /** Administrador: pode excluir. */
   podeExcluir: boolean;
-  /**
-   * O livro desta pessoa não tem os pagamentos (sem Pagar, Eventos nem Visão
-   * Executiva): o saldo mostrado considera só os recebimentos.
-   */
-  saldoSemPagamentos: boolean;
+  /** Saldos do servidor, sobre o livro inteiro (`PropsTelaFin.saldosContas`). */
+  saldosContas: SaldoContaResumo[];
   avisar: MostrarToast;
 }
 
@@ -39,15 +36,19 @@ export function ContasFinanceiras({
   livro,
   hojeISO,
   podeExcluir,
-  saldoSemPagamentos,
+  saldosContas,
   avisar,
 }: ContasFinanceirasProps) {
-  const { linhas, saldoInicial, saldoAtual } = listaContas(livro);
+  const { linhas, saldoInicial, saldoAtual } = listaContas(livro.contas, saldosContas);
   const [gaveta, setGaveta] = useState<{ conta: ContaFin | null } | null>(null);
   const [menu, setMenu] = useState<{ ancora: HTMLElement; c: ContaFin } | null>(null);
   const [excluindo, setExcluindo] = useState<ContaFin | null>(null);
 
+  // Um inativar/reativar por vez: o menu fecha e reabre antes de o servidor responder.
+  const [alterando, setAlterando] = useState(false);
   const alternarSituacao = async (c: ContaFin) => {
+    if (alterando) return;
+    setAlterando(true);
     const ativa = c.ativa === false;
     try {
       const res = await salvarContaFinAcao(c.id, contaComSituacao(c, ativa));
@@ -55,6 +56,8 @@ export function ContasFinanceiras({
       else avisar("Não foi possível alterar a conta", res.erro, "erro");
     } catch {
       avisar("Não foi possível alterar a conta", "Tente de novo.", "erro");
+    } finally {
+      setAlterando(false);
     }
   };
 
@@ -96,17 +99,6 @@ export function ContasFinanceiras({
             </button>
           </div>
         </div>
-        {saldoSemPagamentos && (
-          <div className="card-body" style={{ paddingBottom: 0 }}>
-            <div className="ctx-note" style={{ marginBottom: 0 }}>
-              <Icone nome="info" tamanho="sm" />
-              <div>
-                O saldo abaixo considera só os recebimentos: os pagamentos ficam na tela Pagar, que
-                não está liberada para você.
-              </div>
-            </div>
-          </div>
-        )}
         {linhas.length === 0 ? (
           <div className="empty" style={{ padding: 26 }}>
             <p>Nenhuma conta cadastrada.</p>
@@ -148,7 +140,7 @@ export function ContasFinanceiras({
                       {a.conta.numero ? ` · ${a.conta.numero}` : ""}
                     </td>
                     <td className="r num">{moeda(a.conta.saldoInicial, false)}</td>
-                    <td className="r num">{inteiro(a.movimentos.length)}</td>
+                    <td className="r num">{inteiro(a.movimentos)}</td>
                     <td className={`r num strong${a.saldo < 0 ? " neg" : ""}`}>
                       {moeda(a.saldo, false)}
                     </td>

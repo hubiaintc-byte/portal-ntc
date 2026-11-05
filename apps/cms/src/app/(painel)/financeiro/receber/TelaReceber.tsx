@@ -1,11 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 
 import { LISTAS_FIN, periodosDisponiveis, type FaturamentoFin, type ReceitaFin } from "@ntc/lib";
 
 import { navFinVisivel } from "@/lib/cms/navegacao";
-import { temTela } from "@/lib/cms/telas";
 
 import type { PropsTelaFin } from "../ShellFinanceiro";
 import { BuscaAba } from "../eventos/AbaReceitas";
@@ -21,6 +20,7 @@ import { ContasFinanceiras } from "./ContasFinanceiras";
 import { EscolhaFaturamento } from "./EscolhaFaturamento";
 import { GavetaReceitaCorporativa } from "./GavetaReceitaCorporativa";
 import { TabelaParcelas } from "./TabelaParcelas";
+import { TabelaReceitasCorporativas } from "./TabelaReceitasCorporativas";
 import {
   agingReceber,
   algumFiltroReceber,
@@ -32,6 +32,7 @@ import {
   NOME_CSV_RECEBER,
   OPCOES_ESCOPO,
   OPCOES_SITUACAO_RECEBER,
+  linhasReceitasCorporativas,
   receitasCorporativasContratadas,
   serieReceber,
   totaisReceber,
@@ -50,7 +51,8 @@ import {
 interface TelaReceberProps extends PropsTelaFin {
   /** Filtros guardados no casco (o `UI.fin` do protótipo vale para a sessão). */
   filtros: FiltrosReceber;
-  aoMudarFiltros: (f: FiltrosReceber) => void;
+  /** Setter do casco: atualização funcional, para a busca atrasada não desfazer um select. */
+  aoMudarFiltros: Dispatch<SetStateAction<FiltrosReceber>>;
 }
 
 type GavetaFat = {
@@ -64,6 +66,7 @@ type ChaveSelect = "periodo" | "escopo" | "centro" | "situacao";
 
 export function TelaReceber({
   livro,
+  saldosContas,
   hojeISO,
   capacidades,
   acesso,
@@ -72,7 +75,8 @@ export function TelaReceber({
   filtros,
   aoMudarFiltros,
 }: TelaReceberProps) {
-  const [novaReceita, setNovaReceita] = useState(false);
+  // Gaveta da receita corporativa: `r: null` = nova.
+  const [receitaCorp, setReceitaCorp] = useState<{ r: ReceitaFin | null } | null>(null);
   const [escolha, setEscolha] = useState(false);
   const [fat, setFat] = useState<GavetaFat | null>(null);
   // Remonta a busca ao "Limpar" (o campo guarda o texto digitado).
@@ -85,6 +89,7 @@ export function TelaReceber({
   const ag = agingReceber(linhas, hojeISO);
   const serie = serieReceber(linhas);
   const corp = receitasCorporativasContratadas(livro);
+  const receitasCorp = useMemo(() => linhasReceitasCorporativas(livro, filtros), [livro, filtros]);
 
   const defs: {
     chave: ChaveSelect;
@@ -115,7 +120,7 @@ export function TelaReceber({
     },
   ];
 
-  const mudar = (p: Partial<FiltrosReceber>) => aoMudarFiltros({ ...filtros, ...p });
+  const mudar = (p: Partial<FiltrosReceber>) => aoMudarFiltros((s) => ({ ...s, ...p }));
   const limpar = () => {
     aoMudarFiltros(FILTROS_RECEBER_INICIAIS);
     setLimpezas((x) => x + 1);
@@ -151,7 +156,11 @@ export function TelaReceber({
           </div>
         </div>
         <div className="ph-actions">
-          <button type="button" className="btn btn-secondary" onClick={() => setNovaReceita(true)}>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setReceitaCorp({ r: null })}
+          >
             <Icone nome="plus" tamanho="sm" />
             Receita corporativa
           </button>
@@ -378,24 +387,33 @@ export function TelaReceber({
         </div>
       </div>
 
+      {filtros.escopo !== "eventos" && (
+        <TabelaReceitasCorporativas
+          linhas={receitasCorp}
+          podeExcluir={capacidades.excluirFinanceiro}
+          aoEditar={(r) => setReceitaCorp({ r })}
+          avisar={avisar}
+        />
+      )}
+
       <ContasFinanceiras
         livro={livro}
         hojeISO={hojeISO}
         podeExcluir={capacidades.excluirFinanceiro}
-        saldoSemPagamentos={!temTela(acesso, ["fin.visao-executiva", "fin.eventos", "fin.pagar"])}
+        saldosContas={saldosContas}
         avisar={avisar}
       />
 
-      {novaReceita && (
+      {receitaCorp && (
         <GavetaReceitaCorporativa
-          receita={null}
+          receita={receitaCorp.r}
           livro={livro}
           hojeISO={hojeISO}
           aoSalvo={(titulo, descricao) => {
-            setNovaReceita(false);
+            setReceitaCorp(null);
             avisar(titulo, descricao);
           }}
-          aoFechar={() => setNovaReceita(false)}
+          aoFechar={() => setReceitaCorp(null)}
         />
       )}
 

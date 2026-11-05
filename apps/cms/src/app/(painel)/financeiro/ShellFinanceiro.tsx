@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import type { LivroFinanceiro } from "@ntc/lib";
+import type { LivroFinanceiro, SaldoContaResumo } from "@ntc/lib";
 
 import { mostraModuloCrm, navFinVisivel, telaInicialFin, type TelaFinId } from "@/lib/cms/navegacao";
 import type { AcessoPainel, CapacidadesPainel } from "@/lib/cms/telas";
@@ -53,6 +53,14 @@ export type IrParaFin = (tela: TelaFinId, extra?: ExtraNavegacao) => void;
 /** Props comuns de toda tela do Financeiro. */
 export interface PropsTelaFin {
   livro: LivroFinanceiro;
+  /**
+   * Saldo de cada conta calculado no servidor sobre o livro INTEIRO, antes do
+   * recorte por tela (Ruling R11): só números por conta (`contaId`,
+   * movimentos, entradas, saídas, saldo). Receber e Pagar mostram o saldo
+   * por aqui, nunca por `saldosPorConta(livro)`, que no livro recortado
+   * perde as saídas (ou as entradas) de quem não tem a outra tela.
+   */
+  saldosContas: SaldoContaResumo[];
   /** Data civil de Brasília (`AAAA-MM-DD`), calculada no servidor. */
   hojeISO: string;
   capacidades: CapacidadesPainel;
@@ -68,6 +76,8 @@ interface ShellFinanceiroProps {
   capacidades: CapacidadesPainel;
   /** Já recortado por tela no servidor (`recortarLivroPorTela`). */
   livro: LivroFinanceiro;
+  /** Saldos das contas sobre o livro inteiro (`resumoSaldosPorConta`, antes do recorte). */
+  saldosContas: SaldoContaResumo[];
   hojeISO: string;
   erroLeitura: boolean;
 }
@@ -137,7 +147,15 @@ function EmConstrucao({ titulo }: PropsTelaFin & { titulo: string }) {
   );
 }
 
-export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, erroLeitura }: ShellFinanceiroProps) {
+export function ShellFinanceiro({
+  usuario,
+  acesso,
+  capacidades,
+  livro,
+  saldosContas,
+  hojeISO,
+  erroLeitura,
+}: ShellFinanceiroProps) {
   const visiveis = navFinVisivel(acesso);
   const [estado, setEstado] = useState<EstadoTelaFin>(() => estadoDe(telaInicialFin(acesso)));
   // Filtros da Visão Executiva sobrevivem à navegação, como o `UI.dash` do protótipo.
@@ -176,7 +194,7 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
     ? `Financeiro · ${ROTULO.eventos} · ${eventoAberto.nome}`
     : `Financeiro · ${ROTULO[estado.tela]}`;
 
-  const props: PropsTelaFin = { livro, hojeISO, capacidades, acesso, irPara, avisar };
+  const props: PropsTelaFin = { livro, saldosContas, hojeISO, capacidades, acesso, irPara, avisar };
 
   return (
     <ShellPainel

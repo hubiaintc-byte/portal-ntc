@@ -3,7 +3,7 @@ import {
   aging, cashSeries, cronogramaFaturamento, phaseDonut, serieExigivelPorMes, serieObrigacoesPorMes,
   seriePagantesCortesias, serieReceitaXCusto, serieSegmento, serieVertical, serieOrcadoRealizado, groupCosts,
 } from "./agregados";
-import { consolidado, corpAlerts, extrato, saldoGeral, saldosPorConta } from "./consolidado";
+import { consolidado, corpAlerts, extrato, resumoSaldosPorConta, saldoGeral, saldosPorConta } from "./consolidado";
 import { eventMetrics, portfolio } from "./eventos";
 import type { LivroFinanceiro } from "./tipos";
 
@@ -55,5 +55,24 @@ describe("agregados", () => {
       labels: ["jul/26", "ago/26"],
       series: [{ nome: "Exigível", valores: [3, 7] }],
     });
+  });
+});
+
+describe("resumoSaldosPorConta", () => {
+  it("projeta só os números de saldosPorConta, sem movimentos", () => {
+    const conta = { id: "5", nome: "C", tipo: "Conta corrente", banco: "", agencia: "", numero: "", saldoInicial: 1000, dataSaldoInicial: "2026-01-01", ativa: true, observacao: "" };
+    const livro: LivroFinanceiro = {
+      ...vazio,
+      contas: [conta, { ...conta, id: "6", saldoInicial: 0 }],
+      faturamentos: [{ id: "50", receitaId: "10", eventoId: "", parcela: "1", nf: "", dataFaturamento: "2026-07-01", valorFaturado: 500, vencimento: "", retencaoTributaria: 0, retencaoContratual: 0, retencaoContratualLiberada: 0, dataRecebimento: "2026-07-02", valorRecebido: 500, contaId: "5", quitado: false, observacao: "" }],
+      pagamentos: [{ id: "70", custoId: "20", eventoId: "", documento: "", vencimento: "", valor: 200, dataPagamento: "2026-07-03", valorPago: 200, contaId: "5", observacao: "" }],
+    };
+    expect(resumoSaldosPorConta(livro)).toEqual([
+      { contaId: "5", movimentos: 2, entradas: 500, saidas: 200, saldo: 1300 },
+      { contaId: "6", movimentos: 0, entradas: 0, saidas: 0, saldo: 0 },
+    ]);
+    expect(resumoSaldosPorConta(vazio)).toEqual([]);
+    const r = resumoSaldosPorConta(livro)[0]!;
+    expect(Object.keys(r).sort()).toEqual(["contaId", "entradas", "movimentos", "saidas", "saldo"]);
   });
 });

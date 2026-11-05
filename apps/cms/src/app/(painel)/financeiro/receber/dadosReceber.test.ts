@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   consolidado,
+  resumoSaldosPorConta,
   validarFaturamento,
   validarReceita,
   type ContaFin,
@@ -17,6 +18,7 @@ import {
   algumFiltroReceber,
   aplicarFiltrosReceber,
   celulasAging,
+  competenciaCurta,
   clientesCorporativos,
   contaComSituacao,
   contextoDaParcela,
@@ -27,14 +29,18 @@ import {
   FILTROS_RECEBER_INICIAIS,
   formReceitaCorp,
   linhasReceber,
+  linhasReceitasCorporativas,
   listaContas,
   receitasCorporativasContratadas,
   serieReceber,
   totaisReceber,
+  totaisReceitasCorporativas,
   type FiltrosReceber,
 } from "./dadosReceber";
 
 const HOJE = "2026-07-15";
+/** Como a página faz: saldos sobre o livro inteiro, contas do livro da tela. */
+const contasDe = (l: LivroFinanceiro) => listaContas(l.contas, resumoSaldosPorConta(l));
 const vazio: LivroFinanceiro = {
   eventos: [],
   receitas: [],
@@ -276,7 +282,7 @@ describe("totais, aging e série", () => {
     const c = celulasAging(agingReceber(l, HOJE));
     expect(c.every((x) => x.largura === "0.0%" && x.valor === 0)).toBe(true);
     expect(serieReceber(l).labels).toEqual([]);
-    const k = listaContas(vazio);
+    const k = contasDe(vazio);
     expect(k).toEqual({ linhas: [], saldoInicial: 0, saldoAtual: 0 });
   });
 });
@@ -401,7 +407,7 @@ describe("receita corporativa", () => {
       HOJE,
     );
     expect(c.recebida).toBe(50_000_00);
-    expect(listaContas(l2).saldoAtual).toBe(60_000_00);
+    expect(contasDe(l2).saldoAtual).toBe(60_000_00);
   });
 
   it("clientes corporativos e contexto de parcela de evento", () => {
@@ -428,15 +434,28 @@ describe("contas", () => {
       contaId: "5",
       observacao: "",
     };
-    const k = listaContas({
+    const completo: LivroFinanceiro = {
       ...livro,
       pagamentos: [pag],
       contas: [conta(), conta({ id: "6", saldoInicial: 0, ativa: false })],
-    });
+    };
+    const k = contasDe(completo);
     expect(k.linhas.map((x) => x.saldo)).toEqual([19_000_00, 0]);
-    expect(k.linhas[0]!.movimentos).toHaveLength(2);
+    expect(k.linhas[0]!.movimentos).toBe(2);
+    expect(k.linhas[0]!.saidas).toBe(1_000_00);
     expect(k.saldoInicial).toBe(10_000_00);
     expect(k.saldoAtual).toBe(19_000_00);
+    // Quem só tem Receber recebe o livro sem pagamentos, mas o saldo vem do livro inteiro.
+    const recortado: LivroFinanceiro = { ...completo, custos: [], pagamentos: [] };
+    const r = listaContas(recortado.contas, resumoSaldosPorConta(completo));
+    expect(r.linhas.map((x) => x.saldo)).toEqual([19_000_00, 0]);
+    expect(r.saldoAtual).toBe(19_000_00);
+  });
+
+  it("conta ainda sem saldo do servidor fica com o saldo inicial", () => {
+    const k = listaContas([conta({ id: "9", saldoInicial: 7_00 })], []);
+    expect(k.linhas[0]).toMatchObject({ movimentos: 0, entradas: 0, saidas: 0, saldo: 7_00 });
+    expect(k.saldoAtual).toBe(7_00);
   });
 
   it("inativar mantém os demais dados", () => {
@@ -451,5 +470,51 @@ describe("contas", () => {
       ativa: false,
       observacao: "",
     });
+  });
+});
+
+describe("receitas corporativas (lista)", () => {
+  const prevista = rec({
+    id: "12",
+    eventoId: "",
+    tipoLancamento: "Corporativa",
+    centroCusto: "ADM",
+    cliente: "Banco Alfa",
+    origem: "Receita financeira",
+    statusEconomico: "Prevista",
+    valorUnit: 5_000_00,
+    competencia: "2026-03",
+  });
+  const l: LivroFinanceiro = { ...livro, receitas: [...livro.receitas, prevista] };
+  const ids = (p: Partial<FiltrosReceber> = {}) =>
+    linhasReceitasCorporativas(l, filtros(p)).map((x) => x.r.id);
+
+  it("só receitas sem evento, inclusive previstas, competência mais recente primeiro", () => {
+    expect(ids()).toEqual(["11", "12"]);
+    const [gama, alfa] = linhasReceitasCorporativas(l, filtros());
+    expect(gama!.m).toMatchObject({ valor: 30_000_00, faturado: 30_000_00, aFaturar: 0 });
+    expect(alfa!.m).toMatchObject({ status: "Prevista", faturado: 0, aFaturar: 0 });
+  });
+
+  it("segue o Recorte: escopo, centro, período pela competência e busca", () => {
+    expect(ids({ escopo: "eventos" })).toEqual([]);
+    expect(ids({ escopo: "corporativo" })).toEqual(["11", "12"]);
+    expect(ids({ centro: "ADM" })).toEqual(["12"]);
+    expect(ids({ periodo: "2026-Q1" })).toEqual(["12"]);
+    expect(ids({ periodo: "2026-Q3" })).toEqual(["11"]);
+    expect(ids({ q: "financeira" })).toEqual(["12"]);
+    expect(ids({ situacao: "vencido" })).toEqual(["11", "12"]);
+  });
+
+  it("totais, competência curta e livro vazio", () => {
+    expect(totaisReceitasCorporativas(linhasReceitasCorporativas(l, filtros()))).toEqual({
+      valor: 35_000_00,
+      faturado: 30_000_00,
+      aFaturar: 0,
+    });
+    expect(competenciaCurta("2026-03")).toBe("03/2026");
+    expect(competenciaCurta("")).toBe("—");
+    expect(linhasReceitasCorporativas(vazio, filtros())).toEqual([]);
+    expect(totaisReceitasCorporativas([])).toEqual({ valor: 0, faturado: 0, aFaturar: 0 });
   });
 });

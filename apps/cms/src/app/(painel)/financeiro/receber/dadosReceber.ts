@@ -6,8 +6,7 @@ import {
   inPeriod,
   isContratada,
   mesDe,
-  saldoGeral,
-  saldosPorConta,
+  receitaFin,
   serieExigivelPorMes,
   valorReceita,
   type Centavos,
@@ -20,9 +19,10 @@ import {
   type FaturamentoFin,
   type LivroFinanceiro,
   type MetricasParcela,
+  type MetricasReceita,
   type Periodo,
   type ReceitaFin,
-  type SaldoConta,
+  type SaldoContaResumo,
   type SerieGrafico,
 } from "@ntc/lib";
 
@@ -359,6 +359,56 @@ export function dadosDaReceitaCorp(f: FormReceitaCorp, r: ReceitaFin | null): Da
   };
 }
 
+export interface LinhaReceitaCorp {
+  r: ReceitaFin;
+  m: MetricasReceita;
+}
+
+/**
+ * Tabela "Receitas corporativas" (Ruling R12): todas as receitas sem evento,
+ * inclusive previstas e ainda não faturadas, para editar ou excluir. Segue o
+ * Recorte onde ele se aplica: some com o escopo "Somente eventos", período
+ * pela competência, centro de custo e busca (id, cliente, origem,
+ * referência). A Situação do Recorte é da parcela e não se aplica.
+ * Competência mais recente primeiro, depois id.
+ */
+export function linhasReceitasCorporativas(
+  livro: LivroFinanceiro,
+  filtros: FiltrosReceber,
+): LinhaReceitaCorp[] {
+  if (filtros.escopo === "eventos") return [];
+  const q = norm(filtros.q);
+  return livro.receitas
+    .filter((r) => !r.eventoId)
+    .filter((r) => filtros.centro === "all" || r.centroCusto === filtros.centro)
+    .filter((r) => filtros.periodo === "all" || inPeriod(r.competencia, filtros.periodo))
+    .filter((r) => !q || norm([r.id, r.cliente, r.origem, r.referencia].join(" ")).includes(q))
+    .map((r) => ({ r, m: receitaFin(r, livro) }))
+    .sort(
+      (a, b) =>
+        (b.r.competencia || "").localeCompare(a.r.competencia || "") ||
+        a.r.id.localeCompare(b.r.id, "pt-BR", { numeric: true }),
+    );
+}
+
+export interface TotaisReceitasCorp {
+  valor: Centavos;
+  faturado: Centavos;
+  aFaturar: Centavos;
+}
+
+export const totaisReceitasCorporativas = (
+  linhas: readonly LinhaReceitaCorp[],
+): TotaisReceitasCorp => ({
+  valor: linhas.reduce((a, l) => a + n(l.m.valor), 0),
+  faturado: linhas.reduce((a, l) => a + n(l.m.faturado), 0),
+  aFaturar: linhas.reduce((a, l) => a + n(l.m.aFaturar), 0),
+});
+
+/** Competência `AAAA-MM` → `mm/aaaa` (ou "—"). */
+export const competenciaCurta = (c: string): string =>
+  /^\d{4}-\d{2}/.test(c) ? `${c.slice(5, 7)}/${c.slice(0, 4)}` : "—";
+
 /** Clientes já usados em receitas corporativas (datalist), em ordem. */
 export const clientesCorporativos = (livro: Pick<LivroFinanceiro, "receitas">): string[] =>
   [
@@ -384,18 +434,42 @@ export const descricaoReceitaCorpSalva = (id: string, d: DadosReceitaFin): strin
 
 // ---------------------------------------------------------------- contas
 
+export interface LinhaConta {
+  conta: ContaFin;
+  movimentos: number;
+  entradas: Centavos;
+  saidas: Centavos;
+  saldo: Centavos;
+}
+
 export interface ListaContas {
-  linhas: SaldoConta[];
+  linhas: LinhaConta[];
   saldoInicial: Centavos;
   saldoAtual: Centavos;
 }
 
-/** Tabela "Contas financeiras" (a da Administração do protótipo), com o rodapé consolidado. */
-export function listaContas(livro: LivroFinanceiro): ListaContas {
+/**
+ * Tabela "Contas financeiras" (a da Administração do protótipo), com o rodapé
+ * consolidado. Os saldos vêm do servidor (`saldosContas`, calculados sobre o
+ * livro inteiro antes do recorte — Ruling R11), não do livro desta tela.
+ * Conta ainda sem resumo (recém-criada, antes da revalidação) fica com o
+ * saldo inicial.
+ */
+export function listaContas(
+  contas: readonly ContaFin[],
+  saldos: readonly SaldoContaResumo[],
+): ListaContas {
+  const porId = new Map(saldos.map((s) => [s.contaId, s]));
+  const linhas = contas.map((conta) => {
+    const s = porId.get(conta.id);
+    return s
+      ? { conta, movimentos: s.movimentos, entradas: s.entradas, saidas: s.saidas, saldo: s.saldo }
+      : { conta, movimentos: 0, entradas: 0, saidas: 0, saldo: n(conta.saldoInicial) };
+  });
   return {
-    linhas: saldosPorConta(livro),
-    saldoInicial: livro.contas.reduce((a, c) => a + n(c.saldoInicial), 0),
-    saldoAtual: saldoGeral(livro),
+    linhas,
+    saldoInicial: contas.reduce((a, c) => a + n(c.saldoInicial), 0),
+    saldoAtual: linhas.reduce((a, l) => a + n(l.saldo), 0),
   };
 }
 

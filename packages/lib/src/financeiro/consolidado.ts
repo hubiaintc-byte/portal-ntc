@@ -113,6 +113,31 @@ export function saldosPorConta(livro: LivroFinanceiro, ate?: string): SaldoConta
   });
 }
 
+/**
+ * Saldo de cada conta reduzido a números (sem a lista de movimentos), para o
+ * servidor calcular sobre o livro inteiro antes do recorte por tela e mandar
+ * só isto ao navegador: quem tem Receber sem Pagar (ou o contrário) vê o
+ * saldo certo sem receber os pagamentos/recebimentos que não pode ver.
+ */
+export interface SaldoContaResumo {
+  contaId: string;
+  /** Quantidade de movimentações (recebimentos + pagamentos) na conta. */
+  movimentos: number;
+  entradas: Centavos;
+  saidas: Centavos;
+  saldo: Centavos;
+}
+
+export function resumoSaldosPorConta(livro: LivroFinanceiro, ate?: string): SaldoContaResumo[] {
+  return saldosPorConta(livro, ate).map((s) => ({
+    contaId: s.conta.id,
+    movimentos: s.movimentos.length,
+    entradas: s.entradas,
+    saidas: s.saidas,
+    saldo: s.saldo,
+  }));
+}
+
 export interface Consolidado {
   contratada: Centavos;
   prevista: Centavos;
