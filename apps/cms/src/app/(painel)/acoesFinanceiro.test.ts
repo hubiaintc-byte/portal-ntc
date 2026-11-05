@@ -43,7 +43,7 @@ const escrita = {
 };
 vi.mock("@/lib/financeiro/escrita", () => escrita);
 const lerHistoricoFinMock = vi.fn(async () => []);
-const lancamentoCorporativoFinMock = vi.fn(async (_slug: string, _id: string) => false);
+const lancamentoCorporativoFinMock = vi.fn<(slug: string, id: string) => Promise<boolean>>(async () => false);
 vi.mock("@/lib/financeiro/leitura", () => ({
   lerHistoricoFin: lerHistoricoFinMock,
   lancamentoCorporativoFin: lancamentoCorporativoFinMock,
