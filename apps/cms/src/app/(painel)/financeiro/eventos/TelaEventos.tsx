@@ -518,8 +518,8 @@ interface ExclusaoEventoProps {
   aoFechar: () => void;
 }
 
-/** `deleteEventFlow` do protótipo, sem a nota de "protótipo sem persistência". */
-function ExclusaoEvento({
+/** `deleteEventFlow` do protótipo, sem a nota de "protótipo sem persistência" (também na área do evento). */
+export function ExclusaoEvento({
   evento: ev,
   dependentes: d,
   ocupado,

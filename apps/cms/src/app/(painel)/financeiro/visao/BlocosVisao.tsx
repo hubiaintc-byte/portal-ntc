@@ -70,17 +70,23 @@ export function LinhaFunil({ rotulo, valor, max, cor, nota }: LinhaFunilProps) {
 }
 
 /**
- * `resultHero(tot)` da carteira, **sem** a célula "Comissões comerciais"
+ * `resultHero(t, { scope })`, **sem** a célula "Comissões comerciais"
  * (fora da Fase 1): Resultado previsto, Movimentação financeira e Desvio do
- * orçamento.
+ * orçamento. Serve à carteira (Visão Executiva) e ao evento (`escopo` "do evento").
  */
-export function HeroResultado({ tot }: { tot: TotaisCarteira }) {
+export function HeroResultado({
+  tot,
+  escopo = "da carteira",
+}: {
+  tot: Pick<TotaisCarteira, "resultadoRealizado" | "resultadoPrevisto" | "movimentacao" | "desvio">;
+  escopo?: string;
+}) {
   const res = tot.resultadoRealizado;
   return (
     <section className="hero" aria-label="Resultado">
       <div>
         <div className="h-label">
-          <Icone nome="scale" tamanho="sm" /> Resultado da carteira
+          <Icone nome="scale" tamanho="sm" /> Resultado {escopo}
         </div>
         <div className={`h-value${res < 0 ? " neg" : ""}`}>
           <ValorGrande valor={res} />

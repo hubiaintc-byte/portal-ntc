@@ -132,6 +132,8 @@ interface PropsSelect extends PropsFld {
   aoMudar: (v: string) => void;
   opcoes: readonly string[];
   placeholder?: string;
+  /** Rótulo da opção quando difere do valor (ex.: centro de custo "OPE · Operações e Eventos"). */
+  rotuloDe?: (valor: string) => string;
 }
 
 export function CampoSelect({
@@ -139,6 +141,7 @@ export function CampoSelect({
   aoMudar,
   opcoes,
   placeholder = "Selecione…",
+  rotuloDe,
   ...fld
 }: PropsSelect) {
   return (
@@ -154,7 +157,7 @@ export function CampoSelect({
         <option value="">{placeholder}</option>
         {opcoes.map((o) => (
           <option key={o} value={o}>
-            {o}
+            {rotuloDe ? rotuloDe(o) : o}
           </option>
         ))}
       </select>

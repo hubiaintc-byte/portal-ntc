@@ -695,6 +695,8 @@
   /* Selos de status, origem e situação do CRM lado a lado (cartão e lista). */
   & .ec-foot-selos { gap: 6px; flex-wrap: wrap; }
   & .selos-linha { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  /* Área do evento: o "← Eventos" do protótipo é `<a>`; aqui é botão (volta à lista). */
+  & :where(button.ws-back) { margin: 0; padding: 0; border: 0; background: none; cursor: pointer; }
   /* Wizard: campo que o CRM preencheu (só leitura, "Editar no CRM"). */
   & .fld input[readonly] { background: var(--surface-2); color: var(--grafite); }
 }

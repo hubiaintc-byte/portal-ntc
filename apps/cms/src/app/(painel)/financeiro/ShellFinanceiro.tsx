@@ -8,6 +8,7 @@ import { mostraModuloCrm, navFinVisivel, telaInicialFin, type TelaFinId } from "
 import type { AcessoPainel, CapacidadesPainel } from "@/lib/cms/telas";
 
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
+import { AreaEvento, EventoNaoEncontrado } from "./eventos/AreaEvento";
 import { aplicarFiltrosRecebidos, ESTADO_LISTA_INICIAL, type EstadoListaEventos } from "./eventos/dadosEventos";
 import { TelaEventos } from "./eventos/TelaEventos";
 import { RaizFin05Contexto } from "./ui/PortalFin05";
@@ -197,8 +198,18 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
           {estado.tela === "eventos" && !estado.eventoId && (
             <TelaEventos {...props} lista={listaEventos} aoMudarLista={setListaEventos} />
           )}
-          {/* Área do evento: Task 14. */}
-          {estado.tela === "eventos" && estado.eventoId && <EmConstrucao titulo={ROTULO.eventos} {...props} />}
+          {estado.tela === "eventos" && estado.eventoId && eventoAberto && (
+            <AreaEvento
+              {...props}
+              evento={eventoAberto}
+              aba={estado.aba}
+              aoTrocarAba={(aba) => irPara("eventos", { eventoId: eventoAberto.id, aba })}
+              aoVoltar={() => irPara("eventos")}
+            />
+          )}
+          {estado.tela === "eventos" && estado.eventoId && !eventoAberto && (
+            <EventoNaoEncontrado id={estado.eventoId} aoVoltar={() => irPara("eventos")} />
+          )}
           {estado.tela === "receber" && <EmConstrucao titulo={ROTULO.receber} {...props} />}
           {estado.tela === "pagar" && <EmConstrucao titulo={ROTULO.pagar} {...props} />}
         </div>
