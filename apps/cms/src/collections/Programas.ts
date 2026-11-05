@@ -7,14 +7,12 @@ import { seoFields } from "../shared/seoFields";
 import { leituraPublica } from "../access/leituraPublica";
 import { ctaHrefPermitido } from "../lib/cms/cardsCorpoDocente";
 import type { Field } from "payload";
+import { IDENTIDADES_VISUAIS } from "../lib/cms/paginaProgramaCatalogo";
 
 
 const MARCACAO = "Marcação leve: **negrito** e *itálico*.";
 
-const IDENTIDADES = [
-  "vertente", "AGIP", "EDUTEC", "EGIDE", "FUTURA", "LIDERA", "PEAR", "PEI",
-  "PINEI", "PROAPS", "PROGE", "PROGIR", "PROSUS", "SIGA", "SIGS", "VIVAESCOLA",
-];
+const IDENTIDADES = IDENTIDADES_VISUAIS;
 
 const campoImagemDocente = (): Field[] => [
   { name: "imagem", type: "upload", relationTo: "media", label: "Imagem" },

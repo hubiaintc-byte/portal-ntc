@@ -27,6 +27,8 @@ export interface LinhaContador {
 }
 
 export interface LinhaCoordenacao {
+  /** Id da linha no array gravado ("" em linha nova) — o envio de imagem acha a linha por ele. */
+  linhaId: string;
   tag: string;
   /** Id da media enviada, "" se não há. Preservado, não editado na tela. */
   imagemId: string;
@@ -97,7 +99,7 @@ export interface PaginaProgramaEdicao {
   };
 }
 
-/** Identidades visuais da página (mesma lista do select do schema). */
+/** Identidades visuais da página — fonte única: o select `pagina.identidadeVisual` do schema lê daqui. */
 export const IDENTIDADES_VISUAIS = [
   "vertente",
   "AGIP",
@@ -192,6 +194,7 @@ export function paginaDoDocumento(pg: Programa["pagina"] | null | undefined): Pa
       contadores: (d.contadores ?? []).map((k) => ({ num: txt(k.num), lbl: txt(k.lbl) })),
       nota: txt(d.nota),
       coordenacao: (d.coordenacao ?? []).map((x) => ({
+        linhaId: txt(x.id),
         tag: txt(x.tag),
         imagemId: idMidia(x.imagem),
         imagemCaminho: txt(x.imagemCaminho),
@@ -203,6 +206,7 @@ export function paginaDoDocumento(pg: Programa["pagina"] | null | undefined): Pa
         modulos: txt(x.modulos),
       })),
       especialistas: (d.especialistas ?? []).map((x) => ({
+        linhaId: txt(x.id),
         imagemId: idMidia(x.imagem),
         imagemCaminho: txt(x.imagemCaminho),
         imagemAlt: txt(x.imagemAlt),
@@ -243,10 +247,15 @@ const ouNulo = (v: string): string | null => (v.trim() === "" ? null : v.trim())
 const midiaOuNula = (id: string): number | null => (/^\d+$/.test(id.trim()) ? Number(id.trim()) : null);
 const ORDEM = /^\d+$/;
 
-/** Linha em que todo campo de texto está em branco não é dado. */
+/** Linha em que todo campo de texto está em branco não é dado (o id da linha não conta). */
 function semLinhasVazias<T extends object>(linhas: readonly T[]): T[] {
-  return linhas.filter((l) => Object.values(l).some((v) => typeof v === "string" && v.trim() !== ""));
+  return linhas.filter((l) =>
+    Object.entries(l).some(([k, v]) => k !== "linhaId" && typeof v === "string" && v.trim() !== ""),
+  );
 }
+
+/** Mantém o id da linha do array entre salvamentos (o envio de imagem do docente depende dele). */
+const idDaLinha = (linhaId: string): { id?: string } => (linhaId === "" ? {} : { id: linhaId });
 
 /** Formulário → group `pagina` do Payload (o group inteiro, para um `update`). */
 export function paginaParaGravar(e: PaginaProgramaEdicao): Record<string, unknown> {
@@ -276,6 +285,7 @@ export function paginaParaGravar(e: PaginaProgramaEdicao): Record<string, unknow
       contadores: semLinhasVazias(e.docentes.contadores).map((k) => ({ num: ouNulo(k.num), lbl: ouNulo(k.lbl) })),
       nota: ouNulo(e.docentes.nota),
       coordenacao: semLinhasVazias(e.docentes.coordenacao).map((x) => ({
+        ...idDaLinha(x.linhaId),
         tag: ouNulo(x.tag),
         imagem: midiaOuNula(x.imagemId),
         imagemCaminho: ouNulo(x.imagemCaminho),
@@ -287,6 +297,7 @@ export function paginaParaGravar(e: PaginaProgramaEdicao): Record<string, unknow
         modulos: ouNulo(x.modulos),
       })),
       especialistas: semLinhasVazias(e.docentes.especialistas).map((x) => ({
+        ...idDaLinha(x.linhaId),
         imagem: midiaOuNula(x.imagemId),
         imagemCaminho: ouNulo(x.imagemCaminho),
         imagemAlt: ouNulo(x.imagemAlt),
@@ -323,28 +334,34 @@ export function paginaParaGravar(e: PaginaProgramaEdicao): Record<string, unknow
   };
 }
 
-/** Caminho de imagem servido pelo próprio site: começa com uma barra só. */
+/**
+ * Caminho de imagem servido pelo próprio site: começa com uma barra só e só
+ * tem letras, números, `/`, `_`, `.` e `-` (nada de aspas, parênteses ou
+ * espaço — o caminho também vai para `url()` no CSS da página).
+ */
+const CAMINHO_IMAGEM = /^\/[A-Za-z0-9/_.-]+$/;
 const caminhoValido = (c: string): boolean => {
   const t = c.trim();
-  return t === "" || (t.startsWith("/") && !t.startsWith("//"));
+  return t === "" || (CAMINHO_IMAGEM.test(t) && !t.startsWith("//"));
 };
 
+const MSG_CAMINHO = "o caminho deve começar com / e ter só letras, números, /, _, . e -";
 const MSG_LINK = "o link do botão deve começar com /, #, http://, https:// ou mailto:";
 
 /** O que impede gravar (mesmo em rascunho): links e caminhos que o site não aceita. */
 export function errosDaPagina(e: PaginaProgramaEdicao): string[] {
   const erros: string[] = [];
-  if (!caminhoValido(e.heroImagemCaminho)) erros.push("Imagem do topo: o caminho deve começar com /");
+  if (!caminhoValido(e.heroImagemCaminho)) erros.push(`Imagem do topo: ${MSG_CAMINHO}`);
   e.docentes.coordenacao.forEach((x, i) => {
-    if (!caminhoValido(x.imagemCaminho)) erros.push(`Coordenação ${i + 1}: o caminho da imagem deve começar com /`);
+    if (!caminhoValido(x.imagemCaminho)) erros.push(`Coordenação ${i + 1}: ${MSG_CAMINHO}`);
   });
   e.docentes.especialistas.forEach((x, i) => {
-    if (!caminhoValido(x.imagemCaminho)) erros.push(`Especialista ${i + 1}: o caminho da imagem deve começar com /`);
+    if (!caminhoValido(x.imagemCaminho)) erros.push(`Especialista ${i + 1}: ${MSG_CAMINHO}`);
   });
   e.modalidadesCards.forEach((m, i) => {
     if (!ctaHrefPermitido(m.ctaHref)) erros.push(`Modalidade ${i + 1}: ${MSG_LINK}`);
   });
-  if (!caminhoValido(e.cartao.imagemCaminho)) erros.push("Cartão: o caminho da imagem deve começar com /");
+  if (!caminhoValido(e.cartao.imagemCaminho)) erros.push(`Cartão: ${MSG_CAMINHO}`);
   const ordem = e.cartao.ordem.trim();
   if (ordem !== "" && !ORDEM.test(ordem)) erros.push("Cartão: a ordem deve ser um número inteiro");
   return erros;
@@ -360,4 +377,53 @@ export function paginaParaPublicar(e: PaginaProgramaEdicao): PaginaParaPublicar 
     cartaoDescricaoMenu: e.cartao.descricaoMenu,
     cartaoDescricaoMapa: e.cartao.descricaoMapa,
   };
+}
+
+/* ---------------- Imagens enviadas (media) ---------------- */
+
+/** Onde a imagem enviada entra no group `pagina`. Docentes pela linha (id do array). */
+export type AlvoImagemPrograma =
+  | { tipo: "topo" }
+  | { tipo: "cartao" }
+  | { tipo: "coordenacao"; linhaId: string }
+  | { tipo: "especialista"; linhaId: string };
+
+/** Formato do alvo vindo da Server Action (o cliente pode mandar qualquer coisa). */
+export function ehAlvoImagem(v: unknown): v is AlvoImagemPrograma {
+  if (!v || typeof v !== "object") return false;
+  const a = v as { tipo?: unknown; linhaId?: unknown };
+  if (a.tipo === "topo" || a.tipo === "cartao") return true;
+  return (a.tipo === "coordenacao" || a.tipo === "especialista") && typeof a.linhaId === "string" && a.linhaId !== "";
+}
+
+type LinhaComImagem = { id?: string | null; imagem?: unknown };
+
+/**
+ * Cópia do group com a relação de imagem do alvo trocada (`null` limpa).
+ * Só a relação muda — o caminho legado fica, e o site volta a usá-lo sem a
+ * media. Devolve `null` se a linha do docente não existe no gravado.
+ */
+export function comImagem(
+  pagina: Programa["pagina"] | null | undefined,
+  alvo: AlvoImagemPrograma,
+  midiaId: number | null,
+): NonNullable<Programa["pagina"]> | null {
+  const copia = structuredClone(pagina ?? {}) as NonNullable<Programa["pagina"]>;
+  if (alvo.tipo === "topo") {
+    copia.heroImagem = midiaId;
+    return copia;
+  }
+  if (alvo.tipo === "cartao") {
+    copia.cartao = { ...(copia.cartao ?? {}), imagem: midiaId };
+    return copia;
+  }
+  const docentes = copia.docentes ?? {};
+  const linhas = (alvo.tipo === "coordenacao" ? docentes.coordenacao : docentes.especialistas) as
+    | LinhaComImagem[]
+    | null
+    | undefined;
+  const linha = (linhas ?? []).find((l) => l.id === alvo.linhaId);
+  if (!linha) return null;
+  linha.imagem = midiaId;
+  return copia;
 }

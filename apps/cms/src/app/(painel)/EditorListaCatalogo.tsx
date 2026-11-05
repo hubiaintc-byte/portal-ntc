@@ -21,6 +21,8 @@ interface EditorListaCatalogoProps<T> {
   onMudar: (itens: T[]) => void;
   novo: () => T;
   campos: CampoItem<T>[];
+  /** Conteúdo extra por item, depois dos campos (ex.: envio de imagem). */
+  extra?: (item: T, indice: number) => React.ReactNode;
 }
 
 /** Lista editável do catálogo: adicionar, remover e reordenar por botões (acessível por teclado). */
@@ -32,6 +34,7 @@ export function EditorListaCatalogo<T extends { [K in keyof T]: string | boolean
   onMudar,
   novo,
   campos,
+  extra,
 }: EditorListaCatalogoProps<T>) {
   const base = useId();
 
@@ -82,6 +85,7 @@ export function EditorListaCatalogo<T extends { [K in keyof T]: string | boolean
                 </div>
               );
             })}
+            {extra?.(it, i)}
             <div className="pcms-lista-catalogo__acoes">
               <button type="button" className="pcms-btn pcms-btn--ghost" disabled={i === 0} onClick={() => mover(i, -1)} aria-label={`Mover ${rotuloItem} ${i + 1} para cima`}>
                 ↑

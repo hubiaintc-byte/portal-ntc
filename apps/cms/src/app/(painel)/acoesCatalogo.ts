@@ -11,14 +11,18 @@ import {
   type ProgramaCatalogoDetalhe,
 } from "@/lib/cms/catalogoCrm";
 import {
+  enviarImagemPrograma,
   excluirModulo,
   excluirPrograma,
+  removerImagemPrograma,
   salvarModulo,
   salvarPrograma,
   type DadosModulo,
   type DadosPrograma,
   type ResultadoComId,
+  type ResultadoImagem,
 } from "@/lib/cms/catalogoCrmEscrita";
+import type { AlvoImagemPrograma } from "@/lib/cms/paginaProgramaCatalogo";
 import type { ResultadoEscrita } from "@/lib/cms/painelCmsEscrita";
 
 /**
@@ -80,6 +84,34 @@ export async function excluirModuloCatalogoCrm(id: string): Promise<ResultadoEsc
   const usuario = await obterUsuarioAutenticadoComTela(TELAS_MODULO);
   if (!usuario) return RECUSADO;
   const r = await excluirModulo(id, usuario);
+  if (r.ok) revalidarPainel();
+  return r;
+}
+
+/**
+ * Envia uma imagem (media) para o topo, o cartão ou um docente da página do
+ * programa. O File chega no campo "arquivo" do FormData, como na capa do
+ * evento (mesmo limite de corpo das Server Actions).
+ */
+export async function enviarImagemProgramaCatalogoCrm(
+  id: string,
+  alvo: AlvoImagemPrograma,
+  formData: FormData,
+): Promise<ResultadoImagem> {
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_PROGRAMA);
+  if (!usuario) return RECUSADO;
+  const arquivo = formData.get("arquivo");
+  if (!(arquivo instanceof File) || arquivo.size === 0) return { ok: false, erro: "Nenhum arquivo selecionado." };
+  const r = await enviarImagemPrograma(id, alvo, arquivo, usuario);
+  if (r.ok) revalidarPainel();
+  return r;
+}
+
+/** Tira a imagem enviada; o caminho `/img/…` volta a valer no site. */
+export async function removerImagemProgramaCatalogoCrm(id: string, alvo: AlvoImagemPrograma): Promise<ResultadoEscrita> {
+  const usuario = await obterUsuarioAutenticadoComTela(TELAS_PROGRAMA);
+  if (!usuario) return RECUSADO;
+  const r = await removerImagemPrograma(id, alvo, usuario);
   if (r.ok) revalidarPainel();
   return r;
 }

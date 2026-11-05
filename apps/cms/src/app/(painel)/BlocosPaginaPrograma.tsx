@@ -11,6 +11,7 @@ import {
 import { CampoMarkdown } from "./crm/CampoMarkdown";
 import { CampoArea, CampoSelect, CampoTexto } from "./crm/CamposCrm";
 import { EditorListaCatalogo } from "./EditorListaCatalogo";
+import { UploadImagemPrograma } from "./UploadImagemPrograma";
 
 /**
  * Blocos "Página do site" do detalhe do programa (group `programas.pagina`),
@@ -24,6 +25,8 @@ interface BlocosPaginaProgramaProps {
   onMudar: (p: PaginaProgramaEdicao) => void;
   /** Endereço atual da página, para orientar quem edita. */
   slug: string;
+  /** `null` = programa novo, ainda sem id: o envio de imagens espera o primeiro salvar. */
+  programaId: string | null;
 }
 
 const DICA_MARCACAO = "Use *texto* para itálico e **texto** para negrito.";
@@ -34,6 +37,7 @@ const OPCOES_IDENTIDADE = IDENTIDADES_VISUAIS.map((v) => ({
 }));
 
 const novaCoordenacao = (): LinhaCoordenacao => ({
+  linhaId: "",
   tag: "",
   imagemId: "",
   imagemCaminho: "",
@@ -46,6 +50,7 @@ const novaCoordenacao = (): LinhaCoordenacao => ({
 });
 
 const novoEspecialista = (): LinhaEspecialista => ({
+  linhaId: "",
   imagemId: "",
   imagemCaminho: "",
   imagemAlt: "",
@@ -64,15 +69,7 @@ const novaModalidade = (): LinhaModalidade => ({
   ctaHref: "",
 });
 
-function AvisoImagemEnviada({ onde }: { onde: string }) {
-  return (
-    <p className="pcms-aviso" role="note">
-      Há uma imagem enviada vinculada {onde}; no site ela vence o caminho abaixo.
-    </p>
-  );
-}
-
-export function BlocosPaginaPrograma({ pagina: p, onMudar, slug }: BlocosPaginaProgramaProps) {
+export function BlocosPaginaPrograma({ pagina: p, onMudar, slug, programaId }: BlocosPaginaProgramaProps) {
   const campo =
     <K extends keyof PaginaProgramaEdicao>(chave: K) =>
     (v: PaginaProgramaEdicao[K]) =>
@@ -81,6 +78,17 @@ export function BlocosPaginaPrograma({ pagina: p, onMudar, slug }: BlocosPaginaP
     <K extends keyof PaginaProgramaEdicao["docentes"]>(chave: K) =>
     (v: PaginaProgramaEdicao["docentes"][K]) =>
       onMudar({ ...p, docentes: { ...p.docentes, [chave]: v } });
+  /** Troca só a imagem enviada de uma linha de docente (a escrita já gravou). */
+  const imagemDaLinha =
+    <L extends { imagemId: string }>(lista: "coordenacao" | "especialistas", indice: number) =>
+    (midiaId: string) =>
+      onMudar({
+        ...p,
+        docentes: {
+          ...p.docentes,
+          [lista]: (p.docentes[lista] as unknown as L[]).map((l, j) => (j === indice ? { ...l, imagemId: midiaId } : l)),
+        },
+      });
   const cartao =
     <K extends keyof PaginaProgramaEdicao["cartao"]>(chave: K) =>
     (v: PaginaProgramaEdicao["cartao"][K]) =>
@@ -101,7 +109,13 @@ export function BlocosPaginaPrograma({ pagina: p, onMudar, slug }: BlocosPaginaP
         <h2>Página do site · Topo</h2>
         <CampoMarkdown rotulo="Título do topo" valor={p.heroTitulo} onMudar={campo("heroTitulo")} linhas={2} soEnfase dica={DICA_MARCACAO} />
         <CampoArea rotulo="Subtítulo do topo" valor={p.heroSubtitulo} onMudar={campo("heroSubtitulo")} />
-        {p.heroImagemId !== "" && <AvisoImagemEnviada onde="ao topo" />}
+        <UploadImagemPrograma
+          programaId={programaId}
+          alvo={{ tipo: "topo" }}
+          rotulo="Imagem do topo — imagem enviada"
+          midiaId={p.heroImagemId}
+          onMudou={campo("heroImagemId")}
+        />
         <CampoTexto rotulo="Imagem do topo — caminho (/img/…)" valor={p.heroImagemCaminho} onMudar={campo("heroImagemCaminho")} />
       </section>
 
@@ -169,6 +183,15 @@ export function BlocosPaginaPrograma({ pagina: p, onMudar, slug }: BlocosPaginaP
         itens={p.docentes.coordenacao}
         onMudar={docente("coordenacao")}
         novo={novaCoordenacao}
+        extra={(linha, i) => (
+          <UploadImagemPrograma
+            programaId={programaId}
+            alvo={linha.linhaId === "" ? null : { tipo: "coordenacao", linhaId: linha.linhaId }}
+            rotulo={`Coordenação ${i + 1} — imagem enviada`}
+            midiaId={linha.imagemId}
+            onMudou={imagemDaLinha("coordenacao", i)}
+          />
+        )}
         campos={[
           { chave: "tag", rotulo: "Etiqueta" },
           { chave: "nome", rotulo: "Nome" },
@@ -186,6 +209,15 @@ export function BlocosPaginaPrograma({ pagina: p, onMudar, slug }: BlocosPaginaP
         itens={p.docentes.especialistas}
         onMudar={docente("especialistas")}
         novo={novoEspecialista}
+        extra={(linha, i) => (
+          <UploadImagemPrograma
+            programaId={programaId}
+            alvo={linha.linhaId === "" ? null : { tipo: "especialista", linhaId: linha.linhaId }}
+            rotulo={`Especialista ${i + 1} — imagem enviada`}
+            midiaId={linha.imagemId}
+            onMudou={imagemDaLinha("especialistas", i)}
+          />
+        )}
         campos={[
           { chave: "nome", rotulo: "Nome" },
           { chave: "credencial", rotulo: "Credencial", area: true },
@@ -253,7 +285,13 @@ export function BlocosPaginaPrograma({ pagina: p, onMudar, slug }: BlocosPaginaP
         <CampoTexto rotulo="Nome" valor={p.cartao.nome} onMudar={cartao("nome")} />
         <CampoTexto rotulo="Chamada" valor={p.cartao.tagline} onMudar={cartao("tagline")} />
         <CampoTexto rotulo="Meta (ex.: 10 módulos · 80h)" valor={p.cartao.meta} onMudar={cartao("meta")} />
-        {p.cartao.imagemId !== "" && <AvisoImagemEnviada onde="ao cartão" />}
+        <UploadImagemPrograma
+          programaId={programaId}
+          alvo={{ tipo: "cartao" }}
+          rotulo="Imagem do cartão — imagem enviada"
+          midiaId={p.cartao.imagemId}
+          onMudou={cartao("imagemId")}
+        />
         <CampoTexto rotulo="Imagem — caminho (/img/…)" valor={p.cartao.imagemCaminho} onMudar={cartao("imagemCaminho")} />
         <CampoTexto rotulo="Ordem nas listas" valor={p.cartao.ordem} onMudar={cartao("ordem")} curto />
         <CampoTexto rotulo="Descrição no menu" valor={p.cartao.descricaoMenu} onMudar={cartao("descricaoMenu")} />

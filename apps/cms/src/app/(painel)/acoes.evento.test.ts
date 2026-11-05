@@ -23,8 +23,10 @@ vi.mock("@/lib/cms/autenticacao", async () => {
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 const revalidarProgramasDoEventoMock = vi.fn(async () => true);
+const programaPublicadoDoEventoMock = vi.fn(async () => "8" as string | null);
 vi.mock("@/lib/cms/revalidarSite", () => ({
   revalidarProgramasDoEvento: revalidarProgramasDoEventoMock,
+  programaPublicadoDoEvento: programaPublicadoDoEventoMock,
   AVISO_REVALIDACAO_SITE: "Salvo, mas a atualização no site pode levar alguns minutos.",
 }));
 
@@ -81,7 +83,8 @@ describe("alternarPublicacaoEvento revalida a página do programa do evento", ()
     expect(r.resultado).toEqual({ ok: true });
     await alternarPublicacaoEvento("12", false);
     expect(revalidarProgramasDoEventoMock).toHaveBeenCalledTimes(2);
-    expect(revalidarProgramasDoEventoMock).toHaveBeenCalledWith(expect.anything(), "12");
+    // O programa da versão publicada é lido antes e também revalidado (troca de programa).
+    expect(revalidarProgramasDoEventoMock).toHaveBeenCalledWith(expect.anything(), "12", ["8"]);
   });
 
   it("falha na revalidação vira aviso, nunca erro", async () => {
@@ -89,6 +92,15 @@ describe("alternarPublicacaoEvento revalida a página do programa do evento", ()
     findByID.mockResolvedValue(null);
     revalidarProgramasDoEventoMock.mockResolvedValueOnce(false);
     const r = await alternarPublicacaoEvento("12", true);
+    expect(r.resultado).toEqual({ ok: true, aviso: "Salvo, mas a atualização no site pode levar alguns minutos." });
+  });
+
+  it("revalidação que lança também vira aviso", async () => {
+    obterUsuarioCmsMock.mockResolvedValue({ id: 1, administrador: false, telas: ["site.eventos"] });
+    findByID.mockResolvedValue(null);
+    revalidarProgramasDoEventoMock.mockRejectedValueOnce(new Error("banco fora"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const r = await alternarPublicacaoEvento("12", false);
     expect(r.resultado).toEqual({ ok: true, aviso: "Salvo, mas a atualização no site pode levar alguns minutos." });
   });
 

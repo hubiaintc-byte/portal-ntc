@@ -70,7 +70,7 @@ describe("paginaDoDocumento / paginaParaGravar", () => {
     expect(paginaVazia().identidadeVisual).toBe("vertente");
   });
 
-  it("ida e volta preserva o group, inclusive as imagens enviadas (ids), sem os ids das linhas", () => {
+  it("ida e volta preserva o group, inclusive as imagens enviadas e os ids das linhas de docentes", () => {
     const volta = paginaParaGravar(paginaDoDocumento(gravado));
     expect(volta).toEqual({
       ...gravado,
@@ -80,10 +80,10 @@ describe("paginaDoDocumento / paginaParaGravar", () => {
         ...gravado.docentes,
         contadores: [{ num: "12", lbl: "especialistas" }],
         coordenacao: [
-          { tag: "Coordenação", imagem: 9, imagemCaminho: "/img/a.webp", imagemAlt: "Foto", eixoBadge: "Eixo 1", nome: "Ana", credencial: "Dra.", eixo: "Gestão", modulos: "M1" },
+          { id: "d", tag: "Coordenação", imagem: 9, imagemCaminho: "/img/a.webp", imagemAlt: "Foto", eixoBadge: "Eixo 1", nome: "Ana", credencial: "Dra.", eixo: "Gestão", modulos: "M1" },
         ],
         especialistas: [
-          { imagem: null, imagemCaminho: "/img/b.webp", imagemAlt: null, eixoBadge: null, nome: "Beto", credencial: "Me.", modulos: "M2" },
+          { id: "e", imagem: null, imagemCaminho: "/img/b.webp", imagemAlt: null, eixoBadge: null, nome: "Beto", credencial: "Me.", modulos: "M2" },
         ],
       },
       modalidadesCards: [{ destaque: true, tag: "Tag", titulo: "Turma", descricao: "Desc", ctaRotulo: "Fale", ctaHref: "/contato" }],
@@ -118,12 +118,23 @@ describe("errosDaPagina", () => {
     e.cartao.imagemCaminho = "//outro.site/x.webp";
     e.cartao.ordem = "1,5";
     expect(errosDaPagina(e)).toEqual([
-      "Imagem do topo: o caminho deve começar com /",
+      "Imagem do topo: o caminho deve começar com / e ter só letras, números, /, _, . e -",
       "Modalidade 1: o link do botão deve começar com /, #, http://, https:// ou mailto:",
-      "Cartão: o caminho da imagem deve começar com /",
+      "Cartão: o caminho deve começar com / e ter só letras, números, /, _, . e -",
       "Cartão: a ordem deve ser um número inteiro",
     ]);
   });
+  it("caminho com aspas, parênteses ou espaço é recusado; o formato dos 15 passa", () => {
+    for (const caminho of ['/img/a".webp', "/img/a(1).webp", "/img/a b.webp", "/img/a');x.webp"]) {
+      const e = paginaVazia();
+      e.heroImagemCaminho = caminho;
+      expect(errosDaPagina(e)).toEqual(["Imagem do topo: o caminho deve começar com / e ter só letras, números, /, _, . e -"]);
+    }
+    const ok = paginaVazia();
+    ok.heroImagemCaminho = "/img/fotos/_optimized/area-educacao.1920.webp";
+    expect(errosDaPagina(ok)).toEqual([]);
+  });
+
   it("página vazia não tem erro", () => {
     expect(errosDaPagina(paginaVazia())).toEqual([]);
   });

@@ -99,13 +99,33 @@ export async function revalidarProgramas(
 }
 
 /**
+ * Programa da versão PUBLICADA do evento — lido antes de publicar/despublicar,
+ * para revalidar também a página do programa antigo quando o rascunho trocou
+ * de programa. Falha de leitura vira `null` (melhor esforço).
+ */
+export async function programaPublicadoDoEvento(
+  payload: Pick<Payload, "findByID">,
+  eventoId: string,
+): Promise<string | null> {
+  try {
+    const evento = await payload.findByID({ collection: "eventos", id: eventoId, depth: 0, draft: false });
+    return evento._status === "published" ? idDe(evento.programa) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Evento publicado/despublicado: a página do programa dele (bloco Módulos
  * abertos e selo dos módulos), pelo campo `programa` do evento e pelos
- * módulos que o listam em `eventosVinculados`. Sem programa nenhum, `true`.
+ * módulos que o listam em `eventosVinculados`, mais `outrosProgramas` (o
+ * programa anterior, quando o evento trocou de programa). Sem programa
+ * nenhum, `true`.
  */
 export async function revalidarProgramasDoEvento(
   payload: Pick<Payload, "findByID" | "find">,
   eventoId: string,
+  outrosProgramas: readonly (string | null)[] = [],
 ): Promise<boolean> {
   try {
     const [evento, modulos] = await Promise.all([
@@ -118,7 +138,7 @@ export async function revalidarProgramasDoEvento(
         select: { programa: true },
       }),
     ]);
-    const ids = [idDe(evento.programa), ...modulos.docs.map((m) => idDe(m.programa))].filter(
+    const ids = [idDe(evento.programa), ...modulos.docs.map((m) => idDe(m.programa)), ...outrosProgramas].filter(
       (x): x is string => x !== null,
     );
     if (ids.length === 0) return true;

@@ -10,7 +10,8 @@ const executarEmTransacaoMock = vi.fn(
 );
 vi.mock("@/lib/crm/transacao", () => ({ executarEmTransacao: executarEmTransacaoMock }));
 
-const { salvarPrograma, excluirPrograma, salvarModulo, excluirModulo } = await import("./catalogoCrmEscrita");
+const { salvarPrograma, excluirPrograma, salvarModulo, excluirModulo, enviarImagemPrograma, removerImagemPrograma } =
+  await import("./catalogoCrmEscrita");
 type DadosPrograma = Parameters<typeof salvarPrograma>[1];
 type DadosModulo = Parameters<typeof salvarModulo>[1];
 
@@ -369,5 +370,102 @@ describe("excluirModulo", () => {
     expect(p.delete).toHaveBeenCalledWith(expect.objectContaining({ collection: "modulos", id: "9" }));
     expect(p.update).toHaveBeenCalledWith(expect.objectContaining({ collection: "programas", id: 4 }));
     expect(pathsRevalidados()).toContain("/programas");
+  });
+});
+
+/** Programa gravado com imagens legadas por caminho e uma linha de cada docente. */
+const PAGINA_GRAVADA = {
+  heroTitulo: "T",
+  heroImagem: null,
+  heroImagemCaminho: "/img/topo.webp",
+  docentes: {
+    titulo: "D",
+    coordenacao: [{ id: "c1", nome: "Ana", imagem: null, imagemCaminho: "/img/ana.webp" }],
+    especialistas: [{ id: "e1", nome: "Beto", imagem: 5, imagemCaminho: "/img/beto.webp" }],
+  },
+  cartao: { nome: "N", imagem: 6, imagemCaminho: "/img/cartao.webp" },
+};
+
+function arquivo(tipo = "image/webp"): File {
+  return new File([new Uint8Array([1, 2, 3])], "foto.webp", { type: tipo });
+}
+
+function paginaGravadaNoUpdate(p: ReturnType<typeof payloadFalso>) {
+  const chamada = p.update.mock.calls.find((c) => (c[0] as { collection: string }).collection === "programas");
+  return chamada![0] as { data: { pagina: typeof PAGINA_GRAVADA; _status: string }; draft?: boolean };
+}
+
+describe("enviarImagemPrograma", () => {
+  it("topo: cria a media e aponta pagina.heroImagem para ela, sem tocar no caminho legado", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    const r = await enviarImagemPrograma("4", { tipo: "topo" }, arquivo(), usuario);
+    expect(r).toEqual({ ok: true, midiaId: "77" });
+    expect(p.create).toHaveBeenCalledWith(expect.objectContaining({ collection: "media" }));
+    const { data, draft } = paginaGravadaNoUpdate(p);
+    expect(draft).toBeFalsy();
+    expect(data._status).toBe("published");
+    expect(data.pagina.heroImagem).toBe(77);
+    expect(data.pagina.heroImagemCaminho).toBe("/img/topo.webp");
+    expect(data.pagina.cartao).toEqual(PAGINA_GRAVADA.cartao);
+  });
+
+  it("programa publicado: revalida a página; nunca publicado: grava rascunho e não revalida", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    await enviarImagemPrograma("4", { tipo: "cartao" }, arquivo(), usuario);
+    expect(pathsRevalidados()).toContain("/programas/edutec");
+    expect(paginaGravadaNoUpdate(p).data.pagina.cartao).toEqual({ ...PAGINA_GRAVADA.cartao, imagem: 77 });
+
+    fetchMock.mockClear();
+    const q = payloadFalso({ statusPrincipal: "draft", statusUltima: "draft", programaGravado: { pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(q);
+    await enviarImagemPrograma("4", { tipo: "cartao" }, arquivo(), usuario);
+    expect(paginaGravadaNoUpdate(q).data._status).toBe("draft");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("docente: acha a linha pelo id e preserva o caminho e as outras linhas", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    await enviarImagemPrograma("4", { tipo: "coordenacao", linhaId: "c1" }, arquivo(), usuario);
+    const d = paginaGravadaNoUpdate(p).data.pagina.docentes;
+    expect(d.coordenacao).toEqual([{ id: "c1", nome: "Ana", imagem: 77, imagemCaminho: "/img/ana.webp" }]);
+    expect(d.especialistas).toEqual(PAGINA_GRAVADA.docentes.especialistas);
+  });
+
+  it("linha inexistente ou arquivo que não é imagem recusam antes de subir a media", async () => {
+    const p = payloadFalso({ programaGravado: { pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await enviarImagemPrograma("4", { tipo: "especialista", linhaId: "nao-existe" }, arquivo(), usuario)).toEqual({
+      ok: false,
+      erro: "Salve o programa antes de enviar a imagem desta linha.",
+    });
+    expect(await enviarImagemPrograma("4", { tipo: "topo" }, arquivo("application/pdf"), usuario)).toEqual({
+      ok: false,
+      erro: "Envie uma imagem JPEG, PNG, WebP, AVIF ou SVG.",
+    });
+    expect(await enviarImagemPrograma("4", { tipo: "forjado" } as never, arquivo(), usuario)).toEqual({
+      ok: false,
+      erro: "Imagem desconhecida.",
+    });
+    expect(p.create).not.toHaveBeenCalled();
+    expect(p.update).not.toHaveBeenCalled();
+  });
+});
+
+describe("removerImagemPrograma", () => {
+  it("limpa a relação e mantém o caminho legado (o site volta a usá-lo)", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "especialista", linhaId: "e1" }, usuario)).toEqual({ ok: true });
+    const d = paginaGravadaNoUpdate(p).data.pagina.docentes;
+    expect(d.especialistas).toEqual([{ id: "e1", nome: "Beto", imagem: null, imagemCaminho: "/img/beto.webp" }]);
+    expect(p.create).not.toHaveBeenCalled();
+
+    const q = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(q);
+    await removerImagemPrograma("4", { tipo: "cartao" }, usuario);
+    expect(paginaGravadaNoUpdate(q).data.pagina.cartao).toEqual({ ...PAGINA_GRAVADA.cartao, imagem: null });
   });
 });

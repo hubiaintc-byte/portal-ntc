@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const { caminhosDoPrograma, pedirRevalidacao, revalidarProgramas, revalidarProgramasDoEvento } = await import(
+const {
+  caminhosDoPrograma,
+  pedirRevalidacao,
+  programaPublicadoDoEvento,
+  revalidarProgramas,
+  revalidarProgramasDoEvento,
+} = await import(
   "./revalidarSite"
 );
 
@@ -92,6 +98,25 @@ describe("revalidarProgramasDoEvento", () => {
     expect(p.find).toHaveBeenCalledWith(
       expect.objectContaining({ collection: "modulos", where: { eventosVinculados: { equals: "12" } } }),
     );
+    expect(corpos().map((c) => c.path).sort()).toEqual(["/programas/edutec", "/programas/proge"]);
+  });
+});
+
+describe("programa anterior do evento", () => {
+  it("lê o programa da versão publicada; rascunho ou falha devolvem null", async () => {
+    const findByID = vi.fn(async () => ({ id: 12, _status: "published", programa: { id: 8 } }));
+    expect(await programaPublicadoDoEvento({ findByID } as never, "12")).toBe("8");
+    expect(findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: "eventos", draft: false }));
+    findByID.mockResolvedValueOnce({ id: 12, _status: "draft", programa: { id: 8 } });
+    expect(await programaPublicadoDoEvento({ findByID } as never, "12")).toBeNull();
+    findByID.mockRejectedValueOnce(new Error("banco"));
+    expect(await programaPublicadoDoEvento({ findByID } as never, "12")).toBeNull();
+  });
+
+  it("evento que trocou de programa revalida também a página do programa anterior", async () => {
+    const p = payloadFalso();
+    p.find.mockResolvedValueOnce({ docs: [] });
+    expect(await revalidarProgramasDoEvento(p as never, "12", ["8"])).toBe(true);
     expect(corpos().map((c) => c.path).sort()).toEqual(["/programas/edutec", "/programas/proge"]);
   });
 });

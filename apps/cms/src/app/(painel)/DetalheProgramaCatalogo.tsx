@@ -203,7 +203,7 @@ export function DetalheProgramaCatalogo({
         campos={[{ chave: "texto", rotulo: "Resultado", area: true }]}
       />
 
-      <BlocosPaginaPrograma pagina={pagina} onMudar={setPagina} slug={p?.slug ?? ""} />
+      <BlocosPaginaPrograma pagina={pagina} onMudar={setPagina} slug={p?.slug ?? ""} programaId={p?.id ?? null} />
       </fieldset>
 
       {!novo && (

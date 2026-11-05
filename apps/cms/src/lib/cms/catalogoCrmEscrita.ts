@@ -22,10 +22,13 @@ import { contarDependentesModulo, contarDependentesPrograma } from "@/lib/crm/ex
 import { executarEmTransacao } from "@/lib/crm/transacao";
 import { lexicalParaMarkdown, markdownParaLexical } from "@/lib/markdownLexical";
 import {
+  comImagem,
+  ehAlvoImagem,
   errosDaPagina,
   paginaDoDocumento,
   paginaParaGravar,
   paginaParaPublicar,
+  type AlvoImagemPrograma,
   type PaginaProgramaEdicao,
 } from "@/lib/cms/paginaProgramaCatalogo";
 import {
@@ -320,5 +323,90 @@ export async function excluirModulo(id: string, usuario: UsuarioAutenticado): Pr
   } catch (e) {
     console.error("[excluirModulo]", e);
     return { ok: false, erro: ERRO_GENERICO };
+  }
+}
+
+/* ---------------- Imagens enviadas da página do programa ---------------- */
+
+/** As imagens que a coleção `media` aceita (sem PDF nem vídeo). */
+const MIMES_IMAGEM: readonly string[] = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/svg+xml"];
+
+export type ResultadoImagem = ResultadoEscrita & { midiaId?: string };
+
+const SEM_LINHA = "Salve o programa antes de enviar a imagem desta linha.";
+
+/**
+ * Aponta (ou limpa) a relação de imagem do alvo. Como a capa do evento
+ * (`enviarMidiaEvento`), grava no registro principal SEM `draft`, reenviando o
+ * `_status` atual: num programa publicado a imagem vai ao ar na hora (e o site
+ * é revalidado); num nunca publicado, segue rascunho. Atenção, mesma regra da
+ * capa: num programa publicado com alterações pendentes no rascunho, elas vão
+ * ao ar junto — o group `pagina` é lido da última versão.
+ */
+async function gravarImagem(
+  payload: Payload,
+  id: string,
+  pagina: NonNullable<ReturnType<typeof comImagem>>,
+  usuario: UsuarioAutenticado,
+): Promise<ResultadoEscrita> {
+  const situacao = await situacaoDoPrograma(payload, id);
+  const publicado = situacao !== "rascunho";
+  await payload.update({
+    collection: "programas",
+    id,
+    data: { pagina, _status: publicado ? "published" : "draft" } as unknown as ProgramaData,
+    overrideAccess: true,
+    user: usuario,
+  });
+  if (!publicado) return { ok: true };
+  return comAviso({ ok: true }, await revalidarProgramas(payload, [id]));
+}
+
+export async function enviarImagemPrograma(
+  id: string,
+  alvo: AlvoImagemPrograma,
+  arquivo: File,
+  usuario: UsuarioAutenticado,
+): Promise<ResultadoImagem> {
+  if (!ehAlvoImagem(alvo)) return { ok: false, erro: "Imagem desconhecida." };
+  if (!MIMES_IMAGEM.includes(arquivo.type)) return { ok: false, erro: "Envie uma imagem JPEG, PNG, WebP, AVIF ou SVG." };
+  try {
+    const payload = await obterPayload();
+    const atual = await payload.findByID({ collection: "programas", id, depth: 0, draft: true, overrideAccess: true });
+    // Confere a linha antes de subir a media — senão sobraria media órfã.
+    if (comImagem(atual.pagina, alvo, null) === null) return { ok: false, erro: SEM_LINHA };
+    const media = await payload.create({
+      collection: "media",
+      data: { alt: arquivo.name },
+      file: { data: Buffer.from(await arquivo.arrayBuffer()), name: arquivo.name, mimetype: arquivo.type, size: arquivo.size },
+      overrideAccess: true,
+      user: usuario,
+    });
+    const pagina = comImagem(atual.pagina, alvo, Number(media.id));
+    if (pagina === null) return { ok: false, erro: SEM_LINHA };
+    const r = await gravarImagem(payload, id, pagina, usuario);
+    return r.ok ? { ...r, midiaId: String(media.id) } : r;
+  } catch (e) {
+    console.error("[enviarImagemPrograma]", e);
+    return { ok: false, erro: "Não foi possível enviar a imagem. Tente novamente." };
+  }
+}
+
+/** Tira a imagem enviada; o caminho `/img/…` (se houver) volta a valer no site. A media fica no acervo. */
+export async function removerImagemPrograma(
+  id: string,
+  alvo: AlvoImagemPrograma,
+  usuario: UsuarioAutenticado,
+): Promise<ResultadoEscrita> {
+  if (!ehAlvoImagem(alvo)) return { ok: false, erro: "Imagem desconhecida." };
+  try {
+    const payload = await obterPayload();
+    const atual = await payload.findByID({ collection: "programas", id, depth: 0, draft: true, overrideAccess: true });
+    const pagina = comImagem(atual.pagina, alvo, null);
+    if (pagina === null) return { ok: false, erro: SEM_LINHA };
+    return await gravarImagem(payload, id, pagina, usuario);
+  } catch (e) {
+    console.error("[removerImagemPrograma]", e);
+    return { ok: false, erro: "Não foi possível remover a imagem. Tente novamente." };
   }
 }

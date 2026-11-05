@@ -63,7 +63,11 @@ import {
   type UsuarioGestaoResumo,
 } from "@/lib/cms/painelCmsUsuarios";
 import { listarPasskeysDoUsuario, removerPasskey, type PasskeyResumo } from "@/lib/cms/painelPasskeys";
-import { AVISO_REVALIDACAO_SITE, revalidarProgramasDoEvento } from "@/lib/cms/revalidarSite";
+import {
+  AVISO_REVALIDACAO_SITE,
+  programaPublicadoDoEvento,
+  revalidarProgramasDoEvento,
+} from "@/lib/cms/revalidarSite";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
@@ -127,7 +131,8 @@ export async function enviarMidia(
   if (!(arquivo instanceof File) || arquivo.size === 0) {
     return { resultado: { ok: false, erro: "Nenhum arquivo selecionado." }, evento: null };
   }
-  const resultado = await revalidarProgramaDoEvento(id, await enviarMidiaEvento(id, campo, arquivo));
+  const anterior = await lerProgramaAnterior(id);
+  const resultado = await revalidarProgramaDoEvento(id, anterior, await enviarMidiaEvento(id, campo, arquivo));
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
   return { resultado, evento };
@@ -135,11 +140,30 @@ export async function enviarMidia(
 
 /**
  * Evento publicado/despublicado ou com capa nova muda o bloco Módulos abertos
- * da página do programa dele: pede ao site que a revalide. Falha vira aviso.
+ * da página do programa dele: pede ao site que a revalide — e também a do
+ * programa que a versão publicada tinha antes (`anterior`, lido antes da
+ * escrita), se o evento trocou de programa. Falha vira aviso, nunca erro.
  */
-async function revalidarProgramaDoEvento(id: string, resultado: ResultadoEscrita): Promise<ResultadoEscrita> {
+async function lerProgramaAnterior(id: string): Promise<string | null> {
+  try {
+    return await programaPublicadoDoEvento(await obterPayload(), id);
+  } catch {
+    return null;
+  }
+}
+
+async function revalidarProgramaDoEvento(
+  id: string,
+  anterior: string | null,
+  resultado: ResultadoEscrita,
+): Promise<ResultadoEscrita> {
   if (!resultado.ok) return resultado;
-  const revalidou = await revalidarProgramasDoEvento(await obterPayload(), id);
+  let revalidou = false;
+  try {
+    revalidou = await revalidarProgramasDoEvento(await obterPayload(), id, [anterior]);
+  } catch (e) {
+    console.error("[revalidarProgramaDoEvento]", e);
+  }
   return revalidou ? resultado : { ...resultado, aviso: resultado.aviso ?? AVISO_REVALIDACAO_SITE };
 }
 
@@ -149,7 +173,12 @@ export async function alternarPublicacaoEvento(
   publicar: boolean,
 ): Promise<{ resultado: ResultadoEscrita; evento: EventoCmsDetalhe | null }> {
   if (!(await obterUsuarioCmsComTela(TELAS_EVENTOS))) return { resultado: RECUSADO_TELA, evento: null };
-  const resultado = await revalidarProgramaDoEvento(id, publicar ? await publicarEvento(id) : await despublicarEvento(id));
+  const anterior = await lerProgramaAnterior(id);
+  const resultado = await revalidarProgramaDoEvento(
+    id,
+    anterior,
+    publicar ? await publicarEvento(id) : await despublicarEvento(id),
+  );
   if (resultado.ok) revalidatePath("/");
   const evento = resultado.ok ? await obterEventoCms(id) : null;
   return { resultado, evento };
