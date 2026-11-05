@@ -30,6 +30,46 @@ try {
     db.orcamentos = [];
     db.fechamentos = [];
 
+    // Casos vencidos sintéticos: o seed não tem título vencido sem baixa nenhuma.
+    // Entram no db vivo antes de qualquer saída, para o próprio protótipo calcular.
+    const sinteticos = [];
+    const clonar = (o) => JSON.parse(JSON.stringify(o));
+    const recEvento = db.receitas.find((r) => r.id === "RC-0013"); // evento, a faturar 48.000,00
+    const recCorpBase = db.receitas.find((r) => !r.eventoId && Rules.isContratada(r));
+    const cusEventoBase = db.custos.find((c) => c.eventoId && c.valorRealizado > 0);
+    const cusCorpBase = db.custos.find((c) => !c.eventoId && c.valorRealizado > 0);
+    const novoFat = (id, r, valor, nf) => ({
+      id, receitaId: r.id, eventoId: r.eventoId || "", parcela: "Sintética", nf,
+      dataFaturamento: "2026-05-20", valorFaturado: valor, vencimento: "2026-06-30",
+      retencaoTributaria: 0, retencaoContratual: 0, retencaoContratualLiberada: 0,
+      dataRecebimento: "", valorRecebido: 0, contaId: "CT-0001", quitado: false, observacao: "",
+    });
+    const novoPag = (id, c, valor, doc) => ({
+      id, custoId: c.id, eventoId: c.eventoId || "", documento: doc, vencimento: "2026-06-30",
+      valor, dataPagamento: "", valorPago: 0, contaId: "CT-0001", observacao: "",
+    });
+    // (a) faturamento de evento vencido, nada recebido (dentro do saldo a faturar de RC-0013)
+    db.fatrec.push(novoFat("FR-SINT-01", recEvento, 1000000, "NF-SINT-01"));
+    sinteticos.push({ id: "FR-SINT-01", entidade: "faturamentos", motivo: "evento: exigível > 0, vencimento 2026-06-30 < hoje, nada recebido" });
+    // (c) receita corporativa sintética (as do seed já estão 100% faturadas) + faturamento vencido
+    const recCorp = { ...clonar(recCorpBase), id: "RC-SINT-01", qtde: 1, valorUnit: 500000, desconto: 0, etapas: [] };
+    db.receitas.push(recCorp);
+    db.fatrec.push(novoFat("FR-SINT-02", recCorp, 500000, "NF-SINT-02"));
+    sinteticos.push({ id: "RC-SINT-01", entidade: "receitas", motivo: "receita corporativa (sem evento) clonada de " + recCorpBase.id + ", valor 5.000,00, para sustentar o faturamento corporativo vencido" });
+    sinteticos.push({ id: "FR-SINT-02", entidade: "faturamentos", motivo: "corporativo: exigível > 0, vencimento 2026-06-30 < hoje, nada recebido" });
+    // (b) título de evento vencido, nada pago (custo sintético com realizado, sem outros títulos)
+    const cusEv = { ...clonar(cusEventoBase), id: "CU-SINT-01", valorRealizado: 300000 };
+    db.custos.push(cusEv);
+    db.pagamentos.push(novoPag("PG-SINT-01", cusEv, 300000, "TIT-SINT-01"));
+    sinteticos.push({ id: "CU-SINT-01", entidade: "custos", motivo: "custo de evento clonado de " + cusEventoBase.id + ", realizado 3.000,00, para sustentar o título vencido" });
+    sinteticos.push({ id: "PG-SINT-01", entidade: "pagamentos", motivo: "evento: saldo > 0, vencimento 2026-06-30 < hoje, nada pago" });
+    // (c) título corporativo vencido
+    const cusCorp = { ...clonar(cusCorpBase), id: "CU-SINT-02", valorRealizado: 200000 };
+    db.custos.push(cusCorp);
+    db.pagamentos.push(novoPag("PG-SINT-02", cusCorp, 200000, "TIT-SINT-02"));
+    sinteticos.push({ id: "CU-SINT-02", entidade: "custos", motivo: "custo corporativo clonado de " + cusCorpBase.id + ", realizado 2.000,00, para sustentar o título vencido" });
+    sinteticos.push({ id: "PG-SINT-02", entidade: "pagamentos", motivo: "corporativo: saldo > 0, vencimento 2026-06-30 < hoje, nada pago" });
+
     const copia = (o) => JSON.parse(JSON.stringify(o));
     const semRefs = (m) => {
       const { rf, cf, sc, db: _db, ...resto } = m;
@@ -102,6 +142,7 @@ try {
     return {
       hoje: Rules.todayISO(),
       geradoDe: "financeiro-fin05-v0.2.2.html",
+      sinteticos,
       db: {
         eventos: copia(db.eventos),
         receitas: copia(db.receitas),

@@ -1,6 +1,43 @@
 {
   "hoje": "2026-07-15",
   "geradoDe": "financeiro-fin05-v0.2.2.html",
+  "sinteticos": [
+    {
+      "id": "FR-SINT-01",
+      "entidade": "faturamentos",
+      "motivo": "evento: exigível > 0, vencimento 2026-06-30 < hoje, nada recebido"
+    },
+    {
+      "id": "RC-SINT-01",
+      "entidade": "receitas",
+      "motivo": "receita corporativa (sem evento) clonada de RC-0036, valor 5.000,00, para sustentar o faturamento corporativo vencido"
+    },
+    {
+      "id": "FR-SINT-02",
+      "entidade": "faturamentos",
+      "motivo": "corporativo: exigível > 0, vencimento 2026-06-30 < hoje, nada recebido"
+    },
+    {
+      "id": "CU-SINT-01",
+      "entidade": "custos",
+      "motivo": "custo de evento clonado de CU-0001, realizado 3.000,00, para sustentar o título vencido"
+    },
+    {
+      "id": "PG-SINT-01",
+      "entidade": "pagamentos",
+      "motivo": "evento: saldo > 0, vencimento 2026-06-30 < hoje, nada pago"
+    },
+    {
+      "id": "CU-SINT-02",
+      "entidade": "custos",
+      "motivo": "custo corporativo clonado de CU-0129, realizado 2.000,00, para sustentar o título vencido"
+    },
+    {
+      "id": "PG-SINT-02",
+      "entidade": "pagamentos",
+      "motivo": "corporativo: saldo > 0, vencimento 2026-06-30 < hoje, nada pago"
+    }
+  ],
   "db": {
     "eventos": [
       {
@@ -1468,6 +1505,28 @@
         "competencia": "2026-10-01",
         "referencia": "Rendimento de aplicação",
         "observacao": "DADOS FICTÍCIOS — EXCLUSIVOS PARA HOMOLOGAÇÃO"
+      },
+      {
+        "id": "RC-SINT-01",
+        "eventoId": "",
+        "tipoLancamento": "Corporativa",
+        "centroCusto": "DIR",
+        "cliente": "Instituto Fictício Alfa",
+        "segmento": "Privado/Outro",
+        "origem": "Consultoria institucional",
+        "tipoReceita": "Valor global",
+        "etapa": "",
+        "qtde": 1,
+        "valorUnit": 500000,
+        "desconto": 0,
+        "pagantes": 0,
+        "cortesias": 0,
+        "statusEconomico": "Contratada",
+        "criterioReconhecimento": "Integral no encerramento",
+        "etapas": [],
+        "competencia": "2026-03-01",
+        "referencia": "CT-FIC-C001/2026",
+        "observacao": "DADOS FICTÍCIOS — EXCLUSIVOS PARA HOMOLOGAÇÃO"
       }
     ],
     "faturamentos": [
@@ -2045,6 +2104,42 @@
         "valorRecebido": 782000,
         "contaId": "CT-0002",
         "quitado": true,
+        "observacao": ""
+      },
+      {
+        "id": "FR-SINT-01",
+        "receitaId": "RC-0013",
+        "eventoId": "EV-0016",
+        "parcela": "Sintética",
+        "nf": "NF-SINT-01",
+        "dataFaturamento": "2026-05-20",
+        "valorFaturado": 1000000,
+        "vencimento": "2026-06-30",
+        "retencaoTributaria": 0,
+        "retencaoContratual": 0,
+        "retencaoContratualLiberada": 0,
+        "dataRecebimento": "",
+        "valorRecebido": 0,
+        "contaId": "CT-0001",
+        "quitado": false,
+        "observacao": ""
+      },
+      {
+        "id": "FR-SINT-02",
+        "receitaId": "RC-SINT-01",
+        "eventoId": "",
+        "parcela": "Sintética",
+        "nf": "NF-SINT-02",
+        "dataFaturamento": "2026-05-20",
+        "valorFaturado": 500000,
+        "vencimento": "2026-06-30",
+        "retencaoTributaria": 0,
+        "retencaoContratual": 0,
+        "retencaoContratualLiberada": 0,
+        "dataRecebimento": "",
+        "valorRecebido": 0,
+        "contaId": "CT-0001",
+        "quitado": false,
         "observacao": ""
       }
     ],
@@ -7363,6 +7458,57 @@
         "periodicidade": "Única",
         "criterioApropriacao": "",
         "observacao": "DADOS FICTÍCIOS — EXCLUSIVOS PARA HOMOLOGAÇÃO"
+      },
+      {
+        "id": "CU-SINT-01",
+        "eventoId": "EV-0011",
+        "tipoLancamento": "Evento",
+        "centroCusto": "OPE",
+        "compartilhada": false,
+        "origemLancamento": "",
+        "fase": "Pré-evento",
+        "categoria": "Instrutoria/Palestrantes",
+        "subcategoria": "Honorários",
+        "descricao": "Honorários",
+        "fornecedor": "Especialistas PJ · diversos",
+        "documento": "NF-FIC-0001",
+        "natureza": "Direto",
+        "comportamento": "Fixo",
+        "driver": "Especialistas",
+        "unidade": "especialista",
+        "qtde": 3,
+        "valorUnitPrev": 900000,
+        "valorRealizado": 300000,
+        "competencia": "2026-03-12",
+        "dataPrevista": "2026-03-10",
+        "criterioApropriacao": "",
+        "observacao": ""
+      },
+      {
+        "id": "CU-SINT-02",
+        "eventoId": "",
+        "tipoLancamento": "Corporativa",
+        "centroCusto": "EST",
+        "compartilhada": true,
+        "origemLancamento": "",
+        "fase": "",
+        "categoria": "Ocupação e utilidades",
+        "subcategoria": "Aluguel e condomínio da sede",
+        "descricao": "Aluguel e condomínio da sede · jan/2026",
+        "fornecedor": "Administradora Predial Fictícia",
+        "documento": "NF-FIC-C01OC",
+        "natureza": "Indireto",
+        "comportamento": "Fixo",
+        "driver": "Dias",
+        "unidade": "mês",
+        "qtde": 1,
+        "valorUnitPrev": 980000,
+        "valorRealizado": 200000,
+        "competencia": "2026-01-01",
+        "dataPrevista": "2026-01-05",
+        "periodicidade": "Mensal",
+        "criterioApropriacao": "",
+        "observacao": "DADOS FICTÍCIOS — EXCLUSIVOS PARA HOMOLOGAÇÃO"
       }
     ],
     "pagamentos": [
@@ -9645,6 +9791,30 @@
         "valorPago": 540000,
         "contaId": "CT-0001",
         "observacao": ""
+      },
+      {
+        "id": "PG-SINT-01",
+        "custoId": "CU-SINT-01",
+        "eventoId": "EV-0011",
+        "documento": "TIT-SINT-01",
+        "vencimento": "2026-06-30",
+        "valor": 300000,
+        "dataPagamento": "",
+        "valorPago": 0,
+        "contaId": "CT-0001",
+        "observacao": ""
+      },
+      {
+        "id": "PG-SINT-02",
+        "custoId": "CU-SINT-02",
+        "eventoId": "",
+        "documento": "TIT-SINT-02",
+        "vencimento": "2026-06-30",
+        "valor": 200000,
+        "dataPagamento": "",
+        "valorPago": 0,
+        "contaId": "CT-0001",
+        "observacao": ""
       }
     ],
     "contas": [
@@ -9897,19 +10067,20 @@
       "RC-0013": {
         "valor": 14400000,
         "contratado": 14400000,
-        "faturado": 9600000,
+        "faturado": 10600000,
         "recebido": 4536000,
-        "aFaturar": 4800000,
-        "aReceber": 5064000,
+        "aFaturar": 3800000,
+        "aReceber": 6064000,
         "retTributaria": 528000,
         "retContratual": 0,
-        "exigivel": 4536000,
+        "exigivel": 5536000,
         "aLiberar": 0,
-        "liquidoEsperado": 9072000,
+        "liquidoEsperado": 10072000,
         "status": "Recebida parcialmente",
         "parcelasIds": [
           "FR-0015",
-          "FR-0016"
+          "FR-0016",
+          "FR-SINT-01"
         ]
       },
       "RC-0014": {
@@ -10348,6 +10519,23 @@
         "parcelasIds": [
           "FR-0032"
         ]
+      },
+      "RC-SINT-01": {
+        "valor": 500000,
+        "contratado": 500000,
+        "faturado": 500000,
+        "recebido": 0,
+        "aFaturar": 0,
+        "aReceber": 500000,
+        "retTributaria": 0,
+        "retContratual": 0,
+        "exigivel": 500000,
+        "aLiberar": 0,
+        "liquidoEsperado": 500000,
+        "status": "Faturada",
+        "parcelasIds": [
+          "FR-SINT-02"
+        ]
       }
     },
     "reconhecimentoReceita": {
@@ -10600,6 +10788,15 @@
         {
           "mes": "2026-10",
           "valor": 782000,
+          "rotulo": "Competência declarada",
+          "criterio": "Integral no encerramento",
+          "provisorio": false
+        }
+      ],
+      "RC-SINT-01": [
+        {
+          "mes": "2026-03",
+          "valor": 500000,
           "rotulo": "Competência declarada",
           "criterio": "Integral no encerramento",
           "provisorio": false
@@ -11022,6 +11219,32 @@
         "saldo": 0,
         "status": "Liquidada",
         "vencido": false
+      },
+      "FR-SINT-01": {
+        "bruto": 1000000,
+        "retTrib": 0,
+        "retContr": 0,
+        "liquido": 1000000,
+        "recebido": 0,
+        "exigivel": 1000000,
+        "aLiberar": 0,
+        "diferenca": 0,
+        "saldo": 1000000,
+        "status": "Faturada",
+        "vencido": true
+      },
+      "FR-SINT-02": {
+        "bruto": 500000,
+        "retTrib": 0,
+        "retContr": 0,
+        "liquido": 500000,
+        "recebido": 0,
+        "exigivel": 500000,
+        "aLiberar": 0,
+        "diferenca": 0,
+        "saldo": 500000,
+        "status": "Faturada",
+        "vencido": true
       }
     },
     "custoFin": {
@@ -13694,6 +13917,32 @@
         "pagamentosIds": [
           "PG-0198"
         ]
+      },
+      "CU-SINT-01": {
+        "previsto": 2700000,
+        "realizado": 300000,
+        "pago": 0,
+        "programado": 300000,
+        "aPagar": 300000,
+        "desvio": -2400000,
+        "acima": false,
+        "status": "Realizado",
+        "pagamentosIds": [
+          "PG-SINT-01"
+        ]
+      },
+      "CU-SINT-02": {
+        "previsto": 980000,
+        "realizado": 200000,
+        "pago": 0,
+        "programado": 200000,
+        "aPagar": 200000,
+        "desvio": -780000,
+        "acima": false,
+        "status": "Realizado",
+        "pagamentosIds": [
+          "PG-SINT-02"
+        ]
       }
     },
     "pagamentoFin": {
@@ -14646,6 +14895,16 @@
         "saldo": 0,
         "status": "Pago",
         "vencido": false
+      },
+      "PG-SINT-01": {
+        "saldo": 300000,
+        "status": "Programado",
+        "vencido": true
+      },
+      "PG-SINT-02": {
+        "saldo": 200000,
+        "status": "Programado",
+        "vencido": true
       }
     },
     "eventMetrics": {
@@ -14656,15 +14915,15 @@
         "recebida": 12800000,
         "aFaturar": 0,
         "aReceber": 0,
-        "orcado": 7788000,
-        "realizado": 7637000,
+        "orcado": 10488000,
+        "realizado": 7937000,
         "pago": 7637000,
-        "aPagar": 0,
-        "direto": 7637000,
+        "aPagar": 300000,
+        "direto": 7937000,
         "indireto": 0,
-        "resultado": 5163000,
-        "resultadoPrevisto": 5012000,
-        "resultadoRealizado": 5163000,
+        "resultado": 4863000,
+        "resultadoPrevisto": 2312000,
+        "resultadoRealizado": 4863000,
         "reconhecida": 12800000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
@@ -14672,8 +14931,8 @@
         "comissaoSaldo": 0,
         "nComissoes": 0,
         "vendedores": [],
-        "custoOperacionalPrevisto": 7788000,
-        "custoOperacionalRealizado": 7637000,
+        "custoOperacionalPrevisto": 10488000,
+        "custoOperacionalRealizado": 7937000,
         "custoOperacionalPago": 7637000,
         "demo": {
           "receita": [
@@ -14682,8 +14941,8 @@
             12800000
           ],
           "operacional": [
-            7788000,
-            7637000,
+            10488000,
+            7937000,
             7637000
           ],
           "comissao": [
@@ -14692,32 +14951,32 @@
             0
           ],
           "custoTotal": [
-            7788000,
-            7637000,
+            10488000,
+            7937000,
             7637000
           ],
           "resultado": [
-            5012000,
-            5163000,
+            2312000,
+            4863000,
             5163000
           ],
           "confere": true
         },
         "movimentacao": 5163000,
         "caixa": 5163000,
-        "desvio": -151000,
-        "desvioTotal": -151000,
-        "execucaoOrcamento": 0.9806111967128917,
+        "desvio": -2551000,
+        "desvioTotal": -2551000,
+        "execucaoOrcamento": 0.756769641495042,
         "pagantes": 0,
         "cortesias": 0,
         "participantes": 0,
         "baseUnit": 118,
         "baseUnitLabel": "participantes efetivos (cadastro)",
-        "custoPorParticipante": 64720.338983050846,
+        "custoPorParticipante": 67262.71186440678,
         "receitaPorPagante": null,
         "receitaPorParticipante": null,
         "nReceitas": 1,
-        "nCustos": 8
+        "nCustos": 9
       },
       "EV-0012": {
         "contratada": 25438800,
@@ -15002,17 +15261,17 @@
       "EV-0016": {
         "contratada": 14400000,
         "prevista": 0,
-        "faturada": 9600000,
+        "faturada": 10600000,
         "recebida": 4536000,
-        "aFaturar": 4800000,
-        "aReceber": 5064000,
+        "aFaturar": 3800000,
+        "aReceber": 6064000,
         "orcado": 7164800,
         "realizado": 7164800,
         "pago": 5264800,
         "aPagar": 1900000,
         "direto": 7164800,
         "indireto": 0,
-        "resultado": 2435200,
+        "resultado": 3435200,
         "resultadoPrevisto": 7235200,
         "resultadoRealizado": 3035200,
         "reconhecida": 10200000,
@@ -15841,7 +16100,26 @@
       }
     },
     "eventAlerts": {
-      "EV-0011": [],
+      "EV-0011": [
+        {
+          "sev": "Vencido",
+          "titulo": "Pagamento vencido",
+          "detalhe": "1 título(s) com vencimento ultrapassado sem baixa",
+          "tab": "pagamentos",
+          "valor": 300000,
+          "eventoId": "EV-0011",
+          "eventoNome": "Jornada de Gestão Escolar Democrática"
+        },
+        {
+          "sev": "Pendente",
+          "titulo": "Pagamentos pendentes",
+          "detalhe": "1 custo(s) realizado(s) com saldo a pagar",
+          "tab": "pagamentos",
+          "valor": 300000,
+          "eventoId": "EV-0011",
+          "eventoNome": "Jornada de Gestão Escolar Democrática"
+        }
+      ],
       "EV-0012": [
         {
           "sev": "Atenção",
@@ -15887,11 +16165,20 @@
       ],
       "EV-0016": [
         {
+          "sev": "Vencido",
+          "titulo": "Recebimento vencido",
+          "detalhe": "NF-SINT-01 · venc. 30/06/2026",
+          "tab": "faturamento",
+          "valor": 1000000,
+          "eventoId": "EV-0016",
+          "eventoNome": "Gestão do SUS Municipal — Trilha Customizada"
+        },
+        {
           "sev": "Pendente",
           "titulo": "Receita contratada ainda não faturada",
           "detalhe": "Consórcio Intermunicipal de Saúde L",
           "tab": "faturamento",
-          "valor": 4800000,
+          "valor": 3800000,
           "eventoId": "EV-0016",
           "eventoNome": "Gestão do SUS Municipal — Trilha Customizada"
         },
@@ -16080,46 +16367,46 @@
     },
     "consolidado": {
       "2026": {
-        "contratada": 255217900,
+        "contratada": 255717900,
         "prevista": 12160000,
-        "faturada": 190548400,
+        "faturada": 192048400,
         "recebida": 113295800,
         "retTributaria": 1023000,
         "retContratual": 1140000,
-        "exigivel": 75089600,
+        "exigivel": 76589600,
         "aLiberar": 1140000,
-        "aFaturar": 64669500,
-        "aReceber": 77252600,
-        "orcado": 206916600,
-        "realizado": 149983100,
+        "aFaturar": 63669500,
+        "aReceber": 78752600,
+        "orcado": 210596600,
+        "realizado": 150483100,
         "pago": 123954100,
-        "obrigacoes": 160203100,
-        "aPagar": 26029000,
+        "obrigacoes": 160703100,
+        "aPagar": 26529000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": 48301300,
-        "reconhecida": 152198900,
-        "incorrido": 149983100,
+        "projetado": 45121300,
+        "reconhecida": 152698900,
+        "incorrido": 150483100,
         "economico": 2215800,
         "entradas": 113295800,
         "saidas": 123954100,
         "movimentacaoLiquida": -10658300,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 206916600,
-        "custoOperacionalIncorrido": 149983100,
+        "custoOperacionalPrevisto": 210596600,
+        "custoOperacionalIncorrido": 150483100,
         "demo": {
           "receita": [
-            255217900,
-            152198900,
+            255717900,
+            152698900,
             113295800
           ],
           "operacional": [
-            206916600,
-            149983100,
+            210596600,
+            150483100,
             123954100
           ],
           "comissao": [
@@ -16128,12 +16415,12 @@
             0
           ],
           "custoTotal": [
-            206916600,
-            149983100,
+            210596600,
+            150483100,
             123954100
           ],
           "resultado": [
-            48301300,
+            45121300,
             2215800,
             -10658300
           ],
@@ -16143,7 +16430,7 @@
         "saldoFinal": 40211700,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 42738800,
+          "2026-03": 43238800,
           "2026-04": 7200000,
           "2026-05": 18600000,
           "2026-06": 20774000,
@@ -16154,7 +16441,7 @@
           "2026-11": 4800000
         },
         "cusMes": {
-          "2026-03": 22549500,
+          "2026-03": 22849500,
           "2026-04": 10218000,
           "2026-05": 15602300,
           "2026-06": 12779400,
@@ -16163,7 +16450,7 @@
           "2026-10": 13755000,
           "2026-09": 25703500,
           "2026-11": 2220000,
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000
         },
         "extrato": [
@@ -18083,31 +18370,31 @@
           }
         ],
         "caixa": -10658300,
-        "desvioOrcamento": -56933500,
-        "execucaoOrcamento": 0.7248480788878224
+        "desvioOrcamento": -60113500,
+        "execucaoOrcamento": 0.7145561704225044
       },
       "2027": {
-        "contratada": 25082000,
+        "contratada": 25582000,
         "prevista": 0,
-        "faturada": 25082000,
+        "faturada": 25582000,
         "recebida": 15872000,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 7815000,
+        "exigivel": 8315000,
         "aLiberar": 900000,
         "aFaturar": 0,
-        "aReceber": 9210000,
-        "orcado": 74280000,
-        "realizado": 63672500,
+        "aReceber": 9710000,
+        "orcado": 75260000,
+        "realizado": 63872500,
         "pago": 57325500,
-        "obrigacoes": 74872500,
-        "aPagar": 6347000,
+        "obrigacoes": 75072500,
+        "aPagar": 6547000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -49198000,
+        "projetado": -49678000,
         "reconhecida": 0,
         "incorrido": 0,
         "economico": 0,
@@ -18116,16 +18403,16 @@
         "movimentacaoLiquida": 0,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 74280000,
+        "custoOperacionalPrevisto": 75260000,
         "custoOperacionalIncorrido": 0,
         "demo": {
           "receita": [
-            25082000,
+            25582000,
             0,
             0
           ],
           "operacional": [
-            74280000,
+            75260000,
             0,
             0
           ],
@@ -18135,12 +18422,12 @@
             0
           ],
           "custoTotal": [
-            74280000,
+            75260000,
             0,
             0
           ],
           "resultado": [
-            -49198000,
+            -49678000,
             0,
             0
           ],
@@ -18150,14 +18437,14 @@
         "saldoFinal": 40211700,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
         },
         "cusMes": {
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -18985,50 +19272,50 @@
           }
         ],
         "caixa": -41453500,
-        "desvioOrcamento": -10607500,
-        "execucaoOrcamento": 0.8571957458266021
+        "desvioOrcamento": -11387500,
+        "execucaoOrcamento": 0.848691203826734
       },
       "all": {
-        "contratada": 255217900,
+        "contratada": 255717900,
         "prevista": 12160000,
-        "faturada": 190548400,
+        "faturada": 192048400,
         "recebida": 113295800,
         "retTributaria": 1023000,
         "retContratual": 1140000,
-        "exigivel": 75089600,
+        "exigivel": 76589600,
         "aLiberar": 1140000,
-        "aFaturar": 64669500,
-        "aReceber": 77252600,
-        "orcado": 206916600,
-        "realizado": 149983100,
+        "aFaturar": 63669500,
+        "aReceber": 78752600,
+        "orcado": 210596600,
+        "realizado": 150483100,
         "pago": 123954100,
-        "obrigacoes": 160203100,
-        "aPagar": 26029000,
+        "obrigacoes": 160703100,
+        "aPagar": 26529000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": 48301300,
-        "reconhecida": 152198900,
-        "incorrido": 149983100,
+        "projetado": 45121300,
+        "reconhecida": 152698900,
+        "incorrido": 150483100,
         "economico": 2215800,
         "entradas": 113295800,
         "saidas": 123954100,
         "movimentacaoLiquida": -10658300,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 206916600,
-        "custoOperacionalIncorrido": 149983100,
+        "custoOperacionalPrevisto": 210596600,
+        "custoOperacionalIncorrido": 150483100,
         "demo": {
           "receita": [
-            255217900,
-            152198900,
+            255717900,
+            152698900,
             113295800
           ],
           "operacional": [
-            206916600,
-            149983100,
+            210596600,
+            150483100,
             123954100
           ],
           "comissao": [
@@ -19037,12 +19324,12 @@
             0
           ],
           "custoTotal": [
-            206916600,
-            149983100,
+            210596600,
+            150483100,
             123954100
           ],
           "resultado": [
-            48301300,
+            45121300,
             2215800,
             -10658300
           ],
@@ -19052,7 +19339,7 @@
         "saldoFinal": 40211700,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 42738800,
+          "2026-03": 43238800,
           "2026-04": 7200000,
           "2026-05": 18600000,
           "2026-06": 20774000,
@@ -19063,7 +19350,7 @@
           "2026-11": 4800000
         },
         "cusMes": {
-          "2026-03": 22549500,
+          "2026-03": 22849500,
           "2026-04": 10218000,
           "2026-05": 15602300,
           "2026-06": 12779400,
@@ -19072,7 +19359,7 @@
           "2026-10": 13755000,
           "2026-09": 25703500,
           "2026-11": 2220000,
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000
         },
         "extrato": [
@@ -20992,50 +21279,50 @@
           }
         ],
         "caixa": -10658300,
-        "desvioOrcamento": -56933500,
-        "execucaoOrcamento": 0.7248480788878224
+        "desvioOrcamento": -60113500,
+        "execucaoOrcamento": 0.7145561704225044
       },
       "2026-Q1": {
-        "contratada": 63320800,
+        "contratada": 63820800,
         "prevista": 0,
-        "faturada": 63320800,
+        "faturada": 63820800,
         "recebida": 54110800,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 7815000,
+        "exigivel": 8315000,
         "aLiberar": 900000,
         "aFaturar": 0,
-        "aReceber": 9210000,
-        "orcado": 89780000,
-        "realizado": 79331500,
+        "aReceber": 9710000,
+        "orcado": 93460000,
+        "realizado": 79831500,
         "pago": 72984500,
-        "obrigacoes": 90531500,
-        "aPagar": 6347000,
+        "obrigacoes": 91031500,
+        "aPagar": 6847000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -26459200,
-        "reconhecida": 42738800,
-        "incorrido": 33790000,
+        "projetado": -29639200,
+        "reconhecida": 43238800,
+        "incorrido": 34290000,
         "economico": 8948800,
         "entradas": 0,
         "saidas": 25768000,
         "movimentacaoLiquida": -25768000,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 89780000,
-        "custoOperacionalIncorrido": 33790000,
+        "custoOperacionalPrevisto": 93460000,
+        "custoOperacionalIncorrido": 34290000,
         "demo": {
           "receita": [
-            63320800,
-            42738800,
+            63820800,
+            43238800,
             0
           ],
           "operacional": [
-            89780000,
-            33790000,
+            93460000,
+            34290000,
             25768000
           ],
           "comissao": [
@@ -21044,12 +21331,12 @@
             0
           ],
           "custoTotal": [
-            89780000,
-            33790000,
+            93460000,
+            34290000,
             25768000
           ],
           "resultado": [
-            -26459200,
+            -29639200,
             8948800,
             -25768000
           ],
@@ -21059,15 +21346,15 @@
         "saldoFinal": 40211700,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 42738800,
+          "2026-03": 43238800,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
         },
         "cusMes": {
-          "2026-03": 22549500,
-          "2026-01": 5613500,
+          "2026-03": 22849500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-04": 6140000,
           "2026-05": 5613500,
@@ -22158,31 +22445,31 @@
           }
         ],
         "caixa": -18873700,
-        "desvioOrcamento": -10448500,
-        "execucaoOrcamento": 0.8836210737357986
+        "desvioOrcamento": -13628500,
+        "execucaoOrcamento": 0.8541782580783223
       },
       "2026-Q2": {
-        "contratada": 80056000,
+        "contratada": 80556000,
         "prevista": 0,
-        "faturada": 75256000,
+        "faturada": 76756000,
         "recebida": 46915500,
         "retTributaria": 1023000,
         "retContratual": 900000,
-        "exigivel": 26417500,
+        "exigivel": 27917500,
         "aLiberar": 900000,
-        "aFaturar": 4800000,
-        "aReceber": 28340500,
-        "orcado": 101542000,
-        "realizado": 90806500,
+        "aFaturar": 3800000,
+        "aReceber": 29840500,
+        "orcado": 102522000,
+        "realizado": 91006500,
         "pago": 80649500,
-        "obrigacoes": 102006500,
-        "aPagar": 10157000,
+        "obrigacoes": 102206500,
+        "aPagar": 10357000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -21486000,
+        "projetado": -21966000,
         "reconhecida": 46574000,
         "incorrido": 38599700,
         "economico": 7974300,
@@ -22191,16 +22478,16 @@
         "movimentacaoLiquida": -8719300,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 101542000,
+        "custoOperacionalPrevisto": 102522000,
         "custoOperacionalIncorrido": 38599700,
         "demo": {
           "receita": [
-            80056000,
+            80556000,
             46574000,
             22068000
           ],
           "operacional": [
-            101542000,
+            102522000,
             38599700,
             30787300
           ],
@@ -22210,12 +22497,12 @@
             0
           ],
           "custoTotal": [
-            101542000,
+            102522000,
             38599700,
             30787300
           ],
           "resultado": [
-            -21486000,
+            -21966000,
             7974300,
             -8719300
           ],
@@ -22229,7 +22516,7 @@
           "2026-05": 18600000,
           "2026-06": 20774000,
           "2026-07": 10200000,
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
@@ -22239,7 +22526,7 @@
           "2026-05": 15602300,
           "2026-06": 12779400,
           "2026-07": 12805300,
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-08": 8780000,
@@ -23481,31 +23768,31 @@
           }
         ],
         "caixa": -33734000,
-        "desvioOrcamento": -10735500,
-        "execucaoOrcamento": 0.8942752752555593
+        "desvioOrcamento": -11515500,
+        "execucaoOrcamento": 0.8876777667232398
       },
       "2026-Q3": {
-        "contratada": 97512600,
+        "contratada": 98012600,
         "prevista": 2535000,
-        "faturada": 84707600,
+        "faturada": 85207600,
         "recebida": 41013500,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 42299100,
+        "exigivel": 42799100,
         "aLiberar": 900000,
         "aFaturar": 12805000,
-        "aReceber": 43694100,
-        "orcado": 120399600,
-        "realizado": 99750100,
+        "aReceber": 44194100,
+        "orcado": 121379600,
+        "realizado": 99950100,
         "pago": 79351100,
-        "obrigacoes": 110530100,
-        "aPagar": 20399000,
+        "obrigacoes": 110730100,
+        "aPagar": 20599000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -22887000,
+        "projetado": -23367000,
         "reconhecida": 42304100,
         "incorrido": 54453600,
         "economico": -12149500,
@@ -23514,16 +23801,16 @@
         "movimentacaoLiquida": -13848100,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 120399600,
+        "custoOperacionalPrevisto": 121379600,
         "custoOperacionalIncorrido": 54453600,
         "demo": {
           "receita": [
-            97512600,
+            98012600,
             42304100,
             28141500
           ],
           "operacional": [
-            120399600,
+            121379600,
             54453600,
             41989600
           ],
@@ -23533,12 +23820,12 @@
             0
           ],
           "custoTotal": [
-            120399600,
+            121379600,
             54453600,
             41989600
           ],
           "resultado": [
-            -22887000,
+            -23367000,
             -12149500,
             -13848100
           ],
@@ -23550,7 +23837,7 @@
         "recMes": {
           "2026-08": 27304100,
           "2026-09": 15000000,
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-11": 4800000,
           "2026-10": 782000
@@ -23559,7 +23846,7 @@
           "2026-08": 23109600,
           "2026-10": 8535000,
           "2026-09": 25703500,
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -24703,31 +24990,31 @@
           }
         ],
         "caixa": -38337600,
-        "desvioOrcamento": -20649500,
-        "execucaoOrcamento": 0.8284919551227745
+        "desvioOrcamento": -21429500,
+        "execucaoOrcamento": 0.8234505633566102
       },
       "2026-Q4": {
-        "contratada": 89574500,
+        "contratada": 90074500,
         "prevista": 9625000,
-        "faturada": 42510000,
+        "faturada": 43010000,
         "recebida": 18872000,
         "retTributaria": 495000,
         "retContratual": 1140000,
-        "exigivel": 22003000,
+        "exigivel": 22503000,
         "aLiberar": 1140000,
         "aFaturar": 47064500,
-        "aReceber": 23638000,
-        "orcado": 118035000,
-        "realizado": 71112500,
+        "aReceber": 24138000,
+        "orcado": 119015000,
+        "realizado": 71312500,
         "pago": 62945500,
-        "obrigacoes": 81752500,
-        "aPagar": 8167000,
+        "obrigacoes": 81952500,
+        "aPagar": 8367000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -28460500,
+        "projetado": -28940500,
         "reconhecida": 10382000,
         "incorrido": 13067000,
         "economico": -2685000,
@@ -24736,16 +25023,16 @@
         "movimentacaoLiquida": 5092000,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 118035000,
+        "custoOperacionalPrevisto": 119015000,
         "custoOperacionalIncorrido": 13067000,
         "demo": {
           "receita": [
-            89574500,
+            90074500,
             10382000,
             8372000
           ],
           "operacional": [
-            118035000,
+            119015000,
             13067000,
             3280000
           ],
@@ -24755,12 +25042,12 @@
             0
           ],
           "custoTotal": [
-            118035000,
+            119015000,
             13067000,
             3280000
           ],
           "resultado": [
-            -28460500,
+            -28940500,
             -2685000,
             5092000
           ],
@@ -24771,7 +25058,7 @@
         "saldoAtual": 40211700,
         "recMes": {
           "2026-10": 5582000,
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000
@@ -24779,7 +25066,7 @@
         "cusMes": {
           "2026-11": 2220000,
           "2026-10": 10847000,
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -25705,43 +25992,43 @@
           }
         ],
         "caixa": -44073500,
-        "desvioOrcamento": -46922500,
-        "execucaoOrcamento": 0.6024696064726565
+        "desvioOrcamento": -47702500,
+        "execucaoOrcamento": 0.5991891778347267
       }
     },
     "consolidadoEventos": {
       "2026": {
         "contratada": 230135900,
         "prevista": 12160000,
-        "faturada": 165466400,
+        "faturada": 166466400,
         "recebida": 97423800,
         "retTributaria": 528000,
         "retContratual": 240000,
-        "exigivel": 67274600,
+        "exigivel": 68274600,
         "aLiberar": 240000,
-        "aFaturar": 64669500,
-        "aReceber": 68042600,
-        "orcado": 132636600,
-        "realizado": 86310600,
+        "aFaturar": 63669500,
+        "aReceber": 69042600,
+        "orcado": 135336600,
+        "realizado": 86610600,
         "pago": 66628600,
-        "obrigacoes": 85330600,
-        "aPagar": 19682000,
+        "obrigacoes": 85630600,
+        "aPagar": 19982000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": 97499300,
+        "projetado": 94799300,
         "reconhecida": 127116900,
-        "incorrido": 86310600,
-        "economico": 40806300,
+        "incorrido": 86610600,
+        "economico": 40506300,
         "entradas": 97423800,
         "saidas": 66628600,
         "movimentacaoLiquida": 30795200,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 132636600,
-        "custoOperacionalIncorrido": 86310600,
+        "custoOperacionalPrevisto": 135336600,
+        "custoOperacionalIncorrido": 86610600,
         "demo": {
           "receita": [
             230135900,
@@ -25749,8 +26036,8 @@
             97423800
           ],
           "operacional": [
-            132636600,
-            86310600,
+            135336600,
+            86610600,
             66628600
           ],
           "comissao": [
@@ -25759,13 +26046,13 @@
             0
           ],
           "custoTotal": [
-            132636600,
-            86310600,
+            135336600,
+            86610600,
             66628600
           ],
           "resultado": [
-            97499300,
-            40806300,
+            94799300,
+            40506300,
             30795200
           ],
           "confere": true
@@ -25784,7 +26071,7 @@
           "2026-10": 4800000
         },
         "cusMes": {
-          "2026-03": 15659000,
+          "2026-03": 15959000,
           "2026-04": 4078000,
           "2026-05": 9988800,
           "2026-06": 5902400,
@@ -26897,8 +27184,8 @@
           }
         ],
         "caixa": 30795200,
-        "desvioOrcamento": -46326000,
-        "execucaoOrcamento": 0.6507298890351532
+        "desvioOrcamento": -48726000,
+        "execucaoOrcamento": 0.6399643555401865
       },
       "2027": {
         "contratada": 0,
@@ -26973,35 +27260,35 @@
       "all": {
         "contratada": 230135900,
         "prevista": 12160000,
-        "faturada": 165466400,
+        "faturada": 166466400,
         "recebida": 97423800,
         "retTributaria": 528000,
         "retContratual": 240000,
-        "exigivel": 67274600,
+        "exigivel": 68274600,
         "aLiberar": 240000,
-        "aFaturar": 64669500,
-        "aReceber": 68042600,
-        "orcado": 132636600,
-        "realizado": 86310600,
+        "aFaturar": 63669500,
+        "aReceber": 69042600,
+        "orcado": 135336600,
+        "realizado": 86610600,
         "pago": 66628600,
-        "obrigacoes": 85330600,
-        "aPagar": 19682000,
+        "obrigacoes": 85630600,
+        "aPagar": 19982000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": 97499300,
+        "projetado": 94799300,
         "reconhecida": 127116900,
-        "incorrido": 86310600,
-        "economico": 40806300,
+        "incorrido": 86610600,
+        "economico": 40506300,
         "entradas": 97423800,
         "saidas": 66628600,
         "movimentacaoLiquida": 30795200,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 132636600,
-        "custoOperacionalIncorrido": 86310600,
+        "custoOperacionalPrevisto": 135336600,
+        "custoOperacionalIncorrido": 86610600,
         "demo": {
           "receita": [
             230135900,
@@ -27009,8 +27296,8 @@
             97423800
           ],
           "operacional": [
-            132636600,
-            86310600,
+            135336600,
+            86610600,
             66628600
           ],
           "comissao": [
@@ -27019,13 +27306,13 @@
             0
           ],
           "custoTotal": [
-            132636600,
-            86310600,
+            135336600,
+            86610600,
             66628600
           ],
           "resultado": [
-            97499300,
-            40806300,
+            94799300,
+            40506300,
             30795200
           ],
           "confere": true
@@ -27044,7 +27331,7 @@
           "2026-10": 4800000
         },
         "cusMes": {
-          "2026-03": 15659000,
+          "2026-03": 15959000,
           "2026-04": 4078000,
           "2026-05": 9988800,
           "2026-06": 5902400,
@@ -28157,8 +28444,8 @@
           }
         ],
         "caixa": 30795200,
-        "desvioOrcamento": -46326000,
-        "execucaoOrcamento": 0.6507298890351532
+        "desvioOrcamento": -48726000,
+        "execucaoOrcamento": 0.6399643555401865
       },
       "2026-Q1": {
         "contratada": 38238800,
@@ -28171,27 +28458,27 @@
         "aLiberar": 0,
         "aFaturar": 0,
         "aReceber": 0,
-        "orcado": 15500000,
-        "realizado": 15659000,
+        "orcado": 18200000,
+        "realizado": 15959000,
         "pago": 15659000,
-        "obrigacoes": 15659000,
-        "aPagar": 0,
+        "obrigacoes": 15959000,
+        "aPagar": 300000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": 22738800,
+        "projetado": 20038800,
         "reconhecida": 38238800,
-        "incorrido": 15659000,
-        "economico": 22579800,
+        "incorrido": 15959000,
+        "economico": 22279800,
         "entradas": 0,
         "saidas": 7637000,
         "movimentacaoLiquida": -7637000,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 15500000,
-        "custoOperacionalIncorrido": 15659000,
+        "custoOperacionalPrevisto": 18200000,
+        "custoOperacionalIncorrido": 15959000,
         "demo": {
           "receita": [
             38238800,
@@ -28199,8 +28486,8 @@
             0
           ],
           "operacional": [
-            15500000,
-            15659000,
+            18200000,
+            15959000,
             7637000
           ],
           "comissao": [
@@ -28209,13 +28496,13 @@
             0
           ],
           "custoTotal": [
-            15500000,
-            15659000,
+            18200000,
+            15959000,
             7637000
           ],
           "resultado": [
-            22738800,
-            22579800,
+            20038800,
+            22279800,
             -7637000
           ],
           "confere": true
@@ -28227,7 +28514,7 @@
           "2026-03": 38238800
         },
         "cusMes": {
-          "2026-03": 15659000
+          "2026-03": 15959000
         },
         "extrato": [
           {
@@ -28496,20 +28783,20 @@
           }
         ],
         "caixa": 22579800,
-        "desvioOrcamento": 159000,
-        "execucaoOrcamento": 1.010258064516129
+        "desvioOrcamento": -2241000,
+        "execucaoOrcamento": 0.8768681318681318
       },
       "2026-Q2": {
         "contratada": 54974000,
         "prevista": 0,
-        "faturada": 50174000,
+        "faturada": 51174000,
         "recebida": 31043500,
         "retTributaria": 528000,
         "retContratual": 0,
-        "exigivel": 18602500,
+        "exigivel": 19602500,
         "aLiberar": 0,
-        "aFaturar": 4800000,
-        "aReceber": 19130500,
+        "aFaturar": 3800000,
+        "aReceber": 20130500,
         "orcado": 27262000,
         "realizado": 27134000,
         "pago": 23324000,
@@ -29573,46 +29860,46 @@
     },
     "consolidadoCorporativo": {
       "2026": {
-        "contratada": 25082000,
+        "contratada": 25582000,
         "prevista": 0,
-        "faturada": 25082000,
+        "faturada": 25582000,
         "recebida": 15872000,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 7815000,
+        "exigivel": 8315000,
         "aLiberar": 900000,
         "aFaturar": 0,
-        "aReceber": 9210000,
-        "orcado": 74280000,
-        "realizado": 63672500,
+        "aReceber": 9710000,
+        "orcado": 75260000,
+        "realizado": 63872500,
         "pago": 57325500,
-        "obrigacoes": 74872500,
-        "aPagar": 6347000,
+        "obrigacoes": 75072500,
+        "aPagar": 6547000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -49198000,
-        "reconhecida": 25082000,
-        "incorrido": 63672500,
-        "economico": -38590500,
+        "projetado": -49678000,
+        "reconhecida": 25582000,
+        "incorrido": 63872500,
+        "economico": -38290500,
         "entradas": 15872000,
         "saidas": 57325500,
         "movimentacaoLiquida": -41453500,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 74280000,
-        "custoOperacionalIncorrido": 63672500,
+        "custoOperacionalPrevisto": 75260000,
+        "custoOperacionalIncorrido": 63872500,
         "demo": {
           "receita": [
-            25082000,
-            25082000,
+            25582000,
+            25582000,
             15872000
           ],
           "operacional": [
-            74280000,
-            63672500,
+            75260000,
+            63872500,
             57325500
           ],
           "comissao": [
@@ -29621,13 +29908,13 @@
             0
           ],
           "custoTotal": [
-            74280000,
-            63672500,
+            75260000,
+            63872500,
             57325500
           ],
           "resultado": [
-            -49198000,
-            -38590500,
+            -49678000,
+            -38290500,
             -41453500
           ],
           "confere": true
@@ -29636,14 +29923,14 @@
         "saldoFinal": 9416500,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
         },
         "cusMes": {
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -30471,31 +30758,31 @@
           }
         ],
         "caixa": -41453500,
-        "desvioOrcamento": -10607500,
-        "execucaoOrcamento": 0.8571957458266021
+        "desvioOrcamento": -11387500,
+        "execucaoOrcamento": 0.848691203826734
       },
       "2027": {
-        "contratada": 25082000,
+        "contratada": 25582000,
         "prevista": 0,
-        "faturada": 25082000,
+        "faturada": 25582000,
         "recebida": 15872000,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 7815000,
+        "exigivel": 8315000,
         "aLiberar": 900000,
         "aFaturar": 0,
-        "aReceber": 9210000,
-        "orcado": 74280000,
-        "realizado": 63672500,
+        "aReceber": 9710000,
+        "orcado": 75260000,
+        "realizado": 63872500,
         "pago": 57325500,
-        "obrigacoes": 74872500,
-        "aPagar": 6347000,
+        "obrigacoes": 75072500,
+        "aPagar": 6547000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -49198000,
+        "projetado": -49678000,
         "reconhecida": 0,
         "incorrido": 0,
         "economico": 0,
@@ -30504,16 +30791,16 @@
         "movimentacaoLiquida": 0,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 74280000,
+        "custoOperacionalPrevisto": 75260000,
         "custoOperacionalIncorrido": 0,
         "demo": {
           "receita": [
-            25082000,
+            25582000,
             0,
             0
           ],
           "operacional": [
-            74280000,
+            75260000,
             0,
             0
           ],
@@ -30523,12 +30810,12 @@
             0
           ],
           "custoTotal": [
-            74280000,
+            75260000,
             0,
             0
           ],
           "resultado": [
-            -49198000,
+            -49678000,
             0,
             0
           ],
@@ -30538,14 +30825,14 @@
         "saldoFinal": 40211700,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
         },
         "cusMes": {
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -31373,50 +31660,50 @@
           }
         ],
         "caixa": -41453500,
-        "desvioOrcamento": -10607500,
-        "execucaoOrcamento": 0.8571957458266021
+        "desvioOrcamento": -11387500,
+        "execucaoOrcamento": 0.848691203826734
       },
       "all": {
-        "contratada": 25082000,
+        "contratada": 25582000,
         "prevista": 0,
-        "faturada": 25082000,
+        "faturada": 25582000,
         "recebida": 15872000,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 7815000,
+        "exigivel": 8315000,
         "aLiberar": 900000,
         "aFaturar": 0,
-        "aReceber": 9210000,
-        "orcado": 74280000,
-        "realizado": 63672500,
+        "aReceber": 9710000,
+        "orcado": 75260000,
+        "realizado": 63872500,
         "pago": 57325500,
-        "obrigacoes": 74872500,
-        "aPagar": 6347000,
+        "obrigacoes": 75072500,
+        "aPagar": 6547000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -49198000,
-        "reconhecida": 25082000,
-        "incorrido": 63672500,
-        "economico": -38590500,
+        "projetado": -49678000,
+        "reconhecida": 25582000,
+        "incorrido": 63872500,
+        "economico": -38290500,
         "entradas": 15872000,
         "saidas": 57325500,
         "movimentacaoLiquida": -41453500,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 74280000,
-        "custoOperacionalIncorrido": 63672500,
+        "custoOperacionalPrevisto": 75260000,
+        "custoOperacionalIncorrido": 63872500,
         "demo": {
           "receita": [
-            25082000,
-            25082000,
+            25582000,
+            25582000,
             15872000
           ],
           "operacional": [
-            74280000,
-            63672500,
+            75260000,
+            63872500,
             57325500
           ],
           "comissao": [
@@ -31425,13 +31712,13 @@
             0
           ],
           "custoTotal": [
-            74280000,
-            63672500,
+            75260000,
+            63872500,
             57325500
           ],
           "resultado": [
-            -49198000,
-            -38590500,
+            -49678000,
+            -38290500,
             -41453500
           ],
           "confere": true
@@ -31440,14 +31727,14 @@
         "saldoFinal": 9416500,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
         },
         "cusMes": {
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -32275,50 +32562,50 @@
           }
         ],
         "caixa": -41453500,
-        "desvioOrcamento": -10607500,
-        "execucaoOrcamento": 0.8571957458266021
+        "desvioOrcamento": -11387500,
+        "execucaoOrcamento": 0.848691203826734
       },
       "2026-Q1": {
-        "contratada": 25082000,
+        "contratada": 25582000,
         "prevista": 0,
-        "faturada": 25082000,
+        "faturada": 25582000,
         "recebida": 15872000,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 7815000,
+        "exigivel": 8315000,
         "aLiberar": 900000,
         "aFaturar": 0,
-        "aReceber": 9210000,
-        "orcado": 74280000,
-        "realizado": 63672500,
+        "aReceber": 9710000,
+        "orcado": 75260000,
+        "realizado": 63872500,
         "pago": 57325500,
-        "obrigacoes": 74872500,
-        "aPagar": 6347000,
+        "obrigacoes": 75072500,
+        "aPagar": 6547000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -49198000,
-        "reconhecida": 4500000,
-        "incorrido": 18131000,
-        "economico": -13631000,
+        "projetado": -49678000,
+        "reconhecida": 5000000,
+        "incorrido": 18331000,
+        "economico": -13331000,
         "entradas": 0,
         "saidas": 18131000,
         "movimentacaoLiquida": -18131000,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 74280000,
-        "custoOperacionalIncorrido": 18131000,
+        "custoOperacionalPrevisto": 75260000,
+        "custoOperacionalIncorrido": 18331000,
         "demo": {
           "receita": [
-            25082000,
-            4500000,
+            25582000,
+            5000000,
             0
           ],
           "operacional": [
-            74280000,
-            18131000,
+            75260000,
+            18331000,
             18131000
           ],
           "comissao": [
@@ -32327,13 +32614,13 @@
             0
           ],
           "custoTotal": [
-            74280000,
-            18131000,
+            75260000,
+            18331000,
             18131000
           ],
           "resultado": [
-            -49198000,
-            -13631000,
+            -49678000,
+            -13331000,
             -18131000
           ],
           "confere": true
@@ -32342,14 +32629,14 @@
         "saldoFinal": 47848700,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
         },
         "cusMes": {
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -33177,31 +33464,31 @@
           }
         ],
         "caixa": -41453500,
-        "desvioOrcamento": -10607500,
-        "execucaoOrcamento": 0.8571957458266021
+        "desvioOrcamento": -11387500,
+        "execucaoOrcamento": 0.848691203826734
       },
       "2026-Q2": {
-        "contratada": 25082000,
+        "contratada": 25582000,
         "prevista": 0,
-        "faturada": 25082000,
+        "faturada": 25582000,
         "recebida": 15872000,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 7815000,
+        "exigivel": 8315000,
         "aLiberar": 900000,
         "aFaturar": 0,
-        "aReceber": 9210000,
-        "orcado": 74280000,
-        "realizado": 63672500,
+        "aReceber": 9710000,
+        "orcado": 75260000,
+        "realizado": 63872500,
         "pago": 57325500,
-        "obrigacoes": 74872500,
-        "aPagar": 6347000,
+        "obrigacoes": 75072500,
+        "aPagar": 6547000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -49198000,
+        "projetado": -49678000,
         "reconhecida": 6000000,
         "incorrido": 18630500,
         "economico": -12630500,
@@ -33210,16 +33497,16 @@
         "movimentacaoLiquida": -14130500,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 74280000,
+        "custoOperacionalPrevisto": 75260000,
         "custoOperacionalIncorrido": 18630500,
         "demo": {
           "receita": [
-            25082000,
+            25582000,
             6000000,
             4500000
           ],
           "operacional": [
-            74280000,
+            75260000,
             18630500,
             18630500
           ],
@@ -33229,12 +33516,12 @@
             0
           ],
           "custoTotal": [
-            74280000,
+            75260000,
             18630500,
             18630500
           ],
           "resultado": [
-            -49198000,
+            -49678000,
             -12630500,
             -14130500
           ],
@@ -33244,14 +33531,14 @@
         "saldoFinal": 4583700,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
         },
         "cusMes": {
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -34079,31 +34366,31 @@
           }
         ],
         "caixa": -41453500,
-        "desvioOrcamento": -10607500,
-        "execucaoOrcamento": 0.8571957458266021
+        "desvioOrcamento": -11387500,
+        "execucaoOrcamento": 0.848691203826734
       },
       "2026-Q3": {
-        "contratada": 25082000,
+        "contratada": 25582000,
         "prevista": 0,
-        "faturada": 25082000,
+        "faturada": 25582000,
         "recebida": 15872000,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 7815000,
+        "exigivel": 8315000,
         "aLiberar": 900000,
         "aFaturar": 0,
-        "aReceber": 9210000,
-        "orcado": 74280000,
-        "realizado": 63672500,
+        "aReceber": 9710000,
+        "orcado": 75260000,
+        "realizado": 63872500,
         "pago": 57325500,
-        "obrigacoes": 74872500,
-        "aPagar": 6347000,
+        "obrigacoes": 75072500,
+        "aPagar": 6547000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -49198000,
+        "projetado": -49678000,
         "reconhecida": 9000000,
         "incorrido": 21284000,
         "economico": -12284000,
@@ -34112,16 +34399,16 @@
         "movimentacaoLiquida": -16964000,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 74280000,
+        "custoOperacionalPrevisto": 75260000,
         "custoOperacionalIncorrido": 21284000,
         "demo": {
           "receita": [
-            25082000,
+            25582000,
             9000000,
             3000000
           ],
           "operacional": [
-            74280000,
+            75260000,
             21284000,
             19964000
           ],
@@ -34131,12 +34418,12 @@
             0
           ],
           "custoTotal": [
-            74280000,
+            75260000,
             21284000,
             19964000
           ],
           "resultado": [
-            -49198000,
+            -49678000,
             -12284000,
             -16964000
           ],
@@ -34146,14 +34433,14 @@
         "saldoFinal": 34727500,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
         },
         "cusMes": {
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -34981,31 +35268,31 @@
           }
         ],
         "caixa": -41453500,
-        "desvioOrcamento": -10607500,
-        "execucaoOrcamento": 0.8571957458266021
+        "desvioOrcamento": -11387500,
+        "execucaoOrcamento": 0.848691203826734
       },
       "2026-Q4": {
-        "contratada": 25082000,
+        "contratada": 25582000,
         "prevista": 0,
-        "faturada": 25082000,
+        "faturada": 25582000,
         "recebida": 15872000,
         "retTributaria": 495000,
         "retContratual": 900000,
-        "exigivel": 7815000,
+        "exigivel": 8315000,
         "aLiberar": 900000,
         "aFaturar": 0,
-        "aReceber": 9210000,
-        "orcado": 74280000,
-        "realizado": 63672500,
+        "aReceber": 9710000,
+        "orcado": 75260000,
+        "realizado": 63872500,
         "pago": 57325500,
-        "obrigacoes": 74872500,
-        "aPagar": 6347000,
+        "obrigacoes": 75072500,
+        "aPagar": 6547000,
         "comissaoPrevista": 0,
         "comissaoDevida": 0,
         "comissaoPaga": 0,
         "comissaoSaldo": 0,
         "nComissoes": 0,
-        "projetado": -49198000,
+        "projetado": -49678000,
         "reconhecida": 5582000,
         "incorrido": 5627000,
         "economico": -45000,
@@ -35014,16 +35301,16 @@
         "movimentacaoLiquida": 7772000,
         "comissaoIncorrida": 0,
         "comissaoPagaPeriodo": 0,
-        "custoOperacionalPrevisto": 74280000,
+        "custoOperacionalPrevisto": 75260000,
         "custoOperacionalIncorrido": 5627000,
         "demo": {
           "receita": [
-            25082000,
+            25582000,
             5582000,
             8372000
           ],
           "operacional": [
-            74280000,
+            75260000,
             5627000,
             600000
           ],
@@ -35033,12 +35320,12 @@
             0
           ],
           "custoTotal": [
-            74280000,
+            75260000,
             5627000,
             600000
           ],
           "resultado": [
-            -49198000,
+            -49678000,
             -45000,
             7772000
           ],
@@ -35048,14 +35335,14 @@
         "saldoFinal": 42891700,
         "saldoAtual": 40211700,
         "recMes": {
-          "2026-03": 4500000,
+          "2026-03": 5000000,
           "2026-06": 6000000,
           "2026-09": 9000000,
           "2026-11": 4800000,
           "2026-10": 782000
         },
         "cusMes": {
-          "2026-01": 5613500,
+          "2026-01": 5813500,
           "2026-02": 5627000,
           "2026-03": 6890500,
           "2026-04": 6140000,
@@ -35883,8 +36170,8 @@
           }
         ],
         "caixa": -41453500,
-        "desvioOrcamento": -10607500,
-        "execucaoOrcamento": 0.8571957458266021
+        "desvioOrcamento": -11387500,
+        "execucaoOrcamento": 0.848691203826734
       }
     },
     "portfolio": {
@@ -35892,17 +36179,17 @@
         "tot": {
           "contratada": 230135900,
           "prevista": 12160000,
-          "faturada": 165466400,
+          "faturada": 166466400,
           "recebida": 97423800,
-          "aFaturar": 64669500,
-          "aReceber": 68042600,
-          "orcado": 132636600,
-          "realizado": 86310600,
+          "aFaturar": 63669500,
+          "aReceber": 69042600,
+          "orcado": 135336600,
+          "realizado": 86610600,
           "pago": 66628600,
-          "aPagar": 19682000,
-          "resultado": 79155800,
-          "resultadoPrevisto": 97499300,
-          "resultadoRealizado": 40806300,
+          "aPagar": 19982000,
+          "resultado": 79855800,
+          "resultadoPrevisto": 94799300,
+          "resultadoRealizado": 40506300,
           "reconhecida": 127116900,
           "comissaoPrevista": 0,
           "comissaoDevida": 0,
@@ -35910,13 +36197,40 @@
           "comissaoSaldo": 0,
           "caixa": 30795200,
           "movimentacao": 30795200,
-          "desvio": -6477000,
-          "desvioTotal": -46326000,
+          "desvio": -8877000,
+          "desvioTotal": -48726000,
           "pagantes": 936,
           "cortesias": 80,
           "participantes": 1016
         },
         "alerts": [
+          {
+            "sev": "Vencido",
+            "titulo": "Pagamento vencido",
+            "detalhe": "1 título(s) com vencimento ultrapassado sem baixa",
+            "tab": "pagamentos",
+            "valor": 300000,
+            "eventoId": "EV-0011",
+            "eventoNome": "Jornada de Gestão Escolar Democrática"
+          },
+          {
+            "sev": "Vencido",
+            "titulo": "Recebimento vencido",
+            "detalhe": "NF-SINT-01 · venc. 30/06/2026",
+            "tab": "faturamento",
+            "valor": 1000000,
+            "eventoId": "EV-0016",
+            "eventoNome": "Gestão do SUS Municipal — Trilha Customizada"
+          },
+          {
+            "sev": "Pendente",
+            "titulo": "Pagamentos pendentes",
+            "detalhe": "1 custo(s) realizado(s) com saldo a pagar",
+            "tab": "pagamentos",
+            "valor": 300000,
+            "eventoId": "EV-0011",
+            "eventoNome": "Jornada de Gestão Escolar Democrática"
+          },
           {
             "sev": "Pendente",
             "titulo": "Pagamentos pendentes",
@@ -35931,7 +36245,7 @@
             "titulo": "Receita contratada ainda não faturada",
             "detalhe": "Consórcio Intermunicipal de Saúde L",
             "tab": "faturamento",
-            "valor": 4800000,
+            "valor": 3800000,
             "eventoId": "EV-0016",
             "eventoNome": "Gestão do SUS Municipal — Trilha Customizada"
           },
@@ -36154,15 +36468,15 @@
               "recebida": 12800000,
               "aFaturar": 0,
               "aReceber": 0,
-              "orcado": 7788000,
-              "realizado": 7637000,
+              "orcado": 10488000,
+              "realizado": 7937000,
               "pago": 7637000,
-              "aPagar": 0,
-              "direto": 7637000,
+              "aPagar": 300000,
+              "direto": 7937000,
               "indireto": 0,
-              "resultado": 5163000,
-              "resultadoPrevisto": 5012000,
-              "resultadoRealizado": 5163000,
+              "resultado": 4863000,
+              "resultadoPrevisto": 2312000,
+              "resultadoRealizado": 4863000,
               "reconhecida": 12800000,
               "comissaoPrevista": 0,
               "comissaoDevida": 0,
@@ -36170,8 +36484,8 @@
               "comissaoSaldo": 0,
               "nComissoes": 0,
               "vendedores": [],
-              "custoOperacionalPrevisto": 7788000,
-              "custoOperacionalRealizado": 7637000,
+              "custoOperacionalPrevisto": 10488000,
+              "custoOperacionalRealizado": 7937000,
               "custoOperacionalPago": 7637000,
               "demo": {
                 "receita": [
@@ -36180,8 +36494,8 @@
                   12800000
                 ],
                 "operacional": [
-                  7788000,
-                  7637000,
+                  10488000,
+                  7937000,
                   7637000
                 ],
                 "comissao": [
@@ -36190,32 +36504,32 @@
                   0
                 ],
                 "custoTotal": [
-                  7788000,
-                  7637000,
+                  10488000,
+                  7937000,
                   7637000
                 ],
                 "resultado": [
-                  5012000,
-                  5163000,
+                  2312000,
+                  4863000,
                   5163000
                 ],
                 "confere": true
               },
               "movimentacao": 5163000,
               "caixa": 5163000,
-              "desvio": -151000,
-              "desvioTotal": -151000,
-              "execucaoOrcamento": 0.9806111967128917,
+              "desvio": -2551000,
+              "desvioTotal": -2551000,
+              "execucaoOrcamento": 0.756769641495042,
               "pagantes": 0,
               "cortesias": 0,
               "participantes": 0,
               "baseUnit": 118,
               "baseUnitLabel": "participantes efetivos (cadastro)",
-              "custoPorParticipante": 64720.338983050846,
+              "custoPorParticipante": 67262.71186440678,
               "receitaPorPagante": null,
               "receitaPorParticipante": null,
               "nReceitas": 1,
-              "nCustos": 8
+              "nCustos": 9
             }
           },
           {
@@ -36515,17 +36829,17 @@
             "m": {
               "contratada": 14400000,
               "prevista": 0,
-              "faturada": 9600000,
+              "faturada": 10600000,
               "recebida": 4536000,
-              "aFaturar": 4800000,
-              "aReceber": 5064000,
+              "aFaturar": 3800000,
+              "aReceber": 6064000,
               "orcado": 7164800,
               "realizado": 7164800,
               "pago": 5264800,
               "aPagar": 1900000,
               "direto": 7164800,
               "indireto": 0,
-              "resultado": 2435200,
+              "resultado": 3435200,
               "resultadoPrevisto": 7235200,
               "resultadoRealizado": 3035200,
               "reconhecida": 10200000,
@@ -37424,17 +37738,17 @@
         "tot": {
           "contratada": 230135900,
           "prevista": 12160000,
-          "faturada": 165466400,
+          "faturada": 166466400,
           "recebida": 97423800,
-          "aFaturar": 64669500,
-          "aReceber": 68042600,
-          "orcado": 132636600,
-          "realizado": 86310600,
+          "aFaturar": 63669500,
+          "aReceber": 69042600,
+          "orcado": 135336600,
+          "realizado": 86610600,
           "pago": 66628600,
-          "aPagar": 19682000,
-          "resultado": 79155800,
-          "resultadoPrevisto": 97499300,
-          "resultadoRealizado": 40806300,
+          "aPagar": 19982000,
+          "resultado": 79855800,
+          "resultadoPrevisto": 94799300,
+          "resultadoRealizado": 40506300,
           "reconhecida": 127116900,
           "comissaoPrevista": 0,
           "comissaoDevida": 0,
@@ -37442,13 +37756,40 @@
           "comissaoSaldo": 0,
           "caixa": 30795200,
           "movimentacao": 30795200,
-          "desvio": -6477000,
-          "desvioTotal": -46326000,
+          "desvio": -8877000,
+          "desvioTotal": -48726000,
           "pagantes": 936,
           "cortesias": 80,
           "participantes": 1016
         },
         "alerts": [
+          {
+            "sev": "Vencido",
+            "titulo": "Pagamento vencido",
+            "detalhe": "1 título(s) com vencimento ultrapassado sem baixa",
+            "tab": "pagamentos",
+            "valor": 300000,
+            "eventoId": "EV-0011",
+            "eventoNome": "Jornada de Gestão Escolar Democrática"
+          },
+          {
+            "sev": "Vencido",
+            "titulo": "Recebimento vencido",
+            "detalhe": "NF-SINT-01 · venc. 30/06/2026",
+            "tab": "faturamento",
+            "valor": 1000000,
+            "eventoId": "EV-0016",
+            "eventoNome": "Gestão do SUS Municipal — Trilha Customizada"
+          },
+          {
+            "sev": "Pendente",
+            "titulo": "Pagamentos pendentes",
+            "detalhe": "1 custo(s) realizado(s) com saldo a pagar",
+            "tab": "pagamentos",
+            "valor": 300000,
+            "eventoId": "EV-0011",
+            "eventoNome": "Jornada de Gestão Escolar Democrática"
+          },
           {
             "sev": "Pendente",
             "titulo": "Pagamentos pendentes",
@@ -37463,7 +37804,7 @@
             "titulo": "Receita contratada ainda não faturada",
             "detalhe": "Consórcio Intermunicipal de Saúde L",
             "tab": "faturamento",
-            "valor": 4800000,
+            "valor": 3800000,
             "eventoId": "EV-0016",
             "eventoNome": "Gestão do SUS Municipal — Trilha Customizada"
           },
@@ -37686,15 +38027,15 @@
               "recebida": 12800000,
               "aFaturar": 0,
               "aReceber": 0,
-              "orcado": 7788000,
-              "realizado": 7637000,
+              "orcado": 10488000,
+              "realizado": 7937000,
               "pago": 7637000,
-              "aPagar": 0,
-              "direto": 7637000,
+              "aPagar": 300000,
+              "direto": 7937000,
               "indireto": 0,
-              "resultado": 5163000,
-              "resultadoPrevisto": 5012000,
-              "resultadoRealizado": 5163000,
+              "resultado": 4863000,
+              "resultadoPrevisto": 2312000,
+              "resultadoRealizado": 4863000,
               "reconhecida": 12800000,
               "comissaoPrevista": 0,
               "comissaoDevida": 0,
@@ -37702,8 +38043,8 @@
               "comissaoSaldo": 0,
               "nComissoes": 0,
               "vendedores": [],
-              "custoOperacionalPrevisto": 7788000,
-              "custoOperacionalRealizado": 7637000,
+              "custoOperacionalPrevisto": 10488000,
+              "custoOperacionalRealizado": 7937000,
               "custoOperacionalPago": 7637000,
               "demo": {
                 "receita": [
@@ -37712,8 +38053,8 @@
                   12800000
                 ],
                 "operacional": [
-                  7788000,
-                  7637000,
+                  10488000,
+                  7937000,
                   7637000
                 ],
                 "comissao": [
@@ -37722,32 +38063,32 @@
                   0
                 ],
                 "custoTotal": [
-                  7788000,
-                  7637000,
+                  10488000,
+                  7937000,
                   7637000
                 ],
                 "resultado": [
-                  5012000,
-                  5163000,
+                  2312000,
+                  4863000,
                   5163000
                 ],
                 "confere": true
               },
               "movimentacao": 5163000,
               "caixa": 5163000,
-              "desvio": -151000,
-              "desvioTotal": -151000,
-              "execucaoOrcamento": 0.9806111967128917,
+              "desvio": -2551000,
+              "desvioTotal": -2551000,
+              "execucaoOrcamento": 0.756769641495042,
               "pagantes": 0,
               "cortesias": 0,
               "participantes": 0,
               "baseUnit": 118,
               "baseUnitLabel": "participantes efetivos (cadastro)",
-              "custoPorParticipante": 64720.338983050846,
+              "custoPorParticipante": 67262.71186440678,
               "receitaPorPagante": null,
               "receitaPorParticipante": null,
               "nReceitas": 1,
-              "nCustos": 8
+              "nCustos": 9
             }
           },
           {
@@ -38047,17 +38388,17 @@
             "m": {
               "contratada": 14400000,
               "prevista": 0,
-              "faturada": 9600000,
+              "faturada": 10600000,
               "recebida": 4536000,
-              "aFaturar": 4800000,
-              "aReceber": 5064000,
+              "aFaturar": 3800000,
+              "aReceber": 6064000,
               "orcado": 7164800,
               "realizado": 7164800,
               "pago": 5264800,
               "aPagar": 1900000,
               "direto": 7164800,
               "indireto": 0,
-              "resultado": 2435200,
+              "resultado": 3435200,
               "resultadoPrevisto": 7235200,
               "resultadoRealizado": 3035200,
               "reconhecida": 10200000,
@@ -38928,13 +39269,13 @@
           "recebida": 38238800,
           "aFaturar": 0,
           "aReceber": 0,
-          "orcado": 15500000,
-          "realizado": 15659000,
+          "orcado": 18200000,
+          "realizado": 15959000,
           "pago": 15659000,
-          "aPagar": 0,
-          "resultado": 22579800,
-          "resultadoPrevisto": 22738800,
-          "resultadoRealizado": 22579800,
+          "aPagar": 300000,
+          "resultado": 22279800,
+          "resultadoPrevisto": 20038800,
+          "resultadoRealizado": 22279800,
           "reconhecida": 38238800,
           "comissaoPrevista": 0,
           "comissaoDevida": 0,
@@ -38942,13 +39283,31 @@
           "comissaoSaldo": 0,
           "caixa": 22579800,
           "movimentacao": 22579800,
-          "desvio": 159000,
-          "desvioTotal": 159000,
+          "desvio": -2241000,
+          "desvioTotal": -2241000,
           "pagantes": 212,
           "cortesias": 18,
           "participantes": 230
         },
         "alerts": [
+          {
+            "sev": "Vencido",
+            "titulo": "Pagamento vencido",
+            "detalhe": "1 título(s) com vencimento ultrapassado sem baixa",
+            "tab": "pagamentos",
+            "valor": 300000,
+            "eventoId": "EV-0011",
+            "eventoNome": "Jornada de Gestão Escolar Democrática"
+          },
+          {
+            "sev": "Pendente",
+            "titulo": "Pagamentos pendentes",
+            "detalhe": "1 custo(s) realizado(s) com saldo a pagar",
+            "tab": "pagamentos",
+            "valor": 300000,
+            "eventoId": "EV-0011",
+            "eventoNome": "Jornada de Gestão Escolar Democrática"
+          },
           {
             "sev": "Atenção",
             "titulo": "Custo realizado acima do previsto",
@@ -38973,15 +39332,15 @@
               "recebida": 12800000,
               "aFaturar": 0,
               "aReceber": 0,
-              "orcado": 7788000,
-              "realizado": 7637000,
+              "orcado": 10488000,
+              "realizado": 7937000,
               "pago": 7637000,
-              "aPagar": 0,
-              "direto": 7637000,
+              "aPagar": 300000,
+              "direto": 7937000,
               "indireto": 0,
-              "resultado": 5163000,
-              "resultadoPrevisto": 5012000,
-              "resultadoRealizado": 5163000,
+              "resultado": 4863000,
+              "resultadoPrevisto": 2312000,
+              "resultadoRealizado": 4863000,
               "reconhecida": 12800000,
               "comissaoPrevista": 0,
               "comissaoDevida": 0,
@@ -38989,8 +39348,8 @@
               "comissaoSaldo": 0,
               "nComissoes": 0,
               "vendedores": [],
-              "custoOperacionalPrevisto": 7788000,
-              "custoOperacionalRealizado": 7637000,
+              "custoOperacionalPrevisto": 10488000,
+              "custoOperacionalRealizado": 7937000,
               "custoOperacionalPago": 7637000,
               "demo": {
                 "receita": [
@@ -38999,8 +39358,8 @@
                   12800000
                 ],
                 "operacional": [
-                  7788000,
-                  7637000,
+                  10488000,
+                  7937000,
                   7637000
                 ],
                 "comissao": [
@@ -39009,32 +39368,32 @@
                   0
                 ],
                 "custoTotal": [
-                  7788000,
-                  7637000,
+                  10488000,
+                  7937000,
                   7637000
                 ],
                 "resultado": [
-                  5012000,
-                  5163000,
+                  2312000,
+                  4863000,
                   5163000
                 ],
                 "confere": true
               },
               "movimentacao": 5163000,
               "caixa": 5163000,
-              "desvio": -151000,
-              "desvioTotal": -151000,
-              "execucaoOrcamento": 0.9806111967128917,
+              "desvio": -2551000,
+              "desvioTotal": -2551000,
+              "execucaoOrcamento": 0.756769641495042,
               "pagantes": 0,
               "cortesias": 0,
               "participantes": 0,
               "baseUnit": 118,
               "baseUnitLabel": "participantes efetivos (cadastro)",
-              "custoPorParticipante": 64720.338983050846,
+              "custoPorParticipante": 67262.71186440678,
               "receitaPorPagante": null,
               "receitaPorParticipante": null,
               "nReceitas": 1,
-              "nCustos": 8
+              "nCustos": 9
             }
           },
           {
@@ -39116,15 +39475,15 @@
         "tot": {
           "contratada": 54974000,
           "prevista": 0,
-          "faturada": 50174000,
+          "faturada": 51174000,
           "recebida": 31043500,
-          "aFaturar": 4800000,
-          "aReceber": 19130500,
+          "aFaturar": 3800000,
+          "aReceber": 20130500,
           "orcado": 27262000,
           "realizado": 27134000,
           "pago": 23324000,
           "aPagar": 3810000,
-          "resultado": 23040000,
+          "resultado": 24040000,
           "resultadoPrevisto": 27712000,
           "resultadoRealizado": 23640000,
           "reconhecida": 50774000,
@@ -39142,6 +39501,15 @@
         },
         "alerts": [
           {
+            "sev": "Vencido",
+            "titulo": "Recebimento vencido",
+            "detalhe": "NF-SINT-01 · venc. 30/06/2026",
+            "tab": "faturamento",
+            "valor": 1000000,
+            "eventoId": "EV-0016",
+            "eventoNome": "Gestão do SUS Municipal — Trilha Customizada"
+          },
+          {
             "sev": "Pendente",
             "titulo": "Pagamentos pendentes",
             "detalhe": "2 custo(s) realizado(s) com saldo a pagar",
@@ -39155,7 +39523,7 @@
             "titulo": "Receita contratada ainda não faturada",
             "detalhe": "Consórcio Intermunicipal de Saúde L",
             "tab": "faturamento",
-            "valor": 4800000,
+            "valor": 3800000,
             "eventoId": "EV-0016",
             "eventoNome": "Gestão do SUS Municipal — Trilha Customizada"
           },
@@ -39436,17 +39804,17 @@
             "m": {
               "contratada": 14400000,
               "prevista": 0,
-              "faturada": 9600000,
+              "faturada": 10600000,
               "recebida": 4536000,
-              "aFaturar": 4800000,
-              "aReceber": 5064000,
+              "aFaturar": 3800000,
+              "aReceber": 6064000,
               "orcado": 7164800,
               "realizado": 7164800,
               "pago": 5264800,
               "aPagar": 1900000,
               "direto": 7164800,
               "indireto": 0,
-              "resultado": 2435200,
+              "resultado": 3435200,
               "resultadoPrevisto": 7235200,
               "resultadoRealizado": 3035200,
               "reconhecida": 10200000,
@@ -42643,6 +43011,22 @@
     ],
     "corpAlerts": [
       {
+        "sev": "Vencido",
+        "titulo": "Recebimento corporativo vencido",
+        "detalhe": "NF-SINT-02",
+        "valor": 500000,
+        "go": "#/receber",
+        "corporativo": true
+      },
+      {
+        "sev": "Vencido",
+        "titulo": "Obrigação corporativa vencida",
+        "detalhe": "1 título(s) sem baixa",
+        "valor": 200000,
+        "go": "#/pagar",
+        "corporativo": true
+      },
+      {
         "sev": "Pendente",
         "titulo": "Retenção contratual a liberar",
         "detalhe": "NF-FIC-C003 · garantia — não é inadimplência",
@@ -42669,8 +43053,8 @@
       {
         "sev": "A validar",
         "titulo": "Despesas de estrutura compartilhada sem critério de rateio",
-        "detalhe": "48 lançamento(s) · rateio não aplicado por ausência de critério institucional aprovado",
-        "valor": 14692500,
+        "detalhe": "49 lançamento(s) · rateio não aplicado por ausência de critério institucional aprovado",
+        "valor": 14892500,
         "go": "#/resultado",
         "corporativo": true
       }
@@ -42690,7 +43074,7 @@
         "fat": [
           38238800,
           7200000,
-          18600000,
+          19600000,
           12816000,
           9600000,
           44745100,
@@ -42819,18 +43203,26 @@
         },
         "EV-0016": {
           "labels": [
+            "mai/26",
+            "jun/26",
             "jul/26",
             "ago/26"
           ],
           "fat": [
+            1000000,
+            0,
             9600000,
             0
           ],
           "rec": [
             0,
+            0,
+            0,
             4536000
           ],
           "pag": [
+            0,
+            0,
             5264800,
             0
           ]
@@ -42992,7 +43384,7 @@
       }
     },
     "agingReceber": {
-      "vencido": 3000000,
+      "vencido": 4500000,
       "d30": 12108500,
       "d60": 13366000,
       "d90": 37255100,
@@ -43000,7 +43392,7 @@
       "semData": 0
     },
     "agingPagar": {
-      "vencido": 0,
+      "vencido": 500000,
       "d30": 0,
       "d60": 2815000,
       "d90": 20588000,
@@ -43010,12 +43402,12 @@
     "groupCostsFase": [
       {
         "k": "Pré-evento",
-        "previsto": 41854000,
-        "realizado": 39226000,
+        "previsto": 44554000,
+        "realizado": 39526000,
         "pago": 36661000,
-        "aPagar": 2565000,
-        "n": 43,
-        "prevRealizados": 40394000
+        "aPagar": 2865000,
+        "n": 44,
+        "prevRealizados": 43094000
       },
       {
         "k": "Execução",
