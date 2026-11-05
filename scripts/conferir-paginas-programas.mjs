@@ -9,10 +9,18 @@
  * `/programas`, as 3 vertentes de `/solucoes-estrategicas/<área>` e
  * `/mapa-do-site`.
  *
- * De cada uma extrai o `<main>`, remove a seção `#modulos-abertos`, os
- * selos de status de módulo (`m-status`) e a marca `pc-flag` dos cartões
- * (esses vêm dos eventos e mudam de propósito), normaliza espaços e
- * compara. Regras puras em `packages/lib/src/programas/conferirHtml.ts`.
+ * De cada uma extrai o `<main>` e o mega-menu `#mega-programas` do
+ * cabeçalho, remove a seção `#modulos-abertos`, os links que dependem dela
+ * (item da navegação interna, "Ver módulos abertos", CTA `.open-module-cta`
+ * do detalhamento), os selos de status de módulo (`m-status`) e a marca
+ * `pc-flag` dos cartões (esses vêm dos eventos e mudam de propósito),
+ * normaliza espaços e compara. Regras puras em
+ * `packages/lib/src/programas/conferirHtml.ts`.
+ *
+ * Diferença ESPERADA (não conta como falha): `/mapa-do-site` com o diff
+ * feito só de troca de ordem — a Gestão Pública passa de LIDERA·AGIP·SIGA
+ * para AGIP·LIDERA·SIGA (ruling R19, ordem única do cartão). Sai como
+ * `ESPERADO` com o diff impresso, para o PO conferir.
  *
  * Uso (Node >= 22.18 — importa o .ts sem flag):
  *   node scripts/conferir-paginas-programas.mjs <ANTES> <DEPOIS>
@@ -24,7 +32,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { compararPaginas } from "../packages/lib/src/programas/conferirHtml.ts";
+import { compararPaginas, soReordenacao } from "../packages/lib/src/programas/conferirHtml.ts";
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -47,12 +55,24 @@ const caminhos = [
 ];
 
 async function baixar(base, caminho) {
-  const resposta = await fetch(`${base}${caminho}`, { redirect: "follow" });
+  const resposta = await fetch(`${base}${caminho}`, {
+    redirect: "follow",
+    signal: AbortSignal.timeout(30000),
+  });
   if (!resposta.ok) throw new Error(`${base}${caminho} respondeu ${resposta.status}`);
   return resposta.text();
 }
 
+/** Páginas cuja reordenação pura é esperada (R19). */
+const REORDENACAO_ESPERADA = new Set(["/mapa-do-site"]);
+
+function imprimir(diff) {
+  for (const l of diff.slice(0, 80)) console.log(`      ${l.tipo} ${l.texto.slice(0, 200)}`);
+  if (diff.length > 80) console.log(`      … mais ${diff.length - 80} linhas`);
+}
+
 let comDiferenca = 0;
+let esperadas = 0;
 for (const caminho of caminhos) {
   try {
     const [antes, depois] = await Promise.all([
@@ -64,10 +84,15 @@ for (const caminho of caminhos) {
       console.log(`OK    ${caminho}`);
       continue;
     }
+    if (REORDENACAO_ESPERADA.has(caminho) && soReordenacao(diff)) {
+      esperadas += 1;
+      console.log(`ESPERADO ${caminho}  (só troca de ordem — R19, Gestão Pública AGIP·LIDERA·SIGA)`);
+      imprimir(diff);
+      continue;
+    }
     comDiferenca += 1;
     console.log(`DIFF  ${caminho}  (${diff.length} linhas)`);
-    for (const l of diff.slice(0, 80)) console.log(`      ${l.tipo} ${l.texto.slice(0, 200)}`);
-    if (diff.length > 80) console.log(`      … mais ${diff.length - 80} linhas`);
+    imprimir(diff);
   } catch (erro) {
     comDiferenca += 1;
     console.log(`ERRO  ${caminho}  ${erro instanceof Error ? erro.message : erro}`);
@@ -75,7 +100,8 @@ for (const caminho of caminhos) {
 }
 
 console.log(
-  `\n${caminhos.length - comDiferenca}/${caminhos.length} páginas sem diferença` +
+  `\n${caminhos.length - comDiferenca}/${caminhos.length} páginas sem diferença inesperada` +
+    (esperadas ? ` (${esperadas} com diferença esperada)` : "") +
     (comDiferenca ? ` — ${comDiferenca} com diferença ou erro.` : "."),
 );
 process.exit(comDiferenca === 0 ? 0 : 1);

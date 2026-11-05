@@ -47,6 +47,25 @@ export function removerSecaoModulosAbertos(html: string): string {
   }
 }
 
+/**
+ * Tira os links que dependem do bloco de módulos abertos e por isso somem
+ * sem evento ativo, de propósito: o item `#modulos-abertos` da navegação
+ * interna (R6), os "Ver módulos abertos" da chamada final e da barra
+ * lateral (R27) e o CTA `.open-module-cta` do detalhamento (R5).
+ */
+export function removerLinksModulosAbertos(html: string): string {
+  return html
+    .replace(/<a\b[^>]*\bhref="#modulos-abertos"[^>]*>[\s\S]*?<\/a>/gi, "")
+    .replace(/<a\b[^>]*\bclass="[^"]*\bopen-module-cta\b[^"]*"[^>]*>[\s\S]*?<\/a>/gi, "");
+}
+
+/** Bloco `#mega-programas` do cabeçalho (fora do `<main>`); vazio se não houver. */
+export function extrairMegaProgramas(html: string): string {
+  const m = /<(div|section|nav)\b[^>]*\bid="mega-programas"[^>]*>/i.exec(html);
+  if (!m) return "";
+  return html.slice(m.index, fimDoElemento(html, m.index, (m[1] ?? "").toLowerCase()));
+}
+
 /** Tira os selos de status de módulo (`m-status`) e a marca `pc-flag` dos cartões. */
 export function removerSelos(html: string): string {
   return html
@@ -63,9 +82,15 @@ export function normalizarEspacos(html: string): string {
     .trim();
 }
 
-/** `<main>` → sem a seção e os selos que mudam de propósito → normalizado. */
+/**
+ * Mega-menu de programas do cabeçalho + `<main>` → sem a seção, os links e
+ * os selos que mudam de propósito → normalizado.
+ */
 export function prepararParaConferencia(html: string): string {
-  return normalizarEspacos(removerSelos(removerSecaoModulosAbertos(extrairMain(html))));
+  const alvo = extrairMegaProgramas(html) + extrairMain(html);
+  return normalizarEspacos(
+    removerSelos(removerLinksModulosAbertos(removerSecaoModulosAbertos(alvo))),
+  );
 }
 
 /** Uma "linha" por tag/texto, para o diff apontar o trecho. */
@@ -113,6 +138,19 @@ export function diffLinhas(antes: string[], depois: string[]): LinhaDiff[] {
   while (i < n) saida.push({ tipo: "-", texto: antes[i++] ?? "" });
   while (j < m) saida.push({ tipo: "+", texto: depois[j++] ?? "" });
   return saida;
+}
+
+/**
+ * O diff só troca linhas de lugar (as mesmas linhas saem e entram)? É a
+ * diferença esperada do mapa do site (R19: Gestão Pública passa a seguir a
+ * ordem do cartão). Diff vazio → falso.
+ */
+export function soReordenacao(diff: LinhaDiff[]): boolean {
+  if (diff.length === 0) return false;
+  const saldo = new Map<string, number>();
+  for (const l of diff) saldo.set(l.texto, (saldo.get(l.texto) ?? 0) + (l.tipo === "-" ? 1 : -1));
+  for (const v of saldo.values()) if (v !== 0) return false;
+  return true;
 }
 
 /** Compara duas páginas já baixadas; lista vazia = sem diferença. */

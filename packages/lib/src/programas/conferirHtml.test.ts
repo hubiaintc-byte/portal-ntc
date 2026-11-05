@@ -4,6 +4,9 @@ import {
   compararPaginas,
   diffLinhas,
   extrairMain,
+  extrairMegaProgramas,
+  removerLinksModulosAbertos,
+  soReordenacao,
   normalizarEspacos,
   prepararParaConferencia,
   removerSecaoModulosAbertos,
@@ -89,5 +92,63 @@ describe("compararPaginas", () => {
   it("prepararParaConferencia é idempotente", () => {
     const uma = prepararParaConferencia(PAGINA(comStatus("Aberto")));
     expect(prepararParaConferencia(uma)).toBe(uma);
+  });
+});
+
+describe("removerLinksModulosAbertos (R5/R6/R27: somem sem evento ativo)", () => {
+  it("tira o item #modulos-abertos da navegação e os links que apontam para ele", () => {
+    const html =
+      '<a class="prog-nav-link" href="#visao">Visão</a><a class="prog-nav-link" href="#modulos-abertos">Módulos abertos</a><a class="btn" href="#modulos-abertos">Ver módulos abertos</a>';
+    expect(removerLinksModulosAbertos(html)).toBe('<a class="prog-nav-link" href="#visao">Visão</a>');
+  });
+  it("tira o CTA .open-module-cta do detalhamento e só ele", () => {
+    const html =
+      '<p>x</p><a href="/contato?programa=edutec&amp;modulo=1" class="open-module-cta">Ver módulo aberto · próxima turma →</a><a href="/contato">Contato</a>';
+    expect(removerLinksModulosAbertos(html)).toBe('<p>x</p><a href="/contato">Contato</a>');
+  });
+});
+
+describe("extrairMegaProgramas", () => {
+  it("devolve o bloco #mega-programas do cabeçalho, com aninhamento", () => {
+    const html =
+      '<header><div class="mega" id="mega-programas"><div class="container"><h4>NTC Educação · 9 programas</h4></div></div><div id="mega-solucoes">x</div></header>';
+    expect(extrairMegaProgramas(html)).toBe(
+      '<div class="mega" id="mega-programas"><div class="container"><h4>NTC Educação · 9 programas</h4></div></div>',
+    );
+  });
+  it("sem o bloco → vazio", () => {
+    expect(extrairMegaProgramas("<header></header>")).toBe("");
+  });
+});
+
+describe("compararPaginas com o mega-menu", () => {
+  const mega = (itens: string) =>
+    `<header><div id="mega-programas"><ul>${itens}</ul></div></header>`;
+  it("diferença no mega-menu de programas é apontada, mesmo fora do <main>", () => {
+    const antes = `<html><body>${mega("<li>EDUTEC</li>")}<main><p>a</p></main></body></html>`;
+    const depois = `<html><body>${mega("<li>PEAR</li>")}<main><p>a</p></main></body></html>`;
+    expect(compararPaginas(antes, depois)).toEqual([
+      { tipo: "-", texto: "EDUTEC" },
+      { tipo: "+", texto: "PEAR" },
+    ]);
+  });
+  it("links para #modulos-abertos e o CTA do módulo aberto não contam", () => {
+    const antes = PAGINA('<p>a</p><a href="#modulos-abertos">Ver módulos abertos</a>');
+    const depois = PAGINA("<p>a</p>");
+    expect(compararPaginas(antes, depois)).toEqual([]);
+  });
+});
+
+describe("soReordenacao (R19: mapa do site, Gestão Pública reordenada)", () => {
+  it("mesmas linhas, outra ordem → só reordenação", () => {
+    const diff = diffLinhas(["LIDERA", "AGIP", "SIGA"], ["AGIP", "LIDERA", "SIGA"]);
+    expect(diff.length).toBeGreaterThan(0);
+    expect(soReordenacao(diff)).toBe(true);
+  });
+  it("texto que muda não é reordenação", () => {
+    expect(soReordenacao(diffLinhas(["a", "b"], ["b", "c"]))).toBe(false);
+  });
+  it("sem diferença → falso (nada a explicar)", () => {
+    expect(soReordenacao([])).toBe(false);
   });
 });
