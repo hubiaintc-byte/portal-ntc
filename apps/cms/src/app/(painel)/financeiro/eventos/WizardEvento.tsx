@@ -17,6 +17,7 @@ import {
   PASSOS_WIZARD,
   SUBTITULOS_WIZARD,
   validarForm,
+  wizardEmEdicao,
   type FormEvento,
 } from "./dadosEventos";
 
@@ -43,7 +44,7 @@ export interface WizardEventoProps {
 }
 
 export function WizardEvento({ evento, aoSalvar, aoFechar }: WizardEventoProps) {
-  const edicao = evento !== null;
+  const edicao = wizardEmEdicao(evento);
   const soLeitura = camposSoLeitura(evento);
   const [v, setV] = useState<FormEvento>(() => formDoEvento(evento));
   const [passo, setPasso] = useState(0);

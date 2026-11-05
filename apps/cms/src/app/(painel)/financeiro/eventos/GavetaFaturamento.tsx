@@ -52,6 +52,7 @@ import {
   preencherRecebido,
   receitasFaturaveis,
   saldoAFaturar,
+  validadeAoMudarRetencaoContratual,
   type FormFaturamento,
 } from "./dadosLancamentos";
 
@@ -151,6 +152,10 @@ export function GavetaFaturamento({
       setF((x) => ({ ...x, [k]: v }));
       if (erro?.campo === k) setErro(null);
     };
+  const mudarRetencaoContratual = (v: FormFaturamento["retencaoContratual"]) => {
+    mudar("retencaoContratual")(v);
+    setValidade((x) => validadeAoMudarRetencaoContratual(x, v));
+  };
   const erroDe = (campo: string) => (erro?.campo === campo ? erro.texto : undefined);
   const calc = calculosFaturamento(f);
   const rt = f.retencaoTributaria ?? 0;
@@ -182,7 +187,7 @@ export function GavetaFaturamento({
   const salvar = async () => {
     if (salvando) return;
     // Sem retenção contratual o campo "já liberada" some: o texto que ficou nele não conta.
-    const valendo = rc > 0 ? validade : comValidade(validade, "retencaoContratualLiberada", true);
+    const valendo = validadeAoMudarRetencaoContratual(validade, rc);
     const invalido = primeiroDinheiroInvalido(valendo, CAMPOS_DINHEIRO_FATURAMENTO);
     if (invalido) return mostrarErro(invalido, ERRO_FORMATO_DINHEIRO);
     const dados = dadosDoFaturamento(f);
@@ -459,7 +464,7 @@ export function GavetaFaturamento({
                 opcional
                 dica="Valor retido pelo contratante com previsão de liberação futura (garantia de execução). Não é inadimplência."
                 valor={f.retencaoContratual}
-                aoMudar={mudar("retencaoContratual")}
+                aoMudar={mudarRetencaoContratual}
                 aoMudarValidade={validadeDe("retencaoContratual")}
                 erro={erroDe("retencaoContratual")}
               />

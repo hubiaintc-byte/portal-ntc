@@ -21,6 +21,7 @@ import {
   passoDoCampo,
   totalPrevisto,
   validarForm,
+  wizardEmEdicao,
   type FormEvento,
 } from "./dadosEventos";
 
@@ -284,5 +285,14 @@ describe("listarEventos com evento do CRM pendente (ruling R15)", () => {
     expect(r.lista.map((e) => e.id).sort()).toEqual(["crm-7", "crm-8"]);
     expect(r.alertas["crm-7"]).toEqual([]);
     expect(r.alertas["crm-8"]).toEqual([]);
+  });
+});
+
+describe("wizardEmEdicao", () => {
+  it("novo e evento do CRM pendente abrem em modo de criação; evento cadastrado em edição", () => {
+    expect(wizardEmEdicao(null)).toBe(false);
+    expect(wizardEmEdicao(ev({ id: "crm-7", origem: "crm", cadastroPendente: true }))).toBe(false);
+    expect(wizardEmEdicao(ev())).toBe(true);
+    expect(wizardEmEdicao(ev({ origem: "crm", eventoComercialId: "7" }))).toBe(true);
   });
 });

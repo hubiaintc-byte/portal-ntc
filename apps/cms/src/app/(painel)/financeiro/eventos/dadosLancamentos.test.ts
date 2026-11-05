@@ -54,6 +54,7 @@ import {
   situacaoTitulo,
   subDescricaoCusto,
   tabelaCustos,
+  validadeAoMudarRetencaoContratual,
 } from "./dadosLancamentos";
 
 const HOJE = "2026-07-15";
@@ -660,5 +661,16 @@ describe("contas", () => {
       erro: "Informe o nome da conta.",
       campo: "nome",
     });
+  });
+});
+
+describe("validadeAoMudarRetencaoContratual", () => {
+  const invalida = { retencaoContratualLiberada: true, valorFaturado: true };
+  it("retenção contratual zerada (o campo \"já liberada\" some) limpa a validade dele, e só dele", () => {
+    expect(validadeAoMudarRetencaoContratual(invalida, 0)).toEqual({ retencaoContratualLiberada: false, valorFaturado: true });
+    expect(validadeAoMudarRetencaoContratual(invalida, null)).toEqual({ retencaoContratualLiberada: false, valorFaturado: true });
+  });
+  it("com retenção contratual positiva a validade fica como está", () => {
+    expect(validadeAoMudarRetencaoContratual(invalida, 5000)).toBe(invalida);
   });
 });

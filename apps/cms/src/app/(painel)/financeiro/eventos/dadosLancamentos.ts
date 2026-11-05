@@ -30,7 +30,7 @@ import {
   type ReceitaFin,
 } from "@ntc/lib";
 
-import { moeda } from "../ui/formato";
+import { comValidade, moeda, type ValidadeDinheiro } from "../ui/formato";
 import { buscaCasa } from "./dadosArea";
 
 /**
@@ -395,6 +395,19 @@ export interface FormFaturamento {
 }
 
 /** Primeira conta ativa (default do protótipo, que pegava a primeira conta). */
+/**
+ * Sem retenção contratual o campo "Retenção contratual já liberada" sai da
+ * tela; o texto inválido que ficou nele morre junto, então a validade dele
+ * volta a valer — senão, ao reaparecer com um valor bom, o salvar seguia
+ * barrado por um erro que não está mais à vista.
+ */
+export function validadeAoMudarRetencaoContratual(
+  v: ValidadeDinheiro,
+  retencaoContratual: Centavos | null,
+): ValidadeDinheiro {
+  return (retencaoContratual ?? 0) > 0 ? v : comValidade(v, "retencaoContratualLiberada", true);
+}
+
 export const contaPadrao = (contas: readonly ContaFin[]): string =>
   contas.find((c) => c.ativa)?.id ?? "";
 

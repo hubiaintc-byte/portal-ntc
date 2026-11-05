@@ -323,6 +323,15 @@ export function validarForm(f: FormEvento): ResultadoValidacao {
   return validarEvento(dadosDoForm(f));
 }
 
+/**
+ * O wizard edita só o evento que já tem cadastro financeiro. Evento do CRM
+ * pendente abre em modo de criação ("Criar evento", etapas a cumprir), porque
+ * salvar CRIA o `fin-eventos`; os campos do CRM seguem só leitura.
+ */
+export function wizardEmEdicao(ev: EventoFin | null): boolean {
+  return ev !== null && !ev.cadastroPendente;
+}
+
 /** Campos que, para evento do CRM, aparecem só leitura (o CRM os tem preenchidos). */
 export function camposSoLeitura(ev: EventoFin | null): ReadonlySet<CampoDoCrm> {
   return new Set(ev && ev.origem === "crm" ? ev.camposDoCrm : []);
