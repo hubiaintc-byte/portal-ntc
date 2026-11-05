@@ -9,3 +9,4 @@ export * from "./eventos";
 export * from "./consolidado";
 export * from "./agregados";
 export * from "./csv";
+export * from "./validacao";
