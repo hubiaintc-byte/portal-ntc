@@ -347,12 +347,16 @@ export async function excluirModulo(id: string, usuario: UsuarioAutenticado): Pr
 
 /* ---------------- Imagens enviadas da página do programa ---------------- */
 
-/** As imagens que a coleção `media` aceita (sem PDF nem vídeo). */
-const MIMES_IMAGEM: readonly string[] = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/svg+xml"];
+/**
+ * As imagens aceitas na página do programa (sem PDF nem vídeo). Sem SVG: o
+ * otimizador de imagens do Next, que serve estas imagens no site, recusa SVG.
+ */
+const MIMES_IMAGEM: readonly string[] = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
 export type ResultadoImagem = ResultadoEscrita & { midiaId?: string };
 
 const SEM_LINHA = "Salve o programa antes de enviar a imagem desta linha.";
+const ERRO_TOPO_OBRIGATORIO = "O programa publicado precisa de uma imagem do topo. Envie outra antes de remover esta.";
 
 /**
  * Aponta (ou limpa) a relação de imagem do alvo. O group `pagina` vem da
@@ -407,7 +411,7 @@ export async function enviarImagemPrograma(
   usuario: UsuarioAutenticado,
 ): Promise<ResultadoImagem> {
   if (!ehAlvoImagem(alvo)) return { ok: false, erro: "Imagem desconhecida." };
-  if (!MIMES_IMAGEM.includes(arquivo.type)) return { ok: false, erro: "Envie uma imagem JPEG, PNG, WebP, AVIF ou SVG." };
+  if (!MIMES_IMAGEM.includes(arquivo.type)) return { ok: false, erro: "Envie uma imagem JPEG, PNG, WebP ou AVIF." };
   try {
     const payload = await obterPayload();
     const atual = await payload.findByID({ collection: "programas", id, depth: 0, draft: true, overrideAccess: true });
@@ -442,6 +446,11 @@ export async function removerImagemPrograma(
     const atual = await payload.findByID({ collection: "programas", id, depth: 0, draft: true, overrideAccess: true });
     const pagina = comImagem(atual.pagina, alvo, null);
     if (pagina === null) return { ok: false, erro: SEM_LINHA };
+    // Programa no ar (publicado, com ou sem alterações pendentes) não fica
+    // sem imagem do topo: sem o caminho legado para voltar, recusa (R29).
+    if (alvo.tipo === "topo" && !(atual.pagina?.heroImagemCaminho ?? "").trim()) {
+      if ((await situacaoDoPrograma(payload, id)) !== "rascunho") return { ok: false, erro: ERRO_TOPO_OBRIGATORIO };
+    }
     return await gravarImagem(payload, id, pagina, usuario);
   } catch (e) {
     console.error("[removerImagemPrograma]", e);

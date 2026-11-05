@@ -517,7 +517,12 @@ describe("enviarImagemPrograma", () => {
     });
     expect(await enviarImagemPrograma("4", { tipo: "topo" }, arquivo("application/pdf"), usuario)).toEqual({
       ok: false,
-      erro: "Envie uma imagem JPEG, PNG, WebP, AVIF ou SVG.",
+      erro: "Envie uma imagem JPEG, PNG, WebP ou AVIF.",
+    });
+    // SVG fica de fora: o otimizador de imagens do Next recusa.
+    expect(await enviarImagemPrograma("4", { tipo: "topo" }, arquivo("image/svg+xml"), usuario)).toEqual({
+      ok: false,
+      erro: "Envie uma imagem JPEG, PNG, WebP ou AVIF.",
     });
     expect(await enviarImagemPrograma("4", { tipo: "forjado" } as never, arquivo(), usuario)).toEqual({
       ok: false,
@@ -541,5 +546,37 @@ describe("removerImagemPrograma", () => {
     obterPayloadMock.mockResolvedValue(q);
     await removerImagemPrograma("4", { tipo: "cartao" }, usuario);
     expect(paginaGravadaNoUpdate(q).data.pagina.cartao).toEqual({ ...PAGINA_GRAVADA.cartao, imagem: null });
+  });
+});
+
+describe("removerImagemPrograma — topo de programa publicado (R29)", () => {
+  const ERRO = "O programa publicado precisa de uma imagem do topo. Envie outra antes de remover esta.";
+  const semCaminho = { ...PAGINA_GRAVADA, heroImagem: 9, heroImagemCaminho: "" };
+
+  it("publicado sem caminho legado para voltar: recusa e não grava", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: semCaminho } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "topo" }, usuario)).toEqual({ ok: false, erro: ERRO });
+    expect(p.update).not.toHaveBeenCalled();
+  });
+
+  it("publicado com alterações pendentes também recusa (o programa segue no ar)", async () => {
+    const p = payloadFalso({ statusUltima: "draft", programaGravado: { ...GRAVADO_EDUTEC, pagina: { ...semCaminho, heroImagemCaminho: null } } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "topo" }, usuario)).toEqual({ ok: false, erro: ERRO });
+    expect(p.update).not.toHaveBeenCalled();
+  });
+
+  it("publicado com caminho legado: remove (o site volta ao caminho)", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: { ...PAGINA_GRAVADA, heroImagem: 9 } } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "topo" }, usuario)).toEqual({ ok: true });
+    expect(paginaGravadaNoUpdate(p).data.pagina.heroImagem).toBeNull();
+  });
+
+  it("rascunho (nunca publicado) sem caminho: remove", async () => {
+    const p = payloadFalso({ statusPrincipal: "draft", statusUltima: "draft", programaGravado: { pagina: semCaminho } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "topo" }, usuario)).toEqual({ ok: true });
   });
 });

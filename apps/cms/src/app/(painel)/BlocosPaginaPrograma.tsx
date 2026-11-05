@@ -11,6 +11,7 @@ import {
 import { CampoMarkdown } from "./crm/CampoMarkdown";
 import { CampoArea, CampoSelect, CampoTexto } from "./crm/CamposCrm";
 import { EditorListaCatalogo } from "./EditorListaCatalogo";
+import { identificacaoDaLinha } from "./rotuloImagemPrograma";
 import { UploadImagemPrograma } from "./UploadImagemPrograma";
 
 /**
@@ -113,6 +114,7 @@ export function BlocosPaginaPrograma({ pagina: p, onMudar, slug, programaId }: B
           programaId={programaId}
           alvo={{ tipo: "topo" }}
           rotulo="Imagem do topo — imagem enviada"
+          identificacao="imagem do topo"
           midiaId={p.heroImagemId}
           onMudou={campo("heroImagemId")}
         />
@@ -188,6 +190,7 @@ export function BlocosPaginaPrograma({ pagina: p, onMudar, slug, programaId }: B
             programaId={programaId}
             alvo={linha.linhaId === "" ? null : { tipo: "coordenacao", linhaId: linha.linhaId }}
             rotulo={`Coordenação ${i + 1} — imagem enviada`}
+            identificacao={identificacaoDaLinha("Coordenação", linha.nome, i)}
             midiaId={linha.imagemId}
             onMudou={imagemDaLinha("coordenacao", i)}
           />
@@ -214,6 +217,7 @@ export function BlocosPaginaPrograma({ pagina: p, onMudar, slug, programaId }: B
             programaId={programaId}
             alvo={linha.linhaId === "" ? null : { tipo: "especialista", linhaId: linha.linhaId }}
             rotulo={`Especialista ${i + 1} — imagem enviada`}
+            identificacao={identificacaoDaLinha("Especialista", linha.nome, i)}
             midiaId={linha.imagemId}
             onMudou={imagemDaLinha("especialistas", i)}
           />
@@ -289,6 +293,7 @@ export function BlocosPaginaPrograma({ pagina: p, onMudar, slug, programaId }: B
           programaId={programaId}
           alvo={{ tipo: "cartao" }}
           rotulo="Imagem do cartão — imagem enviada"
+          identificacao="imagem do cartão"
           midiaId={p.cartao.imagemId}
           onMudou={cartao("imagemId")}
         />

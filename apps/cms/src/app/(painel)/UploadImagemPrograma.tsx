@@ -5,15 +5,18 @@ import { useId, useRef, useState, useTransition } from "react";
 import type { AlvoImagemPrograma } from "@/lib/cms/paginaProgramaCatalogo";
 
 import { enviarImagemProgramaCatalogoCrm, removerImagemProgramaCatalogoCrm } from "./acoesCatalogo";
+import { nomeAcessivelAcao } from "./rotuloImagemPrograma";
 
-/** Os tipos que a coleção `media` aceita como imagem. */
-const ACEITOS = "image/jpeg,image/png,image/webp,image/avif,image/svg+xml";
+/** Os tipos aceitos (sem SVG: o otimizador de imagens do Next recusa). */
+const ACEITOS = "image/jpeg,image/png,image/webp,image/avif";
 
 interface UploadImagemProgramaProps {
   /** `null` = programa ainda não salvo. */
   programaId: string | null;
   alvo: AlvoImagemPrograma | null;
   rotulo: string;
+  /** De quem é a imagem ("Imagem do topo", "Especialista Ana Lima"…), no nome acessível dos botões. */
+  identificacao: string;
   /** Id da media vinculada, "" se não há. */
   midiaId: string;
   /** Depois de enviar/remover: o novo id ("" ao remover), para o formulário não sobrescrever no próximo salvar. */
@@ -25,7 +28,7 @@ interface UploadImagemProgramaProps {
  * padrão do `CampoUpload` da capa do evento. A media vence o caminho
  * `/img/…`; removê-la devolve o caminho. Grava na hora (fora do Salvar).
  */
-export function UploadImagemPrograma({ programaId, alvo, rotulo, midiaId, onMudou }: UploadImagemProgramaProps) {
+export function UploadImagemPrograma({ programaId, alvo, rotulo, identificacao, midiaId, onMudou }: UploadImagemProgramaProps) {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [enviando, iniciar] = useTransition();
@@ -38,6 +41,8 @@ export function UploadImagemPrograma({ programaId, alvo, rotulo, midiaId, onMudo
       : alvo === null
         ? "Salve o programa para enviar a imagem desta linha."
         : null;
+
+  const textoEnviar = enviando ? "Enviando…" : midiaId !== "" ? "Trocar imagem" : "Enviar imagem";
 
   function aoEscolher(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -92,11 +97,23 @@ export function UploadImagemPrograma({ programaId, alvo, rotulo, midiaId, onMudo
             disabled={enviando}
             aria-labelledby={`${id}-rot`}
           />
-          <button type="button" className="pcms-btn pcms-btn--ghost" onClick={() => inputRef.current?.click()} disabled={enviando}>
-            {enviando ? "Enviando…" : midiaId !== "" ? "Trocar imagem" : "Enviar imagem"}
+          <button
+            type="button"
+            className="pcms-btn pcms-btn--ghost"
+            onClick={() => inputRef.current?.click()}
+            disabled={enviando}
+            aria-label={nomeAcessivelAcao(textoEnviar, identificacao)}
+          >
+            {textoEnviar}
           </button>
           {midiaId !== "" && (
-            <button type="button" className="pcms-btn pcms-btn--ghost" onClick={remover} disabled={enviando}>
+            <button
+              type="button"
+              className="pcms-btn pcms-btn--ghost"
+              onClick={remover}
+              disabled={enviando}
+              aria-label={nomeAcessivelAcao("Remover imagem enviada", identificacao)}
+            >
               Remover imagem enviada
             </button>
           )}
