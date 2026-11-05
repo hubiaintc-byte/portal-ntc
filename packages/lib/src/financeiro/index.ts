@@ -6,3 +6,6 @@ export * from "./receitas";
 export * from "./custos";
 export * from "./reconhecimento";
 export * from "./eventos";
+export * from "./consolidado";
+export * from "./agregados";
+export * from "./csv";
