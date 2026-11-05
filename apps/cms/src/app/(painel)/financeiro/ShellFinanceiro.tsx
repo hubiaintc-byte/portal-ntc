@@ -11,6 +11,8 @@ import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { AreaEvento, EventoNaoEncontrado } from "./eventos/AreaEvento";
 import { aplicarFiltrosRecebidos, ESTADO_LISTA_INICIAL, type EstadoListaEventos } from "./eventos/dadosEventos";
 import { TelaEventos } from "./eventos/TelaEventos";
+import { aplicarFiltrosReceber, FILTROS_RECEBER_INICIAIS, type FiltrosReceber } from "./receber/dadosReceber";
+import { TelaReceber } from "./receber/TelaReceber";
 import { RaizFin05Contexto } from "./ui/PortalFin05";
 import { useToasts, type MostrarToast } from "./ui/Toasts";
 import { TelaVisaoExecutiva } from "./visao/TelaVisaoExecutiva";
@@ -142,6 +144,8 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
   const [filtrosVisao, setFiltrosVisao] = useState<FiltrosVisao>(FILTROS_VISAO_INICIAIS);
   // Estado da lista de Eventos (filtros, busca, Cards/Lista, ordem), como o `UI.events`.
   const [listaEventos, setListaEventos] = useState<EstadoListaEventos>(ESTADO_LISTA_INICIAL);
+  // Recorte de Receber (filtros e busca), como o `UI.fin`.
+  const [filtrosReceber, setFiltrosReceber] = useState<FiltrosReceber>(FILTROS_RECEBER_INICIAIS);
   // Raiz `.fin05` para os portais das camadas fixas (gaveta, menus, toasts).
   const [raiz, setRaiz] = useState<HTMLDivElement | null>(null);
   // Toasts no casco: um "Evento criado" sobrevive à navegação para a área do evento.
@@ -154,6 +158,7 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
     // Filtros levados a Eventos (ex.: a faixa por status da Visão Executiva) entram na lista.
     const filtros = extra?.filtros;
     if (tela === "eventos" && filtros) setListaEventos((s) => aplicarFiltrosRecebidos(s, filtros));
+    if (tela === "receber" && filtros) setFiltrosReceber((s) => aplicarFiltrosReceber(s, filtros));
     setEstado(estadoDe(tela, extra));
     window.scrollTo({ top: 0 });
   };
@@ -210,7 +215,9 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
           {estado.tela === "eventos" && estado.eventoId && !eventoAberto && (
             <EventoNaoEncontrado id={estado.eventoId} aoVoltar={() => irPara("eventos")} />
           )}
-          {estado.tela === "receber" && <EmConstrucao titulo={ROTULO.receber} {...props} />}
+          {estado.tela === "receber" && (
+            <TelaReceber {...props} filtros={filtrosReceber} aoMudarFiltros={setFiltrosReceber} />
+          )}
           {estado.tela === "pagar" && <EmConstrucao titulo={ROTULO.pagar} {...props} />}
         </div>
       </div>
