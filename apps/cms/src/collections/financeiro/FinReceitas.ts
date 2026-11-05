@@ -2,6 +2,8 @@ import type { CollectionConfig } from "payload";
 
 import { LISTAS_FIN } from "@ntc/lib";
 
+import { bloquearReceitaComFaturamento } from "../../lib/financeiro/exclusao";
+
 import {
   acessoFin,
   CENTROS_CUSTO,
@@ -27,7 +29,7 @@ export const FinReceitas: CollectionConfig = {
   typescript: { interface: "FinReceita" },
   admin: { useAsTitle: "cliente", group: "Financeiro" },
   access: acessoFin(["fin.eventos", "fin.receber"]),
-  hooks: hooksAuditoriaFin,
+  hooks: { ...hooksAuditoriaFin, beforeDelete: [bloquearReceitaComFaturamento] },
   fields: [
     { name: "evento", type: "relationship", relationTo: "fin-eventos", index: true },
     lista("tipoLancamento", TIPOS_LANCAMENTO),

@@ -80,3 +80,11 @@ describe("access das coleções fin-*", () => {
     }
   });
 });
+
+describe("guardas de exclusão registradas", () => {
+  it("fin-eventos, fin-receitas, fin-custos e fin-contas têm beforeDelete; parcela e título excluem livre", () => {
+    for (const c of [FinEventos, FinReceitas, FinCustos, FinContas])
+      expect(c.hooks?.beforeDelete?.length).toBe(1);
+    for (const c of [FinFaturamentos, FinPagamentos]) expect(c.hooks?.beforeDelete).toBeUndefined();
+  });
+});

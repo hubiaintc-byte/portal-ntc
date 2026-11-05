@@ -2,6 +2,8 @@ import type { CollectionConfig } from "payload";
 
 import { LISTAS_FIN } from "@ntc/lib";
 
+import { bloquearContaEmUso } from "../../lib/financeiro/exclusao";
+
 import { acessoFin, centavos, data, hooksAuditoriaFin, lista, texto, textoLongo } from "./campos";
 
 /** Conta financeira — cadastro mínimo emprestado da Fase 2 (spec §3.4). */
@@ -11,7 +13,7 @@ export const FinContas: CollectionConfig = {
   typescript: { interface: "FinConta" },
   admin: { useAsTitle: "nome", group: "Financeiro" },
   access: acessoFin(["fin.receber", "fin.pagar"]),
-  hooks: hooksAuditoriaFin,
+  hooks: { ...hooksAuditoriaFin, beforeDelete: [bloquearContaEmUso] },
   fields: [
     { name: "nome", type: "text", required: true },
     lista("tipo", LISTAS_FIN.tiposConta),

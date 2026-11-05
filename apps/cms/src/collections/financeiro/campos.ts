@@ -48,11 +48,18 @@ export function validarNaLista(lista: readonly string[]) {
       : "Valor fora da lista permitida.";
 }
 
-/** Data civil `AAAA-MM-DD` (texto, sem fuso — como no protótipo). */
+/** Data civil `AAAA-MM-DD` (texto, sem fuso — como no protótipo), conferida no calendário. */
 export function validarData(v: unknown): true | string {
-  return vazio(v) || (typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v))
+  if (vazio(v)) return true;
+  const msg = "Data no formato AAAA-MM-DD.";
+  if (typeof v !== "string") return msg;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+  if (!m) return msg;
+  const [ano, mes, dia] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const d = new Date(Date.UTC(ano, mes - 1, dia));
+  return d.getUTCFullYear() === ano && d.getUTCMonth() === mes - 1 && d.getUTCDate() === dia
     ? true
-    : "Data no formato AAAA-MM-DD.";
+    : msg;
 }
 
 /** Competência `AAAA-MM`. */

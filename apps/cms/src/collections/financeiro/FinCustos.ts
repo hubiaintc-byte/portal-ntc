@@ -2,6 +2,8 @@ import type { CollectionConfig } from "payload";
 
 import { LISTAS_FIN } from "@ntc/lib";
 
+import { bloquearCustoComPagamento } from "../../lib/financeiro/exclusao";
+
 import {
   acessoFin,
   CENTROS_CUSTO,
@@ -26,7 +28,7 @@ export const FinCustos: CollectionConfig = {
   typescript: { interface: "FinCusto" },
   admin: { useAsTitle: "descricao", group: "Financeiro" },
   access: acessoFin(["fin.eventos", "fin.pagar"]),
-  hooks: hooksAuditoriaFin,
+  hooks: { ...hooksAuditoriaFin, beforeDelete: [bloquearCustoComPagamento] },
   fields: [
     { name: "evento", type: "relationship", relationTo: "fin-eventos", index: true },
     lista("tipoLancamento", TIPOS_LANCAMENTO),

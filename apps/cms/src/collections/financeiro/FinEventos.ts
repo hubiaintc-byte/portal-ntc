@@ -2,6 +2,8 @@ import type { CollectionConfig } from "payload";
 
 import { LISTAS_FIN } from "@ntc/lib";
 
+import { bloquearFinEventoComLancamentos } from "../../lib/financeiro/exclusao";
+
 import {
   acessoFin,
   data,
@@ -26,7 +28,7 @@ export const FinEventos: CollectionConfig = {
   typescript: { interface: "FinEvento" },
   admin: { useAsTitle: "nome", group: "Financeiro" },
   access: acessoFin(["fin.eventos"]),
-  hooks: hooksAuditoriaFin,
+  hooks: { ...hooksAuditoriaFin, beforeDelete: [bloquearFinEventoComLancamentos] },
   fields: [
     {
       name: "eventoComercial",
