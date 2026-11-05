@@ -34,10 +34,12 @@ interface GavetaProps {
   aoFechar: () => void;
   /** Conteúdo do `.ov-foot`; sem ele, a gaveta não tem rodapé. */
   rodape?: ReactNode;
+  /** Corpo sem o recuo do `.ov-body` (o protótipo zera o padding na gaveta de pendências). */
+  corpoSemRecuo?: boolean;
   children: ReactNode;
 }
 
-export function Gaveta({ titulo, eyebrow, sub, aoFechar, rodape, children }: GavetaProps) {
+export function Gaveta({ titulo, eyebrow, sub, aoFechar, rodape, corpoSemRecuo, children }: GavetaProps) {
   const caixa = useRef<HTMLDivElement>(null);
   const fechar = useRef<HTMLButtonElement>(null);
   const [visivel, setVisivel] = useState(false);
@@ -114,7 +116,7 @@ export function Gaveta({ titulo, eyebrow, sub, aoFechar, rodape, children }: Gav
             <Icone nome="x" />
           </button>
         </div>
-        <div className="ov-body">{children}</div>
+        <div className={`ov-body${corpoSemRecuo ? " sem-recuo" : ""}`}>{children}</div>
         {rodape !== undefined && <div className="ov-foot">{rodape}</div>}
       </div>
     </PortalFin05>

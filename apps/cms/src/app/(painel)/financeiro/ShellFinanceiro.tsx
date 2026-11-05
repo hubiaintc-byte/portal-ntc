@@ -9,6 +9,7 @@ import type { AcessoPainel, CapacidadesPainel } from "@/lib/cms/telas";
 
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { RaizFin05Contexto } from "./ui/PortalFin05";
+import { TelaVisaoExecutiva } from "./visao/TelaVisaoExecutiva";
 
 /**
  * Casco do módulo Financeiro (spec §3.3): a moldura é a do painel
@@ -111,8 +112,8 @@ function estadoDe(tela: TelaFinId, extra?: ExtraNavegacao): EstadoTelaFin {
 }
 
 /**
- * Placeholder desta task; cada tela entra no lugar dela nas Tasks 12–17 e já
- * recebe o contrato completo (`PropsTelaFin`).
+ * Placeholder das telas ainda não portadas; cada uma entra no lugar dela nas
+ * Tasks 13–17 e já recebe o contrato completo (`PropsTelaFin`).
  */
 function EmConstrucao({ titulo }: PropsTelaFin & { titulo: string }) {
   return (
@@ -176,7 +177,7 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
           </div>
         )}
         <div className="view-enter" key={`${estado.tela}:${estado.tela === "eventos" ? (estado.eventoId ?? "") : ""}`}>
-          {estado.tela === "visao" && <EmConstrucao titulo={ROTULO.visao} {...props} />}
+          {estado.tela === "visao" && <TelaVisaoExecutiva {...props} />}
           {estado.tela === "eventos" && <EmConstrucao titulo={ROTULO.eventos} {...props} />}
           {estado.tela === "receber" && <EmConstrucao titulo={ROTULO.receber} {...props} />}
           {estado.tela === "pagar" && <EmConstrucao titulo={ROTULO.pagar} {...props} />}

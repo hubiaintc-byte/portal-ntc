@@ -1,6 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { compacto, lerCampoDinheiro, porcentagem, resumoGrafico, textoAoSairDinheiro, textoDeCentavos } from "./formato";
+import {
+  compacto,
+  inteiro,
+  intervaloDatas,
+  lerCampoDinheiro,
+  moeda,
+  porcentagem,
+  resumoGrafico,
+  textoAoSairDinheiro,
+  textoDeCentavos,
+  tipoCurto,
+} from "./formato";
 
 describe("resumoGrafico (aria-label dos gráficos, spec §5)", () => {
   it("livro vazio não produz NaN", () => {
@@ -65,5 +76,33 @@ describe("lerCampoDinheiro e textoAoSairDinheiro (CampoDinheiro valida ao sair)"
     expect(textoAoSairDinheiro("1234,5")).toBe("1.234,50");
     expect(textoAoSairDinheiro("abc")).toBe("abc");
     expect(textoAoSairDinheiro("")).toBe("");
+  });
+});
+
+describe("formatação da Visão Executiva (fmtBRL, fmtPct, fmtNum, fmtRange, tipoShort)", () => {
+  it("moeda: traço no zero e na ausência, R$ 0,00 sem traço, sinal −", () => {
+    expect(moeda(123456)).toBe("R$ 1.234,56");
+    expect(moeda(-5000)).toBe("−R$ 50,00");
+    expect(moeda(0)).toBe("—");
+    expect(moeda(0, false)).toBe("R$ 0,00");
+    expect(moeda(null)).toBe("—");
+    expect(moeda(Number.NaN, false)).toBe("—");
+  });
+
+  it("porcentagem com casas e ÷ 0", () => {
+    expect(porcentagem(0.625, 0)).toBe("63%");
+    expect(porcentagem(null, 0)).toBe("—");
+    expect(porcentagem(1 / 0, 0)).toBe("—");
+  });
+
+  it("inteiro, intervalo de datas e tipo curto", () => {
+    expect(inteiro(1234)).toBe("1.234");
+    expect(inteiro(Number.NaN)).toBe("—");
+    expect(intervaloDatas("2026-08-05", "2026-08-07")).toBe("05–07/08/2026");
+    expect(intervaloDatas("2026-08-30", "2026-09-02")).toBe("30/08/2026 – 02/09/2026");
+    expect(intervaloDatas("2026-08-05", "2026-08-05")).toBe("05/08/2026");
+    expect(intervaloDatas("", "")).toBe("—");
+    expect(tipoCurto("In Company / Projeto B2G")).toBe("In Company / B2G");
+    expect(tipoCurto("Módulo")).toBe("Módulo");
   });
 });

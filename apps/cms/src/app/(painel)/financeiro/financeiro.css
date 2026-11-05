@@ -672,4 +672,19 @@
   & .hist-topo { display: flex; justify-content: space-between; gap: 12px; }
   & .hist-quem { font-size: 12.5px; margin-top: 2px; }
   & .hist-mudancas { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--grafite); }
+  /* Visão Executiva. Itens que no protótipo são `div[role=link|button]`
+     (`.aitem`, `.ritem`, `.status-cell`) viram `<button>`: zera o desenho
+     do navegador com especificidade baixa (`:where`), para as regras do
+     protótipo (bordas, primeiro filho, media queries) continuarem valendo. */
+  & :where(button.aitem, button.ritem, button.status-cell) { width: 100%; margin: 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; }
+  /* Mesmo item sem destino (tela que a pessoa não tem, ou da Fase 2). */
+  & .sem-link { cursor: default; }
+  & .sem-link:hover { background: none; }
+  /* `resultHero` sem a célula de comissões (Fase 1): três células. */
+  & .hero-cells.tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 900px) {
+    & .hero-cells.tres { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  /* Gaveta de pendências: o protótipo zera o padding do corpo. */
+  & .ov-body.sem-recuo { padding: 0; }
 }

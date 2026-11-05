@@ -20,10 +20,49 @@ export function compacto(centavos: number): string {
   return v.toLocaleString("pt-BR");
 }
 
-/** `fmtPct(v, 1)` do protótipo; não finito (÷ 0) ⇒ "—". */
-export function porcentagem(f: number): string {
-  if (!Number.isFinite(f)) return "—";
-  return `${(f * 100).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+/** `fmtPct(v, casas)` do protótipo (padrão 1 casa); `null` ou não finito (÷ 0) ⇒ "—". */
+export function porcentagem(f: number | null, casas = 1): string {
+  if (f === null || !Number.isFinite(f)) return "—";
+  return `${(f * 100).toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas })}%`;
+}
+
+/**
+ * `fmtBRL(v, { dash })` do protótipo: centavos → "R$ 1.234,56", negativo com
+ * "−" na frente. Sem valor ⇒ "—"; zero ⇒ "—", a menos que `traco` seja
+ * `false` (o `{ dash: false }` do protótipo, que mostra "R$ 0,00").
+ */
+export function moeda(c: Centavos | null | undefined, traco = true): string {
+  if (c === null || c === undefined || !Number.isFinite(c)) return "—";
+  if (c === 0 && traco) return "—";
+  const s = formatarReais(Math.abs(c));
+  return c < 0 ? `−${s}` : s;
+}
+
+/** `fmtNum` do protótipo: inteiro com milhar pt-BR; não finito ⇒ "—". */
+export function inteiro(v: number): string {
+  return Number.isFinite(v) ? NUM_INT.format(v) : "—";
+}
+
+/** `fmtDate`: `AAAA-MM-DD` → `DD/MM/AAAA`; vazio ⇒ "—". */
+export function dataCurta(iso: string | undefined): string {
+  if (!iso) return "—";
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+/** `fmtRange(a, b)` do protótipo: "05–07/08/2026" no mesmo mês, senão "dd/mm/aaaa – dd/mm/aaaa". */
+export function intervaloDatas(a: string | undefined, b: string | undefined): string {
+  if (!a) return "—";
+  if (!b || a === b) return dataCurta(a);
+  const [ya, ma, da] = a.split("-");
+  const [yb, mb, db] = b.split("-");
+  if (ya === yb && ma === mb) return `${da}–${db}/${mb}/${yb}`;
+  return `${dataCurta(a)} – ${dataCurta(b)}`;
+}
+
+/** `tipoShort` do protótipo: rótulo curto do tipo de operação. */
+export function tipoCurto(tipo: string): string {
+  return tipo === "In Company / Projeto B2G" ? "In Company / B2G" : tipo;
 }
 
 /** Resumo textual dos números de um gráfico, para o `aria-label` (spec §5). */
