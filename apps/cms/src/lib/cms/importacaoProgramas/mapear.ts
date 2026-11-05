@@ -11,7 +11,7 @@
  * imprime o relatório).
  */
 
-import { textoParaLexical } from "@/lib/lexicalBuilders";
+import { textoParaLexical } from "../../lexicalBuilders";
 
 import { extrairCartoesDeResultado, htmlParaLexical, listaParaLexical } from "../htmlParaLexical";
 import type { DocumentoLexical } from "../htmlParaLexical";
