@@ -24,6 +24,12 @@ export function validarCentavos(v: unknown): true | string {
     : "Valor em centavos inteiros, não negativo.";
 }
 
+/** Dinheiro com sinal (saldo inicial de conta: o protótipo aceita negativo). Centavos inteiros. */
+export function validarCentavosComSinal(v: unknown): true | string {
+  if (vazio(v)) return true;
+  return typeof v === "number" && Number.isInteger(v) ? true : "Valor em centavos inteiros.";
+}
+
 /** Quantidades e contagens: inteiro ≥ 0. */
 export function validarInteiro(v: unknown): true | string {
   if (vazio(v)) return true;
@@ -89,6 +95,11 @@ export const centavos = (name: string): Field => ({
   name,
   type: "number",
   validate: validarCentavos,
+});
+export const centavosComSinal = (name: string): Field => ({
+  name,
+  type: "number",
+  validate: validarCentavosComSinal,
 });
 export const inteiro = (name: string): Field => ({
   name,

@@ -39,8 +39,20 @@ async function contar(
   return r.totalDocs;
 }
 
+/**
+ * Recusa de regra do Financeiro, com mensagem do protótipo, pensada para a
+ * tela. É a única `APIError` cuja mensagem a escrita (`escrita.ts`) repassa:
+ * as demais 400 do Payload (QueryError, ValidationError…) trazem detalhes
+ * internos e viram a mensagem genérica.
+ */
+export class RecusaFinanceiro extends APIError {
+  constructor(mensagem: string) {
+    super(mensagem, 400, null, true);
+  }
+}
+
 function recusarSe(r: ResultadoValidacao): void {
-  if (!r.ok) throw new APIError(r.erro, 400);
+  if (!r.ok) throw new RecusaFinanceiro(r.erro);
 }
 
 const LIVRO_VAZIO: LivroFinanceiro = {
@@ -107,7 +119,7 @@ export const MSG_EVENTO_FIN_COM_LANCAMENTOS =
 export const bloquearFinEventoComLancamentos: CollectionBeforeDeleteHook = async ({ id, req }) => {
   const receitas = await contar(req, "fin-receitas", { evento: { equals: id } });
   const custos = await contar(req, "fin-custos", { evento: { equals: id } });
-  if (receitas > 0 || custos > 0) throw new APIError(MSG_EVENTO_FIN_COM_LANCAMENTOS, 400);
+  if (receitas > 0 || custos > 0) throw new RecusaFinanceiro(MSG_EVENTO_FIN_COM_LANCAMENTOS);
 };
 
 /**
@@ -130,7 +142,7 @@ export const bloquearEventoComFinanceiro: CollectionBeforeDeleteHook = async ({ 
   const receitas = await contar(req, "fin-receitas", { evento: { in: ids } });
   const custos = await contar(req, "fin-custos", { evento: { in: ids } });
   if (receitas > 0 || custos > 0) {
-    throw new APIError("Este evento tem lançamentos no Financeiro e não pode ser apagado.", 400);
+    throw new RecusaFinanceiro("Este evento tem lançamentos no Financeiro e não pode ser apagado.");
   }
   for (const finId of ids) {
     await req.payload.delete({ collection: "fin-eventos", id: finId, req });

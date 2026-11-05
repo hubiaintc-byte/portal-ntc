@@ -392,3 +392,62 @@ describe("evento", () => {
     expect(banco.payload.create.mock.calls[0]?.[0].data).toEqual(d);
   });
 });
+
+describe("fix round 1 — erros internos e entradas forjadas", () => {
+  it("só a recusa do financeiro chega à tela; APIError 400 interno e ValidationError viram a mensagem genérica", async () => {
+    const { APIError, ValidationError } = await import("payload");
+    const { RecusaFinanceiro } = await import("./exclusao");
+    const erro = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const casos: Array<[unknown, string]> = [
+      [new RecusaFinanceiro("Mensagem do protótipo."), "Mensagem do protótipo."],
+      [new APIError("relação interna fin_pagamentos.custo_id", 400), "Não foi possível excluir. Tente novamente."],
+      [new ValidationError({ collection: "fin-pagamentos", errors: [{ path: "valor", message: "invalid" }] }), "Não foi possível excluir. Tente novamente."],
+    ];
+    for (const [e, msg] of casos) {
+      const banco = bancoFalso({ "fin-eventos": [{ id: 1 }], "fin-custos": [{ id: 6, evento: 1 }], "fin-pagamentos": [{ id: 7, custo: 6 }] });
+      banco.payload.delete.mockRejectedValueOnce(e);
+      expect(await escrita.excluirPagamentoFin("7", usuario)).toEqual({ ok: false, erro: msg });
+    }
+    erro.mockRestore();
+  });
+
+  it("id e dados forjados são recusados sem tocar o banco", async () => {
+    const banco = bancoFalso();
+    const INVALIDO = { ok: false, erro: "Dados do formulário inválidos." };
+    expect(await escrita.salvarEventoFin(123 as never, dadosEvento(), usuario)).toEqual(INVALIDO);
+    expect(await escrita.salvarEventoFin(null, null as never, usuario)).toEqual(INVALIDO);
+    expect(await escrita.salvarReceitaFin(null, null as never, usuario)).toEqual(INVALIDO);
+    expect(await escrita.salvarCustoFin(null, "x" as never, usuario)).toEqual(INVALIDO);
+    expect(await escrita.salvarFaturamentoFin(null, undefined as never, usuario)).toEqual(INVALIDO);
+    expect(await escrita.salvarPagamentoFin({} as never, null as never, usuario)).toEqual(INVALIDO);
+    expect(await escrita.salvarContaFin(null, null as never, usuario)).toEqual(INVALIDO);
+    expect(await escrita.salvarEtapasFin(7 as never, [], usuario)).toEqual(INVALIDO);
+    expect(await escrita.excluirEventoFin(undefined as never, usuario)).toEqual(INVALIDO);
+    expect(await escrita.excluirContaFin({} as never, usuario)).toEqual(INVALIDO);
+    expect(banco.ops).toEqual([]);
+  });
+
+  it("receita nova com etapa inválida é recusada antes de gravar", async () => {
+    const banco = bancoFalso({ "fin-eventos": [{ id: 1, nome: "E" }] });
+    const etapas = [{ nome: "M01", base: "valor" as const, valor: -10, percentual: 0, concluida: false, dataConclusao: "" }];
+    expect(await escrita.salvarReceitaFin(null, dadosReceita({ etapas }), usuario)).toEqual({
+      ok: false,
+      erro: "O valor da etapa não pode ser negativo.",
+      campo: "etapas",
+    });
+    expect(banco.escritas()).toEqual([]);
+  });
+
+  it("conta informada e inexistente é recusada no faturamento e no pagamento, mesmo sem recebimento", async () => {
+    const banco = bancoFalso({
+      "fin-eventos": [{ id: 1, nome: "E" }],
+      "fin-receitas": [receitaDoc(3)],
+      "fin-custos": [{ id: 6, evento: 1, qtde: 1, valorUnitPrev: 1000 }],
+    });
+    const CONTA = { ok: false, erro: "Conta financeira inexistente.", campo: "contaId" };
+    expect(await escrita.salvarFaturamentoFin(null, dadosFaturamento({ contaId: "99" }), usuario)).toEqual(CONTA);
+    const pag: DadosPagamentoFin = { custoId: "6", documento: "", vencimento: "2026-11-10", valor: 500, dataPagamento: "", valorPago: 0, contaId: "99", observacao: "" };
+    expect(await escrita.salvarPagamentoFin(null, pag, usuario)).toEqual(CONTA);
+    expect(banco.escritas()).toEqual([]);
+  });
+});

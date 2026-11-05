@@ -6,6 +6,7 @@ import {
   bloquearEventoComFinanceiro,
   bloquearFinEventoComLancamentos,
   bloquearReceitaComFaturamento,
+  RecusaFinanceiro,
 } from "./exclusao";
 
 type Hook = (args: Record<string, unknown>) => Promise<void>;
@@ -41,6 +42,7 @@ describe("bloquearEventoComFinanceiro (beforeDelete de eventos-comerciais)", () 
       message: MENSAGEM_CRM,
       status: 400,
     });
+    await expect(hook({ id: 4, req })).rejects.toBeInstanceOf(RecusaFinanceiro);
     expect(payload.find).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: "fin-eventos",
@@ -133,6 +135,7 @@ for (const g of guardas) {
         message: g.mensagem,
         status: 400,
       });
+      await expect(g.hook({ id: 3, req })).rejects.toBeInstanceOf(RecusaFinanceiro);
       for (const c of g.consultas) expect(payload.count).toHaveBeenCalledWith({ ...c, req });
     });
 

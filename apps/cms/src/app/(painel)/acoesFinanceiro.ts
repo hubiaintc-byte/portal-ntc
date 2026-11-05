@@ -138,6 +138,12 @@ export async function excluirContaFinAcao(id: string): Promise<ResultadoFin> {
 /** Histórico de um lançamento: qualquer tela `fin.*`; `slug` só um dos seis `fin-*`. */
 export async function carregarHistoricoFinAcao(slug: string, id: string): Promise<ResultadoHistoricoFin> {
   if (!(await obterUsuarioCmsComTela(TELAS_FIN))) return RECUSADO;
-  if (!SLUGS_FIN.includes(slug) || typeof id !== "string" || !/^\d{1,15}$/.test(id.trim())) return RECUSADO;
-  return { ok: true, itens: await lerHistoricoFin(slug, String(Number(id.trim()))) };
+  if (typeof slug !== "string" || !SLUGS_FIN.includes(slug)) return RECUSADO;
+  if (typeof id !== "string" || !/^\d{1,15}$/.test(id.trim())) return RECUSADO;
+  try {
+    return { ok: true, itens: await lerHistoricoFin(slug, String(Number(id.trim()))) };
+  } catch (e) {
+    console.error("[carregarHistoricoFinAcao]", e);
+    return { ok: false, erro: "Não foi possível carregar o histórico. Tente novamente." };
+  }
 }

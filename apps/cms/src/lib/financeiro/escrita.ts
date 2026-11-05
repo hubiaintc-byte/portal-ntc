@@ -25,14 +25,14 @@ import {
   type LivroFinanceiro,
   type ResultadoValidacao,
 } from "@ntc/lib";
-import { APIError, type PayloadRequest } from "payload";
+import type { PayloadRequest } from "payload";
 
 import type { UsuarioAutenticado } from "@/lib/cms/autenticacao";
 import { acessoDoUsuario, temTela, type TelaPainel } from "@/lib/cms/telas";
 import { executarEmTransacao } from "@/lib/crm/transacao";
 import { obterPayload } from "@/lib/payloadClient";
 
-import { MSG_EVENTO_FIN_COM_LANCAMENTOS } from "./exclusao";
+import { MSG_EVENTO_FIN_COM_LANCAMENTOS, RecusaFinanceiro } from "./exclusao";
 import { lerLivroFinanceiro, mesclarEventos, type EventoComercialDoc } from "./leitura";
 
 /**
@@ -62,6 +62,8 @@ const ERRO_EXCLUIR = "Não foi possível excluir. Tente novamente.";
 const MSG_NAO_ENCONTRADO = "Registro não encontrado. Recarregue a página.";
 /** Mensagem do protótipo (`saveComissao`). */
 const MSG_EVENTO_INEXISTENTE = "Evento vinculado inexistente.";
+/** Mensagem do protótipo (`saveFatrec`/`savePagamento`). */
+const MSG_CONTA_INEXISTENTE = "Conta financeira inexistente.";
 const MSG_SEM_CADASTRO = "Complete o cadastro financeiro do evento antes de lançar nele.";
 const MSG_PENDENTE_SEM_CADASTRO = "Este evento ainda não tem cadastro financeiro.";
 const CRIT_POR_ETAPA = "Por etapa/módulo concluído";
@@ -81,6 +83,11 @@ function relacaoCanonica(v: unknown): string | null {
   return idCanonico(v);
 }
 
+/** Entrada vinda de Server Action: não confiar no tipo declarado. */
+const ehTexto = (v: unknown): v is string => typeof v === "string";
+const ehIdOuNulo = (v: unknown): v is string | null => v === null || typeof v === "string";
+const ehDados = (v: unknown): v is object => typeof v === "object" && v !== null && !Array.isArray(v);
+
 const paraRelacao = (id: string): number | null => (id ? Number(id) : null);
 
 // ------------------------------------------------------------- execução
@@ -91,9 +98,10 @@ function falhou(r: ResultadoValidacao): ResultadoFin | null {
 }
 
 /**
- * Roda `fn` na transação. Recusa de regra no nível da coleção (`APIError` 400
- * dos `beforeDelete`, com as mensagens do protótipo) chega à tela como está;
- * qualquer outra falha desfaz tudo e vira a mensagem genérica.
+ * Roda `fn` na transação. Só a recusa de regra das coleções (`RecusaFinanceiro`,
+ * lançada pelos `beforeDelete` com as mensagens do protótipo) chega à tela como
+ * está; qualquer outra falha — inclusive as `APIError` 400 do Payload, que
+ * trazem caminhos e campos internos — desfaz tudo e vira a mensagem genérica.
  */
 async function naTransacao(
   usuario: UsuarioAutenticado,
@@ -105,9 +113,7 @@ async function naTransacao(
     const payload = await obterPayload();
     return await executarEmTransacao(payload, usuario, fn);
   } catch (e) {
-    if (e instanceof APIError && e.status === 400 && e.name !== "ValidationError") {
-      return { ok: false, erro: e.message };
-    }
+    if (e instanceof RecusaFinanceiro) return { ok: false, erro: e.message };
     console.error(`[${rotulo}]`, e);
     return { ok: false, erro: erroGenerico };
   }
@@ -127,6 +133,12 @@ function conferirEvento(livro: LivroFinanceiro, eventoId: string): ResultadoFin 
   if (!eventoId) return null;
   const ev = livro.eventos.find((e) => e.id === eventoId && !e.cadastroPendente);
   return ev ? null : { ok: false, erro: MSG_EVENTO_INEXISTENTE, campo: "eventoId" };
+}
+
+/** Conta informada precisa existir, mesmo sem recebimento/baixa (senão bateria na FK). */
+function conferirConta(livro: LivroFinanceiro, contaId: string): ResultadoFin | null {
+  if (!contaId || livro.contas.some((c) => c.id === contaId)) return null;
+  return { ok: false, erro: MSG_CONTA_INEXISTENTE, campo: "contaId" };
 }
 
 /** `eventoId` do formulário: "" (corporativo), id canônico, ou recusa. */
@@ -212,6 +224,7 @@ function docDoEvento(d: DadosEventoFin): Record<string, unknown> {
  * comercial `n` (só se ele ainda não tiver um); id numérico altera.
  */
 export async function salvarEventoFin(id: string | null, dados: DadosEventoFin, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehIdOuNulo(id) || !ehDados(dados)) return DADOS_INVALIDOS;
   let comercialNovo: string | null = null;
   let finId: string | null = null;
   if (id !== null && id.startsWith(PREFIXO_CRM)) {
@@ -275,6 +288,7 @@ export async function salvarEventoFin(id: string | null, dados: DadosEventoFin, 
  * comercial nunca é apagado.
  */
 export async function excluirEventoFin(id: string, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehTexto(id)) return DADOS_INVALIDOS;
   if (typeof id === "string" && id.startsWith(PREFIXO_CRM)) return { ok: false, erro: MSG_PENDENTE_SEM_CADASTRO };
   const finId = idCanonico(id);
   if (finId === null) return DADOS_INVALIDOS;
@@ -332,6 +346,7 @@ function docDaReceita(d: DadosReceitaFin): Record<string, unknown> {
  * gravam as que vierem; na alteração não são tocadas.
  */
 export async function salvarReceitaFin(id: string | null, dados: DadosReceitaFin, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehIdOuNulo(id) || !ehDados(dados)) return DADOS_INVALIDOS;
   if (id !== null && idCanonico(id) === null) return DADOS_INVALIDOS;
   const ev = eventoDoLancamento(dados.eventoId);
   if (ehResultado(ev)) return ev;
@@ -342,7 +357,12 @@ export async function salvarReceitaFin(id: string | null, dados: DadosReceitaFin
     const a = alvo(id, livro.receitas);
     if (!ehAlvo(a)) return a;
     if ((!d.eventoId || (a.atual && !a.atual.eventoId)) && !podeCorporativo(usuario, "fin.receber")) return RECUSADO;
-    const erro = falhou(validarReceita(d, livro, a.id)) ?? conferirEvento(livro, d.eventoId);
+    // Na criação as etapas entram junto: validadas como em `salvarEtapasFin`.
+    const etapas = a.id === null ? limparEtapas(Array.isArray(d.etapas) ? d.etapas : []) : [];
+    const erro =
+      falhou(validarReceita(d, livro, a.id)) ??
+      conferirEvento(livro, d.eventoId) ??
+      (a.id === null ? falhou(validarEtapas(d, etapas)) : null);
     if (erro) return erro;
 
     const data = docDaReceita(d);
@@ -352,7 +372,7 @@ export async function salvarReceitaFin(id: string | null, dados: DadosReceitaFin
     }
     const criado = await req.payload.create({
       collection: "fin-receitas",
-      data: { ...data, etapas: limparEtapas(Array.isArray(d.etapas) ? d.etapas : []) },
+      data: { ...data, etapas },
       req,
     });
     return { ok: true, id: String(criado.id) };
@@ -379,6 +399,7 @@ function limparEtapas(etapas: EtapaReceita[]): EtapaReceita[] {
 
 /** Etapas de reconhecimento da receita (drawer "Etapas e reconhecimento econômico"). */
 export async function salvarEtapasFin(receitaId: string, etapas: EtapaReceita[], usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehTexto(receitaId)) return DADOS_INVALIDOS;
   if (idCanonico(receitaId) === null || !Array.isArray(etapas)) return DADOS_INVALIDOS;
   return naTransacao(usuario, "salvarEtapasFin", ERRO_SALVAR, async (req) => {
     const livro = await lerLivroFinanceiro(req);
@@ -401,6 +422,7 @@ export async function salvarEtapasFin(receitaId: string, etapas: EtapaReceita[],
 }
 
 export async function excluirReceitaFin(id: string, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehTexto(id)) return DADOS_INVALIDOS;
   if (idCanonico(id) === null) return DADOS_INVALIDOS;
   return naTransacao(usuario, "excluirReceitaFin", ERRO_EXCLUIR, async (req) => {
     const livro = await lerLivroFinanceiro(req);
@@ -421,6 +443,7 @@ export async function salvarFaturamentoFin(
   dados: DadosFaturamentoFin,
   usuario: UsuarioAutenticado,
 ): Promise<ResultadoFin> {
+  if (!ehIdOuNulo(id) || !ehDados(dados)) return DADOS_INVALIDOS;
   if (id !== null && idCanonico(id) === null) return DADOS_INVALIDOS;
   const receitaId = relacaoCanonica(dados.receitaId);
   const contaId = relacaoCanonica(dados.contaId);
@@ -436,7 +459,7 @@ export async function salvarFaturamentoFin(
       return !!r && !r.eventoId;
     };
     if ((corporativa(receitaId) || corporativa(a.atual?.receitaId)) && !podeCorporativo(usuario, "fin.receber")) return RECUSADO;
-    const erro = falhou(validarFaturamento(d, livro, a.id));
+    const erro = falhou(validarFaturamento(d, livro, a.id)) ?? conferirConta(livro, contaId);
     if (erro) return erro;
 
     const data = {
@@ -466,6 +489,7 @@ export async function salvarFaturamentoFin(
 
 /** Excluir parcela é livre (protótipo). */
 export async function excluirFaturamentoFin(id: string, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehTexto(id)) return DADOS_INVALIDOS;
   if (idCanonico(id) === null) return DADOS_INVALIDOS;
   return naTransacao(usuario, "excluirFaturamentoFin", ERRO_EXCLUIR, async (req) => {
     const livro = await lerLivroFinanceiro(req);
@@ -508,6 +532,7 @@ function docDoCusto(d: DadosCustoFin): Record<string, unknown> {
 }
 
 export async function salvarCustoFin(id: string | null, dados: DadosCustoFin, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehIdOuNulo(id) || !ehDados(dados)) return DADOS_INVALIDOS;
   if (id !== null && idCanonico(id) === null) return DADOS_INVALIDOS;
   const ev = eventoDoLancamento(dados.eventoId);
   if (ehResultado(ev)) return ev;
@@ -532,6 +557,7 @@ export async function salvarCustoFin(id: string | null, dados: DadosCustoFin, us
 }
 
 export async function excluirCustoFin(id: string, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehTexto(id)) return DADOS_INVALIDOS;
   if (idCanonico(id) === null) return DADOS_INVALIDOS;
   return naTransacao(usuario, "excluirCustoFin", ERRO_EXCLUIR, async (req) => {
     const livro = await lerLivroFinanceiro(req);
@@ -548,6 +574,7 @@ export async function excluirCustoFin(id: string, usuario: UsuarioAutenticado): 
 // ------------------------------------------------------------ pagamento
 
 export async function salvarPagamentoFin(id: string | null, dados: DadosPagamentoFin, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehIdOuNulo(id) || !ehDados(dados)) return DADOS_INVALIDOS;
   if (id !== null && idCanonico(id) === null) return DADOS_INVALIDOS;
   const custoId = relacaoCanonica(dados.custoId);
   const contaId = relacaoCanonica(dados.contaId);
@@ -563,7 +590,7 @@ export async function salvarPagamentoFin(id: string | null, dados: DadosPagament
       return !!c && !c.eventoId;
     };
     if ((corporativo(custoId) || corporativo(a.atual?.custoId)) && !podeCorporativo(usuario, "fin.pagar")) return RECUSADO;
-    const erro = falhou(validarPagamento(d, livro, a.id));
+    const erro = falhou(validarPagamento(d, livro, a.id)) ?? conferirConta(livro, contaId);
     if (erro) return erro;
 
     const data = {
@@ -587,6 +614,7 @@ export async function salvarPagamentoFin(id: string | null, dados: DadosPagament
 
 /** Excluir título é livre (protótipo). */
 export async function excluirPagamentoFin(id: string, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehTexto(id)) return DADOS_INVALIDOS;
   if (idCanonico(id) === null) return DADOS_INVALIDOS;
   return naTransacao(usuario, "excluirPagamentoFin", ERRO_EXCLUIR, async (req) => {
     const livro = await lerLivroFinanceiro(req);
@@ -601,6 +629,7 @@ export async function excluirPagamentoFin(id: string, usuario: UsuarioAutenticad
 // ---------------------------------------------------------------- conta
 
 export async function salvarContaFin(id: string | null, dados: DadosContaFin, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehIdOuNulo(id) || !ehDados(dados)) return DADOS_INVALIDOS;
   if (id !== null && idCanonico(id) === null) return DADOS_INVALIDOS;
   return naTransacao(usuario, "salvarContaFin", ERRO_SALVAR, async (req) => {
     const livro = await lerLivroFinanceiro(req);
@@ -629,6 +658,7 @@ export async function salvarContaFin(id: string | null, dados: DadosContaFin, us
 }
 
 export async function excluirContaFin(id: string, usuario: UsuarioAutenticado): Promise<ResultadoFin> {
+  if (!ehTexto(id)) return DADOS_INVALIDOS;
   if (idCanonico(id) === null) return DADOS_INVALIDOS;
   return naTransacao(usuario, "excluirContaFin", ERRO_EXCLUIR, async (req) => {
     const livro = await lerLivroFinanceiro(req);

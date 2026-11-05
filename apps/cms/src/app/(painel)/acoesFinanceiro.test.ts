@@ -157,3 +157,21 @@ describe("acoesFinanceiro — histórico", () => {
     expect(lerHistoricoFinMock).not.toHaveBeenCalled();
   });
 });
+
+describe("acoesFinanceiro — histórico com falha", () => {
+  it("falha na leitura do histórico vira mensagem genérica", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(com("fin.receber"));
+    lerHistoricoFinMock.mockRejectedValueOnce(new Error("conexão"));
+    const erro = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    expect(await acoes.carregarHistoricoFinAcao("fin-receitas", "3")).toEqual({
+      ok: false,
+      erro: "Não foi possível carregar o histórico. Tente novamente.",
+    });
+    erro.mockRestore();
+  });
+  it("slug ou id não texto é recusado", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(com("fin.receber"));
+    expect(await acoes.carregarHistoricoFinAcao(1 as never, "3")).toEqual(RECUSADO);
+    expect(await acoes.carregarHistoricoFinAcao("fin-receitas", 3 as never)).toEqual(RECUSADO);
+  });
+});
