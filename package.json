@@ -30,6 +30,7 @@
     "revalidar": "node scripts/revalidar.mjs",
     "revalidar:corpo-docente": "node scripts/revalidar.mjs /o-grupo/corpo-docente",
     "programas:instantaneo": "node scripts/gerar-instantaneo-programas.mjs",
+    "programas:instantaneo-paginas": "node scripts/gerar-instantaneo-paginas-programas.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
     "clean": "turbo run clean && rm -rf node_modules .turbo"

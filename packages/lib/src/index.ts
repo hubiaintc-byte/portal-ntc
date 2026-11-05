@@ -211,3 +211,6 @@ export {
   montarAvisoLead,
   type AvisoPush,
 } from "./avisos/avisoLead";
+
+// Programas — tipos do conteúdo das páginas de programa.
+export type * from "./programas/tipos";
