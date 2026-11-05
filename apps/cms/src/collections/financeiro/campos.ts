@@ -4,7 +4,7 @@ import { LISTAS_FIN } from "@ntc/lib";
 
 import { acessoPorTela, administrador } from "../../access/porTela";
 import { registrarAuditoriaFin, registrarExclusaoFin } from "../../lib/financeiro/auditoria";
-import { TELAS_FIN, type TelaPainel } from "../../lib/cms/telas";
+import { TELAS_LEITURA_FIN, type SlugFin } from "../../lib/financeiro/telasDeLeitura";
 
 /**
  * Peças comuns das coleções `fin-*`. Listas fechadas são gravadas como `text`
@@ -112,12 +112,17 @@ export const naoNegativo = (name: string): Field => ({
   validate: validarNaoNegativo,
 });
 
-/** Access comum: leitura por qualquer tela `fin.*`, escrita pelas telas dadas, exclusão só administrador. */
-export function acessoFin(escrita: readonly TelaPainel[]) {
+/**
+ * Access comum (ruling R16): leitura por grupo de telas (`TELAS_LEITURA_FIN`);
+ * create/update fechados na REST — toda escrita passa pelas Server Actions,
+ * que aplicam as regras de negócio e gravam pela Local API (`overrideAccess`
+ * padrão); exclusão só administrador.
+ */
+export function acessoFin(slug: SlugFin) {
   return {
-    read: acessoPorTela(TELAS_FIN),
-    create: acessoPorTela(escrita),
-    update: acessoPorTela(escrita),
+    read: acessoPorTela(TELAS_LEITURA_FIN[slug]),
+    create: () => false,
+    update: () => false,
     delete: administrador,
   };
 }

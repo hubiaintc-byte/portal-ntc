@@ -43,7 +43,11 @@ const escrita = {
 };
 vi.mock("@/lib/financeiro/escrita", () => escrita);
 const lerHistoricoFinMock = vi.fn(async () => []);
-vi.mock("@/lib/financeiro/leitura", () => ({ lerHistoricoFin: lerHistoricoFinMock }));
+const lancamentoCorporativoFinMock = vi.fn(async (_slug: string, _id: string) => false);
+vi.mock("@/lib/financeiro/leitura", () => ({
+  lerHistoricoFin: lerHistoricoFinMock,
+  lancamentoCorporativoFin: lancamentoCorporativoFinMock,
+}));
 
 const acoes = await import("./acoesFinanceiro");
 
@@ -140,7 +144,7 @@ describe("acoesFinanceiro — telas", () => {
 
 describe("acoesFinanceiro — histórico", () => {
   it("carregarHistoricoFinAcao recusa slug fora dos seis", async () => {
-    obterUsuarioCmsMock.mockResolvedValue(com("fin.pagar"));
+    obterUsuarioCmsMock.mockResolvedValue(com("fin.receber"));
     for (const slug of ["audit-log", "users", "leads", "fin-movimentos", ""]) {
       expect(await acoes.carregarHistoricoFinAcao(slug, "3")).toEqual(RECUSADO);
     }
@@ -155,6 +159,49 @@ describe("acoesFinanceiro — histórico", () => {
     obterUsuarioCmsMock.mockResolvedValue(com("fin.visao-executiva"));
     expect(await acoes.carregarHistoricoFinAcao("fin-contas", "abc")).toEqual(RECUSADO);
     expect(lerHistoricoFinMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("acoesFinanceiro — histórico por grupo de telas (R16)", () => {
+  it("só fin.pagar não abre histórico de receita nem de faturamento", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(com("fin.pagar"));
+    expect(await acoes.carregarHistoricoFinAcao("fin-receitas", "3")).toEqual(RECUSADO);
+    expect(await acoes.carregarHistoricoFinAcao("fin-faturamentos", "3")).toEqual(RECUSADO);
+    expect(await acoes.carregarHistoricoFinAcao("fin-custos", "3")).toEqual({ ok: true, itens: [] });
+    expect(await acoes.carregarHistoricoFinAcao("fin-contas", "3")).toEqual({ ok: true, itens: [] });
+    expect(await acoes.carregarHistoricoFinAcao("fin-eventos", "3")).toEqual({ ok: true, itens: [] });
+  });
+
+  it("só fin.receber não abre histórico de custo nem de pagamento", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(com("fin.receber"));
+    expect(await acoes.carregarHistoricoFinAcao("fin-custos", "3")).toEqual(RECUSADO);
+    expect(await acoes.carregarHistoricoFinAcao("fin-pagamentos", "3")).toEqual(RECUSADO);
+    expect(lerHistoricoFinMock).not.toHaveBeenCalled();
+  });
+
+  it("lançamento corporativo exige a tela dedicada; de evento, basta fin.eventos", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(com("fin.eventos", "fin.visao-executiva"));
+    lancamentoCorporativoFinMock.mockResolvedValue(true);
+    for (const slug of ["fin-receitas", "fin-faturamentos", "fin-custos", "fin-pagamentos"])
+      expect(await acoes.carregarHistoricoFinAcao(slug, "3")).toEqual(RECUSADO);
+    expect(lerHistoricoFinMock).not.toHaveBeenCalled();
+    lancamentoCorporativoFinMock.mockResolvedValue(false);
+    expect(await acoes.carregarHistoricoFinAcao("fin-receitas", "3")).toEqual({ ok: true, itens: [] });
+    obterUsuarioCmsMock.mockResolvedValue(com("fin.receber"));
+    lancamentoCorporativoFinMock.mockResolvedValue(true);
+    expect(await acoes.carregarHistoricoFinAcao("fin-faturamentos", "4")).toEqual({ ok: true, itens: [] });
+    expect(lancamentoCorporativoFinMock).toHaveBeenCalledWith("fin-faturamentos", "4");
+    obterUsuarioCmsMock.mockResolvedValue(ADMIN);
+    expect(await acoes.carregarHistoricoFinAcao("fin-custos", "5")).toEqual({ ok: true, itens: [] });
+    lancamentoCorporativoFinMock.mockReset();
+    lancamentoCorporativoFinMock.mockResolvedValue(false);
+  });
+
+  it("eventos e contas não consultam se é corporativo", async () => {
+    obterUsuarioCmsMock.mockResolvedValue(com("fin.visao-executiva"));
+    await acoes.carregarHistoricoFinAcao("fin-eventos", "1");
+    await acoes.carregarHistoricoFinAcao("fin-contas", "1");
+    expect(lancamentoCorporativoFinMock).not.toHaveBeenCalled();
   });
 });
 

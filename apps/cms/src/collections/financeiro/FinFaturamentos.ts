@@ -11,7 +11,7 @@ export const FinFaturamentos: CollectionConfig = {
   labels: { singular: "Faturamento", plural: "Faturamentos" },
   typescript: { interface: "FinFaturamento" },
   admin: { useAsTitle: "parcela", group: "Financeiro" },
-  access: acessoFin(["fin.eventos", "fin.receber"]),
+  access: acessoFin("fin-faturamentos"),
   hooks: hooksAuditoriaFin,
   fields: [
     {

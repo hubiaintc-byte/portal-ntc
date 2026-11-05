@@ -28,7 +28,7 @@ export const FinReceitas: CollectionConfig = {
   labels: { singular: "Receita", plural: "Receitas" },
   typescript: { interface: "FinReceita" },
   admin: { useAsTitle: "cliente", group: "Financeiro" },
-  access: acessoFin(["fin.eventos", "fin.receber"]),
+  access: acessoFin("fin-receitas"),
   hooks: { ...hooksAuditoriaFin, beforeDelete: [bloquearReceitaComFaturamento] },
   fields: [
     { name: "evento", type: "relationship", relationTo: "fin-eventos", index: true },

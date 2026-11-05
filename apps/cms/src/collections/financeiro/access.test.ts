@@ -43,40 +43,49 @@ describe("access das coleções fin-*", () => {
     for (const c of TODAS) expect(pode(c, "delete", todasTelasFin)).toBe(false);
   });
 
-  it("com fin.pagar não cria fin-receitas", () => {
-    expect(pode(FinReceitas, "create", { telas: ["fin.pagar"] })).toBe(false);
-    expect(pode(FinFaturamentos, "create", { telas: ["fin.pagar"] })).toBe(false);
-  });
-
-  it("com fin.receber não cria custo nem pagamento", () => {
-    expect(pode(FinCustos, "create", { telas: ["fin.receber"] })).toBe(false);
-    expect(pode(FinPagamentos, "update", { telas: ["fin.receber"] })).toBe(false);
-  });
-
-  it("create/update por tela, como no brief", () => {
-    expect(pode(FinEventos, "create", { telas: ["fin.eventos"] })).toBe(true);
-    expect(pode(FinEventos, "create", { telas: ["fin.receber", "fin.pagar"] })).toBe(false);
-    expect(pode(FinReceitas, "update", { telas: ["fin.eventos"] })).toBe(true);
-    expect(pode(FinFaturamentos, "create", { telas: ["fin.receber"] })).toBe(true);
-    expect(pode(FinCustos, "create", { telas: ["fin.pagar"] })).toBe(true);
-    expect(pode(FinPagamentos, "create", { telas: ["fin.eventos"] })).toBe(true);
-    expect(pode(FinContas, "create", { telas: ["fin.receber"] })).toBe(true);
-    expect(pode(FinContas, "update", { telas: ["fin.pagar"] })).toBe(true);
-    expect(pode(FinContas, "create", { telas: ["fin.eventos"] })).toBe(false);
-  });
-
-  it("read: qualquer tela fin.*, e nada para quem só tem telas de outros módulos ou anônimo", () => {
+  it("create/update fechados na REST para todos, inclusive administrador (escrita só pelas Server Actions)", () => {
     for (const c of TODAS) {
-      expect(pode(c, "read", { telas: ["fin.visao-executiva"] })).toBe(true);
+      for (const op of ["create", "update"] as const) {
+        expect(pode(c, op, admin)).toBe(false);
+        expect(pode(c, op, todasTelasFin)).toBe(false);
+        expect(pode(c, op, null)).toBe(false);
+      }
+    }
+  });
+
+  it("read por grupo: receitas e faturamentos só com visão executiva, eventos ou receber", () => {
+    for (const c of [FinReceitas, FinFaturamentos]) {
+      expect(pode(c, "read", { telas: ["fin.pagar"] })).toBe(false);
+      for (const t of ["fin.visao-executiva", "fin.eventos", "fin.receber"])
+        expect(pode(c, "read", { telas: [t] })).toBe(true);
+    }
+  });
+
+  it("read por grupo: custos e pagamentos só com visão executiva, eventos ou pagar", () => {
+    for (const c of [FinCustos, FinPagamentos]) {
+      expect(pode(c, "read", { telas: ["fin.receber"] })).toBe(false);
+      for (const t of ["fin.visao-executiva", "fin.eventos", "fin.pagar"])
+        expect(pode(c, "read", { telas: [t] })).toBe(true);
+    }
+  });
+
+  it("read: eventos e contas com qualquer tela fin.*", () => {
+    for (const c of [FinEventos, FinContas]) {
+      for (const t of ["fin.visao-executiva", "fin.eventos", "fin.receber", "fin.pagar"])
+        expect(pode(c, "read", { telas: [t] })).toBe(true);
+    }
+  });
+
+  it("read: nada para quem só tem telas de outros módulos ou anônimo", () => {
+    for (const c of TODAS) {
       expect(pode(c, "read", { telas: ["crm.leads", "site.eventos"] })).toBe(false);
       expect(pode(c, "read", null)).toBe(false);
     }
   });
 
-  it("admin pode tudo", () => {
+  it("admin lê e exclui tudo", () => {
     for (const c of TODAS) {
-      for (const op of ["read", "create", "update", "delete"] as const)
-        expect(pode(c, op, admin)).toBe(true);
+      for (const op of ["read", "delete"] as const) expect(pode(c, op, admin)).toBe(true);
     }
   });
 });

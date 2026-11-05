@@ -8,7 +8,7 @@ export const FinPagamentos: CollectionConfig = {
   labels: { singular: "Pagamento", plural: "Pagamentos" },
   typescript: { interface: "FinPagamento" },
   admin: { useAsTitle: "documento", group: "Financeiro" },
-  access: acessoFin(["fin.eventos", "fin.pagar"]),
+  access: acessoFin("fin-pagamentos"),
   hooks: hooksAuditoriaFin,
   fields: [
     { name: "custo", type: "relationship", relationTo: "fin-custos", required: true, index: true },

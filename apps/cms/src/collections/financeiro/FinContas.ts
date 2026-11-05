@@ -12,7 +12,7 @@ export const FinContas: CollectionConfig = {
   labels: { singular: "Conta financeira", plural: "Contas financeiras" },
   typescript: { interface: "FinConta" },
   admin: { useAsTitle: "nome", group: "Financeiro" },
-  access: acessoFin(["fin.receber", "fin.pagar"]),
+  access: acessoFin("fin-contas"),
   hooks: { ...hooksAuditoriaFin, beforeDelete: [bloquearContaEmUso] },
   fields: [
     { name: "nome", type: "text", required: true },

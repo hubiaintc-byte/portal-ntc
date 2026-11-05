@@ -27,7 +27,7 @@ export const FinCustos: CollectionConfig = {
   labels: { singular: "Custo", plural: "Custos" },
   typescript: { interface: "FinCusto" },
   admin: { useAsTitle: "descricao", group: "Financeiro" },
-  access: acessoFin(["fin.eventos", "fin.pagar"]),
+  access: acessoFin("fin-custos"),
   hooks: { ...hooksAuditoriaFin, beforeDelete: [bloquearCustoComPagamento] },
   fields: [
     { name: "evento", type: "relationship", relationTo: "fin-eventos", index: true },

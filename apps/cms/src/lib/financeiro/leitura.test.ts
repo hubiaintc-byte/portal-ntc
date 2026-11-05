@@ -4,7 +4,7 @@ vi.mock("server-only", () => ({}));
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
 
-const { mesclarEventos, lerLivroFinanceiro, recortarLivroPorTela, lerHistoricoFin } = await import("./leitura");
+const { mesclarEventos, lerLivroFinanceiro, recortarLivroPorTela, lerHistoricoFin, lancamentoCorporativoFin } = await import("./leitura");
 
 const fin = { id: 5, eventoComercial: 12, nome: "Reserva", dataInicio: "2026-10-01", dataFim: "2026-10-03", modalidade: "Presencial", cliente: "Antigo", refContratual: "" };
 const crm = {
@@ -140,5 +140,45 @@ describe("lerHistoricoFin", () => {
     const h = await lerHistoricoFin("fin-receitas", "3");
     expect(h).toEqual([{ quando: "2026-11-04T10:00:00Z", quem: "Ana", acao: "Receita RC-0003 alterada", mudancas: [{ campo: "qtde", antes: 1, depois: 2 }] }]);
     expect((find.mock.calls[0] as unknown as [{ sort: string }])[0].sort).toBe("-createdAt");
+  });
+});
+
+describe("lancamentoCorporativoFin", () => {
+  type Args = { collection: string; where: { id: { equals: number } } };
+  const banco: Record<string, Record<number, Record<string, unknown>>> = {
+    "fin-receitas": { 1: { id: 1, evento: 7 }, 2: { id: 2, evento: null } },
+    "fin-faturamentos": { 10: { id: 10, receita: 1 }, 11: { id: 11, receita: 2 } },
+    "fin-custos": { 3: { id: 3, evento: { id: 7 } }, 4: { id: 4 } },
+    "fin-pagamentos": { 20: { id: 20, custo: 3 }, 21: { id: 21, custo: { id: 4 } } },
+  };
+  const find = vi.fn(async ({ collection, where }: Args) => {
+    const d = banco[collection]?.[where.id.equals];
+    return { docs: d ? [d] : [] };
+  });
+  it("receita/custo sem evento é corporativo; com evento não", async () => {
+    obterPayloadMock.mockResolvedValue({ find });
+    expect(await lancamentoCorporativoFin("fin-receitas", "1")).toBe(false);
+    expect(await lancamentoCorporativoFin("fin-receitas", "2")).toBe(true);
+    expect(await lancamentoCorporativoFin("fin-custos", "3")).toBe(false);
+    expect(await lancamentoCorporativoFin("fin-custos", "4")).toBe(true);
+  });
+  it("faturamento e pagamento seguem a receita e o custo", async () => {
+    obterPayloadMock.mockResolvedValue({ find });
+    expect(await lancamentoCorporativoFin("fin-faturamentos", "10")).toBe(false);
+    expect(await lancamentoCorporativoFin("fin-faturamentos", "11")).toBe(true);
+    expect(await lancamentoCorporativoFin("fin-pagamentos", "20")).toBe(false);
+    expect(await lancamentoCorporativoFin("fin-pagamentos", "21")).toBe(true);
+  });
+  it("registro que não existe mais é tratado como corporativo (falha fechado)", async () => {
+    obterPayloadMock.mockResolvedValue({ find });
+    expect(await lancamentoCorporativoFin("fin-receitas", "99")).toBe(true);
+    expect(await lancamentoCorporativoFin("fin-pagamentos", "99")).toBe(true);
+  });
+  it("eventos e contas nunca são corporativos e não consultam o banco", async () => {
+    find.mockClear();
+    obterPayloadMock.mockResolvedValue({ find });
+    expect(await lancamentoCorporativoFin("fin-eventos", "1")).toBe(false);
+    expect(await lancamentoCorporativoFin("fin-contas", "1")).toBe(false);
+    expect(find).not.toHaveBeenCalled();
   });
 });

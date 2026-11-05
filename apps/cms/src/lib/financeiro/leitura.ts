@@ -16,6 +16,7 @@ import type {
 import type { PayloadRequest } from "payload";
 
 import { temTela, type AcessoPainel } from "@/lib/cms/telas";
+import { SLUGS_FIN, TELAS_LEITURA_FIN, temCorporativo, type SlugFin } from "@/lib/financeiro/telasDeLeitura";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
@@ -378,18 +379,20 @@ export async function lerLivroFinanceiro(req?: PayloadRequest): Promise<LivroFin
   };
 }
 
-/** Corte de dados por tela (regra da v3.8). Pura. */
+/**
+ * Corte de dados por tela (regra da v3.8). Pura. Mesma regra do `read` das
+ * coleções na REST (`TELAS_LEITURA_FIN`), para as duas não divergirem.
+ */
 export function recortarLivroPorTela(livro: LivroFinanceiro, acesso: AcessoPainel): LivroFinanceiro {
-  if (temTela(acesso, ["fin.visao-executiva", "fin.eventos"])) return livro;
-  const receber = temTela(acesso, ["fin.receber"]);
-  const pagar = temTela(acesso, ["fin.pagar"]);
+  const pode = (slug: SlugFin): boolean => temTela(acesso, TELAS_LEITURA_FIN[slug]);
+  if (SLUGS_FIN.every(pode)) return livro;
   return {
-    eventos: livro.eventos,
-    contas: livro.contas,
-    receitas: receber ? livro.receitas : [],
-    faturamentos: receber ? livro.faturamentos : [],
-    custos: pagar ? livro.custos : [],
-    pagamentos: pagar ? livro.pagamentos : [],
+    eventos: pode("fin-eventos") ? livro.eventos : [],
+    contas: pode("fin-contas") ? livro.contas : [],
+    receitas: pode("fin-receitas") ? livro.receitas : [],
+    faturamentos: pode("fin-faturamentos") ? livro.faturamentos : [],
+    custos: pode("fin-custos") ? livro.custos : [],
+    pagamentos: pode("fin-pagamentos") ? livro.pagamentos : [],
   };
 }
 
@@ -422,4 +425,40 @@ export async function lerHistoricoFin(slug: string, id: string): Promise<ItemHis
       })),
     };
   });
+}
+
+/**
+ * Se o lançamento é corporativo (sem evento), para a guarda do histórico
+ * (ruling R16). Faturamento segue a receita; pagamento segue o custo. Registro
+ * que não existe mais conta como corporativo (falha fechado: exige a tela
+ * dedicada). Eventos e contas nunca são corporativos.
+ */
+export async function lancamentoCorporativoFin(slug: SlugFin, id: string): Promise<boolean> {
+  if (!temCorporativo(slug)) return false;
+  const payload = await obterPayload();
+  const ler = async (collection: SlugFin, docId: Id): Promise<Doc | undefined> => {
+    const r = await payload.find({
+      collection: collection as "fin-receitas",
+      where: { id: { equals: Number(docId) } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+    });
+    return (r.docs as unknown as Doc[])[0];
+  };
+  const idDe = (v: unknown): Id | undefined => {
+    if (typeof v === "string" || typeof v === "number") return v;
+    if (v && typeof v === "object" && "id" in v) return (v as { id: Id }).id;
+    return undefined;
+  };
+  let doc: Doc | undefined;
+  if (slug === "fin-faturamentos" || slug === "fin-pagamentos") {
+    const filho = await ler(slug, id);
+    const pai = idDe(slug === "fin-faturamentos" ? filho?.receita : filho?.custo);
+    if (pai === undefined) return true;
+    doc = await ler(slug === "fin-faturamentos" ? "fin-receitas" : "fin-custos", pai);
+  } else {
+    doc = await ler(slug, id);
+  }
+  return !doc || idDe(doc.evento) === undefined;
 }

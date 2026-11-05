@@ -18,7 +18,7 @@ import {
   obterUsuarioCmsComTela,
   type UsuarioAutenticado,
 } from "@/lib/cms/autenticacao";
-import { TELAS_FIN, type TelaPainel } from "@/lib/cms/telas";
+import type { TelaPainel } from "@/lib/cms/telas";
 import {
   excluirContaFin,
   excluirCustoFin,
@@ -35,7 +35,8 @@ import {
   salvarReceitaFin,
   type ResultadoFin,
 } from "@/lib/financeiro/escrita";
-import { lerHistoricoFin, type ItemHistorico } from "@/lib/financeiro/leitura";
+import { lancamentoCorporativoFin, lerHistoricoFin, type ItemHistorico } from "@/lib/financeiro/leitura";
+import { ehSlugFin, TELAS_LEITURA_FIN, telasDoHistoricoFin, temCorporativo } from "@/lib/financeiro/telasDeLeitura";
 
 /**
  * Server Actions do Financeiro. Sessão e tela conferidas ANTES de tocar a
@@ -49,14 +50,6 @@ const TELAS_RECEITA: readonly TelaPainel[] = ["fin.eventos", "fin.receber"];
 const TELAS_CUSTO: readonly TelaPainel[] = ["fin.eventos", "fin.pagar"];
 const TELAS_CONTA: readonly TelaPainel[] = ["fin.receber", "fin.pagar"];
 
-const SLUGS_FIN: readonly string[] = [
-  "fin-eventos",
-  "fin-receitas",
-  "fin-faturamentos",
-  "fin-custos",
-  "fin-pagamentos",
-  "fin-contas",
-];
 
 const RECUSADO = { ok: false, erro: "Sessão expirada ou sem permissão para esta ação." } as const;
 
@@ -135,13 +128,23 @@ export async function excluirContaFinAcao(id: string): Promise<ResultadoFin> {
 
 // ------------------------------------------------------------ histórico
 
-/** Histórico de um lançamento: qualquer tela `fin.*`; `slug` só um dos seis `fin-*`. */
+/**
+ * Histórico de um lançamento (ruling R16): o `slug` precisa ser um dos seis
+ * `fin-*` e o usuário precisa ler aquele grupo (`TELAS_LEITURA_FIN`, a mesma
+ * regra da REST); lançamento corporativo (sem evento) exige ainda a tela
+ * dedicada — `fin.receber` para receita/faturamento, `fin.pagar` para
+ * custo/pagamento —, como na escrita.
+ */
 export async function carregarHistoricoFinAcao(slug: string, id: string): Promise<ResultadoHistoricoFin> {
-  if (!(await obterUsuarioCmsComTela(TELAS_FIN))) return RECUSADO;
-  if (typeof slug !== "string" || !SLUGS_FIN.includes(slug)) return RECUSADO;
+  if (!ehSlugFin(slug)) return RECUSADO;
   if (typeof id !== "string" || !/^\d{1,15}$/.test(id.trim())) return RECUSADO;
+  if (!(await obterUsuarioCmsComTela(TELAS_LEITURA_FIN[slug]))) return RECUSADO;
+  const idCanonico = String(Number(id.trim()));
   try {
-    return { ok: true, itens: await lerHistoricoFin(slug, String(Number(id.trim()))) };
+    if (temCorporativo(slug) && (await lancamentoCorporativoFin(slug, idCanonico))) {
+      if (!(await obterUsuarioCmsComTela(telasDoHistoricoFin(slug, true)))) return RECUSADO;
+    }
+    return { ok: true, itens: await lerHistoricoFin(slug, idCanonico) };
   } catch (e) {
     console.error("[carregarHistoricoFinAcao]", e);
     return { ok: false, erro: "Não foi possível carregar o histórico. Tente novamente." };

@@ -27,7 +27,7 @@ export const FinEventos: CollectionConfig = {
   labels: { singular: "Evento financeiro", plural: "Eventos financeiros" },
   typescript: { interface: "FinEvento" },
   admin: { useAsTitle: "nome", group: "Financeiro" },
-  access: acessoFin(["fin.eventos"]),
+  access: acessoFin("fin-eventos"),
   hooks: { ...hooksAuditoriaFin, beforeDelete: [bloquearFinEventoComLancamentos] },
   fields: [
     {
