@@ -8,6 +8,7 @@ import {
   relacionadosDe,
 } from "@/lib/cms/programas";
 import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
+import { imagemOpenGraph, urlPublicaDoSite } from "@/lib/imagemOpenGraph";
 
 import { NavBarAncoras } from "./NavBarAncoras";
 import { FaqAcordeao } from "./FaqAcordeao";
@@ -56,13 +57,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const p = await buscarProgramaPublicado(slug);
   if (!p) return { title: "Programa · Grupo NTC" };
+  const imagemOg = imagemOpenGraph(p.hero.bgSrc, urlPublicaDoSite());
   return {
     title: `${p.siglaExibida} · ${p.nomeCompleto}`,
     description: primeiraFrase(p.visaoGeral.corpoHtml),
     openGraph: {
       title: `${p.siglaExibida} · ${p.nomeCompleto}`,
       description: primeiraFrase(p.visaoGeral.corpoHtml),
-      images: [{ url: p.hero.bgSrc }],
+      ...(imagemOg ? { images: [{ url: imagemOg }] } : {}),
     },
   };
 }
