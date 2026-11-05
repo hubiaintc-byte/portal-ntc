@@ -1,6 +1,7 @@
 import "server-only";
 
 import {
+  CAMPOS_DO_CRM,
   comDefaultsDeLancamento,
   CRIT_PROVISORIO,
   hojeEmSaoPaulo,
@@ -162,8 +163,6 @@ const ehAlvo = <T>(x: { id: string | null; atual: T | null } | ResultadoFin): x 
   !("ok" in x);
 
 // --------------------------------------------------------------- evento
-
-const CAMPOS_DO_CRM = ["nome", "modalidade", "local", "dataInicio", "dataFim", "cliente"] as const;
 
 /** O evento comercial como a leitura o vê, só com os valores do CRM. */
 async function eventoComercialPuro(req: PayloadRequest, id: string): Promise<EventoFin | null> {

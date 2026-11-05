@@ -1,6 +1,8 @@
 import "server-only";
 
+import { CAMPOS_DO_CRM } from "@ntc/lib";
 import type {
+  CampoDoCrm,
   ContaFin,
   CustoFin,
   EtapaReceita,
@@ -141,16 +143,26 @@ function eventoDoFin(f: FinEventoDoc, c: EventoComercialDoc | undefined): Evento
     eventoComercialId: null,
     cadastroPendente: false,
     canceladoNoCrm: false,
+    camposDoCrm: [],
   };
   if (!c) return base;
+  const doCrm: Record<CampoDoCrm, string> = {
+    nome: str(c.titulo),
+    modalidade: (c.modalidade && MODALIDADE_CRM[c.modalidade]) || "",
+    local: str(c.local),
+    dataInicio: soData(c.dataInicio),
+    dataFim: soData(c.dataFim),
+    cliente: orgaoDoCrm(c),
+  };
   return {
     ...base,
-    nome: str(c.titulo) || base.nome,
-    modalidade: (c.modalidade && MODALIDADE_CRM[c.modalidade]) || base.modalidade,
-    local: str(c.local) || base.local,
-    dataInicio: soData(c.dataInicio) || base.dataInicio,
-    dataFim: soData(c.dataFim) || base.dataFim,
-    cliente: orgaoDoCrm(c) || base.cliente,
+    nome: doCrm.nome || base.nome,
+    modalidade: doCrm.modalidade || base.modalidade,
+    local: doCrm.local || base.local,
+    dataInicio: doCrm.dataInicio || base.dataInicio,
+    dataFim: doCrm.dataFim || base.dataFim,
+    cliente: doCrm.cliente || base.cliente,
+    camposDoCrm: CAMPOS_DO_CRM.filter((k) => doCrm[k] !== ""),
     refContratual: base.refContratual || str(c.contratoEmpenho?.numero),
     refCrm: String(c.id),
     origem: "crm",

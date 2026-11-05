@@ -9,7 +9,7 @@ const ev = (o: Partial<EventoFin> = {}): EventoFin => ({
   modulo: "", cliente: "Prefeitura X", cidade: "Recife", uf: "PE", local: "", dataInicio: "2026-03-10", dataFim: "2026-03-11",
   cargaHoraria: 8, responsavel: "", status: "Planejado", qtdPrevista: 0, capacidade: 0, efetivos: 0, pagantesPrev: 0,
   cortesiasPrev: 0, refCrm: "", refContratual: "", observacoes: "", origem: "financeiro", eventoComercialId: null,
-  cadastroPendente: false, canceladoNoCrm: false, ...o,
+  cadastroPendente: false, canceladoNoCrm: false, camposDoCrm: [], ...o,
 });
 
 describe("carteira", () => {

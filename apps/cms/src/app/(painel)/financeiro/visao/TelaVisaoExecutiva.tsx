@@ -13,6 +13,7 @@ import { Selo } from "../ui/Selo";
 import { inteiro, moeda, porcentagem, tipoCurto } from "../ui/formato";
 import { GavetaAlertas, ItemAlerta, ResumoAlertas, type Alerta } from "./Alertas";
 import { AnaliseVisao } from "./AnaliseVisao";
+import { WizardEvento } from "../eventos/WizardEvento";
 import { HeroResultado, RodapeBarra } from "./BlocosVisao";
 import { CarteiraEventos } from "./CarteiraEventos";
 import {
@@ -55,6 +56,7 @@ export function TelaVisaoExecutiva({
   aoMudarFiltros,
 }: TelaVisaoExecutivaProps) {
   const [gaveta, setGaveta] = useState<"alertas" | "corporativas" | null>(null);
+  const [novoEvento, setNovoEvento] = useState(false);
 
   const telas = navFinVisivel(acesso);
   const tem = (t: TelaFinId) => telas.includes(t);
@@ -133,8 +135,7 @@ export function TelaVisaoExecutiva({
               <Icone nome="calendar" tamanho="sm" />
               Ver eventos
             </button>
-            {/* Task 13 liga este botão ao assistente de novo evento; até lá ele leva à lista de Eventos. */}
-            <button type="button" className="btn btn-primary" onClick={() => irPara("eventos")}>
+            <button type="button" className="btn btn-primary" onClick={() => setNovoEvento(true)}>
               <Icone nome="plus" tamanho="sm" />
               Novo evento
             </button>
@@ -466,6 +467,17 @@ export function TelaVisaoExecutiva({
           titulo="Pendências corporativas"
           destinoDe={destinoDe}
           aoFechar={() => setGaveta(null)}
+        />
+      )}
+      {novoEvento && (
+        <WizardEvento
+          evento={null}
+          aoFechar={() => setNovoEvento(false)}
+          aoSalvar={(id) => {
+            setNovoEvento(false);
+            // Como no protótipo: o evento criado abre na área dele.
+            irPara("eventos", { eventoId: id, aba: "visao" });
+          }}
         />
       )}
     </>

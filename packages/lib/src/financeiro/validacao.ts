@@ -46,7 +46,7 @@ export function comDefaultsDeLancamento<T extends { eventoId: string; centroCust
 
 // ---------------------------------------------------------------- evento
 
-export type DadosEventoFin = Omit<EventoFin, "id" | "refCrm" | "origem" | "eventoComercialId" | "cadastroPendente" | "canceladoNoCrm">;
+export type DadosEventoFin = Omit<EventoFin, "id" | "refCrm" | "origem" | "eventoComercialId" | "cadastroPendente" | "canceladoNoCrm" | "camposDoCrm">;
 
 /**
  * Recebe o evento já com os campos do CRM aplicados (valor do CRM vence;

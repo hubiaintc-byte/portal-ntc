@@ -20,7 +20,8 @@ import { PortalFin05 } from "./PortalFin05";
  */
 
 const FOCAVEIS = 'button, [href], input, select, textarea, summary, [tabindex]:not([tabindex="-1"])';
-const PRIMEIRO_CAMPO = ".ov-body input, .ov-body select, .ov-body textarea, [data-autofocus]";
+const PRIMEIRO_CAMPO =
+  ".ov-body input, .ov-body select, .ov-body textarea, .wpanel input, .wpanel select, [data-autofocus]";
 
 /** Pilha das gavetas abertas: Esc e Tab valem só para a do topo. */
 const pilha: symbol[] = [];
@@ -36,10 +37,30 @@ interface GavetaProps {
   rodape?: ReactNode;
   /** Corpo sem o recuo do `.ov-body` (o protótipo zera o padding na gaveta de pendências). */
   corpoSemRecuo?: boolean;
+  /**
+   * `modal` = `Overlay.open({ kind: 'modal' })` do protótipo (centrada; `sm`
+   * para confirmação). Padrão: gaveta lateral.
+   */
+  forma?: "gaveta" | "modal";
+  tamanho?: "sm";
+  /** Filhos no lugar do `.ov-body` (o wizard do protótipo substitui o corpo pelo `.wizard`). */
+  semCorpo?: boolean;
   children: ReactNode;
 }
 
-export function Gaveta({ titulo, eyebrow, sub, aoFechar, rodape, corpoSemRecuo, children }: GavetaProps) {
+export function Gaveta({
+  titulo,
+  eyebrow,
+  sub,
+  aoFechar,
+  rodape,
+  corpoSemRecuo,
+  forma = "gaveta",
+  tamanho,
+  semCorpo,
+  children,
+}: GavetaProps) {
+  const classe = forma === "modal" ? `modal${tamanho ? ` ${tamanho}` : ""}` : "drawer";
   const caixa = useRef<HTMLDivElement>(null);
   const fechar = useRef<HTMLButtonElement>(null);
   const [visivel, setVisivel] = useState(false);
@@ -101,7 +122,7 @@ export function Gaveta({ titulo, eyebrow, sub, aoFechar, rodape, corpoSemRecuo, 
       <div className={`overlay${visivel ? " show" : ""}`} onClick={aoFechar} aria-hidden="true" />
       <div
         ref={caixa}
-        className={`drawer${visivel ? " show" : ""}`}
+        className={`${classe}${visivel ? " show" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={idTitulo}
@@ -116,7 +137,7 @@ export function Gaveta({ titulo, eyebrow, sub, aoFechar, rodape, corpoSemRecuo, 
             <Icone nome="x" />
           </button>
         </div>
-        <div className={`ov-body${corpoSemRecuo ? " sem-recuo" : ""}`}>{children}</div>
+        {semCorpo ? children : <div className={`ov-body${corpoSemRecuo ? " sem-recuo" : ""}`}>{children}</div>}
         {rodape !== undefined && <div className="ov-foot">{rodape}</div>}
       </div>
     </PortalFin05>

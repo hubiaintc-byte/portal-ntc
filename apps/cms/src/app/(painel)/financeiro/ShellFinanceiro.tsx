@@ -8,6 +8,8 @@ import { mostraModuloCrm, navFinVisivel, telaInicialFin, type TelaFinId } from "
 import type { AcessoPainel, CapacidadesPainel } from "@/lib/cms/telas";
 
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
+import { aplicarFiltrosRecebidos, ESTADO_LISTA_INICIAL, type EstadoListaEventos } from "./eventos/dadosEventos";
+import { TelaEventos } from "./eventos/TelaEventos";
 import { RaizFin05Contexto } from "./ui/PortalFin05";
 import { TelaVisaoExecutiva } from "./visao/TelaVisaoExecutiva";
 import { FILTROS_VISAO_INICIAIS, type FiltrosVisao } from "./visao/dadosVisao";
@@ -133,6 +135,8 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
   const [estado, setEstado] = useState<EstadoTelaFin>(() => estadoDe(telaInicialFin(acesso)));
   // Filtros da Visão Executiva sobrevivem à navegação, como o `UI.dash` do protótipo.
   const [filtrosVisao, setFiltrosVisao] = useState<FiltrosVisao>(FILTROS_VISAO_INICIAIS);
+  // Estado da lista de Eventos (filtros, busca, Cards/Lista, ordem), como o `UI.events`.
+  const [listaEventos, setListaEventos] = useState<EstadoListaEventos>(ESTADO_LISTA_INICIAL);
   // Raiz `.fin05` para os portais das camadas fixas (gaveta, menus, toasts).
   const [raiz, setRaiz] = useState<HTMLDivElement | null>(null);
 
@@ -140,6 +144,9 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
     // Tela que a pessoa não tem não abre (o menu já não a mostra; isto
     // cobre os atalhos internos, ex.: um link de Receber na Visão Executiva).
     if (!visiveis.includes(tela)) return;
+    // Filtros levados a Eventos (ex.: a faixa por status da Visão Executiva) entram na lista.
+    const filtros = extra?.filtros;
+    if (tela === "eventos" && filtros) setListaEventos((s) => aplicarFiltrosRecebidos(s, filtros));
     setEstado(estadoDe(tela, extra));
     window.scrollTo({ top: 0 });
   };
@@ -181,7 +188,11 @@ export function ShellFinanceiro({ usuario, acesso, capacidades, livro, hojeISO, 
         )}
         <div className="view-enter" key={`${estado.tela}:${estado.tela === "eventos" ? (estado.eventoId ?? "") : ""}`}>
           {estado.tela === "visao" && <TelaVisaoExecutiva {...props} filtros={filtrosVisao} aoMudarFiltros={setFiltrosVisao} />}
-          {estado.tela === "eventos" && <EmConstrucao titulo={ROTULO.eventos} {...props} />}
+          {estado.tela === "eventos" && !estado.eventoId && (
+            <TelaEventos {...props} lista={listaEventos} aoMudarLista={setListaEventos} />
+          )}
+          {/* Área do evento: Task 14. */}
+          {estado.tela === "eventos" && estado.eventoId && <EmConstrucao titulo={ROTULO.eventos} {...props} />}
           {estado.tela === "receber" && <EmConstrucao titulo={ROTULO.receber} {...props} />}
           {estado.tela === "pagar" && <EmConstrucao titulo={ROTULO.pagar} {...props} />}
         </div>

@@ -21,6 +21,7 @@ export function carregarFixture(): FixtureParidade {
       eventoComercialId: null,
       cadastroPendente: false,
       canceladoNoCrm: false,
+      camposDoCrm: [],
       ...(e as object),
     })),
   } as unknown as LivroFinanceiro;

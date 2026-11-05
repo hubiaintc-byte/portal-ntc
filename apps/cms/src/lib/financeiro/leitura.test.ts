@@ -51,6 +51,12 @@ describe("mesclarEventos", () => {
     expect(um(mesclarEventos([fin], [crm])).refContratual).toBe("2026NE1");
     expect(um(mesclarEventos([{ ...fin, refContratual: "X" }], [crm])).refContratual).toBe("X");
   });
+  it("camposDoCrm lista só os campos que o CRM preencheu", () => {
+    expect(um(mesclarEventos([fin], [crm])).camposDoCrm).toEqual(["nome", "modalidade", "local", "dataInicio", "cliente"]);
+    const semNada = { id: 13, titulo: "", dataInicio: null, dataFim: null, modalidade: null, local: "", cliente: null, status: "agendado" as const };
+    expect(um(mesclarEventos([], [semNada])).camposDoCrm).toEqual([]);
+    expect(um(mesclarEventos([{ id: 9, nome: "Próprio" }], [])).camposDoCrm).toEqual([]);
+  });
   it("evento só do financeiro tem origem financeiro", () => {
     const r = mesclarEventos([{ id: 9, nome: "Próprio" }], []);
     expect(um(r)).toMatchObject({ origem: "financeiro", eventoComercialId: null, cadastroPendente: false });

@@ -687,4 +687,14 @@
   }
   /* Gaveta de pendências: o protótipo zera o padding do corpo. */
   & .ov-body.sem-recuo { padding: 0; }
+  /* Eventos. O cartão `article[role=link]` do protótipo vira `<button>`:
+     zera o desenho do navegador com especificidade baixa (o `.ev-card`
+     do protótipo continua valendo). */
+  & :where(button.ev-card) { width: 100%; margin: 0; font: inherit; }
+  & :where(button.ev-card:not(.new-card)) { text-align: left; }
+  /* Selos de status, origem e situação do CRM lado a lado (cartão e lista). */
+  & .ec-foot-selos { gap: 6px; flex-wrap: wrap; }
+  & .selos-linha { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  /* Wizard: campo que o CRM preencheu (só leitura, "Editar no CRM"). */
+  & .fld input[readonly] { background: var(--surface-2); color: var(--grafite); }
 }

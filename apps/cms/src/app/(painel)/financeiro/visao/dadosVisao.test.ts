@@ -56,6 +56,7 @@ function evento(id: string, p: Partial<EventoFin> = {}): EventoFin {
     eventoComercialId: null,
     cadastroPendente: false,
     canceladoNoCrm: false,
+    camposDoCrm: [],
     ...p,
   };
 }

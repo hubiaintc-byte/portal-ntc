@@ -3,6 +3,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 import { Icone, type NomeIcone } from "./Icone";
+import { PortalFin05 } from "./PortalFin05";
 
 /**
  * Selos e marcadores do protótipo FIN-05: `.badge` (`badgeOp`/`badgeFin`),
@@ -131,10 +132,13 @@ export function Dica({ texto }: { texto: string }) {
       >
         <Icone nome="info" tamanho="xs" />
       </span>
+      {/* Fora do `.view-enter`/modal (ambos com transform), para o `fixed` valer contra a janela. */}
       {aberta && (
-        <div ref={caixa} className="tip" role="tooltip" style={{ left: -9999, top: -9999 }}>
-          {texto}
-        </div>
+        <PortalFin05>
+          <div ref={caixa} className="tip" role="tooltip" style={{ left: -9999, top: -9999 }}>
+            {texto}
+          </div>
+        </PortalFin05>
       )}
     </>
   );

@@ -6,6 +6,10 @@
 
 export type Centavos = number;
 
+/** Campos que o evento comercial do CRM já tem (spec §3.2): o valor do CRM vence quando preenchido. */
+export const CAMPOS_DO_CRM = ["nome", "modalidade", "local", "dataInicio", "dataFim", "cliente"] as const;
+export type CampoDoCrm = (typeof CAMPOS_DO_CRM)[number];
+
 export type StatusOperacional = "Planejado" | "Em preparação" | "Em execução" | "Realizado" | "Encerrado";
 
 export interface EventoFin {
@@ -39,6 +43,11 @@ export interface EventoFin {
   eventoComercialId: string | null;
   cadastroPendente: boolean;
   canceladoNoCrm: boolean;
+  /**
+   * Campos cujo valor veio do CRM (preenchidos lá): no wizard ficam só
+   * leitura, com "Editar no CRM". Vazio para evento próprio do financeiro.
+   */
+  camposDoCrm: CampoDoCrm[];
 }
 
 export interface EtapaReceita {
