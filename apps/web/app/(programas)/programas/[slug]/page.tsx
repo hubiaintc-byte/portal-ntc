@@ -564,9 +564,11 @@ export default async function ProgramaPage({ params }: Props) {
                     <Link className="btn btn--secondary" href={`/contato?programa=${p.slug}&assunto=folder`}>
                       Solicitar folder do programa
                     </Link>
+                    {p.modulosAbertos && (
                     <a className="btn btn--secondary" href="#modulos-abertos">
                       Ver módulos abertos
                     </a>
+                    )}
                   </div>
                 </article>
               ) : null}
@@ -611,9 +613,11 @@ export default async function ProgramaPage({ params }: Props) {
                     <Link className="btn btn--secondary" href={`/contato?programa=${p.slug}&assunto=folder`}>
                       Solicitar folder do programa
                     </Link>
+                    {p.modulosAbertos && (
                     <a className="link-arrow" href="#modulos-abertos">
                       Ver módulos abertos
                     </a>
+                    )}
                   </div>
                 </div>
               </aside>

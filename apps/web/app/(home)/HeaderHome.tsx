@@ -198,7 +198,7 @@ export function HeaderHome({ programas }: HeaderHomeProps) {
                 const itens = programas.porVertical[vertical];
                 return (
                   <div key={vertical} className="mega-col">
-                    <h4>{`${rotulo} · ${contagem(itens.length)}`}</h4>
+                    <h4>{programas.total === null ? rotulo : `${rotulo} · ${contagem(itens.length)}`}</h4>
                     <ul className="mega-list">
                       {itens.map((p) => (
                         <li key={p.slug}>
@@ -390,7 +390,7 @@ export function HeaderHome({ programas }: HeaderHomeProps) {
             <Link href="/programas/agip"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></Link>
             <Link href="/programas/lidera"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></Link>
             <Link href="/programas/prosus"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></Link>
-            <Link href="/programas"><strong>{`Ver todos os ${contagem(programas.total)} →`}</strong><span>Página completa</span></Link>
+            <Link href="/programas"><strong>{programas.total === null ? "Ver todos os programas →" : `Ver todos os ${contagem(programas.total)} →`}</strong><span>Página completa</span></Link>
           </div>
 
           <button

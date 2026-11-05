@@ -55,7 +55,8 @@ export interface ItemMenuPrograma {
 
 export interface MenuProgramas {
   porVertical: Record<Vertical, ItemMenuPrograma[]>;
-  total: number;
+  /** `null` quando a leitura falhou (menu vazio, contagem desconhecida). */
+  total: number | null;
 }
 
 // ============================================================
@@ -242,6 +243,24 @@ export const obterListasProgramas = cache(
   (): Promise<ListasProgramas> => carregarListasProgramas(),
 );
 
+/** Menu sem programas e sem contagem: o que o cabeçalho mostra se o CMS falhar. */
+export const MENU_PROGRAMAS_VAZIO: MenuProgramas = {
+  porVertical: { educacao: [], "gestao-publica": [], saude: [] },
+  total: null,
+};
+
+/**
+ * Menu do cabeçalho de TODO layout do site. Diferente das listas (que
+ * lançam, R20), o menu tolera falha (R26): um erro de leitura do CMS — ou
+ * nenhum programa publicado — não pode derrubar o prerender de toda página,
+ * o build do CI (sem banco) nem o 404 de slug desconhecido. Loga e devolve
+ * o menu vazio; "Ver todos os programas" continua levando a `/programas`.
+ */
 export async function obterMenuProgramas(): Promise<MenuProgramas> {
-  return menuDasListas(await obterListasProgramas());
+  try {
+    return menuDasListas(await obterListasProgramas());
+  } catch (erro) {
+    console.error("[menuProgramas] Falha ao ler os programas do CMS; menu vazio.", erro);
+    return MENU_PROGRAMAS_VAZIO;
+  }
 }

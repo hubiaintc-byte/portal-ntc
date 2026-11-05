@@ -11,7 +11,9 @@ import { FALLBACK_VERTICAIS } from "@/app/(vertical)/solucoes-estrategicas/[area
 import {
   carregarListasProgramas,
   cartaoDoPrograma,
+  menuDasListas,
   montarListas,
+  obterMenuProgramas,
   programasComEventoAtivo,
   trocarContagem,
   trocarContagemExtenso,
@@ -253,5 +255,37 @@ describe("carregarListasProgramas", () => {
   it("CMS sem nenhum programa publicado → lança", async () => {
     find.mockResolvedValue({ docs: [] });
     await expect(carregarListasProgramas(AGORA)).rejects.toThrow(/Nenhum programa publicado/);
+  });
+});
+
+describe("obterMenuProgramas (R26: o menu tolera falha)", () => {
+  beforeEach(() => {
+    find.mockReset();
+  });
+
+  it("falha do banco → menu vazio, total desconhecido, e loga [menuProgramas]", async () => {
+    const erro = vi.spyOn(console, "error").mockImplementation(() => {});
+    find.mockRejectedValue(new Error("coluna inexistente"));
+    const m = await obterMenuProgramas();
+    expect(m).toEqual({
+      porVertical: { educacao: [], "gestao-publica": [], saude: [] },
+      total: null,
+    });
+    expect(erro.mock.calls[0]?.[0]).toMatch(/\[menuProgramas\]/);
+    erro.mockRestore();
+  });
+
+  it("nenhum programa publicado → menu vazio (não derruba a página)", async () => {
+    const erro = vi.spyOn(console, "error").mockImplementation(() => {});
+    find.mockResolvedValue({ docs: [] });
+    const m = await obterMenuProgramas();
+    expect(m.total).toBeNull();
+    expect(m.porVertical.educacao).toEqual([]);
+    erro.mockRestore();
+  });
+
+  it("com programas: total conhecido", () => {
+    const l = montarListas([cartaoDoPrograma(campos("PEAR", "educacao", 1))]);
+    expect(menuDasListas(l).total).toBe(1);
   });
 });
