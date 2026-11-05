@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import {
+  buscarProgramaPublicado,
+  listarProgramasPublicados,
+  relacionadosDe,
+} from "@/lib/cms/programas";
 import { fundoResponsivo, imgResponsiva } from "@/lib/imagemLocal";
 
-import {
-  PROGRAMAS,
-  SLUGS_VALIDOS,
-  calcularRelacionados,
-} from "./conteudoIndex";
 import { NavBarAncoras } from "./NavBarAncoras";
 import { FaqAcordeao } from "./FaqAcordeao";
 import { ModulosAcordeao } from "./ModulosAcordeao";
@@ -17,16 +17,25 @@ import { ModulosAcordeao } from "./ModulosAcordeao";
  * Página `/programas/[slug]` — porta literal das ~13 seções dos
  * 15 protótipos `*_Pagina_Programa_*.html`.
  *
- * Conteúdo: `PROGRAMAS[slug]` (conteudoIndex.ts) com textos
- * extraídos 1:1 do HTML. Cromático: `<main className="program-page"
+ * Conteúdo: lido do CMS (`buscarProgramaPublicado`, lib/cms/programas.ts),
+ * só programas publicados. Cromático: `<main className="program-page"
  * data-programa={siglaCss}>` ativa os seletores específicos do CSS
  * portado em programas-prototipo.css.
  */
 
 export const revalidate = 3600;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return SLUGS_VALIDOS.map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  // Sem banco no build, nenhuma página é pré-gerada: com dynamicParams elas
+  // são geradas no primeiro acesso (e aí a falha do banco aparece).
+  try {
+    const programas = await listarProgramasPublicados();
+    return programas.map((p) => ({ slug: p.slug }));
+  } catch (erro) {
+    console.error("[programas] generateStaticParams sem CMS:", erro);
+    return [];
+  }
 }
 
 interface Props {
@@ -45,7 +54,7 @@ function primeiraFrase(html: string): string {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const p = PROGRAMAS[slug];
+  const p = await buscarProgramaPublicado(slug);
   if (!p) return { title: "Programa · Grupo NTC" };
   return {
     title: `${p.siglaExibida} · ${p.nomeCompleto}`,
@@ -74,10 +83,10 @@ function classeCta(variante?: string): string {
 
 export default async function ProgramaPage({ params }: Props) {
   const { slug } = await params;
-  const p = PROGRAMAS[slug];
+  const p = await buscarProgramaPublicado(slug);
   if (!p) notFound();
 
-  const relacionados = calcularRelacionados(slug);
+  const relacionados = relacionadosDe(slug, await listarProgramasPublicados());
 
   return (
     <main id="main" className="program-page" data-programa={p.siglaCss}>
@@ -391,6 +400,7 @@ export default async function ProgramaPage({ params }: Props) {
               </article>
 
               {/* MÓDULOS ABERTOS — layout de eventos */}
+              {p.modulosAbertos && (
               <article className="prog-section fade-in" id="modulos-abertos">
                 <p className="eyebrow">{p.modulosAbertos.eyebrow}</p>
                 {p.modulosAbertos.tituloHtml
@@ -446,7 +456,7 @@ export default async function ProgramaPage({ params }: Props) {
                             </div>
                           </div>
                           <div className="pef-actions">
-                            <Link className="btn btn--gold" href={`/contato?programa=${p.slug}`}>
+                            <Link className="btn btn--gold" href={f.ctaHref ?? `/contato?programa=${p.slug}`}>
                               {f.ctaPrimario} <span className="btn-arrow">→</span>
                             </Link>
                             <Link className="btn btn--secondary" href={`/contato?programa=${p.slug}&assunto=detalhes`}>
@@ -492,7 +502,7 @@ export default async function ProgramaPage({ params }: Props) {
                                 />
                                 <Link
                                   className="pem-cta"
-                                  href={`/contato?programa=${p.slug}&assunto=inscricao`}
+                                  href={mini.ctaHref ?? `/contato?programa=${p.slug}&assunto=inscricao`}
                                 >
                                   {mini.ctaRotulo}
                                 </Link>
@@ -523,6 +533,7 @@ export default async function ProgramaPage({ params }: Props) {
                   </div>
                 ) : null}
               </article>
+              )}
 
               {/* FAQ */}
               <article className="prog-section fade-in" id="faq">

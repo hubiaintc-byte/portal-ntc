@@ -221,3 +221,4 @@ export { MOLDE, ROTULO_VERTICAL, SIGLA_CSS_DA_VERTENTE, interpolarMolde } from "
 export { camposParaPagina, paginaVazia } from "./programas/paginaPrograma";
 export { ctaHrefPermitido } from "./programas/ctaHref";
 export { numeroPorExtenso } from "./programas/numeroPorExtenso";
+export { eventoAtivo, montarExtrasEventos, type EventoDoPrograma } from "./programas/modulosAbertos";
