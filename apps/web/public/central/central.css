@@ -1,0 +1,207 @@
+/* Fontes auto-hospedadas (OFL) */
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/cormorant-garamond-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:500;font-display:swap;src:url(fonts/cormorant-garamond-latin-500-italic.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/barlow-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/barlow-condensed-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/barlow-condensed-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* Central de Acesso NTC · v1.3
+   Tokens e tipografia: Manual de Marca Grupo NTC 2026.3 (§07 Paleta Gabinete Soberano v2026.2 · §10 Tipografia · §13 Assinatura e slogan)
+   Títulos e chamadas: Cormorant Garamond SemiBold (Azul ou Tinta) · Apoios e taglines: Cormorant Garamond Medium Italic
+   Corpo: Barlow Regular (Grafite) · Botões: Barlow SemiBold · Rótulos e metadados: Barlow Condensed
+   Regras: cantos retos em blocos estruturais, sem sombra, sem gradiente, duas famílias tipográficas. */
+:root{
+  --azul:#1A4372; --vermelho:#8E2A1C; --verde:#37661C; --dourado:#B8952E;
+  --noite:#0B1726; --pergaminho:#F2F0EA; --pergaminho-2:#E9E6DD; --branco:#FFFFFF;
+  --tinta:#14202E; --grafite:#3A4050; --hairline:#A8ACB6;
+  --prata-legivel:#767E8D;
+  --hair-dark:rgba(168,172,182,.28);
+  --accent:var(--azul);
+  --serif:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --sans:'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --cond:'Barlow Condensed', 'Barlow', system-ui, sans-serif;
+  --gutter:22px; --max:1040px;
+  --ease:cubic-bezier(.2,.6,.2,1);
+}
+[data-vert="educacao"]{--accent:var(--azul)}
+[data-vert="gestao"]{--accent:var(--vermelho)}
+[data-vert="saude"]{--accent:var(--verde)}
+[data-vert="grupo"]{--accent:var(--azul)}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--pergaminho);color:var(--grafite);font:400 16px/1.55 var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+.wrap{width:100%;max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Foco visível: Azul sobre fundos claros, Dourado sobre Noite */
+:focus{outline:none}
+:focus-visible{outline:3px solid var(--azul);outline-offset:3px}
+main:focus,main:focus-visible{outline:none}
+.dark :focus-visible,.hero :focus-visible,.footer :focus-visible,.panel-dark :focus-visible{outline-color:var(--dourado)}
+
+.skip{position:absolute;left:12px;top:-60px;z-index:50;background:var(--pergaminho);color:var(--tinta);padding:15px 14px;font:600 14px/1 var(--sans);text-decoration:none;border:1px solid var(--tinta)}
+.skip:focus{top:12px}
+
+/* Tipografia base */
+.eyebrow{display:flex;align-items:center;gap:10px;margin:0 0 16px;font:600 12px/1.2 var(--cond);letter-spacing:.24em;text-transform:uppercase;color:var(--vermelho)}
+.eyebrow .n{font-variant-numeric:lining-nums}
+.h2{margin:0;font:600 clamp(30px,7.6vw,40px)/1.08 var(--serif);letter-spacing:-.005em;color:var(--azul);text-wrap:balance}
+.lead{margin:12px 0 0;max-width:52ch;font:500 italic 19.5px/1.42 var(--serif);color:var(--grafite);text-wrap:pretty}
+
+/* ===== 1 · Cabeçalho institucional ===== */
+.hero{position:relative;background:var(--noite);color:var(--pergaminho);overflow:hidden;isolation:isolate}
+.hero__photo{position:absolute;inset:0;z-index:-2;background-size:cover;background-position:50% 40%}
+.hero__veil{position:absolute;inset:0;z-index:-1;background:rgba(11,23,38,.84)}
+.hero__top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:22px}
+.hero__logo{width:132px;height:auto}
+.hero__site{font:600 11.5px/1 var(--cond);letter-spacing:.2em;text-transform:uppercase;color:var(--hairline);text-decoration:none;display:inline-flex;align-items:center;min-height:44px;padding:0}
+.hero__site:hover{color:var(--dourado)}
+.hero__body{padding:54px 0 30px}
+.hero__label{margin:0 0 18px;font:600 11.5px/1.5 var(--cond);letter-spacing:.24em;text-transform:uppercase;color:var(--dourado)}
+.hero h1{margin:0;font:600 clamp(44px,12vw,68px)/1.0 var(--serif);letter-spacing:-.01em;color:var(--pergaminho)}
+.hero__slogan{margin:14px 0 0;padding-bottom:22px;border-bottom:1px solid var(--hair-dark);max-width:36ch;font:500 italic clamp(21px,5.6vw,26px)/1.3 var(--serif);color:var(--dourado)}
+.hero__lead{margin:20px 0 0;max-width:46ch;font-size:16px;line-height:1.55;color:var(--pergaminho)}
+.shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:34px 0 0;padding:0;list-style:none;border-top:1px solid var(--hair-dark)}
+.shortcuts li+li a{border-left:1px solid var(--hair-dark)}
+.shortcuts a{display:flex;align-items:center;justify-content:center;min-height:52px;padding:8px 4px;font:600 12.5px/1.1 var(--cond);letter-spacing:.16em;text-transform:uppercase;color:var(--pergaminho);text-decoration:none;text-align:center;transition:color .16s var(--ease)}
+.shortcuts a:hover{color:var(--dourado)}
+
+/* ===== Seções ===== */
+.section{padding:56px 0}
+.section__cta{margin-top:28px}
+/* Transição cabeçalho → primeira seção: a faixa de atalhos fecha o cabeçalho; a seção abre com respiro maior */
+#secoes > .section:first-child{padding-top:60px}
+.section + .section{border-top:1px solid var(--hairline)}
+.section--tint{background:var(--pergaminho-2)}
+
+/* Botões de interface (Design System: retângulo 2px, Barlow SemiBold) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:12px 20px;border:1px solid transparent;border-radius:2px;font:600 15px/1.2 var(--sans);text-decoration:none;cursor:pointer;transition:background-color .16s var(--ease),color .16s var(--ease)}
+.btn--primary{background:var(--azul);color:var(--pergaminho)}
+.btn--primary:hover,.btn--primary:active{background:var(--tinta)}
+.btn--light{background:var(--pergaminho);color:var(--azul)}
+.btn--light:hover{background:var(--branco)}
+.btn--ghost-dark{border-color:var(--hair-dark);color:var(--pergaminho)}
+.btn--ghost-dark:hover{border-color:var(--dourado);color:var(--dourado)}
+.btn .arr{font-family:var(--sans)}
+.tlink{display:inline-flex;align-items:center;gap:8px;min-height:44px;font:600 15px/1.2 var(--sans);color:var(--azul);text-decoration:none;border-bottom:1px solid transparent;transition:color .16s var(--ease)}
+.tlink:hover{color:var(--tinta);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+
+/* ===== Lista editorial numerada ===== */
+.rows{margin:28px 0 0;padding:0;list-style:none;border-top:1px solid var(--hairline)}
+.rows li{border-bottom:1px solid var(--hairline)}
+.row{display:grid;grid-template-columns:44px 1fr 22px;gap:14px;align-items:center;padding:18px 0;min-height:72px;text-decoration:none;color:inherit}
+.row__n{font:500 italic 25px/1 var(--serif);font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1;color:var(--azul)}
+.row__t{display:block;font:600 21px/1.18 var(--serif);color:var(--tinta);text-wrap:pretty}
+.row__d{display:block;margin-top:4px;font-size:15px;line-height:1.45;color:var(--grafite);text-wrap:pretty}
+.row__a{font-size:19px;color:var(--azul);justify-self:end;transition:transform .16s var(--ease)}
+a.row:hover .row__t{color:var(--azul)}
+a.row:hover .row__a{transform:translateX(3px)}
+
+/* ===== 3 · Verticais ===== */
+.verts{display:grid;grid-template-columns:1fr;gap:12px;margin:28px 0 0}
+.vcard{position:relative;display:block;padding:22px 20px 20px 26px;background:var(--branco);border:1px solid var(--hairline);text-decoration:none;color:inherit}
+.vcard::before{content:"";position:absolute;left:-1px;top:-1px;bottom:-1px;width:6px;background:var(--accent)}
+.vcard__name{display:block;font:600 12.5px/1.2 var(--cond);letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.vcard__line{display:block;margin-top:10px;font:500 italic 22px/1.18 var(--serif);color:var(--tinta)}
+.vcard__desc{display:block;margin-top:8px;font-size:15px;line-height:1.45;color:var(--grafite)}
+.vcard__go{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font:600 14.5px/1 var(--sans);color:var(--azul)}
+a.vcard:hover .vcard__go{text-decoration:underline;text-underline-offset:4px}
+.models{display:flex;flex-wrap:wrap;gap:6px 22px;margin:22px 0 0;padding:0;list-style:none}
+.models li{display:inline-flex;align-items:center;gap:9px;font:600 12px/1 var(--cond);letter-spacing:.2em;text-transform:uppercase;color:var(--grafite);padding:6px 0}
+.models li::before{content:"";width:6px;height:6px;background:var(--azul);flex:none}
+.cta-panel{margin:30px 0 0;padding:30px 22px;background:var(--azul);color:var(--pergaminho)}
+.cta-panel__t{margin:0;font:600 clamp(27px,6.8vw,36px)/1.08 var(--serif);color:var(--pergaminho);text-wrap:balance}
+.cta-panel__p{margin:12px 0 22px;max-width:46ch;font:500 italic 19px/1.4 var(--serif);color:var(--pergaminho)}
+.cta-panel__row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px}
+.cta-panel .tlink{color:var(--pergaminho)}
+.cta-panel .tlink:hover{color:var(--pergaminho)}
+.cta-panel :focus-visible{outline-color:var(--pergaminho)}
+
+/* ===== 5 · EventON (bloco cerimonial escuro) ===== */
+.panel-dark{background:var(--noite);color:var(--pergaminho)}
+.panel-dark .eyebrow{color:var(--dourado)}
+.panel-dark .h2{color:var(--pergaminho);font-size:clamp(36px,9vw,52px)}
+.panel-dark .lead{color:var(--pergaminho)}
+.panel-dark__actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.section.panel-dark + .section{border-top:0}
+
+/* ===== 6 · Grupo NTC ===== */
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:28px 0 0;border-top:1px solid var(--hairline)}
+.stat{padding:18px 14px 18px 0;border-bottom:1px solid var(--hairline)}
+.stat:nth-child(odd){border-right:1px solid var(--hairline)}
+.stat:nth-child(even){padding-left:18px}
+.stat__l1{display:block;font:600 11.5px/1.2 var(--cond);letter-spacing:.2em;text-transform:uppercase;color:var(--grafite)}
+.stat__v{display:block;margin-top:6px;font:600 clamp(34px,9vw,44px)/1 var(--serif);font-variant-numeric:lining-nums;font-feature-settings:'lnum' 1;letter-spacing:-.02em;color:var(--azul);white-space:nowrap}
+.stat__v sup{font-size:.6em;vertical-align:.45em;margin-left:1px}
+.stat__l2{display:block;margin-top:6px;font-size:14.5px;color:var(--grafite)}
+.source{margin:12px 0 0;font:600 11.5px/1.3 var(--cond);letter-spacing:.2em;text-transform:uppercase;color:var(--grafite)}
+.links-inline{display:flex;flex-wrap:wrap;gap:4px 26px;margin-top:20px}
+
+/* ===== 7 · Contato ===== */
+.channels{margin:28px 0 0;padding:0;list-style:none;border-top:1px solid var(--hairline)}
+.channels li{border-bottom:1px solid var(--hairline)}
+.channel{display:grid;grid-template-columns:104px 1fr 22px;gap:12px;align-items:center;min-height:64px;padding:14px 0;text-decoration:none;color:inherit}
+.channel__l{font:600 12px/1.2 var(--cond);letter-spacing:.2em;text-transform:uppercase;color:var(--vermelho)}
+.channel__v{font:500 17px/1.3 var(--sans);color:var(--tinta);overflow-wrap:anywhere}
+.channel__a{color:var(--azul);justify-self:end}
+a.channel:hover .channel__v{color:var(--azul)}
+
+/* ===== 8 · Rodapé ===== */
+.footer{background:var(--noite);color:var(--hairline);padding:46px 0 34px}
+.footer__logo{width:112px;height:auto}
+.footer__sig{margin:24px 0 0;font:500 italic 24px/1.25 var(--serif);color:var(--dourado)}
+.footer__slogan{margin:6px 0 0;font:500 italic 18px/1.35 var(--serif);color:var(--pergaminho)}
+.footer__data{margin:22px 0 0;padding-top:18px;border-top:1px solid var(--hair-dark);font:500 13px/1.65 var(--cond);letter-spacing:.08em;color:var(--hairline)}
+.footer__data strong{color:var(--pergaminho);font-weight:600}
+.footer__links{display:flex;flex-wrap:wrap;gap:4px 22px;margin-top:14px}
+.footer__links a{display:inline-flex;align-items:center;min-height:44px;min-width:44px;font:600 12px/1 var(--cond);letter-spacing:.2em;text-transform:uppercase;color:var(--pergaminho);text-decoration:none}
+.footer__links a:hover{color:var(--dourado)}
+
+/* ===== Estados de revisão (?revisao=1) ===== */
+.is-pending{opacity:.62;cursor:not-allowed}
+.badge-pend{display:inline-block;margin-left:8px;padding:3px 6px;border:1px dashed var(--vermelho);font:600 10.5px/1 var(--cond);letter-spacing:.12em;text-transform:uppercase;color:var(--vermelho);vertical-align:middle}
+.review{background:var(--tinta);color:var(--pergaminho);padding:26px 0 30px;font-size:14px}
+.review h2{margin:0 0 6px;font:600 22px/1.2 var(--serif)}
+.review table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
+.review th,.review td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--hair-dark);vertical-align:top;overflow-wrap:anywhere}
+.review th{font:600 11.5px/1.2 var(--cond);letter-spacing:.12em;text-transform:uppercase;color:var(--hairline)}
+.review .ok{color:var(--pergaminho)}.review .pend{color:var(--dourado)}
+.review a{color:var(--pergaminho)}
+.review__bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+@media (max-width:599px){.review thead{display:none}.review tr{display:block;padding:10px 0;border-bottom:1px solid var(--hair-dark)}.review td{display:block;border:0;padding:2px 0;overflow-wrap:break-word}.review td:first-child{font:600 11.5px/1.3 var(--cond);letter-spacing:.12em;text-transform:uppercase;color:var(--hairline)}.review td:last-child{overflow-wrap:anywhere}}
+.review input{font:500 14px var(--sans);padding:8px;border:1px solid var(--hairline);border-radius:2px;background:var(--pergaminho);color:var(--tinta)}
+
+/* ===== Responsivo ===== */
+@media (min-width:600px){
+  :root{--gutter:32px}
+  .verts{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .stat,.stat:nth-child(even){padding:20px 18px;border-right:1px solid var(--hairline)}
+  .stat:first-child{padding-left:0}
+  .stat:last-child{border-right:0}
+  .cta-panel{padding:38px 40px}
+}
+@media (min-width:900px){
+  .section{padding:76px 0}
+  #secoes > .section:first-child{padding-top:80px}
+  .hero__body{padding:84px 0 40px}
+  .hero__logo{width:150px}
+  .split{display:grid;grid-template-columns:5fr 7fr;gap:56px;align-items:start}
+  .split .rows,.split .channels{margin-top:4px}
+}
+@media (max-width:519px){
+  .channel{grid-template-columns:1fr 22px;gap:4px 12px}
+  .channel__l{grid-column:1;grid-row:1}
+  .channel__v{grid-column:1;grid-row:2}
+  .channel__a{grid-column:2;grid-row:1 / span 2}
+}
+@media (max-width:359px){
+  :root{--gutter:16px}
+  .shortcuts a{font-size:12px;letter-spacing:.08em}
+}
+@media print{.hero__photo,.hero__veil,.shortcuts,.review{display:none}.hero,.footer,.panel-dark{background:none;color:var(--tinta)}}
