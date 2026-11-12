@@ -248,7 +248,7 @@ describe("custos", () => {
       comportamento: "A validar",
       unidade: "un",
       qtde: "1",
-      competencia: "2026-08-12",
+      competencia: "2026-08",
       dataPrevista: "2026-08-10",
     });
     const d = dadosDoCusto(
@@ -269,7 +269,7 @@ describe("custos", () => {
   it("editar mostra a competência AAAA-MM como data e preserva compartilhada/origem/periodicidade", () => {
     const c = cus({ compartilhada: true, origemLancamento: "Manual", periodicidade: "Mensal" });
     const f = formCusto(ev(), c);
-    expect(f.competencia).toBe("2026-08-01");
+    expect(f.competencia).toBe("2026-08");
     expect(dadosDoCusto(f, ev(), c)).toMatchObject({
       compartilhada: true,
       origemLancamento: "Manual",

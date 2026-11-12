@@ -316,7 +316,7 @@ describe("receita corporativa", () => {
     expect(f).toMatchObject({
       origem: "Consultoria institucional",
       centroCusto: "ADM",
-      competencia: "2026-07-01",
+      competencia: "2026-07",
       statusEconomico: "Contratada",
       segmento: "Privado/Outro",
       tipoReceita: "Valor global",
@@ -348,7 +348,7 @@ describe("receita corporativa", () => {
 
   it("editar reabre com a competência como data e preserva o que não está no formulário", () => {
     const f = formReceitaCorp(corp, HOJE);
-    expect(f.competencia).toBe("2026-07-01");
+    expect(f.competencia).toBe("2026-07");
     const d = dadosDaReceitaCorp(f, { ...corp, etapa: "E1", desconto: 100 });
     expect(d).toMatchObject({ etapa: "E1", desconto: 100, competencia: "2026-07" });
   });

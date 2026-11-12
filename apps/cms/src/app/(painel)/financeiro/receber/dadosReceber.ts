@@ -26,7 +26,7 @@ import {
   type SerieGrafico,
 } from "@ntc/lib";
 
-import { dataDaCompetencia } from "../eventos/dadosLancamentos";
+import { competenciaDoForm } from "../eventos/dadosLancamentos";
 import { dataCurta, moeda } from "../ui/formato";
 
 /**
@@ -284,7 +284,7 @@ export const eventosParaFaturar = (eventos: readonly EventoFin[]): EventoFin[] =
 
 // ------------------------------------------------- receita corporativa
 
-/** Estado do formulário de receita corporativa; competência como data (`AAAA-MM-01`). */
+/** Estado do formulário de receita corporativa; competência como mês e ano (`AAAA-MM`). */
 export interface FormReceitaCorp {
   cliente: string;
   origem: string;
@@ -307,7 +307,7 @@ export function formReceitaCorp(r: ReceitaFin | null, hoje: string): FormReceita
       origem: r.origem,
       centroCusto: r.centroCusto,
       valorUnit: n(r.valorUnit),
-      competencia: dataDaCompetencia(r.competencia),
+      competencia: competenciaDoForm(r.competencia),
       statusEconomico: r.statusEconomico,
       referencia: r.referencia,
       segmento: r.segmento,
@@ -320,7 +320,7 @@ export function formReceitaCorp(r: ReceitaFin | null, hoje: string): FormReceita
     origem: "Consultoria institucional",
     centroCusto: "ADM",
     valorUnit: 0,
-    competencia: `${hoje.slice(0, 7)}-01`,
+    competencia: hoje.slice(0, 7),
     statusEconomico: "Contratada",
     referencia: "",
     segmento: "Privado/Outro",

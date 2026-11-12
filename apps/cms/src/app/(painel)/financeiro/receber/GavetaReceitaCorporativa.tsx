@@ -13,6 +13,7 @@ import {
 import { salvarReceitaFinAcao } from "../../acoesFinanceiro";
 import {
   CampoAreaTexto,
+  CampoCompetencia,
   CampoSelect,
   CampoTexto,
   Grupo,
@@ -211,15 +212,15 @@ export function GavetaReceitaCorporativa({
           aoMudarValidade={(ok) => setValidade((v) => comValidade(v, "valorUnit", ok))}
           erro={erroDe("valorUnit")}
         />
-        <CampoTexto
+        <CampoCompetencia
           campo="competencia"
           rotulo="Competência econômica"
           span={3}
           obrigatorio
-          tipo="date"
           dica="Mês em que o fato econômico é reconhecido — independe do faturamento e do recebimento."
           valor={f.competencia}
           aoMudar={mudar("competencia")}
+          anoReferencia={Number(hojeISO.slice(0, 4))}
           erro={erroDe("competencia")}
         />
         <CampoSelect

@@ -385,7 +385,7 @@ describe("despesa corporativa: formulário", () => {
     expect(f).toMatchObject({
       centroCusto: "ADM",
       compartilhada: false,
-      competencia: "2026-07-01",
+      competencia: "2026-07",
       periodicidade: "Mensal",
       comportamento: "Fixo",
       qtde: "1",
@@ -426,7 +426,7 @@ describe("despesa corporativa: formulário", () => {
 
   it("editar preserva o que o formulário não mostra", () => {
     const f = formDespesaCorp({ ...aluguel, driver: "Escala", unidade: "verba" }, HOJE);
-    expect(f.competencia).toBe("2026-07-01");
+    expect(f.competencia).toBe("2026-07");
     const d = dadosDaDespesaCorp(f, { ...aluguel, driver: "Escala", unidade: "verba" });
     expect(d.driver).toBe("Escala");
     expect(d.unidade).toBe("verba");

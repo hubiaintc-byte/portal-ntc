@@ -50,8 +50,8 @@ export const comSinal = (v: Centavos): string => `${v > 0 ? "+" : ""}${moeda(v)}
 /** Classe do desvio: acima do previsto é ruim (`neg`), abaixo é bom (`pos`). */
 export const classeDesvio = (v: Centavos): string => (v > 0 ? "neg" : v < 0 ? "pos" : "");
 
-/** Data do formulário (`AAAA-MM-DD`) a partir de uma competência `AAAA-MM` gravada. */
-export const dataDaCompetencia = (c: string): string => (/^\d{4}-\d{2}$/.test(c) ? `${c}-01` : c);
+/** Competência do formulário (`AAAA-MM`) a partir do que está gravado (tolera data completa). */
+export const competenciaDoForm = (c: string): string => (c ? mesDe(c) : "");
 
 // ================================================================ custos
 
@@ -176,7 +176,7 @@ export interface FormCusto {
   qtde: string;
   valorUnitPrev: Centavos | null;
   valorRealizado: Centavos | null;
-  /** Data no formulário; gravada como `AAAA-MM`. */
+  /** Mês e ano (`AAAA-MM`), como se grava. */
   competencia: string;
   dataPrevista: string;
   criterioApropriacao: string;
@@ -204,7 +204,7 @@ export function formCusto(
       qtde: String(n(c.qtde)),
       valorUnitPrev: n(c.valorUnitPrev),
       valorRealizado: n(c.valorRealizado),
-      competencia: dataDaCompetencia(c.competencia),
+      competencia: competenciaDoForm(c.competencia),
       dataPrevista: c.dataPrevista,
       criterioApropriacao: c.criterioApropriacao,
       observacao: c.observacao,
@@ -224,7 +224,7 @@ export function formCusto(
     qtde: "1",
     valorUnitPrev: 0,
     valorRealizado: 0,
-    competencia: ev.dataFim,
+    competencia: competenciaDoForm(ev.dataFim),
     dataPrevista: ev.dataInicio,
     criterioApropriacao: "",
     observacao: "",

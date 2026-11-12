@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { Icone, type NomeIcone } from "../ui/Icone";
 import { Dica } from "../ui/Selo";
@@ -345,5 +345,93 @@ export function MaisDetalhes({
       </summary>
       <div className="form">{children}</div>
     </details>
+  );
+}
+
+const MESES = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+] as const;
+
+interface PropsCompetencia extends PropsFld {
+  /** `AAAA-MM`, ou `""` enquanto mês e ano não estão os dois escolhidos. */
+  valor: string;
+  aoMudar: (v: string) => void;
+  /** Ano em torno do qual a lista de anos é montada quando o campo está vazio. */
+  anoReferencia: number;
+}
+
+/**
+ * Competência como **mês e ano** (o que se grava), em dois `<select>` — o
+ * `type="month"` nativo não tem seletor no Safari nem no Firefox de desktop.
+ * Só emite valor com os dois escolhidos; a escolha parcial fica local.
+ */
+export function CampoCompetencia({ valor, aoMudar, anoReferencia, ...fld }: PropsCompetencia) {
+  const casado = /^(\d{4})-(\d{2})$/.exec(valor);
+  const [mes, setMes] = useState(casado ? casado[2]! : "");
+  const [ano, setAno] = useState(casado ? casado[1]! : "");
+  const anoValor = ano ? Number(ano) : anoReferencia;
+  const primeiro = Math.min(anoValor, anoReferencia) - 5;
+  const ultimo = Math.max(anoValor, anoReferencia) + 3;
+  const anos: string[] = [];
+  for (let a = primeiro; a <= ultimo; a++) anos.push(String(a));
+  const emitir = (m: string, a: string) => aoMudar(m && a ? `${a}-${m}` : "");
+  const comum = {
+    "aria-invalid": fld.erro ? true : undefined,
+    "aria-describedby": descr(fld.campo, fld.erro),
+    "aria-required": fld.obrigatorio || undefined,
+  };
+  return (
+    <Fld {...fld}>
+      <div className="fld-competencia">
+        <select
+          id={`f_${fld.campo}`}
+          aria-label={`${fld.rotulo}: mês`}
+          value={mes}
+          {...comum}
+          onChange={(e) => {
+            setMes(e.target.value);
+            emitir(e.target.value, ano);
+          }}
+        >
+          <option value="">Mês</option>
+          {MESES.map((nome, i) => {
+            const m = String(i + 1).padStart(2, "0");
+            return (
+              <option key={m} value={m}>
+                {nome}
+              </option>
+            );
+          })}
+        </select>
+        <select
+          id={`f_${fld.campo}_ano`}
+          aria-label={`${fld.rotulo}: ano`}
+          value={ano}
+          {...comum}
+          onChange={(e) => {
+            setAno(e.target.value);
+            emitir(mes, e.target.value);
+          }}
+        >
+          <option value="">Ano</option>
+          {anos.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
+        </select>
+      </div>
+    </Fld>
   );
 }

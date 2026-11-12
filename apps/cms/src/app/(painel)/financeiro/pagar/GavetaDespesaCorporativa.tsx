@@ -15,6 +15,7 @@ import {
   Calculado,
   CampoAreaTexto,
   CampoChips,
+  CampoCompetencia,
   CampoSelect,
   CampoTexto,
   Grupo,
@@ -257,14 +258,14 @@ export function GavetaDespesaCorporativa({
           aoMudarValidade={validadeDe("valorRealizado")}
           erro={erroDe("valorRealizado")}
         />
-        <CampoTexto
+        <CampoCompetencia
           campo="competencia"
           rotulo="Competência econômica"
           span={3}
           obrigatorio
-          tipo="date"
           valor={f.competencia}
           aoMudar={mudar("competencia")}
+          anoReferencia={Number(hojeISO.slice(0, 4))}
           erro={erroDe("competencia")}
         />
         <CampoTexto

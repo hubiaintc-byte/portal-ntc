@@ -28,6 +28,7 @@ import {
   Calculado,
   CampoAreaTexto,
   CampoChips,
+  CampoCompetencia,
   CampoSelect,
   CampoTexto,
   Grupo,
@@ -52,8 +53,8 @@ import {
 /**
  * Gaveta de custo do evento (`openCustoDrawer` do protótipo). Acrescenta o
  * **Centro de custo** (padrão OPE, spec §3.7) em "Mais detalhes" e, ao editar,
- * o Histórico. Competência: o protótipo usa campo de data; o portal grava o
- * mês (`AAAA-MM`) dessa data.
+ * o Histórico. Competência: o protótipo usa campo de data; o portal pede e
+ * grava só mês e ano (`AAAA-MM`), decisão do PO de 12/11.
  */
 
 interface GavetaCustoProps {
@@ -354,13 +355,13 @@ export function GavetaCusto({ evento: ev, custo: c, livro, aoSalvo, aoFechar }: 
             aoMudar={mudar("dataPrevista")}
             erro={erroDe("dataPrevista")}
           />
-          <CampoTexto
+          <CampoCompetencia
             campo="competencia"
             rotulo="Competência"
             span={2}
-            tipo="date"
             valor={f.competencia}
             aoMudar={mudar("competencia")}
+            anoReferencia={Number((c?.competencia || ev.dataFim || "2026").slice(0, 4))}
             erro={erroDe("competencia")}
           />
           <CampoSelect

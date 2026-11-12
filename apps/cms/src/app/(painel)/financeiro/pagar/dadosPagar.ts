@@ -23,7 +23,7 @@ import {
   type SerieGrafico,
 } from "@ntc/lib";
 
-import { dataDaCompetencia } from "../eventos/dadosLancamentos";
+import { competenciaDoForm } from "../eventos/dadosLancamentos";
 import {
   algumFiltroReceber,
   aplicarFiltrosReceber,
@@ -302,7 +302,7 @@ export const totaisDespesasCorporativas = (
 
 // --------------------------------------------------- despesa corporativa
 
-/** Estado do formulário da despesa corporativa; competência como data (`AAAA-MM-01`). */
+/** Estado do formulário da despesa corporativa; competência como mês e ano (`AAAA-MM`). */
 export interface FormDespesaCorp {
   descricao: string;
   categoria: string;
@@ -332,7 +332,7 @@ export function formDespesaCorp(c: CustoFin | null, hoje: string): FormDespesaCo
       compartilhada: !!c.compartilhada,
       valorUnitPrev: n(c.valorUnitPrev),
       valorRealizado: n(c.valorRealizado),
-      competencia: dataDaCompetencia(c.competencia),
+      competencia: competenciaDoForm(c.competencia),
       dataPrevista: c.dataPrevista,
       fornecedor: c.fornecedor,
       documento: c.documento,
@@ -350,7 +350,7 @@ export function formDespesaCorp(c: CustoFin | null, hoje: string): FormDespesaCo
     compartilhada: false,
     valorUnitPrev: 0,
     valorRealizado: 0,
-    competencia: `${hoje.slice(0, 7)}-01`,
+    competencia: hoje.slice(0, 7),
     dataPrevista: "",
     fornecedor: "",
     documento: "",
