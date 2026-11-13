@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  aplicarIdentidadeCms,
+  normalizarProgramaContato,
   compararPaginas,
   diffLinhas,
   extrairMain,
@@ -150,5 +152,40 @@ describe("soReordenacao (R19: mapa do site, Gestão Pública reordenada)", () =>
   });
   it("sem diferença → falso (nada a explicar)", () => {
     expect(soReordenacao([])).toBe(false);
+  });
+});
+
+describe("aplicarIdentidadeCms", () => {
+  const trocas = [
+    { slugPagina: "proaps", slugCms: "proaps-plus", nomePagina: "Nome Antigo", nomeCms: "Nome Novo" },
+    { slugPagina: "pear", slugCms: "pear", nomePagina: "Pear Antigo", nomeCms: "Pear Antigo" },
+  ];
+
+  it("troca endereço e nome, sem tocar em slug que só começa igual", () => {
+    const html =
+      '<a href="/programas/proaps">Nome Antigo</a><a href="/programas/proaps/modulos/x">' +
+      '</a><a href="/programas/proaps#topo"></a><a href="/programas/proapsx"></a>';
+    expect(aplicarIdentidadeCms(html, trocas)).toBe(
+      '<a href="/programas/proaps-plus">Nome Novo</a><a href="/programas/proaps-plus/modulos/x">' +
+        '</a><a href="/programas/proaps-plus#topo"></a><a href="/programas/proapsx"></a>',
+    );
+  });
+
+  it("sem diferença de identidade → HTML intacto", () => {
+    const html = '<a href="/programas/pear">Pear Antigo</a>';
+    expect(aplicarIdentidadeCms(html, trocas)).toBe(html);
+  });
+});
+
+describe("normalizarProgramaContato", () => {
+  const trocas = [
+    { slugPagina: "proaps", slugCms: "proaps-plus", nomePagina: "A", nomeCms: "B" },
+  ];
+  it("leva o endereço do CMS à forma antiga e deixa o resto", () => {
+    const html =
+      '<a href="/contato?programa=proaps-plus">x</a><a href="/contato?programa=proaps&modalidade=trilha">y</a>';
+    expect(normalizarProgramaContato(html, trocas)).toBe(
+      '<a href="/contato?programa=proaps">x</a><a href="/contato?programa=proaps&modalidade=trilha">y</a>',
+    );
   });
 });

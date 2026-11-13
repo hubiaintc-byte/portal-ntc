@@ -246,10 +246,19 @@ export function planejarCargaPaginas(
     else if (d === "divergente") divergencias.push(nome);
   };
 
-  // Identificação: só preenche se vazio; diferença é relatada.
-  const textos = [
+  // Identidade do programa (endereço e nome completo): o CMS é a fonte oficial
+  // (decisão do PO, 12/11). Só preenche se vazio; valor diferente fica como
+  // está no CMS e não conta como divergência.
+  const identidade = [
     ["slug", atual.slug, campos.slug],
     ["nomeCompleto", atual.nomeCompleto, campos.nomeCompleto],
+  ] as const;
+  for (const [nome, a, b] of identidade) {
+    if (decidir(chave(a), chave(b), VAZIO_CHAVE) === "escrever") escrita[nome] = b;
+  }
+
+  // Carga horária: só preenche se vazio; diferença é relatada.
+  const textos = [
     [
       "cargaHorariaTotal",
       atual.cargaHorariaTotal === "A definir" ? null : atual.cargaHorariaTotal,

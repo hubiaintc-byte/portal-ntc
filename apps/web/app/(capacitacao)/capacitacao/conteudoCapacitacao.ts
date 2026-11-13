@@ -234,8 +234,8 @@ export const cardsVerticaisCapacitacao: CardVerticalCap[] = [
     contagem: "3 programas estratégicos",
     programas: [
       { textoHtml: "<strong>SIGS</strong><span>Gestão integrada SUS</span>", href: "/programas/sigs", cmsLink: "programa-SIGS" },
-      { textoHtml: "<strong>PROAPS+</strong><span>Atenção Primária</span>", href: "/programas/proaps", cmsLink: "programa-PROAPS" },
-      { textoHtml: "<strong>PROSUS+</strong><span>Direção institucional SUS</span>", href: "/programas/prosus", cmsLink: "programa-PROSUS" },
+      { textoHtml: "<strong>PROAPS+</strong><span>Atenção Primária</span>", href: "/programas/proaps-plus", cmsLink: "programa-PROAPS" },
+      { textoHtml: "<strong>PROSUS+</strong><span>Direção institucional SUS</span>", href: "/programas/prosus-plus", cmsLink: "programa-PROSUS" },
     ],
     link: {
       texto: "Conhecer a vertical",

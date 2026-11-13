@@ -389,7 +389,7 @@ export function HeaderHome({ programas }: HeaderHomeProps) {
             <Link href="/programas/proge"><strong>PROGE</strong><span>NTC Educação · Gestão escolar</span></Link>
             <Link href="/programas/agip"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></Link>
             <Link href="/programas/lidera"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></Link>
-            <Link href="/programas/prosus"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></Link>
+            <Link href="/programas/prosus-plus"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></Link>
             <Link href="/programas"><strong>{programas.total === null ? "Ver todos os programas →" : `Ver todos os ${contagem(programas.total)} →`}</strong><span>Página completa</span></Link>
           </div>
 

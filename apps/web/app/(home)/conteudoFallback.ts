@@ -514,7 +514,7 @@ export const FALLBACK_HOME = {
       tituloLong:
         "PROSUS+ — Programa Estratégico de Governança, Financiamento e Performance no SUS",
       corLink: "olive",
-      ctaConhecer: { rotulo: "Conhecer programa", href: "/programas/prosus" },
+      ctaConhecer: { rotulo: "Conhecer programa", href: "/programas/prosus-plus" },
       ctaSecundario: { rotulo: "Ver módulo aberto", href: "/agenda" },
     },
     {

@@ -22,6 +22,11 @@
  * para AGIP·LIDERA·SIGA (ruling R19, ordem única do cartão). Sai como
  * `ESPERADO` com o diff impresso, para o PO conferir.
  *
+ * Também ESPERADO: diferença feita só da troca de nome completo e endereço
+ * para os do CMS (decisão do PO, 12/11 — PROAPS+ e PROSUS+ passam a
+ * `/programas/proaps-plus` e `/programas/prosus-plus`, com redirecionamento
+ * dos antigos). A tabela fica em `scripts/identidade-programas-cms.json`.
+ *
  * Uso (Node >= 22.18 — importa o .ts sem flag):
  *   node scripts/conferir-paginas-programas.mjs <ANTES> <DEPOIS>
  *   ex.: node scripts/conferir-paginas-programas.mjs https://www.institutontc.com.br http://localhost:3000
@@ -32,7 +37,12 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { compararPaginas, soReordenacao } from "../packages/lib/src/programas/conferirHtml.ts";
+import {
+  aplicarIdentidadeCms,
+  compararPaginas,
+  normalizarProgramaContato,
+  soReordenacao,
+} from "../packages/lib/src/programas/conferirHtml.ts";
 
 const raiz = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -63,6 +73,11 @@ async function baixar(base, caminho) {
   return resposta.text();
 }
 
+/** Nome completo e endereço oficiais são os do CMS (decisão do PO, 12/11). */
+const trocasIdentidade = JSON.parse(
+  readFileSync(join(raiz, "scripts/identidade-programas-cms.json"), "utf8"),
+).programas;
+
 /** Páginas cuja reordenação pura é esperada (R19). */
 const REORDENACAO_ESPERADA = new Set(["/mapa-do-site"]);
 
@@ -79,9 +94,19 @@ for (const caminho of caminhos) {
       baixar(antesBase, caminho),
       baixar(depoisBase, caminho),
     ]);
-    const diff = compararPaginas(antes, depois);
-    if (diff.length === 0) {
+    const diffBruto = compararPaginas(antes, depois);
+    if (diffBruto.length === 0) {
       console.log(`OK    ${caminho}`);
+      continue;
+    }
+    const diff = compararPaginas(
+      normalizarProgramaContato(aplicarIdentidadeCms(antes, trocasIdentidade), trocasIdentidade),
+      normalizarProgramaContato(depois, trocasIdentidade),
+    );
+    if (diff.length === 0) {
+      esperadas += 1;
+      console.log(`ESPERADO ${caminho}  (só nome completo/endereço do CMS — decisão de 12/11)`);
+      imprimir(diffBruto);
       continue;
     }
     if (REORDENACAO_ESPERADA.has(caminho) && soReordenacao(diff)) {

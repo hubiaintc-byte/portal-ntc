@@ -125,6 +125,24 @@ describe("planejarCargaPaginas — regras", () => {
     expect(plano.dados.modulos).toEqual([]);
   });
 
+  it("slug e nome completo do CMS diferentes da página → mantidos, sem divergência", () => {
+    const atual = {
+      ...atualDe30Set(primeiro),
+      slug: `${primeiro.slug}-plus`,
+      nomeCompleto: "Nome oficial do catálogo",
+    };
+    const plano = planejarCargaPaginas(atual, primeiro);
+    expect(plano.divergencias).toEqual([]);
+    expect(plano.acao).toBe("atualizar");
+    expect(plano.dados.programa).not.toHaveProperty("slug");
+    expect(plano.dados.programa).not.toHaveProperty("nomeCompleto");
+  });
+
+  it("nome completo vazio no CMS → preenchido com o da página", () => {
+    const plano = planejarCargaPaginas({ ...atualDe30Set(primeiro), nomeCompleto: null }, primeiro);
+    expect(plano.dados.programa?.nomeCompleto).toBe(primeiro.nomeCompleto);
+  });
+
   it("visaoGeral com uma palavra trocada → divergente e não escrita", () => {
     const atual = atualDe30Set(primeiro);
     const visao = structuredClone(atual.visaoGeral) as {

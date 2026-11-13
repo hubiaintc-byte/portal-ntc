@@ -160,3 +160,48 @@ export function compararPaginas(htmlAntes: string, htmlDepois: string): LinhaDif
   if (a === b) return [];
   return diffLinhas(emLinhas(a), emLinhas(b));
 }
+
+/** Nome e endereço de um programa: o que a página tinha → o que o CMS tem. */
+export interface TrocaIdentidade {
+  slugPagina: string;
+  slugCms: string;
+  nomePagina: string;
+  nomeCms: string;
+}
+
+function escaparRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Aplica no HTML de ANTES a troca de identidade decidida pelo PO (12/11: o
+ * nome completo e o endereço oficiais são os do CMS) — `/programas/<slug>`
+ * seguido de `"`, `/`, `#` ou `?`, e o nome completo onde aparecer. Assim a
+ * conferência separa essa mudança esperada de qualquer outra.
+ */
+export function aplicarIdentidadeCms(html: string, trocas: TrocaIdentidade[]): string {
+  let saida = html;
+  for (const t of trocas) {
+    if (t.slugPagina !== t.slugCms) {
+      const re = new RegExp(`/programas/${escaparRegex(t.slugPagina)}(?=["/#?])`, "g");
+      saida = saida.replace(re, `/programas/${t.slugCms}`);
+    }
+    if (t.nomePagina !== t.nomeCms) saida = saida.split(t.nomePagina).join(t.nomeCms);
+  }
+  return saida;
+}
+
+/**
+ * Links de contato (`?programa=<slug>`): o formulário aceita o endereço antigo
+ * e o do CMS (tira o "-plus"), e as duas formas convivem na página. Põe as
+ * duas na forma antiga, para aplicar aos dois lados da conferência.
+ */
+export function normalizarProgramaContato(html: string, trocas: TrocaIdentidade[]): string {
+  let saida = html;
+  for (const t of trocas) {
+    if (t.slugPagina === t.slugCms) continue;
+    const re = new RegExp(`programa=${escaparRegex(t.slugCms)}(?=["&])`, "g");
+    saida = saida.replace(re, `programa=${t.slugPagina}`);
+  }
+  return saida;
+}
