@@ -1,0 +1,110 @@
+{
+  "observacao": "Identidade oficial (CMS) dos 15 programas na virada — decisão do PO de 12/11/2026. Usado só pelo conferidor 1:1 para reconhecer a troca de nome completo e endereço como esperada.",
+  "programas": [
+    {
+      "sigla": "AGIP",
+      "slugPagina": "agip",
+      "slugCms": "agip",
+      "nomePagina": "Programa Avançado de Governança, Integridade e Performance nas Contratações Públicas",
+      "nomeCms": "Governança, Integridade e Performance nas Contratações Públicas"
+    },
+    {
+      "sigla": "EDUTEC",
+      "slugPagina": "edutec",
+      "slugCms": "edutec",
+      "nomePagina": "Educação Conectada, Inovação Pedagógica e Tecnologia em Sala de Aula",
+      "nomeCms": "Educação Digital, Inovação e Tecnologias para Redes Públicas"
+    },
+    {
+      "sigla": "EGIDE",
+      "slugPagina": "egide",
+      "slugCms": "egide",
+      "nomePagina": "Programa de Governança Digital, IA Educacional e Cultura de Dados nas Redes Públicas",
+      "nomeCms": "IA, Dados e Governança da Transformação Digital"
+    },
+    {
+      "sigla": "FUTURA",
+      "slugPagina": "futura",
+      "slugCms": "futura",
+      "nomePagina": "Programa de Educação para o Futuro",
+      "nomeCms": "Ensino Médio, Itinerários de Futuro, Empregabilidade"
+    },
+    {
+      "sigla": "LIDERA",
+      "slugPagina": "lidera",
+      "slugCms": "lidera",
+      "nomePagina": "Liderança, Direção Estratégica e Resultados na Administração",
+      "nomeCms": "Liderança, Direção Estratégica e Resultados na Administração"
+    },
+    {
+      "sigla": "PEAR",
+      "slugPagina": "pear",
+      "slugCms": "pear",
+      "nomePagina": "Excelência em Aprendizagem e Resultados",
+      "nomeCms": "Alfabetização de Alta Performance e Recomposição da Aprendizagem"
+    },
+    {
+      "sigla": "PEI",
+      "slugPagina": "pei",
+      "slugCms": "pei",
+      "nomePagina": "Educação Integral e Escola em Tempo Integral nas Redes Públicas",
+      "nomeCms": "Educação Integral — Gestão, Currículo e Resultados"
+    },
+    {
+      "sigla": "PINEI",
+      "slugPagina": "pinei",
+      "slugCms": "pinei",
+      "nomePagina": "Programa de Inovação na Educação Infantil",
+      "nomeCms": "Primeira Infância e Educação Infantil"
+    },
+    {
+      "sigla": "PROAPS+",
+      "slugPagina": "proaps",
+      "slugCms": "proaps-plus",
+      "nomePagina": "Programa Avançado de Atenção Primária à Saúde",
+      "nomeCms": "Alta Performance na Atenção Primária e Redes de Cuidado"
+    },
+    {
+      "sigla": "PROGE",
+      "slugPagina": "proge",
+      "slugCms": "proge",
+      "nomePagina": "Programa de Gestão Escolar, Coordenação Pedagógica e Direção de Alta Performance",
+      "nomeCms": "Gestão Escolar, Coordenação Pedagógica e Resultados"
+    },
+    {
+      "sigla": "PROGIR",
+      "slugPagina": "progir",
+      "slugCms": "progir",
+      "nomePagina": "Programa de Inclusão, Equidade e Garantia de Direitos Educacionais nas Redes Públicas",
+      "nomeCms": "Gestão da Inclusão com Resultado"
+    },
+    {
+      "sigla": "PROSUS+",
+      "slugPagina": "prosus",
+      "slugCms": "prosus-plus",
+      "nomePagina": "Programa Avançado de Direção Institucional em Saúde Pública",
+      "nomeCms": "Governança, Financiamento e Performance no SUS"
+    },
+    {
+      "sigla": "SIGA",
+      "slugPagina": "siga",
+      "slugCms": "siga",
+      "nomePagina": "Programa de Soluções Inteligentes de Governança e Administração",
+      "nomeCms": "Soluções Inteligentes de Governança e Administração"
+    },
+    {
+      "sigla": "SIGS",
+      "slugPagina": "sigs",
+      "slugCms": "sigs",
+      "nomePagina": "Sistema Integrado de Gestão em Saúde",
+      "nomeCms": "Saúde Inteligente, Governança Digital, IA e Transformação do SUS"
+    },
+    {
+      "sigla": "VIVAESCOLA",
+      "slugPagina": "vivaescola",
+      "slugCms": "vivaescola",
+      "nomePagina": "Programa de Bem-Estar e Cultura Positiva na Escola",
+      "nomeCms": "Convivência, Permanência, Bem-Estar e Proteção Integral"
+    }
+  ]
+}

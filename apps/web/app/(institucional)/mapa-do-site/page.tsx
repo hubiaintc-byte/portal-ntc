@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { obterListasProgramas, type CartaoPrograma } from "@/lib/cms/listasProgramas";
 import { carregarContatos } from "@/lib/contatos";
 
 export const revalidate = 3600;
@@ -37,8 +38,20 @@ export const metadata: Metadata = {
   },
 };
 
+function contagem(n: number): string {
+  return `${n} ${n === 1 ? "programa" : "programas"}`;
+}
+
+/** Programa no mapa: sigla + `pagina.cartao.descricaoMapa` (CMS). */
+function itemMapa(p: CartaoPrograma) {
+  return (
+    <li key={p.slug}><Link href={`/programas/${p.slug}`}><strong>{p.sigla}</strong><span>{p.descricaoMapa}</span></Link></li>
+  );
+}
+
 export default async function MapaDoSitePage() {
-  const contatos = await carregarContatos();
+  const [contatos, listas] = await Promise.all([carregarContatos(), obterListasProgramas()]);
+  const { porVertical: pv } = listas;
 
   return (
     <main id="main">
@@ -58,7 +71,7 @@ export default async function MapaDoSitePage() {
           <p className="eyebrow gold">Estrutura institucional · Grupo NTC · Edição 2026</p>
           <h1>Mapa do site<span className="accent">.</span><br />Todas as páginas-mãe do portal Grupo NTC, em um só lugar.</h1>
           <p className="hero-page-sub">Este Mapa apresenta a estrutura completa do portal <strong style={{ color: 'var(--pergaminho)' }}>Grupo NTC</strong> organizada em 6 macrocategorias institucionais — Institucional · Verticais · Programas · Capacitação · Comercial · Governança — com link direto para cada uma das páginas-mãe publicadas.</p>
-          <div className="hero-meta"><span><strong>15 programas</strong> estratégicos</span><span><strong>3 verticais</strong> · Educação · Gestão Pública · Saúde</span><span><strong>17+ páginas-mãe</strong> publicadas</span></div>
+          <div className="hero-meta"><span><strong>{contagem(listas.total)}</strong> estratégicos</span><span><strong>3 verticais</strong> · Educação · Gestão Pública · Saúde</span><span><strong>17+ páginas-mãe</strong> publicadas</span></div>
         </div>
       </section>
 
@@ -126,21 +139,21 @@ export default async function MapaDoSitePage() {
                     <span className="sitemap-col-num">NTC Educação</span>
                     <h3>Educação <small>Excelência e formação com resultado</small></h3>
                     <ul>
-                      <li><Link href="/solucoes-estrategicas/educacao"><strong>NTC Educação</strong><span>Vertical completa · 9 programas</span></Link></li>
+                      <li><Link href="/solucoes-estrategicas/educacao"><strong>NTC Educação</strong><span>{`Vertical completa · ${contagem(pv["educacao"].length)}`}</span></Link></li>
                     </ul>
                   </div>
                   <div className="sitemap-col">
                     <span className="sitemap-col-num">NTC Gestão Pública</span>
                     <h3>Gestão Pública <small>Governança com transformação</small></h3>
                     <ul>
-                      <li><Link href="/solucoes-estrategicas/gestao-publica"><strong>NTC Gestão Pública</strong><span>Vertical completa · 3 programas</span></Link></li>
+                      <li><Link href="/solucoes-estrategicas/gestao-publica"><strong>NTC Gestão Pública</strong><span>{`Vertical completa · ${contagem(pv["gestao-publica"].length)}`}</span></Link></li>
                     </ul>
                   </div>
                   <div className="sitemap-col">
                     <span className="sitemap-col-num">NTC Saúde</span>
                     <h3>Saúde <small>Gestão com competência</small></h3>
                     <ul>
-                      <li><Link href="/solucoes-estrategicas/saude"><strong>NTC Saúde</strong><span>Vertical completa · 3 programas</span></Link></li>
+                      <li><Link href="/solucoes-estrategicas/saude"><strong>NTC Saúde</strong><span>{`Vertical completa · ${contagem(pv["saude"].length)}`}</span></Link></li>
                     </ul>
                   </div>
                 </div>
@@ -154,36 +167,24 @@ export default async function MapaDoSitePage() {
 
                 <div className="sitemap-grid">
                   <div className="sitemap-col">
-                    <span className="sitemap-col-num">NTC Educação · 9 programas</span>
+                    <span className="sitemap-col-num">{`NTC Educação · ${contagem(pv["educacao"].length)}`}</span>
                     <h3>Educação</h3>
                     <ul>
-                      <li><Link href="/programas/edutec"><strong>EDUTEC</strong><span>Educação Digital · Inovação · Tecnologias</span></Link></li>
-                      <li><Link href="/programas/pear"><strong>PEAR</strong><span>Alfabetização e recomposição da aprendizagem</span></Link></li>
-                      <li><Link href="/programas/pei"><strong>PEI</strong><span>Educação Integral · gestão e currículo</span></Link></li>
-                      <li><Link href="/programas/progir"><strong>PROGIR</strong><span>Gestão da Inclusão com resultado</span></Link></li>
-                      <li><Link href="/programas/proge"><strong>PROGE</strong><span>Gestão Escolar e coordenação pedagógica</span></Link></li>
-                      <li><Link href="/programas/egide"><strong>EGIDE</strong><span>IA, dados e governança digital</span></Link></li>
-                      <li><Link href="/programas/vivaescola"><strong>VIVAESCOLA</strong><span>Convivência, bem-estar e proteção integral</span></Link></li>
-                      <li><Link href="/programas/pinei"><strong>PINEI</strong><span>Primeira Infância e Educação Infantil</span></Link></li>
-                      <li><Link href="/programas/futura"><strong>FUTURA</strong><span>Ensino Médio e empregabilidade</span></Link></li>
+                      {pv["educacao"].map(itemMapa)}
                     </ul>
                   </div>
                   <div className="sitemap-col">
-                    <span className="sitemap-col-num">NTC Gestão Pública · 3 programas</span>
+                    <span className="sitemap-col-num">{`NTC Gestão Pública · ${contagem(pv["gestao-publica"].length)}`}</span>
                     <h3>Gestão Pública</h3>
                     <ul>
-                      <li><Link href="/programas/lidera"><strong>LIDERA</strong><span>Liderança e direção estratégica</span></Link></li>
-                      <li><Link href="/programas/agip"><strong>AGIP</strong><span>Governança e performance em contratações</span></Link></li>
-                      <li><Link href="/programas/siga"><strong>SIGA</strong><span>Soluções inteligentes de governança</span></Link></li>
+                      {pv["gestao-publica"].map(itemMapa)}
                     </ul>
                   </div>
                   <div className="sitemap-col">
-                    <span className="sitemap-col-num">NTC Saúde · 3 programas</span>
+                    <span className="sitemap-col-num">{`NTC Saúde · ${contagem(pv["saude"].length)}`}</span>
                     <h3>Saúde</h3>
                     <ul>
-                      <li><Link href="/programas/sigs"><strong>SIGS</strong><span>Sistema integrado de gestão em saúde</span></Link></li>
-                      <li><Link href="/programas/proaps"><strong>PROAPS+</strong><span>Atenção Primária e redes de cuidado</span></Link></li>
-                      <li><Link href="/programas/prosus"><strong>PROSUS+</strong><span>Direção institucional em saúde pública</span></Link></li>
+                      {pv["saude"].map(itemMapa)}
                     </ul>
                   </div>
                 </div>

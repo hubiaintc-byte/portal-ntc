@@ -518,6 +518,148 @@ export interface Programa {
     disponivel?: boolean | null;
     observacoes?: string | null;
   };
+  pagina?: {
+    identidadeVisual?:
+      | (
+          | 'vertente'
+          | 'AGIP'
+          | 'EDUTEC'
+          | 'EGIDE'
+          | 'FUTURA'
+          | 'LIDERA'
+          | 'PEAR'
+          | 'PEI'
+          | 'PINEI'
+          | 'PROAPS'
+          | 'PROGE'
+          | 'PROGIR'
+          | 'PROSUS'
+          | 'SIGA'
+          | 'SIGS'
+          | 'VIVAESCOLA'
+        )
+      | null;
+    /**
+     * Marcação leve: **negrito** e *itálico*.
+     */
+    heroTitulo?: string | null;
+    heroSubtitulo?: string | null;
+    heroImagem?: (number | null) | Media;
+    heroImagemCaminho?: string | null;
+    barraDados?:
+      | {
+          rotulo?: string | null;
+          valor?: string | null;
+          valorSub?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Marcação leve: **negrito** e *itálico*.
+     */
+    visaoGeralTitulo?: string | null;
+    /**
+     * Marcação leve: **negrito** e *itálico*.
+     */
+    problemaTitulo?: string | null;
+    /**
+     * Marcação leve: **negrito** e *itálico*.
+     */
+    problemaDestaque?: string | null;
+    publicoChips?:
+      | {
+          texto?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    docentes?: {
+      /**
+       * Marcação leve: **negrito** e *itálico*.
+       */
+      titulo?: string | null;
+      /**
+       * Marcação leve: **negrito** e *itálico*.
+       */
+      intro?: string | null;
+      coordenacaoMarcador?: string | null;
+      especialistasMarcador?: string | null;
+      contadores?:
+        | {
+            num?: string | null;
+            lbl?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+      nota?: string | null;
+      coordenacao?:
+        | {
+            tag?: string | null;
+            imagem?: (number | null) | Media;
+            imagemCaminho?: string | null;
+            imagemAlt?: string | null;
+            eixoBadge?: string | null;
+            nome?: string | null;
+            credencial?: string | null;
+            eixo?: string | null;
+            modulos?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+      especialistas?:
+        | {
+            imagem?: (number | null) | Media;
+            imagemCaminho?: string | null;
+            imagemAlt?: string | null;
+            eixoBadge?: string | null;
+            nome?: string | null;
+            credencial?: string | null;
+            modulos?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    modalidadesIntro?: string | null;
+    modalidadesCards?:
+      | {
+          destaque?: boolean | null;
+          tag?: string | null;
+          titulo?: string | null;
+          descricao?: string | null;
+          ctaRotulo?: string | null;
+          ctaHref?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    modulosAbertosMicrocopy?: string | null;
+    /**
+     * Marcação leve: **negrito** e *itálico*.
+     */
+    chamadaFinalTitulo?: string | null;
+    chamadaFinalTexto?: string | null;
+    resumoLateral?:
+      | {
+          rotulo?: string | null;
+          valor?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    entregas?:
+      | {
+          texto?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    cartao?: {
+      nome?: string | null;
+      tagline?: string | null;
+      meta?: string | null;
+      imagem?: (number | null) | Media;
+      imagemCaminho?: string | null;
+      ordem?: number | null;
+      descricaoMenu?: string | null;
+      descricaoMapa?: string | null;
+    };
+  };
   faq?:
     | {
         pergunta: string;
@@ -701,6 +843,12 @@ export interface Modulo {
     [k: string]: unknown;
   };
   cargaHoraria?: string | null;
+  topicos?:
+    | {
+        texto?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Eventos abertos que derivam deste módulo.
    */
@@ -2068,6 +2216,114 @@ export interface ProgramasSelect<T extends boolean = true> {
         disponivel?: T;
         observacoes?: T;
       };
+  pagina?:
+    | T
+    | {
+        identidadeVisual?: T;
+        heroTitulo?: T;
+        heroSubtitulo?: T;
+        heroImagem?: T;
+        heroImagemCaminho?: T;
+        barraDados?:
+          | T
+          | {
+              rotulo?: T;
+              valor?: T;
+              valorSub?: T;
+              id?: T;
+            };
+        visaoGeralTitulo?: T;
+        problemaTitulo?: T;
+        problemaDestaque?: T;
+        publicoChips?:
+          | T
+          | {
+              texto?: T;
+              id?: T;
+            };
+        docentes?:
+          | T
+          | {
+              titulo?: T;
+              intro?: T;
+              coordenacaoMarcador?: T;
+              especialistasMarcador?: T;
+              contadores?:
+                | T
+                | {
+                    num?: T;
+                    lbl?: T;
+                    id?: T;
+                  };
+              nota?: T;
+              coordenacao?:
+                | T
+                | {
+                    tag?: T;
+                    imagem?: T;
+                    imagemCaminho?: T;
+                    imagemAlt?: T;
+                    eixoBadge?: T;
+                    nome?: T;
+                    credencial?: T;
+                    eixo?: T;
+                    modulos?: T;
+                    id?: T;
+                  };
+              especialistas?:
+                | T
+                | {
+                    imagem?: T;
+                    imagemCaminho?: T;
+                    imagemAlt?: T;
+                    eixoBadge?: T;
+                    nome?: T;
+                    credencial?: T;
+                    modulos?: T;
+                    id?: T;
+                  };
+            };
+        modalidadesIntro?: T;
+        modalidadesCards?:
+          | T
+          | {
+              destaque?: T;
+              tag?: T;
+              titulo?: T;
+              descricao?: T;
+              ctaRotulo?: T;
+              ctaHref?: T;
+              id?: T;
+            };
+        modulosAbertosMicrocopy?: T;
+        chamadaFinalTitulo?: T;
+        chamadaFinalTexto?: T;
+        resumoLateral?:
+          | T
+          | {
+              rotulo?: T;
+              valor?: T;
+              id?: T;
+            };
+        entregas?:
+          | T
+          | {
+              texto?: T;
+              id?: T;
+            };
+        cartao?:
+          | T
+          | {
+              nome?: T;
+              tagline?: T;
+              meta?: T;
+              imagem?: T;
+              imagemCaminho?: T;
+              ordem?: T;
+              descricaoMenu?: T;
+              descricaoMapa?: T;
+            };
+      };
   faq?:
     | T
     | {
@@ -2098,6 +2354,12 @@ export interface ModulosSelect<T extends boolean = true> {
   titulo?: T;
   ementa?: T;
   cargaHoraria?: T;
+  topicos?:
+    | T
+    | {
+        texto?: T;
+        id?: T;
+      };
   eventosVinculados?: T;
   comercial?:
     | T

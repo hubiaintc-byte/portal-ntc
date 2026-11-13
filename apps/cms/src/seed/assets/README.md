@@ -1,5 +1,7 @@
 # Seed assets — Portal Grupo NTC
 
+> Desde a v4.0 (05/11/2026) `programas.json` e `paginas-programas.json` são registros congelados: os geradores (`scripts/gerar-instantaneo-*.mjs`) foram removidos junto com os `conteudo<SIGLA>.ts`.
+
 Esta pasta guarda os arquivos usados pelos scripts de seed do CMS. Os
 binários (jpg/png) **não são versionados** no git (ver `.gitignore`);
 a exceção é `programas.json` — o instantâneo do conteúdo editorial dos

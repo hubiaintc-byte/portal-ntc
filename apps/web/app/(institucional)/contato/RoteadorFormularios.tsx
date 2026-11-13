@@ -254,7 +254,9 @@ export function RoteadorFormularios({ asides }: RoteadorFormulariosProps) {
         // setTimeout(0): o painel proposta só monta os campos após o setState da aba.
         setTimeout(() => {
           if (programa) {
-            prefillSelectPorId("prop-programa", programa.toUpperCase());
+            // O link usa o endereço do programa; PROAPS+/PROSUS+ têm o
+            // endereço "-plus" e a opção do select é a sigla sem o "+".
+            prefillSelectPorId("prop-programa", programa.toUpperCase().replace(/-PLUS$/, ""));
           }
           if (modalidade) {
             const value = MODALIDADE_LINK_PARA_SELECT[modalidade];

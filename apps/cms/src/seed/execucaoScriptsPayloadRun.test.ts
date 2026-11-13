@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
  * `process.exit(0)` em seguida: um `void main()` de topo sai 0 sem rodar.
  * Os scripts abaixo precisam do `await main()` de topo.
  */
-const SCRIPTS = ["migrarPermissoesPorTela.ts", "importarProgramas.ts"];
+const SCRIPTS = ["migrarPermissoesPorTela.ts", "importarProgramas.ts", "carregarPaginasProgramas.ts"];
 
 describe("scripts executados por payload run", () => {
   it.each(SCRIPTS)("%s espera main() no topo", (arquivo) => {

@@ -1,4 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { paginaVazia, type PaginaProgramaEdicao } from "./paginaProgramaCatalogo";
 
 const obterPayloadMock = vi.fn();
 vi.mock("@/lib/payloadClient", () => ({ obterPayload: obterPayloadMock }));
@@ -8,7 +10,8 @@ const executarEmTransacaoMock = vi.fn(
 );
 vi.mock("@/lib/crm/transacao", () => ({ executarEmTransacao: executarEmTransacaoMock }));
 
-const { salvarPrograma, excluirPrograma, salvarModulo, excluirModulo } = await import("./catalogoCrmEscrita");
+const { salvarPrograma, excluirPrograma, salvarModulo, excluirModulo, enviarImagemPrograma, removerImagemPrograma } =
+  await import("./catalogoCrmEscrita");
 type DadosPrograma = Parameters<typeof salvarPrograma>[1];
 type DadosModulo = Parameters<typeof salvarModulo>[1];
 
@@ -16,6 +19,7 @@ const usuario = { id: 5, collection: "users", nome: "Ana", email: "a@b.c", creat
 
 interface Opcoes {
   siglaEmUso?: boolean;
+  slugEmUso?: boolean;
   numeroEmUso?: boolean;
   statusPrincipal?: string;
   statusUltima?: string;
@@ -28,7 +32,10 @@ function payloadFalso(o: Opcoes = {}) {
   const create = vi.fn(async ({ data }: { collection?: string; data: Record<string, unknown> }) => ({ id: 77, ...data }));
   const update = vi.fn(async ({ data }: { collection?: string; id?: unknown; data: Record<string, unknown> }) => ({ id: 1, ...data }));
   const del = vi.fn(async () => ({ id: 1 }));
-  const find = vi.fn(async () => ({ docs: o.siglaEmUso ? [{ id: 2 }] : [] }));
+  const find = vi.fn(async ({ where }: { where?: unknown } = {}) => {
+    const porSlug = JSON.stringify(where ?? {}).includes('"slug"');
+    return { docs: (porSlug ? o.slugEmUso : o.siglaEmUso) ? [{ id: 2 }] : [] };
+  });
   const count = vi.fn(async ({ collection }: { collection: string }) => {
     if (collection === "modulos" && o.numeroEmUso !== undefined) return { totalDocs: o.numeroEmUso ? 1 : 0 };
     return { totalDocs: o.contagens?.[collection] ?? 0 };
@@ -56,7 +63,35 @@ const programaBase: DadosPrograma = {
   resultados: [" R ", " "],
 };
 
-afterEach(() => vi.clearAllMocks());
+const fetchMock = vi.fn(async () => ({ ok: true }));
+beforeEach(() => {
+  vi.stubGlobal("fetch", fetchMock);
+  vi.stubEnv("PAYLOAD_PUBLIC_FRONT_URL", "https://site.test");
+  vi.stubEnv("REVALIDATE_SECRET", "s");
+});
+afterEach(() => {
+  vi.clearAllMocks();
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
+
+const pathsRevalidados = () =>
+  fetchMock.mock.calls.map((c) => (JSON.parse(((c as unknown[])[1] as { body: string }).body) as { path: string }).path);
+
+function paginaCompleta(): PaginaProgramaEdicao {
+  const pg = paginaVazia();
+  pg.heroTitulo = "Programa *X*";
+  pg.heroSubtitulo = "Sub";
+  pg.heroImagemCaminho = "/img/x.webp";
+  pg.cartao.nome = "X";
+  pg.cartao.tagline = "Chamada";
+  pg.cartao.descricaoMenu = "Menu";
+  pg.cartao.descricaoMapa = "Mapa";
+  return pg;
+}
+
+/** Programa já gravado, com o que a revalidação lê (slug e sigla da área). */
+const GRAVADO_EDUTEC = { slug: "edutec", area: { id: 2, sigla: "educacao" } };
 
 describe("salvarPrograma", () => {
   it("programa novo nasce rascunho, sigla em maiúsculas, listas sem itens vazios e aparadas", async () => {
@@ -103,10 +138,10 @@ describe("salvarPrograma", () => {
   });
 
   it("publicar envia os dados do formulário com _status published numa só escrita", async () => {
-    const p = payloadFalso();
+    const p = payloadFalso({ contagens: { modulos: 1 }, programaGravado: GRAVADO_EDUTEC });
     obterPayloadMock.mockResolvedValue(p);
-    const r = await salvarPrograma("4", programaBase, true, usuario);
-    expect(r.ok).toBe(true);
+    const r = await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, true, usuario);
+    expect(r).toEqual({ ok: true, id: "1" });
     expect(p.update).toHaveBeenCalledTimes(1);
     const args = p.update.mock.calls[0]![0] as { data: Record<string, unknown>; draft: boolean };
     expect(args.draft).toBe(false);
@@ -116,8 +151,79 @@ describe("salvarPrograma", () => {
   it("publicar sem visão geral (nem no formulário nem gravada) lista as faltas e não escreve", async () => {
     const p = payloadFalso({ programaGravado: { visaoGeral: null } });
     obterPayloadMock.mockResolvedValue(p);
-    const r = await salvarPrograma("4", { ...programaBase, areaId: "", textos: {} }, true, usuario);
-    expect(r).toEqual({ ok: false, erro: "Para publicar, preencha: Área, Visão geral." });
+    const r = await salvarPrograma(
+      "4",
+      { ...programaBase, areaId: "", textos: {}, pagina: paginaCompleta() },
+      true,
+      usuario,
+    );
+    expect(r).toEqual({ ok: false, erro: "Para publicar, preencha: Área, Visão geral, Ao menos um módulo." });
+    expect(p.update).not.toHaveBeenCalled();
+  });
+
+  it("publicar só com o mínimo antigo pede o mínimo da página (lido do gravado quando não vem no formulário)", async () => {
+    const p = payloadFalso({ contagens: { modulos: 2 }, programaGravado: { pagina: { heroTitulo: "Gravado" } } });
+    obterPayloadMock.mockResolvedValue(p);
+    const r = await salvarPrograma("4", programaBase, true, usuario);
+    expect(r).toEqual({
+      ok: false,
+      erro:
+        "Para publicar, preencha: Subtítulo do topo, Imagem do topo, Cartão: nome, Cartão: chamada, Cartão: descrição no menu, Cartão: descrição no mapa do site.",
+    });
+    expect(p.update).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("publicar pede ao site a página do programa, a lista, a vertente, o menu e o mapa", async () => {
+    const p = payloadFalso({ contagens: { modulos: 1 }, programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, true, usuario);
+    expect(pathsRevalidados()).toEqual([
+      "/programas/edutec",
+      "/programas",
+      "/solucoes-estrategicas/educacao",
+      "/",
+      "/mapa-do-site",
+    ]);
+  });
+
+  it("falha na revalidação vira aviso — a publicação fica", async () => {
+    fetchMock.mockResolvedValue({ ok: false });
+    const p = payloadFalso({ contagens: { modulos: 1 }, programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    const r = await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, true, usuario);
+    expect(r).toEqual({ ok: true, id: "1", aviso: "Salvo, mas a atualização no site pode levar alguns minutos." });
+    expect(p.update).toHaveBeenCalledTimes(1);
+    fetchMock.mockResolvedValue({ ok: true });
+  });
+
+  it("salvar rascunho não revalida o site (ele lê o publicado)", async () => {
+    const p = payloadFalso({ programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, false, usuario);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("página enviada vai inteira no group pagina; ausente não é tocada", async () => {
+    const p = payloadFalso();
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarPrograma("4", { ...programaBase, pagina: paginaCompleta() }, false, usuario);
+    await salvarPrograma("4", programaBase, false, usuario);
+    const dados = p.update.mock.calls.map((c) => (c[0] as { data: Record<string, unknown> }).data);
+    expect(dados[0]!.pagina).toMatchObject({ heroTitulo: "Programa *X*", heroImagemCaminho: "/img/x.webp", cartao: { nome: "X" } });
+    expect("pagina" in dados[1]!).toBe(false);
+  });
+
+  it("página com link ou caminho inválido recusa antes de escrever", async () => {
+    const p = payloadFalso();
+    obterPayloadMock.mockResolvedValue(p);
+    const pg = paginaCompleta();
+    pg.modalidadesCards = [{ destaque: false, tag: "", titulo: "A", descricao: "", ctaRotulo: "", ctaHref: "javascript:x" }];
+    const r = await salvarPrograma("4", { ...programaBase, pagina: pg }, false, usuario);
+    expect(r).toEqual({
+      ok: false,
+      erro: "Corrija: Modalidade 1: o link do botão deve começar com /, #, http://, https:// ou mailto:.",
+    });
     expect(p.update).not.toHaveBeenCalled();
   });
 
@@ -135,6 +241,43 @@ describe("salvarPrograma", () => {
   });
 });
 
+describe("salvarPrograma — endereço (slug) do programa novo (R28)", () => {
+  it("programa novo nasce com o slug da sigla, como os 15 (PROSUS+ → prosus)", async () => {
+    const p = payloadFalso();
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarPrograma(null, { ...programaBase, sigla: " prosus+ " }, false, usuario);
+    const args = p.create.mock.calls[0]![0] as { data: Record<string, unknown> };
+    expect(args.data.slug).toBe("prosus");
+  });
+
+  it("confere o slug em publicados e rascunhos antes de gravar; repetido recusa sem escrever", async () => {
+    const p = payloadFalso({ slugEmUso: true });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await salvarPrograma(null, programaBase, false, usuario)).toEqual({
+      ok: false,
+      erro: "Já existe um programa com este endereço (sigla).",
+    });
+    expect(p.create).not.toHaveBeenCalled();
+
+    const livre = payloadFalso();
+    obterPayloadMock.mockResolvedValue(livre);
+    await salvarPrograma(null, programaBase, false, usuario);
+    const consultas = livre.find.mock.calls.map((c) => (c as unknown[])[0] as { where: unknown; draft?: boolean });
+    const porSlug = consultas.filter((a) => JSON.stringify(a.where).includes('"slug"'));
+    expect(porSlug.map((a) => a.draft === true).sort()).toEqual([false, true]);
+    for (const a of porSlug) expect(a.where).toEqual({ slug: { equals: "edu" } });
+  });
+
+  it("programa existente nunca muda de slug (não envia slug nem confere)", async () => {
+    const p = payloadFalso({ slugEmUso: true, programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    const r = await salvarPrograma("4", { ...programaBase, sigla: "OUTRA" }, false, usuario);
+    expect(r.ok).toBe(true);
+    const args = p.update.mock.calls[0]![0] as { data: Record<string, unknown> };
+    expect("slug" in args.data).toBe(false);
+  });
+});
+
 describe("excluirPrograma", () => {
   it("com módulos recusa antes de apagar", async () => {
     const p = payloadFalso({ contagens: { modulos: 2 } });
@@ -142,11 +285,13 @@ describe("excluirPrograma", () => {
     expect(await excluirPrograma("4", usuario)).toEqual({ ok: false, erro: "Vinculado a 2 módulos — exclua ou desvincule antes." });
     expect(p.delete).not.toHaveBeenCalled();
   });
-  it("sem dependentes apaga", async () => {
-    const p = payloadFalso();
+  it("sem dependentes apaga e revalida o que mostrava o programa (lido antes de apagar)", async () => {
+    const p = payloadFalso({ programaGravado: GRAVADO_EDUTEC });
     obterPayloadMock.mockResolvedValue(p);
     expect(await excluirPrograma("4", usuario)).toEqual({ ok: true });
     expect(p.delete).toHaveBeenCalledWith(expect.objectContaining({ collection: "programas", id: "4" }));
+    expect(pathsRevalidados()).toContain("/programas/edutec");
+    expect(pathsRevalidados()).toContain("/programas");
   });
 });
 
@@ -206,6 +351,25 @@ describe("salvarModulo", () => {
     expect(recalculados.sort()).toEqual(["4", "8"]);
   });
 
+  it("tópicos: enviados viram a lista (sem os vazios); ausentes não são tocados", async () => {
+    const p = payloadFalso({ numeroEmUso: false });
+    obterPayloadMock.mockResolvedValue(p);
+    await salvarModulo("9", { ...moduloBase, topicos: [" A ", "", "B"] }, usuario);
+    await salvarModulo("9", moduloBase, usuario);
+    const dados = p.update.mock.calls
+      .filter((c) => (c[0] as { collection: string }).collection === "modulos")
+      .map((c) => (c[0] as { data: Record<string, unknown> }).data);
+    expect(dados[0]!.topicos).toEqual([{ texto: "A" }, { texto: "B" }]);
+    expect("topicos" in dados[1]!).toBe(false);
+  });
+
+  it("salvar módulo revalida a página do programa", async () => {
+    const p = payloadFalso({ numeroEmUso: false, programaGravado: GRAVADO_EDUTEC });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await salvarModulo("9", moduloBase, usuario)).toEqual({ ok: true, id: "1" });
+    expect(pathsRevalidados()).toContain("/programas/edutec");
+  });
+
   it("atualizar sem ementa não reescreve a ementa", async () => {
     const p = payloadFalso({ numeroEmUso: false });
     obterPayloadMock.mockResolvedValue(p);
@@ -246,5 +410,173 @@ describe("excluirModulo", () => {
     expect(await excluirModulo("9", usuario)).toEqual({ ok: true });
     expect(p.delete).toHaveBeenCalledWith(expect.objectContaining({ collection: "modulos", id: "9" }));
     expect(p.update).toHaveBeenCalledWith(expect.objectContaining({ collection: "programas", id: 4 }));
+    expect(pathsRevalidados()).toContain("/programas");
+  });
+});
+
+/** Programa gravado com imagens legadas por caminho e uma linha de cada docente. */
+const PAGINA_GRAVADA = {
+  heroTitulo: "T",
+  heroImagem: null,
+  heroImagemCaminho: "/img/topo.webp",
+  docentes: {
+    titulo: "D",
+    coordenacao: [{ id: "c1", nome: "Ana", imagem: null, imagemCaminho: "/img/ana.webp" }],
+    especialistas: [{ id: "e1", nome: "Beto", imagem: 5, imagemCaminho: "/img/beto.webp" }],
+  },
+  cartao: { nome: "N", imagem: 6, imagemCaminho: "/img/cartao.webp" },
+};
+
+function arquivo(tipo = "image/webp"): File {
+  return new File([new Uint8Array([1, 2, 3])], "foto.webp", { type: tipo });
+}
+
+function paginaGravadaNoUpdate(p: ReturnType<typeof payloadFalso>) {
+  const chamada = p.update.mock.calls.find((c) => (c[0] as { collection: string }).collection === "programas");
+  return chamada![0] as { data: { pagina: typeof PAGINA_GRAVADA; _status: string }; draft?: boolean };
+}
+
+describe("enviarImagemPrograma", () => {
+  it("topo: cria a media e aponta pagina.heroImagem para ela, sem tocar no caminho legado", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    const r = await enviarImagemPrograma("4", { tipo: "topo" }, arquivo(), usuario);
+    expect(r).toEqual({ ok: true, midiaId: "77" });
+    expect(p.create).toHaveBeenCalledWith(expect.objectContaining({ collection: "media" }));
+    const { data, draft } = paginaGravadaNoUpdate(p);
+    expect(draft).toBe(false);
+    expect(data._status).toBe("published");
+    expect(data.pagina.heroImagem).toBe(77);
+    expect(data.pagina.heroImagemCaminho).toBe("/img/topo.webp");
+    expect(data.pagina.cartao).toEqual(PAGINA_GRAVADA.cartao);
+  });
+
+  it("publicado (sem pendências): grava publicado (draft false) e revalida a página", async () => {
+    const p = payloadFalso({ statusPrincipal: "published", statusUltima: "published", programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await enviarImagemPrograma("4", { tipo: "cartao" }, arquivo(), usuario)).toEqual({ ok: true, midiaId: "77" });
+    const u = paginaGravadaNoUpdate(p);
+    expect(u.draft).toBe(false);
+    expect(u.data._status).toBe("published");
+    expect(u.data.pagina.cartao).toEqual({ ...PAGINA_GRAVADA.cartao, imagem: 77 });
+    expect(pathsRevalidados()).toContain("/programas/edutec");
+  });
+
+  it("alterações pendentes: grava só no rascunho, nunca publicado, avisa e não revalida", async () => {
+    const p = payloadFalso({ statusPrincipal: "published", statusUltima: "draft", programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await enviarImagemPrograma("4", { tipo: "topo" }, arquivo(), usuario)).toEqual({
+      ok: true,
+      midiaId: "77",
+      aviso: "A imagem foi salva no rascunho e vai ao ar quando você publicar o programa.",
+    });
+    const programas = p.update.mock.calls
+      .map((c) => c[0] as { collection: string; draft?: boolean; data: Record<string, unknown> })
+      .filter((c) => c.collection === "programas");
+    expect(programas).toHaveLength(1);
+    expect(programas[0]!.draft).toBe(true);
+    expect(programas.some((c) => c.data._status === "published")).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    const q = payloadFalso({ statusPrincipal: "published", statusUltima: "draft", programaGravado: { pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(q);
+    expect(await removerImagemPrograma("4", { tipo: "cartao" }, usuario)).toEqual({
+      ok: true,
+      aviso: "A imagem foi salva no rascunho e vai ao ar quando você publicar o programa.",
+    });
+    expect(paginaGravadaNoUpdate(q).draft).toBe(true);
+    expect(paginaGravadaNoUpdate(q).data._status).toBe("draft");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rascunho (nunca publicado): grava no rascunho, sem aviso e sem revalidar", async () => {
+    const p = payloadFalso({ statusPrincipal: "draft", statusUltima: "draft", programaGravado: { pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await enviarImagemPrograma("4", { tipo: "cartao" }, arquivo(), usuario)).toEqual({ ok: true, midiaId: "77" });
+    const u = paginaGravadaNoUpdate(p);
+    expect(u.draft).toBe(true);
+    expect(u.data._status).toBe("draft");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("docente: acha a linha pelo id e preserva o caminho e as outras linhas", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    await enviarImagemPrograma("4", { tipo: "coordenacao", linhaId: "c1" }, arquivo(), usuario);
+    const d = paginaGravadaNoUpdate(p).data.pagina.docentes;
+    expect(d.coordenacao).toEqual([{ id: "c1", nome: "Ana", imagem: 77, imagemCaminho: "/img/ana.webp" }]);
+    expect(d.especialistas).toEqual(PAGINA_GRAVADA.docentes.especialistas);
+  });
+
+  it("linha inexistente ou arquivo que não é imagem recusam antes de subir a media", async () => {
+    const p = payloadFalso({ programaGravado: { pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await enviarImagemPrograma("4", { tipo: "especialista", linhaId: "nao-existe" }, arquivo(), usuario)).toEqual({
+      ok: false,
+      erro: "Salve o programa antes de enviar a imagem desta linha.",
+    });
+    expect(await enviarImagemPrograma("4", { tipo: "topo" }, arquivo("application/pdf"), usuario)).toEqual({
+      ok: false,
+      erro: "Envie uma imagem JPEG, PNG, WebP ou AVIF.",
+    });
+    // SVG fica de fora: o otimizador de imagens do Next recusa.
+    expect(await enviarImagemPrograma("4", { tipo: "topo" }, arquivo("image/svg+xml"), usuario)).toEqual({
+      ok: false,
+      erro: "Envie uma imagem JPEG, PNG, WebP ou AVIF.",
+    });
+    expect(await enviarImagemPrograma("4", { tipo: "forjado" } as never, arquivo(), usuario)).toEqual({
+      ok: false,
+      erro: "Imagem desconhecida.",
+    });
+    expect(p.create).not.toHaveBeenCalled();
+    expect(p.update).not.toHaveBeenCalled();
+  });
+});
+
+describe("removerImagemPrograma", () => {
+  it("limpa a relação e mantém o caminho legado (o site volta a usá-lo)", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "especialista", linhaId: "e1" }, usuario)).toEqual({ ok: true });
+    const d = paginaGravadaNoUpdate(p).data.pagina.docentes;
+    expect(d.especialistas).toEqual([{ id: "e1", nome: "Beto", imagem: null, imagemCaminho: "/img/beto.webp" }]);
+    expect(p.create).not.toHaveBeenCalled();
+
+    const q = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: PAGINA_GRAVADA } });
+    obterPayloadMock.mockResolvedValue(q);
+    await removerImagemPrograma("4", { tipo: "cartao" }, usuario);
+    expect(paginaGravadaNoUpdate(q).data.pagina.cartao).toEqual({ ...PAGINA_GRAVADA.cartao, imagem: null });
+  });
+});
+
+describe("removerImagemPrograma — topo de programa publicado (R29)", () => {
+  const ERRO = "O programa publicado precisa de uma imagem do topo. Envie outra antes de remover esta.";
+  const semCaminho = { ...PAGINA_GRAVADA, heroImagem: 9, heroImagemCaminho: "" };
+
+  it("publicado sem caminho legado para voltar: recusa e não grava", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: semCaminho } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "topo" }, usuario)).toEqual({ ok: false, erro: ERRO });
+    expect(p.update).not.toHaveBeenCalled();
+  });
+
+  it("publicado com alterações pendentes também recusa (o programa segue no ar)", async () => {
+    const p = payloadFalso({ statusUltima: "draft", programaGravado: { ...GRAVADO_EDUTEC, pagina: { ...semCaminho, heroImagemCaminho: null } } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "topo" }, usuario)).toEqual({ ok: false, erro: ERRO });
+    expect(p.update).not.toHaveBeenCalled();
+  });
+
+  it("publicado com caminho legado: remove (o site volta ao caminho)", async () => {
+    const p = payloadFalso({ programaGravado: { ...GRAVADO_EDUTEC, pagina: { ...PAGINA_GRAVADA, heroImagem: 9 } } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "topo" }, usuario)).toEqual({ ok: true });
+    expect(paginaGravadaNoUpdate(p).data.pagina.heroImagem).toBeNull();
+  });
+
+  it("rascunho (nunca publicado) sem caminho: remove", async () => {
+    const p = payloadFalso({ statusPrincipal: "draft", statusUltima: "draft", programaGravado: { pagina: semCaminho } });
+    obterPayloadMock.mockResolvedValue(p);
+    expect(await removerImagemPrograma("4", { tipo: "topo" }, usuario)).toEqual({ ok: true });
   });
 });

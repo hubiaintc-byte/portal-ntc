@@ -106,6 +106,18 @@ export function faltasParaRascunho(p: { sigla: string; nomeCompleto: string }): 
   return faltas;
 }
 
+/** O que a página pública do programa não consegue omitir sem ficar quebrada (spec 2026-11-05 §6.5). */
+export interface PaginaParaPublicar {
+  heroTitulo: string;
+  heroSubtitulo: string;
+  /** Imagem do topo: media enviada ou caminho em /img. */
+  temImagemTopo: boolean;
+  cartaoNome: string;
+  cartaoTagline: string;
+  cartaoDescricaoMenu: string;
+  cartaoDescricaoMapa: string;
+}
+
 export interface ProgramaParaPublicar {
   sigla: string;
   nomeCompleto: string;
@@ -116,9 +128,16 @@ export interface ProgramaParaPublicar {
   eixos: ItemTituloDescricao[];
   diferenciais: ItemTituloDescricao[];
   resultados: string[];
+  /** Módulos já gravados do programa (a página lista os módulos). */
+  numModulos: number;
+  pagina: PaginaParaPublicar;
 }
 
-/** O que o schema do Payload exige na publicação, em rótulos da tela. Listas já devem vir sem itens vazios. */
+/**
+ * O que o schema do Payload exige na publicação, mais o mínimo da página do
+ * site (publicar põe a página no ar e libera o programa para a proposta),
+ * em rótulos da tela. Listas já devem vir sem itens vazios.
+ */
 export function faltasParaPublicar(p: ProgramaParaPublicar): string[] {
   const faltas = faltasParaRascunho(p);
   if (vazio(p.areaId)) faltas.push("Área");
@@ -134,6 +153,16 @@ export function faltasParaPublicar(p: ProgramaParaPublicar): string[] {
   p.resultados.forEach((r, i) => {
     if (vazio(r)) faltas.push(`Resultado ${i + 1}: texto`);
   });
+  if (p.eixos.length === 0) faltas.push("Ao menos um eixo temático");
+  if (p.numModulos < 1) faltas.push("Ao menos um módulo");
+  const g = p.pagina;
+  if (vazio(g.heroTitulo)) faltas.push("Título do topo");
+  if (vazio(g.heroSubtitulo)) faltas.push("Subtítulo do topo");
+  if (!g.temImagemTopo) faltas.push("Imagem do topo");
+  if (vazio(g.cartaoNome)) faltas.push("Cartão: nome");
+  if (vazio(g.cartaoTagline)) faltas.push("Cartão: chamada");
+  if (vazio(g.cartaoDescricaoMenu)) faltas.push("Cartão: descrição no menu");
+  if (vazio(g.cartaoDescricaoMapa)) faltas.push("Cartão: descrição no mapa do site");
   return faltas;
 }
 

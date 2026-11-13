@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { obterListasProgramas, vertenteComProgramas } from "@/lib/cms/listasProgramas";
 import { fundoResponsivo } from "@/lib/imagemLocal";
 
 import {
@@ -14,11 +15,13 @@ import {
  *
  * Mora no route group (vertical) para reaproveitar o CSS das páginas
  * de vertical (verticais-prototipo.css): hero, faixa de metadados,
- * grade `.programs-grid-vert` e CTA final. Os cards vêm da mesma
- * fonte das páginas de vertical (`FALLBACK_VERTICAIS[area].programas`),
- * então um card editado lá muda aqui também. Cada bloco recebe
+ * grade `.programs-grid-vert` e CTA final. Os cards vêm do CMS
+ * (`obterListasProgramas`, os programas publicados com `pagina.cartao`),
+ * a mesma fonte das páginas de vertical. Cada bloco recebe
  * `data-vertical` para herdar o acento cromático da vertical.
  */
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Programas Estratégicos · Grupo NTC",
@@ -32,8 +35,12 @@ const FUNDO_SECAO: Record<VerticalSlug, string> = {
   saude: "vert-section--ivory",
 };
 
-export default function ProgramasPage() {
-  const verticais = ORDEM_VERTICAIS.map((slug) => ({ slug, v: FALLBACK_VERTICAIS[slug] }));
+export default async function ProgramasPage() {
+  const listas = await obterListasProgramas();
+  const verticais = ORDEM_VERTICAIS.map((slug) => ({
+    slug,
+    v: vertenteComProgramas(FALLBACK_VERTICAIS[slug], listas.porVertical[slug], listas.total),
+  }));
   const total = verticais.reduce((soma, { v }) => soma + v.programas.cards.length, 0);
 
   return (
@@ -102,7 +109,7 @@ export default function ProgramasPage() {
                   <Link
                     key={p.sigla}
                     className="program-card-vert"
-                    href={`/programas/${p.sigla.toLowerCase().replace(/\+$/, "")}`}
+                    href={`/programas/${p.slug}`}
                   >
                     <div className="pc-cover">
                       <div

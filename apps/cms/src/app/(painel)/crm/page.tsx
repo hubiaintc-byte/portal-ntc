@@ -11,7 +11,6 @@ import {
   listarLeadsOpcoesCrm,
   listarUsuariosCms,
   obterCatalogoCrm,
-  listarProdutosCrm,
   listarPropostasCrm,
   todosEnviosCrm,
   type CatalogoCrm,
@@ -20,19 +19,9 @@ import {
   type LeadCrmResumo,
   type LeadOpcao,
   type UsuarioCmsResumo,
-  type ProdutoCrmResumo,
   type PropostaResumo,
   type EnvioResumo,
 } from "@/lib/cms/painelCrm";
-import {
-  listarAreasCrm,
-  listarModulosCrm,
-  listarProgramasCrm,
-  type AreaOpcao,
-  type ModuloCrmResumo,
-  type ProgramaCrmResumo,
-} from "@/lib/cms/catalogoCrm";
-
 import { ShellCrm } from "./ShellCrm";
 
 export const dynamic = "force-dynamic";
@@ -67,7 +56,6 @@ export default async function PainelCrmPage({ searchParams }: PainelCrmPageProps
   const verLeads = temTela(acesso, TELAS_LEADS);
   const verClientes = temTela(acesso, ["crm.clientes"]);
   const verPropostas = temTela(acesso, ["crm.propostas"]);
-  const verCatalogo = temTela(acesso, ["crm.programas", "crm.modulos"]);
 
   let clientes: ClienteCrmResumo[] = [];
   let clientesOpcoes: ClienteOpcao[] = [];
@@ -75,12 +63,8 @@ export default async function PainelCrmPage({ searchParams }: PainelCrmPageProps
   let leadsOpcoes: LeadOpcao[] = [];
   let catalogo: CatalogoCrm = CATALOGO_VAZIO;
   let usuarios: UsuarioCmsResumo[] = [];
-  let programas: ProgramaCrmResumo[] = [];
-  let modulos: ModuloCrmResumo[] = [];
-  let produtos: ProdutoCrmResumo[] = [];
   let propostas: PropostaResumo[] = [];
   let envios: EnvioResumo[] = [];
-  let areas: AreaOpcao[] = [];
   let erroLeitura = false;
 
   try {
@@ -91,12 +75,8 @@ export default async function PainelCrmPage({ searchParams }: PainelCrmPageProps
       leadsOpcoes,
       catalogo,
       usuarios,
-      programas,
-      modulos,
-      produtos,
       propostas,
       envios,
-      areas,
     ] = await Promise.all([
       seTiver(verClientes, listarClientesCrm, []),
       // Apoio: o select de cliente do lead e do wizard, para quem não tem Clientes.
@@ -109,12 +89,8 @@ export default async function PainelCrmPage({ searchParams }: PainelCrmPageProps
       seTiver(verLeads || verClientes || verPropostas, obterCatalogoCrm, CATALOGO_VAZIO),
       // Responsáveis (só nome): selects do lead, do cliente e da proposta.
       seTiver(verLeads || verClientes || verPropostas, listarUsuariosCms, []),
-      seTiver(verCatalogo, listarProgramasCrm, []),
-      seTiver(verCatalogo, listarModulosCrm, []),
-      seTiver(temTela(acesso, ["crm.produtos"]), listarProdutosCrm, []),
       seTiver(verPropostas, listarPropostasCrm, []),
       seTiver(temTela(acesso, ["crm.envios"]), todosEnviosCrm, []),
-      seTiver(verCatalogo, listarAreasCrm, []),
     ]);
   } catch (e) {
     console.error("[PainelCrmPage] Erro ao ler banco:", e);
@@ -136,10 +112,6 @@ export default async function PainelCrmPage({ searchParams }: PainelCrmPageProps
       leadsOpcoes={leadsOpcoes}
       catalogo={catalogo}
       usuarios={usuarios}
-      programas={programas}
-      areas={areas}
-      modulos={modulos}
-      produtos={produtos}
       propostas={propostas}
       envios={envios}
       hojeISO={hojeISO}

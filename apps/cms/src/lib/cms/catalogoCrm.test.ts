@@ -61,6 +61,8 @@ describe("obterProgramaCatalogo", () => {
             visaoGeral: negrito, problema: ambos, objetivo: null, publicoAlvo: null, metodologia: null,
             eixosTematicos: [{ titulo: "E", descricao: "D" }], diferenciais: [{ titulo: "T", descricao: null }],
             resultadosEsperados: [{ resultado: "R" }],
+            slug: "edu",
+            pagina: { heroTitulo: "Topo *x*", problemaDestaque: "**D**", publicoChips: [{ texto: "Gestores" }], cartao: { ordem: 2 } },
           }
         : { id: 4, _status: "published" },
     );
@@ -79,6 +81,14 @@ describe("obterProgramaCatalogo", () => {
       resultados: ["R"],
       modulos: [{ id: "11", numero: 1, titulo: "M1", cargaHoraria: "8h" }],
       dependentes: { modulos: 0, propostas: 0, leads: 0, eventos: 0, especialistas: 0 },
+      slug: "edu",
+      pagina: {
+        heroTitulo: "Topo *x*",
+        problemaDestaque: "**D**",
+        publicoChips: [{ texto: "Gestores" }],
+        identidadeVisual: "vertente",
+        cartao: { ordem: "2", nome: "" },
+      },
     });
   });
   it("id inexistente devolve null", async () => {
@@ -91,12 +101,13 @@ describe("obterModuloCatalogo", () => {
   it("formata o valor para edição e converte a ementa", async () => {
     const findByID = vi.fn(async () => ({
       id: 5, programa: { id: 4 }, numero: 2, titulo: "T", ementa: negrito, cargaHoraria: null,
+      topicos: [{ texto: "Tópico A" }, { texto: null }],
       comercial: { tituloComercial: null, valor: 1500.5, replay: "90 dias", certificacao: null },
     }));
     const count = vi.fn(async () => ({ totalDocs: 0 }));
     obterPayloadMock.mockResolvedValue({ findByID, count });
     expect(await obterModuloCatalogo("5")).toMatchObject({
-      programaId: "4", numero: "2", ementa: "**Forte**", ementaComPerda: false, cargaHoraria: "",
+      programaId: "4", numero: "2", ementa: "**Forte**", ementaComPerda: false, cargaHoraria: "", topicos: ["Tópico A"],
       tituloComercial: "", valor: "1500,5", replay: "90 dias", certificacao: "",
       dependentes: { propostas: 0, eventosComerciais: 0 },
     });

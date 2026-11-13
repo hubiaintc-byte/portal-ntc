@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import type { Vertical } from "@ntc/lib";
+
+import type { MenuProgramas } from "@/lib/cms/listasProgramas";
+
 /**
  * `HeaderHome` — header sticky com mega-menu hover + mobile drawer.
  *
@@ -14,11 +18,30 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *   - Mobile drawer abre/fecha via toggle + backdrop, com classe
  *     no-scroll no body para travar scroll.
  *   - Submenus do drawer expandem com `+/−`.
+ * - Mega-menu "Programas" com a lista de programas publicados no CMS,
+ *   recebida por prop do layout (server); o drawer mobile continua com a
+ *   seleção curada de 6, escrita aqui.
  */
 
 type MegaId = "programas" | "capacitacao" | "solucoes";
 
-export function HeaderHome() {
+/** Colunas do mega-menu "Programas", na ordem do protótipo. */
+const COLUNAS_MENU: { vertical: Vertical; rotulo: string }[] = [
+  { vertical: "educacao", rotulo: "NTC Educação" },
+  { vertical: "gestao-publica", rotulo: "NTC Gestão Pública" },
+  { vertical: "saude", rotulo: "NTC Saúde" },
+];
+
+function contagem(n: number): string {
+  return `${n} ${n === 1 ? "programa" : "programas"}`;
+}
+
+interface HeaderHomeProps {
+  /** Programas publicados no CMS (`obterMenuProgramas`), lidos no layout. */
+  programas: MenuProgramas;
+}
+
+export function HeaderHome({ programas }: HeaderHomeProps) {
   const [megaAberto, setMegaAberto] = useState<MegaId | null>(null);
   const [drawerAberto, setDrawerAberto] = useState(false);
   const [subDrawerAberto, setSubDrawerAberto] = useState<Record<string, boolean>>({});
@@ -171,111 +194,24 @@ export function HeaderHome() {
         <div {...propsMega("programas")} id="mega-programas">
           <div className="container">
             <div className="mega-inner">
-              <div className="mega-col">
-                <h4>NTC Educação · 9 programas</h4>
-                <ul className="mega-list">
-                  <li>
-                    <Link href="/programas/edutec">
-                      <strong>EDUTEC</strong>
-                      <span>Educação Digital, Inovação e Tecnologias para Redes Públicas</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/pear">
-                      <strong>PEAR</strong>
-                      <span>Alfabetização de Alta Performance e Recomposição da Aprendizagem</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/pei">
-                      <strong>PEI</strong>
-                      <span>Educação Integral — Gestão, Currículo e Resultados</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/progir">
-                      <strong>PROGIR</strong>
-                      <span>Gestão da Inclusão com Resultado</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/proge">
-                      <strong>PROGE</strong>
-                      <span>Gestão Escolar, Coordenação Pedagógica e Resultados</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/egide">
-                      <strong>EGIDE</strong>
-                      <span>IA, Dados e Governança da Transformação Digital</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/vivaescola">
-                      <strong>VIVAESCOLA</strong>
-                      <span>Convivência, Permanência, Bem-Estar e Proteção Integral</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/pinei">
-                      <strong>PINEI</strong>
-                      <span>Primeira Infância e Educação Infantil</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/futura">
-                      <strong>FUTURA</strong>
-                      <span>Ensino Médio, Itinerários de Futuro, Empregabilidade</span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div className="mega-col">
-                <h4>NTC Gestão Pública · 3 programas</h4>
-                <ul className="mega-list">
-                  <li>
-                    <Link href="/programas/agip">
-                      <strong>AGIP</strong>
-                      <span>Governança, Integridade e Performance nas Contratações Públicas</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/lidera">
-                      <strong>LIDERA</strong>
-                      <span>Liderança, Direção Estratégica e Resultados na Administração</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/siga">
-                      <strong>SIGA</strong>
-                      <span>Soluções Inteligentes de Governança e Administração</span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div className="mega-col">
-                <h4>NTC Saúde · 3 programas</h4>
-                <ul className="mega-list">
-                  <li>
-                    <Link href="/programas/sigs">
-                      <strong>SIGS</strong>
-                      <span>Saúde Inteligente, Governança Digital, IA e Transformação do SUS</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/proaps">
-                      <strong>PROAPS+</strong>
-                      <span>Alta Performance na Atenção Primária e Redes de Cuidado</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/programas/prosus">
-                      <strong>PROSUS+</strong>
-                      <span>Governança, Financiamento e Performance no SUS</span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+              {COLUNAS_MENU.map(({ vertical, rotulo }) => {
+                const itens = programas.porVertical[vertical];
+                return (
+                  <div key={vertical} className="mega-col">
+                    <h4>{programas.total === null ? rotulo : `${rotulo} · ${contagem(itens.length)}`}</h4>
+                    <ul className="mega-list">
+                      {itens.map((p) => (
+                        <li key={p.slug}>
+                          <Link href={`/programas/${p.slug}`}>
+                            <strong>{p.sigla}</strong>
+                            <span>{p.descricao}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -453,8 +389,8 @@ export function HeaderHome() {
             <Link href="/programas/proge"><strong>PROGE</strong><span>NTC Educação · Gestão escolar</span></Link>
             <Link href="/programas/agip"><strong>AGIP</strong><span>NTC Gestão Pública · Contratações</span></Link>
             <Link href="/programas/lidera"><strong>LIDERA</strong><span>NTC Gestão Pública · Liderança</span></Link>
-            <Link href="/programas/prosus"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></Link>
-            <Link href="/programas"><strong>Ver todos os 15 programas →</strong><span>Página completa</span></Link>
+            <Link href="/programas/prosus-plus"><strong>PROSUS+</strong><span>NTC Saúde · Governança SUS</span></Link>
+            <Link href="/programas"><strong>{programas.total === null ? "Ver todos os programas →" : `Ver todos os ${contagem(programas.total)} →`}</strong><span>Página completa</span></Link>
           </div>
 
           <button

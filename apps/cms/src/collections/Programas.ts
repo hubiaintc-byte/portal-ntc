@@ -5,6 +5,160 @@ import { autoSlug } from "../hooks/autoSlug";
 import { bloquearProgramaComDependentes } from "../lib/crm/exclusaoCatalogo";
 import { seoFields } from "../shared/seoFields";
 import { leituraPublica } from "../access/leituraPublica";
+import { ctaHrefPermitido } from "../lib/cms/cardsCorpoDocente";
+import type { Field } from "payload";
+import { IDENTIDADES_VISUAIS } from "../lib/cms/paginaProgramaCatalogo";
+
+
+const MARCACAO = "Marcação leve: **negrito** e *itálico*.";
+
+const IDENTIDADES = IDENTIDADES_VISUAIS;
+
+const campoImagemDocente = (): Field[] => [
+  { name: "imagem", type: "upload", relationTo: "media", label: "Imagem" },
+  { name: "imagemCaminho", type: "text", label: "Caminho da imagem (/img/…)" },
+  { name: "imagemAlt", type: "text", label: "Texto alternativo da imagem" },
+  { name: "eixoBadge", type: "text", label: "Selo do eixo" },
+  { name: "nome", type: "text", label: "Nome" },
+  { name: "credencial", type: "textarea", label: "Credencial" },
+];
+
+const validarCtaHref = (valor: string | null | undefined): true | string =>
+  !valor || ctaHrefPermitido(valor)
+    ? true
+    : "O link deve começar com /, #, http://, https:// ou mailto:.";
+
+/** Aba "Página do site": textos e dados da página pública do programa. Tudo opcional. */
+const abaPaginaDoSite = {
+  label: "Página do site",
+  fields: [
+    {
+      name: "pagina",
+      type: "group",
+      label: "Página do site",
+      fields: [
+        {
+          name: "identidadeVisual",
+          type: "select",
+          label: "Identidade visual",
+          defaultValue: "vertente",
+          options: IDENTIDADES.map((v) => ({ label: v === "vertente" ? "Pela vertente" : v, value: v })),
+        },
+        { name: "heroTitulo", type: "text", label: "Título do topo", admin: { description: MARCACAO } },
+        { name: "heroSubtitulo", type: "textarea", label: "Subtítulo do topo" },
+        { name: "heroImagem", type: "upload", relationTo: "media", label: "Imagem do topo" },
+        { name: "heroImagemCaminho", type: "text", label: "Caminho da imagem do topo (/img/…)" },
+        {
+          name: "barraDados",
+          type: "array",
+          label: "Barra de dados",
+          fields: [
+            { name: "rotulo", type: "text", label: "Rótulo" },
+            { name: "valor", type: "text", label: "Valor" },
+            { name: "valorSub", type: "text", label: "Complemento do valor" },
+          ],
+        },
+        { name: "visaoGeralTitulo", type: "text", label: "Título da Visão Geral", admin: { description: MARCACAO } },
+        { name: "problemaTitulo", type: "text", label: "Título do Problema", admin: { description: MARCACAO } },
+        { name: "problemaDestaque", type: "text", label: "Destaque do Problema", admin: { description: MARCACAO } },
+        {
+          name: "publicoChips",
+          type: "array",
+          label: "Chips do público-alvo",
+          fields: [{ name: "texto", type: "text", label: "Texto" }],
+        },
+        {
+          name: "docentes",
+          type: "group",
+          label: "Docentes (página)",
+          fields: [
+            { name: "titulo", type: "text", label: "Título", admin: { description: MARCACAO } },
+            { name: "intro", type: "textarea", label: "Introdução", admin: { description: MARCACAO } },
+            { name: "coordenacaoMarcador", type: "text", label: "Marcador da coordenação" },
+            { name: "especialistasMarcador", type: "text", label: "Marcador dos especialistas" },
+            {
+              name: "contadores",
+              type: "array",
+              label: "Contadores",
+              fields: [
+                { name: "num", type: "text", label: "Número" },
+                { name: "lbl", type: "text", label: "Legenda" },
+              ],
+            },
+            { name: "nota", type: "textarea", label: "Nota" },
+            {
+              name: "coordenacao",
+              type: "array",
+              label: "Coordenação científica",
+              fields: [
+                { name: "tag", type: "text", label: "Etiqueta" },
+                ...campoImagemDocente(),
+                { name: "eixo", type: "text", label: "Eixo" },
+                { name: "modulos", type: "text", label: "Módulos" },
+              ],
+            },
+            {
+              name: "especialistas",
+              type: "array",
+              label: "Especialistas",
+              fields: [
+                ...campoImagemDocente(),
+                { name: "modulos", type: "text", label: "Módulos" },
+              ],
+            },
+          ],
+        },
+        { name: "modalidadesIntro", type: "textarea", label: "Introdução das modalidades" },
+        {
+          name: "modalidadesCards",
+          type: "array",
+          label: "Cartões de modalidades",
+          fields: [
+            { name: "destaque", type: "checkbox", label: "Destaque" },
+            { name: "tag", type: "text", label: "Etiqueta" },
+            { name: "titulo", type: "text", label: "Título" },
+            { name: "descricao", type: "textarea", label: "Descrição" },
+            { name: "ctaRotulo", type: "text", label: "Rótulo do botão" },
+            { name: "ctaHref", type: "text", label: "Link do botão", validate: validarCtaHref },
+          ],
+        },
+        { name: "modulosAbertosMicrocopy", type: "textarea", label: "Texto dos módulos abertos" },
+        { name: "chamadaFinalTitulo", type: "text", label: "Título da chamada final", admin: { description: MARCACAO } },
+        { name: "chamadaFinalTexto", type: "textarea", label: "Texto da chamada final" },
+        {
+          name: "resumoLateral",
+          type: "array",
+          label: "Resumo lateral",
+          fields: [
+            { name: "rotulo", type: "text", label: "Rótulo" },
+            { name: "valor", type: "text", label: "Valor" },
+          ],
+        },
+        {
+          name: "entregas",
+          type: "array",
+          label: "Entregas",
+          fields: [{ name: "texto", type: "text", label: "Texto" }],
+        },
+        {
+          name: "cartao",
+          type: "group",
+          label: "Cartão (listas e menus)",
+          fields: [
+            { name: "nome", type: "text", label: "Nome" },
+            { name: "tagline", type: "text", label: "Chamada" },
+            { name: "meta", type: "text", label: "Meta" },
+            { name: "imagem", type: "upload", relationTo: "media", label: "Imagem" },
+            { name: "imagemCaminho", type: "text", label: "Caminho da imagem (/img/…)" },
+            { name: "ordem", type: "number", label: "Ordem" },
+            { name: "descricaoMenu", type: "text", label: "Descrição no menu" },
+            { name: "descricaoMapa", type: "text", label: "Descrição no mapa do site" },
+          ],
+        },
+      ],
+    },
+  ],
+} as const;
 
 /**
  * Programas Estratégicos (doc 11 §5).
@@ -154,6 +308,7 @@ export const Programas: CollectionConfig = {
             },
           ],
         },
+        abaPaginaDoSite as unknown as { label: string; fields: Field[] },
         {
           label: "FAQ e Relacionados",
           fields: [

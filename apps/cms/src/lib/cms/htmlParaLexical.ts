@@ -33,7 +33,7 @@
  * a um trabalho diferente (texto simples e sessões digitadas no painel).
  */
 
-import type { DocumentoLexical, NoBlocoLexical, NoTextoLexical } from "@/lib/lexicalBuilders";
+import type { DocumentoLexical, NoBlocoLexical, NoTextoLexical } from "../lexicalBuilders";
 
 export type { DocumentoLexical };
 

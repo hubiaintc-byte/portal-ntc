@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { obterMenuProgramas } from "@/lib/cms/listasProgramas";
 import { carregarContatos } from "@/lib/contatos";
 
 import { HeaderHome } from "../(home)/HeaderHome";
@@ -26,11 +27,11 @@ import "../conteudos-prototipo.css";
  * CSS específico vem do root layout (conteudos-prototipo.css).
  */
 export default async function ConteudosLayout({ children }: { children: ReactNode }) {
-  const contatos = await carregarContatos();
+  const [contatos, programas] = await Promise.all([carregarContatos(), obterMenuProgramas()]);
 
   return (
     <>
-      <HeaderHome />
+      <HeaderHome programas={programas} />
       {children}
       <FooterHome contatos={contatos} />
       <InteracoesScroll />

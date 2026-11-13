@@ -34,6 +34,7 @@ import { textoComSubtitulosParaLexical } from "@/lib/lexicalBuilders";
 import { gerarPdfDeHtml } from "@/lib/pdf/gerarPdfDeHtml";
 import { obterPayload } from "@/lib/payloadClient";
 
+import { comporEmenta, comporProblema, comporPublicoAlvo, textosDeLista } from "./importacaoProgramas/comporTextos";
 import type { ResultadoEscrita } from "./painelCmsEscrita";
 
 /**
@@ -339,9 +340,9 @@ function textosDoPrograma(programa: Programa | null): Partial<PropostaData> {
   if (programa === null) return {};
   return {
     ...seTemTexto("textoApresentacao", programa.visaoGeral),
-    ...seTemTexto("textoContexto", programa.problema),
+    ...seTemTexto("textoContexto", comporProblema(programa.problema, programa.pagina?.problemaDestaque)),
     ...seTemTexto("textoObjetivos", programa.objetivo),
-    ...seTemTexto("textoPublicoAlvo", programa.publicoAlvo),
+    ...seTemTexto("textoPublicoAlvo", comporPublicoAlvo(programa.publicoAlvo, textosDeLista(programa.pagina?.publicoChips))),
     ...seTemTexto("textoMetodologia", programa.metodologia),
   };
 }
@@ -438,7 +439,7 @@ function conteudoParaGravar(p: {
       tituloExibido: m.titulo,
       // Mesma regra dos textos: ementa vazia ou ausente não é gravada, para o
       // documento omitir o corpo do módulo em vez de imprimir um bloco branco.
-      ...seTemTexto("ementa", m.ementa),
+      ...seTemTexto("ementa", comporEmenta(m.ementa, textosDeLista(m.topicos))),
     })),
   };
 }
@@ -527,7 +528,7 @@ function mesclarModulosDetalhados(
   const novas = novosDoCatalogo.map((m) => ({
     modulo: Number(m.id),
     tituloExibido: m.titulo,
-    ...seTemTexto("ementa", m.ementa),
+    ...seTemTexto("ementa", comporEmenta(m.ementa, textosDeLista(m.topicos))),
   }));
   return [...mantidas, ...novas] as PropostaModulosDetalhados;
 }

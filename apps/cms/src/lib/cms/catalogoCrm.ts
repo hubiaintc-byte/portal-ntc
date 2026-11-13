@@ -14,10 +14,13 @@ import type { Payload, PayloadRequest } from "payload";
 import { contarModulosPorPrograma } from "@/lib/cms/agregadosCrm";
 import { contarDependentesModulo, contarDependentesPrograma } from "@/lib/crm/exclusaoCatalogo";
 import { idaEVoltaPreserva, lexicalParaMarkdown } from "@/lib/markdownLexical";
+import { paginaDoDocumento, type PaginaProgramaEdicao } from "@/lib/cms/paginaProgramaCatalogo";
 import { obterPayload } from "@/lib/payloadClient";
 
 /**
- * Leitura do catálogo comercial gerido pelo CRM (spec catálogo §2–§4).
+ * Leitura do catálogo (Programas e Módulos, no módulo Site desde 05/11/2026;
+ * spec catálogo §2–§4). As listas de opções do CRM (wizard, lead, evento)
+ * seguem em `obterCatalogoCrm` (painelCrm.ts).
  * Programas têm rascunho: a situação cruza a linha principal (sem `draft`)
  * com a última versão (`draft: true`) — ver `situacaoPrograma`.
  */
@@ -73,6 +76,10 @@ export interface ProgramaCatalogoDetalhe {
   resultados: string[];
   modulos: ModuloDoPrograma[];
   dependentes: DependentesPrograma;
+  /** Endereço da página pública (`/programas/<slug>`). */
+  slug: string;
+  /** Group "Página do site" em forma de formulário. */
+  pagina: PaginaProgramaEdicao;
 }
 
 export interface ModuloCatalogoDetalhe {
@@ -80,8 +87,10 @@ export interface ModuloCatalogoDetalhe {
   programaId: string;
   numero: string;
   titulo: string;
+  /** Só a descrição — os tópicos moram em `topicos` (a proposta compõe os dois). */
   ementa: string;
   ementaComPerda: boolean;
+  topicos: string[];
   cargaHoraria: string;
   tituloComercial: string;
   valor: string;
@@ -206,6 +215,8 @@ export async function obterProgramaCatalogo(id: string): Promise<ProgramaCatalog
       resultados: (p.resultadosEsperados ?? []).map((r) => r.resultado ?? ""),
       modulos: modulos.docs.map((m) => ({ id: String(m.id), numero: m.numero, titulo: m.titulo, cargaHoraria: m.cargaHoraria ?? null })),
       dependentes,
+      slug: p.slug ?? "",
+      pagina: paginaDoDocumento(p.pagina),
     };
   } catch (e) {
     console.error("[obterProgramaCatalogo]", e);
@@ -226,6 +237,7 @@ export async function obterModuloCatalogo(id: string): Promise<ModuloCatalogoDet
       titulo: m.titulo,
       ementa: lexicalParaMarkdown(m.ementa),
       ementaComPerda: !idaEVoltaPreserva(m.ementa),
+      topicos: (m.topicos ?? []).map((t) => t.texto ?? "").filter((t) => t !== ""),
       cargaHoraria: m.cargaHoraria ?? "",
       tituloComercial: m.comercial?.tituloComercial ?? "",
       valor: valor === null || valor === undefined ? "" : String(valor).replace(".", ","),

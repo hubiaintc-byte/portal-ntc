@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { obterMenuProgramas } from "@/lib/cms/listasProgramas";
 import { carregarContatos } from "@/lib/contatos";
 
 import { HeaderHome } from "./HeaderHome";
@@ -16,11 +17,11 @@ import { InteracoesScroll } from "./InteracoesScroll";
  * pequenos (`HeaderHome`, com megas e drawer).
  */
 export default async function HomeLayout({ children }: { children: ReactNode }) {
-  const contatos = await carregarContatos();
+  const [contatos, programas] = await Promise.all([carregarContatos(), obterMenuProgramas()]);
 
   return (
     <>
-      <HeaderHome />
+      <HeaderHome programas={programas} />
       {children}
       <FooterHome contatos={contatos} />
       <InteracoesScroll />

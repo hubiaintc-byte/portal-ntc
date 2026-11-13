@@ -80,16 +80,19 @@ export interface BarraFormatacaoProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   valor: string;
   onMudar: (novo: string) => void;
+  /** Só negrito e itálico — campos de marcação leve de uma linha (títulos, destaques). */
+  soEnfase?: boolean;
 }
 
-export function BarraFormatacao({ textareaRef, valor, onMudar }: BarraFormatacaoProps) {
+export function BarraFormatacao({ textareaRef, valor, onMudar, soEnfase }: BarraFormatacaoProps) {
+  const botoes = soEnfase ? BOTOES.filter((b) => b.acao === "negrito" || b.acao === "italico") : BOTOES;
   return (
     <div className="pcms-barra-md" role="group" aria-label="Formatação do texto">
-      {BOTOES.map((b) => (
+      {botoes.map((b, i) => (
         <button
           key={b.acao}
           type="button"
-          className={`pcms-barra-md__botao${b.separar ? " pcms-barra-md__botao--grupo" : ""} pcms-barra-md__botao--${b.acao}`}
+          className={`pcms-barra-md__botao${b.separar && i > 0 ? " pcms-barra-md__botao--grupo" : ""} pcms-barra-md__botao--${b.acao}`}
           aria-label={b.descricao}
           title={b.descricao}
           onClick={() => aplicarNoTextarea(textareaRef.current, valor, b.acao, onMudar)}

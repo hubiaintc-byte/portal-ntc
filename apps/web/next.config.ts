@@ -79,6 +79,12 @@ const nextConfig: NextConfig = {
         destination: "/contato",
         permanent: false,
       },
+      // PROAPS+ e PROSUS+ passaram a usar o endereço do CMS (decisão do PO,
+      // 12/11): os endereços antigos redirecionam para não quebrar links.
+      { source: "/programas/proaps", destination: "/programas/proaps-plus", permanent: true },
+      { source: "/programas/proaps/:resto*", destination: "/programas/proaps-plus/:resto*", permanent: true },
+      { source: "/programas/prosus", destination: "/programas/prosus-plus", permanent: true },
+      { source: "/programas/prosus/:resto*", destination: "/programas/prosus-plus/:resto*", permanent: true },
     ];
   },
 };
