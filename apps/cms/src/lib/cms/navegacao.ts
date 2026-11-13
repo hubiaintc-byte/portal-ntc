@@ -12,6 +12,8 @@ export type TelaIdSite =
   | "palestrantes"
   | "corpo-docente"
   | "eventos"
+  | "programas"
+  | "modulos"
   | "conteudos"
   | "home"
   | "config"
@@ -23,10 +25,7 @@ export type TelaCrmId =
   | "leads"
   | "clientes"
   | "propostas"
-  | "envios"
-  | "programas"
-  | "modulos"
-  | "produtos";
+  | "envios";
 
 /** Ids de navegação do módulo Financeiro (`ShellFinanceiro`). */
 export type TelaFinId = "visao" | "eventos" | "receber" | "pagar";
@@ -37,6 +36,8 @@ export const NAV_SITE: readonly { id: TelaIdSite; tela: TelaPainel }[] = [
   { id: "palestrantes", tela: "site.palestrantes" },
   { id: "corpo-docente", tela: "site.corpo-docente" },
   { id: "eventos", tela: "site.eventos" },
+  { id: "programas", tela: "crm.programas" },
+  { id: "modulos", tela: "crm.modulos" },
   { id: "conteudos", tela: "site.conteudos" },
   { id: "home", tela: "site.home" },
 ];
@@ -48,9 +49,6 @@ export const NAV_CRM: readonly { id: TelaCrmId; tela: TelaPainel }[] = [
   { id: "clientes", tela: "crm.clientes" },
   { id: "propostas", tela: "crm.propostas" },
   { id: "envios", tela: "crm.envios" },
-  { id: "programas", tela: "crm.programas" },
-  { id: "modulos", tela: "crm.modulos" },
-  { id: "produtos", tela: "crm.produtos" },
 ];
 
 /** Itens do menu do Financeiro, na ordem do menu. */

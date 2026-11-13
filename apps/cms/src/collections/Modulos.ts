@@ -37,6 +37,12 @@ export const Modulos: CollectionConfig = {
     { name: "ementa", type: "richText", required: true },
     { name: "cargaHoraria", type: "text" },
     {
+      name: "topicos",
+      type: "array",
+      label: "Tópicos (página do programa)",
+      fields: [{ name: "texto", type: "text", label: "Texto" }],
+    },
+    {
       name: "eventosVinculados",
       type: "relationship",
       relationTo: "eventos",

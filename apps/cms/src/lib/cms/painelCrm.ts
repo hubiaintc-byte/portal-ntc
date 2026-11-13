@@ -132,13 +132,6 @@ export interface UsuarioCmsResumo {
   nome: string;
 }
 
-export interface ProdutoCrmResumo {
-  id: string;
-  nome: string;
-  codigo: string | null;
-  valor: number | null;
-}
-
 export interface PropostaResumo {
   id: string;
   codigo: string;
@@ -833,8 +826,7 @@ export async function obterClienteCrm(
 
 /**
  * Eventos do catálogo (rascunho incluso), com só os campos que o CRM exibe.
- * `cache` por request: a página /crm pede a mesma leitura por
- * `obterCatalogoCrm` e por `listarProdutosCrm`, e ela sai uma vez só.
+ * `cache` por request: a leitura sai uma vez só por página.
  */
 const lerEventosCatalogo = cache(async () => {
   const payload = await obterPayload();
@@ -904,16 +896,6 @@ export async function listarUsuariosCms(): Promise<UsuarioCmsResumo[]> {
   const payload = await obterPayload();
   const res = await payload.find({ collection: "users", depth: 0, limit: 100, sort: "nome", select: { nome: true, email: true } });
   return res.docs.map((u) => ({ id: String(u.id), nome: u.nome ?? u.email }));
-}
-
-export async function listarProdutosCrm(): Promise<ProdutoCrmResumo[]> {
-  const eventos = await lerEventosCatalogo();
-  return eventos.map((e) => ({
-    id: String(e.id),
-    nome: e.nome,
-    codigo: e.comercial?.codigo ?? null,
-    valor: e.comercial?.valor ?? null,
-  }));
 }
 
 type PropostaResumoDoc = Pick<

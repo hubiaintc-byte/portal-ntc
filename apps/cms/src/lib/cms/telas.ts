@@ -27,11 +27,20 @@ export type TelaPainel =
   | "fin.receber"
   | "fin.pagar";
 
+/**
+ * Telas do menu, na ordem do menu. Programas e Módulos (o catálogo) moram no
+ * Site desde 05/11/2026 — publicar o programa põe a página no ar —, mas os
+ * ids gravados continuam `crm.*` (trocar mudaria o enum `enum_users_telas`).
+ * `crm.produtos` saiu do menu e não dá acesso a nada; o valor segue no tipo e
+ * no enum (ver `IDS_TELAS_GRAVADOS`).
+ */
 export const TELAS: readonly { id: TelaPainel; modulo: ModuloPainel; rotulo: string }[] = [
   { id: "site.painel", modulo: "site", rotulo: "Painel" },
   { id: "site.palestrantes", modulo: "site", rotulo: "Palestrantes" },
   { id: "site.corpo-docente", modulo: "site", rotulo: "Corpo Docente" },
   { id: "site.eventos", modulo: "site", rotulo: "Eventos" },
+  { id: "crm.programas", modulo: "site", rotulo: "Programas" },
+  { id: "crm.modulos", modulo: "site", rotulo: "Módulos" },
   { id: "site.conteudos", modulo: "site", rotulo: "Conteúdos" },
   { id: "site.home", modulo: "site", rotulo: "Home" },
   { id: "site.contatos", modulo: "site", rotulo: "Contatos do site" },
@@ -40,13 +49,38 @@ export const TELAS: readonly { id: TelaPainel; modulo: ModuloPainel; rotulo: str
   { id: "crm.clientes", modulo: "crm", rotulo: "Clientes" },
   { id: "crm.propostas", modulo: "crm", rotulo: "Propostas" },
   { id: "crm.envios", modulo: "crm", rotulo: "Envios" },
-  { id: "crm.programas", modulo: "crm", rotulo: "Programas" },
-  { id: "crm.modulos", modulo: "crm", rotulo: "Módulos" },
-  { id: "crm.produtos", modulo: "crm", rotulo: "Produtos / Eventos" },
   { id: "fin.visao-executiva", modulo: "financeiro", rotulo: "Visão Executiva" },
   { id: "fin.eventos", modulo: "financeiro", rotulo: "Eventos e Projetos" },
   { id: "fin.receber", modulo: "financeiro", rotulo: "Receber" },
   { id: "fin.pagar", modulo: "financeiro", rotulo: "Pagar" },
+];
+
+/**
+ * Valores do select `users.telas`, na ordem em que o enum nasceu. Mudar a
+ * lista ou a ordem muda o enum do Postgres no próximo `payload:push:schema`
+ * — por isso fica separada de `TELAS` (o menu). Nunca tirar um valor daqui;
+ * valor novo entra só no fim (as 4 do Financeiro, 13/11/2026).
+ */
+export const IDS_TELAS_GRAVADOS: readonly TelaPainel[] = [
+  "site.painel",
+  "site.palestrantes",
+  "site.corpo-docente",
+  "site.eventos",
+  "site.conteudos",
+  "site.home",
+  "site.contatos",
+  "crm.dashboard",
+  "crm.leads",
+  "crm.clientes",
+  "crm.propostas",
+  "crm.envios",
+  "crm.programas",
+  "crm.modulos",
+  "crm.produtos",
+  "fin.visao-executiva",
+  "fin.eventos",
+  "fin.receber",
+  "fin.pagar",
 ];
 
 /** Telas do módulo Financeiro. */

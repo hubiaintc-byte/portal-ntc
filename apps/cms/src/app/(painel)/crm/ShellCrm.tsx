@@ -14,18 +14,10 @@ import type {
   LeadCrmDetalhe,
   LeadCrmResumo,
   LeadOpcao,
-  ProdutoCrmResumo,
   PropostaDetalhe,
   PropostaResumo,
   UsuarioCmsResumo,
 } from "@/lib/cms/painelCrm";
-import type {
-  AreaOpcao,
-  ModuloCatalogoDetalhe,
-  ModuloCrmResumo,
-  ProgramaCatalogoDetalhe,
-  ProgramaCrmResumo,
-} from "@/lib/cms/catalogoCrm";
 
 import {
   adicionarNotaCrm,
@@ -36,12 +28,9 @@ import {
   novaVersaoPropostaCrm,
   registrarEnvioCrm,
 } from "../acoesCrm";
-import { carregarModuloCatalogoCrm, carregarProgramaCatalogoCrm } from "../acoesCatalogo";
 import { ShellPainel, type GrupoNav } from "../shell/ShellPainel";
 import { AvisoForm } from "./CamposCrm";
 import { DetalheCliente } from "./DetalheCliente";
-import { DetalheModuloCatalogo } from "./DetalheModuloCatalogo";
-import { DetalheProgramaCatalogo } from "./DetalheProgramaCatalogo";
 import { DetalheProposta } from "./DetalheProposta";
 import { FormCliente } from "./FormCliente";
 import { FormProposta } from "./FormProposta";
@@ -49,10 +38,7 @@ import { ModalLead } from "./ModalLead";
 import { TelaClientes } from "./TelaClientes";
 import { TelaEnvios } from "./TelaEnvios";
 import { TelaLeadsCrm } from "./TelaLeadsCrm";
-import { TelaModulos } from "./TelaModulos";
 import { TelaPainelComercial } from "./TelaPainelComercial";
-import { TelaProdutos } from "./TelaProdutos";
-import { TelaProgramas } from "./TelaProgramas";
 import { TelaPropostas } from "./TelaPropostas";
 
 interface ShellCrmProps {
@@ -75,10 +61,6 @@ interface ShellCrmProps {
   leadsOpcoes: LeadOpcao[];
   catalogo: CatalogoCrm;
   usuarios: UsuarioCmsResumo[];
-  programas: ProgramaCrmResumo[];
-  areas: AreaOpcao[];
-  modulos: ModuloCrmResumo[];
-  produtos: ProdutoCrmResumo[];
   propostas: PropostaResumo[];
   envios: EnvioResumo[];
   hojeISO: string;
@@ -94,11 +76,6 @@ type FormCrmAberto =
 
 /** Modal do lead: sobreposição à tela ativa (spec §4.4) — ver um lead ou criar um novo. */
 type ModalLeadAberto = { modo: "ver"; lead: LeadCrmDetalhe } | { modo: "novo" };
-
-/** Detalhe/criação de programa ou módulo do catálogo, aberto em tela cheia. */
-type DetalheCatalogoAberto =
-  | { tipo: "programa"; programa: ProgramaCatalogoDetalhe | null }
-  | { tipo: "modulo"; modulo: ModuloCatalogoDetalhe | null; programaIdInicial?: string };
 
 /* Ícones lineares funcionais, peso 1.5 (CLAUDE.md §3). */
 const Ico = {
@@ -133,21 +110,6 @@ const Ico = {
       <path d="M3 5h18v14H3z" /><path d="m3 6 9 7 9-7" />
     </svg>
   ),
-  programas: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3 2 8l10 5 10-5z" /><path d="m6 10.5 6 3 6-3" />
-    </svg>
-  ),
-  modulos: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="4" /><rect x="3" y="10" width="18" height="4" /><rect x="3" y="16" width="18" height="4" />
-    </svg>
-  ),
-  produtos: (
-    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 2 3 7v10l9 5 9-5V7z" /><path d="M12 12 3 7M12 12l9-5M12 12v10" />
-    </svg>
-  ),
 };
 
 const NAV_COMERCIAL: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
@@ -158,21 +120,12 @@ const NAV_COMERCIAL: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[]
   { id: "envios", rotulo: "Envios", icone: Ico.envios },
 ];
 
-const NAV_CATALOGO: { id: TelaCrmId; rotulo: string; icone: React.ReactNode }[] = [
-  { id: "programas", rotulo: "Programas", icone: Ico.programas },
-  { id: "modulos", rotulo: "Módulos", icone: Ico.modulos },
-  { id: "produtos", rotulo: "Produtos / Eventos", icone: Ico.produtos },
-];
-
 const CRUMB: Record<TelaCrmId, string> = {
   painel: "CRM · Dashboard",
   leads: "CRM · Leads",
   clientes: "CRM · Clientes",
   propostas: "CRM · Propostas",
   envios: "CRM · Envios",
-  programas: "CRM · Programas",
-  modulos: "CRM · Módulos",
-  produtos: "CRM · Produtos / Eventos",
 };
 
 export function ShellCrm({
@@ -185,10 +138,6 @@ export function ShellCrm({
   leadsOpcoes,
   catalogo,
   usuarios,
-  programas,
-  areas,
-  modulos,
-  produtos,
   propostas,
   envios,
   hojeISO,
@@ -200,9 +149,6 @@ export function ShellCrm({
   const [modalLead, setModalLead] = useState<ModalLeadAberto | null>(null);
   const [propostaDet, setPropostaDet] = useState<PropostaDetalhe | null>(null);
   const [formAberto, setFormAberto] = useState<FormCrmAberto | null>(null);
-  const [catalogoDet, setCatalogoDet] = useState<DetalheCatalogoAberto | null>(null);
-  /** Sobe a cada detalhe do catálogo recarregado, para o formulário remontar com os dados novos. */
-  const [versaoDet, setVersaoDet] = useState(0);
   const [erroAcao, setErroAcao] = useState<string | null>(null);
   const [carregando, iniciarCarga] = useTransition();
   const [leadsLocal, setLeadsLocal] = useState<LeadCrmResumo[]>(leads);
@@ -233,7 +179,6 @@ export function ShellCrm({
     setModalLead(null);
     setPropostaDet(null);
     setFormAberto(null);
-    setCatalogoDet(null);
     setErroAcao(null);
   }
 
@@ -285,30 +230,6 @@ export function ShellCrm({
     });
   }
 
-  function abrirProgramaCatalogo(id: string) {
-    iniciarCarga(async () => {
-      const det = await carregarProgramaCatalogoCrm(id);
-      if (det) {
-        setErroAcao(null);
-        setCatalogoDet({ tipo: "programa", programa: det });
-        setVersaoDet((v) => v + 1);
-      }
-      else setErroAcao("Não foi possível abrir o programa.");
-    });
-  }
-
-  function abrirModuloCatalogo(id: string) {
-    iniciarCarga(async () => {
-      const det = await carregarModuloCatalogoCrm(id);
-      if (det) {
-        setErroAcao(null);
-        setCatalogoDet({ tipo: "modulo", modulo: det });
-        setVersaoDet((v) => v + 1);
-      }
-      else setErroAcao("Não foi possível abrir o módulo.");
-    });
-  }
-
   function novaVersao(codBase: string, motivo: string) {
     iniciarCarga(async () => {
       const r = await novaVersaoPropostaCrm(codBase, motivo);
@@ -334,7 +255,6 @@ export function ShellCrm({
   const visiveis = new Set(navCrmVisivel(acesso));
   const grupos: GrupoNav[] = [
     { rotulo: "Comercial", itens: NAV_COMERCIAL.filter((i) => visiveis.has(i.id)) },
-    { rotulo: "Catálogo Institucional", itens: NAV_CATALOGO.filter((i) => visiveis.has(i.id)) },
   ].filter((g) => g.itens.length > 0);
 
   const verClientes = temTela(acesso, ["crm.clientes"]);
@@ -356,42 +276,7 @@ export function ShellCrm({
       carregando={carregando}
     >
       {/* Detalhes e formulários em tela cheia têm precedência sobre a tela ativa. */}
-      {catalogoDet?.tipo === "programa" ? (
-        <>
-        <AvisoForm erro={erroAcao} />
-        <DetalheProgramaCatalogo
-          key={`${catalogoDet.programa?.id ?? "novo"}:${versaoDet}`}
-          programa={catalogoDet.programa}
-          areas={areas}
-          onVoltar={fecharTudo}
-          onSalvo={abrirProgramaCatalogo}
-          onExcluido={() => {
-            fecharTudo();
-            setTela("programas");
-          }}
-          onAbrirModulo={abrirModuloCatalogo}
-          onNovoModulo={(programaId) => setCatalogoDet({ tipo: "modulo", modulo: null, programaIdInicial: programaId })}
-          podeEditar={capacidades.editarProgramas}
-        />
-        </>
-      ) : catalogoDet?.tipo === "modulo" ? (
-        <>
-        <AvisoForm erro={erroAcao} />
-        <DetalheModuloCatalogo
-          key={`${catalogoDet.modulo?.id ?? `novo-${catalogoDet.programaIdInicial ?? ""}`}:${versaoDet}`}
-          modulo={catalogoDet.modulo}
-          programaIdInicial={catalogoDet.programaIdInicial}
-          programas={programas}
-          onVoltar={fecharTudo}
-          onSalvo={abrirModuloCatalogo}
-          onExcluido={() => {
-            fecharTudo();
-            setTela("modulos");
-          }}
-          podeEditar={capacidades.editarModulos}
-        />
-        </>
-      ) : formAberto?.entidade === "cliente" ? (
+      {formAberto?.entidade === "cliente" ? (
         <FormCliente
           inicial={formAberto.inicial}
           usuarios={usuarios}
@@ -469,25 +354,6 @@ export function ShellCrm({
               onNovo={() => setFormAberto({ entidade: "cliente", inicial: null })}
             />
           )}
-          {tela === "programas" && (
-            <TelaProgramas
-              programas={programas}
-              areas={areas}
-              onAbrir={abrirProgramaCatalogo}
-              onNovo={() => setCatalogoDet({ tipo: "programa", programa: null })}
-              podeEditar={capacidades.editarProgramas}
-            />
-          )}
-          {tela === "modulos" && (
-            <TelaModulos
-              modulos={modulos}
-              programas={programas}
-              onAbrir={abrirModuloCatalogo}
-              onNovo={() => setCatalogoDet({ tipo: "modulo", modulo: null })}
-              podeEditar={capacidades.editarModulos}
-            />
-          )}
-          {tela === "produtos" && <TelaProdutos produtos={produtos} />}
           {tela === "propostas" && (
             <TelaPropostas
               propostas={propostas}

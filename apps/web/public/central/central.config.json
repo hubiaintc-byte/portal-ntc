@@ -1,0 +1,278 @@
+{
+  "_leia_me": "Arquivo único de conteúdo da Central de Acesso NTC. Edite apenas os textos entre aspas e os campos ativo (true/false). Destinos com status 'pendente' ficam ocultos no site e aparecem apenas no modo de revisão (?revisao=1 ou #revisao).",
+  "versao": "1.3",
+  "atualizado_em": "2026-11-11",
+  "base_url": "https://www.institutontc.com.br",
+  "cabecalho": {
+    "rotulo": "Instituto NTC do Brasil · Brasília · DF",
+    "titulo": "Central de Acesso.",
+    "slogan": "O novo padrão da formação institucional.",
+    "apoio": "Educação, Gestão Pública e Saúde integradas em uma plataforma nacional de soluções para a Administração Pública.",
+    "atalhos": [
+      {
+        "texto": "Agenda",
+        "ancora": "eventos"
+      },
+      {
+        "texto": "Soluções",
+        "ancora": "solucoes"
+      },
+      {
+        "texto": "EventON",
+        "ancora": "eventon"
+      },
+      {
+        "texto": "Contato",
+        "ancora": "contato"
+      }
+    ]
+  },
+  "secoes": [
+    {
+      "id": "eventos",
+      "ativo": true,
+      "tipo": "lista",
+      "numero": "01",
+      "rotulo": "Agenda",
+      "titulo": "Agenda de Eventos e Capacitações",
+      "apoio": "Confira a programação de cursos, seminários e capacitações do Grupo NTC.",
+      "itens": [
+        {
+          "titulo": "Eventos on-line ao vivo",
+          "descricao": "Transmissão ao vivo, replay e certificado.",
+          "url": "/agenda?modalidade=online",
+          "status": "verificado"
+        },
+        {
+          "titulo": "Inscrição de equipes e grupos",
+          "descricao": "Inscrições institucionais para equipes de órgãos públicos.",
+          "url": "/contato",
+          "status": "verificado"
+        },
+        {
+          "titulo": "Eventos realizados",
+          "descricao": "Acervo de eventos com replay disponível.",
+          "url": "/agenda?tab=realizados",
+          "status": "verificado"
+        }
+      ],
+      "chamada": {
+        "texto": "Consultar agenda completa",
+        "url": "/agenda",
+        "status": "verificado"
+      }
+    },
+    {
+      "id": "solucoes",
+      "ativo": true,
+      "tipo": "verticais",
+      "numero": "02",
+      "rotulo": "Soluções para órgãos públicos",
+      "titulo": "Três áreas. Uma única inteligência institucional.",
+      "apoio": "Programas estratégicos, trilhas e soluções sob medida para governos, secretarias, redes e órgãos públicos.",
+      "verticais": [
+        {
+          "vertical": "educacao",
+          "nome": "NTC Educação",
+          "linha": "Educação com excelência. Formação com resultado.",
+          "descricao": "Gestão, tecnologia, inclusão e inovação para redes públicas de ensino.",
+          "url": "/solucoes-estrategicas/educacao",
+          "status": "verificado"
+        },
+        {
+          "vertical": "gestao",
+          "nome": "NTC Gestão Pública",
+          "linha": "Governança com excelência. Gestão com transformação.",
+          "descricao": "Governança, liderança, integridade e contratações públicas.",
+          "url": "/solucoes-estrategicas/gestao-publica",
+          "status": "verificado"
+        },
+        {
+          "vertical": "saude",
+          "nome": "NTC Saúde",
+          "linha": "Gestão com competência. Saúde com qualidade.",
+          "descricao": "Governança, financiamento e transformação digital do SUS.",
+          "url": "/solucoes-estrategicas/saude",
+          "status": "verificado"
+        }
+      ],
+      "modelos": [
+        "In company",
+        "Turmas fechadas",
+        "Soluções sob medida",
+        "Trilhas e jornadas"
+      ],
+      "chamada": {
+        "titulo": "Solicite uma proposta institucional.",
+        "texto": "Aderência à Lei nº 14.133/2021 e suporte à adequada instrução da contratação.",
+        "botao": "Solicitar proposta",
+        "url": "/contato?assunto=proposta",
+        "status": "verificado",
+        "link_secundario": {
+          "texto": "Conheça os programas",
+          "url": "/programas",
+          "status": "verificado"
+        }
+      }
+    },
+    {
+      "id": "conteudos",
+      "ativo": true,
+      "tipo": "lista",
+      "numero": "03",
+      "rotulo": "Conteúdos e publicações",
+      "titulo": "A inteligência institucional do Grupo NTC, em circulação.",
+      "apoio": "Artigos, estudos, notas técnicas e materiais produzidos pela curadoria das três verticais.",
+      "itens": [
+        {
+          "titulo": "Biblioteca editorial",
+          "descricao": "Conteúdos institucionais para dirigentes e equipes técnicas.",
+          "url": "/conteudos",
+          "status": "verificado"
+        },
+        {
+          "titulo": "Portfólio Institucional 2026",
+          "descricao": "Áreas, programas, metodologia e credenciais do Grupo NTC.",
+          "url": "",
+          "status": "pendente",
+          "pendencia": "Arquivo público do Portfólio ainda não publicado: o botão 'Baixar portfólio' do site aponta para /#contato."
+        },
+        {
+          "titulo": "Newsletter institucional",
+          "descricao": "Receba as publicações do Grupo NTC.",
+          "url": "",
+          "status": "pendente",
+          "pendencia": "Endereço de inscrição da newsletter não confirmado."
+        }
+      ]
+    },
+    {
+      "id": "eventon",
+      "ativo": true,
+      "tipo": "plataforma",
+      "numero": "04",
+      "rotulo": "Plataforma própria",
+      "titulo": "EventON NTC",
+      "apoio": "Acesso ao vivo, replay, materiais e certificado em um só ambiente, com suporte ao participante.",
+      "botao": {
+        "texto": "Acessar Área do Participante",
+        "url": "https://ntceventon.com.br/",
+        "status": "verificado"
+      },
+      "link_secundario": {
+        "texto": "Conheça a plataforma",
+        "url": "/eventon",
+        "status": "verificado"
+      }
+    },
+    {
+      "id": "grupo",
+      "ativo": true,
+      "tipo": "institucional",
+      "numero": "05",
+      "rotulo": "Conheça o Grupo NTC",
+      "titulo": "Uma organização de inteligência institucional.",
+      "apoio": "Parceira de governos, secretarias, redes e órgãos públicos desde 2006.",
+      "indicadores": [
+        {
+          "valor": "2006",
+          "sufixo": "",
+          "rotulo": "Desde"
+        },
+        {
+          "valor": "500",
+          "sufixo": "+",
+          "rotulo": "eventos formativos"
+        },
+        {
+          "valor": "400 mil",
+          "sufixo": "+",
+          "rotulo": "agentes públicos"
+        },
+        {
+          "valor": "3",
+          "sufixo": "",
+          "rotulo": "esferas de governo"
+        }
+      ],
+      "fonte": "Fonte · Portfólio Institucional 2026",
+      "itens": [
+        {
+          "titulo": "Conheça o Grupo NTC",
+          "url": "/o-grupo",
+          "status": "verificado"
+        },
+        {
+          "titulo": "Corpo docente e curadoria",
+          "url": "/o-grupo/corpo-docente",
+          "status": "verificado"
+        }
+      ]
+    },
+    {
+      "id": "contato",
+      "ativo": true,
+      "tipo": "contato",
+      "numero": "06",
+      "rotulo": "Fale com a NTC",
+      "titulo": "Fale com a equipe NTC.",
+      "apoio": "Atendimento humano e institucional, em horário comercial.",
+      "canais": [
+        {
+          "rotulo": "WhatsApp",
+          "valor": "(63) 98444-4040",
+          "url": "https://wa.me/5563984444040?text=Ol%C3%A1%2C%20equipe%20NTC.%20Cheguei%20pela%20Central%20de%20Acesso%20e%20gostaria%20de%20atendimento.",
+          "status": "verificado"
+        },
+        {
+          "rotulo": "WhatsApp",
+          "valor": "(61) 99383-3737",
+          "url": "https://wa.me/5561993833737?text=Ol%C3%A1%2C%20equipe%20NTC.%20Cheguei%20pela%20Central%20de%20Acesso%20e%20gostaria%20de%20atendimento.",
+          "status": "verificado"
+        },
+        {
+          "rotulo": "Telefone",
+          "valor": "(63) 3322-3727",
+          "url": "tel:+556333223727",
+          "status": "verificado"
+        },
+        {
+          "rotulo": "E-mail",
+          "valor": "contato@institutontc.com.br",
+          "url": "mailto:contato@institutontc.com.br",
+          "status": "verificado"
+        },
+        {
+          "rotulo": "Formulário",
+          "valor": "Atendimento por assunto",
+          "url": "/contato",
+          "status": "verificado"
+        }
+      ]
+    }
+  ],
+  "rodape": {
+    "assinatura": "Inteligência institucional. Impacto real.",
+    "razao_social": "Instituto NTC do Brasil",
+    "cnpj": "CNPJ 10.614.200.0001-98",
+    "endereco": "SCS Quadra 9, Bloco C · Ed. Parque Cidade Corporate · Sala 1001 · Asa Sul · Brasília – DF",
+    "site": {
+      "texto": "www.institutontc.com.br",
+      "url": "/",
+      "status": "verificado"
+    },
+    "links": [
+      {
+        "texto": "Política de Privacidade",
+        "url": "/politica-de-privacidade",
+        "status": "verificado"
+      },
+      {
+        "texto": "LGPD",
+        "url": "/lgpd",
+        "status": "verificado"
+      }
+    ],
+    "slogan": "O novo padrão da formação institucional."
+  }
+}

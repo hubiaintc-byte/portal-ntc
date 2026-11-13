@@ -17,6 +17,7 @@ import type {
 import { mostraModuloCrm, mostraModuloFinanceiro, navSiteVisivel, telaInicialSite, type TelaIdSite } from "@/lib/cms/navegacao";
 import type { UsuarioGestaoResumo } from "@/lib/cms/painelCmsUsuarios";
 import type { AcessoPainel, CapacidadesPainel } from "@/lib/cms/telas";
+import type { AreaOpcao, ModuloCrmResumo, ProgramaCrmResumo } from "@/lib/cms/catalogoCrm";
 
 import {
   carregarAreas,
@@ -28,6 +29,7 @@ import {
   carregarPalestrante,
   carregarUsuarios,
 } from "./acoes";
+import { PainelCatalogo } from "./PainelCatalogo";
 import { ShellPainel, type GrupoNav } from "./shell/ShellPainel";
 import { TelaDashboard } from "./TelaDashboard";
 import { TelaCorpoDocente } from "./TelaCorpoDocente";
@@ -65,6 +67,10 @@ interface ShellCmsProps {
   resumoLeads: ResumoLeadsCms;
   conteudos: ConteudoCmsResumo[];
   eventosHomeIds: string[];
+  /** Catálogo (telas Programas e Módulos) — vazio sem as telas. */
+  programas: ProgramaCrmResumo[];
+  modulos: ModuloCrmResumo[];
+  areasCatalogo: AreaOpcao[];
   erroLeitura: boolean;
 }
 
@@ -113,6 +119,16 @@ const Ico = {
       <path d="M9 12h7M9 16h7" />
     </svg>
   ),
+  programas: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3 2 8l10 5 10-5z" /><path d="m6 10.5 6 3 6-3" />
+    </svg>
+  ),
+  modulos: (
+    <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="4" /><rect x="3" y="10" width="18" height="4" /><rect x="3" y="16" width="18" height="4" />
+    </svg>
+  ),
   home: (
     <svg className="pcms-nav__ico" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 11 12 4l8 7" />
@@ -141,6 +157,8 @@ const NAV_PRINCIPAL: ItemNav[] = [
   { id: "palestrantes", rotulo: "Palestrantes", icone: Ico.palestrantes },
   { id: "corpo-docente", rotulo: "Corpo Docente", icone: Ico.corpoDocente },
   { id: "eventos", rotulo: "Eventos", icone: Ico.eventos },
+  { id: "programas", rotulo: "Programas", icone: Ico.programas },
+  { id: "modulos", rotulo: "Módulos", icone: Ico.modulos },
   { id: "conteudos", rotulo: "Conteúdos", icone: Ico.conteudos },
   { id: "home", rotulo: "Home", icone: Ico.home },
 ];
@@ -150,6 +168,8 @@ const CRUMB: Record<TelaId, string> = {
   palestrantes: "Editorial · Palestrantes",
   "corpo-docente": "Editorial · Corpo Docente",
   eventos: "Editorial · Eventos",
+  programas: "Editorial · Programas",
+  modulos: "Editorial · Módulos",
   conteudos: "Editorial · Conteúdos",
   home: "Editorial · Home",
   config: "Sistema · Configurações",
@@ -165,9 +185,14 @@ export function ShellCms({
   resumoLeads,
   conteudos,
   eventosHomeIds,
+  programas,
+  modulos,
+  areasCatalogo,
   erroLeitura,
 }: ShellCmsProps) {
   const [tela, setTela] = useState<TelaId>(() => telaInicialSite(acesso));
+  /** Sobe a cada clique na sidebar: remonta o catálogo e fecha o detalhe dele. */
+  const [navegacoes, setNavegacoes] = useState(0);
   const [eventoDet, setEventoDet] = useState<EventoCmsDetalhe | null>(null);
   // true ⇒ o detalhe abre direto em edição (revisão pós-importação de PDF).
   const [eventoEmEdicao, setEventoEmEdicao] = useState(false);
@@ -328,6 +353,7 @@ export function ShellCms({
     setConteudoDet(null);
     setCriandoConteudo(false);
     setCriandoPalestrante(false);
+    setNavegacoes((n) => n + 1);
     setTela(id);
     if (id === "usuarios") abrirUsuarios();
     if (id === "corpo-docente") abrirCorpoDocente();
@@ -466,6 +492,17 @@ export function ShellCms({
                 criando={criandoEvento}
                 erroNovo={erroNovoEvento}
                 podeEditar={capacidades.editarEventos}
+              />
+            )}
+            {(tela === "programas" || tela === "modulos") && (
+              <PainelCatalogo
+                key={`${tela}:${navegacoes}`}
+                tela={tela}
+                programas={programas}
+                modulos={modulos}
+                areas={areasCatalogo}
+                podeEditarProgramas={capacidades.editarProgramas}
+                podeEditarModulos={capacidades.editarModulos}
               />
             )}
             {tela === "conteudos" && (

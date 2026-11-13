@@ -7,7 +7,6 @@
  * `PERMISSOES_MIGRAR_APLICAR=1`. Execução: `pnpm --filter @ntc/cms permissoes:migrar`.
  */
 
-import { TELAS } from "../lib/cms/telas";
 import type { AcessoPainel, TelaPainel } from "../lib/cms/telas";
 
 const APLICAR = process.env.PERMISSOES_MIGRAR_APLICAR === "1";
@@ -16,9 +15,34 @@ const APLICAR = process.env.PERMISSOES_MIGRAR_APLICAR === "1";
  * Mapeamento dos 4 perfis fixos (modelo antigo) para administrador/telas.
  * Mora aqui porque só esta migração ainda precisa dele.
  */
+/**
+ * Telas por módulo como eram em 22/10/2026, quando esta migração rodou —
+ * congeladas aqui para o mapeamento não mudar quando o menu muda (o catálogo
+ * foi para o Site em 05/11/2026 e `crm.produtos` saiu do menu).
+ */
+const SITE_EM_22_10: readonly TelaPainel[] = [
+  "site.painel",
+  "site.palestrantes",
+  "site.corpo-docente",
+  "site.eventos",
+  "site.conteudos",
+  "site.home",
+  "site.contatos",
+];
+const CRM_EM_22_10: readonly TelaPainel[] = [
+  "crm.dashboard",
+  "crm.leads",
+  "crm.clientes",
+  "crm.propostas",
+  "crm.envios",
+  "crm.programas",
+  "crm.modulos",
+  "crm.produtos",
+];
+
 export function acessoDoPerfilLegado(perfil: string | null | undefined): AcessoPainel {
-  const site = TELAS.filter((t) => t.modulo === "site").map((t) => t.id);
-  const crm = TELAS.filter((t) => t.modulo === "crm").map((t) => t.id);
+  const site = SITE_EM_22_10;
+  const crm = CRM_EM_22_10;
   switch (perfil) {
     case "super-admin":
       return { administrador: true, telas: [] };

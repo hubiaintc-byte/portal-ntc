@@ -177,6 +177,7 @@ export {
   type FiltroModulos,
   type ModuloFiltravel,
   type ProgramaParaPublicar,
+  type PaginaParaPublicar,
   type DependentesPrograma,
   type DependentesModulo,
 } from "./crm/catalogo";
@@ -211,6 +212,17 @@ export {
   montarAvisoLead,
   type AvisoPush,
 } from "./avisos/avisoLead";
+
+// Programas — tipos do conteúdo das páginas de programa.
+export type * from "./programas/tipos";
+export { escaparTexto, marcacaoParaHtml, htmlInlineParaMarcacao } from "./programas/marcacaoLeve";
+export { paragrafosParaHtml, textoDoLexical } from "./programas/paragrafos";
+export { inteiroParaRomano } from "./programas/romanos";
+export { MOLDE, ROTULO_VERTICAL, SIGLA_CSS_DA_VERTENTE, interpolarMolde } from "./programas/molde";
+export { camposParaPagina, paginaVazia } from "./programas/paginaPrograma";
+export { ctaHrefPermitido } from "./programas/ctaHref";
+export { numeroPorExtenso } from "./programas/numeroPorExtenso";
+export { eventoAtivo, montarExtrasEventos, type EventoDoPrograma } from "./programas/modulosAbertos";
 
 // Financeiro — tipos, listas, dinheiro e períodos.
 export * from "./financeiro";

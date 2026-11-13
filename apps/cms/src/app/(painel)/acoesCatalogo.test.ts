@@ -26,6 +26,8 @@ const escrita = {
   excluirPrograma: vi.fn(async () => ({ ok: true })),
   salvarModulo: vi.fn(async () => ({ ok: true, id: "2" })),
   excluirModulo: vi.fn(async () => ({ ok: true })),
+  enviarImagemPrograma: vi.fn(async () => ({ ok: true, midiaId: "77" })),
+  removerImagemPrograma: vi.fn(async () => ({ ok: true })),
 };
 vi.mock("@/lib/cms/catalogoCrmEscrita", () => escrita);
 const leitura = { obterProgramaCatalogo: vi.fn(async () => null), obterModuloCatalogo: vi.fn(async () => null) };
@@ -96,17 +98,54 @@ describe("acoesCatalogo por tela", () => {
     expect(escrita.excluirPrograma).not.toHaveBeenCalled();
   });
 
-  it("leituras do detalhe: crm.programas, crm.modulos ou crm.propostas; outra tela não", async () => {
-    for (const t of ["crm.programas", "crm.modulos", "crm.propostas"]) {
+  it("leituras do detalhe: crm.programas ou crm.modulos; outra tela (inclusive Propostas) não", async () => {
+    for (const t of ["crm.programas", "crm.modulos"]) {
       obterUsuarioCmsMock.mockResolvedValue(com(t));
       await acoes.carregarProgramaCatalogoCrm("1");
       await acoes.carregarModuloCatalogoCrm("1");
     }
-    expect(leitura.obterProgramaCatalogo).toHaveBeenCalledTimes(3);
-    expect(leitura.obterModuloCatalogo).toHaveBeenCalledTimes(3);
-    obterUsuarioCmsMock.mockResolvedValue(com("crm.leads", "site.painel"));
+    expect(leitura.obterProgramaCatalogo).toHaveBeenCalledTimes(2);
+    expect(leitura.obterModuloCatalogo).toHaveBeenCalledTimes(2);
+    obterUsuarioCmsMock.mockResolvedValue(com("crm.leads", "crm.propostas", "site.painel"));
     expect(await acoes.carregarProgramaCatalogoCrm("1")).toBeNull();
     expect(await acoes.carregarModuloCatalogoCrm("1")).toBeNull();
-    expect(leitura.obterProgramaCatalogo).toHaveBeenCalledTimes(3);
+    expect(leitura.obterProgramaCatalogo).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("imagens da página do programa", () => {
+  const com = (...telas: string[]) => ({ id: 1, administrador: false, telas });
+  const formulario = () => {
+    const fd = new FormData();
+    fd.append("arquivo", new File([new Uint8Array([1])], "foto.webp", { type: "image/webp" }));
+    return fd;
+  };
+
+  it("sem a tela Programas (inclusive só com Módulos) recusa enviar e remover sem tocar a escrita", async () => {
+    for (const u of [null, com("crm.modulos"), com("site.eventos")]) {
+      obterUsuarioAutenticadoMock.mockResolvedValue(u);
+      expect(await acoes.enviarImagemProgramaCatalogoCrm("4", { tipo: "topo" }, formulario())).toEqual(RECUSADO);
+      expect(await acoes.removerImagemProgramaCatalogoCrm("4", { tipo: "topo" })).toEqual(RECUSADO);
+    }
+    expect(escrita.enviarImagemPrograma).not.toHaveBeenCalled();
+    expect(escrita.removerImagemPrograma).not.toHaveBeenCalled();
+  });
+
+  it("com a tela, repassa o arquivo, o alvo e o usuário", async () => {
+    const u = com("crm.programas");
+    obterUsuarioAutenticadoMock.mockResolvedValue(u);
+    expect(await acoes.enviarImagemProgramaCatalogoCrm("4", { tipo: "cartao" }, formulario())).toEqual({ ok: true, midiaId: "77" });
+    expect(escrita.enviarImagemPrograma).toHaveBeenCalledWith("4", { tipo: "cartao" }, expect.any(File), u);
+    await acoes.removerImagemProgramaCatalogoCrm("4", { tipo: "coordenacao", linhaId: "c1" });
+    expect(escrita.removerImagemPrograma).toHaveBeenCalledWith("4", { tipo: "coordenacao", linhaId: "c1" }, u);
+  });
+
+  it("sem arquivo recusa antes da escrita", async () => {
+    obterUsuarioAutenticadoMock.mockResolvedValue(com("crm.programas"));
+    expect(await acoes.enviarImagemProgramaCatalogoCrm("4", { tipo: "topo" }, new FormData())).toEqual({
+      ok: false,
+      erro: "Nenhum arquivo selecionado.",
+    });
+    expect(escrita.enviarImagemPrograma).not.toHaveBeenCalled();
   });
 });

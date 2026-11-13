@@ -75,13 +75,8 @@ export function sanitizarHtmlCard(texto: string): string {
   return saida.replaceAll("&lt;strong&gt;", "<strong>").replaceAll("&lt;/strong&gt;", "</strong>");
 }
 
-const PREFIXOS_CTA = ["/", "#", "http://", "https://", "mailto:"];
-
-/** Link do botão do card: vazio (o site usa "#"), caminho interno, âncora, http(s) ou e-mail. */
-export function ctaHrefPermitido(href: string): boolean {
-  const h = href.trim().toLowerCase();
-  return h === "" || PREFIXOS_CTA.some((p) => h.startsWith(p));
-}
+/** Link do botão do card — a regra mora em @ntc/lib (também usada pela página de programa). */
+export { ctaHrefPermitido } from "@ntc/lib";
 
 function textoDe(v: string | null | undefined): string {
   return v ?? "";

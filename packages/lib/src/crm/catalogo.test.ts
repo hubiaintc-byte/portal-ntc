@@ -74,6 +74,16 @@ describe("faltas", () => {
     eixos: [{ titulo: "E1", descricao: "D1" }],
     diferenciais: [{ titulo: "Dif", descricao: "" }],
     resultados: ["R1"],
+    numModulos: 1,
+    pagina: {
+      heroTitulo: "Título *x*",
+      heroSubtitulo: "Sub",
+      temImagemTopo: true,
+      cartaoNome: "Nome",
+      cartaoTagline: "Chamada",
+      cartaoDescricaoMenu: "Menu",
+      cartaoDescricaoMapa: "Mapa",
+    },
   };
   it("rascunho exige sigla e nome", () => {
     expect(faltasParaRascunho({ sigla: " ", nomeCompleto: "" })).toEqual(["Sigla", "Nome completo"]);
@@ -109,6 +119,34 @@ describe("faltas", () => {
       "Eixo 1: descrição",
       "Diferencial 1: título",
       "Resultado 1: texto",
+    ]);
+  });
+  it("só com o mínimo antigo, pede o mínimo da página do site", () => {
+    expect(
+      faltasParaPublicar({
+        ...completo,
+        eixos: [],
+        numModulos: 0,
+        pagina: {
+          heroTitulo: " ",
+          heroSubtitulo: "",
+          temImagemTopo: false,
+          cartaoNome: "",
+          cartaoTagline: "",
+          cartaoDescricaoMenu: "",
+          cartaoDescricaoMapa: "",
+        },
+      }),
+    ).toEqual([
+      "Ao menos um eixo temático",
+      "Ao menos um módulo",
+      "Título do topo",
+      "Subtítulo do topo",
+      "Imagem do topo",
+      "Cartão: nome",
+      "Cartão: chamada",
+      "Cartão: descrição no menu",
+      "Cartão: descrição no mapa do site",
     ]);
   });
 });

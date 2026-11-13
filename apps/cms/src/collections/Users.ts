@@ -3,7 +3,7 @@ import type { CollectionConfig } from "payload";
 import { administrador, administradorField, proprioOuAdministrador } from "../access/porTela";
 import { recusarLoginForaDoPainel } from "../lib/cms/loginSoPeloPainel";
 import { emailRecuperacaoHtml } from "../lib/emailsCms";
-import { TELAS } from "../lib/cms/telas";
+import { IDS_TELAS_GRAVADOS, TELAS } from "../lib/cms/telas";
 
 /**
  * Coleção Users — auth nativa do Payload, com permissões por tela
@@ -101,7 +101,11 @@ export const Users: CollectionConfig = {
       label: "Telas",
       type: "select",
       hasMany: true,
-      options: TELAS.map((t) => ({ label: t.rotulo, value: t.id })),
+      // Valores na ordem original do enum (mudar a ordem muda o schema).
+      options: IDS_TELAS_GRAVADOS.map((id) => ({
+        label: TELAS.find((t) => t.id === id)?.rotulo ?? "Produtos / Eventos (fora de uso)",
+        value: id,
+      })),
       access: { create: administradorField, update: administradorField },
       admin: { description: "Telas do painel que esta pessoa pode usar." },
     },
